@@ -38,8 +38,8 @@ namespace WinUI3DEngine.Assets.Engine.Components
 
             #region //Set ViewConstantBuffer
             var view = Matrix4x4.CreateLookAt(
+                m_Transform.m_Position + m_Transform.Forward,
                 m_Transform.m_Position,
-                m_Transform.m_Position - m_Transform.Forward,
                 Vector3.UnitY);
 
             var aspect = (float)(m_d3d.m_SwapChainPanel.ActualWidth / m_d3d.m_SwapChainPanel.ActualHeight);
@@ -51,7 +51,7 @@ namespace WinUI3DEngine.Assets.Engine.Components
 
             var viewProjection = Matrix4x4.Transpose(view * projection);
 
-            m_ViewConstants = new SViewConstantsBuffer() { ViewProjection = viewProjection, WorldCamPos = m_Transform.m_Position };
+            m_ViewConstants = new SViewConstantsBuffer() { ViewProjection = viewProjection, World = m_Transform.m_Position };
             #endregion
 
             unsafe

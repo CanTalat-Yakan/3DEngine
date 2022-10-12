@@ -5,7 +5,7 @@ namespace WinUI3DEngine.Assets.Engine.Data
     public struct SViewConstantsBuffer
     {
         public Matrix4x4 ViewProjection;
-        public Vector3 WorldCamPos;
+        public Vector3 World;
         public float pad;
     }
 
