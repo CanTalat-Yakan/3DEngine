@@ -1,0 +1,153 @@
+﻿<UserControl
+    x:Class="Engine.UserControls.Files"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Engine.UserControls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    mc:Ignorable="d">
+    <Grid>
+        <CommandBar HorizontalAlignment="Right" Margin="244,-44,0,0">
+            <AppBarButton Label="Add Files" Icon="Add"/>
+
+            <AppBarSeparator/>
+
+            <CommandBar.SecondaryCommands>
+                <AppBarButton Label="Refresh Files" Icon="Refresh"/>
+                <AppBarButton Label="Clean Files">
+                    <AppBarButton.Content>
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEA99;"/>
+                    </AppBarButton.Content>
+                </AppBarButton>
+            </CommandBar.SecondaryCommands>
+        </CommandBar>
+
+        <Grid Background="#282828" Height="16000">
+            <ScrollViewer>
+                <StackPanel Orientation="Vertical" Spacing="10">
+                    <controls:WrapPanel HorizontalSpacing="10" VerticalSpacing="10" Padding="16">
+                        <Button Background="DeepSkyBlue" Width="150" Height="100" CornerRadius="10" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                            <Button.Content>
+                                <StackPanel Spacing="20">
+                                    <Viewbox MaxHeight="24" MaxWidth="24">
+                                        <!--<FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xED39;"/>-->
+                                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEA86;"/>
+                                    </Viewbox>
+                                    <!--<FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xED43;"/>-->
+                                    <TextBlock Text="Scenes"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+
+                        <Button Background="IndianRed" Width="150" Height="100" CornerRadius="10" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                            <Button.Content>
+                                <StackPanel Spacing="20">
+                                    <SymbolIcon Symbol="Document"/>
+                                    <TextBlock Text="Scripts"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+
+                        <Button Background="DarkSeaGreen" Width="150" Height="100" CornerRadius="10" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                            <Button.Content>
+                                <StackPanel Spacing="20">
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE734;"/>
+                                    <TextBlock Text="Prefabs"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+
+                        <Button Background="Orange" Width="150" Height="100" CornerRadius="10" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                            <Button.Content>
+                                <StackPanel Spacing="20">
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xF158;"/>
+                                    <TextBlock Text="Models"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+
+                        <Button Background="CornflowerBlue" Width="150" Height="100" CornerRadius="10" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                            <Button.Content>
+                                <StackPanel Spacing="20">
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE805;"/>
+                                    <TextBlock Text="Animation"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+
+                        <Button Background="MediumPurple" Width="150" Height="100" CornerRadius="10" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                            <Button.Content>
+                                <StackPanel Spacing="20">
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xF156;"/>
+                                    <TextBlock Text="Materials"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+
+                        <Button Background="DarkKhaki" Width="150" Height="100" CornerRadius="10" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                            <Button.Content>
+                                <StackPanel Spacing="20">
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEB9F;"/>
+                                    <TextBlock Text="Textures"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+
+                        <Button Background="LightSkyBlue" Width="150" Height="100" CornerRadius="10" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                            <Button.Content>
+                                <StackPanel Spacing="20">
+                                    <SymbolIcon Symbol="Audio"/>
+                                    <TextBlock Text="Audio"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+
+                        <Button Background="LightSeaGreen" Width="150" Height="100" CornerRadius="10" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                            <Button.Content>
+                                <StackPanel Spacing="20">
+                                    <SymbolIcon Symbol="Video"/>
+                                    <TextBlock Text="Videos"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+
+                        <Button Background="DarkOrange" Width="150" Height="100" CornerRadius="10" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                            <Button.Content>
+                                <StackPanel Spacing="20">
+                                    <SymbolIcon Symbol="Font"/>
+                                    <TextBlock Text="Fonts"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+
+                        <Button Background="MediumTurquoise" Width="150" Height="100" CornerRadius="10" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                            <Button.Content>
+                                <StackPanel Spacing="20">
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEA90;"/>
+                                    <TextBlock Text="Documents"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+
+                        <Button Width="150" Height="100" CornerRadius="10" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                            <Button.Content>
+                                <StackPanel Spacing="20">
+                                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74C;"/>
+                                    <TextBlock Text="Packages"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                    </controls:WrapPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="5">
+                        <Viewbox MaxHeight="25" MaxWidth="25">
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE78B;" Rotation="180" Translation="0,17,0"/>
+                        </Viewbox>
+                        <TextBlock Text="Drag and drop files here."/>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>

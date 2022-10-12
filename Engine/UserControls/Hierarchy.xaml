@@ -1,0 +1,111 @@
+﻿<UserControl
+    x:Class="Engine.UserControls.Hierarchy"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Engine.UserControls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.ContextFlyout>
+            <MenuFlyout>
+                <MenuFlyoutItem Text="Create Empty"/>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Text="Camera"/>
+                <MenuFlyoutSubItem Text="3D Object">
+                    <MenuFlyoutItem Text="Plane"/>
+                    <MenuFlyoutItem Text="Cube"/>
+                    <MenuFlyoutItem Text="Sphere"/>
+                    <MenuFlyoutItem Text="Cylinder"/>
+                    <MenuFlyoutItem Text="Capsule"/>
+                    <MenuFlyoutItem Text="Quad"/>
+                </MenuFlyoutSubItem>
+                <MenuFlyoutSubItem Text="Light">
+                    <MenuFlyoutItem Text="Directional Light"/>
+                    <MenuFlyoutItem Text="Point Light"/>
+                    <MenuFlyoutItem Text="Spot Light"/>
+                    <MenuFlyoutSeparator/>
+                    <MenuFlyoutItem Text="Reflection Probe"/>
+                </MenuFlyoutSubItem>
+            </MenuFlyout>
+        </Grid.ContextFlyout>
+
+        <ScrollViewer Padding="8,0,8,8">
+            <StackPanel Orientation="Vertical" Spacing="16">
+                <TextBlock Text="Scene" HorizontalAlignment="Left" Width="140" Height="26" Margin="0,4,0,0" FontSize="16"  Padding="8,0,0,0"/>
+
+                <controls:WrapPanel HorizontalSpacing="4" VerticalSpacing="6">
+                    <Button Content="Canera"/>
+                    <Button Content="Player"/>
+                    <Button Content="Entity"/>
+                    <Button Content="Cube"/>
+                    <Button Content="Sphere"/>
+                    <Button Content="Atmosphere"/>
+                    <Button Content="Sun"/>
+                    <Button Content="Clouds"/>
+                </controls:WrapPanel>
+
+                <muxc:TreeView x:Name="x_TreeView_Hierarchy" SelectionMode="Single">
+                    <muxc:TreeView.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="Cut" Icon="Cut"/>
+                            <MenuFlyoutItem Text="Copy" Icon="Copy"/>
+                            <MenuFlyoutItem Text="Paste" Icon="Paste"/>
+                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutItem Text="Rename" Icon="Rename"/>
+                            <MenuFlyoutItem Text="Delete" Icon="Delete"/>
+                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutItem Text="Create Empty"/>
+                            <MenuFlyoutItem Text="Create Empty Child"/>
+                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutItem Text="Camera"/>
+                            <MenuFlyoutSubItem Text="3D Object">
+                                <MenuFlyoutItem Text="Plane"/>
+                                <MenuFlyoutItem Text="Cube"/>
+                                <MenuFlyoutItem Text="Sphere"/>
+                                <MenuFlyoutItem Text="Cylinder"/>
+                                <MenuFlyoutItem Text="Capsule"/>
+                                <MenuFlyoutItem Text="Quad"/>
+                            </MenuFlyoutSubItem>
+                            <MenuFlyoutSubItem Text="Light">
+                                <MenuFlyoutItem Text="Directional Light"/>
+                                <MenuFlyoutItem Text="Point Light"/>
+                                <MenuFlyoutItem Text="Spot Light"/>
+                                <MenuFlyoutSeparator/>
+                                <MenuFlyoutItem Text="Reflection Probe"/>
+                            </MenuFlyoutSubItem>
+                        </MenuFlyout>
+                    </muxc:TreeView.ContextFlyout>
+                </muxc:TreeView>
+
+                <Button Content="Add Entity" Margin="10,10,10,10" HorizontalAlignment="Center">
+                    <Button.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="Create Empty"/>
+                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutItem Text="Camera"/>
+                            <MenuFlyoutSubItem Text="3D Object">
+                                <MenuFlyoutItem Text="Plane"/>
+                                <MenuFlyoutItem Text="Cube"/>
+                                <MenuFlyoutItem Text="Sphere"/>
+                                <MenuFlyoutItem Text="Cylinder"/>
+                                <MenuFlyoutItem Text="Capsule"/>
+                                <MenuFlyoutItem Text="Quad"/>
+                            </MenuFlyoutSubItem>
+                            <MenuFlyoutSubItem Text="Light">
+                                <MenuFlyoutItem Text="Directional Light"/>
+                                <MenuFlyoutItem Text="Point Light"/>
+                                <MenuFlyoutItem Text="Spot Light"/>
+                                <MenuFlyoutSeparator/>
+                                <MenuFlyoutItem Text="Reflection Probe"/>
+                            </MenuFlyoutSubItem>
+                        </MenuFlyout>
+                    </Button.ContextFlyout>
+                </Button>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
