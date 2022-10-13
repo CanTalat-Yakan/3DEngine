@@ -48,25 +48,25 @@ namespace WinUI3DEngine.Assets.Engine.Helper
                     mesh.Vertices[i].X,
                     mesh.Vertices[i].Y,
                     mesh.Vertices[i].Z,
-                    1-mesh.TextureCoordinateChannels[0][i].X,
+                    mesh.TextureCoordinateChannels[0][i].X,
                     1-mesh.TextureCoordinateChannels[0][i].Y,
                     mesh.Normals[i].X,
                     mesh.Normals[i].Y,
                     mesh.Normals[i].Z));
 
-                foreach (var item in mesh.Faces)
+                foreach (var face in mesh.Faces)
                 {
                     var rangeIndices = new ushort[] {
-                        (ushort)(item.Indices[0]),
-                        (ushort)(item.Indices[1]),
-                        (ushort)(item.Indices[2])};
+                        (ushort)(face.Indices[0]),
+                        (ushort)(face.Indices[2]),
+                        (ushort)(face.Indices[1])};
                     obj.Indices.AddRange(rangeIndices);
-                    if (item.IndexCount == 4)
+                    if (face.IndexCount == 4)
                     {
                         rangeIndices = new ushort[] {
-                        (ushort)(item.Indices[0]),
-                        (ushort)(item.Indices[2]),
-                        (ushort)(item.Indices[3])};
+                        (ushort)(face.Indices[0]),
+                        (ushort)(face.Indices[3]),
+                        (ushort)(face.Indices[2])};
                         obj.Indices.AddRange(rangeIndices);
                     }
                 }

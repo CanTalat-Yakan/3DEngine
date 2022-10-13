@@ -61,7 +61,7 @@ namespace WinUI3DEngine.Assets.Engine.Editor
         }
                 
         void CameraMovement(int _horizontalFactor = 1, int _verticalFactor = 1) =>
-            m_rotation = new Vector3(m_input.GetMouseAxis().Y, m_input.GetMouseAxis().X * -1, 0);
+            m_rotation = new Vector3(m_input.GetMouseAxis().Y, m_input.GetMouseAxis().X, 0);
 
         void TransformMovement() =>
             m_direction = m_camera.m_Transform.Forward * m_input.GetAxis().Y + m_camera.m_Transform.Right * m_input.GetAxis().X;

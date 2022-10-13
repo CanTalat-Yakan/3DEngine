@@ -1,11 +1,11 @@
 cbuffer ViewConstantsBuffer : register(b0)
 {
     float4x4 ViewProjection;
-    float3 World;
+    float3 Camera;
 };
 cbuffer PerModelConstantBuffer : register(b1)
 {
-    float4x4 ModelView;
+    float4x4 World;
 };
 
 struct appdata
@@ -32,10 +32,10 @@ VS_OUTPUT VS(appdata v)
 {
     VS_OUTPUT o;
     
-    o.pos = mul(float4(v.vertex, 1), mul(ModelView, ViewProjection));
-    o.normal = mul(float4(v.normal, 0), ModelView);
-    o.worldPos = mul(float4(v.vertex, 1), ModelView);
-    o.camPos = World;
+    o.pos = mul(float4(v.vertex, 1), mul(World, ViewProjection));
+    o.normal = mul(float4(v.normal, 0), World);
+    o.worldPos = mul(float4(v.vertex, 1), World);
+    o.camPos = Camera;
     o.uv = v.uv;
 
     return o;

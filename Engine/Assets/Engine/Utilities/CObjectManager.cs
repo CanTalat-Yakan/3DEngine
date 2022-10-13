@@ -12,7 +12,8 @@ namespace WinUI3DEngine.Assets.Engine.Utilities
         SPHERE,
         PLANE,
         CYLINDER,
-        CAPSULE
+        CAPSULE,
+        SPECIAL
     }
     class MyList<T> : List<T>
     {
@@ -34,6 +35,7 @@ namespace WinUI3DEngine.Assets.Engine.Utilities
         CMaterial m_materialSky;
         CMesh m_meshSphere;
         CMesh m_meshCube;
+        CMesh m_meshSpecial;
 
         static readonly string SHADER_LIT = @"Shader\Lit.hlsl";
         static readonly string SHADER_SIMPLELIT = @"Shader\SimpleLit.hlsl";
@@ -42,6 +44,7 @@ namespace WinUI3DEngine.Assets.Engine.Utilities
         static readonly string IMAGE_DEFAULT = @"Textures\dark.png";
         static readonly string IMAGE_SKY = @"Textures\SkyGradient2.png";
 
+        static readonly string OBJ_SPECIAL = @"Models\Lowpoly_tree_sample.obj";
         static readonly string OBJ_CUBE = @"Models\Cube.obj";
         static readonly string OBJ_SPHERE = @"Models\Sphere.obj";
 
@@ -52,6 +55,7 @@ namespace WinUI3DEngine.Assets.Engine.Utilities
             m_materialReflection = new CMaterial(SHADER_LIT, IMAGE_SKY);
             m_materialSky = new CMaterial(SHADER_UNLIT, IMAGE_SKY);
 
+            m_meshSpecial = new CMesh(CObjLoader.LoadFilePro(OBJ_SPECIAL));
             m_meshCube = new CMesh(CObjLoader.LoadFilePro(OBJ_CUBE));
             m_meshSphere = new CMesh(CObjLoader.LoadFilePro(OBJ_SPHERE));
         }
@@ -84,6 +88,10 @@ namespace WinUI3DEngine.Assets.Engine.Utilities
 
             switch (_type)
             {
+                case EPrimitiveTypes.SPECIAL:
+                    gObject.m_Mesh = m_meshSpecial;
+                    gObject.m_Name = "special" + m_List.Count.ToString();
+                    break;
                 case EPrimitiveTypes.CUBE:
                     gObject.m_Mesh = m_meshCube;
                     gObject.m_Name = "Cube" + m_List.Count.ToString();

@@ -27,9 +27,13 @@ namespace WinUI3DEngine.Assets.Engine.Utilities
         }
 
         CObject subParent;
-        CObject test;
+        CObject special;
         internal void Start()
         {
+            special = m_ObjectManager.CreatePrimitive(EPrimitiveTypes.SPECIAL);
+            special.m_Transform.m_Scale *= 0.1f;
+            special.m_Transform.m_Position.Y += 0.5f;
+
             CObject parent = m_ObjectManager.CreateEmpty("Content");
             subParent = m_ObjectManager.CreateEmpty("Cubes");
             subParent.m_Parent = parent;
@@ -41,8 +45,6 @@ namespace WinUI3DEngine.Assets.Engine.Utilities
             m_ObjectManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).m_Transform.m_Position = new Vector3(2, 0, 0);
             m_ObjectManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).m_Transform.m_Position = new Vector3(-1, 1, 0);
             m_ObjectManager.CreatePrimitive(EPrimitiveTypes.CUBE, subParent);
-
-            test = m_ObjectManager.CreatePrimitive(EPrimitiveTypes.CUBE);
         }
 
         internal void Update()
@@ -52,9 +54,9 @@ namespace WinUI3DEngine.Assets.Engine.Utilities
             m_ObjectManager.m_Sky.m_Transform.m_Position = m_Camera.m_Transform.m_Position;
 
             if (CInput.Instance.GetKey(Windows.System.VirtualKey.F, CInput.EInputState.DOWN))
-                test.m_Transform.m_Position += Vector3.UnitZ;
+                special.m_Transform.m_Position += special.m_Transform.Forward;
             if (CInput.Instance.GetKey(Windows.System.VirtualKey.G, CInput.EInputState.DOWN))
-                test.m_Transform.m_Position += Vector3.UnitX;
+                special.m_Transform.m_Position += special.m_Transform.Right;
             if (CInput.Instance.GetKey(Windows.System.VirtualKey.V, CInput.EInputState.DOWN))
                 m_Camera.m_Transform.m_Position += m_Camera.m_Transform.Right;
 

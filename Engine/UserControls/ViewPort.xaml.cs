@@ -54,7 +54,7 @@ namespace Engine.UserControls
         }
 
 
-        void x_Slider_FOV_ValueChanged(object sender, RangeBaseValueChangedEventArgs e) { CCamera.m_FOV = e.NewValue; }
+        void x_Slider_FOV_ValueChanged(object sender, RangeBaseValueChangedEventArgs e) { CCamera.FieldOfView = e.NewValue; }
         void x_NumberBox_CameraSpeed_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) { CController.m_MovementSpeed = (float)args.NewValue; }
     }
 }
