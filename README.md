@@ -26,8 +26,7 @@ Plus, **create beautiful, modern apps for Windows 11 that are backwards compatib
 This library targets netstandard2.0 and net6.0 using modern .NET API, see [CHANGELOG](https://github.com/amerkoleci/Vortice.Windows/blob/main/CHANGELOG.md) for list of changes between commits.
 
 
-Universal Scene Description
-===========================
+# Universal Scene Description
 
 Universal Scene Description (USD) is an efficient, scalable system for
 authoring, reading, and streaming time-sampled scene description for
@@ -35,3 +34,6 @@ interchange between graphics applications.
 
 For more details, please visit the web site [here](http://openusd.org).
 
+
+# Preview
+![alt text](https://drive.google.com/uc?export=view&id=1mcehLyJOGVpjFk7ZbLeMNDct9VOwXiiE)
