@@ -29,7 +29,7 @@ namespace Editor.Controls
 
         public string GetInfo() { return Script.Split("\\").Last() + $":{Line} ({Method})"; }
     }
-    internal class COutput
+    internal class OutputController
     {
         static Dictionary<SMessageInfo, List<DateTime>> m_messageCollection = new Dictionary<SMessageInfo, List<DateTime>>();
 
@@ -43,7 +43,7 @@ namespace Editor.Controls
         static AppBarToggleButton m_pauseError;
         internal AppBarToggleButton m_ClearPlay;
 
-        internal COutput(StackPanel _stack, ScrollViewer _scroll, AppBarToggleButton _collapse, AppBarToggleButton _filterMessages, AppBarToggleButton _filterWarnings, AppBarToggleButton _filterErrors, AppBarToggleButton _pauseError, AppBarToggleButton _clearPlay)
+        internal OutputController(StackPanel _stack, ScrollViewer _scroll, AppBarToggleButton _collapse, AppBarToggleButton _filterMessages, AppBarToggleButton _filterWarnings, AppBarToggleButton _filterErrors, AppBarToggleButton _pauseError, AppBarToggleButton _clearPlay)
         {
             m_stack = _stack;
             m_scroll = _scroll;
@@ -54,7 +54,7 @@ namespace Editor.Controls
             m_pauseError = _pauseError;
             m_ClearPlay = _clearPlay;
 
-            m_status = CMain.Singleton.m_Status;
+            m_status = MainController.Singleton.m_Status;
         }
 
         static void SetStatus(SMessageInfo _m)
@@ -119,7 +119,7 @@ namespace Editor.Controls
 
             if (m_pauseError.IsChecked.Value)
                 if (_t == EMessageType.ERROR)
-                    CMain.Singleton.m_Player.Pause();
+                    MainController.Singleton.m_Player.Pause();
 
             if (!m_messageCollection.ContainsKey(message))
                 m_messageCollection.Add(message, new List<DateTime>() { DateTime.Now });

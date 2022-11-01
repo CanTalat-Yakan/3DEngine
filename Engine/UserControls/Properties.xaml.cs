@@ -25,14 +25,14 @@ namespace Editor.UserControls
     {
         internal event PropertyChangedEventHandler m_PropertyChanged;
 
-        internal CProperties m_Control;
+        internal PropertiesController m_Control;
 
 
         public Properties()
         {
             this.InitializeComponent();
 
-            m_Control = new CProperties();
+            m_Control = new PropertiesController();
             List<Grid> collection = new List<Grid>();
             collection.Add(m_Control.CreateColorButton());
             collection.Add(m_Control.CreateNumberInput());

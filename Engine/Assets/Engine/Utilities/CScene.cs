@@ -61,7 +61,7 @@ namespace Engine.Utilities
 
             if (CInput.Instance.GetKey(Windows.System.VirtualKey.C, CInput.EInputState.DOWN))
             {
-                COutput.Log("Spawned Cube");
+                OutputController.Log("Spawned Cube");
 
                 m_ObjectManager.CreatePrimitive(EPrimitiveTypes.CUBE, subParent).m_Transform = new CTransform
                 {

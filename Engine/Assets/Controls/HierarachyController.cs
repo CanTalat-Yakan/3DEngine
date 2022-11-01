@@ -13,7 +13,7 @@ namespace Editor.Controls
         //public CObject Object;
         public TreeViewNode Node;
     }
-    class CScene
+    class SceneController
     {
         public List<TreeEntry> m_Hierarchy = new List<TreeEntry>();
 
@@ -57,14 +57,14 @@ namespace Editor.Controls
             return _path;
         }
     }
-    class CHierarchy
+    class HierarachyController
     {
-        CTreeView m_control = new CTreeView();
+        TreeViewController m_control = new TreeViewController();
 
         internal TreeView m_Tree;
-        internal CScene m_Scene;
+        internal SceneController m_Scene;
 
-        public CHierarchy(TreeView _tree, CScene _scene)
+        public HierarachyController(TreeView _tree, SceneController _scene)
         {
             m_Tree = _tree;
             m_Scene = _scene;

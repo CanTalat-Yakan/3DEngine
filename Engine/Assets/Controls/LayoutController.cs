@@ -4,7 +4,6 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
 using System;
 using Editor.UserControls;
-using Microsoft.UI.Xaml.Media;
 
 namespace Editor.Controls
 {
@@ -15,7 +14,7 @@ namespace Editor.Controls
         public double MinHeight = 40;
         public UIElement Content;
     }
-    internal class CLayout
+    internal class LayoutController
     {
         internal Grid m_GridContent;
 
@@ -27,7 +26,7 @@ namespace Editor.Controls
         internal Files m_Files;
         internal Settings m_Settings;
 
-        public CLayout(Grid _content, ViewPort _viewPort, Hierarchy _hierarchy, Properties _properties, Output _output, Files _files, Settings _settings)
+        public LayoutController(Grid _content, ViewPort _viewPort, Hierarchy _hierarchy, Properties _properties, Output _output, Files _files, Settings _settings)
         {
             m_Main = _content;
             m_ViewPort = _viewPort;
@@ -147,7 +146,7 @@ namespace Editor.Controls
         Grid WrapInTabView(params TabViewItemDataTemplate[] _i)
         {
             Grid grid = new Grid();
-            CTabViewPage tabViewPage = new CTabViewPage(_i);
+            TabViewPageController tabViewPage = new TabViewPageController(_i);
             grid.Children.Add(tabViewPage.m_TabView);
 
             //BindingOperations.SetBinding(grid, Grid.VisibilityProperty, new Binding() { ElementName = "x_AppBarToggleButton_Status_OpenPane", Path = new PropertyPath("IsChecked"), Converter = new BooleanToVisibilityConverter() });

@@ -19,7 +19,7 @@ namespace Editor.Controls
             return DisplayText;
         }
     }
-    class CTreeView
+    class TreeViewController
     {
         internal string[] GetRelativePaths(string[] _list, string _relativeTo)
         {

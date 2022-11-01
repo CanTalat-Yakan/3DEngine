@@ -11,7 +11,7 @@ namespace Editor.Controls
         PLAYING,
         PAUSED
     }
-    internal class CPlayer
+    internal class PlayerController
     {
         internal EPlayMode m_PlayMode;
 
@@ -19,15 +19,15 @@ namespace Editor.Controls
         AppBarToggleButton m_pause;
         AppBarButton m_forward;
         TextBlock m_status;
-        COutput m_output;
+        OutputController m_output;
 
-        internal CPlayer(AppBarToggleButton play, AppBarToggleButton pause, AppBarButton forward)
+        internal PlayerController(AppBarToggleButton play, AppBarToggleButton pause, AppBarButton forward)
         {
             m_play = play;
             m_pause = pause;
             m_forward = forward;
-            m_output = CMain.Singleton.m_Layout.m_Output.m_Control;
-            m_status = CMain.Singleton.m_Status;
+            m_output = MainController.Singleton.m_Layout.m_Output.m_Control;
+            m_status = MainController.Singleton.m_Status;
         }
 
         void SetStatusAppBarButtons(bool _b)
@@ -53,8 +53,8 @@ namespace Editor.Controls
                 if (m_output.m_ClearPlay.IsChecked.Value)
                     m_output.ClearOutput();
 
-            CMain.Singleton.m_Layout.m_ViewPort.m_BorderBrush.BorderBrush = new SolidColorBrush(Colors.GreenYellow);
-            CMain.Singleton.m_Layout.m_ViewPort.m_BorderBrush.BorderThickness = new Thickness(m_play.IsChecked.Value ? 2 : 0);
+            MainController.Singleton.m_Layout.m_ViewPort.m_BorderBrush.BorderBrush = new SolidColorBrush(Colors.GreenYellow);
+            MainController.Singleton.m_Layout.m_ViewPort.m_BorderBrush.BorderThickness = new Thickness(m_play.IsChecked.Value ? 2 : 0);
 
             SetStatusAppBarButtons(m_play.IsChecked.Value);
 
@@ -65,7 +65,7 @@ namespace Editor.Controls
             m_PlayMode = m_pause.IsChecked.Value ? EPlayMode.PAUSED : EPlayMode.PLAYING;
 
             m_forward.IsEnabled = m_pause.IsChecked.Value;
-            CMain.Singleton.m_Layout.m_ViewPort.m_BorderBrush.BorderBrush = new SolidColorBrush(m_pause.IsChecked.Value ? Colors.Orange : Colors.GreenYellow);
+            MainController.Singleton.m_Layout.m_ViewPort.m_BorderBrush.BorderBrush = new SolidColorBrush(m_pause.IsChecked.Value ? Colors.Orange : Colors.GreenYellow);
 
             SetStatus(m_pause.IsChecked.Value ? "Paused Gamemode" : "Continued Gamemode");
         }
@@ -74,7 +74,7 @@ namespace Editor.Controls
             if (m_PlayMode != EPlayMode.PAUSED)
                 return;
 
-            COutput.Log("Stepped Forward..");
+            OutputController.Log("Stepped Forward..");
 
             SetStatus("Stepped Forward");
         }

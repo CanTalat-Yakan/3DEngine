@@ -16,7 +16,7 @@ namespace Editor
 {
     public sealed partial class MainWindow : WindowEx
     {
-        CMain m_mainControl;
+        MainController m_mainControl;
 
         public MainWindow()
         {
@@ -24,8 +24,8 @@ namespace Editor
 
             ExtendsContentIntoTitleBar = true;
 
-            m_mainControl = new CMain(x_Grid_Main, x_TextBlock_Status_Content);
-            m_mainControl.m_Player = new CPlayer(x_AppBarToggleButton_Status_Play, x_AppBarToggleButton_Status_Pause, x_AppBarButton_Status_Forward);
+            m_mainControl = new MainController(x_Grid_Main, x_TextBlock_Status_Content);
+            m_mainControl.m_Player = new PlayerController(x_AppBarToggleButton_Status_Play, x_AppBarToggleButton_Status_Pause, x_AppBarButton_Status_Forward);
         }
 
         private void AppBarToggleButton_Status_Play_Click(object sender, RoutedEventArgs e) { m_mainControl.m_Player.Play(); }

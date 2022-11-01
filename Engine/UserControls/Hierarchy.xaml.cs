@@ -28,21 +28,21 @@ namespace Editor.UserControls
             this.InitializeComponent();
             m_treeView = x_TreeView_Hierarchy;
 
-            CMain.Singleton.m_Content.Loaded += Initialize0;
+            MainController.Singleton.m_Content.Loaded += Initialize0;
         }
 
 
         void Initialize0(object sender, RoutedEventArgs e)
         {
-            CMain.Singleton.m_Layout.m_ViewPort.Loaded += Initialize;
+            MainController.Singleton.m_Layout.m_ViewPort.Loaded += Initialize;
         }
 
         void Initialize(object sender, RoutedEventArgs e)
         {
-            var engineObjectList = CMain.Singleton.m_Layout.m_ViewPort.m_Engine.m_Scene.m_ObjectManager.m_List;
+            var engineObjectList = MainController.Singleton.m_Layout.m_ViewPort.m_Engine.m_Scene.m_ObjectManager.m_List;
             engineObjectList.OnAdd += list_OnAdd;
 
-            CScene scene = new CScene();
+            SceneController scene = new SceneController();
             foreach (var item in engineObjectList)
             {
                 var newEntry = new TreeEntry() { Name = item.m_Name, ID = item.ID }; // Object = item,
@@ -72,9 +72,9 @@ namespace Editor.UserControls
 
         void list_OnAdd(object sender, EventArgs e)
         {
-            var engineObjectList = CMain.Singleton.m_Layout.m_ViewPort.m_Engine.m_Scene.m_ObjectManager.m_List;
+            var engineObjectList = MainController.Singleton.m_Layout.m_ViewPort.m_Engine.m_Scene.m_ObjectManager.m_List;
 
-            CScene scene = new CScene();
+            SceneController scene = new SceneController();
 
             var newObject = engineObjectList[engineObjectList.Count - 1];
             var newEntry = new TreeEntry() { Name = newObject.m_Name, ID = newObject.ID }; // Object = newObject

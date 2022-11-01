@@ -21,13 +21,13 @@ namespace Editor.UserControls
 {
     public sealed partial class Output : UserControl
     {
-        internal COutput m_Control;
+        internal OutputController m_Control;
 
         public Output()
         {
             this.InitializeComponent();
 
-            m_Control = new COutput(
+            m_Control = new OutputController(
                 x_Stackpanel_Output, 
                 x_ScrollViewer_Output, 
                 x_AppBarToggleButton_Output_Collapse, 
@@ -49,18 +49,18 @@ namespace Editor.UserControls
 
         void Tick(object sender, object e)
         {
-            if (CMain.Singleton.m_Player.m_PlayMode == EPlayMode.PLAYING)
+            if (MainController.Singleton.m_Player.m_PlayMode == EPlayMode.PLAYING)
                 Update();
         }
         void TickSec(object sender, object e)
         {
-            if (CMain.Singleton.m_Player.m_PlayMode == EPlayMode.PLAYING)
+            if (MainController.Singleton.m_Player.m_PlayMode == EPlayMode.PLAYING)
                 UpdateSec();
         }
 
         void Update()
         {
-            COutput.Log("Updated Frame..");
+            OutputController.Log("Updated Frame..");
         }
         void UpdateSec()
         {
@@ -72,24 +72,24 @@ namespace Editor.UserControls
             Random rnd = new Random();
             int i = rnd.Next(0, 24);
 
-            COutput.Log(i.ToString());
+            OutputController.Log(i.ToString());
             if (i < 5)
-                COutput.Log("Error Example!", EMessageType.ERROR);
+                OutputController.Log("Error Example!", EMessageType.ERROR);
             if (i < 10 && i > 5)
-                COutput.Log("A Warning.", EMessageType.WARNING);
+                OutputController.Log("A Warning.", EMessageType.WARNING);
             if (i < 15)
-                COutput.Log("This is a Message");
+                OutputController.Log("This is a Message");
             if (i > 15)
                 Test();
         }
         void Test()
         {
-            COutput.Log("Test");
+            OutputController.Log("Test");
         }
 
         private void AppBarButton_Output_Clear(object sender, RoutedEventArgs e) { m_Control.ClearOutput(); }
-        private void AppBarToggleButton_Output_Collapse_Click(object sender, RoutedEventArgs e) { COutput.IterateOutputMessages(); }
-        private void AppBarToggleButton_Filter_Click(object sender, RoutedEventArgs e) { COutput.IterateOutputMessages(); }
+        private void AppBarToggleButton_Output_Collapse_Click(object sender, RoutedEventArgs e) { OutputController.IterateOutputMessages(); }
+        private void AppBarToggleButton_Filter_Click(object sender, RoutedEventArgs e) { OutputController.IterateOutputMessages(); }
         private void AppBarToggleButton_Debug_ErrorPause_Click(object sender, RoutedEventArgs e) { }
         private void AppBarToggleButton_Debug_ClearPlay_Click(object sender, RoutedEventArgs e) { }
     }

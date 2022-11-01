@@ -18,7 +18,7 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 
 namespace Editor.Controls
 {
-    internal class CProperties
+    internal class PropertiesController
     {
         internal async void SelectImage(Image _image, TextBlock _path)
         {

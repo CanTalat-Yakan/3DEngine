@@ -14,11 +14,11 @@ namespace Editor.Controls
         public object Content;
         public Symbol Symbol;
     }
-    internal class CTabViewPage
+    internal class TabViewPageController
     {
         internal TabView m_TabView;
 
-        public CTabViewPage(params TabViewItemDataTemplate[] _icollection)
+        public TabViewPageController(params TabViewItemDataTemplate[] _icollection)
         {
             m_TabView = new TabView() { TabWidthMode = TabViewWidthMode.Equal, CloseButtonOverlayMode = TabViewCloseButtonOverlayMode.Auto, IsAddTabButtonVisible = false };
             m_TabView.AddTabButtonClick += TabView_AddButtonClick;
