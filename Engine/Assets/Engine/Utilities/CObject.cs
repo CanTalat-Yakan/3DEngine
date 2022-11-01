@@ -1,7 +1,7 @@
 ﻿using System;
-using WinUI3DEngine.Assets.Engine.Components;
+using Engine.Components;
 
-namespace WinUI3DEngine.Assets.Engine.Utilities
+namespace Engine.Utilities
 {
     internal class CObject : ICloneable
     {

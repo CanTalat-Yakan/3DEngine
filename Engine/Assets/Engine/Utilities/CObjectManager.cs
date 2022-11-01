@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Numerics;
 using System.Collections.Generic;
-using WinUI3DEngine.Assets.Engine.Components;
-using WinUI3DEngine.Assets.Engine.Helper;
+using Engine.Components;
+using Engine.Helper;
 
-namespace WinUI3DEngine.Assets.Engine.Utilities
+namespace Engine.Utilities
 {
     public enum EPrimitiveTypes
     {

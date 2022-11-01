@@ -12,12 +12,12 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
-using Engine.Assets.Controls;
+using Editor.Controls;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Engine.UserControls
+namespace Editor.UserControls
 {
     public sealed partial class Hierarchy : UserControl
     {

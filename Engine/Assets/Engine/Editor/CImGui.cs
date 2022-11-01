@@ -4,10 +4,10 @@ using System;
 using System.Numerics;
 using Vortice.Direct3D12;
 using Vortice.DXGI;
-using WinUI3DEngine.Assets.Engine.Utilities;
 using Vortice.Direct3D11;
+using Engine.Utilities;
 
-namespace WinUI3DEngine.Assets.Engine.Editor
+namespace Engine.Editor
 {
     internal class CImGui
     {

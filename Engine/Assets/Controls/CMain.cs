@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Controls;
-using Engine.UserControls;
+using Editor.UserControls;
 
-namespace Engine.Assets.Controls
+namespace Editor.Controls
 {
     internal class CMain
     {

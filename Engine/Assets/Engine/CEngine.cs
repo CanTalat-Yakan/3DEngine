@@ -1,12 +1,12 @@
 ﻿using CommunityToolkit.WinUI.UI.Helpers;
-using Engine.UserControls;
+using Editor.UserControls;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Windows.UI.Core;
-using WinUI3DEngine.Assets.Engine.Editor;
-using WinUI3DEngine.Assets.Engine.Utilities;
+using Engine.Editor;
+using Engine.Utilities;
 
-namespace WinUI3DEngine.Assets.Engine
+namespace Engine
 {
     internal class CEngine
     {

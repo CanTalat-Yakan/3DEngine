@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Numerics;
 using Vortice.Mathematics;
-using WinUI3DEngine.Assets.Engine.Data;
+using Engine.Data;
 
-namespace WinUI3DEngine.Assets.Engine.Components
+namespace Engine.Components
 {
     internal class CTransform
     {

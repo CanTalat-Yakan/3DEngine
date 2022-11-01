@@ -7,7 +7,7 @@ using Vortice.Direct3D11;
 using Vortice.DXGI;
 using Vortice.Mathematics;
 
-namespace WinUI3DEngine.Assets.Engine.Utilities
+namespace Engine.Utilities
 {
     internal class CRenderer
     {

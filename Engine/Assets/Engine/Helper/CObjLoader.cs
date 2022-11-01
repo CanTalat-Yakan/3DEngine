@@ -3,10 +3,10 @@ using Aspose.ThreeD;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using WinUI3DEngine.Assets.Engine.Data;
+using Engine.Data;
 using Assimp.Configs;
 
-namespace WinUI3DEngine.Assets.Engine.Helper
+namespace Engine.Helper
 {
     internal class CObjLoader
     {

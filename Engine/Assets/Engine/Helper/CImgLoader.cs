@@ -9,7 +9,7 @@ using Vortice.Mathematics;
 using Vortice.WIC;
 
 
-namespace WinUI3DEngine.Assets.Engine.Helper
+namespace Engine.Helper
 {
     internal class CImgLoader
     {

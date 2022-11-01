@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace WinUI3DEngine.Assets.Engine.Data
+namespace Engine.Data
 {
     struct CVertex
     {

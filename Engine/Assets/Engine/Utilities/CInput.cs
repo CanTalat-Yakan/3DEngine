@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using Windows.Foundation;
 using Windows.System;
 using Windows.UI.Core;
-using Engine.Assets.Controls;
+using Editor.Controls;
 
-namespace WinUI3DEngine.Assets.Engine.Utilities
+namespace Engine.Utilities
 {
     public enum EMouseButton
     {

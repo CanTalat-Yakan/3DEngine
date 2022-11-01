@@ -9,14 +9,14 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Core;
-using WinUI3DEngine.Assets.Engine;
-using WinUI3DEngine.Assets.Engine.Components;
-using WinUI3DEngine.Assets.Engine.Editor;
+using Engine;
+using Engine.Components;
+using Engine.Editor;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Engine.UserControls
+namespace Editor.UserControls
 {
     public sealed partial class ViewPort : UserControl
     {

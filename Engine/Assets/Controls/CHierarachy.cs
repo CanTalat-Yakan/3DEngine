@@ -1,9 +1,9 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
-//using Engine.Assets.Engine.Utilities;
+//using Engine.Utilities;
 
-namespace Engine.Assets.Controls
+namespace Editor.Controls
 {
     class TreeEntry
     {

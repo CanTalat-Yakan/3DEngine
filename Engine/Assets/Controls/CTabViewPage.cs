@@ -6,7 +6,7 @@ using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 
-namespace Engine.Assets.Controls
+namespace Editor.Controls
 {
     public class TabViewItemDataTemplate
     {

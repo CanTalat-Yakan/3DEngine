@@ -2,14 +2,14 @@
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using WinUI3DEngine.Assets.Engine.Data;
-using WinUI3DEngine.Assets.Engine.Utilities;
 using Vortice.Direct3D11;
 using Vortice.Mathematics;
 using System.Xml.Schema;
 using Microsoft.UI.Xaml.Media;
+using Engine.Data;
+using Engine.Utilities;
 
-namespace WinUI3DEngine.Assets.Engine.Components
+namespace Engine.Components
 {
     internal class CCamera
     {

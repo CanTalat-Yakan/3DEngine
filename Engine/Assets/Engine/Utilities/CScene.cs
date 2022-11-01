@@ -1,13 +1,12 @@
 ﻿using Assimp;
-using Engine.Assets.Controls;
-using Engine.UserControls;
 using System;
 using System.Linq;
 using System.Numerics;
-using WinUI3DEngine.Assets.Engine.Components;
-using WinUI3DEngine.Assets.Engine.Editor;
+using Editor.Controls;
+using Engine.Components;
+using Engine.Editor;
 
-namespace WinUI3DEngine.Assets.Engine.Utilities
+namespace Engine.Utilities
 {
     internal class CScene
     {

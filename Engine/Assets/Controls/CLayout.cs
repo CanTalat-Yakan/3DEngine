@@ -3,10 +3,10 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
 using System;
-using Engine.UserControls;
+using Editor.UserControls;
 using Microsoft.UI.Xaml.Media;
 
-namespace Engine.Assets.Controls
+namespace Editor.Controls
 {
     class GridDataTemeplate
     {

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
-using WinUI3DEngine.Assets.Engine.Data;
-using WinUI3DEngine.Assets.Engine.Utilities;
 using System.Runtime.CompilerServices;
 using Vortice.Direct3D11;
+using Engine.Data;
+using Engine.Utilities;
 
-namespace WinUI3DEngine.Assets.Engine.Components
+namespace Engine.Components
 {
     internal class CMesh
     {

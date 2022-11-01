@@ -1,4 +1,4 @@
-﻿using Engine.Assets.Controls;
+﻿using Editor.Controls;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -12,9 +12,9 @@ using WinUIEx;
 using System.Runtime.InteropServices;
 using WinRT;
 
-namespace Engine
+namespace Editor
 {
-    public sealed partial class MainWindow : WindowEx //WindowEx
+    public sealed partial class MainWindow : WindowEx
     {
         CMain m_mainControl;
 

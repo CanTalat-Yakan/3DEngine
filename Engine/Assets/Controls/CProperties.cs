@@ -16,7 +16,7 @@ using Microsoft.UI.Xaml.Shapes;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 using Microsoft.UI.Xaml.Controls.Primitives;
 
-namespace Engine.Assets.Controls
+namespace Editor.Controls
 {
     internal class CProperties
     {

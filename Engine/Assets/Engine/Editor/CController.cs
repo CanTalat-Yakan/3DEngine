@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Numerics;
 using Windows.System;
-using WinUI3DEngine.Assets.Engine.Components;
-using WinUI3DEngine.Assets.Engine.Utilities;
 using static System.Runtime.CompilerServices.RuntimeHelpers;
+using Engine.Components;
+using Engine.Utilities;
 
-namespace WinUI3DEngine.Assets.Engine.Editor
+namespace Engine.Editor
 {
     internal class CController
     {
