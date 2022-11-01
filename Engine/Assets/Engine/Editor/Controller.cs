@@ -9,33 +9,33 @@ namespace Engine.Editor
 {
     internal class Controller
     {
-        internal string m_Profile { get => m_camera.m_Transform.ToString(); }
+        internal string m_Profile { get => camera.transform.ToString(); }
 
-        Camera m_camera;
-        Input m_input;
+        Camera camera;
+        Input input;
 
-        internal static float m_MovementSpeed = 2;
-        float m_rotationSpeed = 5;
-        Vector3 m_direction;
-        Vector3 m_rotation;
+        internal static float s_movementSpeed = 2;
+        float rotationSpeed = 5;
+        Vector3 direction;
+        Vector3 rotation;
 
 
         public Controller(Camera _camera)
         {
-            m_camera = _camera;
-            m_input = Input.Instance;
+            camera = _camera;
+            input = Input.Instance;
         }
 
         internal void Update()
         {
             MovementSpeedCalc();
 
-            if (m_input.GetButton(EMouseButton.IsMiddleButtonPressed))
-                if (m_input.SetPointerInBounds())
+            if (input.GetButton(EMouseButton.IsMiddleButtonPressed))
+                if (input.SetPointerInBounds())
                     ScreenMovement();
 
-            if (m_input.GetButton(EMouseButton.IsRightButtonPressed))
-                if (m_input.SetPointerInBounds())
+            if (input.GetButton(EMouseButton.IsRightButtonPressed))
+                if (input.SetPointerInBounds())
                 {
                     TransformMovement();
                     CameraMovement();
@@ -44,54 +44,54 @@ namespace Engine.Editor
 
             ScrollMovement();
 
-            m_camera.m_Transform.m_Position += m_direction * (float)Time.m_Delta * m_MovementSpeed;
-            m_camera.m_Transform.m_EulerAngles -= m_rotation * (float)Time.m_Delta * m_rotationSpeed;
+            camera.transform.position += direction * (float)Time.s_delta * s_movementSpeed;
+            camera.transform.eulerAngles -= rotation * (float)Time.s_delta * rotationSpeed;
 
-            m_rotation = new Vector3();
-            m_direction = new Vector3();
+            rotation = new Vector3();
+            direction = new Vector3();
         }
 
         void MovementSpeedCalc()
         {
-            if (m_input.GetButton(EMouseButton.IsLeftButtonPressed)
-                || m_input.GetButton(EMouseButton.IsRightButtonPressed))
-                m_MovementSpeed += m_input.GetMouseWheel();
+            if (input.GetButton(EMouseButton.IsLeftButtonPressed)
+                || input.GetButton(EMouseButton.IsRightButtonPressed))
+                s_movementSpeed += input.GetMouseWheel();
 
-            m_MovementSpeed = Math.Clamp(m_MovementSpeed, 0.1f, 10);
+            s_movementSpeed = Math.Clamp(s_movementSpeed, 0.1f, 10);
         }
                 
         void CameraMovement(int _horizontalFactor = 1, int _verticalFactor = 1) =>
-            m_rotation = new Vector3(m_input.GetMouseAxis().Y, m_input.GetMouseAxis().X, 0);
+            rotation = new Vector3(input.GetMouseAxis().Y, input.GetMouseAxis().X, 0);
 
         void TransformMovement() =>
-            m_direction = m_camera.m_Transform.Forward * m_input.GetAxis().Y + m_camera.m_Transform.Right * m_input.GetAxis().X;
+            direction = camera.transform.forward * input.GetAxis().Y + camera.transform.right * input.GetAxis().X;
 
         void ScreenMovement() =>
-            m_direction -= m_camera.m_Transform.Right * m_input.GetMouseAxis().X * (float)Time.m_Delta + m_camera.m_Transform.LocalUp * m_input.GetMouseAxis().Y * (float)Time.m_Delta;
+            direction -= camera.transform.right * input.GetMouseAxis().X * (float)Time.s_delta + camera.transform.localUp * input.GetMouseAxis().Y * (float)Time.s_delta;
 
         void ScrollMovement()
         {
-            if (!m_input.GetButton(EMouseButton.IsLeftButtonPressed)
-                && !m_input.GetButton(EMouseButton.IsMiddleButtonPressed)
-                && !m_input.GetButton(EMouseButton.IsRightButtonPressed))
-                m_direction += 5 * m_camera.m_Transform.Forward * m_input.GetMouseWheel();
+            if (!input.GetButton(EMouseButton.IsLeftButtonPressed)
+                && !input.GetButton(EMouseButton.IsMiddleButtonPressed)
+                && !input.GetButton(EMouseButton.IsRightButtonPressed))
+                direction += 5 * camera.transform.forward * input.GetMouseWheel();
         }
 
         void HeightTransformMovement()
         {
             float input = 0;
 
-            if (m_input.GetKey(VirtualKey.E)) input = 1;
-            if (m_input.GetKey(VirtualKey.Q)) input = -1;
-            if (m_input.GetKey(VirtualKey.E) && m_input.GetKey(VirtualKey.W)) input = 1;
-            if (m_input.GetKey(VirtualKey.Q) && m_input.GetKey(VirtualKey.W)) input = -1;
-            if (m_input.GetKey(VirtualKey.E) && m_input.GetKey(VirtualKey.S)) input = 1;
-            if (m_input.GetKey(VirtualKey.Q) && m_input.GetKey(VirtualKey.S)) input = -1;
+            if (this.input.GetKey(VirtualKey.E)) input = 1;
+            if (this.input.GetKey(VirtualKey.Q)) input = -1;
+            if (this.input.GetKey(VirtualKey.E) && this.input.GetKey(VirtualKey.W)) input = 1;
+            if (this.input.GetKey(VirtualKey.Q) && this.input.GetKey(VirtualKey.W)) input = -1;
+            if (this.input.GetKey(VirtualKey.E) && this.input.GetKey(VirtualKey.S)) input = 1;
+            if (this.input.GetKey(VirtualKey.Q) && this.input.GetKey(VirtualKey.S)) input = -1;
 
-            if (m_input.GetKey(VirtualKey.W) || m_input.GetKey(VirtualKey.S))
-                m_direction += input * m_camera.m_Transform.LocalUp;
+            if (this.input.GetKey(VirtualKey.W) || this.input.GetKey(VirtualKey.S))
+                direction += input * camera.transform.localUp;
             else
-                m_direction += input * Vector3.UnitY;
+                direction += input * Vector3.UnitY;
         }
     }
 }

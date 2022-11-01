@@ -5,29 +5,29 @@ namespace Engine.Utilities
 {
     internal class Time
     {
-        internal string m_Profile = "";
+        internal string profile = "";
 
-        internal static double m_Time, m_Delta;
-        internal static Stopwatch m_Watch = new Stopwatch();
-        int m_fps, m_lastFPS;
-        DateTime m_now = DateTime.Now;
+        internal static double s_time, s_delta;
+        internal static Stopwatch s_watch = new Stopwatch();
+        int fps, tmpFPS;
+        DateTime now = DateTime.Now;
 
         internal void Update()
         {
-            m_Delta = m_Watch.ElapsedMilliseconds * 0.001;
-            m_Time += m_Delta;
-            ++m_lastFPS;
+            s_delta = s_watch.ElapsedMilliseconds * 0.001;
+            s_time += s_delta;
+            ++tmpFPS;
 
-            if (m_now.Second != DateTime.Now.Second)
+            if (now.Second != DateTime.Now.Second)
             {
-                m_fps = m_lastFPS;
-                m_lastFPS = 0;
-                m_now = DateTime.Now;
+                fps = tmpFPS;
+                tmpFPS = 0;
+                now = DateTime.Now;
 
-                m_Profile = m_Watch.ElapsedMilliseconds.ToString() + " ms" + "\n" + m_fps.ToString() + " FPS";
+                profile = s_watch.ElapsedMilliseconds.ToString() + " ms" + "\n" + fps.ToString() + " FPS";
             }
 
-            m_Watch.Restart();
+            s_watch.Restart();
         }
     }
 }

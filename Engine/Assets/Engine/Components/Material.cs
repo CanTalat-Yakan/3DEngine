@@ -14,22 +14,22 @@ namespace Engine.Components
 {
     internal class Material
     {
-        Renderer m_d3d;
+        Renderer d3d;
 
-        ID3D11VertexShader m_vertexShader;
-        ID3D11PixelShader m_pixelShader;
-        ID3D11GeometryShader m_geometryShader;
+        ID3D11VertexShader vertexShader;
+        ID3D11PixelShader pixelShader;
+        ID3D11GeometryShader geometryShader;
 
-        ID3D11InputLayout m_inputLayout;
+        ID3D11InputLayout inputLayout;
 
-        ID3D11ShaderResourceView m_resourceView;
-        ID3D11SamplerState m_sampler;
-        ID3D11Buffer m_model;
+        ID3D11ShaderResourceView resourceView;
+        ID3D11SamplerState sampler;
+        ID3D11Buffer model;
 
         internal Material(string _shaderFileName, string _imageFileName, bool _includeGeometryShader = false)
         {
             #region //Get Instances
-            m_d3d = Renderer.Instance;
+            d3d = Renderer.Instance;
             #endregion
 
             #region //Create InputLayout
@@ -42,21 +42,21 @@ namespace Engine.Components
             #region //Create VertexShader
             ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(_shaderFileName, "VS", "vs_4_0");
 
-            m_vertexShader = m_d3d.m_Device.CreateVertexShader(vertexShaderByteCode.Span);
-            m_inputLayout = m_d3d.m_Device.CreateInputLayout(inputElements, vertexShaderByteCode.Span);
+            vertexShader = d3d.device.CreateVertexShader(vertexShaderByteCode.Span);
+            inputLayout = d3d.device.CreateInputLayout(inputElements, vertexShaderByteCode.Span);
             #endregion
 
             #region //Create PixelShader 
             ReadOnlyMemory<byte> pixelShaderByteCode = CompileBytecode(_shaderFileName, "PS", "ps_4_0");
 
-            m_pixelShader = m_d3d.m_Device.CreatePixelShader(pixelShaderByteCode.Span);
+            pixelShader = d3d.device.CreatePixelShader(pixelShaderByteCode.Span);
             #endregion
 
             #region //Create GeometryShader
             if (_includeGeometryShader)
             {
                 ReadOnlyMemory<byte> geometryShaderByteCode = CompileBytecode(_shaderFileName, "GS", "ps_4_0");
-                m_geometryShader = m_d3d.m_Device.CreateGeometryShader(geometryShaderByteCode.Span);
+                geometryShader = d3d.device.CreateGeometryShader(geometryShaderByteCode.Span);
             }
             #endregion
 
@@ -70,12 +70,12 @@ namespace Engine.Components
                 Usage = ResourceUsage.Dynamic,
             };
 
-            m_model = m_d3d.m_Device.CreateBuffer(cbModel, bufferDescription);
+            model = d3d.device.CreateBuffer(cbModel, bufferDescription);
             #endregion
 
             #region //Create Texture and Sampler
-            var texture = ImageLoader.LoadTexture(m_d3d.m_Device, _imageFileName);
-            m_resourceView = m_d3d.m_Device.CreateShaderResourceView(texture);
+            var texture = ImageLoader.LoadTexture(d3d.device, _imageFileName);
+            resourceView = d3d.device.CreateShaderResourceView(texture);
 
             SamplerDescription samplerStateDescription = new SamplerDescription
             {
@@ -89,7 +89,7 @@ namespace Engine.Components
                 MaxLOD = float.MaxValue,
             };
 
-            m_sampler = m_d3d.m_Device.CreateSamplerState(samplerStateDescription);
+            sampler = d3d.device.CreateSamplerState(samplerStateDescription);
             #endregion
         }
 
@@ -112,22 +112,22 @@ namespace Engine.Components
 
         internal void Render(SPerModelConstantBuffer _data)
         {
-            m_d3d.m_DeviceContext.IASetInputLayout(m_inputLayout);
-            m_d3d.m_DeviceContext.VSSetShader(m_vertexShader);
-            m_d3d.m_DeviceContext.PSSetShader(m_pixelShader);
-            m_d3d.m_DeviceContext.GSSetShader(m_geometryShader);
+            d3d.deviceContext.IASetInputLayout(inputLayout);
+            d3d.deviceContext.VSSetShader(vertexShader);
+            d3d.deviceContext.PSSetShader(pixelShader);
+            d3d.deviceContext.GSSetShader(geometryShader);
 
             unsafe
             {
                 // Update constant buffer data
-                MappedSubresource mappedResource = m_d3d.m_DeviceContext.Map(m_model, MapMode.WriteDiscard);
+                MappedSubresource mappedResource = d3d.deviceContext.Map(model, MapMode.WriteDiscard);
                 Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref _data);
-                m_d3d.m_DeviceContext.Unmap(m_model, 0);
+                d3d.deviceContext.Unmap(model, 0);
             }
-            m_d3d.m_DeviceContext.VSSetConstantBuffer(1, m_model);
+            d3d.deviceContext.VSSetConstantBuffer(1, model);
 
-            m_d3d.m_DeviceContext.PSSetShaderResource(0, m_resourceView);
-            m_d3d.m_DeviceContext.PSSetSampler(0, m_sampler);
+            d3d.deviceContext.PSSetShaderResource(0, resourceView);
+            d3d.deviceContext.PSSetSampler(0, sampler);
         }
     }
 }

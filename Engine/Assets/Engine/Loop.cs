@@ -10,50 +10,50 @@ namespace Engine
 {
     internal class Loop
     {
-        internal Input m_Input;
-        internal Time m_Time;
-        internal Scene m_Scene;
-        internal Renderer m_Render;
-        internal ImGui m_Gui;
+        internal Input input;
+        internal Time time;
+        internal Scene scene;
+        internal Renderer render;
+        internal ImGui gui;
 
         internal Loop(SwapChainPanel _swapChainPanel, TextBlock _textBlock)
         {
-            m_Render = new Renderer(_swapChainPanel);
-            m_Input = new Input();
-            m_Time = new Time();
-            m_Scene = new Scene();
-            m_Gui = new ImGui();
+            render = new Renderer(_swapChainPanel);
+            input = new Input();
+            time = new Time();
+            scene = new Scene();
+            gui = new ImGui();
 
-            m_Scene.Awake();
-            m_Scene.Start();
+            scene.Awake();
+            scene.Start();
             
             CompositionTarget.Rendering += (s, e) =>
             {
-                m_Render.Clear();
+                render.Clear();
 
-                m_Input.Update();
+                input.Update();
 
-                m_Scene.Update();
-                m_Scene.LateUpdate();
+                scene.Update();
+                scene.LateUpdate();
 
-                m_Input.LateUpdate();
+                input.LateUpdate();
 
-                m_Time.Update();
+                time.Update();
 
-                m_Render.SetSolid();
-                m_Scene.Render();
-                m_Render.SetWireframe();
-                m_Scene.Render();
+                render.SetSolid();
+                scene.Render();
+                render.SetWireframe();
+                scene.Render();
 
-                m_Gui.Draw();
+                gui.Draw();
 
-                m_Render.Present();
+                render.Present();
 
-                _textBlock.Text = m_Time.m_Profile;
-                _textBlock.Text += "\n\n" + m_Render.m_Profile;
-                _textBlock.Text += "\n\n" + m_Scene.m_Profile;
-                _textBlock.Text += "\n\n" + m_Scene.m_Camera.m_Transform.m_Position.ToString();
-                _textBlock.Text += "\n\n" + m_Scene.m_Camera.m_Transform.m_EulerAngles.ToString();
+                _textBlock.Text = time.profile;
+                _textBlock.Text += "\n\n" + render.profile;
+                _textBlock.Text += "\n\n" + scene.profile;
+                _textBlock.Text += "\n\n" + scene.camera.transform.position.ToString();
+                _textBlock.Text += "\n\n" + scene.camera.transform.eulerAngles.ToString();
             };
         }
     }

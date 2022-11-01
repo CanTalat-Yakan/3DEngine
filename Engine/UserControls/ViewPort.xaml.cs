@@ -9,7 +9,6 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Core;
-using Engine;
 using Engine.Components;
 using Engine.Editor;
 
@@ -20,31 +19,31 @@ namespace Editor.UserControls
 {
     public sealed partial class ViewPort : UserControl
     {
-        internal Engine.Loop m_Engine;
+        internal Engine.Loop engineLoop;
 
-        internal TextBlock m_DebugProfiling;
-        internal Grid m_BorderBrush;
+        internal TextBlock debugProfiling;
+        internal Grid borderBrush;
 
         public ViewPort()
         {
             this.InitializeComponent();
 
-            m_DebugProfiling = x_TextBlock_Debug_FPS;
-            m_BorderBrush = x_Grid_ViewPort_BorderBrush;
+            debugProfiling = x_TextBlock_Debug_FPS;
+            borderBrush = x_Grid_ViewPort_BorderBrush;
 
             Loaded += Initialize;
         }
 
         void Initialize(object sender, RoutedEventArgs e)
         {
-            m_Engine = new Engine.Loop(x_SwapChainPanel_ViewPort, m_DebugProfiling);
+            engineLoop = new Engine.Loop(x_SwapChainPanel_ViewPort, debugProfiling);
 
-            PointerPressed += m_Engine.m_Input.PointerPressed;
-            PointerWheelChanged += m_Engine.m_Input.PointerWheelChanged;
-            PointerReleased += m_Engine.m_Input.PointerReleased;
-            PointerMoved += m_Engine.m_Input.PointerMoved;
-            KeyDown += m_Engine.m_Input.KeyDown;
-            KeyUp += m_Engine.m_Input.KeyUp;
+            PointerPressed += engineLoop.input.PointerPressed;
+            PointerWheelChanged += engineLoop.input.PointerWheelChanged;
+            PointerReleased += engineLoop.input.PointerReleased;
+            PointerMoved += engineLoop.input.PointerMoved;
+            KeyDown += engineLoop.input.KeyDown;
+            KeyUp += engineLoop.input.KeyUp;
 
             //var window = (Application.Current as App)?.Window as MainWindow;
             //window.CoreWindow.KeyDown += m_Engine.m_Input.KeyDown;
@@ -54,7 +53,7 @@ namespace Editor.UserControls
         }
 
 
-        void x_Slider_FOV_ValueChanged(object sender, RangeBaseValueChangedEventArgs e) { Camera.FieldOfView = e.NewValue; }
-        void x_NumberBox_CameraSpeed_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) { Controller.m_MovementSpeed = (float)args.NewValue; }
+        void x_Slider_FOV_ValueChanged(object sender, RangeBaseValueChangedEventArgs e) { Camera.s_fieldOfView = e.NewValue; }
+        void x_NumberBox_CameraSpeed_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) { Controller.s_movementSpeed = (float)args.NewValue; }
     }
 }

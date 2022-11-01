@@ -6,7 +6,7 @@ namespace Engine.Data
     {
         public Matrix4x4 ViewProjection;
         public Vector3 CameraPisiton;
-        public float pad;
+        public float Pad;
     }
 
     public struct SPerModelConstantBuffer
@@ -17,20 +17,20 @@ namespace Engine.Data
     public struct SDirectionalLightConstantBuffer
     {
         public Vector3 Direction;
-        public float pad;
+        public float Pad;
         public Vector4 Diffuse;
         public Vector4 Ambient;
         public float Intensity;
-        public Vector3 pad2;
+        public Vector3 Pad2;
     }
 
     public struct SPointLightConstantBuffer
     {
         public Vector3 Position;
-        public float pad;
+        public float Pad;
         public Vector4 Diffuse;
         public float Intensity;
         public float Radius;
-        public Vector2 pad2;
+        public Vector2 Pad2;
     }
 }

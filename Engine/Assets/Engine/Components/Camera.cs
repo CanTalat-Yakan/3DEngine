@@ -13,39 +13,39 @@ namespace Engine.Components
 {
     internal class Camera
     {
-        Renderer m_d3d;
+        Renderer d3d;
 
-        internal static double FieldOfView;
-        internal SViewConstantsBuffer m_ViewConstants;
-        ID3D11Buffer m_view;
+        internal static double s_fieldOfView;
+        internal SViewConstantsBuffer viewConstants;
+        ID3D11Buffer view;
 
-        internal Transform m_Transform = new Transform();
+        internal Transform transform = new Transform();
 
         internal Camera()
         {
             #region //Get Instances
-            m_d3d = Renderer.Instance;
+            d3d = Renderer.Instance;
             #endregion
 
-            m_view = m_d3d.m_Device.CreateConstantBuffer<SViewConstantsBuffer>();
+            view = d3d.device.CreateConstantBuffer<SViewConstantsBuffer>();
 
             RecreateViewConstants();
         }
 
         internal void RecreateViewConstants()
         {
-            m_Transform.Update();
+            transform.Update();
 
             #region //Set ViewConstantBuffer
             var view = Matrix4x4.CreateLookAt(
-                m_Transform.m_Position,
-                m_Transform.m_Position + m_Transform.Forward,
+                transform.position,
+                transform.position + transform.forward,
                 Vector3.UnitY);
 
-            var aspect = (float)(m_d3d.m_SwapChainPanel.ActualWidth / m_d3d.m_SwapChainPanel.ActualHeight);
+            var aspect = (float)(d3d.swapChainPanel.ActualWidth / d3d.swapChainPanel.ActualHeight);
             var dAspect = aspect < 1 ? 1 * aspect : 1 / aspect;
 
-            var radAngle = MathHelper.ToRadians((float)FieldOfView);
+            var radAngle = MathHelper.ToRadians((float)s_fieldOfView);
             var radHFOV = 2 * MathF.Atan(MathF.Tan(radAngle * 0.5f) * dAspect);
             var hFOV = MathHelper.ToDegrees(radHFOV);
 
@@ -60,17 +60,17 @@ namespace Engine.Components
             // (World * View * Projection)T = ProjectionT * ViewT * WorldT. World is in PerModelConstantBuffer
             var viewProjection = Matrix4x4.Transpose(view * projection); // HLSL calculates matrix mul in collumn-major and system.numerics returns row-major
 
-            m_ViewConstants = new SViewConstantsBuffer() { ViewProjection = viewProjection, CameraPisiton = m_Transform.m_Position };
+            viewConstants = new SViewConstantsBuffer() { ViewProjection = viewProjection, CameraPisiton = transform.position };
             #endregion
 
             unsafe
             {
                 // Update constant buffer data
-                MappedSubresource mappedResource = m_d3d.m_DeviceContext.Map(m_view, MapMode.WriteDiscard);
-                Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref m_ViewConstants);
-                m_d3d.m_DeviceContext.Unmap(m_view, 0);
+                MappedSubresource mappedResource = d3d.deviceContext.Map(this.view, MapMode.WriteDiscard);
+                Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref viewConstants);
+                d3d.deviceContext.Unmap(this.view, 0);
             }
-            m_d3d.m_DeviceContext.VSSetConstantBuffer(0, m_view);
+            d3d.deviceContext.VSSetConstantBuffer(0, this.view);
         }
     }
 }

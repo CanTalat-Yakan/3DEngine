@@ -21,13 +21,13 @@ namespace Editor.UserControls
 {
     public sealed partial class Output : UserControl
     {
-        internal OutputController m_Control;
+        internal OutputController outputControl;
 
         public Output()
         {
             this.InitializeComponent();
 
-            m_Control = new OutputController(
+            outputControl = new OutputController(
                 x_Stackpanel_Output, 
                 x_ScrollViewer_Output, 
                 x_AppBarToggleButton_Output_Collapse, 
@@ -87,7 +87,7 @@ namespace Editor.UserControls
             OutputController.Log("Test");
         }
 
-        private void AppBarButton_Output_Clear(object sender, RoutedEventArgs e) { m_Control.ClearOutput(); }
+        private void AppBarButton_Output_Clear(object sender, RoutedEventArgs e) { outputControl.ClearOutput(); }
         private void AppBarToggleButton_Output_Collapse_Click(object sender, RoutedEventArgs e) { OutputController.IterateOutputMessages(); }
         private void AppBarToggleButton_Filter_Click(object sender, RoutedEventArgs e) { OutputController.IterateOutputMessages(); }
         private void AppBarToggleButton_Debug_ErrorPause_Click(object sender, RoutedEventArgs e) { }

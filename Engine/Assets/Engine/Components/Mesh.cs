@@ -9,39 +9,39 @@ namespace Engine.Components
 {
     internal class Mesh
     {
-        Renderer m_d3d;
+        Renderer d3d;
 
-        internal ID3D11Buffer m_VertexBuffer;
-        internal ID3D11Buffer m_IndexBuffer;
+        internal ID3D11Buffer vertexBuffer;
+        internal ID3D11Buffer indexBuffer;
 
-        internal int m_VertexCount;
-        internal int m_VertexStride;
-        internal int m_IndexCount;
-        internal int m_IndexStride;
+        internal int vertexCount;
+        internal int vertexStride;
+        internal int indexCount;
+        internal int indexStride;
 
 
         internal Mesh(MeshInfo _obj)
         {
             #region //Get Instance of DirectX
-            m_d3d = Renderer.Instance;
+            d3d = Renderer.Instance;
             #endregion
 
             #region //Set Variables
-            m_VertexCount = _obj.Vertices.Count();
-            m_VertexStride = Unsafe.SizeOf<Vertex>();
+            vertexCount = _obj.Vertices.Count();
+            vertexStride = Unsafe.SizeOf<Vertex>();
 
-            m_IndexCount = _obj.Indices.Count();
-            m_IndexStride = Unsafe.SizeOf<int>();
+            indexCount = _obj.Indices.Count();
+            indexStride = Unsafe.SizeOf<int>();
             #endregion
 
             #region //Create VertexBuffer
-            m_VertexBuffer = m_d3d.m_Device.CreateBuffer(
+            vertexBuffer = d3d.device.CreateBuffer(
                 _obj.Vertices.ToArray(),
                 BindFlags.VertexBuffer);
             #endregion
 
             #region //Create IndexBuffer
-            m_IndexBuffer = m_d3d.m_Device.CreateBuffer(
+            indexBuffer = d3d.device.CreateBuffer(
                 _obj.Indices.ToArray(),
                 BindFlags.IndexBuffer);
             #endregion
@@ -49,9 +49,9 @@ namespace Engine.Components
 
         internal void Render()
         {
-            m_d3d.RenderMesh(
-                m_VertexBuffer, m_VertexStride,
-                m_IndexBuffer, m_IndexCount);
+            d3d.RenderMesh(
+                vertexBuffer, vertexStride,
+                indexBuffer, indexCount);
         }
     }
 }

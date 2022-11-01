@@ -5,31 +5,31 @@ namespace Engine.Utilities
 {
     internal class Entity : ICloneable
     {
-        internal Guid ID = Guid.NewGuid();
+        internal Guid id = Guid.NewGuid();
 
-        internal Entity m_Parent;
+        internal Entity parent;
 
-        internal Transform m_Transform = new Transform();
-        internal Material m_Material;
-        internal Mesh m_Mesh;
+        internal Transform transform = new Transform();
+        internal Material material;
+        internal Mesh mesh;
 
-        internal string m_Name = "Object";
-        internal bool m_Enabled = true;
-        internal bool m_Static = false;
+        internal string name = "Object";
+        internal bool isEnabled = true;
+        internal bool isStatic = false;
 
         internal Entity Clone() { return (Entity)this.MemberwiseClone(); }
         object ICloneable.Clone() { return Clone(); }
 
         internal void Update_Render()
         {
-            if (!m_Static)
+            if (!isStatic)
             {
-                if (m_Parent != null)
-                    m_Transform.m_Parent = m_Parent.m_Transform;
-                m_Transform.Update();
+                if (parent != null)
+                    transform.parent = parent.transform;
+                transform.Update();
             }
-            m_Material.Render(m_Transform.m_ConstantsBuffer);
-            m_Mesh.Render();
+            material.Render(transform.m_ConstantsBuffer);
+            mesh.Render();
         }
     }
 }

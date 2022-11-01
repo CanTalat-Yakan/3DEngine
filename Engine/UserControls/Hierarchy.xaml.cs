@@ -21,12 +21,12 @@ namespace Editor.UserControls
 {
     public sealed partial class Hierarchy : UserControl
     {
-        TreeView m_treeView;
+        TreeView treeView;
 
         public Hierarchy()
         {
             this.InitializeComponent();
-            m_treeView = x_TreeView_Hierarchy;
+            treeView = x_TreeView_Hierarchy;
 
             MainController.Singleton.m_Content.Loaded += Initialize0;
         }
@@ -39,15 +39,15 @@ namespace Editor.UserControls
 
         void Initialize(object sender, RoutedEventArgs e)
         {
-            var engineObjectList = MainController.Singleton.m_Layout.m_ViewPort.m_Engine.m_Scene.m_ObjectManager.m_List;
+            var engineObjectList = MainController.Singleton.m_Layout.m_ViewPort.engineLoop.scene.entitytManager.list;
             engineObjectList.OnAdd += list_OnAdd;
 
             SceneController scene = new SceneController();
             foreach (var item in engineObjectList)
             {
-                var newEntry = new TreeEntry() { Name = item.m_Name, ID = item.ID }; // Object = item,
-                if (item.m_Parent != null)
-                    newEntry.IDparent = item.m_Parent.ID;
+                var newEntry = new TreeEntry() { Name = item.name, ID = item.id }; // Object = item,
+                if (item.parent != null)
+                    newEntry.IDparent = item.parent.id;
 
                 scene.m_Hierarchy.Add(newEntry);
             }
@@ -72,14 +72,14 @@ namespace Editor.UserControls
 
         void list_OnAdd(object sender, EventArgs e)
         {
-            var engineObjectList = MainController.Singleton.m_Layout.m_ViewPort.m_Engine.m_Scene.m_ObjectManager.m_List;
+            var engineObjectList = MainController.Singleton.m_Layout.m_ViewPort.engineLoop.scene.entitytManager.list;
 
             SceneController scene = new SceneController();
 
             var newObject = engineObjectList[engineObjectList.Count - 1];
-            var newEntry = new TreeEntry() { Name = newObject.m_Name, ID = newObject.ID }; // Object = newObject
-            if (newObject.m_Parent != null)
-                newEntry.IDparent = newObject.m_Parent.ID;
+            var newEntry = new TreeEntry() { Name = newObject.name, ID = newObject.id }; // Object = newObject
+            if (newObject.parent != null)
+                newEntry.IDparent = newObject.parent.id;
 
             newEntry.Node = new TreeViewNode() { Content = newEntry.Name, IsExpanded = true };
             scene.m_Hierarchy.Add(newEntry);
