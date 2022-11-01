@@ -12,9 +12,9 @@ using Engine.Utilities;
 
 namespace Engine.Components
 {
-    internal class CMaterial
+    internal class Material
     {
-        CRenderer m_d3d;
+        Renderer m_d3d;
 
         ID3D11VertexShader m_vertexShader;
         ID3D11PixelShader m_pixelShader;
@@ -26,10 +26,10 @@ namespace Engine.Components
         ID3D11SamplerState m_sampler;
         ID3D11Buffer m_model;
 
-        internal CMaterial(string _shaderFileName, string _imageFileName, bool _includeGeometryShader = false)
+        internal Material(string _shaderFileName, string _imageFileName, bool _includeGeometryShader = false)
         {
             #region //Get Instances
-            m_d3d = CRenderer.Instance;
+            m_d3d = Renderer.Instance;
             #endregion
 
             #region //Create InputLayout
@@ -74,7 +74,7 @@ namespace Engine.Components
             #endregion
 
             #region //Create Texture and Sampler
-            var texture = CImgLoader.LoadTexture(m_d3d.m_Device, _imageFileName);
+            var texture = ImageLoader.LoadTexture(m_d3d.m_Device, _imageFileName);
             m_resourceView = m_d3d.m_Device.CreateShaderResourceView(texture);
 
             SamplerDescription samplerStateDescription = new SamplerDescription

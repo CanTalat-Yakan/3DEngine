@@ -9,31 +9,31 @@ using Engine.Utilities;
 
 namespace Engine.Editor
 {
-    internal class CImGui
+    internal class ImGui
     {
-        CRenderer m_d3d;
+        Renderer m_d3d;
         InputLayoutDescription m_inputLayoutDescription;
         ID3D11Texture2D m_fontTexture;
         Mesh m_imguiMesh;
 
-        internal CImGui()
+        internal ImGui()
         {
-            m_d3d = CRenderer.Instance;
-            var con = ImGui.CreateContext();
-            ImGui.SetCurrentContext(con);
-            var fonts = ImGui.GetIO().Fonts;
-            ImGui.GetIO().Fonts.AddFontDefault();
-            var io = ImGui.GetIO();
+            m_d3d = Renderer.Instance;
+            var con = ImGuiNET.ImGui.CreateContext();
+            ImGuiNET.ImGui.SetCurrentContext(con);
+            var fonts = ImGuiNET.ImGui.GetIO().Fonts;
+            ImGuiNET.ImGui.GetIO().Fonts.AddFontDefault();
+            var io = ImGuiNET.ImGui.GetIO();
             io.DisplaySize = m_d3d.m_SwapChainPanel.ActualSize;
             io.DisplayFramebufferScale = Vector2.One;
-            io.DeltaTime = (float)CTime.m_Watch.Elapsed.TotalSeconds;
-            ImGui.StyleColorsDark();
+            io.DeltaTime = (float)Time.m_Watch.Elapsed.TotalSeconds;
+            ImGuiNET.ImGui.StyleColorsDark();
             RecreateFontDeviceTexture();
         }
 
         static void RecreateFontDeviceTexture()
         {
-            ImGuiIOPtr io = ImGui.GetIO();
+            ImGuiIOPtr io = ImGuiNET.ImGui.GetIO();
             IntPtr pixels;
             int width, height, bytesPerPixel;
             io.Fonts.GetTexDataAsRGBA32(out pixels, out width, out height, out bytesPerPixel);
@@ -42,15 +42,15 @@ namespace Engine.Editor
 
         internal void Draw()
         {
-            ImGui.GetIO().DeltaTime = (float)CTime.m_Watch.Elapsed.TotalSeconds;
-            ImGui.NewFrame();
-            ImGui.Begin("Test");
+            ImGuiNET.ImGui.GetIO().DeltaTime = (float)Time.m_Watch.Elapsed.TotalSeconds;
+            ImGuiNET.ImGui.NewFrame();
+            ImGuiNET.ImGui.Begin("Test");
 
             ImGuiLayout();
 
-            ImGui.End();
-            ImGui.Render();
-            unsafe { RenderDrawData(ImGui.GetDrawData()); }
+            ImGuiNET.ImGui.End();
+            ImGuiNET.ImGui.Render();
+            unsafe { RenderDrawData(ImGuiNET.ImGui.GetDrawData()); }
         }
 
         float f = 0.0f;
@@ -61,37 +61,37 @@ namespace Engine.Editor
         void ImGuiLayout()
         {
             {
-                ImGui.Text("Hello, world!");
-                ImGui.SliderFloat("float", ref f, 0.0f, 1.0f, string.Empty);
-                ImGui.ColorEdit3("clear color", ref clear_color);
-                if (ImGui.Button("Test Window")) show_test_window = !show_test_window;
-                if (ImGui.Button("Another Window")) show_another_window = !show_another_window;
-                ImGui.Text(string.Format("Application average {0:F3} ms/frame ({1:F1} FPS)", 1000f / ImGui.GetIO().Framerate, ImGui.GetIO().Framerate));
+                ImGuiNET.ImGui.Text("Hello, world!");
+                ImGuiNET.ImGui.SliderFloat("float", ref f, 0.0f, 1.0f, string.Empty);
+                ImGuiNET.ImGui.ColorEdit3("clear color", ref clear_color);
+                if (ImGuiNET.ImGui.Button("Test Window")) show_test_window = !show_test_window;
+                if (ImGuiNET.ImGui.Button("Another Window")) show_another_window = !show_another_window;
+                ImGuiNET.ImGui.Text(string.Format("Application average {0:F3} ms/frame ({1:F1} FPS)", 1000f / ImGuiNET.ImGui.GetIO().Framerate, ImGuiNET.ImGui.GetIO().Framerate));
 
-                ImGui.InputText("Text input", _textBuffer, 100);
+                ImGuiNET.ImGui.InputText("Text input", _textBuffer, 100);
             }
 
             // 2. Show another simple window, this time using an explicit Begin/End pair
             if (show_another_window)
             {
-                ImGui.SetNextWindowSize(new Vector2(200, 100), ImGuiCond.FirstUseEver);
-                ImGui.Begin("Another Window", ref show_another_window);
-                ImGui.Text("Hello");
-                ImGui.End();
+                ImGuiNET.ImGui.SetNextWindowSize(new Vector2(200, 100), ImGuiCond.FirstUseEver);
+                ImGuiNET.ImGui.Begin("Another Window", ref show_another_window);
+                ImGuiNET.ImGui.Text("Hello");
+                ImGuiNET.ImGui.End();
             }
 
             // 3. Show the ImGui test window. Most of the sample code is in ImGui.ShowTestWindow()
             if (show_test_window)
             {
-                ImGui.SetNextWindowPos(new Vector2(650, 20), ImGuiCond.FirstUseEver);
-                ImGui.ShowDemoWindow(ref show_test_window);
+                ImGuiNET.ImGui.SetNextWindowPos(new Vector2(650, 20), ImGuiCond.FirstUseEver);
+                ImGuiNET.ImGui.ShowDemoWindow(ref show_test_window);
             }
         }
 
         void RenderDrawData(ImDrawDataPtr drawData)
         {
             // Handle cases of screen coordinates != from framebuffer coordinates (e.g. retina displays)
-            drawData.ScaleClipRects(ImGui.GetIO().DisplayFramebufferScale);
+            drawData.ScaleClipRects(ImGuiNET.ImGui.GetIO().DisplayFramebufferScale);
 
             UpdateBuffers(drawData);
             RenderCommandLists(drawData);

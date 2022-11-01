@@ -5,9 +5,9 @@ using Engine.Data;
 
 namespace Engine.Components
 {
-    internal class CTransform
+    internal class Transform
     {
-        internal CTransform m_Parent;
+        internal Transform m_Parent;
 
         internal SPerModelConstantBuffer m_ConstantsBuffer { get => new SPerModelConstantBuffer() { ModelView = m_WorldMatrix }; }
         internal Matrix4x4 m_WorldMatrix = Matrix4x4.Identity;

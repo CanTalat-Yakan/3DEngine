@@ -7,9 +7,9 @@ using Engine.Utilities;
 
 namespace Engine.Components
 {
-    internal class CMesh
+    internal class Mesh
     {
-        CRenderer m_d3d;
+        Renderer m_d3d;
 
         internal ID3D11Buffer m_VertexBuffer;
         internal ID3D11Buffer m_IndexBuffer;
@@ -20,15 +20,15 @@ namespace Engine.Components
         internal int m_IndexStride;
 
 
-        internal CMesh(CMeshInfo _obj)
+        internal Mesh(MeshInfo _obj)
         {
             #region //Get Instance of DirectX
-            m_d3d = CRenderer.Instance;
+            m_d3d = Renderer.Instance;
             #endregion
 
             #region //Set Variables
             m_VertexCount = _obj.Vertices.Count();
-            m_VertexStride = Unsafe.SizeOf<CVertex>();
+            m_VertexStride = Unsafe.SizeOf<Vertex>();
 
             m_IndexCount = _obj.Indices.Count();
             m_IndexStride = Unsafe.SizeOf<int>();

@@ -8,9 +8,9 @@ using Assimp.Configs;
 
 namespace Engine.Helper
 {
-    internal class CObjLoader
+    internal class ModelLoader
     {
-        internal static CMeshInfo LoadFilePro(string _fileName)
+        internal static MeshInfo LoadFilePro(string _fileName)
         {
             string assetsPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources\");
             string modelFile = Path.Combine(assetsPath, _fileName);
@@ -37,14 +37,14 @@ namespace Engine.Helper
             var con = new Assimp.AssimpContext();
             var file = con.ImportFile(modelFile);
 
-            CMeshInfo obj = new CMeshInfo();
+            MeshInfo obj = new MeshInfo();
 
-            obj.Vertices = new List<CVertex>();
+            obj.Vertices = new List<Vertex>();
             obj.Indices = new List<ushort>();
             foreach (var mesh in file.Meshes)
             {
                 for (int i = 0; i < mesh.VertexCount; i++)
-                    obj.Vertices.Add(new CVertex(
+                    obj.Vertices.Add(new Vertex(
                     mesh.Vertices[i].X,
                     mesh.Vertices[i].Y,
                     mesh.Vertices[i].Z,

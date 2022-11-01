@@ -11,7 +11,7 @@ using Vortice.WIC;
 
 namespace Engine.Helper
 {
-    internal class CImgLoader
+    internal class ImageLoader
     {
         public static ID3D11Texture2D LoadTexture(ID3D11Device _device, string _fileName)
         {

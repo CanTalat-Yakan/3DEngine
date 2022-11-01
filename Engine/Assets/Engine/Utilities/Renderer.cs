@@ -9,9 +9,9 @@ using Vortice.Mathematics;
 
 namespace Engine.Utilities
 {
-    internal class CRenderer
+    internal class Renderer
     {
-        public static CRenderer Instance { get; private set; }
+        public static Renderer Instance { get; private set; }
 
         internal string m_Profile;
 
@@ -28,7 +28,7 @@ namespace Engine.Utilities
         ID3D11DepthStencilView m_depthStencilView;
         ID3D11BlendState m_blendState;
 
-        internal CRenderer(SwapChainPanel _swapChainPanel)
+        internal Renderer(SwapChainPanel _swapChainPanel)
         {
             #region //Create Instance
             Instance = this;

@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace Engine.Utilities
 {
-    internal class CTime
+    internal class Time
     {
         internal string m_Profile = "";
 

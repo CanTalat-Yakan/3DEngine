@@ -3,21 +3,21 @@ using Engine.Components;
 
 namespace Engine.Utilities
 {
-    internal class CObject : ICloneable
+    internal class Entity : ICloneable
     {
         internal Guid ID = Guid.NewGuid();
 
-        internal CObject m_Parent;
+        internal Entity m_Parent;
 
-        internal CTransform m_Transform = new CTransform();
-        internal CMaterial m_Material;
-        internal CMesh m_Mesh;
+        internal Transform m_Transform = new Transform();
+        internal Material m_Material;
+        internal Mesh m_Mesh;
 
         internal string m_Name = "Object";
         internal bool m_Enabled = true;
         internal bool m_Static = false;
 
-        internal CObject Clone() { return (CObject)this.MemberwiseClone(); }
+        internal Entity Clone() { return (Entity)this.MemberwiseClone(); }
         object ICloneable.Clone() { return Clone(); }
 
         internal void Update_Render()

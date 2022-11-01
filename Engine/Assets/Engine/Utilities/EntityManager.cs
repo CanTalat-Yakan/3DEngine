@@ -25,17 +25,17 @@ namespace Engine.Utilities
             base.Add(item);
         }
     }
-    internal class CObjectManager
+    internal class EntityManager
     {
-        internal MyList<CObject> m_List = new MyList<CObject>();
-        internal CObject m_Sky;
+        internal MyList<Entity> m_List = new MyList<Entity>();
+        internal Entity m_Sky;
 
-        CMaterial m_materialDefault;
-        CMaterial m_materialReflection;
-        CMaterial m_materialSky;
-        CMesh m_meshSphere;
-        CMesh m_meshCube;
-        CMesh m_meshSpecial;
+        Material m_materialDefault;
+        Material m_materialReflection;
+        Material m_materialSky;
+        Mesh m_meshSphere;
+        Mesh m_meshCube;
+        Mesh m_meshSpecial;
 
         static readonly string SHADER_LIT = @"Shader\Lit.hlsl";
         static readonly string SHADER_SIMPLELIT = @"Shader\SimpleLit.hlsl";
@@ -49,29 +49,29 @@ namespace Engine.Utilities
         static readonly string OBJ_SPHERE = @"Models\Sphere.obj";
 
 
-        internal CObjectManager()
+        internal EntityManager()
         {
-            m_materialDefault = new CMaterial(SHADER_SIMPLELIT, IMAGE_DEFAULT);
-            m_materialReflection = new CMaterial(SHADER_LIT, IMAGE_SKY);
-            m_materialSky = new CMaterial(SHADER_UNLIT, IMAGE_SKY);
+            m_materialDefault = new Material(SHADER_SIMPLELIT, IMAGE_DEFAULT);
+            m_materialReflection = new Material(SHADER_LIT, IMAGE_SKY);
+            m_materialSky = new Material(SHADER_UNLIT, IMAGE_SKY);
 
-            m_meshSpecial = new CMesh(CObjLoader.LoadFilePro(OBJ_SPECIAL));
-            m_meshCube = new CMesh(CObjLoader.LoadFilePro(OBJ_CUBE));
-            m_meshSphere = new CMesh(CObjLoader.LoadFilePro(OBJ_SPHERE));
+            m_meshSpecial = new Mesh(ModelLoader.LoadFilePro(OBJ_SPECIAL));
+            m_meshCube = new Mesh(ModelLoader.LoadFilePro(OBJ_CUBE));
+            m_meshSphere = new Mesh(ModelLoader.LoadFilePro(OBJ_SPHERE));
         }
 
 
-        internal CObject Duplicate(CObject _refObject)
+        internal Entity Duplicate(Entity _refObject)
         {
-            CObject gObject = _refObject.Clone();
+            Entity gObject = _refObject.Clone();
 
             m_List.Add(gObject);
             return gObject;
         }
 
-        internal CObject CreateEmpty(string _name = "Entity")
+        internal Entity CreateEmpty(string _name = "Entity")
         {
-            CObject gObject = new CObject()
+            Entity gObject = new Entity()
             {
                 m_Name = _name,
                 m_Material = m_materialDefault,
@@ -81,9 +81,9 @@ namespace Engine.Utilities
             return gObject;
         }
 
-        internal CObject CreatePrimitive(EPrimitiveTypes _type)
+        internal Entity CreatePrimitive(EPrimitiveTypes _type)
         {
-            CObject gObject = new CObject();
+            Entity gObject = new Entity();
             gObject.m_Material = m_materialDefault;
 
             switch (_type)
@@ -113,7 +113,7 @@ namespace Engine.Utilities
             m_List.Add(gObject);
             return gObject;
         }
-        internal CObject CreatePrimitive(EPrimitiveTypes _type, CObject _parent)
+        internal Entity CreatePrimitive(EPrimitiveTypes _type, Entity _parent)
         {
             var gObject = CreatePrimitive(_type);
             gObject.m_Parent = _parent;
@@ -123,7 +123,7 @@ namespace Engine.Utilities
 
         internal void CreateSky()
         {
-            m_Sky = new CObject()
+            m_Sky = new Entity()
             {
                 m_Name = "Sky",
                 m_Mesh = m_meshSphere,

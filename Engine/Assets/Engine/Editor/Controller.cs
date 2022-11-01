@@ -7,12 +7,12 @@ using Engine.Utilities;
 
 namespace Engine.Editor
 {
-    internal class CController
+    internal class Controller
     {
         internal string m_Profile { get => m_camera.m_Transform.ToString(); }
 
-        CCamera m_camera;
-        CInput m_input;
+        Camera m_camera;
+        Input m_input;
 
         internal static float m_MovementSpeed = 2;
         float m_rotationSpeed = 5;
@@ -20,10 +20,10 @@ namespace Engine.Editor
         Vector3 m_rotation;
 
 
-        public CController(CCamera _camera)
+        public Controller(Camera _camera)
         {
             m_camera = _camera;
-            m_input = CInput.Instance;
+            m_input = Input.Instance;
         }
 
         internal void Update()
@@ -44,8 +44,8 @@ namespace Engine.Editor
 
             ScrollMovement();
 
-            m_camera.m_Transform.m_Position += m_direction * (float)CTime.m_Delta * m_MovementSpeed;
-            m_camera.m_Transform.m_EulerAngles -= m_rotation * (float)CTime.m_Delta * m_rotationSpeed;
+            m_camera.m_Transform.m_Position += m_direction * (float)Time.m_Delta * m_MovementSpeed;
+            m_camera.m_Transform.m_EulerAngles -= m_rotation * (float)Time.m_Delta * m_rotationSpeed;
 
             m_rotation = new Vector3();
             m_direction = new Vector3();
@@ -67,7 +67,7 @@ namespace Engine.Editor
             m_direction = m_camera.m_Transform.Forward * m_input.GetAxis().Y + m_camera.m_Transform.Right * m_input.GetAxis().X;
 
         void ScreenMovement() =>
-            m_direction -= m_camera.m_Transform.Right * m_input.GetMouseAxis().X * (float)CTime.m_Delta + m_camera.m_Transform.LocalUp * m_input.GetMouseAxis().Y * (float)CTime.m_Delta;
+            m_direction -= m_camera.m_Transform.Right * m_input.GetMouseAxis().X * (float)Time.m_Delta + m_camera.m_Transform.LocalUp * m_input.GetMouseAxis().Y * (float)Time.m_Delta;
 
         void ScrollMovement()
         {

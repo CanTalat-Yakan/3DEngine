@@ -8,21 +8,21 @@ using Engine.Utilities;
 
 namespace Engine
 {
-    internal class CEngine
+    internal class Loop
     {
-        internal CInput m_Input;
-        internal CTime m_Time;
-        internal CScene m_Scene;
-        internal CRenderer m_Render;
-        internal CImGui m_Gui;
+        internal Input m_Input;
+        internal Time m_Time;
+        internal Scene m_Scene;
+        internal Renderer m_Render;
+        internal ImGui m_Gui;
 
-        internal CEngine(SwapChainPanel _swapChainPanel, TextBlock _textBlock)
+        internal Loop(SwapChainPanel _swapChainPanel, TextBlock _textBlock)
         {
-            m_Render = new CRenderer(_swapChainPanel);
-            m_Input = new CInput();
-            m_Time = new CTime();
-            m_Scene = new CScene();
-            m_Gui = new CImGui();
+            m_Render = new Renderer(_swapChainPanel);
+            m_Input = new Input();
+            m_Time = new Time();
+            m_Scene = new Scene();
+            m_Gui = new ImGui();
 
             m_Scene.Awake();
             m_Scene.Start();

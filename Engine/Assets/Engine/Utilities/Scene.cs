@@ -8,32 +8,32 @@ using Engine.Editor;
 
 namespace Engine.Utilities
 {
-    internal class CScene
+    internal class Scene
     {
         internal string m_Profile;
 
-        internal CCamera m_Camera = new CCamera();
-        internal CController m_CameraController;
-        internal CObjectManager m_ObjectManager = new CObjectManager();
+        internal Components.Camera m_Camera = new Components.Camera();
+        internal Controller m_CameraController;
+        internal EntityManager m_ObjectManager = new EntityManager();
 
         internal void Awake()
         {
-            m_CameraController = new CController(m_Camera);
+            m_CameraController = new Controller(m_Camera);
             m_Camera.m_Transform.m_Position = new Vector3(3, 4, 5);
             m_Camera.m_Transform.m_EulerAngles = new Vector3(35, -150, 0);
 
             m_ObjectManager.CreateSky();
         }
 
-        CObject subParent;
-        CObject special;
+        Entity subParent;
+        Entity special;
         internal void Start()
         {
             special = m_ObjectManager.CreatePrimitive(EPrimitiveTypes.SPECIAL);
             special.m_Transform.m_Scale *= 0.1f;
             special.m_Transform.m_Position.Y += 0.5f;
 
-            CObject parent = m_ObjectManager.CreateEmpty("Content");
+            Entity parent = m_ObjectManager.CreateEmpty("Content");
             subParent = m_ObjectManager.CreateEmpty("Cubes");
             subParent.m_Parent = parent;
 
@@ -52,18 +52,18 @@ namespace Engine.Utilities
             m_Camera.RecreateViewConstants();
             m_ObjectManager.m_Sky.m_Transform.m_Position = m_Camera.m_Transform.m_Position;
 
-            if (CInput.Instance.GetKey(Windows.System.VirtualKey.F, CInput.EInputState.DOWN))
+            if (Input.Instance.GetKey(Windows.System.VirtualKey.F, Input.EInputState.DOWN))
                 special.m_Transform.m_Position += special.m_Transform.Forward;
-            if (CInput.Instance.GetKey(Windows.System.VirtualKey.G, CInput.EInputState.DOWN))
+            if (Input.Instance.GetKey(Windows.System.VirtualKey.G, Input.EInputState.DOWN))
                 special.m_Transform.m_Position += special.m_Transform.Right;
-            if (CInput.Instance.GetKey(Windows.System.VirtualKey.V, CInput.EInputState.DOWN))
+            if (Input.Instance.GetKey(Windows.System.VirtualKey.V, Input.EInputState.DOWN))
                 m_Camera.m_Transform.m_Position += m_Camera.m_Transform.Right;
 
-            if (CInput.Instance.GetKey(Windows.System.VirtualKey.C, CInput.EInputState.DOWN))
+            if (Input.Instance.GetKey(Windows.System.VirtualKey.C, Input.EInputState.DOWN))
             {
                 OutputController.Log("Spawned Cube");
 
-                m_ObjectManager.CreatePrimitive(EPrimitiveTypes.CUBE, subParent).m_Transform = new CTransform
+                m_ObjectManager.CreatePrimitive(EPrimitiveTypes.CUBE, subParent).m_Transform = new Transform
                 {
                     m_EulerAngles = new Vector3(new Random().Next(1, 360), new Random().Next(1, 360), new Random().Next(1, 360)),
                     m_Scale = new Vector3(new Random().Next(1, 3), new Random().Next(1, 3), new Random().Next(1, 3))

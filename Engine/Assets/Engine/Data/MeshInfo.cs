@@ -2,9 +2,9 @@
 
 namespace Engine.Data
 {
-    struct CMeshInfo
+    struct MeshInfo
     {
-        public List<CVertex> Vertices;
+        public List<Vertex> Vertices;
         public List<ushort> Indices;
     }
 }

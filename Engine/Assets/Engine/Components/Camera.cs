@@ -11,20 +11,20 @@ using Engine.Utilities;
 
 namespace Engine.Components
 {
-    internal class CCamera
+    internal class Camera
     {
-        CRenderer m_d3d;
+        Renderer m_d3d;
 
         internal static double FieldOfView;
         internal SViewConstantsBuffer m_ViewConstants;
         ID3D11Buffer m_view;
 
-        internal CTransform m_Transform = new CTransform();
+        internal Transform m_Transform = new Transform();
 
-        internal CCamera()
+        internal Camera()
         {
             #region //Get Instances
-            m_d3d = CRenderer.Instance;
+            m_d3d = Renderer.Instance;
             #endregion
 
             m_view = m_d3d.m_Device.CreateConstantBuffer<SViewConstantsBuffer>();

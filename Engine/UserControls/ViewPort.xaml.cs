@@ -20,7 +20,7 @@ namespace Editor.UserControls
 {
     public sealed partial class ViewPort : UserControl
     {
-        internal CEngine m_Engine;
+        internal Engine.Loop m_Engine;
 
         internal TextBlock m_DebugProfiling;
         internal Grid m_BorderBrush;
@@ -37,7 +37,7 @@ namespace Editor.UserControls
 
         void Initialize(object sender, RoutedEventArgs e)
         {
-            m_Engine = new CEngine(x_SwapChainPanel_ViewPort, m_DebugProfiling);
+            m_Engine = new Engine.Loop(x_SwapChainPanel_ViewPort, m_DebugProfiling);
 
             PointerPressed += m_Engine.m_Input.PointerPressed;
             PointerWheelChanged += m_Engine.m_Input.PointerWheelChanged;
@@ -54,7 +54,7 @@ namespace Editor.UserControls
         }
 
 
-        void x_Slider_FOV_ValueChanged(object sender, RangeBaseValueChangedEventArgs e) { CCamera.FieldOfView = e.NewValue; }
-        void x_NumberBox_CameraSpeed_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) { CController.m_MovementSpeed = (float)args.NewValue; }
+        void x_Slider_FOV_ValueChanged(object sender, RangeBaseValueChangedEventArgs e) { Camera.FieldOfView = e.NewValue; }
+        void x_NumberBox_CameraSpeed_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) { Controller.m_MovementSpeed = (float)args.NewValue; }
     }
 }

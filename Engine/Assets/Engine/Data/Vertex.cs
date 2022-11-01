@@ -2,13 +2,13 @@
 
 namespace Engine.Data
 {
-    struct CVertex
+    struct Vertex
     {
         public Vector3 Pos;
         public Vector2 TexCoord;
         public Vector3 Normal;
 
-        public CVertex(
+        public Vertex(
             float x, float y, float z,
             float u, float v,
             float nx, float ny, float nz)
@@ -17,7 +17,7 @@ namespace Engine.Data
             TexCoord = new Vector2(u, v);
             Normal = new Vector3(nx, ny, nz);
         }
-        public CVertex(
+        public Vertex(
             Vector3 _pos,
             Vector2 _tex,
             Vector3 _nor)

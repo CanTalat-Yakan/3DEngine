@@ -16,9 +16,9 @@ namespace Engine.Utilities
         IsRightButtonPressed,
         IsMiddleButtonPressed
     }
-    internal class CInput
+    internal class Input
     {
-        public static CInput Instance { get; private set; }
+        public static Input Instance { get; private set; }
 
         public enum EInputState { DOWN, PRESSED, UP }
 
@@ -36,7 +36,7 @@ namespace Engine.Utilities
         Point m_pointerPosition = new Point(), m_tmpPoint = new Point();
 
 
-        public CInput()
+        public Input()
         {
             #region //Set Instance
             Instance = this;
