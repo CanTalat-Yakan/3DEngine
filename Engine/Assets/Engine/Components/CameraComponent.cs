@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Vortice.Direct3D11;
 using Vortice.Mathematics;
-using System.Xml.Schema;
-using Microsoft.UI.Xaml.Media;
 using Engine.Data;
 using Engine.Utilities;
 

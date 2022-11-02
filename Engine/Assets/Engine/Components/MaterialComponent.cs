@@ -1,10 +1,8 @@
 ﻿using Vortice.D3DCompiler;
-using Vortice.Direct3D;
 using Vortice.Direct3D11;
 using Vortice.DXGI;
 using System.IO;
 using System;
-using Vortice.WIC;
 using System.Runtime.CompilerServices;
 using Engine.Data;
 using Engine.Helper;

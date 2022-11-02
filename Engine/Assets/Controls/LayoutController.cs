@@ -14,6 +14,7 @@ namespace Editor.Controls
         public double MinHeight = 40;
         public UIElement Content;
     }
+
     public class LayoutController
     {
         public Grid Content;

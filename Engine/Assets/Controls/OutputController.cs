@@ -104,7 +104,7 @@ namespace Editor.Controls
                 VerticalAlignment = VerticalAlignment.Stretch,
                 Background = new SolidColorBrush(
                     m.Type == EMessageType.MESSAGE ?
-                        OutputController.s_stack.Children.Count() % 2 == 0 ?
+                        s_stack.Children.Count() % 2 == 0 ?
                             Colors.Transparent :
                             Windows.UI.Color.FromArgb(50, 10, 10, 10) :
                         m.Type == EMessageType.ERROR ?
