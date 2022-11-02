@@ -2,11 +2,12 @@
     x:Class="Editor.UserControls.Files"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Engine.UserControls"
+    xmlns:local="using:Editor.UserControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     mc:Ignorable="d">
+    
     <Grid>
         <CommandBar HorizontalAlignment="Right" Margin="244,-44,0,0">
             <AppBarButton Label="Add Files" Icon="Add"/>
@@ -23,7 +24,7 @@
             </CommandBar.SecondaryCommands>
         </CommandBar>
 
-        <Grid Height="16000">
+        <Grid x:Name="x_Grid_ChangeColorWithTheme" Background="#282828" Height="16000">
             <ScrollViewer>
                 <StackPanel Orientation="Vertical" Spacing="10">
                     <controls:WrapPanel HorizontalSpacing="10" VerticalSpacing="10" Padding="16">

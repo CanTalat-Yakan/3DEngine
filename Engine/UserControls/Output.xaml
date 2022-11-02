@@ -35,7 +35,7 @@
             </CommandBar.SecondaryCommands>
         </CommandBar>
 
-        <Grid Background="#282828" MinHeight="16000">
+        <Grid x:Name="x_Grid_ChangeColorWithTheme" Background="#282828" MinHeight="16000">
             <ScrollViewer x:Name="x_ScrollViewer_Output" VerticalContentAlignment="Bottom" VerticalScrollBarVisibility="Visible" Grid.ColumnSpan="2">
                 <StackPanel x:Name="x_Stackpanel_Output" Orientation="Vertical" Spacing="4" Margin="2,8,2,8"/>
             </ScrollViewer>

@@ -19,11 +19,14 @@ namespace Editor.UserControls
 {
     public sealed partial class Output : UserControl
     {
+        public Grid ChangeColorWithTheme;
         public OutputController OutputControl;
 
         public Output()
         {
             this.InitializeComponent();
+
+            ChangeColorWithTheme = x_Grid_ChangeColorWithTheme;
 
             OutputControl = new OutputController(
                 x_Stackpanel_Output, 

@@ -7,9 +7,13 @@ namespace Editor.UserControls
 {
     public sealed partial class Files : UserControl
     {
+        public Grid ChangeColorWithTheme;
+
         public Files()
         {
             this.InitializeComponent();
+
+            ChangeColorWithTheme = x_Grid_ChangeColorWithTheme;
         }
     }
 }

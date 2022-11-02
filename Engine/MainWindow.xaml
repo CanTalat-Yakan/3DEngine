@@ -15,7 +15,7 @@
                     IsSettingsVisible="True"
                     IsBackButtonVisible="Collapsed"
                     IsBackEnabled="False"
-                    PaneDisplayMode="LeftMinimal"
+                    PaneDisplayMode="LeftCompact"
                     ExpandedModeThresholdWidth="500"
                     SelectionFollowsFocus="Enabled"
                     IsTabStop="False">
