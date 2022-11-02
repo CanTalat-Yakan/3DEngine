@@ -11,10 +11,8 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Assets\Engine\Resources\Models\alpfabet.obj" />
     <None Remove="Assets\Engine\Resources\Models\Cube.obj" />
     <None Remove="Assets\Engine\Resources\Models\Cylinder.obj" />
-    <None Remove="Assets\Engine\Resources\Models\Desert_Rock_007.obj" />
     <None Remove="Assets\Engine\Resources\Models\Duck.obj" />
     <None Remove="Assets\Engine\Resources\Models\Lowpoly_tree_sample.obj" />
     <None Remove="Assets\Engine\Resources\Models\SmallSphere.obj" />
