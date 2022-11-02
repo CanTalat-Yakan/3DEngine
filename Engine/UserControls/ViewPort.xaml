@@ -46,7 +46,7 @@
 
             </StackPanel>
 
-            <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight" Spacing="6" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight" Spacing="6" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="32, 0, 0, 0">
                 <ComboBox Height="33">
                     <ComboBoxItem Tag="0" Content="Lit"/>
                     <ComboBoxItem Tag="1" Content="Unlit"/>

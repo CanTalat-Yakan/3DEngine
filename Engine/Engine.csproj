@@ -11,6 +11,9 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Content Remove="Assets\Controls\ThemeController.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="Assets\Engine\Resources\Models\Cube.obj" />
     <None Remove="Assets\Engine\Resources\Models\Cylinder.obj" />
     <None Remove="Assets\Engine\Resources\Models\Duck.obj" />

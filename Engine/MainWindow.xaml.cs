@@ -1,4 +1,5 @@
 ﻿using Editor.Controls;
+using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using WinUIEx;
 
@@ -9,17 +10,20 @@ namespace Editor
 {
     public sealed partial class MainWindow : WindowEx
     {
-        MainController _mainControl;
+        private MainController _mainControl;
+        private ThemeController _themeControl;
 
         public MainWindow()
         {
             this.InitializeComponent();
 
-            ExtendsContentIntoTitleBar = true;
+            ExtendsContentIntoTitleBar = true; // enable custom titlebar
 
+            _themeControl = new ThemeController(x_Frame_Main, this);
             _mainControl = new MainController(x_Grid_Main, x_TextBlock_Status_Content);
             _mainControl.ControlPlayer = new PlayerController(x_AppBarToggleButton_Status_Play, x_AppBarToggleButton_Status_Pause, x_AppBarButton_Status_Forward);
         }
+
 
         private void AppBarToggleButton_Status_Play_Click(object sender, RoutedEventArgs e) { _mainControl.ControlPlayer.Play(); }
 
@@ -29,6 +33,6 @@ namespace Editor
 
         private void AppBarButton_Status_Kill_Click(object sender, RoutedEventArgs e) { _mainControl.ControlPlayer.Kill(); }
 
-        private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) { x_Frame_Main.RequestedTheme = x_Frame_Main.RequestedTheme == ElementTheme.Light ? ElementTheme.Dark : x_Frame_Main.RequestedTheme = ElementTheme.Light; }
+        private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) { _themeControl.SetRequstedTheme(); }
     }
 }

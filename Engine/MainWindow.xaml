@@ -12,11 +12,10 @@
     mc:Ignorable="d">
 
     <NavigationView x:Name="nvSample"   
-                    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
                     IsSettingsVisible="True"
                     IsBackButtonVisible="Collapsed"
                     IsBackEnabled="False"
-                    PaneDisplayMode="LeftCompact"
+                    PaneDisplayMode="LeftMinimal"
                     ExpandedModeThresholdWidth="500"
                     SelectionFollowsFocus="Enabled"
                     IsTabStop="False">
@@ -52,7 +51,7 @@
                 <ResourceDictionary Source="ms-appx:///Microsoft.UI.Xaml/DensityStyles/Compact.xaml" />
             </Frame.Resources>
 
-            <controls:DockPanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" MinWidth="820">
+            <controls:DockPanel MinWidth="820">
                 <!--STATUS -->
                 <Grid controls:DockPanel.Dock="Bottom">
                     <CommandBar>
@@ -81,7 +80,7 @@
                 </Grid>
 
                 <!--MAIN-->
-                <Grid x:Name="x_Grid_Main" Background="{ThemeResource SystemAltMediumLowColor}" HorizontalAlignment="Stretch"/>
+                <Grid x:Name="x_Grid_Main" HorizontalAlignment="Stretch"/>
             </controls:DockPanel>
         </Frame>
     </NavigationView>

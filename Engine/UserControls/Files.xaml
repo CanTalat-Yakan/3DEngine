@@ -23,7 +23,7 @@
             </CommandBar.SecondaryCommands>
         </CommandBar>
 
-        <Grid Background="#282828" Height="16000">
+        <Grid Height="16000">
             <ScrollViewer>
                 <StackPanel Orientation="Vertical" Spacing="10">
                     <controls:WrapPanel HorizontalSpacing="10" VerticalSpacing="10" Padding="16">
