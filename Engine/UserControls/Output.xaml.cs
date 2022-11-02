@@ -10,8 +10,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Editor.Controls;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -21,13 +19,13 @@ namespace Editor.UserControls
 {
     public sealed partial class Output : UserControl
     {
-        internal OutputController outputControl;
+        public OutputController OutputControl;
 
         public Output()
         {
             this.InitializeComponent();
 
-            outputControl = new OutputController(
+            OutputControl = new OutputController(
                 x_Stackpanel_Output, 
                 x_ScrollViewer_Output, 
                 x_AppBarToggleButton_Output_Collapse, 
@@ -47,27 +45,28 @@ namespace Editor.UserControls
             dispatcherSec.Start();
         }
 
-        void Tick(object sender, object e)
+        private void Tick(object sender, object e)
         {
-            if (MainController.Singleton.m_Player.m_PlayMode == EPlayMode.PLAYING)
+            if (MainController.Instance.ControlPlayer.PlayMode == EPlayMode.PLAYING)
                 Update();
         }
-        void TickSec(object sender, object e)
+        private void TickSec(object sender, object e)
         {
-            if (MainController.Singleton.m_Player.m_PlayMode == EPlayMode.PLAYING)
+            if (MainController.Instance.ControlPlayer.PlayMode == EPlayMode.PLAYING)
                 UpdateSec();
         }
 
-        void Update()
+        private void Update()
         {
             OutputController.Log("Updated Frame..");
         }
-        void UpdateSec()
+
+        private void UpdateSec()
         {
             ExampleSkriptDebugTest();
         }
 
-        void ExampleSkriptDebugTest()
+        private void ExampleSkriptDebugTest()
         {
             Random rnd = new Random();
             int i = rnd.Next(0, 24);
@@ -82,15 +81,19 @@ namespace Editor.UserControls
             if (i > 15)
                 Test();
         }
-        void Test()
+        private void Test()
         {
             OutputController.Log("Test");
         }
 
-        private void AppBarButton_Output_Clear(object sender, RoutedEventArgs e) { outputControl.ClearOutput(); }
+        private void AppBarButton_Output_Clear(object sender, RoutedEventArgs e) { OutputControl.ClearOutput(); }
+
         private void AppBarToggleButton_Output_Collapse_Click(object sender, RoutedEventArgs e) { OutputController.IterateOutputMessages(); }
+
         private void AppBarToggleButton_Filter_Click(object sender, RoutedEventArgs e) { OutputController.IterateOutputMessages(); }
+
         private void AppBarToggleButton_Debug_ErrorPause_Click(object sender, RoutedEventArgs e) { }
+
         private void AppBarToggleButton_Debug_ClearPlay_Click(object sender, RoutedEventArgs e) { }
     }
 }

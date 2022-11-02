@@ -13,13 +13,14 @@ using Windows.System;
 
 namespace Editor.Controls
 {
-    internal enum EMessageType
+    public enum EMessageType
     {
         MESSAGE,
         WARNING,
         ERROR
     }
-    internal struct SMessageInfo
+
+    public struct SMessageInfo
     {
         public EMessageType Type;
         public string Script;
@@ -29,71 +30,72 @@ namespace Editor.Controls
 
         public string GetInfo() { return Script.Split("\\").Last() + $":{Line} ({Method})"; }
     }
-    internal class OutputController
+
+    public class OutputController
     {
-        static Dictionary<SMessageInfo, List<DateTime>> m_messageCollection = new Dictionary<SMessageInfo, List<DateTime>>();
+        static Dictionary<SMessageInfo, List<DateTime>> s_messageCollection = new Dictionary<SMessageInfo, List<DateTime>>();
 
-        static TextBlock m_status;
-        static StackPanel m_stack;
-        static ScrollViewer m_scroll;
-        static AppBarToggleButton m_collapse;
-        static AppBarToggleButton m_filterMessages;
-        static AppBarToggleButton m_filterWarnings;
-        static AppBarToggleButton m_filterErrors;
-        static AppBarToggleButton m_pauseError;
-        internal AppBarToggleButton m_ClearPlay;
+        static TextBlock s_status;
+        static StackPanel s_stack;
+        static ScrollViewer s_scroll;
+        static AppBarToggleButton s_collapse;
+        static AppBarToggleButton s_filterMessages;
+        static AppBarToggleButton s_filterWarnings;
+        static AppBarToggleButton s_filterErrors;
+        static AppBarToggleButton s_pauseError;
+        internal AppBarToggleButton _clearPlay;
 
-        internal OutputController(StackPanel _stack, ScrollViewer _scroll, AppBarToggleButton _collapse, AppBarToggleButton _filterMessages, AppBarToggleButton _filterWarnings, AppBarToggleButton _filterErrors, AppBarToggleButton _pauseError, AppBarToggleButton _clearPlay)
+        public OutputController(StackPanel stack, ScrollViewer scroll, AppBarToggleButton collapse, AppBarToggleButton filterMessages, AppBarToggleButton filterWarnings, AppBarToggleButton filterErrors, AppBarToggleButton pauseError, AppBarToggleButton clearPlay)
         {
-            m_stack = _stack;
-            m_scroll = _scroll;
-            m_collapse = _collapse;
-            m_filterMessages = _filterMessages;
-            m_filterWarnings = _filterWarnings;
-            m_filterErrors = _filterErrors;
-            m_pauseError = _pauseError;
-            m_ClearPlay = _clearPlay;
+            s_stack = stack;
+            s_scroll = scroll;
+            s_collapse = collapse;
+            s_filterMessages = filterMessages;
+            s_filterWarnings = filterWarnings;
+            s_filterErrors = filterErrors;
+            s_pauseError = pauseError;
+            _clearPlay = clearPlay;
 
-            m_status = MainController.Singleton.m_Status;
+            s_status = MainController.Instance.Status;
         }
 
-        static void SetStatus(SMessageInfo _m)
+        static void SetStatus(SMessageInfo m)
         {
-            m_status.Text = _m.Message;
+            s_status.Text = m.Message;
         }
 
-        async void OpenMessage(string _path)
+        async void OpenMessage(string path)
         {
-            var file = await ApplicationData.Current.LocalFolder.GetFileAsync(_path);
+            var file = await ApplicationData.Current.LocalFolder.GetFileAsync(path);
 
             if (file != null)
                 await Launcher.LaunchFileAsync(file);
         }
 
-        static UIElement CreateMessage(DateTime _d, SMessageInfo _m, int? _i)
+        static UIElement CreateMessage(DateTime d, SMessageInfo m, int? i)
         {
             //Content of the message
             StackPanel stack = new StackPanel() { Orientation = Orientation.Horizontal, Spacing = 10, Margin = new Thickness(10, 0, 0, 0) };
-            if (_m.Type == EMessageType.WARNING)
+            if (m.Type == EMessageType.WARNING)
                 stack.Children.Add(new FontIcon() { Glyph = "\uE7BA" });
             else
-                stack.Children.Add(new SymbolIcon() { Symbol = _m.Type == EMessageType.MESSAGE ? Symbol.Message : Symbol.ReportHacked });
-            stack.Children.Add(new TextBlock() { Text = "[" + _d.TimeOfDay.ToString("hh\\:mm\\:ss").ToString() + "]" });
-            stack.Children.Add(new TextBlock() { Text = _m.Message });
+                stack.Children.Add(new SymbolIcon() { Symbol = m.Type == EMessageType.MESSAGE ? Symbol.Message : Symbol.ReportHacked });
+            stack.Children.Add(new TextBlock() { Text = "[" + d.TimeOfDay.ToString("hh\\:mm\\:ss").ToString() + "]" });
+            stack.Children.Add(new TextBlock() { Text = m.Message });
 
             //The flyout when clicked on the message
             StackPanel stackFlyout = new StackPanel() { Orientation = Orientation.Vertical };
-            stackFlyout.Children.Add(new TextBlock() { Text = _m.GetInfo() + "\n" });
-            stackFlyout.Children.Add(new MarkdownTextBlock() { Text = _m.Message, Padding = new Thickness(2) });
-            stackFlyout.Children.Add(new HyperlinkButton() { Content = Path.GetRelativePath(Directory.GetCurrentDirectory(), _m.Script) + ":" + _m.Line, Foreground = new SolidColorBrush(Colors.CadetBlue) });
+            stackFlyout.Children.Add(new TextBlock() { Text = m.GetInfo() + "\n" });
+            stackFlyout.Children.Add(new MarkdownTextBlock() { Text = m.Message, Padding = new Thickness(2) });
+            stackFlyout.Children.Add(new HyperlinkButton() { Content = Path.GetRelativePath(Directory.GetCurrentDirectory(), m.Script) + ":" + m.Line, Foreground = new SolidColorBrush(Colors.CadetBlue) });
             Flyout flyout = new Flyout() { OverlayInputPassThroughElement = stack, Content = stackFlyout };
 
             //Create main grid that gets returned
             Grid grid = new Grid() { HorizontalAlignment = HorizontalAlignment.Stretch };
             grid.Children.Add(stack);
             //If there is a count the number gets shown on the right
-            if (_i != null)
-                grid.Children.Add(new TextBlock() { Margin = new Thickness(0, 0, 10, 0), MinWidth = 25, HorizontalAlignment = HorizontalAlignment.Right, Text = _i.ToString() });
+            if (i != null)
+                grid.Children.Add(new TextBlock() { Margin = new Thickness(0, 0, 10, 0), MinWidth = 25, HorizontalAlignment = HorizontalAlignment.Right, Text = i.ToString() });
             //Set flyout to button that stretches along the grid
             grid.Children.Add(new Button()
             {
@@ -101,11 +103,11 @@ namespace Editor.Controls
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
                 Background = new SolidColorBrush(
-                    _m.Type == EMessageType.MESSAGE ?
-                        m_stack.Children.Count() % 2 == 0 ?
+                    m.Type == EMessageType.MESSAGE ?
+                        OutputController.s_stack.Children.Count() % 2 == 0 ?
                             Colors.Transparent :
                             Windows.UI.Color.FromArgb(50, 10, 10, 10) :
-                        _m.Type == EMessageType.ERROR ?
+                        m.Type == EMessageType.ERROR ?
                             Windows.UI.Color.FromArgb(88, 255, 0, 0) :
                             Windows.UI.Color.FromArgb(88, 255, 255, 0))
             });
@@ -113,33 +115,33 @@ namespace Editor.Controls
             return grid;
         }
 
-        public static void Log(string _m, EMessageType _t = EMessageType.MESSAGE, [CallerLineNumber] int _l = 0, [CallerMemberName] string _c = null, [CallerFilePath] string _s = null)
+        public static void Log(string _m, EMessageType t = EMessageType.MESSAGE, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null)
         {
-            SMessageInfo message = new SMessageInfo() { Script = _s, Method = _c, Line = _l, Message = _m, Type = _t };
+            SMessageInfo message = new SMessageInfo() { Script = s, Method = c, Line = l, Message = _m, Type = t };
 
-            if (m_pauseError.IsChecked.Value)
-                if (_t == EMessageType.ERROR)
-                    MainController.Singleton.m_Player.Pause();
+            if (s_pauseError.IsChecked.Value)
+                if (t == EMessageType.ERROR)
+                    MainController.Instance.ControlPlayer.Pause();
 
-            if (!m_messageCollection.ContainsKey(message))
-                m_messageCollection.Add(message, new List<DateTime>() { DateTime.Now });
+            if (!s_messageCollection.ContainsKey(message))
+                s_messageCollection.Add(message, new List<DateTime>() { DateTime.Now });
             else
-                m_messageCollection[message].Add(DateTime.Now);
+                s_messageCollection[message].Add(DateTime.Now);
 
             SetStatus(message);
 
             IterateOutputMessages();
         }
 
-        internal static void IterateOutputMessages()
+        public static void IterateOutputMessages()
         {
             Dictionary<DateTime, SMessageInfo> dic = new Dictionary<DateTime, SMessageInfo>();
-            m_stack.Children.Clear();
+            s_stack.Children.Clear();
 
             int numMessages = 0;
             int numWarnings = 0;
             int numErrors = 0;
-            foreach (var kv in m_messageCollection)
+            foreach (var kv in s_messageCollection)
             {
                 switch (kv.Key.Type)
                 {
@@ -156,14 +158,14 @@ namespace Editor.Controls
                         break;
                 }
             }
-            m_filterMessages.Label = $"{numMessages} Messages";
-            m_filterWarnings.Label = $"{numWarnings} Warnings";
-            m_filterErrors.Label = $"{numErrors} Errors";
+            s_filterMessages.Label = $"{numMessages} Messages";
+            s_filterWarnings.Label = $"{numWarnings} Warnings";
+            s_filterErrors.Label = $"{numErrors} Errors";
 
-            if (m_collapse.IsChecked.Value)
+            if (s_collapse.IsChecked.Value)
             {
-                foreach (var k in m_messageCollection.Keys)
-                    dic.Add(m_messageCollection[k].Last(), k);
+                foreach (var k in s_messageCollection.Keys)
+                    dic.Add(s_messageCollection[k].Last(), k);
 
                 var l = dic.OrderBy(key => key.Key);
                 dic = l.ToDictionary((keyItem) => keyItem.Key, (valueItem) => valueItem.Value);
@@ -173,27 +175,27 @@ namespace Editor.Controls
                     switch (kv.Value.Type)
                     {
                         case EMessageType.MESSAGE:
-                            if (!m_filterMessages.IsChecked.Value)
+                            if (!s_filterMessages.IsChecked.Value)
                                 continue;
                             break;
                         case EMessageType.WARNING:
-                            if (!m_filterWarnings.IsChecked.Value)
+                            if (!s_filterWarnings.IsChecked.Value)
                                 continue;
                             break;
                         case EMessageType.ERROR:
-                            if (!m_filterErrors.IsChecked.Value)
+                            if (!s_filterErrors.IsChecked.Value)
                                 continue;
                             break;
                         default:
                             break;
                     }
-                    m_stack.Children.Add(CreateMessage(kv.Key, kv.Value, m_messageCollection[kv.Value].Count()));
+                    s_stack.Children.Add(CreateMessage(kv.Key, kv.Value, s_messageCollection[kv.Value].Count()));
                 }
             }
             else
             {
-                foreach (var k in m_messageCollection.Keys)
-                    foreach (var v in m_messageCollection[k])
+                foreach (var k in s_messageCollection.Keys)
+                    foreach (var v in s_messageCollection[k])
                         dic.Add(v, k);
 
                 var l = dic.OrderBy(key => key.Key);
@@ -204,36 +206,36 @@ namespace Editor.Controls
                     switch (kv.Value.Type)
                     {
                         case EMessageType.MESSAGE:
-                            if (!m_filterMessages.IsChecked.Value)
+                            if (!s_filterMessages.IsChecked.Value)
                                 continue;
                             break;
                         case EMessageType.WARNING:
-                            if (!m_filterWarnings.IsChecked.Value)
+                            if (!s_filterWarnings.IsChecked.Value)
                                 continue;
                             break;
                         case EMessageType.ERROR:
-                            if (!m_filterErrors.IsChecked.Value)
+                            if (!s_filterErrors.IsChecked.Value)
                                 continue;
                             break;
                         default:
                             break;
                     }
-                    m_stack.Children.Add(CreateMessage(kv.Key, kv.Value, null));
+                    s_stack.Children.Add(CreateMessage(kv.Key, kv.Value, null));
                 }
             }
 
-            m_stack.UpdateLayout();
-            m_scroll.ChangeView(0, double.MaxValue, 1);
+            s_stack.UpdateLayout();
+            s_scroll.ChangeView(0, double.MaxValue, 1);
         }
 
-        internal void ClearOutput()
+        public void ClearOutput()
         {
-            m_messageCollection.Clear();
-            m_stack.Children.Clear();
+            s_messageCollection.Clear();
+            s_stack.Children.Clear();
 
-            m_filterMessages.Label = $"  Messages";
-            m_filterWarnings.Label = $"  Warnings";
-            m_filterErrors.Label = $"  Errors";
+            s_filterMessages.Label = $"  Messages";
+            s_filterWarnings.Label = $"  Warnings";
+            s_filterErrors.Label = $"  Errors";
         }
     }
 }

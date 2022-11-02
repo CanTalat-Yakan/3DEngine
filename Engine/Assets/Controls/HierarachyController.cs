@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
-//using Engine.Utilities;
+using Engine.Utilities;
 
 namespace Editor.Controls
 {
@@ -10,7 +10,8 @@ namespace Editor.Controls
         public Guid ID;
         public Guid? IDparent;
         public string Name;
-        //public CObject Object;
+
+        public Entity Entity;
         public TreeViewNode Node;
     }
     class SceneController
@@ -27,34 +28,36 @@ namespace Editor.Controls
             return s;
         }
 
-        public TreeEntry GetParent(TreeEntry _node)
+        public TreeEntry GetParent(TreeEntry node)
         {
-            if (_node.IDparent != null)
+            if (node.IDparent != null)
                 foreach (var item in m_Hierarchy)
-                    if (item.ID == _node.IDparent.Value)
+                    if (item.ID == node.IDparent.Value)
                         return item;
             return null;
         }
-        public TreeEntry[] GetChildren(TreeEntry _node)
+
+        public TreeEntry[] GetChildren(TreeEntry node)
         {
             List<TreeEntry> list = new List<TreeEntry>();
             foreach (var item in m_Hierarchy)
                 if (item.IDparent != null)
-                    if (item.IDparent.Value == _node.ID)
+                    if (item.IDparent.Value == node.ID)
                         list.Add(item);
             return list.ToArray();
         }
-        string GetParents(TreeEntry _current, string _path, char _pathSeperator)
-        {
-            if (_current.IDparent != null)
-                foreach (var item in m_Hierarchy)
-                    if (item.ID == _current.IDparent)
-                        _path = GetParents(
-                            item,
-                            item.Name + _pathSeperator + _path,
-                            _pathSeperator);
 
-            return _path;
+        string GetParents(TreeEntry current, string path, char pathSeperator)
+        {
+            if (current.IDparent != null)
+                foreach (var item in m_Hierarchy)
+                    if (item.ID == current.IDparent)
+                        path = GetParents(
+                            item,
+                            item.Name + pathSeperator + path,
+                            pathSeperator);
+
+            return path;
         }
     }
     class HierarachyController

@@ -9,26 +9,29 @@ namespace Editor.Controls
     {
         public string DisplayText { get; set; }
         public string Path { get; set; }
+        
         public PathDisplay(string d, string p)
         {
             DisplayText = d;
             Path = p;
         }
+    
         public override string ToString()
         {
             return DisplayText;
         }
     }
+
     class TreeViewController
     {
-        internal string[] GetRelativePaths(string[] _list, string _relativeTo)
+        internal string[] GetRelativePaths(string[] sArr, string relativeTo)
         {
-            string[] list = new string[_list.Length];
+            string[] Arr = new string[sArr.Length];
 
-            for (int i = 0; i < _list.Length; i++)
-                list[i] = Path.GetRelativePath(_relativeTo, _list[i]);
+            for (int i = 0; i < sArr.Length; i++)
+                Arr[i] = Path.GetRelativePath(relativeTo, sArr[i]);
 
-            return list;
+            return Arr;
         }
 
         internal void PopulateTreeView(TreeView treeView, string[] paths, char pathSeparator)
@@ -80,10 +83,8 @@ namespace Editor.Controls
                 else
                 {
                     if (node.Children.Count > 0)
-                    {
                         foreach (var item in GetSameNodes(node.Children, _path))
                             yield return item;
-                    }
                 }
             }
         }

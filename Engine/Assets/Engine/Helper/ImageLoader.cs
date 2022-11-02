@@ -13,10 +13,10 @@ namespace Engine.Helper
 {
     internal class ImageLoader
     {
-        public static ID3D11Texture2D LoadTexture(ID3D11Device _device, string _fileName)
+        public static ID3D11Texture2D LoadTexture(ID3D11Device device, string fileName)
         {
             string assetsPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources\");
-            string textureFile = Path.Combine(assetsPath, _fileName);
+            string textureFile = Path.Combine(assetsPath, fileName);
 
             using var wicFactory = new IWICImagingFactory();
             using IWICBitmapDecoder decoder = wicFactory.CreateDecoderFromFileName(textureFile);
@@ -88,7 +88,7 @@ namespace Engine.Helper
             if (format == Format.R32G32B32_Float)
             {
                 // Special case test for optional device support for autogen mipchains for R32G32B32_FLOAT
-                FormatSupport fmtSupport = _device.CheckFormatSupport(Format.R32G32B32_Float);
+                FormatSupport fmtSupport = device.CheckFormatSupport(Format.R32G32B32_Float);
                 if (!fmtSupport.HasFlag(FormatSupport.MipAutogen))
                 {
                     // Use R32G32B32A32_FLOAT instead which is required for Feature Level 10.0 and up
@@ -100,7 +100,7 @@ namespace Engine.Helper
 
             // Verify our target format is supported by the current device
             // (handles WDDM 1.0 or WDDM 1.1 device driver cases as well as DirectX 11.0 Runtime without 16bpp format support)
-            FormatSupport support = _device.CheckFormatSupport(format);
+            FormatSupport support = device.CheckFormatSupport(format);
             if (!support.HasFlag(FormatSupport.Texture2D))
             {
                 // Fallback to RGBA 32-bit format which is supported by all devices
@@ -165,7 +165,7 @@ namespace Engine.Helper
                 converter.CopyPixels(rowPitch, pixels);
             }
 
-            return _device.CreateTexture2D(format, size.Width, size.Height, pixels);
+            return device.CreateTexture2D(format, size.Width, size.Height, pixels);
         }
 
         internal static readonly Dictionary<Guid, Format> s_WICFormats = new()

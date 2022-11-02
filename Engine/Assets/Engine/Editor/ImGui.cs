@@ -9,24 +9,27 @@ using Engine.Utilities;
 
 namespace Engine.Editor
 {
-    internal class ImGui
+    public class ImGui
     {
-        Renderer d3d;
-        InputLayoutDescription inputLayoutDescription;
-        ID3D11Texture2D fontTexture;
-        Mesh imguiMesh;
+        private Renderer _d3d;
+        private InputLayoutDescription _inputLayoutDescription;
+        private ID3D11Texture2D _fontTexture;
+        private Mesh _imguiMesh;
 
         internal ImGui()
         {
-            d3d = Renderer.Instance;
+            #region //Create Instance
+            _d3d = Renderer.Instance;
+            #endregion
+
             var con = ImGuiNET.ImGui.CreateContext();
             ImGuiNET.ImGui.SetCurrentContext(con);
             var fonts = ImGuiNET.ImGui.GetIO().Fonts;
             ImGuiNET.ImGui.GetIO().Fonts.AddFontDefault();
             var io = ImGuiNET.ImGui.GetIO();
-            io.DisplaySize = d3d.swapChainPanel.ActualSize;
+            io.DisplaySize = _d3d.SwapChainPanel.ActualSize;
             io.DisplayFramebufferScale = Vector2.One;
-            io.DeltaTime = (float)Time.s_watch.Elapsed.TotalSeconds;
+            io.DeltaTime = (float)Time.s_Watch.Elapsed.TotalSeconds;
             ImGuiNET.ImGui.StyleColorsDark();
             RecreateFontDeviceTexture();
         }
@@ -42,7 +45,7 @@ namespace Engine.Editor
 
         internal void Draw()
         {
-            ImGuiNET.ImGui.GetIO().DeltaTime = (float)Time.s_watch.Elapsed.TotalSeconds;
+            ImGuiNET.ImGui.GetIO().DeltaTime = (float)Time.s_Watch.Elapsed.TotalSeconds;
             ImGuiNET.ImGui.NewFrame();
             ImGuiNET.ImGui.Begin("Test");
 

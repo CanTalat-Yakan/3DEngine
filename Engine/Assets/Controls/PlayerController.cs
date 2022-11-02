@@ -5,82 +5,87 @@ using Microsoft.UI.Xaml.Media;
 
 namespace Editor.Controls
 {
-    internal enum EPlayMode
+    public enum EPlayMode
     {
         NONE,
         PLAYING,
         PAUSED
     }
-    internal class PlayerController
+
+    public class PlayerController
     {
-        internal EPlayMode m_PlayMode;
+        public EPlayMode PlayMode;
 
-        AppBarToggleButton m_play;
-        AppBarToggleButton m_pause;
-        AppBarButton m_forward;
-        TextBlock m_status;
-        OutputController m_output;
+        AppBarToggleButton _play;
+        AppBarToggleButton _pause;
+        AppBarButton _forward;
+        TextBlock _status;
+        OutputController _output;
 
-        internal PlayerController(AppBarToggleButton play, AppBarToggleButton pause, AppBarButton forward)
+        public PlayerController(AppBarToggleButton play, AppBarToggleButton pause, AppBarButton forward)
         {
-            m_play = play;
-            m_pause = pause;
-            m_forward = forward;
-            m_output = MainController.Singleton.m_Layout.m_Output.outputControl;
-            m_status = MainController.Singleton.m_Status;
+            _play = play;
+            _pause = pause;
+            _forward = forward;
+            _output = MainController.Instance.LayoutControl.Output.OutputControl;
+            _status = MainController.Instance.Status;
         }
 
-        void SetStatusAppBarButtons(bool _b)
+        void SetStatusAppBarButtons(bool b)
         {
-            m_PlayMode = _b ? EPlayMode.PLAYING : EPlayMode.NONE;
+            PlayMode = b ? EPlayMode.PLAYING : EPlayMode.NONE;
 
-            m_pause.IsEnabled = _b;
-            m_pause.IsChecked = false;
-            if(!_b)
-                m_forward.IsEnabled = _b;
+            _pause.IsEnabled = b;
+            _pause.IsChecked = false;
+            if(!b)
+                _forward.IsEnabled = b;
 
-            m_play.Label = _b ? "Stop" : "Play";
-            m_play.Icon = _b ? new SymbolIcon(Symbol.Stop) : new SymbolIcon(Symbol.Play);
+            _play.Label = b ? "Stop" : "Play";
+            _play.Icon = b ? new SymbolIcon(Symbol.Stop) : new SymbolIcon(Symbol.Play);
         }
+
         void SetStatus(string _s)
         {
-            m_status.Text = _s;
+            _status.Text = _s;
         }
 
-        internal void Play()
+        public void Play()
         {
-            if (m_PlayMode == EPlayMode.NONE)
-                if (m_output.m_ClearPlay.IsChecked.Value)
-                    m_output.ClearOutput();
+            if (PlayMode == EPlayMode.NONE)
+                if (_output._clearPlay.IsChecked.Value)
+                    _output.ClearOutput();
 
-            MainController.Singleton.m_Layout.m_ViewPort.borderBrush.BorderBrush = new SolidColorBrush(Colors.GreenYellow);
-            MainController.Singleton.m_Layout.m_ViewPort.borderBrush.BorderThickness = new Thickness(m_play.IsChecked.Value ? 2 : 0);
+            MainController.Instance.LayoutControl.ViewPort.BorderColor.BorderBrush = new SolidColorBrush(Colors.GreenYellow);
+            MainController.Instance.LayoutControl.ViewPort.BorderColor.BorderThickness = new Thickness(_play.IsChecked.Value ? 2 : 0);
 
-            SetStatusAppBarButtons(m_play.IsChecked.Value);
+            SetStatusAppBarButtons(_play.IsChecked.Value);
 
-            SetStatus(m_play.IsChecked.Value ? "Now Playing..." : "Stopped Gamemode");
+            SetStatus(_play.IsChecked.Value ? "Now Playing..." : "Stopped Gamemode");
         }
-        internal void Pause()
+
+        public void Pause()
         {
-            m_PlayMode = m_pause.IsChecked.Value ? EPlayMode.PAUSED : EPlayMode.PLAYING;
+            PlayMode = _pause.IsChecked.Value ? EPlayMode.PAUSED : EPlayMode.PLAYING;
 
-            m_forward.IsEnabled = m_pause.IsChecked.Value;
-            MainController.Singleton.m_Layout.m_ViewPort.borderBrush.BorderBrush = new SolidColorBrush(m_pause.IsChecked.Value ? Colors.Orange : Colors.GreenYellow);
+            _forward.IsEnabled = _pause.IsChecked.Value;
+            MainController.Instance.LayoutControl.ViewPort.BorderColor.BorderBrush = new SolidColorBrush(_pause.IsChecked.Value ? Colors.Orange : Colors.GreenYellow);
 
-            SetStatus(m_pause.IsChecked.Value ? "Paused Gamemode" : "Continued Gamemode");
+            SetStatus(_pause.IsChecked.Value ? "Paused Gamemode" : "Continued Gamemode");
         }
-        internal void Forward()
+
+        public void Forward()
         {
-            if (m_PlayMode != EPlayMode.PAUSED)
+            if (PlayMode != EPlayMode.PAUSED)
                 return;
 
             OutputController.Log("Stepped Forward..");
 
             SetStatus("Stepped Forward");
         }
-        internal void Kill()
+
+        public void Kill()
         {
-            m_play.IsChecked = false;
+            _play.IsChecked = false;
 
             SetStatusAppBarButtons(false);
 

@@ -3,33 +3,33 @@ using Engine.Components;
 
 namespace Engine.Utilities
 {
-    internal class Entity : ICloneable
+    public class Entity : ICloneable
     {
-        internal Guid id = Guid.NewGuid();
+        public Guid ID = Guid.NewGuid();
 
-        internal Entity parent;
+        public Entity Parent;
 
-        internal Transform transform = new Transform();
-        internal Material material;
-        internal Mesh mesh;
+        public TransformComponent Transform = new TransformComponent();
+        public MaterialComponent Material;
+        public MeshComponent Mesh;
 
-        internal string name = "Object";
-        internal bool isEnabled = true;
-        internal bool isStatic = false;
+        public string Name = "Object";
+        public bool IsEnabled = true;
+        public bool IsStatic = false;
 
-        internal Entity Clone() { return (Entity)this.MemberwiseClone(); }
+        public Entity Clone() { return (Entity)this.MemberwiseClone(); }
         object ICloneable.Clone() { return Clone(); }
 
-        internal void Update_Render()
+        public void Update_Render()
         {
-            if (!isStatic)
+            if (!IsStatic)
             {
-                if (parent != null)
-                    transform.parent = parent.transform;
-                transform.Update();
+                if (Parent != null)
+                    Transform.Parent = Parent.Transform;
+                Transform.Update();
             }
-            material.Render(transform.m_ConstantsBuffer);
-            mesh.Render();
+            Material.Render(Transform.ConstantsBuffer);
+            Mesh.Render();
         }
     }
 }

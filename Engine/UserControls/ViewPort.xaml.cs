@@ -1,14 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Core;
 using Engine.Components;
 using Engine.Editor;
 
@@ -19,31 +11,31 @@ namespace Editor.UserControls
 {
     public sealed partial class ViewPort : UserControl
     {
-        internal Engine.Loop engineLoop;
+        public Engine.Core EngineCore;
 
-        internal TextBlock debugProfiling;
-        internal Grid borderBrush;
+        public TextBlock DebugProfiling;
+        public Grid BorderColor;
 
         public ViewPort()
         {
             this.InitializeComponent();
 
-            debugProfiling = x_TextBlock_Debug_FPS;
-            borderBrush = x_Grid_ViewPort_BorderBrush;
+            DebugProfiling = x_TextBlock_Debug_FPS;
+            BorderColor = x_Grid_ViewPort_BorderBrush;
 
             Loaded += Initialize;
         }
 
-        void Initialize(object sender, RoutedEventArgs e)
+        private void Initialize(object sender, RoutedEventArgs e)
         {
-            engineLoop = new Engine.Loop(x_SwapChainPanel_ViewPort, debugProfiling);
+            EngineCore = new Engine.Core(x_SwapChainPanel_ViewPort, DebugProfiling);
 
-            PointerPressed += engineLoop.input.PointerPressed;
-            PointerWheelChanged += engineLoop.input.PointerWheelChanged;
-            PointerReleased += engineLoop.input.PointerReleased;
-            PointerMoved += engineLoop.input.PointerMoved;
-            KeyDown += engineLoop.input.KeyDown;
-            KeyUp += engineLoop.input.KeyUp;
+            PointerPressed += EngineCore.Input.PointerPressed;
+            PointerWheelChanged += EngineCore.Input.PointerWheelChanged;
+            PointerReleased += EngineCore.Input.PointerReleased;
+            PointerMoved += EngineCore.Input.PointerMoved;
+            KeyDown += EngineCore.Input.KeyDown;
+            KeyUp += EngineCore.Input.KeyUp;
 
             //var window = (Application.Current as App)?.Window as MainWindow;
             //window.CoreWindow.KeyDown += m_Engine.m_Input.KeyDown;
@@ -52,8 +44,8 @@ namespace Editor.UserControls
             //Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(Windows.System.VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down);
         }
 
+        private void x_Slider_FOV_ValueChanged(object sender, RangeBaseValueChangedEventArgs e) { CameraComponent.s_FieldOfView = e.NewValue; }
 
-        void x_Slider_FOV_ValueChanged(object sender, RangeBaseValueChangedEventArgs e) { Camera.s_fieldOfView = e.NewValue; }
-        void x_NumberBox_CameraSpeed_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) { Controller.s_movementSpeed = (float)args.NewValue; }
+        private void x_NumberBox_CameraSpeed_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) { ViewPortController.s_MovementSpeed = (float)args.NewValue; }
     }
 }

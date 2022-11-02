@@ -3,25 +3,25 @@ using Editor.UserControls;
 
 namespace Editor.Controls
 {
-    internal class MainController
+    public class MainController
     {
-        public static MainController Singleton { get; private set; }
+        public static MainController Instance { get; private set; }
 
-        internal LayoutController m_Layout;
-        internal PlayerController m_Player;
-        internal Grid m_Content;
-        internal TextBlock m_Status;
+        public LayoutController LayoutControl;
+        public PlayerController ControlPlayer;
+        public Grid Content;
+        public TextBlock Status;
 
-        public MainController(Grid _content, TextBlock _status)
+        public MainController(Grid content, TextBlock status)
         {
-            if (Singleton is null)
-                Singleton = this;
+            if (Instance is null)
+                Instance = this;
 
-            m_Content = _content;
-            m_Status = _status;
+            Content = content;
+            Status = status;
 
-            m_Layout = new LayoutController(
-                m_Content,
+            LayoutControl = new LayoutController(
+                Content,
                 new ViewPort(),
                 new Hierarchy(),
                 new Properties(),
@@ -29,7 +29,7 @@ namespace Editor.Controls
                 new Files(),
                 new Settings());
 
-            m_Layout.Initialize();
+            LayoutControl.Initialize();
         }
     }
 }

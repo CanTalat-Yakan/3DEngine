@@ -10,10 +10,10 @@ namespace Engine.Helper
 {
     internal class ModelLoader
     {
-        internal static MeshInfo LoadFilePro(string _fileName)
+        internal static MeshInfo LoadFilePro(string fileName)
         {
             string assetsPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources\");
-            string modelFile = Path.Combine(assetsPath, _fileName);
+            string modelFile = Path.Combine(assetsPath, fileName);
             
             //// initialize Scene class object
             //Scene scene = new Scene();

@@ -1,22 +1,15 @@
 ﻿using Editor.Controls;
-using Microsoft.UI;
-using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Controls;
-using System;
-using System.IO;
-using WinRT.Interop;
-using Windows.UI.ViewManagement;
 using WinUIEx;
-using System.Runtime.InteropServices;
-using WinRT;
+
+// To learn more about WinUI, the WinUI project structure,
+// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace Editor
 {
     public sealed partial class MainWindow : WindowEx
     {
-        MainController mainControl;
+        MainController _mainControl;
 
         public MainWindow()
         {
@@ -24,14 +17,18 @@ namespace Editor
 
             ExtendsContentIntoTitleBar = true;
 
-            mainControl = new MainController(x_Grid_Main, x_TextBlock_Status_Content);
-            mainControl.m_Player = new PlayerController(x_AppBarToggleButton_Status_Play, x_AppBarToggleButton_Status_Pause, x_AppBarButton_Status_Forward);
+            _mainControl = new MainController(x_Grid_Main, x_TextBlock_Status_Content);
+            _mainControl.ControlPlayer = new PlayerController(x_AppBarToggleButton_Status_Play, x_AppBarToggleButton_Status_Pause, x_AppBarButton_Status_Forward);
         }
 
-        private void AppBarToggleButton_Status_Play_Click(object sender, RoutedEventArgs e) { mainControl.m_Player.Play(); }
-        private void AppBarToggleButton_Status_Pause_Click(object sender, RoutedEventArgs e) { mainControl.m_Player.Pause(); }
-        private void AppBarButton_Status_Forward_Click(object sender, RoutedEventArgs e) { mainControl.m_Player.Forward(); }
-        private void AppBarButton_Status_Kill_Click(object sender, RoutedEventArgs e) { mainControl.m_Player.Kill(); }
+        private void AppBarToggleButton_Status_Play_Click(object sender, RoutedEventArgs e) { _mainControl.ControlPlayer.Play(); }
+
+        private void AppBarToggleButton_Status_Pause_Click(object sender, RoutedEventArgs e) { _mainControl.ControlPlayer.Pause(); }
+
+        private void AppBarButton_Status_Forward_Click(object sender, RoutedEventArgs e) { _mainControl.ControlPlayer.Forward(); }
+
+        private void AppBarButton_Status_Kill_Click(object sender, RoutedEventArgs e) { _mainControl.ControlPlayer.Kill(); }
+
         private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) { x_Frame_Main.RequestedTheme = x_Frame_Main.RequestedTheme == ElementTheme.Light ? ElementTheme.Dark : x_Frame_Main.RequestedTheme = ElementTheme.Light; }
     }
 }

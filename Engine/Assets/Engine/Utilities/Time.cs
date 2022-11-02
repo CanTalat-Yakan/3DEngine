@@ -3,31 +3,32 @@ using System.Diagnostics;
 
 namespace Engine.Utilities
 {
-    internal class Time
+    public class Time
     {
-        internal string profile = "";
+        public string Profile = "";
 
-        internal static double s_time, s_delta;
-        internal static Stopwatch s_watch = new Stopwatch();
-        int fps, tmpFPS;
-        DateTime now = DateTime.Now;
+        public static double s_Time, s_Delta;
+        public static Stopwatch s_Watch = new Stopwatch();
 
-        internal void Update()
+        int _fps, _tmpFPS;
+        DateTime _now = DateTime.Now;
+
+        public void Update()
         {
-            s_delta = s_watch.ElapsedMilliseconds * 0.001;
-            s_time += s_delta;
-            ++tmpFPS;
+            s_Delta = s_Watch.ElapsedMilliseconds * 0.001;
+            s_Time += s_Delta;
+            ++_tmpFPS;
 
-            if (now.Second != DateTime.Now.Second)
+            if (_now.Second != DateTime.Now.Second)
             {
-                fps = tmpFPS;
-                tmpFPS = 0;
-                now = DateTime.Now;
+                _fps = _tmpFPS;
+                _tmpFPS = 0;
+                _now = DateTime.Now;
 
-                profile = s_watch.ElapsedMilliseconds.ToString() + " ms" + "\n" + fps.ToString() + " FPS";
+                Profile = s_Watch.ElapsedMilliseconds.ToString() + " ms" + "\n" + _fps.ToString() + " FPS";
             }
 
-            s_watch.Restart();
+            s_Watch.Restart();
         }
     }
 }

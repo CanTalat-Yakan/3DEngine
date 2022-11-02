@@ -1,19 +1,8 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Editor.Controls;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -23,35 +12,35 @@ namespace Editor.UserControls
 {
     public sealed partial class Properties : UserControl
     {
-        internal event PropertyChangedEventHandler EventPropertyChanged;
+        public event PropertyChangedEventHandler _EventPropertyChanged;
 
-        internal PropertiesController properitesControl;
-
+        public PropertiesController ProperitesControl = new PropertiesController();
 
         public Properties()
         {
             this.InitializeComponent();
 
-            properitesControl = new PropertiesController();
             List<Grid> collection = new List<Grid>();
-            collection.Add(properitesControl.CreateColorButton());
-            collection.Add(properitesControl.CreateNumberInput());
-            collection.Add(properitesControl.CreateTextInput());
-            collection.Add(properitesControl.CreateVec2Input());
-            collection.Add(properitesControl.CreateVec3Input());
-            collection.Add(properitesControl.CreateSlider());
-            collection.Add(properitesControl.CreateBool());
-            collection.Add(properitesControl.CreateTextureSlot());
-            collection.Add(properitesControl.CreateReferenceSlot());
-            collection.Add(properitesControl.CreateHeader());
-            collection.Add(properitesControl.WrapExpander(properitesControl.CreateEvent()));
-            x_StackPanel_Properties.Children.Add(properitesControl.CreateScript("Example", collection.ToArray()));
-            x_StackPanel_Properties.Children.Add(properitesControl.CreateScript("Another", properitesControl.CreateSpacer()));
+            collection.Add(ProperitesControl.CreateColorButton());
+            collection.Add(ProperitesControl.CreateNumberInput());
+            collection.Add(ProperitesControl.CreateTextInput());
+            collection.Add(ProperitesControl.CreateVec2Input());
+            collection.Add(ProperitesControl.CreateVec3Input());
+            collection.Add(ProperitesControl.CreateSlider());
+            collection.Add(ProperitesControl.CreateBool());
+            collection.Add(ProperitesControl.CreateTextureSlot());
+            collection.Add(ProperitesControl.CreateReferenceSlot());
+            collection.Add(ProperitesControl.CreateHeader());
+            collection.Add(ProperitesControl.WrapExpander(ProperitesControl.CreateEvent()));
+
+            x_StackPanel_Properties.Children.Add(ProperitesControl.CreateScript("Example", collection.ToArray()));
+            x_StackPanel_Properties.Children.Add(ProperitesControl.CreateScript("Another", ProperitesControl.CreateSpacer()));
         }
 
+        private void AppBarButton_Click_SelectImagePath(object sender, RoutedEventArgs e) { }//m_Control.SelectImage(Img_SelectTexture, x_TextBlock_TexturePath); }
 
-        void AppBarButton_Click_SelectImagePath(object sender, RoutedEventArgs e) { }//m_Control.SelectImage(Img_SelectTexture, x_TextBlock_TexturePath); }
-        void AppBarButton_Click_SelectFilePath(object sender, RoutedEventArgs e) { }//m_Control.SelectFile(x_TextBlock_FilePath); }
-        void FirePropertyChanged([CallerMemberName] string memberName = null) { this.EventPropertyChanged?.Invoke(this, new PropertyChangedEventArgs(memberName)); }
+        private void AppBarButton_Click_SelectFilePath(object sender, RoutedEventArgs e) { }//m_Control.SelectFile(x_TextBlock_FilePath); }
+
+        private void FirePropertyChanged([CallerMemberName] string memberName = null) { _EventPropertyChanged?.Invoke(this, new PropertyChangedEventArgs(memberName)); }
     }
 }

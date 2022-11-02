@@ -14,38 +14,39 @@ namespace Editor.Controls
         public object Content;
         public Symbol Symbol;
     }
-    internal class TabViewPageController
-    {
-        internal TabView m_TabView;
 
-        public TabViewPageController(params TabViewItemDataTemplate[] _icollection)
+    public class TabViewPageController
+    {
+        internal TabView _tabView;
+
+        public TabViewPageController(params TabViewItemDataTemplate[] icollection)
         {
-            m_TabView = new TabView() { TabWidthMode = TabViewWidthMode.Equal, CloseButtonOverlayMode = TabViewCloseButtonOverlayMode.Auto, IsAddTabButtonVisible = false };
-            m_TabView.AddTabButtonClick += TabView_AddButtonClick;
+            _tabView = new TabView() { TabWidthMode = TabViewWidthMode.Equal, CloseButtonOverlayMode = TabViewCloseButtonOverlayMode.Auto, IsAddTabButtonVisible = false };
+            _tabView.AddTabButtonClick += TabView_AddButtonClick;
             //m_TabView.TabCloseRequested += TabView_TabCloseRequested;
 
-            foreach (var item in _icollection)
-                m_TabView.TabItems.Add(CreateNewTab(item));
+            foreach (var item in icollection)
+                _tabView.TabItems.Add(CreateNewTab(item));
         }
-
 
         void TabView_AddButtonClick(TabView sender, object args)
         {
             var item = new TabViewItemDataTemplate() { Header = "Viewport", Content = new Page(), Symbol = Symbol.View };
-            m_TabView.TabItems.Add(CreateNewTab(item));
+            _tabView.TabItems.Add(CreateNewTab(item));
         }
+
         void TabView_TabCloseRequested(TabView sender, TabViewTabCloseRequestedEventArgs args)
         {
             sender.TabItems.Remove(args.Tab);
         }
 
-        TabViewItem CreateNewTab(TabViewItemDataTemplate _i)
+        TabViewItem CreateNewTab(TabViewItemDataTemplate i)
         {
             TabViewItem newItem = new TabViewItem
             {
-                Header = _i.Header,
-                Content = _i.Content,
-                IconSource = new SymbolIconSource() { Symbol = _i.Symbol },
+                Header = i.Header,
+                Content = i.Content,
+                IconSource = new SymbolIconSource() { Symbol = i.Symbol },
                 IsClosable = false
             };
 

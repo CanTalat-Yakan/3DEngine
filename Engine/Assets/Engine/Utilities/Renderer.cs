@@ -9,34 +9,34 @@ using Vortice.Mathematics;
 
 namespace Engine.Utilities
 {
-    internal class Renderer
+    public class Renderer
     {
         public static Renderer Instance { get; private set; }
 
-        internal string profile;
+        public string Profile;
 
-        internal ID3D11Device2 device;
-        internal ID3D11DeviceContext deviceContext;
-        internal SwapChainPanel swapChainPanel;
+        public ID3D11Device2 Device { get; private set; }
+        public ID3D11DeviceContext DeviceContext { get; private set; }
+        public SwapChainPanel SwapChainPanel { get; private set; }
+        
+        private readonly IDXGISwapChain2 _swapChain;
 
-        internal readonly IDXGISwapChain2 swapChain;
+        ID3D11Texture2D _renderTargetTexture;
+        ID3D11RenderTargetView _renderTargetView;
+        ID3D11Texture2D _depthStencilTexture;
+        Texture2DDescription _depthStencilTextureDescription;
+        ID3D11DepthStencilView _depthStencilView;
+        ID3D11BlendState _blendState;
 
-        ID3D11Texture2D renderTargetTexture;
-        ID3D11RenderTargetView renderTargetView;
-        ID3D11Texture2D depthStencilTexture;
-        Texture2DDescription depthStencilTextureDescription;
-        ID3D11DepthStencilView depthStencilView;
-        ID3D11BlendState blendState;
-
-        internal Renderer(SwapChainPanel _swapChainPanel)
+        internal Renderer(SwapChainPanel swapChainPanel)
         {
             #region //Create Instance
             Instance = this;
             #endregion
 
             #region //Set SwapChainPanel and SizeChanger
-            swapChainPanel = _swapChainPanel;
-            swapChainPanel.SizeChanged += OnSwapChainPanelSizeChanged;
+            SwapChainPanel = swapChainPanel;
+            SwapChainPanel.SizeChanged += OnSwapChainPanelSizeChanged;
             #endregion
 
             #region //Create Buffer Description for swapChain description
@@ -45,8 +45,8 @@ namespace Engine.Utilities
                 AlphaMode = AlphaMode.Ignore,
                 BufferCount = 2,
                 Format = Format.R8G8B8A8_UNorm,
-                Height = (int)swapChainPanel.RenderSize.Height,
-                Width = (int)swapChainPanel.RenderSize.Width,
+                Height = (int)SwapChainPanel.RenderSize.Height,
+                Width = (int)SwapChainPanel.RenderSize.Width,
                 SampleDescription = new SampleDescription(1, 0),
                 Scaling = Scaling.Stretch,
                 Stereo = false,
@@ -67,26 +67,26 @@ namespace Engine.Utilities
                 },
                 out var defaultDevice);
 
-            device = defaultDevice.QueryInterface<ID3D11Device2>();
-            deviceContext = device.ImmediateContext2;
+            Device = defaultDevice.QueryInterface<ID3D11Device2>();
+            DeviceContext = Device.ImmediateContext2;
 
             // Get the Vortice.DXGI factory automatically created when initializing the Direct3D device.
-            using (var dxgiDevice3 = device.QueryInterface<IDXGIDevice3>())
+            using (var dxgiDevice3 = Device.QueryInterface<IDXGIDevice3>())
             using (IDXGIFactory2 dxgiFactory = dxgiDevice3.GetAdapter().GetParent<IDXGIFactory2>())
             using (IDXGISwapChain1 swapChain1 = dxgiFactory.CreateSwapChainForComposition(dxgiDevice3, swapChainDescription))
-                swapChain = swapChain1.QueryInterface<IDXGISwapChain2>();
+                _swapChain = swapChain1.QueryInterface<IDXGISwapChain2>();
 
-            using (var nativeObject = ComObject.As<Vortice.WinUI.ISwapChainPanelNative2>(swapChainPanel))
-                nativeObject.SetSwapChain(swapChain);
+            using (var nativeObject = ComObject.As<Vortice.WinUI.ISwapChainPanelNative2>(this.SwapChainPanel))
+                nativeObject.SetSwapChain(_swapChain);
             #endregion
 
             #region //Create render target view, get back buffer texture before
-            renderTargetTexture = swapChain.GetBuffer<ID3D11Texture2D>(0);
-            renderTargetView = device.CreateRenderTargetView(renderTargetTexture);
+            _renderTargetTexture = _swapChain.GetBuffer<ID3D11Texture2D>(0);
+            _renderTargetView = Device.CreateRenderTargetView(_renderTargetTexture);
             #endregion
 
             #region //Create depth stencil view
-            depthStencilTextureDescription = new Texture2DDescription
+            _depthStencilTextureDescription = new Texture2DDescription
             {
                 Format = Format.D32_Float,
                 ArraySize = 1,
@@ -99,8 +99,8 @@ namespace Engine.Utilities
                 CPUAccessFlags = CpuAccessFlags.None,
                 MiscFlags = ResourceOptionFlags.None
             };
-            using (depthStencilTexture = device.CreateTexture2D(depthStencilTextureDescription))
-                depthStencilView = device.CreateDepthStencilView(depthStencilTexture);
+            using (_depthStencilTexture = Device.CreateTexture2D(_depthStencilTextureDescription))
+                _depthStencilView = Device.CreateDepthStencilView(_depthStencilTexture);
 
             DepthStencilDescription desc = new DepthStencilDescription()
             {
@@ -108,9 +108,9 @@ namespace Engine.Utilities
                 DepthFunc = ComparisonFunction.Less,
                 DepthWriteMask = DepthWriteMask.All,
             };
-            ID3D11DepthStencilState state = device.CreateDepthStencilState(desc);
-            deviceContext.OMSetDepthStencilState(state);
-            deviceContext.OMSetRenderTargets(renderTargetView, depthStencilView);
+            ID3D11DepthStencilState state = Device.CreateDepthStencilState(desc);
+            DeviceContext.OMSetDepthStencilState(state);
+            DeviceContext.OMSetRenderTargets(_renderTargetView, _depthStencilView);
             #endregion
 
             #region //Create rasterizer state
@@ -132,40 +132,38 @@ namespace Engine.Utilities
             };
 
             blendStateDesc.RenderTarget[0] = renTarDesc;
-            blendState = device.CreateBlendState(blendStateDesc);
-            deviceContext.OMSetBlendState(blendState);
+            _blendState = Device.CreateBlendState(blendStateDesc);
+            DeviceContext.OMSetBlendState(_blendState);
             #endregion
 
             #region //Set ViewPort
-            deviceContext.RSSetViewport(0, 0, (int)swapChainPanel.ActualWidth, (int)swapChainPanel.ActualHeight);
+            DeviceContext.RSSetViewport(0, 0, (int)this.SwapChainPanel.ActualWidth, (int)this.SwapChainPanel.ActualHeight);
             #endregion
         }
 
         public void Dispose()
         {
-            device.Dispose();
-            deviceContext.Dispose();
-            swapChain.Dispose();
-            depthStencilView.Dispose();
-            depthStencilTexture.Dispose();
-            renderTargetView.Dispose();
-            renderTargetTexture.Dispose();
-            blendState.Dispose();
+            Device.Dispose();
+            DeviceContext.Dispose();
+            _swapChain.Dispose();
+            _depthStencilView.Dispose();
+            _depthStencilTexture.Dispose();
+            _renderTargetView.Dispose();
+            _renderTargetTexture.Dispose();
+            _blendState.Dispose();
         }
-
-
 
         internal void Clear()
         {
             var col = new Color4(0.15f, 0.15f, 0.15f, 1);
-            deviceContext.ClearRenderTargetView(renderTargetView, col);
-            deviceContext.ClearDepthStencilView(depthStencilView, DepthStencilClearFlags.Depth, 1.0f, 0);
-            deviceContext.OMSetRenderTargets(renderTargetView, depthStencilView);
+            DeviceContext.ClearRenderTargetView(_renderTargetView, col);
+            DeviceContext.ClearDepthStencilView(_depthStencilView, DepthStencilClearFlags.Depth, 1.0f, 0);
+            DeviceContext.OMSetRenderTargets(_renderTargetView, _depthStencilView);
         }
 
         internal void Present()
         {
-            swapChain.Present(0, PresentFlags.None);
+            _swapChain.Present(0, PresentFlags.None);
 
             //int syncInterval = 1;
             //PresentFlags presentFlags = PresentFlags.None;
@@ -175,8 +173,6 @@ namespace Engine.Utilities
             //Result result = m_SwapChain.Present(syncInterval, presentFlags);
         }
 
-
-
         internal void SetSolid()
         {
             var rasterizerDesc = new RasterizerDescription()
@@ -185,8 +181,9 @@ namespace Engine.Utilities
                 CullMode = CullMode.Back,
             };
 
-            deviceContext.RSSetState(device.CreateRasterizerState(rasterizerDesc));
+            DeviceContext.RSSetState(Device.CreateRasterizerState(rasterizerDesc));
         }
+
         internal void SetWireframe()
         {
             var rasterizerDescWireframe = new RasterizerDescription()
@@ -195,52 +192,48 @@ namespace Engine.Utilities
                 CullMode = CullMode.None,
             };
 
-            deviceContext.RSSetState(device.CreateRasterizerState(rasterizerDescWireframe));
+            DeviceContext.RSSetState(Device.CreateRasterizerState(rasterizerDescWireframe));
         }
-
-
 
         internal void RenderMesh(ID3D11Buffer _vertexBuffer, int _vertexStride, ID3D11Buffer _indexBuffer, int _indexCount)
         {
-            deviceContext.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
-            deviceContext.IASetVertexBuffer(0, _vertexBuffer, _vertexStride, 0);
-            deviceContext.IASetIndexBuffer(_indexBuffer, Format.R16_UInt, 0);
-            deviceContext.OMSetBlendState(blendState);
-            deviceContext.DrawIndexed(_indexCount, 0, 0);
+            DeviceContext.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
+            DeviceContext.IASetVertexBuffer(0, _vertexBuffer, _vertexStride, 0);
+            DeviceContext.IASetIndexBuffer(_indexBuffer, Format.R16_UInt, 0);
+            DeviceContext.OMSetBlendState(_blendState);
+            DeviceContext.DrawIndexed(_indexCount, 0, 0);
         }
-
-
 
         internal void OnSwapChainPanelSizeChanged(object sender, SizeChangedEventArgs e)
         {
             var newSize = new SizeI((int)e.NewSize.Width, (int)e.NewSize.Height);
 
-            renderTargetView.Dispose();
-            renderTargetTexture.Dispose();
-            depthStencilView.Dispose();
-            depthStencilTexture.Dispose();
+            _renderTargetView.Dispose();
+            _renderTargetTexture.Dispose();
+            _depthStencilView.Dispose();
+            _depthStencilTexture.Dispose();
 
-            profile = "Resolution: " + "\n" + ((int)e.NewSize.Width).ToString() + ":" + ((int)e.NewSize.Height).ToString();
+            Profile = "Resolution: " + "\n" + ((int)e.NewSize.Width).ToString() + ":" + ((int)e.NewSize.Height).ToString();
 
-            swapChain.ResizeBuffers(
-              swapChain.Description.BufferCount,
+            _swapChain.ResizeBuffers(
+              _swapChain.Description.BufferCount,
               Math.Max(1, (int)e.NewSize.Width),
               Math.Max(1, (int)e.NewSize.Height),
-              swapChain.Description1.Format,
-              swapChain.Description1.Flags);
+              _swapChain.Description1.Format,
+              _swapChain.Description1.Flags);
 
-            renderTargetTexture = swapChain.GetBuffer<ID3D11Texture2D>(0);
-            renderTargetView = device.CreateRenderTargetView(renderTargetTexture);
+            _renderTargetTexture = _swapChain.GetBuffer<ID3D11Texture2D>(0);
+            _renderTargetView = Device.CreateRenderTargetView(_renderTargetTexture);
 
-            depthStencilTextureDescription.Width = Math.Max(1, (int)e.NewSize.Width);
-            depthStencilTextureDescription.Height = Math.Max(1, (int)e.NewSize.Height);
-            using (depthStencilTexture = device.CreateTexture2D(depthStencilTextureDescription))
-                depthStencilView = device.CreateDepthStencilView(depthStencilTexture);
+            _depthStencilTextureDescription.Width = Math.Max(1, (int)e.NewSize.Width);
+            _depthStencilTextureDescription.Height = Math.Max(1, (int)e.NewSize.Height);
+            using (_depthStencilTexture = Device.CreateTexture2D(_depthStencilTextureDescription))
+                _depthStencilView = Device.CreateDepthStencilView(_depthStencilTexture);
 
 
-            swapChain.SourceSize = newSize;
+            _swapChain.SourceSize = newSize;
 
-            deviceContext.RSSetViewport(0, 0, (int)e.NewSize.Width, (int)e.NewSize.Height);
+            DeviceContext.RSSetViewport(0, 0, (int)e.NewSize.Width, (int)e.NewSize.Height);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using Assimp;
-using System;
+﻿using System;
 using System.Linq;
 using System.Numerics;
 using Editor.Controls;
@@ -8,87 +7,88 @@ using Engine.Editor;
 
 namespace Engine.Utilities
 {
-    internal class Scene
+    public class Scene
     {
-        internal string profile;
+        public string Profile;
 
-        internal Components.Camera camera = new Components.Camera();
-        internal Controller cameraController;
-        internal EntityManager entitytManager = new EntityManager();
+        public CameraComponent Camera = new CameraComponent();
+        public ViewPortController CameraController;
+        public EntityManager EntitytManager = new EntityManager();
+
+        private Entity _subParent;
+        private Entity _special;
 
         internal void Awake()
         {
-            cameraController = new Controller(camera);
-            camera.transform.position = new Vector3(3, 4, 5);
-            camera.transform.eulerAngles = new Vector3(35, -150, 0);
+            CameraController = new ViewPortController(Camera);
+            Camera.Transform.Position = new Vector3(3, 4, 5);
+            Camera.Transform.EulerAngles = new Vector3(35, -150, 0);
 
-            entitytManager.CreateSky();
+            EntitytManager.CreateSky();
         }
 
-        Entity subParent;
-        Entity special;
         internal void Start()
         {
-            special = entitytManager.CreatePrimitive(EPrimitiveTypes.SPECIAL);
-            special.transform.scale *= 0.1f;
-            special.transform.position.Y += 0.5f;
+            _special = EntitytManager.CreatePrimitive(EPrimitiveTypes.SPECIAL);
+            _special.Transform.Scale *= 0.1f;
+            _special.Transform.Position.Y += 0.5f;
 
-            Entity parent = entitytManager.CreateEmpty("Content");
-            subParent = entitytManager.CreateEmpty("Cubes");
-            subParent.parent = parent;
+            Entity parent = EntitytManager.CreateEmpty("Content");
+            _subParent = EntitytManager.CreateEmpty("Cubes");
+            _subParent.Parent = parent;
 
-            entitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).transform.position = new Vector3(0, 0, 1);
-            entitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).transform.position = new Vector3(0, 0, -3);
-            entitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).transform.position = new Vector3(0, 2.5f, 0);
-            entitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).transform.position = new Vector3(0, -4, 0);
-            entitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).transform.position = new Vector3(2, 0, 0);
-            entitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).transform.position = new Vector3(-1, 1, 0);
-            entitytManager.CreatePrimitive(EPrimitiveTypes.CUBE, subParent);
+            EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(0, 0, 1);
+            EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(0, 0, -3);
+            EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(0, 2.5f, 0);
+            EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(0, -4, 0);
+            EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(2, 0, 0);
+            EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(-1, 1, 0);
+            EntitytManager.CreatePrimitive(EPrimitiveTypes.CUBE, _subParent);
         }
 
         internal void Update()
         {
-            cameraController.Update();
-            camera.RecreateViewConstants();
-            entitytManager.sky.transform.position = camera.transform.position;
+            CameraController.Update();
+            Camera.RecreateViewConstants();
+            EntitytManager.Sky.Transform.Position = Camera.Transform.Position;
 
-            if (Input.Instance.GetKey(Windows.System.VirtualKey.F, Input.EInputState.DOWN))
-                special.transform.position += special.transform.forward;
-            if (Input.Instance.GetKey(Windows.System.VirtualKey.G, Input.EInputState.DOWN))
-                special.transform.position += special.transform.right;
-            if (Input.Instance.GetKey(Windows.System.VirtualKey.V, Input.EInputState.DOWN))
-                camera.transform.position += camera.transform.right;
+            if (Input.Instance.GetKey(Windows.System.VirtualKey.F, EInputState.DOWN))
+                _special.Transform.Position += _special.Transform.Forward;
+            if (Input.Instance.GetKey(Windows.System.VirtualKey.G, EInputState.DOWN))
+                _special.Transform.Position += _special.Transform.Right;
+            if (Input.Instance.GetKey(Windows.System.VirtualKey.V, EInputState.DOWN))
+                Camera.Transform.Position += Camera.Transform.Right;
 
-            if (Input.Instance.GetKey(Windows.System.VirtualKey.C, Input.EInputState.DOWN))
+            if (Input.Instance.GetKey(Windows.System.VirtualKey.C, EInputState.DOWN))
             {
                 OutputController.Log("Spawned Cube");
 
-                entitytManager.CreatePrimitive(EPrimitiveTypes.CUBE, subParent).transform = new Transform
+                EntitytManager.CreatePrimitive(EPrimitiveTypes.CUBE, _subParent).Transform = new TransformComponent
                 {
-                    eulerAngles = new Vector3(new Random().Next(1, 360), new Random().Next(1, 360), new Random().Next(1, 360)),
-                    scale = new Vector3(new Random().Next(1, 3), new Random().Next(1, 3), new Random().Next(1, 3))
+                    EulerAngles = new Vector3(new Random().Next(1, 360), new Random().Next(1, 360), new Random().Next(1, 360)),
+                    Scale = new Vector3(new Random().Next(1, 3), new Random().Next(1, 3), new Random().Next(1, 3))
                 };
             }
         }
 
         internal void LateUpdate()
         {
-            profile = "Objects: " + entitytManager.list.Count().ToString();
+            Profile = "Objects: " + EntitytManager.EntityList.Count().ToString();
 
             int vertexCount = 0;
-            foreach (var item in entitytManager.list)
-                if (item.isEnabled && item.mesh != null)
-                    vertexCount += item.mesh.vertexCount;
-            profile += "\n" + "Vertices: " + vertexCount;
+            foreach (var item in EntitytManager.EntityList)
+                if (item.IsEnabled && item.Mesh != null)
+                    vertexCount += item.Mesh.VertexCount;
+            Profile += "\n" + "Vertices: " + vertexCount;
         }
 
         internal void Render()
         {
-            foreach (var item in entitytManager.list)
-                if (item.isEnabled && item.mesh != null)
+            foreach (var item in EntitytManager.EntityList)
+                if (item.IsEnabled && item.Mesh != null)
                     item.Update_Render();
 
-            entitytManager.sky.Update_Render();
+            EntitytManager.Sky.Update_Render();
         }
     }
 }
