@@ -1,7 +1,5 @@
 ﻿using Editor.Controls;
-using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using WinUIEx;
 
 // To learn more about WinUI, the WinUI project structure,
