@@ -2,7 +2,7 @@
 
 namespace Engine.Data
 {
-    public struct Vertex
+    internal struct Vertex
     {
         public Vector3 Pos;
         public Vector2 TexCoord;

@@ -35,7 +35,7 @@ namespace Editor.Controls
             return list.ToArray();
         }
 
-        string GetParents(TreeEntry current, string path, char pathSeperator)
+        private string GetParents(TreeEntry current, string path, char pathSeperator)
         {
             if (current.IDparent != null)
                 foreach (var item in Hierarchy)

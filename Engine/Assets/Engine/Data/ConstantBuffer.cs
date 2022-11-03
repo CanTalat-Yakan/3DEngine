@@ -2,19 +2,19 @@
 
 namespace Engine.Data
 {
-    public struct SViewConstantsBuffer
+    internal struct SViewConstantsBuffer
     {
         public Matrix4x4 ViewProjection;
         public Vector3 CameraPisiton;
         public float Pad;
     }
 
-    public struct SPerModelConstantBuffer
+    internal struct SPerModelConstantBuffer
     {
         public Matrix4x4 ModelView;
     }
 
-    public struct SDirectionalLightConstantBuffer
+    internal struct SDirectionalLightConstantBuffer
     {
         public Vector3 Direction;
         public float Pad;
@@ -24,7 +24,7 @@ namespace Engine.Data
         public Vector3 Pad2;
     }
 
-    public struct SPointLightConstantBuffer
+    internal struct SPointLightConstantBuffer
     {
         public Vector3 Position;
         public float Pad;

@@ -1,20 +1,15 @@
 ﻿using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using System.Runtime.InteropServices;
 using WinRT;
-using System.Runtime.InteropServices; // For DllImport
-using WinRT; // required to support Window.As<ICompositionSupportsSystemBackdrop>()
-using System.Runtime.InteropServices; // For DllImport
-using Microsoft.UI.Composition.SystemBackdrops;
 using Frame = Microsoft.UI.Xaml.Controls.Frame;
-using System.Drawing;
-using Microsoft.UI.Xaml.Media;
 
 namespace Editor.Controls
 {
     internal class ThemeController
     {
-        private WindowsSystemDispatcherQueueHelper _wsdqHelper; // See separate sample below for implementation
+        private WindowsSystemDispatcherQueueHelper _wsdqHelper;
         private MicaController _micaController;
         private SystemBackdropConfiguration _configurationSource;
         private Frame _frame;
@@ -26,6 +21,22 @@ namespace Editor.Controls
             _window = window;
 
             Initialize();
+        }
+
+        public void SetRequstedTheme()
+        {
+            _frame.RequestedTheme = _frame.RequestedTheme == ElementTheme.Light ? ElementTheme.Dark : ElementTheme.Light;
+            _configurationSource.Theme = _configurationSource.Theme == SystemBackdropTheme.Light ? SystemBackdropTheme.Dark : SystemBackdropTheme.Light;
+
+            MainController.Instance.LayoutControl.Output.ChangeColorWithTheme.Background =
+                _frame.RequestedTheme == ElementTheme.Light
+                    ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 255, 255))
+                    : new SolidColorBrush(Windows.UI.Color.FromArgb(255, 40, 40, 40));
+
+            MainController.Instance.LayoutControl.Files.ChangeColorWithTheme.Background =
+                _frame.RequestedTheme == ElementTheme.Light
+                    ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 255, 255))
+                    : new SolidColorBrush(Windows.UI.Color.FromArgb(255, 40, 40, 40));
         }
 
         private bool Initialize()
@@ -76,28 +87,6 @@ namespace Editor.Controls
             _window.Activated -= Window_Activated;
             _configurationSource = null;
         }
-
-        private void Window_ThemeChanged(FrameworkElement sender, object args)
-        {
-            if (_configurationSource != null)
-                SetRequstedTheme();
-        }
-
-        public void SetRequstedTheme()
-        {
-            _frame.RequestedTheme = _frame.RequestedTheme == ElementTheme.Light ? ElementTheme.Dark : ElementTheme.Light;
-            _configurationSource.Theme = _configurationSource.Theme == SystemBackdropTheme.Light ? SystemBackdropTheme.Dark : SystemBackdropTheme.Light;
-
-            MainController.Instance.LayoutControl.Output.ChangeColorWithTheme.Background =
-                _frame.RequestedTheme == ElementTheme.Light
-                    ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 255, 255))
-                    : new SolidColorBrush(Windows.UI.Color.FromArgb(255, 40, 40, 40));
-
-            MainController.Instance.LayoutControl.Files.ChangeColorWithTheme.Background =
-                _frame.RequestedTheme == ElementTheme.Light
-                    ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 255, 255))
-                    : new SolidColorBrush(Windows.UI.Color.FromArgb(255, 40, 40, 40));
-        }
     }
 
     public class WindowsSystemDispatcherQueueHelper
@@ -105,15 +94,16 @@ namespace Editor.Controls
         [StructLayout(LayoutKind.Sequential)]
         struct DispatcherQueueOptions
         {
-            internal int dwSize;
-            internal int threadType;
-            internal int apartmentType;
+            internal int _dwSize;
+            internal int _threadType;
+            internal int _apartmentType;
         }
 
         [DllImport("CoreMessaging.dll")]
         private static extern int CreateDispatcherQueueController([In] DispatcherQueueOptions options, [In, Out, MarshalAs(UnmanagedType.IUnknown)] ref object dispatcherQueueController);
 
-        object m_dispatcherQueueController = null;
+        private object _dispatcherQueueController = null;
+
         public void EnsureWindowsSystemDispatcherQueueController()
         {
             if (Windows.System.DispatcherQueue.GetForCurrentThread() != null)
@@ -122,14 +112,14 @@ namespace Editor.Controls
                 return;
             }
 
-            if (m_dispatcherQueueController == null)
+            if (_dispatcherQueueController == null)
             {
                 DispatcherQueueOptions options;
-                options.dwSize = Marshal.SizeOf(typeof(DispatcherQueueOptions));
-                options.threadType = 2;    // DQTYPE_THREAD_CURRENT
-                options.apartmentType = 2; // DQTAT_COM_STA
+                options._dwSize = Marshal.SizeOf(typeof(DispatcherQueueOptions));
+                options._threadType = 2;    // DQTYPE_THREAD_CURRENT
+                options._apartmentType = 2; // DQTAT_COM_STA
 
-                CreateDispatcherQueueController(options, ref m_dispatcherQueueController);
+                CreateDispatcherQueueController(options, ref _dispatcherQueueController);
             }
         }
     }

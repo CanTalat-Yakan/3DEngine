@@ -7,7 +7,7 @@ using Engine.Utilities;
 
 namespace Engine.Components
 {
-    public class MeshComponent
+    internal class MeshComponent
     {
         private Renderer _d3d;
 

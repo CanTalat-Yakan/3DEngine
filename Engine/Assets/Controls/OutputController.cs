@@ -33,16 +33,17 @@ namespace Editor.Controls
 
     internal class OutputController
     {
-        static Dictionary<SMessageInfo, List<DateTime>> s_messageCollection = new Dictionary<SMessageInfo, List<DateTime>>();
+        private static Dictionary<SMessageInfo, List<DateTime>> s_messageCollection = new Dictionary<SMessageInfo, List<DateTime>>();
 
-        static TextBlock s_status;
-        static StackPanel s_stack;
-        static ScrollViewer s_scroll;
-        static AppBarToggleButton s_collapse;
-        static AppBarToggleButton s_filterMessages;
-        static AppBarToggleButton s_filterWarnings;
-        static AppBarToggleButton s_filterErrors;
-        static AppBarToggleButton s_pauseError;
+        private static TextBlock s_status;
+        private static StackPanel s_stack;
+        private static ScrollViewer s_scroll;
+        private static AppBarToggleButton s_collapse;
+        private static AppBarToggleButton s_filterMessages;
+        private static AppBarToggleButton s_filterWarnings;
+        private static AppBarToggleButton s_filterErrors;
+        private static AppBarToggleButton s_pauseError;
+
         internal AppBarToggleButton _clearPlay;
 
         public OutputController(StackPanel stack, ScrollViewer scroll, AppBarToggleButton collapse, AppBarToggleButton filterMessages, AppBarToggleButton filterWarnings, AppBarToggleButton filterErrors, AppBarToggleButton pauseError, AppBarToggleButton clearPlay)
@@ -59,65 +60,9 @@ namespace Editor.Controls
             s_status = MainController.Instance.Status;
         }
 
-        static void SetStatus(SMessageInfo m)
+        public static void Log(string m, EMessageType t = EMessageType.MESSAGE, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null)
         {
-            s_status.Text = m.Message;
-        }
-
-        async void OpenMessage(string path)
-        {
-            var file = await ApplicationData.Current.LocalFolder.GetFileAsync(path);
-
-            if (file != null)
-                await Launcher.LaunchFileAsync(file);
-        }
-
-        static UIElement CreateMessage(DateTime d, SMessageInfo m, int? i)
-        {
-            //Content of the message
-            StackPanel stack = new StackPanel() { Orientation = Orientation.Horizontal, Spacing = 10, Margin = new Thickness(10, 0, 0, 0) };
-            if (m.Type == EMessageType.WARNING)
-                stack.Children.Add(new FontIcon() { Glyph = "\uE7BA" });
-            else
-                stack.Children.Add(new SymbolIcon() { Symbol = m.Type == EMessageType.MESSAGE ? Symbol.Message : Symbol.ReportHacked });
-            stack.Children.Add(new TextBlock() { Text = "[" + d.TimeOfDay.ToString("hh\\:mm\\:ss").ToString() + "]" });
-            stack.Children.Add(new TextBlock() { Text = m.Message });
-
-            //The flyout when clicked on the message
-            StackPanel stackFlyout = new StackPanel() { Orientation = Orientation.Vertical };
-            stackFlyout.Children.Add(new TextBlock() { Text = m.GetInfo() + "\n" });
-            stackFlyout.Children.Add(new MarkdownTextBlock() { Text = m.Message, Padding = new Thickness(2) });
-            stackFlyout.Children.Add(new HyperlinkButton() { Content = Path.GetRelativePath(Directory.GetCurrentDirectory(), m.Script) + ":" + m.Line, Foreground = new SolidColorBrush(Colors.CadetBlue) });
-            Flyout flyout = new Flyout() { OverlayInputPassThroughElement = stack, Content = stackFlyout };
-
-            //Create main grid that gets returned
-            Grid grid = new Grid() { HorizontalAlignment = HorizontalAlignment.Stretch };
-            grid.Children.Add(stack);
-            //If there is a count the number gets shown on the right
-            if (i != null)
-                grid.Children.Add(new TextBlock() { Margin = new Thickness(0, 0, 10, 0), MinWidth = 25, HorizontalAlignment = HorizontalAlignment.Right, Text = i.ToString() });
-            //Set flyout to button that stretches along the grid
-            grid.Children.Add(new Button()
-            {
-                Flyout = flyout,
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Stretch,
-                Background = new SolidColorBrush(
-                    m.Type == EMessageType.MESSAGE ?
-                        s_stack.Children.Count() % 2 == 0 ?
-                            Colors.Transparent :
-                            Windows.UI.Color.FromArgb(50, 10, 10, 10) :
-                        m.Type == EMessageType.ERROR ?
-                            Windows.UI.Color.FromArgb(88, 255, 0, 0) :
-                            Windows.UI.Color.FromArgb(88, 255, 255, 0))
-            });
-
-            return grid;
-        }
-
-        public static void Log(string _m, EMessageType t = EMessageType.MESSAGE, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null)
-        {
-            SMessageInfo message = new SMessageInfo() { Script = s, Method = c, Line = l, Message = _m, Type = t };
+            SMessageInfo message = new SMessageInfo() { Script = s, Method = c, Line = l, Message = m, Type = t };
 
             if (s_pauseError.IsChecked.Value)
                 if (t == EMessageType.ERROR)
@@ -236,6 +181,62 @@ namespace Editor.Controls
             s_filterMessages.Label = $"  Messages";
             s_filterWarnings.Label = $"  Warnings";
             s_filterErrors.Label = $"  Errors";
+        }
+
+        private static void SetStatus(SMessageInfo m)
+        {
+            s_status.Text = m.Message;
+        }
+
+        private async void OpenMessage(string path)
+        {
+            var file = await ApplicationData.Current.LocalFolder.GetFileAsync(path);
+
+            if (file != null)
+                await Launcher.LaunchFileAsync(file);
+        }
+
+        private static UIElement CreateMessage(DateTime d, SMessageInfo m, int? i)
+        {
+            //Content of the message
+            StackPanel stack = new StackPanel() { Orientation = Orientation.Horizontal, Spacing = 10, Margin = new Thickness(10, 0, 0, 0) };
+            if (m.Type == EMessageType.WARNING)
+                stack.Children.Add(new FontIcon() { Glyph = "\uE7BA" });
+            else
+                stack.Children.Add(new SymbolIcon() { Symbol = m.Type == EMessageType.MESSAGE ? Symbol.Message : Symbol.ReportHacked });
+            stack.Children.Add(new TextBlock() { Text = "[" + d.TimeOfDay.ToString("hh\\:mm\\:ss").ToString() + "]" });
+            stack.Children.Add(new TextBlock() { Text = m.Message });
+
+            //The flyout when clicked on the message
+            StackPanel stackFlyout = new StackPanel() { Orientation = Orientation.Vertical };
+            stackFlyout.Children.Add(new TextBlock() { Text = m.GetInfo() + "\n" });
+            stackFlyout.Children.Add(new MarkdownTextBlock() { Text = m.Message, Padding = new Thickness(2) });
+            stackFlyout.Children.Add(new HyperlinkButton() { Content = Path.GetRelativePath(Directory.GetCurrentDirectory(), m.Script) + ":" + m.Line, Foreground = new SolidColorBrush(Colors.CadetBlue) });
+            Flyout flyout = new Flyout() { OverlayInputPassThroughElement = stack, Content = stackFlyout };
+
+            //Create main grid that gets returned
+            Grid grid = new Grid() { HorizontalAlignment = HorizontalAlignment.Stretch };
+            grid.Children.Add(stack);
+            //If there is a count the number gets shown on the right
+            if (i != null)
+                grid.Children.Add(new TextBlock() { Margin = new Thickness(0, 0, 10, 0), MinWidth = 25, HorizontalAlignment = HorizontalAlignment.Right, Text = i.ToString() });
+            //Set flyout to button that stretches along the grid
+            grid.Children.Add(new Button()
+            {
+                Flyout = flyout,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
+                Background = new SolidColorBrush(
+                    m.Type == EMessageType.MESSAGE ?
+                        s_stack.Children.Count() % 2 == 0 ?
+                            Colors.Transparent :
+                            Windows.UI.Color.FromArgb(50, 10, 10, 10) :
+                        m.Type == EMessageType.ERROR ?
+                            Windows.UI.Color.FromArgb(88, 255, 0, 0) :
+                            Windows.UI.Color.FromArgb(88, 255, 255, 0))
+            });
+
+            return grid;
         }
     }
 }

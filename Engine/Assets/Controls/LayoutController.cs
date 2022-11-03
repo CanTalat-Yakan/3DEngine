@@ -25,7 +25,7 @@ namespace Editor.Controls
         public Files Files;
         public Settings Settings;
 
-        Grid _grid;
+        private Grid _grid;
 
         public LayoutController(Grid content, ViewPort viewPort, Hierarchy hierarchy, Properties properties, Output output, Files files, Settings settings)
         {
@@ -51,7 +51,7 @@ namespace Editor.Controls
             Content.Children.Add(_grid);
         }
 
-        Grid CreateLayout(params Grid[] panel)
+        private Grid CreateLayout(params Grid[] panel)
         {
             var a = PairVertical(
                 new GridDataTemeplate() { Content = panel[0], MinHeight = 0 },
@@ -64,7 +64,7 @@ namespace Editor.Controls
             return WrapSplitView(a, b);
         }
 
-        Grid PairHorizontal(GridDataTemeplate left, GridDataTemeplate right)
+        private Grid PairHorizontal(GridDataTemeplate left, GridDataTemeplate right)
         {
             Grid grid = new Grid() { ColumnSpacing = 16 };
             grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = left.Length, MinWidth = left.MinWidth });
@@ -88,7 +88,7 @@ namespace Editor.Controls
             return grid;
         }
 
-        Grid PairHorizontal(GridDataTemeplate left, GridDataTemeplate center, GridDataTemeplate right)
+        private Grid PairHorizontal(GridDataTemeplate left, GridDataTemeplate center, GridDataTemeplate right)
         {
             Grid grid = new Grid() { ColumnSpacing = 16 };
             grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = left.Length, MinWidth = left.MinWidth });
@@ -125,7 +125,7 @@ namespace Editor.Controls
             return grid;
         }
 
-        Grid PairVertical(GridDataTemeplate top, GridDataTemeplate bottom)
+        private Grid PairVertical(GridDataTemeplate top, GridDataTemeplate bottom)
         {
             Grid grid = new Grid() { };
             grid.RowDefinitions.Add(new RowDefinition() { Height = top.Length, MinHeight = top.MinHeight });
@@ -146,18 +146,18 @@ namespace Editor.Controls
             return grid;
         }
 
-        Grid WrapInTabView(params TabViewItemDataTemplate[] i)
+        private Grid WrapInTabView(params TabViewItemDataTemplate[] i)
         {
             Grid grid = new Grid();
             TabViewPageController tabViewPage = new TabViewPageController(i);
-            grid.Children.Add(tabViewPage._tabView);
+            grid.Children.Add(tabViewPage.Tab);
 
             //BindingOperations.SetBinding(grid, Grid.VisibilityProperty, new Binding() { ElementName = "x_AppBarToggleButton_Status_OpenPane", Path = new PropertyPath("IsChecked"), Converter = new BooleanToVisibilityConverter() });
 
             return grid;
         }
 
-        Grid WrapSplitView(Grid content, Grid pane)
+        private Grid WrapSplitView(Grid content, Grid pane)
         {
             Grid grid = new Grid();
             SplitView split = new SplitView() { OpenPaneLength = 333, IsPaneOpen = true, DisplayMode = SplitViewDisplayMode.Inline, PanePlacement = SplitViewPanePlacement.Right, Pane = pane, Content = content };
@@ -167,7 +167,7 @@ namespace Editor.Controls
             return grid;
         }
 
-        Grid WrapGrid(UIElement content)
+        private Grid WrapGrid(UIElement content)
         {
             Grid grid = new Grid();
             grid.Children.Add(content);

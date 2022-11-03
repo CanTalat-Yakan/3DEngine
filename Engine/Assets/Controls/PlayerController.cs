@@ -16,11 +16,11 @@ namespace Editor.Controls
     {
         public EPlayMode PlayMode;
 
-        AppBarToggleButton _play;
-        AppBarToggleButton _pause;
-        AppBarButton _forward;
-        TextBlock _status;
-        OutputController _output;
+        private AppBarToggleButton _play;
+        private AppBarToggleButton _pause;
+        private AppBarButton _forward;
+        private TextBlock _status;
+        private OutputController _output;
 
         public PlayerController(AppBarToggleButton play, AppBarToggleButton pause, AppBarButton forward)
         {
@@ -29,24 +29,6 @@ namespace Editor.Controls
             _forward = forward;
             _output = MainController.Instance.LayoutControl.Output.OutputControl;
             _status = MainController.Instance.Status;
-        }
-
-        private void SetStatusAppBarButtons(bool b)
-        {
-            PlayMode = b ? EPlayMode.PLAYING : EPlayMode.NONE;
-
-            _pause.IsEnabled = b;
-            _pause.IsChecked = false;
-            if(!b)
-                _forward.IsEnabled = b;
-
-            _play.Label = b ? "Stop" : "Play";
-            _play.Icon = b ? new SymbolIcon(Symbol.Stop) : new SymbolIcon(Symbol.Play);
-        }
-
-        private void SetStatus(string _s)
-        {
-            _status.Text = _s;
         }
 
         public void Play()
@@ -90,6 +72,24 @@ namespace Editor.Controls
             SetStatusAppBarButtons(false);
 
             SetStatus("Killed Process of GameInstance!");
+        }
+
+        private void SetStatusAppBarButtons(bool b)
+        {
+            PlayMode = b ? EPlayMode.PLAYING : EPlayMode.NONE;
+
+            _pause.IsEnabled = b;
+            _pause.IsChecked = false;
+            if(!b)
+                _forward.IsEnabled = b;
+
+            _play.Label = b ? "Stop" : "Play";
+            _play.Icon = b ? new SymbolIcon(Symbol.Stop) : new SymbolIcon(Symbol.Play);
+        }
+
+        private void SetStatus(string _s)
+        {
+            _status.Text = _s;
         }
     }
 }

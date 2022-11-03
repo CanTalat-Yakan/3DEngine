@@ -6,7 +6,7 @@ using Engine.Helper;
 
 namespace Engine.Utilities
 {
-    public enum EPrimitiveTypes
+    internal enum EPrimitiveTypes
     {
         CUBE,
         SPHERE,
@@ -15,7 +15,8 @@ namespace Engine.Utilities
         CAPSULE,
         SPECIAL
     }
-    public class EventList<T> : List<T>
+
+    internal class EventList<T> : List<T>
     {
         public event EventHandler EventOnAdd;
 
@@ -27,7 +28,8 @@ namespace Engine.Utilities
             base.Add(item);
         }
     }
-    public class EntityManager
+
+    internal class EntityManager
     {
         public EventList<Entity> EntityList = new EventList<Entity>();
         public Entity Sky;

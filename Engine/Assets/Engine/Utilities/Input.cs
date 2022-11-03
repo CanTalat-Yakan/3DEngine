@@ -8,21 +8,21 @@ using Windows.System;
 
 namespace Engine.Utilities
 {
-    public enum EMouseButton
+    internal enum EMouseButton
     {
         ISLEFTBUTTONPRESSED,
         ISRIGHTBUTTONPRESSED,
         ISMIDDLEBUTTONSPRESSED
     }
-    
-    public enum EInputState 
+
+    internal enum EInputState 
     { 
         DOWN, 
         PRESSED, 
         UP 
     }
-    
-    public class Input
+
+    internal class Input
     {
         public static Input Instance { get; private set; }
 

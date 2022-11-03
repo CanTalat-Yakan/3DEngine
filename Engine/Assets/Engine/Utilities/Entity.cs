@@ -3,7 +3,7 @@ using Engine.Components;
 
 namespace Engine.Utilities
 {
-    public class Entity : ICloneable
+    internal class Entity : ICloneable
     {
         public Guid ID = Guid.NewGuid();
 

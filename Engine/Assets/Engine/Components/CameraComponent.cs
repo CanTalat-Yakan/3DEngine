@@ -8,7 +8,7 @@ using Engine.Utilities;
 
 namespace Engine.Components
 {
-    public class CameraComponent
+    internal class CameraComponent
     {
         private Renderer _d3d;
 

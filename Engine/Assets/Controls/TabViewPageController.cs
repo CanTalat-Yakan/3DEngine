@@ -16,43 +16,19 @@ namespace Editor.Controls
 
     internal class TabViewPageController
     {
-        internal TabView _tabView;
+        public TabView Tab;
 
         public TabViewPageController(params TabViewItemDataTemplate[] icollection)
         {
-            _tabView = new TabView() { TabWidthMode = TabViewWidthMode.Equal, CloseButtonOverlayMode = TabViewCloseButtonOverlayMode.Auto, IsAddTabButtonVisible = false };
-            _tabView.AddTabButtonClick += TabView_AddButtonClick;
+            Tab = new TabView() { TabWidthMode = TabViewWidthMode.Equal, CloseButtonOverlayMode = TabViewCloseButtonOverlayMode.Auto, IsAddTabButtonVisible = false };
+            Tab.AddTabButtonClick += TabView_AddButtonClick;
             //m_TabView.TabCloseRequested += TabView_TabCloseRequested;
 
             foreach (var item in icollection)
-                _tabView.TabItems.Add(CreateNewTab(item));
+                Tab.TabItems.Add(CreateNewTab(item));
         }
 
-        void TabView_AddButtonClick(TabView sender, object args)
-        {
-            var item = new TabViewItemDataTemplate() { Header = "Viewport", Content = new Page(), Symbol = Symbol.View };
-            _tabView.TabItems.Add(CreateNewTab(item));
-        }
-
-        void TabView_TabCloseRequested(TabView sender, TabViewTabCloseRequestedEventArgs args)
-        {
-            sender.TabItems.Remove(args.Tab);
-        }
-
-        TabViewItem CreateNewTab(TabViewItemDataTemplate i)
-        {
-            TabViewItem newItem = new TabViewItem
-            {
-                Header = i.Header,
-                Content = i.Content,
-                IconSource = new SymbolIconSource() { Symbol = i.Symbol },
-                IsClosable = false
-            };
-
-            return newItem;
-        }
-
-        internal async void TabViewWindowingButton_Click(object sender, RoutedEventArgs e)
+        public async void TabViewWindowingButton_Click(object sender, RoutedEventArgs e)
         {
             CoreApplicationView newView = CoreApplication.CreateNewView();
             int newViewId = 0;
@@ -64,6 +40,30 @@ namespace Editor.Controls
                 newViewId = ApplicationView.GetForCurrentView().Id;
             });
             bool viewShown = await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
+        }
+
+        private void TabView_AddButtonClick(TabView sender, object args)
+        {
+            var item = new TabViewItemDataTemplate() { Header = "Viewport", Content = new Page(), Symbol = Symbol.View };
+            Tab.TabItems.Add(CreateNewTab(item));
+        }
+
+        private void TabView_TabCloseRequested(TabView sender, TabViewTabCloseRequestedEventArgs args)
+        {
+            sender.TabItems.Remove(args.Tab);
+        }
+
+        private TabViewItem CreateNewTab(TabViewItemDataTemplate i)
+        {
+            TabViewItem newItem = new TabViewItem
+            {
+                Header = i.Header,
+                Content = i.Content,
+                IconSource = new SymbolIconSource() { Symbol = i.Symbol },
+                IsClosable = false
+            };
+
+            return newItem;
         }
     }
 }

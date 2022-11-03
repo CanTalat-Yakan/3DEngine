@@ -5,7 +5,7 @@ using Engine.Data;
 
 namespace Engine.Components
 {
-    public class TransformComponent
+    internal class TransformComponent
     {
         public TransformComponent Parent;
 
