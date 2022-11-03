@@ -23,11 +23,10 @@ namespace Editor.Controls
         public Properties Properties;
         public Output Output;
         public Files Files;
-        public Settings Settings;
 
         private Grid _grid;
 
-        public LayoutController(Grid content, ViewPort viewPort, Hierarchy hierarchy, Properties properties, Output output, Files files, Settings settings)
+        public LayoutController(Grid content, ViewPort viewPort, Hierarchy hierarchy, Properties properties, Output output, Files files)
         {
             Content = content;
             ViewPort = viewPort;
@@ -35,7 +34,6 @@ namespace Editor.Controls
             Properties = properties;
             Output = output;
             Files = files;
-            Settings = settings;
         }
 
         public void Initialize()

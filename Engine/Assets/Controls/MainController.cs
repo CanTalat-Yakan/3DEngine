@@ -28,8 +28,7 @@ namespace Editor.Controls
                 new Hierarchy(),
                 new Properties(),
                 new Output(),
-                new Files(),
-                new Settings());
+                new Files());
 
             LayoutControl.Initialize();
         }
