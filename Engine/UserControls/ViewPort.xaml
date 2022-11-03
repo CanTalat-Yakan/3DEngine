@@ -15,18 +15,21 @@
         </Grid>
 
         <Grid Margin="8,8,8,0">
-            <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft" Spacing="6" HorizontalAlignment="Right" VerticalAlignment="Top">
+            <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft" Spacing="6" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0, 0, 32, 0">
                 <Button>
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xF167;"/>
+                
                     <Button.Flyout>
                         <Flyout Placement="BottomEdgeAlignedRight">
                             <TextBlock x:Name="x_TextBlock_Debug_FPS"/>
                         </Flyout>
                     </Button.Flyout>
                 </Button>
+                
                 <Button>
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xF158;"/>
                 </Button>
+                
                 <Button>
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE890;"/>
 
@@ -34,7 +37,9 @@
                         <Flyout Placement="BottomEdgeAlignedRight">
                             <StackPanel Orientation="Vertical" Spacing="18" FlowDirection="LeftToRight">
                                 <Slider x:Name="x_Slider_FOV" Header="Field of View" Value="90" Minimum="40" Maximum="110" ValueChanged="x_Slider_FOV_ValueChanged"/>
+                                
                                 <muxc:NumberBox x:Name="x_NumberBox_CameraSpeed" Header="Speed" Value="25" Minimum="1" Maximum="100" SpinButtonPlacementMode="Inline" ValueChanged="x_NumberBox_CameraSpeed_ValueChanged"/>
+                                
                                 <ComboBox Header="Projection">
                                     <ComboBoxItem Tag="0" Content="Perspective" IsSelected="True"/>
                                     <ComboBoxItem Tag="1" Content="Orthographic"/>
@@ -43,10 +48,9 @@
                         </Flyout>
                     </Button.Flyout>
                 </Button>
-
             </StackPanel>
 
-            <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight" Spacing="6" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="32, 0, 0, 0">
+            <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight" Spacing="6" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="32, 0, 0, 0">
                 <ComboBox Height="33">
                     <ComboBoxItem Tag="0" Content="Lit"/>
                     <ComboBoxItem Tag="1" Content="Unlit"/>

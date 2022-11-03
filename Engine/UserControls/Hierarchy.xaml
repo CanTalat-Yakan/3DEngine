@@ -33,22 +33,9 @@
             </MenuFlyout>
         </Grid.ContextFlyout>
 
-        <ScrollViewer Padding="8,0,8,8">
+        <ScrollViewer Padding="4,0,4,0">
             <StackPanel Orientation="Vertical" Spacing="16">
-                <!--<TextBlock Text="Scene" HorizontalAlignment="Left" Width="140" Height="26" Margin="0,4,0,0" FontSize="16"  Padding="8,0,0,0"/>-->
-                <!--<Grid Background="#4d4d4d" Padding="0,27,0,0" Margin="0,0,157,0"/>-->
                 <Grid Padding="14"/>
-
-                <!--<controls:WrapPanel HorizontalSpacing="4" VerticalSpacing="6">
-                    <Button Content="Canera"/>
-                    <Button Content="Player"/>
-                    <Button Content="Entity"/>
-                    <Button Content="Cube"/>
-                    <Button Content="Sphere"/>
-                    <Button Content="Atmosphere"/>
-                    <Button Content="Sun"/>
-                    <Button Content="Clouds"/>
-                </controls:WrapPanel>-->
 
                 <Expander Header="CoreScene" IsExpanded="False" HorizontalAlignment="Stretch">
                     <StackPanel HorizontalAlignment="Stretch">
