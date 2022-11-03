@@ -6,7 +6,7 @@ using Engine.Utilities;
 
 namespace Engine.Editor
 {
-    public class ViewPortController
+    internal class ViewPortController
     {
         public string Profile { get => _camera.Transform.ToString(); }
 

@@ -13,14 +13,14 @@ using Windows.System;
 
 namespace Editor.Controls
 {
-    public enum EMessageType
+    internal enum EMessageType
     {
         MESSAGE,
         WARNING,
         ERROR
     }
 
-    public struct SMessageInfo
+    internal struct SMessageInfo
     {
         public EMessageType Type;
         public string Script;
@@ -31,7 +31,7 @@ namespace Editor.Controls
         public string GetInfo() { return Script.Split("\\").Last() + $":{Line} ({Method})"; }
     }
 
-    public class OutputController
+    internal class OutputController
     {
         static Dictionary<SMessageInfo, List<DateTime>> s_messageCollection = new Dictionary<SMessageInfo, List<DateTime>>();
 

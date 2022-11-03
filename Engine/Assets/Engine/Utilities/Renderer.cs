@@ -9,7 +9,7 @@ using Vortice.Mathematics;
 
 namespace Engine.Utilities
 {
-    public class Renderer
+    internal class Renderer
     {
         public static Renderer Instance { get; private set; }
 
@@ -28,7 +28,7 @@ namespace Engine.Utilities
         ID3D11DepthStencilView _depthStencilView;
         ID3D11BlendState _blendState;
 
-        internal Renderer(SwapChainPanel swapChainPanel)
+        public Renderer(SwapChainPanel swapChainPanel)
         {
             #region //Create Instance
             Instance = this;
@@ -153,7 +153,7 @@ namespace Engine.Utilities
             _blendState.Dispose();
         }
 
-        internal void Clear()
+        public void Clear()
         {
             var col = new Color4(0.15f, 0.15f, 0.15f, 1);
             DeviceContext.ClearRenderTargetView(_renderTargetView, col);
@@ -161,7 +161,7 @@ namespace Engine.Utilities
             DeviceContext.OMSetRenderTargets(_renderTargetView, _depthStencilView);
         }
 
-        internal void Present()
+        public void Present()
         {
             _swapChain.Present(0, PresentFlags.None);
 
@@ -173,7 +173,7 @@ namespace Engine.Utilities
             //Result result = m_SwapChain.Present(syncInterval, presentFlags);
         }
 
-        internal void SetSolid()
+        public void SetSolid()
         {
             var rasterizerDesc = new RasterizerDescription()
             {
@@ -184,7 +184,7 @@ namespace Engine.Utilities
             DeviceContext.RSSetState(Device.CreateRasterizerState(rasterizerDesc));
         }
 
-        internal void SetWireframe()
+        public void SetWireframe()
         {
             var rasterizerDescWireframe = new RasterizerDescription()
             {
@@ -195,7 +195,7 @@ namespace Engine.Utilities
             DeviceContext.RSSetState(Device.CreateRasterizerState(rasterizerDescWireframe));
         }
 
-        internal void RenderMesh(ID3D11Buffer _vertexBuffer, int _vertexStride, ID3D11Buffer _indexBuffer, int _indexCount)
+        public void RenderMesh(ID3D11Buffer _vertexBuffer, int _vertexStride, ID3D11Buffer _indexBuffer, int _indexCount)
         {
             DeviceContext.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
             DeviceContext.IASetVertexBuffer(0, _vertexBuffer, _vertexStride, 0);
@@ -204,7 +204,7 @@ namespace Engine.Utilities
             DeviceContext.DrawIndexed(_indexCount, 0, 0);
         }
 
-        internal void OnSwapChainPanelSizeChanged(object sender, SizeChangedEventArgs e)
+        public void OnSwapChainPanelSizeChanged(object sender, SizeChangedEventArgs e)
         {
             var newSize = new SizeI((int)e.NewSize.Width, (int)e.NewSize.Height);
 

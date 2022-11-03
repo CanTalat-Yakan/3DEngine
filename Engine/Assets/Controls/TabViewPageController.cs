@@ -7,14 +7,14 @@ using Windows.UI.ViewManagement;
 
 namespace Editor.Controls
 {
-    public class TabViewItemDataTemplate
+    internal class TabViewItemDataTemplate
     {
         public string Header;
         public object Content;
         public Symbol Symbol;
     }
 
-    public class TabViewPageController
+    internal class TabViewPageController
     {
         internal TabView _tabView;
 

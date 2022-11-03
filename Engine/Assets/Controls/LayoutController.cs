@@ -7,7 +7,7 @@ using Editor.UserControls;
 
 namespace Editor.Controls
 {
-    class GridDataTemeplate
+    internal class GridDataTemeplate
     {
         public GridLength Length = new GridLength(1, GridUnitType.Star);
         public double MinWidth = 1;
@@ -15,7 +15,7 @@ namespace Editor.Controls
         public UIElement Content;
     }
 
-    public class LayoutController
+    internal class LayoutController
     {
         public Grid Content;
         public ViewPort ViewPort;
@@ -87,7 +87,7 @@ namespace Editor.Controls
 
             return grid;
         }
-        
+
         Grid PairHorizontal(GridDataTemeplate left, GridDataTemeplate center, GridDataTemeplate right)
         {
             Grid grid = new Grid() { ColumnSpacing = 16 };
@@ -156,7 +156,7 @@ namespace Editor.Controls
 
             return grid;
         }
-        
+
         Grid WrapSplitView(Grid content, Grid pane)
         {
             Grid grid = new Grid();
@@ -175,28 +175,28 @@ namespace Editor.Controls
             return grid;
         }
     }
-}
 
-public sealed class BooleanToVisibilityConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, string language)
+    internal sealed class BooleanToVisibilityConverter : IValueConverter
     {
-        bool bValue = false;
-        if (value is bool)
-            bValue = (bool)value;
-        else if (value is Nullable<bool>)
+        public object Convert(object value, Type targetType, object parameter, string language)
         {
-            Nullable<bool> tmp = (Nullable<bool>)value;
-            bValue = tmp.HasValue ? tmp.Value : false;
+            bool bValue = false;
+            if (value is bool)
+                bValue = (bool)value;
+            else if (value is Nullable<bool>)
+            {
+                Nullable<bool> tmp = (Nullable<bool>)value;
+                bValue = tmp.HasValue ? tmp.Value : false;
+            }
+            return (bValue) ? Visibility.Visible : Visibility.Collapsed;
         }
-        return (bValue) ? Visibility.Visible : Visibility.Collapsed;
-    }
 
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    {
-        if (value is Visibility)
-            return (Visibility)value == Visibility.Visible;
-        else
-            return false;
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            if (value is Visibility)
+                return (Visibility)value == Visibility.Visible;
+            else
+                return false;
+        }
     }
 }

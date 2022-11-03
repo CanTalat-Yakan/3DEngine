@@ -32,10 +32,8 @@
                             <Button.Content>
                                 <StackPanel Spacing="20">
                                     <Viewbox MaxHeight="24" MaxWidth="24">
-                                        <!--<FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xED39;"/>-->
                                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEA86;"/>
                                     </Viewbox>
-                                    <!--<FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xED43;"/>-->
                                     <TextBlock Text="Scenes"/>
                                 </StackPanel>
                             </Button.Content>

@@ -12,7 +12,7 @@ using Microsoft.UI.Xaml.Media;
 
 namespace Editor.Controls
 {
-    public class ThemeController
+    internal class ThemeController
     {
         private WindowsSystemDispatcherQueueHelper _wsdqHelper; // See separate sample below for implementation
         private MicaController _micaController;

@@ -3,20 +3,19 @@ using ImGuiNET;
 using System;
 using System.Numerics;
 using Vortice.Direct3D12;
-using Vortice.DXGI;
 using Vortice.Direct3D11;
 using Engine.Utilities;
 
 namespace Engine.Editor
 {
-    public class ImGui
+    internal class ImGui
     {
         private Renderer _d3d;
         private InputLayoutDescription _inputLayoutDescription;
         private ID3D11Texture2D _fontTexture;
         private Mesh _imguiMesh;
 
-        internal ImGui()
+        public ImGui()
         {
             #region //Create Instance
             _d3d = Renderer.Instance;
@@ -34,7 +33,7 @@ namespace Engine.Editor
             RecreateFontDeviceTexture();
         }
 
-        static void RecreateFontDeviceTexture()
+        private static void RecreateFontDeviceTexture()
         {
             ImGuiIOPtr io = ImGuiNET.ImGui.GetIO();
             IntPtr pixels;
@@ -43,7 +42,7 @@ namespace Engine.Editor
             io.Fonts.ClearTexData();
         }
 
-        internal void Draw()
+        public void Draw()
         {
             ImGuiNET.ImGui.GetIO().DeltaTime = (float)Time.s_Watch.Elapsed.TotalSeconds;
             ImGuiNET.ImGui.NewFrame();
@@ -91,7 +90,7 @@ namespace Engine.Editor
             }
         }
 
-        void RenderDrawData(ImDrawDataPtr drawData)
+        private void RenderDrawData(ImDrawDataPtr drawData)
         {
             // Handle cases of screen coordinates != from framebuffer coordinates (e.g. retina displays)
             drawData.ScaleClipRects(ImGuiNET.ImGui.GetIO().DisplayFramebufferScale);

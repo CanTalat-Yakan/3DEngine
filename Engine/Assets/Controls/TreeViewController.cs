@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Editor.Controls
 {
-    public class PathDisplay
+    internal class PathDisplay
     {
         public string DisplayText { get; set; }
         public string Path { get; set; }
@@ -22,9 +22,9 @@ namespace Editor.Controls
         }
     }
 
-    class TreeViewController
+    internal class TreeViewController
     {
-        internal string[] GetRelativePaths(string[] sArr, string relativeTo)
+        public string[] GetRelativePaths(string[] sArr, string relativeTo)
         {
             string[] Arr = new string[sArr.Length];
 
@@ -34,7 +34,7 @@ namespace Editor.Controls
             return Arr;
         }
 
-        internal void PopulateTreeView(TreeView treeView, string[] paths, char pathSeparator)
+        public void PopulateTreeView(TreeView treeView, string[] paths, char pathSeparator)
         {
             TreeViewNode lastNode = null;
             string subPathAgg;

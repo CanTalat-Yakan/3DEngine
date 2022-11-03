@@ -3,7 +3,7 @@ using Editor.UserControls;
 
 namespace Editor.Controls
 {
-    public class MainController
+    internal class MainController
     {
         public static MainController Instance { get; private set; }
 

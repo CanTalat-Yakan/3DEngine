@@ -5,7 +5,7 @@ using Engine.Utilities;
 
 namespace Engine
 {
-    public class Core
+    internal class Core
     {
         public static Core Instance { get; private set; }
 

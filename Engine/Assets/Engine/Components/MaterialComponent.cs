@@ -10,7 +10,7 @@ using Engine.Utilities;
 
 namespace Engine.Components
 {
-    public class MaterialComponent
+    internal class MaterialComponent
     {
         private Renderer _d3d;
 
@@ -91,23 +91,6 @@ namespace Engine.Components
             #endregion
         }
 
-        protected static ReadOnlyMemory<byte> CompileBytecode(string shaderName, string entryPoint, string profile)
-        {
-            string assetsPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources\");
-            string fileName = Path.Combine(assetsPath, shaderName);
-            //string shaderSource = File.ReadAllText(Path.Combine(assetsPath, shaderName));
-
-            ShaderFlags shaderFlags = ShaderFlags.EnableStrictness;
-#if DEBUG
-            shaderFlags |= ShaderFlags.Debug;
-            shaderFlags |= ShaderFlags.SkipValidation;
-#else
-        shaderFlags |= ShaderFlags.OptimizationLevel3;
-#endif
-
-            return Compiler.CompileFromFile(fileName, entryPoint, profile, shaderFlags);
-        }
-
         public void Render(SPerModelConstantBuffer data)
         {
             _d3d.DeviceContext.IASetInputLayout(_inputLayout);
@@ -126,6 +109,23 @@ namespace Engine.Components
 
             _d3d.DeviceContext.PSSetShaderResource(0, _resourceView);
             _d3d.DeviceContext.PSSetSampler(0, _sampler);
+        }
+
+        protected static ReadOnlyMemory<byte> CompileBytecode(string shaderName, string entryPoint, string profile)
+        {
+            string assetsPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources\");
+            string fileName = Path.Combine(assetsPath, shaderName);
+            //string shaderSource = File.ReadAllText(Path.Combine(assetsPath, shaderName));
+
+            ShaderFlags shaderFlags = ShaderFlags.EnableStrictness;
+#if DEBUG
+            shaderFlags |= ShaderFlags.Debug;
+            shaderFlags |= ShaderFlags.SkipValidation;
+#else
+        shaderFlags |= ShaderFlags.OptimizationLevel3;
+#endif
+
+            return Compiler.CompileFromFile(fileName, entryPoint, profile, shaderFlags);
         }
     }
 }

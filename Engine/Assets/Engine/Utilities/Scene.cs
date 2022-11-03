@@ -7,7 +7,7 @@ using Engine.Editor;
 
 namespace Engine.Utilities
 {
-    public class Scene
+    internal class Scene
     {
         public string Profile;
 
@@ -18,7 +18,7 @@ namespace Engine.Utilities
         private Entity _subParent;
         private Entity _special;
 
-        internal void Awake()
+        public void Awake()
         {
             CameraController = new ViewPortController(Camera);
             Camera.Transform.Position = new Vector3(3, 4, 5);
@@ -27,7 +27,7 @@ namespace Engine.Utilities
             EntitytManager.CreateSky();
         }
 
-        internal void Start()
+        public void Start()
         {
             _special = EntitytManager.CreatePrimitive(EPrimitiveTypes.SPECIAL);
             _special.Transform.Scale *= 0.1f;
@@ -46,7 +46,7 @@ namespace Engine.Utilities
             EntitytManager.CreatePrimitive(EPrimitiveTypes.CUBE, _subParent);
         }
 
-        internal void Update()
+        public void Update()
         {
             CameraController.Update();
             Camera.RecreateViewConstants();
@@ -71,7 +71,7 @@ namespace Engine.Utilities
             }
         }
 
-        internal void LateUpdate()
+        public void LateUpdate()
         {
             Profile = "Objects: " + EntitytManager.EntityList.Count().ToString();
 
@@ -82,7 +82,7 @@ namespace Engine.Utilities
             Profile += "\n" + "Vertices: " + vertexCount;
         }
 
-        internal void Render()
+        public void Render()
         {
             foreach (var item in EntitytManager.EntityList)
                 if (item.IsEnabled && item.Mesh != null)

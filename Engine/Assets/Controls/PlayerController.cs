@@ -5,14 +5,14 @@ using Microsoft.UI.Xaml.Media;
 
 namespace Editor.Controls
 {
-    public enum EPlayMode
+    internal enum EPlayMode
     {
         NONE,
         PLAYING,
         PAUSED
     }
 
-    public class PlayerController
+    internal class PlayerController
     {
         public EPlayMode PlayMode;
 
@@ -31,7 +31,7 @@ namespace Editor.Controls
             _status = MainController.Instance.Status;
         }
 
-        void SetStatusAppBarButtons(bool b)
+        private void SetStatusAppBarButtons(bool b)
         {
             PlayMode = b ? EPlayMode.PLAYING : EPlayMode.NONE;
 
@@ -44,7 +44,7 @@ namespace Editor.Controls
             _play.Icon = b ? new SymbolIcon(Symbol.Stop) : new SymbolIcon(Symbol.Play);
         }
 
-        void SetStatus(string _s)
+        private void SetStatus(string _s)
         {
             _status.Text = _s;
         }
