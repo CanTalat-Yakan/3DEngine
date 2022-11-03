@@ -10,8 +10,8 @@ namespace Engine.Utilities
         public static double s_Time, s_Delta;
         public static Stopwatch s_Watch = new Stopwatch();
 
-        int _fps, _tmpFPS;
-        DateTime _now = DateTime.Now;
+        private int _fps, _tmpFPS;
+        private DateTime _now = DateTime.Now;
 
         public void Update()
         {

@@ -9,8 +9,6 @@ namespace Engine.Components
 {
     internal class MeshComponent
     {
-        private Renderer _d3d;
-
         public ID3D11Buffer VertexBuffer;
         public ID3D11Buffer IndexBuffer;
 
@@ -18,6 +16,8 @@ namespace Engine.Components
         public int VertexStride;
         public int IndexCount;
         public int IndexStride;
+
+        private Renderer _d3d;
 
         public MeshComponent(MeshInfo _obj)
         {

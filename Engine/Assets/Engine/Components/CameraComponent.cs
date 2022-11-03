@@ -10,13 +10,13 @@ namespace Engine.Components
 {
     internal class CameraComponent
     {
-        private Renderer _d3d;
-
         public static double s_FieldOfView;
         public SViewConstantsBuffer ViewConstants;
-        private ID3D11Buffer _view;
 
         public TransformComponent Transform = new TransformComponent();
+
+        private Renderer _d3d;
+        private ID3D11Buffer _view;
 
         public CameraComponent()
         {

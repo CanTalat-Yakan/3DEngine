@@ -41,16 +41,16 @@ namespace Engine.Utilities
         private MeshComponent _meshCube;
         private MeshComponent _meshSpecial;
 
-        static readonly string SHADER_LIT = @"Shader\Lit.hlsl";
-        static readonly string SHADER_SIMPLELIT = @"Shader\SimpleLit.hlsl";
-        static readonly string SHADER_UNLIT = @"Shader\Unlit.hlsl";
-
-        static readonly string IMAGE_DEFAULT = @"Textures\dark.png";
-        static readonly string IMAGE_SKY = @"Textures\SkyGradient2.png";
-
-        static readonly string OBJ_SPECIAL = @"Models\Lowpoly_tree_sample.obj";
-        static readonly string OBJ_CUBE = @"Models\Cube.obj";
-        static readonly string OBJ_SPHERE = @"Models\Sphere.obj";
+        private static readonly string SHADER_LIT = @"Shader\Lit.hlsl";
+        private static readonly string SHADER_SIMPLELIT = @"Shader\SimpleLit.hlsl";
+        private static readonly string SHADER_UNLIT = @"Shader\Unlit.hlsl";
+         
+        private static readonly string IMAGE_DEFAULT = @"Textures\dark.png";
+        private static readonly string IMAGE_SKY = @"Textures\SkyGradient2.png";
+         
+        private static readonly string OBJ_SPECIAL = @"Models\Lowpoly_tree_sample.obj";
+        private static readonly string OBJ_CUBE = @"Models\Cube.obj";
+        private static readonly string OBJ_SPHERE = @"Models\Sphere.obj";
 
         public EntityManager()
         {

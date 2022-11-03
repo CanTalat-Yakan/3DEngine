@@ -21,12 +21,12 @@ namespace Engine.Utilities
         
         private readonly IDXGISwapChain2 _swapChain;
 
-        ID3D11Texture2D _renderTargetTexture;
-        ID3D11RenderTargetView _renderTargetView;
-        ID3D11Texture2D _depthStencilTexture;
-        Texture2DDescription _depthStencilTextureDescription;
-        ID3D11DepthStencilView _depthStencilView;
-        ID3D11BlendState _blendState;
+        private ID3D11Texture2D _renderTargetTexture;
+        private ID3D11RenderTargetView _renderTargetView;
+        private ID3D11Texture2D _depthStencilTexture;
+        private Texture2DDescription _depthStencilTextureDescription;
+        private ID3D11DepthStencilView _depthStencilView;
+        private ID3D11BlendState _blendState;
 
         public Renderer(SwapChainPanel swapChainPanel)
         {

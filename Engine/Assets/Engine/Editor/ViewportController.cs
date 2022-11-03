@@ -8,12 +8,13 @@ namespace Engine.Editor
 {
     internal class ViewPortController
     {
+        public static float s_MovementSpeed = 2;
+
         public string Profile { get => _camera.Transform.ToString(); }
 
         private CameraComponent _camera;
         private Input _input;
 
-        public static float s_MovementSpeed = 2;
         private float _rotationSpeed = 5;
         private Vector3 _direction;
         private Vector3 _rotation;

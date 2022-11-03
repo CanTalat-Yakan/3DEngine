@@ -17,6 +17,7 @@ namespace Engine.Data
             TexCoord = new Vector2(u, v);
             Normal = new Vector3(nx, ny, nz);
         }
+
         public Vertex(
             Vector3 _pos,
             Vector2 _tex,
