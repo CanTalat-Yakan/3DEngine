@@ -122,6 +122,8 @@ namespace Engine.Utilities
 
         public Vector2 GetMouseAxis() { return _mouseAxis; }
 
+        public Point GetMousePosition() { return _pointerPosition; }
+
         public int GetMouseWheel() { return _mouseWheelDelta; }
 
         public void KeyDown(object sender, KeyRoutedEventArgs e)

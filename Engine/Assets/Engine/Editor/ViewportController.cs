@@ -3,6 +3,8 @@ using System.Numerics;
 using Windows.System;
 using Engine.Components;
 using Engine.Utilities;
+using Windows.UI.Core;
+using Windows.Foundation;
 
 namespace Engine.Editor
 {
@@ -45,6 +47,8 @@ namespace Engine.Editor
 
             _camera.Transform.Position += _direction * (float)Time.s_Delta * s_MovementSpeed;
             _camera.Transform.EulerAngles -= _rotation * (float)Time.s_Delta * _rotationSpeed;
+
+            _camera.Transform.EulerAngles.X = Math.Clamp(_camera.Transform.EulerAngles.X, -89, 89);
 
             _rotation = new Vector3();
             _direction = new Vector3();
