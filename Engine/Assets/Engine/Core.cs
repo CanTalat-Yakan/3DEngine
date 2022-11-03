@@ -2,6 +2,8 @@
 using Microsoft.UI.Xaml.Media;
 using Engine.Editor;
 using Engine.Utilities;
+using Editor.UserControls;
+using Editor.Controls;
 
 namespace Engine
 {
@@ -26,6 +28,8 @@ namespace Engine
             Time = new Time();
             Scene = new Scene();
             ImGui = new ImGui();
+
+            OutputController.Log("Engine Initialized...");
 
             Scene.Awake();
             Scene.Start();

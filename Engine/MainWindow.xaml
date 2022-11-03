@@ -74,7 +74,7 @@
                         </CommandBar.SecondaryCommands>
 
                         <CommandBar.Content>
-                            <TextBlock x:Name="x_TextBlock_Status_Content" Text="Engine Ready..." Margin="12,14"/>
+                            <TextBlock x:Name="x_TextBlock_Status_Content" Text="" Margin="12,14"/>
                         </CommandBar.Content>
                     </CommandBar>
                 </Grid>
