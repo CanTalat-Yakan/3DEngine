@@ -53,4 +53,8 @@
     <PackageReference Include="WinUIEx" Version="1.8.0" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Frame\" />
+  </ItemGroup>
 </Project>
