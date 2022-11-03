@@ -19,10 +19,9 @@ namespace Engine
 
         public Core(SwapChainPanel swapChainPanel, TextBlock textBlock)
         {
-            #region //Create Instance
-            Instance = this;
-            #endregion
-
+            if (Instance is null)
+                Instance = this;
+         
             Renderer = new Renderer(swapChainPanel);
             Input = new Input();
             Time = new Time();

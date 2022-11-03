@@ -31,7 +31,8 @@ namespace Engine.Utilities
         public Renderer(SwapChainPanel swapChainPanel)
         {
             #region //Create Instance
-            Instance = this;
+            if (Instance is null)
+                Instance = this;
             #endregion
 
             #region //Set SwapChainPanel and SizeChanger

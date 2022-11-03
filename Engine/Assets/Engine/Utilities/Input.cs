@@ -42,9 +42,8 @@ namespace Engine.Utilities
 
         public Input()
         {
-            #region //Set Instance
-            Instance = this;
-            #endregion
+            if (Instance is null)
+                Instance = this;
         }
 
         public void Update()
