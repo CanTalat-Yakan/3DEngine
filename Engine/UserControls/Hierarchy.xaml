@@ -42,7 +42,7 @@
                         <muxc:TreeView x:Name="x_TreeView_CoreHierarchy" SelectionMode="Single"/>
                     </StackPanel>
                 </Expander>
-
+                
                 <Expander Header="SubScene" IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
                     <StackPanel>
                         <muxc:TreeView x:Name="x_TreeView_Hierarchy" SelectionMode="Single" HorizontalAlignment="Stretch" >

@@ -30,9 +30,6 @@
                     <controls:WrapPanel x:Name="x_WrapPanel_Files" HorizontalSpacing="10" VerticalSpacing="10" Padding="16"/>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="5">
-                        <!--<Viewbox MaxHeight="25" MaxWidth="25">
-                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE78B;" Rotation="180" Translation="0,17,0"/>
-                        </Viewbox>-->
                         <TextBlock Text="Drag and drop files here."/>
                     </StackPanel>
                 </StackPanel>
