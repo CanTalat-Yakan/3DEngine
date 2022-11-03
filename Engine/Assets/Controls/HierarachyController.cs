@@ -29,7 +29,7 @@ namespace Editor.Controls
             Initialize();
         }
 
-        void Initialize()
+        private void Initialize()
         {
             _treeViewController.PopulateTreeView(Tree, SceneControl.ToStringArray(), '/');
         }
