@@ -27,7 +27,7 @@ namespace Editor.Controls
             _play = play;
             _pause = pause;
             _forward = forward;
-            _output = MainController.Instance.LayoutControl.Output.OutputControl;
+            _output = MainController.Instance.LayoutControl.Output._outputControl;
             _status = MainController.Instance.Status;
         }
 

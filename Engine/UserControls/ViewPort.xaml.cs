@@ -11,10 +11,10 @@ namespace Editor.UserControls
 {
     public sealed partial class ViewPort : UserControl
     {
-        public Engine.Core EngineCore;
-
         public TextBlock DebugProfiling;
         public Grid BorderColor;
+
+        internal Engine.Core _engineCore;
 
         public ViewPort()
         {
@@ -28,14 +28,14 @@ namespace Editor.UserControls
 
         private void Initialize(object sender, RoutedEventArgs e)
         {
-            EngineCore = new Engine.Core(x_SwapChainPanel_ViewPort, DebugProfiling);
+            _engineCore = new Engine.Core(x_SwapChainPanel_ViewPort, DebugProfiling);
 
-            PointerPressed += EngineCore.Input.PointerPressed;
-            PointerWheelChanged += EngineCore.Input.PointerWheelChanged;
-            PointerReleased += EngineCore.Input.PointerReleased;
-            PointerMoved += EngineCore.Input.PointerMoved;
-            KeyDown += EngineCore.Input.KeyDown;
-            KeyUp += EngineCore.Input.KeyUp;
+            PointerPressed += _engineCore.Input.PointerPressed;
+            PointerWheelChanged += _engineCore.Input.PointerWheelChanged;
+            PointerReleased += _engineCore.Input.PointerReleased;
+            PointerMoved += _engineCore.Input.PointerMoved;
+            KeyDown += _engineCore.Input.KeyDown;
+            KeyUp += _engineCore.Input.KeyUp;
 
             //var window = (Application.Current as App)?.Window as MainWindow;
             //window.CoreWindow.KeyDown += m_Engine.m_Input.KeyDown;

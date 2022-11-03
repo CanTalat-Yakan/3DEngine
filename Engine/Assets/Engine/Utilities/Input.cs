@@ -34,8 +34,10 @@ namespace Engine.Utilities
 
         private PointerPoint _pointer;
         private int _mouseWheelDelta;
+
         private Vector2 _axis = Vector2.Zero;
         private Vector2 _mouseAxis = Vector2.Zero;
+
         private Point _pointerPosition = new Point(), tmpPoint = new Point();
 
         public Input()

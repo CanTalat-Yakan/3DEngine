@@ -38,14 +38,14 @@ namespace Editor.UserControls
                 if (item.Parent != null)
                     newEntry.IDparent = item.Parent.ID;
 
-                scene.m_Hierarchy.Add(newEntry);
+                scene.Hierarchy.Add(newEntry);
             }
 
-            foreach (var item in scene.m_Hierarchy)
+            foreach (var item in scene.Hierarchy)
                 item.Node = new TreeViewNode() { Content = item.Name, IsExpanded = true };
 
             TreeEntry tmp;
-            foreach (var item in scene.m_Hierarchy)
+            foreach (var item in scene.Hierarchy)
                 if ((tmp = scene.GetParent(item)) != null)
                 {
                     if (!_treeView.RootNodes.Contains(tmp.Node))
@@ -71,7 +71,7 @@ namespace Editor.UserControls
                 newEntry.IDparent = newObject.Parent.ID;
 
             newEntry.Node = new TreeViewNode() { Content = newEntry.Name, IsExpanded = true };
-            scene.m_Hierarchy.Add(newEntry);
+            scene.Hierarchy.Add(newEntry);
 
             TreeEntry tmp;
             if ((tmp = scene.GetParent(newEntry)) != null)

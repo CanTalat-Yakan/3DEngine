@@ -20,7 +20,8 @@ namespace Editor.UserControls
     public sealed partial class Output : UserControl
     {
         public Grid ChangeColorWithTheme;
-        public OutputController OutputControl;
+
+        internal OutputController _outputControl;
 
         public Output()
         {
@@ -28,7 +29,7 @@ namespace Editor.UserControls
 
             ChangeColorWithTheme = x_Grid_ChangeColorWithTheme;
 
-            OutputControl = new OutputController(
+            _outputControl = new OutputController(
                 x_Stackpanel_Output, 
                 x_ScrollViewer_Output, 
                 x_AppBarToggleButton_Output_Collapse, 
@@ -89,7 +90,7 @@ namespace Editor.UserControls
             OutputController.Log("Test");
         }
 
-        private void AppBarButton_Output_Clear(object sender, RoutedEventArgs e) { OutputControl.ClearOutput(); }
+        private void AppBarButton_Output_Clear(object sender, RoutedEventArgs e) { _outputControl.ClearOutput(); }
 
         private void AppBarToggleButton_Output_Collapse_Click(object sender, RoutedEventArgs e) { OutputController.IterateOutputMessages(); }
 

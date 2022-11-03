@@ -12,35 +12,35 @@ namespace Editor.UserControls
 {
     public sealed partial class Properties : UserControl
     {
-        public event PropertyChangedEventHandler _EventPropertyChanged;
+        public event PropertyChangedEventHandler EventPropertyChanged;
 
-        public PropertiesController ProperitesControl = new PropertiesController();
+        internal PropertiesController _properitesControl = new PropertiesController();
 
         public Properties()
         {
             this.InitializeComponent();
 
             List<Grid> collection = new List<Grid>();
-            collection.Add(ProperitesControl.CreateColorButton());
-            collection.Add(ProperitesControl.CreateNumberInput());
-            collection.Add(ProperitesControl.CreateTextInput());
-            collection.Add(ProperitesControl.CreateVec2Input());
-            collection.Add(ProperitesControl.CreateVec3Input());
-            collection.Add(ProperitesControl.CreateSlider());
-            collection.Add(ProperitesControl.CreateBool());
-            collection.Add(ProperitesControl.CreateTextureSlot());
-            collection.Add(ProperitesControl.CreateReferenceSlot());
-            collection.Add(ProperitesControl.CreateHeader());
-            collection.Add(ProperitesControl.WrapExpander(ProperitesControl.CreateEvent()));
+            collection.Add(_properitesControl.CreateColorButton());
+            collection.Add(_properitesControl.CreateNumberInput());
+            collection.Add(_properitesControl.CreateTextInput());
+            collection.Add(_properitesControl.CreateVec2Input());
+            collection.Add(_properitesControl.CreateVec3Input());
+            collection.Add(_properitesControl.CreateSlider());
+            collection.Add(_properitesControl.CreateBool());
+            collection.Add(_properitesControl.CreateTextureSlot());
+            collection.Add(_properitesControl.CreateReferenceSlot());
+            collection.Add(_properitesControl.CreateHeader());
+            collection.Add(_properitesControl.WrapExpander(_properitesControl.CreateEvent()));
 
-            x_StackPanel_Properties.Children.Add(ProperitesControl.CreateScript("Example", collection.ToArray()));
-            x_StackPanel_Properties.Children.Add(ProperitesControl.CreateScript("Another", ProperitesControl.CreateSpacer()));
+            x_StackPanel_Properties.Children.Add(_properitesControl.CreateScript("Example", collection.ToArray()));
+            x_StackPanel_Properties.Children.Add(_properitesControl.CreateScript("Another", _properitesControl.CreateSpacer()));
         }
 
         private void AppBarButton_Click_SelectImagePath(object sender, RoutedEventArgs e) { }//m_Control.SelectImage(Img_SelectTexture, x_TextBlock_TexturePath); }
 
         private void AppBarButton_Click_SelectFilePath(object sender, RoutedEventArgs e) { }//m_Control.SelectFile(x_TextBlock_FilePath); }
 
-        private void FirePropertyChanged([CallerMemberName] string memberName = null) { _EventPropertyChanged?.Invoke(this, new PropertyChangedEventArgs(memberName)); }
+        private void FirePropertyChanged([CallerMemberName] string memberName = null) { EventPropertyChanged?.Invoke(this, new PropertyChangedEventArgs(memberName)); }
     }
 }
