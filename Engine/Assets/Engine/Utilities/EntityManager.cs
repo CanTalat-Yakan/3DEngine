@@ -37,6 +37,7 @@ namespace Engine.Utilities
         private MaterialComponent _materialDefault;
         private MaterialComponent _materialReflection;
         private MaterialComponent _materialSky;
+        private MaterialComponent _materialSky2;
         private MeshComponent _meshSphere;
         private MeshComponent _meshCube;
         private MeshComponent _meshSpecial;
@@ -46,7 +47,8 @@ namespace Engine.Utilities
         private static readonly string SHADER_UNLIT = @"Shader\Unlit.hlsl";
          
         private static readonly string IMAGE_DEFAULT = @"Textures\dark.png";
-        private static readonly string IMAGE_SKY = @"Textures\SkyGradient2.png";
+        private static readonly string IMAGE_SKY = @"Textures\SkyGradient.png";
+        private static readonly string IMAGE_SKY_LIGHT = @"Textures\SkyGradient_Light.png";
          
         private static readonly string OBJ_SPECIAL = @"Models\Lowpoly_tree_sample.obj";
         private static readonly string OBJ_CUBE = @"Models\Cube.obj";
@@ -57,6 +59,7 @@ namespace Engine.Utilities
             _materialDefault = new MaterialComponent(SHADER_SIMPLELIT, IMAGE_DEFAULT);
             _materialReflection = new MaterialComponent(SHADER_LIT, IMAGE_SKY);
             _materialSky = new MaterialComponent(SHADER_UNLIT, IMAGE_SKY);
+            _materialSky2 = new MaterialComponent(SHADER_UNLIT, IMAGE_SKY_LIGHT);
 
             _meshSpecial = new MeshComponent(ModelLoader.LoadFilePro(OBJ_SPECIAL));
             _meshCube = new MeshComponent(ModelLoader.LoadFilePro(OBJ_CUBE));
@@ -134,6 +137,11 @@ namespace Engine.Utilities
             };
 
             Sky.Transform.Scale = new Vector3(-1000, -1000, -1000);
+        }
+
+        public void SetTheme(bool light)
+        {
+            Sky.Material = light ? _materialSky2 : _materialSky;
         }
     }
 }

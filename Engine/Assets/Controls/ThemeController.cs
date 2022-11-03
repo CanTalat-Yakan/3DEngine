@@ -30,13 +30,15 @@ namespace Editor.Controls
 
             MainController.Instance.LayoutControl.Output.ChangeColorWithTheme.Background =
                 _frame.RequestedTheme == ElementTheme.Light
-                    ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 255, 255))
+                    ? new SolidColorBrush(Windows.UI.Color.FromArgb(250, 250, 250, 250))
                     : new SolidColorBrush(Windows.UI.Color.FromArgb(255, 40, 40, 40));
 
             MainController.Instance.LayoutControl.Files.ChangeColorWithTheme.Background =
                 _frame.RequestedTheme == ElementTheme.Light
-                    ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 255, 255))
+                    ? new SolidColorBrush(Windows.UI.Color.FromArgb(250, 250, 250, 250))
                     : new SolidColorBrush(Windows.UI.Color.FromArgb(255, 40, 40, 40));
+
+            Engine.Core.Instance.Scene.EntitytManager.SetTheme(_frame.RequestedTheme == ElementTheme.Light);
         }
 
         private bool Initialize()
