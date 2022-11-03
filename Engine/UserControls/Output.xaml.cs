@@ -54,6 +54,7 @@ namespace Editor.UserControls
             if (MainController.Instance.ControlPlayer.PlayMode == EPlayMode.PLAYING)
                 Update();
         }
+
         private void TickSec(object sender, object e)
         {
             if (MainController.Instance.ControlPlayer.PlayMode == EPlayMode.PLAYING)
