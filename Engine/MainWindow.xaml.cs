@@ -1,6 +1,7 @@
 ﻿using Editor.Controls;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using WinUIEx;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -20,10 +21,9 @@ namespace Editor
             ExtendsContentIntoTitleBar = true; // enable custom titlebar
 
             _themeControl = new ThemeController(x_Frame_Main, this);
-            _mainControl = new MainController(x_Grid_Main, x_TextBlock_Status_Content);
+            _mainControl = new MainController(x_Grid_Main, x_TextBlock_Status_Content, x_NavigationView);
             _mainControl.ControlPlayer = new PlayerController(x_AppBarToggleButton_Status_Play, x_AppBarToggleButton_Status_Pause, x_AppBarButton_Status_Forward);
         }
-
 
         private void AppBarToggleButton_Status_Play_Click(object sender, RoutedEventArgs e) { _mainControl.ControlPlayer.Play(); }
 

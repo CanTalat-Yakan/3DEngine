@@ -11,7 +11,7 @@
     MinWidth="1064" MinHeight="768"
     mc:Ignorable="d">
 
-    <NavigationView x:Name="nvSample"   
+    <NavigationView x:Name="x_NavigationView"   
                     IsSettingsVisible="True"
                     IsBackButtonVisible="Collapsed"
                     IsBackEnabled="False"

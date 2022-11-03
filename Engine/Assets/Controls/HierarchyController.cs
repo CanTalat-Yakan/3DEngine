@@ -14,14 +14,14 @@ namespace Editor.Controls
         public TreeViewNode Node;
     }
 
-    internal class HierarachyController
+    internal class HierarchyController
     {
         public TreeView Tree;
         public SceneController SceneControl;
 
         private TreeViewController _treeViewController = new TreeViewController();
 
-        public HierarachyController(TreeView tree, SceneController scene)
+        public HierarchyController(TreeView tree, SceneController scene)
         {
             Tree = tree;
             SceneControl = scene;

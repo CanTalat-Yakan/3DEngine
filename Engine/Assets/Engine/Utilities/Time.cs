@@ -5,10 +5,10 @@ namespace Engine.Utilities
 {
     internal class Time
     {
-        public string Profile = "";
-
         public static double s_Time, s_Delta;
         public static Stopwatch s_Watch = new Stopwatch();
+
+        public string Profile = "";
 
         private int _fps, _tmpFPS;
         private DateTime _now = DateTime.Now;
