@@ -40,8 +40,8 @@
 
         <NavigationView.PaneFooter>
             <StackPanel x:Name="FooterStackPanel" Orientation="Vertical" Visibility="Visible">
-                <!--<NavigationViewItem Icon="Download" AutomationProperties.Name="download" />-->
-                <!--<NavigationViewItem Icon="Favorite" AutomationProperties.Name="favorite" />-->
+                <NavigationViewItem Icon="Download" AutomationProperties.Name="download" />
+                <NavigationViewItem Icon="Favorite" AutomationProperties.Name="favorite" />
             </StackPanel>
         </NavigationView.PaneFooter>
 
