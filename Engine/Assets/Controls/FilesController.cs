@@ -5,19 +5,10 @@ using Windows.UI;
 using System;
 using Microsoft.UI;
 using System.IO;
-using System.Drawing.Drawing2D;
 using CommunityToolkit.WinUI.UI.Controls;
 using Windows.Storage;
-using Vortice.WinUI;
 using Windows.Storage.Pickers;
-using WinRT.Interop;
-using WinRT;
-using System.Runtime.InteropServices;
-using System.Linq;
 using System.Diagnostics;
-using Vortice.Win32;
-using Microsoft.UI.Xaml.Media.Imaging;
-using Windows.Storage.Streams;
 
 namespace Editor.Controls
 {

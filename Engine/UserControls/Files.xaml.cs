@@ -28,7 +28,7 @@ namespace Editor.UserControls
             _filesControl = new FilesController(x_WrapPanel_Files);
 
             _filesControl.CreateCatergoryTiles(
-                new Category() { Name = "Scene", Glyph = "\xEA86", SupportedFileTypes = new string[] { ".usd", ".usda", ".usdc", ".usdz" } },
+                new Category() { Name = "Scenes", Glyph = "\xEA86", SupportedFileTypes = new string[] { ".usd", ".usda", ".usdc", ".usdz" } },
                 new Category() { Name = "Scripts", Symbol = Symbol.Document, SupportedFileTypes = new string[] { ".cs" } },
                 new Category() { Name = "Prefabs", Glyph = "\xE734", SupportedFileTypes = new string[] { ".prefab" } },
                 new Category() { Name = "Models", Glyph = "\xF158", SupportedFileTypes = new string[] { ".fbx", ".obj", ".blend", ".3ds", ".dae" } },
