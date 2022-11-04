@@ -44,6 +44,8 @@ namespace Editor.Controls
 
         public async void SelectFilesAsync()
         {
+            ValidateCategoriesExist();
+
             var picker = new Windows.Storage.Pickers.FileOpenPicker()
             {
                 ViewMode = PickerViewMode.Thumbnail,
@@ -58,14 +60,14 @@ namespace Editor.Controls
 
             var files = await picker.PickMultipleFilesAsync();
 
+            ValidateCategoriesExist();
+
             foreach (StorageFile file in files)
             {
                 foreach (var info in Categories)
                     foreach (var type in info.SupportedFileTypes)
                         if (type == file.FileType)
                         {
-                            ValidateCategoriesExist();
-
                             string subFolderPath = Path.Combine(RootPath, info.Name);
                             string destFile = Path.Combine(subFolderPath, file.Name);
 
@@ -92,6 +94,8 @@ namespace Editor.Controls
 
         public void CreateCatergoryTiles(params Category[] categories)
         {
+            ValidateCategoriesExist();
+
             Wrap.Children.Clear();
 
             Categories = categories;
@@ -111,6 +115,8 @@ namespace Editor.Controls
 
         public async void CreateFileTiles(RoutedEventArgs e)
         {
+            ValidateCategoriesExist();
+
             Wrap.Children.Clear();
 
             var butoon = (Button)e.OriginalSource;
