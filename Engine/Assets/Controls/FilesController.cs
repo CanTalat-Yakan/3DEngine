@@ -16,6 +16,8 @@ using System.Runtime.InteropServices;
 using System.Linq;
 using System.Diagnostics;
 using Vortice.Win32;
+using Microsoft.UI.Xaml.Media.Imaging;
+using Windows.Storage.Streams;
 
 namespace Editor.Controls
 {
@@ -97,20 +99,47 @@ namespace Editor.Controls
                     Directory.CreateDirectory(subFolderPath);
         }
 
-        public void CreateCatergories(params Category[] categories)
+        public void CreateCatergoryTiles(params Category[] categories)
         {
+            Wrap.Children.Clear();
+
             Categories = categories;
 
             foreach (var info in Categories)
+            {
+                Grid icon;
+
                 if (string.IsNullOrEmpty(info.Glyph))
-                    Wrap.Children.Add(CategoryTile(info.Name, info.Symbol, !info.DefaultColor));
+                    icon = CreateIcon(info.Symbol, !info.DefaultColor);
                 else
-                    Wrap.Children.Add(CategoryTile(info.Name, info.Glyph, !info.DefaultColor));
+                    icon = CreateIcon(info.Glyph, !info.DefaultColor);
+
+                Wrap.Children.Add(CategoryTile(info.Name, icon, !info.DefaultColor));
+            }
         }
 
-        private Grid CategoryTile(string s, string glyph, bool rndColor = true)
+        public async void CreateFileTiles(RoutedEventArgs e)
+        {
+            Wrap.Children.Clear();
+
+            var butoon = (Button)e.OriginalSource;
+            var category = (string)butoon.DataContext;
+
+            var filePaths = Directory.EnumerateFiles(Path.Combine(RootPath, category));
+
+            Grid icon = CreateIcon(Symbol.Back, false);
+            Wrap.Children.Add(BackTile("Back", icon));
+            foreach (var path in filePaths)
+            {
+                var file = await StorageFile.GetFileFromPathAsync(path);
+                Wrap.Children.Add(FileTile(file, new Grid()));
+            }
+        }
+
+        private Grid CreateIcon(string glyph, bool rndColor = true)
         {
             Grid grid = new Grid();
+
             FontIcon icon = new FontIcon() { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = glyph };
 
             if (rndColor)
@@ -118,12 +147,13 @@ namespace Editor.Controls
 
             grid.Children.Add(icon);
 
-            return CategoryTile(s, grid, rndColor);
+            return grid;
         }
 
-        private Grid CategoryTile(string s, Symbol symbol, bool rndColor = true)
+        private Grid CreateIcon(Symbol symbol, bool rndColor = true)
         {
             Grid grid = new Grid();
+
             SymbolIcon symbolIcon = new SymbolIcon() { Symbol = symbol };
 
             if (rndColor)
@@ -131,23 +161,27 @@ namespace Editor.Controls
 
             grid.Children.Add(symbolIcon);
 
-            return CategoryTile(s, grid, rndColor);
+            return grid;
         }
 
-        private Grid CategoryTile(string s, Grid symbol, bool rndColor = true)
+        private Grid CategoryTile(string s, Grid icon, bool rndColor = true)
         {
             Grid grid = new Grid();
-            Button btn = new Button()
+
+            Button button = new Button()
             {
                 Width = 150,
                 Height = 100,
                 CornerRadius = new CornerRadius(10),
                 HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment = VerticalAlignment.Center,
+                DataContext = s,
             };
 
+            button.Click += (s, e) => { CreateFileTiles(e); };
+
             if (rndColor)
-                btn.Background = new SolidColorBrush(new Color()
+                button.Background = new SolidColorBrush(new Color()
                 {
                     A = 255,
                     R = (byte)new Random().Next(64, 192),
@@ -156,6 +190,7 @@ namespace Editor.Controls
                 });
 
             StackPanel stack = new StackPanel() { Spacing = 20 };
+
             Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
 
             TextBlock label = new TextBlock() { Text = s };
@@ -163,13 +198,97 @@ namespace Editor.Controls
             if (rndColor)
                 label.Foreground = new SolidColorBrush(Colors.White);
 
-            viewbox.Child = symbol;
+            viewbox.Child = icon;
 
             stack.Children.Add(viewbox);
             stack.Children.Add(label);
 
-            btn.Content = stack;
-            grid.Children.Add(btn);
+            button.Content = stack;
+            grid.Children.Add(button);
+
+            return grid;
+        }
+
+        private Grid FileTile(StorageFile file, Grid icon)
+        {
+            Grid grid = new Grid();
+
+            Image image = new Image();
+
+            //using (IRandomAccessStream fileStream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read))
+            //{
+            //    BitmapImage bitmapImage = new BitmapImage() { DecodePixelHeight = 48, DecodePixelWidth = 48 };
+            //    await bitmapImage.SetSourceAsync(fileStream);
+            //    image.Source = bitmapImage;
+            //}
+
+            StackPanel stack = new StackPanel() { Spacing = 5 };
+
+            Button button = new Button()
+            {
+                Width = 150,
+                Height = 100,
+                CornerRadius = new CornerRadius(10),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                DataContext = file.Name,
+            };
+
+            button.Click += (s, e) =>
+            {
+                if (File.Exists(file.Path))
+                    new Process
+                    {
+                        StartInfo = new ProcessStartInfo(file.Path) { UseShellExecute = true }
+                    }.Start();
+            };
+
+            TextBlock label = new TextBlock()
+            {
+                Text = file.Name,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                MaxWidth = 150,
+                Margin = new Thickness(0, 0, 0, -30)
+            };
+
+            button.Content = icon;
+            stack.Children.Add(button);
+            stack.Children.Add(label);
+            grid.Children.Add(image);
+            grid.Children.Add(stack);
+
+            return grid;
+        }
+
+        private Grid BackTile(string s, Grid icon)
+        {
+            Grid grid = new Grid();
+
+            Button button = new Button()
+            {
+                Width = 150,
+                Height = 100,
+                CornerRadius = new CornerRadius(10),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                DataContext = s,
+            };
+
+            button.Click += (s, e) => { CreateCatergoryTiles(Categories); };
+
+            StackPanel stack = new StackPanel() { Spacing = 20 };
+
+            Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
+
+            TextBlock label = new TextBlock() { Text = s };
+
+            viewbox.Child = icon;
+
+            stack.Children.Add(viewbox);
+            stack.Children.Add(label);
+
+            button.Content = stack;
+            grid.Children.Add(button);
 
             return grid;
         }

@@ -1,4 +1,5 @@
 ﻿using Editor.Controls;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
@@ -26,7 +27,7 @@ namespace Editor.UserControls
 
             _filesControl = new FilesController(x_WrapPanel_Files);
 
-            _filesControl.CreateCatergories(
+            _filesControl.CreateCatergoryTiles(
                 new Category() { Name = "Scene", Glyph = "\xEA86", SupportedFileTypes = new string[] { ".usd", ".usda", ".usdc", ".usdz" } },
                 new Category() { Name = "Scripts", Symbol = Symbol.Document, SupportedFileTypes = new string[] { ".cs" } },
                 new Category() { Name = "Prefabs", Glyph = "\xE734", SupportedFileTypes = new string[] { ".prefab" } },
@@ -43,8 +44,8 @@ namespace Editor.UserControls
             _filesControl.ValidateCategoriesExist();
         }
 
-        private void AppBarButton_Click_AddFiles(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) { _filesControl.SelectFilesAsync(); }
+        private void AppBarButton_Click_AddFiles(object sender, RoutedEventArgs e) { _filesControl.SelectFilesAsync(); }
 
-        private void AppBarButton_Click_RefreshFiles(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) { _filesControl.Refresh(); }
+        private void AppBarButton_Click_RefreshFiles(object sender, RoutedEventArgs e) { _filesControl.Refresh(); }
     }
 }
