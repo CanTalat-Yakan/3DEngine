@@ -78,11 +78,11 @@
                             </muxc:TreeView.ContextFlyout>
                         </muxc:TreeView>
 
-                        <Button Content="Add new Entity" Margin="10,10,10,10" HorizontalAlignment="Center"/>
+                        <Button Content="Add Entity" Margin="10,10,10,10" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Expander>
 
-                <Button Content="Add new SubScene" Margin="10,10,10,10" HorizontalAlignment="Center"/>
+                <Button Content="Add SubScene" Margin="10,10,10,10" HorizontalAlignment="Center"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>
