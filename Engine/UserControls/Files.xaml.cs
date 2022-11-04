@@ -1,6 +1,11 @@
 ﻿using Editor.Controls;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Imaging;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Windows.Storage;
+using Windows.Storage.Streams;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -28,7 +33,7 @@ namespace Editor.UserControls
                 new Category() { Name = "Models", Glyph = "\xF158", SupportedFileTypes = new string[] { ".fbx", ".obj", ".blend", ".3ds", ".dae" } },
                 new Category() { Name = "Animation", Glyph = "\xE805", SupportedFileTypes = new string[] { ".fbx", ".dae" } },
                 new Category() { Name = "Materials", Glyph = "\xF156", SupportedFileTypes = new string[] { ".material" } },
-                new Category() { Name = "Textures", Glyph = "\xEB9F", SupportedFileTypes = new string[] { ".png", ".jpeg", ".tiff", ".tga", ".psd", ".bmp", } },
+                new Category() { Name = "Textures", Glyph = "\xEB9F", SupportedFileTypes = new string[] { ".png", ".jpg", ".jpeg", ".tiff", ".tga", ".psd", ".bmp", } },
                 new Category() { Name = "Audio", Symbol = Symbol.Audio, SupportedFileTypes = new string[] { ".m4a", ".mp3", ".wav", ".ogg" } },
                 new Category() { Name = "Videos", Symbol = Symbol.Video, SupportedFileTypes = new string[] { ".m4v", ".mp4", ".mov", ".avi" } },
                 new Category() { Name = "Fonts", Symbol = Symbol.Font, SupportedFileTypes = new string[] { ".ttf", ".otf" } },
@@ -38,5 +43,8 @@ namespace Editor.UserControls
             _filesControl.ValidateCategoriesExist();
         }
 
+        private void AppBarButton_Click_AddFiles(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) { _filesControl.SelectFilesAsync(); }
+
+        private void AppBarButton_Click_RefreshFiles(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) { _filesControl.Refresh(); }
     }
 }

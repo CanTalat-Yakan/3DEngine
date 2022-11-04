@@ -7,6 +7,15 @@ using Microsoft.UI;
 using System.IO;
 using System.Drawing.Drawing2D;
 using CommunityToolkit.WinUI.UI.Controls;
+using Windows.Storage;
+using Vortice.WinUI;
+using Windows.Storage.Pickers;
+using WinRT.Interop;
+using WinRT;
+using System.Runtime.InteropServices;
+using System.Linq;
+using System.Diagnostics;
+using Vortice.Win32;
 
 namespace Editor.Controls
 {
@@ -23,6 +32,7 @@ namespace Editor.Controls
     {
         public string RootPath { get; private set; }
         public string CurrentProjectTitle { get; private set; }
+
         public WrapPanel Wrap;
         public Category[] Categories;
 
@@ -36,6 +46,45 @@ namespace Editor.Controls
 
             if (!string.IsNullOrEmpty(CurrentProjectTitle))
                 RootPath = Path.Combine(RootPath, CurrentProjectTitle);
+        }
+
+        public async void SelectFilesAsync()
+        {
+            var picker = new Windows.Storage.Pickers.FileOpenPicker()
+            {
+                ViewMode = PickerViewMode.Thumbnail,
+                SuggestedStartLocation = PickerLocationId.Desktop,
+                FileTypeFilter = { "*" }
+            };
+
+            // Make sure to get the HWND from a Window object,
+            // pass a Window reference to GetWindowHandle.
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+            var files = await picker.PickMultipleFilesAsync();
+
+            foreach (StorageFile file in files)
+            {
+                foreach (var info in Categories)
+                    foreach (var type in info.SupportedFileTypes)
+                        if (type == file.FileType)
+                        {
+                            ValidateCategoriesExist();
+
+                            string subFolderPath = Path.Combine(RootPath, info.Name);
+                            string destFile = Path.Combine(subFolderPath, file.Name);
+
+                            // To copy a file to another location and
+                            // overwrite the destination file if it already exists.
+                            System.IO.File.Copy(file.Path, destFile, true);
+                        }
+            }
+        }
+
+        public void Refresh()
+        {
+            ValidateCategoriesExist();
         }
 
         public void ValidateCategoriesExist()
@@ -123,7 +172,5 @@ namespace Editor.Controls
 
             return grid;
         }
-
-
     }
 }

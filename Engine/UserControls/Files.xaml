@@ -10,17 +10,12 @@
     
     <Grid>
         <CommandBar HorizontalAlignment="Right" Margin="244,-44,0,0">
-            <AppBarButton Label="Add Files" Icon="Add"/>
+            <AppBarButton Label="Add Files" Icon="Add" Click="AppBarButton_Click_AddFiles"/>
 
             <AppBarSeparator/>
 
             <CommandBar.SecondaryCommands>
-                <AppBarButton Label="Refresh Files" Icon="Refresh"/>
-                <AppBarButton Label="Clean Files">
-                    <AppBarButton.Content>
-                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEA99;"/>
-                    </AppBarButton.Content>
-                </AppBarButton>
+                <AppBarButton Label="Refresh Files" Icon="Refresh" Click="AppBarButton_Click_RefreshFiles"/>
             </CommandBar.SecondaryCommands>
         </CommandBar>
 
