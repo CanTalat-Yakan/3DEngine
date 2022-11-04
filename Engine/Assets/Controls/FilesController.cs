@@ -94,11 +94,11 @@ namespace Editor.Controls
 
         public void CreateCatergoryTiles(params Category[] categories)
         {
+            Categories = categories;
+
             ValidateCategoriesExist();
 
             Wrap.Children.Clear();
-
-            Categories = categories;
 
             foreach (var info in Categories)
             {
