@@ -43,6 +43,7 @@ namespace Editor.Controls
             var documentsDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
             RootPath = Path.Combine(documentsDir, "3DEngine");
+            CurrentProjectTitle = "New Project";
 
             if (!string.IsNullOrEmpty(CurrentProjectTitle))
                 RootPath = Path.Combine(RootPath, CurrentProjectTitle);
