@@ -11,19 +11,25 @@ using Expander = Microsoft.UI.Xaml.Controls.Expander;
 using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 using Microsoft.UI.Xaml.Controls.Primitives;
+using Windows.Storage.Pickers;
 
 namespace Editor.Controls
 {
     internal class PropertiesController
     {
-        public async void SelectImage(Image image, TextBlock path)
+        public async void SelectImageAsync(Image image, TextBlock path)
         {
-            var picker = new Windows.Storage.Pickers.FileOpenPicker();
-            picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
-            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary;
-            picker.FileTypeFilter.Add(".jpg");
-            picker.FileTypeFilter.Add(".jpeg");
-            picker.FileTypeFilter.Add(".png");
+            var picker = new Windows.Storage.Pickers.FileOpenPicker()
+            {
+                ViewMode = PickerViewMode.Thumbnail,
+                SuggestedStartLocation = PickerLocationId.PicturesLibrary,
+                FileTypeFilter = { ".jpg", ".jpeg", ".png" }
+            };
+
+            // Make sure to get the HWND from a Window object,
+            // pass a Window reference to GetWindowHandle.
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
             Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
 
@@ -39,12 +45,19 @@ namespace Editor.Controls
             }
         }
 
-        public async void SelectFile(TextBlock path)
+        public async void SelectFileAsync(TextBlock path)
         {
-            var picker = new Windows.Storage.Pickers.FileOpenPicker();
-            picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
-            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.Desktop;
-            picker.FileTypeFilter.Add("*");
+            var picker = new Windows.Storage.Pickers.FileOpenPicker()
+            {
+                ViewMode = PickerViewMode.Thumbnail,
+                SuggestedStartLocation = PickerLocationId.Desktop,
+                FileTypeFilter = { "*" }
+            };
+
+            // Make sure to get the HWND from a Window object,
+            // pass a Window reference to GetWindowHandle.
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
             Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
 
