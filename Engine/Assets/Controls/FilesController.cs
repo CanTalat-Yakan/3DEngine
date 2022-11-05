@@ -32,6 +32,8 @@ namespace Editor.Controls
         public WrapPanel Wrap;
         public Category[] Categories;
 
+        private string _currentCategory;
+
         public FilesController(WrapPanel wrap)
         {
             Wrap = wrap;
@@ -63,8 +65,6 @@ namespace Editor.Controls
 
             var files = await picker.PickMultipleFilesAsync();
 
-            ValidateCategoriesExist();
-
             foreach (StorageFile file in files)
             {
                 foreach (var info in Categories)
@@ -79,6 +79,8 @@ namespace Editor.Controls
                             System.IO.File.Copy(file.Path, destFile, true);
                         }
             }
+
+            Refresh();
         }
 
         public void OpenFolder()
@@ -89,6 +91,9 @@ namespace Editor.Controls
         public void Refresh()
         {
             ValidateCategoriesExist();
+
+            if (!string.IsNullOrEmpty(_currentCategory))
+                CreateFileTiles();
         }
 
         public void ValidateCategoriesExist()
@@ -121,24 +126,25 @@ namespace Editor.Controls
             }
         }
 
-        public async void CreateFileTiles(RoutedEventArgs e)
+        public async void CreateFileTiles()
         {
             ValidateCategoriesExist();
 
             Wrap.Children.Clear();
 
-            var butoon = (Button)e.OriginalSource;
-            var category = (string)butoon.DataContext;
+            OutputController.Log(_currentCategory);
 
-            var filePaths = Directory.EnumerateFiles(Path.Combine(RootPath, category));
+            var filePaths = Directory.EnumerateFiles(Path.Combine(RootPath, _currentCategory));
 
             Grid icon = CreateIcon(Symbol.Back, false);
             Wrap.Children.Add(BackTile(icon));
 
             foreach (var path in filePaths)
             {
+                OutputController.Log(_currentCategory);
+
                 var file = await StorageFile.GetFileFromPathAsync(path);
-                Wrap.Children.Add(FileTile(file, category));
+                Wrap.Children.Add(FileTile(file));
             }
         }
 
@@ -172,6 +178,8 @@ namespace Editor.Controls
 
         private Grid CategoryTile(string s, Grid icon, bool rndColor = true)
         {
+            _currentCategory = null;
+
             Grid grid = new Grid();
 
             Button button = new Button()
@@ -184,7 +192,11 @@ namespace Editor.Controls
                 DataContext = s,
             };
 
-            button.Click += (s, e) => { CreateFileTiles(e); };
+            button.Click += (s, e) =>
+            {
+                _currentCategory = (string)((Button)e.OriginalSource).DataContext;
+                CreateFileTiles();
+            };
 
             if (rndColor)
                 button.Background = new SolidColorBrush(new Color()
@@ -215,7 +227,7 @@ namespace Editor.Controls
             return grid;
         }
 
-        private Grid FileTile(StorageFile file, string category)
+        private Grid FileTile(StorageFile file)
         {
             Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, -30) };
 
@@ -226,7 +238,7 @@ namespace Editor.Controls
             Grid icon = new Grid();
 
             foreach (var info in Categories)
-                if (info.Name == category)
+                if (info.Name == _currentCategory)
                     if (string.IsNullOrEmpty(info.Glyph))
                         icon = CreateIcon(info.Symbol, !info.DefaultColor);
                     else
@@ -286,7 +298,10 @@ namespace Editor.Controls
                 VerticalAlignment = VerticalAlignment.Center,
             };
 
-            button.Click += (s, e) => { CreateCatergoryTiles(Categories); };
+            button.Click += (s, e) =>
+            {
+                CreateCatergoryTiles(Categories);
+            };
 
             Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
 
@@ -302,7 +317,9 @@ namespace Editor.Controls
             using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
             {
                 BitmapImage bitmapImage = new BitmapImage() { DecodePixelWidth = (int)image.Width, DecodePixelHeight = (int)image.Height };
+
                 await bitmapImage.SetSourceAsync(fileStream);
+
                 image.Source = bitmapImage;
             }
         }
