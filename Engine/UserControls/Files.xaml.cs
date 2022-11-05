@@ -39,7 +39,7 @@ namespace Editor.UserControls
                 new Category() { Name = "Videos", Symbol = Symbol.Video, SupportedFileTypes = new string[] { ".m4v", ".mp4", ".mov", ".avi" } },
                 new Category() { Name = "Fonts", Symbol = Symbol.Font, SupportedFileTypes = new string[] { ".ttf", ".otf" } },
                 new Category() { Name = "Documents", Glyph = "\xEA90", SupportedFileTypes = new string[] { ".pdf", ".txt", ".doc", ".docx" } },
-                new Category() { Name = "Packages", Glyph = "\xE74C", DefaultColor = true, SupportedFileTypes = new string[] { ".zip", ".7zip", ".winrar" } });
+                new Category() { Name = "Packages", Glyph = "\xE74C", DefaultColor = true, SupportedFileTypes = new string[] { ".zip", ".7zip", ".rar" } });
         }
 
         private void AppBarButton_Click_AddFiles(object sender, RoutedEventArgs e) { _filesControl.SelectFilesAsync(); }
