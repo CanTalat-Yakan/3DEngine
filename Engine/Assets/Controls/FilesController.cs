@@ -135,17 +135,10 @@ namespace Editor.Controls
             Grid icon = CreateIcon(Symbol.Back, false);
             Wrap.Children.Add(BackTile(icon));
 
-            foreach (var info in Categories)
-                if (info.Name == category)
-                    if (string.IsNullOrEmpty(info.Glyph))
-                        icon = CreateIcon(info.Symbol, !info.DefaultColor);
-                    else
-                        icon = CreateIcon(info.Glyph, !info.DefaultColor);
-
             foreach (var path in filePaths)
             {
                 var file = await StorageFile.GetFileFromPathAsync(path);
-                Wrap.Children.Add(FileTile(file, icon));
+                Wrap.Children.Add(FileTile(file, category));
             }
         }
 
@@ -222,13 +215,22 @@ namespace Editor.Controls
             return grid;
         }
 
-        private Grid FileTile(StorageFile file, Grid icon)
+        private Grid FileTile(StorageFile file, string category)
         {
             Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, -30) };
 
             Grid grid2 = new Grid();
 
             Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
+
+            Grid icon = new Grid();
+
+            foreach (var info in Categories)
+                if (info.Name == category)
+                    if (string.IsNullOrEmpty(info.Glyph))
+                        icon = CreateIcon(info.Symbol, !info.DefaultColor);
+                    else
+                        icon = CreateIcon(info.Glyph, !info.DefaultColor);
 
             Image image = new Image() { Width = 145, Height = 90 };
 
@@ -247,7 +249,7 @@ namespace Editor.Controls
                 DataContext = file.Name,
             };
 
-            button.Click += (s, e) =>
+            button.DoubleTapped += (s, e) =>
             {
                 if (File.Exists(file.Path))
                     Process.Start(new ProcessStartInfo { FileName = file.Path, UseShellExecute = true });
