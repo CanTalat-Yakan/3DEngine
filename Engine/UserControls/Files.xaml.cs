@@ -44,6 +44,8 @@ namespace Editor.UserControls
 
         private void AppBarButton_Click_AddFiles(object sender, RoutedEventArgs e) { _filesControl.SelectFilesAsync(); }
 
+        private void AppBarButton_Click_OpenFolder(object sender, RoutedEventArgs e) { _filesControl.OpenFolder(); }
+
         private void AppBarButton_Click_RefreshFiles(object sender, RoutedEventArgs e) { _filesControl.Refresh(); }
     }
 }

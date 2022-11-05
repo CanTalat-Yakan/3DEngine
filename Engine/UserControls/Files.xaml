@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     mc:Ignorable="d">
-    
+
     <Grid>
         <CommandBar HorizontalAlignment="Right" Margin="244,-44,0,0">
             <AppBarButton Label="Add Files" Icon="Add" Click="AppBarButton_Click_AddFiles"/>
@@ -16,6 +16,7 @@
 
             <CommandBar.SecondaryCommands>
                 <AppBarButton Label="Refresh Files" Icon="Refresh" Click="AppBarButton_Click_RefreshFiles"/>
+                <AppBarButton Label="Open Folder" Icon="Folder" Click="AppBarButton_Click_OpenFolder"/>
             </CommandBar.SecondaryCommands>
         </CommandBar>
 
