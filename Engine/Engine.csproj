@@ -27,6 +27,11 @@
 
   <ItemGroup>
     <PackageReference Include="Aspose.3D" Version="22.10.0" />
+    <PackageReference Include="Aspose.Imaging" Version="22.10.0" />
+    <PackageReference Include="Aspose.PDF" Version="22.10.0" />
+    <PackageReference Include="Aspose.PSD" Version="22.10.0" />
+    <PackageReference Include="Aspose.Words" Version="22.11.0" />
+    <PackageReference Include="Aspose.Zip" Version="22.10.0" />
     <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
