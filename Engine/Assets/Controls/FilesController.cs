@@ -9,6 +9,9 @@ using CommunityToolkit.WinUI.UI.Controls;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using System.Diagnostics;
+using Windows.Storage.Streams;
+using Microsoft.UI.Xaml.Media.Imaging;
+using System.Threading.Tasks;
 
 namespace Editor.Controls
 {
@@ -46,7 +49,7 @@ namespace Editor.Controls
         {
             ValidateCategoriesExist();
 
-            var picker = new Windows.Storage.Pickers.FileOpenPicker()
+            var picker = new FileOpenPicker()
             {
                 ViewMode = PickerViewMode.Thumbnail,
                 SuggestedStartLocation = PickerLocationId.Desktop,
@@ -76,6 +79,11 @@ namespace Editor.Controls
                             System.IO.File.Copy(file.Path, destFile, true);
                         }
             }
+        }
+
+        public void OpenFolder()
+        {
+            Process.Start(new ProcessStartInfo { FileName = RootPath, UseShellExecute = true });
         }
 
         public void Refresh()
@@ -125,11 +133,19 @@ namespace Editor.Controls
             var filePaths = Directory.EnumerateFiles(Path.Combine(RootPath, category));
 
             Grid icon = CreateIcon(Symbol.Back, false);
-            Wrap.Children.Add(BackTile("Back", icon));
+            Wrap.Children.Add(BackTile(icon));
+
+            foreach (var info in Categories)
+                if (info.Name == category)
+                    if (string.IsNullOrEmpty(info.Glyph))
+                        icon = CreateIcon(info.Symbol, !info.DefaultColor);
+                    else
+                        icon = CreateIcon(info.Glyph, !info.DefaultColor);
+
             foreach (var path in filePaths)
             {
                 var file = await StorageFile.GetFileFromPathAsync(path);
-                Wrap.Children.Add(FileTile(file, new Grid()));
+                Wrap.Children.Add(FileTile(file, icon));
             }
         }
 
@@ -167,8 +183,8 @@ namespace Editor.Controls
 
             Button button = new Button()
             {
-                Width = 150,
-                Height = 100,
+                Width = 145,
+                Height = 90,
                 CornerRadius = new CornerRadius(10),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
@@ -181,12 +197,12 @@ namespace Editor.Controls
                 button.Background = new SolidColorBrush(new Color()
                 {
                     A = 255,
-                    R = (byte)new Random().Next(64, 192),
-                    B = (byte)new Random().Next(64, 192),
-                    G = (byte)new Random().Next(64, 192)
+                    R = (byte)new Random().Next(64, 128),
+                    B = (byte)new Random().Next(64, 128),
+                    G = (byte)new Random().Next(64, 128)
                 });
 
-            StackPanel stack = new StackPanel() { Spacing = 20 };
+            StackPanel stack = new StackPanel() { Spacing = 5 };
 
             Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
 
@@ -208,23 +224,23 @@ namespace Editor.Controls
 
         private Grid FileTile(StorageFile file, Grid icon)
         {
-            Grid grid = new Grid();
+            Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, -30) };
 
-            Image image = new Image();
+            Grid grid2 = new Grid();
 
-            //using (IRandomAccessStream fileStream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read))
-            //{
-            //    BitmapImage bitmapImage = new BitmapImage() { DecodePixelHeight = 48, DecodePixelWidth = 48 };
-            //    await bitmapImage.SetSourceAsync(fileStream);
-            //    image.Source = bitmapImage;
-            //}
+            Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
+
+            Image image = new Image() { Width = 145, Height = 90 };
+
+            _ = PreviewFileToImageAsync(file, image);
 
             StackPanel stack = new StackPanel() { Spacing = 5 };
 
             Button button = new Button()
             {
-                Width = 150,
-                Height = 100,
+                Width = 145,
+                Height = 90,
+                Padding = new Thickness(0),
                 CornerRadius = new CornerRadius(10),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
@@ -234,10 +250,7 @@ namespace Editor.Controls
             button.Click += (s, e) =>
             {
                 if (File.Exists(file.Path))
-                    new Process
-                    {
-                        StartInfo = new ProcessStartInfo(file.Path) { UseShellExecute = true }
-                    }.Start();
+                    Process.Start(new ProcessStartInfo { FileName = file.Path, UseShellExecute = true });
             };
 
             TextBlock label = new TextBlock()
@@ -245,49 +258,51 @@ namespace Editor.Controls
                 Text = file.Name,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 MaxWidth = 150,
-                Margin = new Thickness(0, 0, 0, -30)
             };
 
-            button.Content = icon;
+            viewbox.Child = icon;
+            grid2.Children.Add(viewbox);
+            grid2.Children.Add(image);
+            button.Content = grid2;
             stack.Children.Add(button);
             stack.Children.Add(label);
-            grid.Children.Add(image);
             grid.Children.Add(stack);
 
             return grid;
         }
 
-        private Grid BackTile(string s, Grid icon)
+        private Grid BackTile(Grid icon)
         {
             Grid grid = new Grid();
 
             Button button = new Button()
             {
-                Width = 150,
-                Height = 100,
+                Width = 145,
+                Height = 90,
                 CornerRadius = new CornerRadius(10),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
-                DataContext = s,
             };
 
             button.Click += (s, e) => { CreateCatergoryTiles(Categories); };
 
-            StackPanel stack = new StackPanel() { Spacing = 20 };
-
             Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
 
-            TextBlock label = new TextBlock() { Text = s };
-
             viewbox.Child = icon;
-
-            stack.Children.Add(viewbox);
-            stack.Children.Add(label);
-
-            button.Content = stack;
+            button.Content = viewbox;
             grid.Children.Add(button);
 
             return grid;
+        }
+
+        private async Task PreviewFileToImageAsync(StorageFile file, Image image)
+        {
+            using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
+            {
+                BitmapImage bitmapImage = new BitmapImage() { DecodePixelWidth = (int)image.Width, DecodePixelHeight = (int)image.Height };
+                await bitmapImage.SetSourceAsync(fileStream);
+                image.Source = bitmapImage;
+            }
         }
     }
 }
