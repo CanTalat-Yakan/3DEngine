@@ -13,6 +13,7 @@ using Windows.Storage.Streams;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Drawing.Drawing2D;
 
 namespace Editor.Controls
 {
@@ -61,6 +62,14 @@ namespace Editor.Controls
                 FileTypeFilter = { "*" }
             };
 
+            if (_currentCategory is null)
+            {
+                picker.FileTypeFilter.Clear();
+
+                foreach (var type in _currentCategory.Value.FileTypes)
+                    picker.FileTypeFilter.Add(type);
+            }
+
             // Make sure to get the HWND from a Window object,
             // pass a Window reference to GetWindowHandle.
             var hwnd = WinRT.Interop.WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
@@ -70,11 +79,11 @@ namespace Editor.Controls
 
             foreach (StorageFile file in files)
             {
-                foreach (var info in Categories)
-                    foreach (var type in info.FileTypes)
+                foreach (var category in Categories)
+                    foreach (var type in category.FileTypes)
                         if (type == file.FileType)
                         {
-                            string destCategoryPath = Path.Combine(RootPath, info.Name);
+                            string destCategoryPath = Path.Combine(RootPath, category.Name);
                             string destFilePath = Path.Combine(destCategoryPath, file.Name);
 
                             File.Copy(file.Path, destFilePath, true);
@@ -86,28 +95,37 @@ namespace Editor.Controls
 
         public void OpenFolder()
         {
-            Process.Start(new ProcessStartInfo { FileName = RootPath, UseShellExecute = true });
+            var path = RootPath;
+
+            if (_currentCategory != null)
+            {
+                path = Path.Combine(RootPath, _currentCategory.Value.Name);
+
+                if (!string.IsNullOrEmpty(_currentSubPath))
+                    path = Path.Combine(path, _currentSubPath);
+            }
+
+            if (Directory.Exists(path))
+                Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
         }
 
         public void Refresh()
         {
             ValidateCategoriesExist();
-
             ValidateCorrectFileTypesAsync();
 
             if (_currentCategory is null)
                 CreateCatergoryTiles(Categories);
             else
                 CreateFileSystemEntryTilesAsync();
-
         }
 
         public void ValidateCategoriesExist()
         {
             string categoryPath;
 
-            foreach (var info in Categories)
-                if (!Directory.Exists(categoryPath = Path.Combine(RootPath, info.Name)))
+            foreach (var category in Categories)
+                if (!Directory.Exists(categoryPath = Path.Combine(RootPath, category.Name)))
                     Directory.CreateDirectory(categoryPath);
         }
 
@@ -115,26 +133,26 @@ namespace Editor.Controls
         {
             bool dirty = false;
 
-            foreach (var info in Categories)
+            foreach (var category in Categories)
             {
-                var filePaths = Directory.EnumerateFiles(Path.Combine(RootPath, info.Name));
+                var filePaths = Directory.EnumerateFiles(Path.Combine(RootPath, category.Name));
 
                 foreach (var path in filePaths)
                 {
                     var file = await StorageFile.GetFileFromPathAsync(path);
 
-                    if (!info.FileTypes.Contains(file.FileType))
-                        foreach (var info2 in Categories)
-                            foreach (var fileTypes2 in info2.FileTypes)
+                    if (!category.FileTypes.Contains(file.FileType))
+                        foreach (var category2 in Categories)
+                            foreach (var fileTypes2 in category2.FileTypes)
                                 if (file.FileType == fileTypes2)
                                 {
                                     File.Move(
                                         file.Path,
-                                        Path.Combine(RootPath, Path.Combine(info2.Name, file.Name)),
+                                        Path.Combine(RootPath, category2.Name, file.Name),
                                         true);
 
                                     if (_currentCategory != null)
-                                        if (info.Equals(_currentCategory.Value) || info2.Equals(_currentCategory.Value))
+                                        if (category.Equals(_currentCategory.Value) || category2.Equals(_currentCategory.Value))
                                             dirty = true;
                                 }
                 }
@@ -152,16 +170,16 @@ namespace Editor.Controls
 
             Wrap.VerticalSpacing = 10;
 
-            foreach (var info in Categories)
+            foreach (var category in Categories)
             {
                 Grid icon;
 
-                if (string.IsNullOrEmpty(info.Glyph))
-                    icon = CreateIcon(info.Symbol, !info.DefaultColor);
+                if (string.IsNullOrEmpty(category.Glyph))
+                    icon = CreateIcon(category.Symbol, !category.DefaultColor);
                 else
-                    icon = CreateIcon(info.Glyph, !info.DefaultColor);
+                    icon = CreateIcon(category.Glyph, !category.DefaultColor);
 
-                Wrap.Children.Add(CategoryTile(info, icon, !info.DefaultColor));
+                Wrap.Children.Add(CategoryTile(category, icon, !category.DefaultColor));
             }
         }
 
@@ -176,7 +194,24 @@ namespace Editor.Controls
             string currentPath = Path.Combine(RootPath, _currentCategory.Value.Name);
 
             if (!string.IsNullOrEmpty(_currentSubPath))
+            {
                 currentPath = Path.Combine(currentPath, _currentSubPath);
+
+                // When a directoy is deleted and you refresh
+                // Go up a directoy and if it exists continue, if not just display category folder
+                while (!Directory.Exists(currentPath))
+                {
+                    GoUpDirectory(ref _currentSubPath);
+
+                    if (string.IsNullOrEmpty(_currentSubPath))
+                    {
+                        currentPath = Path.Combine(RootPath, _currentCategory.Value.Name);
+                        break;
+                    }
+
+                    currentPath = Path.Combine(RootPath, _currentCategory.Value.Name, _currentSubPath);
+                }
+            }
 
             var folderPaths = Directory.EnumerateDirectories(currentPath);
 
@@ -372,14 +407,7 @@ namespace Editor.Controls
             {
                 if (!string.IsNullOrEmpty(_currentSubPath))
                 {
-                    if (!_currentSubPath.Contains('\\'))
-                        _currentSubPath = null;
-                    else
-                    {
-                        var pathArr = _currentSubPath.Split('\\').SkipLast(1);
-
-                        _currentSubPath = string.Join('\\', pathArr);
-                    }
+                    GoUpDirectory(ref _currentSubPath);
 
                     Refresh();
                 }
@@ -442,6 +470,19 @@ namespace Editor.Controls
             grid.Children.Add(symbolIcon);
 
             return grid;
+        }
+
+        private string GoUpDirectory(ref string path)
+        {
+            if (!path.Contains('\\'))
+                path = null;
+            else
+            {
+                var pathArr = path.Split('\\').SkipLast(1);
+
+                path = string.Join('\\', pathArr);
+            }
+            return path;
         }
 
         private async Task PreviewFileToImageAsync(StorageFile file, Image image)
