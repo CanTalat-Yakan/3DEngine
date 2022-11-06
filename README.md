@@ -35,5 +35,9 @@ interchange between graphics applications.
 For more details, please visit the web site [here](http://openusd.org).
 
 
+# Aspose.3D .NET API for 3D File Formats
+
+[Aspose.3D for .NET](http://products.aspose.com/3d/net) empowers .NET applications to connect with 3D document formats. 3D .NET API lets engineers read, convert, build, alter and control the substance of the [3D document formats](https://docs.aspose.com/3d/net/supported-file-formats/) without any 3D modeling and rendering software installed on the machine.
+
 # Preview
 ![alt text](https://drive.google.com/uc?export=view&id=1mcehLyJOGVpjFk7ZbLeMNDct9VOwXiiE)
