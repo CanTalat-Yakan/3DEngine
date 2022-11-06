@@ -25,6 +25,7 @@ namespace Editor.Controls
         public bool DefaultColor;
         public string[] FileTypes;
         public bool PreviewTile;
+        public bool Creatable;
     }
 
     internal class FilesController
@@ -79,15 +80,16 @@ namespace Editor.Controls
 
             foreach (StorageFile file in files)
             {
-                foreach (var category in Categories)
-                    foreach (var type in category.FileTypes)
-                        if (type == file.FileType)
-                        {
-                            string destCategoryPath = Path.Combine(RootPath, category.Name);
-                            string destFilePath = Path.Combine(destCategoryPath, file.Name);
+                if (file != null)
+                    foreach (var category in Categories)
+                        foreach (var type in category.FileTypes)
+                            if (type == file.FileType)
+                            {
+                                string destCategoryPath = Path.Combine(RootPath, category.Name);
+                                string destFilePath = Path.Combine(destCategoryPath, file.Name);
 
-                            File.Copy(file.Path, destFilePath, true);
-                        }
+                                File.Copy(file.Path, destFilePath, true);
+                            }
             }
 
             Refresh();
@@ -190,6 +192,9 @@ namespace Editor.Controls
             Wrap.VerticalSpacing = 35;
 
             Wrap.Children.Add(BackTile(CreateIcon(Symbol.Back, false)));
+
+            if (_currentCategory.Value.Creatable)
+                Wrap.Children.Add(AddTile(CreateIcon(Symbol.Add, false)));
 
             string currentPath = Path.Combine(RootPath, _currentCategory.Value.Name);
 
@@ -396,7 +401,7 @@ namespace Editor.Controls
 
             Button button = new Button()
             {
-                Width = 145,
+                Width = 67,
                 Height = 90,
                 CornerRadius = new CornerRadius(10),
                 HorizontalAlignment = HorizontalAlignment.Center,
@@ -418,6 +423,38 @@ namespace Editor.Controls
 
                     CreateCatergoryTiles(Categories);
                 }
+            };
+
+            Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
+
+            viewbox.Child = icon;
+            button.Content = viewbox;
+            grid.Children.Add(button);
+
+            return grid;
+        }
+
+        private Grid AddTile(Grid icon)
+        {
+            Grid grid = new Grid();
+
+            Button button = new Button()
+            {
+                Width = 67,
+                Height = 90,
+                CornerRadius = new CornerRadius(10),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+
+            button.Click += (s, e) =>
+            {
+                string path = Path.Combine(RootPath, _currentCategory.Value.Name);
+
+                if (_currentSubPath != null)
+                    path = Path.Combine(RootPath, _currentCategory.Value.Name, _currentSubPath);
+
+                _ = CreateAndSaveFileAsync(path);
             };
 
             Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
@@ -494,6 +531,31 @@ namespace Editor.Controls
                 await bitmapImage.SetSourceAsync(fileStream);
 
                 image.Source = bitmapImage;
+            }
+        }
+
+        private async Task CreateAndSaveFileAsync(string path)
+        {
+            var picker = new FileSavePicker() { SuggestedStartLocation = PickerLocationId.DocumentsLibrary };
+
+            picker.FileTypeChoices.Add(_currentCategory.Value.Name, _currentCategory.Value.FileTypes);
+            picker.SuggestedFileName = "New " + _currentCategory.Value.Name.Remove(_currentCategory.Value.Name.Length - 1); ;
+
+            // Make sure to get the HWND from a Window object,
+            // pass a Window reference to GetWindowHandle.
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+            var file = await picker.PickSaveFileAsync();
+
+            if (file != null)
+            {
+                File.Move(
+                    file.Path,
+                    Path.Combine(path, file.Name),
+                    true);
+
+                Refresh();
             }
         }
     }
