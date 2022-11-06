@@ -32,7 +32,7 @@ namespace Editor.UserControls
                 new Category() { Name = "Audio", Symbol = Symbol.Audio, FileTypes = new string[] { ".m4a", ".mp3", ".wav", ".ogg" } },
                 new Category() { Name = "Videos", Symbol = Symbol.Video, FileTypes = new string[] { ".m4v", ".mp4", ".mov", ".avi" }, PreviewTile = true },
                 new Category() { Name = "Fonts", Symbol = Symbol.Font, FileTypes = new string[] { ".ttf", ".otf" } },
-                new Category() { Name = "Documents", Glyph = "\xEA90", FileTypes = new string[] { ".pdf", ".txt", ".doc", ".docx" } },
+                new Category() { Name = "Documents", Glyph = "\xF000", FileTypes = new string[] { ".pdf", ".txt", ".doc", ".docx" } },
                 new Category() { Name = "Packages", Glyph = "\xE74C", FileTypes = new string[] { ".zip", ".7zip", ".rar" }, DefaultColor = true });
         }
 
