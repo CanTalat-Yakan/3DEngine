@@ -306,6 +306,8 @@ namespace Editor.Controls
 
             StackPanel stack2 = new StackPanel() { Spacing = 5, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center };
 
+            image.Opacity = 0.5f;
+
             Button button = new Button()
             {
                 Width = 145,
@@ -334,8 +336,8 @@ namespace Editor.Controls
             viewbox.Child = icon;
             stack2.Children.Add(viewbox);
             stack2.Children.Add(fileType);
-            grid2.Children.Add(stack2);
             grid2.Children.Add(image);
+            grid2.Children.Add(stack2);
             button.Content = grid2;
             stack.Children.Add(button);
             stack.Children.Add(label);
