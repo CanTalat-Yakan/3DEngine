@@ -12,6 +12,7 @@ using System.Diagnostics;
 using Windows.Storage.Streams;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Editor.Controls
 {
@@ -21,7 +22,8 @@ namespace Editor.Controls
         public Symbol Symbol;
         public string Glyph;
         public bool DefaultColor;
-        public string[] SupportedFileTypes;
+        public string[] FileTypes;
+        public bool PreviewTile;
     }
 
     internal class FilesController
@@ -32,7 +34,7 @@ namespace Editor.Controls
         public WrapPanel Wrap;
         public Category[] Categories;
 
-        private string _currentCategory;
+        private Category? _currentCategory;
 
         public FilesController(WrapPanel wrap)
         {
@@ -68,15 +70,13 @@ namespace Editor.Controls
             foreach (StorageFile file in files)
             {
                 foreach (var info in Categories)
-                    foreach (var type in info.SupportedFileTypes)
+                    foreach (var type in info.FileTypes)
                         if (type == file.FileType)
                         {
                             string subFolderPath = Path.Combine(RootPath, info.Name);
-                            string destFile = Path.Combine(subFolderPath, file.Name);
+                            string destFilePath = Path.Combine(subFolderPath, file.Name);
 
-                            // To copy a file to another location and
-                            // overwrite the destination file if it already exists.
-                            System.IO.File.Copy(file.Path, destFile, true);
+                            File.Copy(file.Path, destFilePath, true);
                         }
             }
 
@@ -92,8 +92,13 @@ namespace Editor.Controls
         {
             ValidateCategoriesExist();
 
-            if (!string.IsNullOrEmpty(_currentCategory))
-                CreateFileTiles();
+            ValidateCorrectFileTypesAsync();
+
+            if (_currentCategory is null)
+                CreateCatergoryTiles(Categories);
+            else
+                CreateFileTilesAsync();
+
         }
 
         public void ValidateCategoriesExist()
@@ -105,11 +110,42 @@ namespace Editor.Controls
                     Directory.CreateDirectory(subFolderPath);
         }
 
+        public async void ValidateCorrectFileTypesAsync()
+        {
+            bool dirty = false;
+
+            foreach (var info in Categories)
+            {
+                var filePaths = Directory.EnumerateFiles(Path.Combine(RootPath, info.Name));
+
+                foreach (var path in filePaths)
+                {
+                    var file = await StorageFile.GetFileFromPathAsync(path);
+
+                    if (!info.FileTypes.Contains(file.FileType))
+                        foreach (var info2 in Categories)
+                            foreach (var fileTypes2 in info2.FileTypes)
+                                if (file.FileType == fileTypes2)
+                                {
+                                    File.Move(
+                                        file.Path,
+                                        Path.Combine(RootPath, Path.Combine(info2.Name, file.Name)),
+                                        true);
+
+                                    if (_currentCategory != null)
+                                        if (info.Equals(_currentCategory.Value) || info2.Equals(_currentCategory.Value))
+                                            dirty = true;
+                                }
+                }
+            }
+
+            if (dirty)
+                CreateFileTilesAsync();
+        }
+
         public void CreateCatergoryTiles(params Category[] categories)
         {
             Categories = categories;
-
-            ValidateCategoriesExist();
 
             Wrap.Children.Clear();
 
@@ -122,63 +158,37 @@ namespace Editor.Controls
                 else
                     icon = CreateIcon(info.Glyph, !info.DefaultColor);
 
-                Wrap.Children.Add(CategoryTile(info.Name, icon, !info.DefaultColor));
+                Wrap.Children.Add(CategoryTile(info, icon, !info.DefaultColor));
             }
         }
 
-        public async void CreateFileTiles()
+        public async void CreateFileTilesAsync()
         {
-            ValidateCategoriesExist();
-
             Wrap.Children.Clear();
 
-            OutputController.Log(_currentCategory);
+            var filePaths = Directory.EnumerateFiles(Path.Combine(RootPath, _currentCategory.Value.Name));
 
-            var filePaths = Directory.EnumerateFiles(Path.Combine(RootPath, _currentCategory));
-
-            Grid icon = CreateIcon(Symbol.Back, false);
-            Wrap.Children.Add(BackTile(icon));
+            Wrap.Children.Add(BackTile(CreateIcon(Symbol.Back, false)));
 
             foreach (var path in filePaths)
             {
-                OutputController.Log(_currentCategory);
+                Grid icon = CreateIcon();
+                Image image = new Image() { Width = 145, Height = 90 };
 
-                var file = await StorageFile.GetFileFromPathAsync(path);
-                Wrap.Children.Add(FileTile(file));
+                if (_currentCategory.Value.PreviewTile)
+                {
+                    var file = await StorageFile.GetFileFromPathAsync(path);
+
+                    _ = PreviewFileToImageAsync(file, image);
+                }
+
+                Wrap.Children.Add(FileTile(path, icon, image));
             }
         }
 
-        private Grid CreateIcon(string glyph, bool rndColor = true)
+        private Grid CategoryTile(Category category, Grid icon, bool rndColor = true)
         {
-            Grid grid = new Grid();
-
-            FontIcon icon = new FontIcon() { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = glyph };
-
-            if (rndColor)
-                icon.Foreground = new SolidColorBrush(Colors.White);
-
-            grid.Children.Add(icon);
-
-            return grid;
-        }
-
-        private Grid CreateIcon(Symbol symbol, bool rndColor = true)
-        {
-            Grid grid = new Grid();
-
-            SymbolIcon symbolIcon = new SymbolIcon() { Symbol = symbol };
-
-            if (rndColor)
-                symbolIcon.Foreground = new SolidColorBrush(Colors.White);
-
-            grid.Children.Add(symbolIcon);
-
-            return grid;
-        }
-
-        private Grid CategoryTile(string s, Grid icon, bool rndColor = true)
-        {
-            _currentCategory = null;
+            Wrap.VerticalSpacing = 10;
 
             Grid grid = new Grid();
 
@@ -189,13 +199,14 @@ namespace Editor.Controls
                 CornerRadius = new CornerRadius(10),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
-                DataContext = s,
+                DataContext = category,
             };
 
             button.Click += (s, e) =>
             {
-                _currentCategory = (string)((Button)e.OriginalSource).DataContext;
-                CreateFileTiles();
+                _currentCategory = (Category)((Button)e.OriginalSource).DataContext;
+
+                Refresh();
             };
 
             if (rndColor)
@@ -211,42 +222,29 @@ namespace Editor.Controls
 
             Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
 
-            TextBlock label = new TextBlock() { Text = s };
+            TextBlock label = new TextBlock() { Text = category.Name };
 
             if (rndColor)
                 label.Foreground = new SolidColorBrush(Colors.White);
 
             viewbox.Child = icon;
-
             stack.Children.Add(viewbox);
             stack.Children.Add(label);
-
             button.Content = stack;
             grid.Children.Add(button);
 
             return grid;
         }
 
-        private Grid FileTile(StorageFile file)
+        private Grid FileTile(string path, Grid icon, Image image)
         {
+            Wrap.VerticalSpacing = 35;
+
             Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, -30) };
 
             Grid grid2 = new Grid();
 
             Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
-
-            Grid icon = new Grid();
-
-            foreach (var info in Categories)
-                if (info.Name == _currentCategory)
-                    if (string.IsNullOrEmpty(info.Glyph))
-                        icon = CreateIcon(info.Symbol, !info.DefaultColor);
-                    else
-                        icon = CreateIcon(info.Glyph, !info.DefaultColor);
-
-            Image image = new Image() { Width = 145, Height = 90 };
-
-            _ = PreviewFileToImageAsync(file, image);
 
             StackPanel stack = new StackPanel() { Spacing = 5 };
 
@@ -258,18 +256,18 @@ namespace Editor.Controls
                 CornerRadius = new CornerRadius(10),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
-                DataContext = file.Name,
+                DataContext = Path.GetFileName(path),
             };
 
             button.DoubleTapped += (s, e) =>
             {
-                if (File.Exists(file.Path))
-                    Process.Start(new ProcessStartInfo { FileName = file.Path, UseShellExecute = true });
+                if (File.Exists(path))
+                    Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
             };
 
             TextBlock label = new TextBlock()
             {
-                Text = file.Name,
+                Text = Path.GetFileName(path),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 MaxWidth = 150,
             };
@@ -300,6 +298,8 @@ namespace Editor.Controls
 
             button.Click += (s, e) =>
             {
+                _currentCategory = null;
+
                 CreateCatergoryTiles(Categories);
             };
 
@@ -308,6 +308,52 @@ namespace Editor.Controls
             viewbox.Child = icon;
             button.Content = viewbox;
             grid.Children.Add(button);
+
+            return grid;
+        }
+
+        private Grid CreateIcon()
+        {
+            Grid grid = new Grid();
+            dynamic icon;
+
+            if (string.IsNullOrEmpty(_currentCategory.Value.Glyph))
+                icon = new SymbolIcon() { Symbol = _currentCategory.Value.Symbol };
+            else
+                icon = new FontIcon() { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = _currentCategory.Value.Glyph };
+
+            if (!_currentCategory.Value.DefaultColor)
+                icon.Foreground = new SolidColorBrush(Colors.White);
+
+            grid.Children.Add(icon);
+
+            return grid;
+        }
+
+        private Grid CreateIcon(string glyph, bool rndColor = true)
+        {
+            Grid grid = new Grid();
+
+            FontIcon icon = new FontIcon() { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = glyph };
+
+            if (rndColor)
+                icon.Foreground = new SolidColorBrush(Colors.White);
+
+            grid.Children.Add(icon);
+
+            return grid;
+        }
+
+        private Grid CreateIcon(Symbol symbol, bool rndColor = true)
+        {
+            Grid grid = new Grid();
+
+            SymbolIcon symbolIcon = new SymbolIcon() { Symbol = symbol };
+
+            if (rndColor)
+                symbolIcon.Foreground = new SolidColorBrush(Colors.White);
+
+            grid.Children.Add(symbolIcon);
 
             return grid;
         }
