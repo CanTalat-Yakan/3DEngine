@@ -72,12 +72,10 @@ namespace Editor.Controls
             };
 
             if (_currentCategory != null)
-            {
-                picker.FileTypeFilter.Clear();
-
                 foreach (var type in _currentCategory.Value.FileTypes)
                     picker.FileTypeFilter.Add(type);
-            }
+            else
+                picker.FileTypeFilter.Add("*");
 
             // Make sure to get the HWND from a Window object,
             // pass a Window reference to GetWindowHandle.
