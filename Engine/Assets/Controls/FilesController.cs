@@ -13,7 +13,6 @@ using Windows.Storage.Streams;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System.Threading.Tasks;
 using System.Linq;
-using System.Drawing.Drawing2D;
 
 namespace Editor.Controls
 {
