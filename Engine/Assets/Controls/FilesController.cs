@@ -71,7 +71,7 @@ namespace Editor.Controls
                 FileTypeFilter = { "*" }
             };
 
-            if (_currentCategory is null)
+            if (_currentCategory != null)
             {
                 picker.FileTypeFilter.Clear();
 
