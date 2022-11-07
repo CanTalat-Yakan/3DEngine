@@ -20,7 +20,7 @@ namespace Editor.Controls
 
         public TabViewPageController(params TabViewItemDataTemplate[] icollection)
         {
-            Tab = new TabView() { TabWidthMode = TabViewWidthMode.Equal, CloseButtonOverlayMode = TabViewCloseButtonOverlayMode.Auto, IsAddTabButtonVisible = false };
+            Tab = new TabView() { TabWidthMode = TabViewWidthMode.Equal, CloseButtonOverlayMode = TabViewCloseButtonOverlayMode.Auto, IsAddTabButtonVisible = false, Padding = new Thickness(8, 8, 8, 0) };
             Tab.AddTabButtonClick += TabView_AddButtonClick;
             //m_TabView.TabCloseRequested += TabView_TabCloseRequested;
 
