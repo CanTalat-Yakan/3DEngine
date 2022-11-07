@@ -20,28 +20,15 @@
                     SelectionFollowsFocus="Enabled"
                     IsTabStop="False">
 
-        <NavigationView.AutoSuggestBox>
-            <AutoSuggestBox QueryIcon="Find" AutomationProperties.Name="Search" />
-        </NavigationView.AutoSuggestBox>
-
         <NavigationView.MenuItems>
-            <NavigationViewItemHeader Content=""/>
+            <NavigationViewItem Icon="Home" Content="Home"/>
             <NavigationViewItem Icon="Play" Content="Engine" IsSelected="True"/>
-            <NavigationViewItem Content="Profiling">
-                <NavigationViewItem.Icon>
-                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE9D9;"/>
-                </NavigationViewItem.Icon>
-            </NavigationViewItem>
-            <NavigationViewItemHeader Content=""/>
-            <NavigationViewItem Icon="ViewAll" Content="All Projects"/>
-            <NavigationViewItem Icon="Document" Content="Templates"/>
-            <NavigationViewItem Icon="Download" Content="Package Browser"/>
+            <NavigationViewItem Icon="ViewAll" Content="Templates"/>
         </NavigationView.MenuItems>
 
         <NavigationView.PaneFooter>
             <StackPanel x:Name="FooterStackPanel" Orientation="Vertical" Visibility="Visible">
-                <NavigationViewItem Icon="Download" AutomationProperties.Name="download" />
-                <NavigationViewItem Icon="Favorite" AutomationProperties.Name="favorite" />
+                <NavigationViewItem Icon="Library" Content="Documentation"/>
             </StackPanel>
         </NavigationView.PaneFooter>
 
