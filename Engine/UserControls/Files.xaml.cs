@@ -19,8 +19,8 @@ namespace Editor.UserControls
 
             ChangeColorWithTheme = x_Grid_ChangeColorWithTheme;
 
-            _filesControl = new FilesController(x_WrapPanel_Files);
-
+            _filesControl = new FilesController(this, x_WrapPanel_Files);
+            
             _filesControl.CreateCatergoryTiles(
                 new Category() { Name = "Scenes", Glyph = "\xEA86", FileTypes = new string[] { ".usd", ".usda", ".usdc", ".usdz" }, Creatable = true },
                 new Category() { Name = "Scripts", Symbol = Symbol.Document, FileTypes = new string[] { ".cs" }, Creatable = true },

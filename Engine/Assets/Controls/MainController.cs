@@ -11,12 +11,14 @@ namespace Editor.Controls
         public PlayerController ControlPlayer;
         public Grid Content;
         public TextBlock Status;
+        public MainWindow MainWindow;
         
-        public MainController(Grid content, TextBlock status)
+        public MainController(MainWindow mainWindow, Grid content, TextBlock status)
         {
             if (Instance is null)
                 Instance = this;
 
+            MainWindow = mainWindow;
             Content = content;
             Status = status;
 
