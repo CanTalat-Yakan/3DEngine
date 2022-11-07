@@ -14,6 +14,7 @@ using Microsoft.UI.Xaml.Media.Imaging;
 using System.Threading.Tasks;
 using System.Linq;
 using Editor.UserControls;
+using System.Text.RegularExpressions;
 
 namespace Editor.Controls
 {
@@ -560,6 +561,23 @@ namespace Editor.Controls
 
             if (result == ContentDialogResult.Primary)
             {
+                // \w is equivalent of [0 - 9a - zA - Z_].
+                string regex = @"^[\w\-. ]+$";
+
+                if (Regex.IsMatch(fileName.Text, regex))
+                {
+                    _ = CreateDialogAsync(new ContentDialog()
+                    {
+                        XamlRoot = _files.XamlRoot,
+                        Title = "A file can't contain any of the following characters",
+                        CloseButtonText = "Close",
+                        DefaultButton = ContentDialogButton.Close,
+                        Content = new TextBlock() { Text = "\\ / : * ? \" < > |" },
+                    });
+
+                    return;
+                }
+
                 string path = Path.Combine(RootPath, _currentCategory.Value.Name);
 
                 if (_currentSubPath != null)
@@ -570,9 +588,7 @@ namespace Editor.Controls
                 else
                     path = Path.Combine(path, fileName.Text + _currentCategory.Value.FileTypes[0]);
 
-                path = IncrementFileIfExists(path);
-
-                File.Create(path);
+                File.Create(IncrementFileIfExists(path));
 
                 CreateFileSystemEntryTilesAsync();
             }
