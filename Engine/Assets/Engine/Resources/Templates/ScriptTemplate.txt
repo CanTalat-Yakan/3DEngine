@@ -1,0 +1,18 @@
+﻿using 3DEngine;
+using System.Collections;
+
+
+public class MyCustomScript : Entity 
+{
+	// Use this for initialization
+	void Start () 
+	{
+	
+	}
+	
+	// Update is called once per frame
+	void Update () 
+	{
+	
+	}
+}

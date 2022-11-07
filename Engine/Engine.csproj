@@ -14,6 +14,7 @@
     <Content Remove="Assets\Controls\FilesController.cs" />
     <Content Remove="Assets\Controls\SceneController.cs" />
     <Content Remove="Assets\Controls\ThemeController.cs" />
+    <Content Remove="Assets\Engine\Resources\Templates\ScriptTemplate.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Assets\Engine\Resources\Models\Cube.obj" />
@@ -60,6 +61,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="ContentDialog\" />
     <Folder Include="Frame\" />
   </ItemGroup>
 </Project>

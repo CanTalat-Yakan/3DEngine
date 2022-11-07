@@ -13,12 +13,12 @@ namespace Editor.Controls
         private MicaController _micaController;
         private SystemBackdropConfiguration _configurationSource;
         private Page _page;
-        private MainWindow _window;
+        private MainWindow _mainWindow;
 
-        public ThemeController(Page page, MainWindow window)
+        public ThemeController(MainWindow mainWindow, Page page)
         {
+            _mainWindow = mainWindow;
             _page = page;
-            _window = window;
 
             Initialize();
         }
@@ -51,8 +51,8 @@ namespace Editor.Controls
                 // Hooking up the policy object
                 _configurationSource = new SystemBackdropConfiguration();
 
-                _window.Activated += Window_Activated;
-                _window.Closed += Window_Closed;
+                _mainWindow.Activated += Window_Activated;
+                _mainWindow.Closed += Window_Closed;
                 //_frame.ActualThemeChanged += Window_ThemeChanged;
 
                 // Initial configuration state.
@@ -62,7 +62,7 @@ namespace Editor.Controls
 
                 // Enable the system backdrop.
                 // Note: Be sure to have "using WinRT;" to support the Window.As<...>() call.
-                _micaController.AddSystemBackdropTarget(_window.As<Microsoft.UI.Composition.ICompositionSupportsSystemBackdrop>());
+                _micaController.AddSystemBackdropTarget(_mainWindow.As<Microsoft.UI.Composition.ICompositionSupportsSystemBackdrop>());
                 _micaController.SetSystemBackdropConfiguration(_configurationSource);
                 return true; // succeeded
 
@@ -86,7 +86,7 @@ namespace Editor.Controls
                 _micaController = null;
             }
 
-            _window.Activated -= Window_Activated;
+            _mainWindow.Activated -= Window_Activated;
             _configurationSource = null;
         }
     }
