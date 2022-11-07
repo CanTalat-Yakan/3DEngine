@@ -9,8 +9,8 @@
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     mc:Ignorable="d">
 
-    <Grid Padding="4,0,4,0">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <ScrollViewer Padding="4,0,4,0">
             <StackPanel>
                 <StackPanel x:Name="x_StackPanel_Properties">
                     <Grid Height="4"/>
