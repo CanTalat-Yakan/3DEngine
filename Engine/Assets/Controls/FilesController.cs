@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Editor.UserControls;
 using System.Text.RegularExpressions;
+using System.Text;
 
 namespace Editor.Controls
 {
@@ -41,6 +42,8 @@ namespace Editor.Controls
 
         private Category? _currentCategory;
         private string _currentSubPath;
+
+        private static readonly string TEMPLATES = @"Assets\Engine\Resources\Templates";
 
         public FilesController(Files files, WrapPanel wrap)
         {
@@ -455,7 +458,7 @@ namespace Editor.Controls
 
             button.Click += (s, e) =>
             {
-                _ = ContentDialogCreateNewFileAsync();
+                ContentDialogCreateNewFileAsync();
 
                 Refresh();
             };
@@ -538,12 +541,12 @@ namespace Editor.Controls
             }
         }
 
-        private async Task CreateDialogAsync(ContentDialog contentDialog)
+        private async void CreateDialogAsync(ContentDialog contentDialog)
         {
             var result = await contentDialog.ShowAsync();
         }
 
-        private async Task ContentDialogCreateNewFileAsync()
+        private async void ContentDialogCreateNewFileAsync()
         {
             TextBox fileName;
 
@@ -566,7 +569,7 @@ namespace Editor.Controls
 
                 if (Regex.IsMatch(fileName.Text, regex))
                 {
-                    _ = CreateDialogAsync(new ContentDialog()
+                    CreateDialogAsync(new ContentDialog()
                     {
                         XamlRoot = _files.XamlRoot,
                         Title = "A file can't contain any of the following characters",
@@ -588,10 +591,28 @@ namespace Editor.Controls
                 else
                     path = Path.Combine(path, fileName.Text + _currentCategory.Value.FileTypes[0]);
 
-                File.Create(IncrementFileIfExists(path));
+                path = IncrementFileIfExists(path);
+
+                WriteFileFromTemplatesAsync(path);
 
                 CreateFileSystemEntryTilesAsync();
             }
+        }
+
+        private async void WriteFileFromTemplatesAsync(string path)
+        {
+            string templatePath = Path.Combine(AppContext.BaseDirectory, TEMPLATES, _currentCategory.Value.Name + ".txt");
+
+            using (FileStream fs = File.Create(path))
+                if (File.Exists(templatePath))
+                {
+                    // writing data in string
+                    string[] lines = await File.ReadAllLinesAsync(templatePath);
+
+                    byte[] info = new UTF8Encoding(true).GetBytes(string.Join("\n", lines));
+
+                    fs.Write(info, 0, info.Length);
+                }
         }
 
         private string RemoveLastChar(string s) { return s.Remove(s.Length - 1); }
