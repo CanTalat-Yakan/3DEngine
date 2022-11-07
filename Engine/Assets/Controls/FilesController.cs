@@ -13,6 +13,7 @@ using Windows.Storage.Streams;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System.Threading.Tasks;
 using System.Linq;
+using Editor.UserControls;
 
 namespace Editor.Controls
 {
@@ -35,12 +36,16 @@ namespace Editor.Controls
         public WrapPanel Wrap;
         public Category[] Categories;
 
+        private Files _files;
+
         private Category? _currentCategory;
         private string _currentSubPath;
 
-        public FilesController(WrapPanel wrap)
+        public FilesController(Files files, WrapPanel wrap)
         {
             Wrap = wrap;
+
+            _files = files;
 
             var documentsDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
@@ -149,8 +154,7 @@ namespace Editor.Controls
                                 {
                                     File.Move(
                                         file.Path,
-                                        Path.Combine(RootPath, category2.Name, file.Name),
-                                        true);
+                                        IncrementFileIfExists(Path.Combine(RootPath, category2.Name, file.Name)));
 
                                     if (_currentCategory != null)
                                         if (category.Equals(_currentCategory.Value) || category2.Equals(_currentCategory.Value))
@@ -205,7 +209,7 @@ namespace Editor.Controls
                 // Go up a directoy and if it exists continue, if not just display category folder
                 while (!Directory.Exists(currentPath))
                 {
-                    GoUpDirectory(ref _currentSubPath);
+                    _currentSubPath = GoUpDirectory(_currentSubPath);
 
                     if (string.IsNullOrEmpty(_currentSubPath))
                     {
@@ -413,7 +417,7 @@ namespace Editor.Controls
             {
                 if (!string.IsNullOrEmpty(_currentSubPath))
                 {
-                    GoUpDirectory(ref _currentSubPath);
+                    _currentSubPath = GoUpDirectory(_currentSubPath);
 
                     Refresh();
                 }
@@ -450,12 +454,9 @@ namespace Editor.Controls
 
             button.Click += (s, e) =>
             {
-                string path = Path.Combine(RootPath, _currentCategory.Value.Name);
+                _ = ContentDialogCreateNewFileAsync();
 
-                if (_currentSubPath != null)
-                    path = Path.Combine(RootPath, _currentCategory.Value.Name, _currentSubPath);
-
-                _ = CreateAndSaveFileAsync(path);
+                Refresh();
             };
 
             Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
@@ -470,6 +471,7 @@ namespace Editor.Controls
         private Grid CreateIcon()
         {
             Grid grid = new Grid();
+
             dynamic icon;
 
             if (string.IsNullOrEmpty(_currentCategory.Value.Glyph))
@@ -510,7 +512,7 @@ namespace Editor.Controls
             return grid;
         }
 
-        private string GoUpDirectory(ref string path)
+        private string GoUpDirectory(string path)
         {
             if (!path.Contains('\\'))
                 path = null;
@@ -535,29 +537,70 @@ namespace Editor.Controls
             }
         }
 
-        private async Task CreateAndSaveFileAsync(string path)
+        private async Task CreateDialogAsync(ContentDialog contentDialog)
         {
-            var picker = new FileSavePicker() { SuggestedStartLocation = PickerLocationId.DocumentsLibrary };
+            var result = await contentDialog.ShowAsync();
+        }
 
-            picker.FileTypeChoices.Add(_currentCategory.Value.Name, _currentCategory.Value.FileTypes);
-            picker.SuggestedFileName = "New " + _currentCategory.Value.Name.Remove(_currentCategory.Value.Name.Length - 1); ;
+        private async Task ContentDialogCreateNewFileAsync()
+        {
+            TextBox fileName;
 
-            // Make sure to get the HWND from a Window object,
-            // pass a Window reference to GetWindowHandle.
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-
-            var file = await picker.PickSaveFileAsync();
-
-            if (file != null)
+            var dialog = new ContentDialog()
             {
-                File.Move(
-                    file.Path,
-                    Path.Combine(path, file.Name),
-                    true);
+                XamlRoot = _files.XamlRoot,
+                Title = "Create a new " + RemoveLastChar(_currentCategory.Value.Name),
+                PrimaryButtonText = "Save",
+                CloseButtonText = "Cancel",
+                DefaultButton = ContentDialogButton.Primary,
+                Content = fileName = new TextBox() { PlaceholderText = "New " + RemoveLastChar(_currentCategory.Value.Name) },
+            };
 
-                Refresh();
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                string path = Path.Combine(RootPath, _currentCategory.Value.Name);
+
+                if (_currentSubPath != null)
+                    path = Path.Combine(RootPath, _currentCategory.Value.Name, _currentSubPath);
+
+                if (string.IsNullOrEmpty(fileName.Text))
+                    path = Path.Combine(path, "New " + RemoveLastChar(_currentCategory.Value.Name) + _currentCategory.Value.FileTypes[0]);
+                else
+                    path = Path.Combine(path, fileName.Text + _currentCategory.Value.FileTypes[0]);
+
+                path = IncrementFileIfExists(path);
+
+                File.Create(path);
+
+                CreateFileSystemEntryTilesAsync();
             }
+        }
+
+        private string RemoveLastChar(string s) { return s.Remove(s.Length - 1); }
+
+        private string IncrementFileIfExists(string path)
+        {
+            var fileCount = 0;
+
+            while (File.Exists(
+                Path.Combine(
+                    GoUpDirectory(path),
+                    Path.GetFileNameWithoutExtension(path) +
+                        (fileCount > 0
+                        ? " (" + (fileCount + 1).ToString() + ")"
+                        : "")
+                    + Path.GetExtension(path))))
+                fileCount++;
+
+            return Path.Combine(
+                GoUpDirectory(path),
+                Path.GetFileNameWithoutExtension(path) +
+                    (fileCount > 0
+                    ? " (" + (fileCount + 1).ToString() + ")"
+                    : "")
+                + Path.GetExtension(path));
         }
     }
 }
