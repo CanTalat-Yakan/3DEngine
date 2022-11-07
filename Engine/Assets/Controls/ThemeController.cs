@@ -1,9 +1,9 @@
 ﻿using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using System.Runtime.InteropServices;
 using WinRT;
-using Frame = Microsoft.UI.Xaml.Controls.Frame;
 
 namespace Editor.Controls
 {
@@ -12,12 +12,12 @@ namespace Editor.Controls
         private WindowsSystemDispatcherQueueHelper _wsdqHelper;
         private MicaController _micaController;
         private SystemBackdropConfiguration _configurationSource;
-        private Frame _frame;
+        private Page _page;
         private MainWindow _window;
 
-        public ThemeController(Frame frame, MainWindow window)
+        public ThemeController(Page page, MainWindow window)
         {
-            _frame = frame;
+            _page = page;
             _window = window;
 
             Initialize();
@@ -25,20 +25,20 @@ namespace Editor.Controls
 
         public void SetRequstedTheme()
         {
-            _frame.RequestedTheme = _frame.RequestedTheme == ElementTheme.Light ? ElementTheme.Dark : ElementTheme.Light;
+            _page.RequestedTheme = _page.RequestedTheme == ElementTheme.Light ? ElementTheme.Dark : ElementTheme.Light;
             _configurationSource.Theme = _configurationSource.Theme == SystemBackdropTheme.Light ? SystemBackdropTheme.Dark : SystemBackdropTheme.Light;
 
             MainController.Instance.LayoutControl.Output.ChangeColorWithTheme.Background =
-                _frame.RequestedTheme == ElementTheme.Light
+                _page.RequestedTheme == ElementTheme.Light
                     ? new SolidColorBrush(Windows.UI.Color.FromArgb(250, 250, 250, 250))
                     : new SolidColorBrush(Windows.UI.Color.FromArgb(255, 40, 40, 40));
 
             MainController.Instance.LayoutControl.Files.ChangeColorWithTheme.Background =
-                _frame.RequestedTheme == ElementTheme.Light
+                _page.RequestedTheme == ElementTheme.Light
                     ? new SolidColorBrush(Windows.UI.Color.FromArgb(250, 250, 250, 250))
                     : new SolidColorBrush(Windows.UI.Color.FromArgb(255, 40, 40, 40));
 
-            Engine.Core.Instance.Scene.EntitytManager.SetTheme(_frame.RequestedTheme == ElementTheme.Light);
+            Engine.Core.Instance.Scene.EntitytManager.SetTheme(_page.RequestedTheme == ElementTheme.Light);
         }
 
         private bool Initialize()

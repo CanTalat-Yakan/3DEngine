@@ -11,64 +11,65 @@
     MinWidth="1064" MinHeight="768"
     mc:Ignorable="d">
 
-    <NavigationView x:Name="x_NavigationView"   
+    <Page x:Name="x_Page_Main">
+        <NavigationView x:Name="x_NavigationView_Main"   
                     IsSettingsVisible="True"
-                    IsBackButtonVisible="Collapsed"
                     IsBackEnabled="False"
+                    IsBackButtonVisible="Collapsed"
                     PaneDisplayMode="LeftCompact"
-                    ExpandedModeThresholdWidth="500"
-                    SelectionFollowsFocus="Enabled"
-                    IsTabStop="False">
+                    OpenPaneLength="200">
 
-        <NavigationView.MenuItems>
-            <NavigationViewItem Icon="Home" Content="Home"/>
-            <NavigationViewItem Icon="Play" Content="Engine" IsSelected="True"/>
-            <NavigationViewItem Icon="ViewAll" Content="Templates"/>
-        </NavigationView.MenuItems>
+            <NavigationView.MenuItems>
+                <NavigationViewItem Icon="Home" Content="Home"/>
+                <NavigationViewItem Icon="Play" Content="Engine" IsSelected="True"/>
+                <NavigationViewItem Icon="ViewAll" Content="Templates"/>
+            </NavigationView.MenuItems>
 
-        <NavigationView.PaneFooter>
-            <StackPanel x:Name="FooterStackPanel" Orientation="Vertical" Visibility="Visible">
-                <NavigationViewItem Icon="Library" Content="Documentation"/>
-            </StackPanel>
-        </NavigationView.PaneFooter>
+            <NavigationView.PaneFooter>
+                <StackPanel x:Name="FooterStackPanel" Orientation="Vertical" Visibility="Visible">
+                    <NavigationViewItem Icon="Library" Content="Documentation"/>
+                </StackPanel>
+            </NavigationView.PaneFooter>
 
 
-        <Frame x:Name="x_Frame_Main">
-            <Frame.Resources>
-                <ResourceDictionary Source="ms-appx:///Microsoft.UI.Xaml/DensityStyles/Compact.xaml" />
-            </Frame.Resources>
+            <Frame x:Name="x_Frame_Main">
+                <Frame.Resources>
+                    <ResourceDictionary Source="ms-appx:///Microsoft.UI.Xaml/DensityStyles/Compact.xaml" />
+                </Frame.Resources>
 
-            <controls:DockPanel MinWidth="820">
-                <!--STATUS -->
-                <Grid controls:DockPanel.Dock="Bottom">
-                    <CommandBar>
-                        <CommandBar.PrimaryCommands>
-                            <AppBarToggleButton Name="x_AppBarToggleButton_Status_Play" Icon="Play" Label="Play" Click="AppBarToggleButton_Status_Play_Click"/>
-                            <AppBarToggleButton x:Name="x_AppBarToggleButton_Status_Pause" Icon="Pause" Label="Pause" IsEnabled="False" Click="AppBarToggleButton_Status_Pause_Click"/>
-                            <AppBarButton x:Name="x_AppBarButton_Status_Forward" Icon="Forward" Label="Forward" IsEnabled="False" Click="AppBarButton_Status_Forward_Click"/>
-                        </CommandBar.PrimaryCommands>
-                        <CommandBar.SecondaryCommands>
-                            <AppBarToggleButton x:Name="x_AppBarToggleButton_Status_OpenPane" Label="Open Pane" IsChecked="True">
-                                <AppBarToggleButton.KeyboardAccelerators>
-                                    <KeyboardAccelerator Key="Tab" Modifiers="Control" />
-                                </AppBarToggleButton.KeyboardAccelerators>
-                            </AppBarToggleButton>
-                            <AppBarToggleButton Label="Toggle Theme" Click="AppBarToggleButton_Status_Light">
-                                <AppBarToggleButton.KeyboardAccelerators>
-                                    <KeyboardAccelerator Key="T" Modifiers="Control" />
-                                </AppBarToggleButton.KeyboardAccelerators>
-                            </AppBarToggleButton>
-                        </CommandBar.SecondaryCommands>
+                <controls:DockPanel MinWidth="820">
+                    <!--STATUS -->
+                    <Grid controls:DockPanel.Dock="Bottom">
+                        <CommandBar>
+                            <CommandBar.PrimaryCommands>
+                                <AppBarToggleButton Name="x_AppBarToggleButton_Status_Play" Icon="Play" Label="Play" Click="AppBarToggleButton_Status_Play_Click"/>
+                                <AppBarToggleButton x:Name="x_AppBarToggleButton_Status_Pause" Icon="Pause" Label="Pause" IsEnabled="False" Click="AppBarToggleButton_Status_Pause_Click"/>
+                                <AppBarButton x:Name="x_AppBarButton_Status_Forward" Icon="Forward" Label="Forward" IsEnabled="False" Click="AppBarButton_Status_Forward_Click"/>
+                            </CommandBar.PrimaryCommands>
 
-                        <CommandBar.Content>
-                            <TextBlock x:Name="x_TextBlock_Status_Content" Text="" Margin="12,14"/>
-                        </CommandBar.Content>
-                    </CommandBar>
-                </Grid>
+                            <CommandBar.SecondaryCommands>
+                                <AppBarToggleButton x:Name="x_AppBarToggleButton_Status_OpenPane" Label="Open Pane" IsChecked="True">
+                                    <AppBarToggleButton.KeyboardAccelerators>
+                                        <KeyboardAccelerator Key="Tab" Modifiers="Control" />
+                                    </AppBarToggleButton.KeyboardAccelerators>
+                                </AppBarToggleButton>
+                                <AppBarToggleButton Label="Toggle Theme" Click="AppBarToggleButton_Status_Light">
+                                    <AppBarToggleButton.KeyboardAccelerators>
+                                        <KeyboardAccelerator Key="T" Modifiers="Control" />
+                                    </AppBarToggleButton.KeyboardAccelerators>
+                                </AppBarToggleButton>
+                            </CommandBar.SecondaryCommands>
 
-                <!--MAIN-->
-                <Grid x:Name="x_Grid_Main" HorizontalAlignment="Stretch"/>
-            </controls:DockPanel>
-        </Frame>
-    </NavigationView>
+                            <CommandBar.Content>
+                                <TextBlock x:Name="x_TextBlock_Status_Content" Text="" Margin="12,14"/>
+                            </CommandBar.Content>
+                        </CommandBar>
+                    </Grid>
+
+                    <!--MAIN-->
+                    <Grid x:Name="x_Grid_Main" HorizontalAlignment="Stretch"/>
+                </controls:DockPanel>
+            </Frame>
+        </NavigationView>
+    </Page>
 </winex:WindowEx>
