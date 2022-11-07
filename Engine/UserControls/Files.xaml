@@ -20,14 +20,14 @@
             </CommandBar.SecondaryCommands>
         </CommandBar>
 
-        <Grid x:Name="x_Grid_ChangeColorWithTheme" Background="#282828" Height="16000">
+        <Grid x:Name="x_Grid_ChangeColorWithTheme" Background="#282828" >
             <ScrollViewer>
                 <StackPanel Orientation="Vertical" Spacing="10">
                     <controls:WrapPanel x:Name="x_WrapPanel_Files" HorizontalSpacing="10" VerticalSpacing="10" Padding="16"/>
 
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="5">
+                    <Grid HorizontalAlignment="Center" Margin="0,10,0,10">
                         <TextBlock Text="Drag and drop files here." Opacity="0.5"/>
-                    </StackPanel>
+                    </Grid>
                 </StackPanel>
             </ScrollViewer>
         </Grid>
