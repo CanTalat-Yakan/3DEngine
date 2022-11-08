@@ -561,20 +561,21 @@ namespace Editor.Controls
 
             if (result == ContentDialogResult.Primary)
             {
-                // \w is equivalent of [0 - 9a - zA - Z_].  @"^[\w\-. ]+$"
-                if (!Regex.Match(fileName.Text, @"^[\w\-.][\w\-. ]*$").Success)
-                {
-                    CreateDialogAsync(new ContentDialog()
+                // \w is equivalent of [0 - 9a - zA - Z_]."
+                if (!string.IsNullOrEmpty(fileName.Text))
+                    if (!Regex.Match(fileName.Text, @"^[\w\-.]+$").Success)
                     {
-                        XamlRoot = _files.XamlRoot,
-                        Title = "A file can't contain any of the following characters",
-                        CloseButtonText = "Close",
-                        DefaultButton = ContentDialogButton.Close,
-                        Content = new TextBlock() { Text = "\\ / : * ? \" < > |" },
-                    });
+                        CreateDialogAsync(new ContentDialog()
+                        {
+                            XamlRoot = _files.XamlRoot,
+                            Title = "A file can't contain any of the following characters",
+                            CloseButtonText = "Close",
+                            DefaultButton = ContentDialogButton.Close,
+                            Content = new TextBlock() { Text = "\\ / : * ? \" < > |" },
+                        });
 
-                    return;
-                }
+                        return;
+                    }
 
                 string path = Path.Combine(RootPath, _currentCategory.Value.Name);
 
@@ -609,8 +610,8 @@ namespace Editor.Controls
 
                     string name = Path.GetFileNameWithoutExtension(path);
 
-                    if (joinedLines.Contains("Name"))
-                        joinedLines = joinedLines.Replace("Name", Regex.Replace(name, @"\s+", ""));
+                    if (joinedLines.Contains("{{FileName}}"))
+                        joinedLines = joinedLines.Replace("{{FileName}}", Regex.Replace(name, @"\s+", ""));
 
                     byte[] info = new UTF8Encoding(true).GetBytes(joinedLines);
 
