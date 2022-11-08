@@ -196,8 +196,7 @@ namespace Editor.Controls
 
             Wrap.Children.Add(BackTile(CreateIcon(Symbol.Back)));
 
-            if (_currentCategory.Value.Creatable)
-                Wrap.Children.Add(AddTile(CreateIcon(Symbol.Add)));
+            Wrap.Children.Add(AddTile(CreateIcon(Symbol.Add)));
 
             string currentPath = Path.Combine(RootPath, _currentCategory.Value.Name);
 
@@ -451,7 +450,10 @@ namespace Editor.Controls
 
             button.Click += (s, e) =>
             {
-                ContentDialogCreateNewFileAsync();
+                if (_currentCategory.Value.Creatable)
+                    ContentDialogCreateNewFileOrFolderAsync();
+                else
+                    ContentDialogCreateNewFolderAsync();
 
                 Refresh();
             };
@@ -533,6 +535,27 @@ namespace Editor.Controls
             var result = await contentDialog.ShowAsync();
         }
 
+        private async void ContentDialogCreateNewFileOrFolderAsync()
+        {
+            var dialog = new ContentDialog()
+            {
+                XamlRoot = _files.XamlRoot,
+                Title = "Create a new",
+                PrimaryButtonText = "File",
+                SecondaryButtonText = "Folder",
+                CloseButtonText = "Cancel",
+                DefaultButton = ContentDialogButton.Primary,
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+                ContentDialogCreateNewFileAsync();
+            else if (result == ContentDialogResult.Secondary)
+                ContentDialogCreateNewFolderAsync();
+
+        }
+
         private async void ContentDialogCreateNewFileAsync()
         {
             TextBox fileName;
@@ -567,7 +590,6 @@ namespace Editor.Controls
                         return;
                     }
 
-
                 string path = Path.Combine(RootPath, _currentCategory.Value.Name);
 
                 if (_currentSubPath != null)
@@ -583,6 +605,60 @@ namespace Editor.Controls
                 path = IncrementFileIfExists(path);
 
                 WriteFileFromTemplatesAsync(path);
+
+                CreateFileSystemEntryTilesAsync();
+            }
+        }
+
+        private async void ContentDialogCreateNewFolderAsync()
+        {
+            TextBox fileName;
+
+            var dialog = new ContentDialog()
+            {
+                XamlRoot = _files.XamlRoot,
+                Title = "Create a new folder",
+                PrimaryButtonText = "Save",
+                CloseButtonText = "Cancel",
+                DefaultButton = ContentDialogButton.Primary,
+                Content = fileName = new TextBox() { PlaceholderText = "New folder" },
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                // \w is equivalent of [0 - 9a - zA - Z_]."
+                if (!string.IsNullOrEmpty(fileName.Text))
+                    if (!Regex.Match(fileName.Text, @"^[\w\-.]+$").Success)
+                    {
+                        CreateDialogAsync(new ContentDialog()
+                        {
+                            XamlRoot = _files.XamlRoot,
+                            Title = "A folder can't contain any of the following characters",
+                            CloseButtonText = "Close",
+                            DefaultButton = ContentDialogButton.Close,
+                            Content = new TextBlock() { Text = "\\ / : * ? \" < > |" },
+                        });
+
+                        return;
+                    }
+
+                string path = Path.Combine(RootPath, _currentCategory.Value.Name);
+
+                if (_currentSubPath != null)
+                    path = Path.Combine(RootPath, _currentCategory.Value.Name, _currentSubPath);
+
+                if (string.IsNullOrEmpty(fileName.Text))
+                    path = Path.Combine(path, "New folder");
+                else if (char.IsDigit(fileName.Text[0]))
+                    path = Path.Combine(path, "_" + fileName.Text);
+                else
+                    path = Path.Combine(path, fileName.Text);
+
+                path = IncrementFolderIfExists(path);
+
+                Directory.CreateDirectory(path);
 
                 CreateFileSystemEntryTilesAsync();
             }
@@ -633,6 +709,26 @@ namespace Editor.Controls
                     ? " (" + (fileCount + 1).ToString() + ")"
                     : "")
                 + Path.GetExtension(path));
+        }
+        private string IncrementFolderIfExists(string path)
+        {
+            var fileCount = 0;
+
+            while (Directory.Exists(
+                Path.Combine(
+                    GoUpDirectory(path),
+                    Path.GetFileNameWithoutExtension(path) +
+                        (fileCount > 0
+                        ? " (" + (fileCount + 1).ToString() + ")"
+                        : ""))))
+                fileCount++;
+
+            return Path.Combine(
+                GoUpDirectory(path),
+                Path.GetFileNameWithoutExtension(path) +
+                    (fileCount > 0
+                    ? " (" + (fileCount + 1).ToString() + ")"
+                    : ""));
         }
     }
 }
