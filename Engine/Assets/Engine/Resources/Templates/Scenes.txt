@@ -1,0 +1,9 @@
+﻿#usda 1.0
+
+def Xform "{{FileName}}"
+{
+    def Cube "default"
+    {
+
+    }
+}

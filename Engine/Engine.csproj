@@ -23,7 +23,11 @@
     <None Remove="Assets\Engine\Resources\Models\SmallSphere.obj" />
     <None Remove="Assets\Engine\Resources\Models\Sphere.obj" />
     <None Remove="Assets\Engine\Resources\Models\sponza.obj" />
+    <None Remove="Assets\Engine\Resources\Shader\ShaderHelper.hlsl" />
+    <None Remove="Assets\Engine\Resources\Templates\Materials.txt" />
+    <None Remove="Assets\Engine\Resources\Templates\Scenes.txt" />
     <None Remove="Assets\Engine\Resources\Templates\Scripts.txt" />
+    <None Remove="Assets\Engine\Resources\Templates\Shaders.txt" />
   </ItemGroup>
 
   <ItemGroup>

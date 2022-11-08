@@ -1,8 +1,7 @@
 ﻿using 3DEngine;
 using System.Collections;
 
-
-public class MyCustomScript : Entity 
+public class {{FileName}} : Entity 
 {
 	// Use this for initialization
 	void Start () 
