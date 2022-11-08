@@ -577,6 +577,7 @@ namespace Editor.Controls
                         return;
                     }
 
+
                 string path = Path.Combine(RootPath, _currentCategory.Value.Name);
 
                 if (_currentSubPath != null)
@@ -611,7 +612,7 @@ namespace Editor.Controls
                     string name = Path.GetFileNameWithoutExtension(path);
 
                     if (joinedLines.Contains("{{FileName}}"))
-                        joinedLines = joinedLines.Replace("{{FileName}}", Regex.Replace(name, @"\s+", ""));
+                        joinedLines = joinedLines.Replace("{{FileName}}", Regex.Replace(name, @"[\s+\(\)]", ""));
 
                     byte[] info = new UTF8Encoding(true).GetBytes(joinedLines);
 
