@@ -24,7 +24,6 @@ namespace Editor.Controls
         public string Name;
         public Symbol Symbol;
         public string Glyph;
-        public bool DefaultColor;
         public string[] FileTypes;
         public bool Thumbnail;
         public bool Creatable;
@@ -181,11 +180,11 @@ namespace Editor.Controls
                 Grid icon;
 
                 if (string.IsNullOrEmpty(category.Glyph))
-                    icon = CreateIcon(category.Symbol, !category.DefaultColor);
+                    icon = CreateIcon(category.Symbol);
                 else
-                    icon = CreateIcon(category.Glyph, !category.DefaultColor);
+                    icon = CreateIcon(category.Glyph);
 
-                Wrap.Children.Add(CategoryTile(category, icon, !category.DefaultColor));
+                Wrap.Children.Add(CategoryTile(category, icon));
             }
         }
 
@@ -195,10 +194,10 @@ namespace Editor.Controls
 
             Wrap.VerticalSpacing = 35;
 
-            Wrap.Children.Add(BackTile(CreateIcon(Symbol.Back, false)));
+            Wrap.Children.Add(BackTile(CreateIcon(Symbol.Back)));
 
             if (_currentCategory.Value.Creatable)
-                Wrap.Children.Add(AddTile(CreateIcon(Symbol.Add, false)));
+                Wrap.Children.Add(AddTile(CreateIcon(Symbol.Add)));
 
             string currentPath = Path.Combine(RootPath, _currentCategory.Value.Name);
 
@@ -250,9 +249,17 @@ namespace Editor.Controls
             }
         }
 
-        private Grid CategoryTile(Category category, Grid icon, bool rndColor = true)
+        private Grid CategoryTile(Category category, Grid icon)
         {
             Grid grid = new Grid() { Padding = new Thickness(-1), CornerRadius = new CornerRadius(10) };
+
+            grid.Background = new SolidColorBrush(new Color()
+            {
+                A = 255,
+                R = (byte)new Random().Next(32, 96),
+                B = (byte)new Random().Next(32, 96),
+                G = (byte)new Random().Next(32, 96)
+            });
 
             Button button = new Button()
             {
@@ -269,15 +276,6 @@ namespace Editor.Controls
 
                 Refresh();
             };
-
-            if (rndColor)
-                grid.Background = new SolidColorBrush(new Color()
-                {
-                    A = 255,
-                    R = (byte)new Random().Next(32, 96),
-                    B = (byte)new Random().Next(32, 96),
-                    G = (byte)new Random().Next(32, 96)
-                });
 
             StackPanel stack = new StackPanel() { Spacing = 5 };
 
@@ -348,7 +346,7 @@ namespace Editor.Controls
 
         private Grid FolderTile(string path, Grid icon)
         {
-            Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, -30)};
+            Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, -30) };
 
             Grid grid2 = new Grid() { Padding = new Thickness(-1), CornerRadius = new CornerRadius(10) };
 
@@ -372,7 +370,7 @@ namespace Editor.Controls
                 VerticalAlignment = VerticalAlignment.Center,
             };
 
-            
+
             button.Click += (s, e) =>
             {
                 _currentSubPath = Path.GetRelativePath(
@@ -483,7 +481,7 @@ namespace Editor.Controls
             return grid;
         }
 
-        private Grid CreateIcon(string glyph, bool rndColor = true)
+        private Grid CreateIcon(string glyph)
         {
             Grid grid = new Grid();
 
@@ -494,7 +492,7 @@ namespace Editor.Controls
             return grid;
         }
 
-        private Grid CreateIcon(Symbol symbol, bool rndColor = true)
+        private Grid CreateIcon(Symbol symbol)
         {
             Grid grid = new Grid();
 
