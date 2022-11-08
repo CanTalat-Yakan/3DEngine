@@ -26,7 +26,7 @@ namespace Editor.Controls
         public string Glyph;
         public bool DefaultColor;
         public string[] FileTypes;
-        public bool PreviewTile;
+        public bool Thumbnail;
         public bool Creatable;
     }
 
@@ -68,7 +68,6 @@ namespace Editor.Controls
             {
                 ViewMode = PickerViewMode.Thumbnail,
                 SuggestedStartLocation = PickerLocationId.Desktop,
-                FileTypeFilter = { "*" }
             };
 
             if (_currentCategory != null)
@@ -240,7 +239,7 @@ namespace Editor.Controls
 
                 Image image = new Image() { Width = 145, Height = 90 };
 
-                if (_currentCategory.Value.PreviewTile)
+                if (_currentCategory.Value.Thumbnail)
                 {
                     var file = await StorageFile.GetFileFromPathAsync(path);
 
@@ -447,7 +446,7 @@ namespace Editor.Controls
 
             Button button = new Button()
             {
-                Width = 67,
+                Width = 68,
                 Height = 90,
                 CornerRadius = new CornerRadius(10),
                 HorizontalAlignment = HorizontalAlignment.Center,
@@ -562,10 +561,8 @@ namespace Editor.Controls
 
             if (result == ContentDialogResult.Primary)
             {
-                // \w is equivalent of [0 - 9a - zA - Z_].
-                string regex = @"^[\w\-. ]+$";
-
-                if (Regex.IsMatch(fileName.Text, regex))
+                // \w is equivalent of [0 - 9a - zA - Z_].  @"^[\w\-. ]+$"
+                if (!Regex.Match(fileName.Text, @"^[\w\-.][\w\-. ]*$").Success)
                 {
                     CreateDialogAsync(new ContentDialog()
                     {
@@ -586,6 +583,8 @@ namespace Editor.Controls
 
                 if (string.IsNullOrEmpty(fileName.Text))
                     path = Path.Combine(path, "New " + RemoveLastChar(_currentCategory.Value.Name) + _currentCategory.Value.FileTypes[0]);
+                else if (char.IsDigit(fileName.Text[0]))
+                    path = Path.Combine(path, "_" + fileName.Text + _currentCategory.Value.FileTypes[0]);
                 else
                     path = Path.Combine(path, fileName.Text + _currentCategory.Value.FileTypes[0]);
 
@@ -606,8 +605,14 @@ namespace Editor.Controls
                 {
                     // writing data in string
                     string[] lines = await File.ReadAllLinesAsync(templatePath);
+                    string joinedLines = string.Join("\n", lines);
 
-                    byte[] info = new UTF8Encoding(true).GetBytes(string.Join("\n", lines));
+                    string name = Path.GetFileNameWithoutExtension(path);
+
+                    if (joinedLines.Contains("Name"))
+                        joinedLines = joinedLines.Replace("Name", Regex.Replace(name, @"\s+", ""));
+
+                    byte[] info = new UTF8Encoding(true).GetBytes(joinedLines);
 
                     fs.Write(info, 0, info.Length);
                 }
