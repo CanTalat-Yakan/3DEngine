@@ -540,7 +540,7 @@ namespace Editor.Controls
             var dialog = new ContentDialog()
             {
                 XamlRoot = _files.XamlRoot,
-                Title = "Create a new",
+                Title = "Create a new file system entry",
                 PrimaryButtonText = "File",
                 SecondaryButtonText = "Folder",
                 CloseButtonText = "Cancel",
