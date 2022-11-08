@@ -252,13 +252,12 @@ namespace Editor.Controls
 
         private Grid CategoryTile(Category category, Grid icon, bool rndColor = true)
         {
-            Grid grid = new Grid();
+            Grid grid = new Grid() { Padding = new Thickness(-1), CornerRadius = new CornerRadius(10) };
 
             Button button = new Button()
             {
                 Width = 145,
                 Height = 90,
-                CornerRadius = new CornerRadius(10),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
                 DataContext = category,
@@ -272,12 +271,12 @@ namespace Editor.Controls
             };
 
             if (rndColor)
-                button.Background = new SolidColorBrush(new Color()
+                grid.Background = new SolidColorBrush(new Color()
                 {
                     A = 255,
-                    R = (byte)new Random().Next(64, 128),
-                    B = (byte)new Random().Next(64, 128),
-                    G = (byte)new Random().Next(64, 128)
+                    R = (byte)new Random().Next(32, 96),
+                    B = (byte)new Random().Next(32, 96),
+                    G = (byte)new Random().Next(32, 96)
                 });
 
             StackPanel stack = new StackPanel() { Spacing = 5 };
@@ -285,9 +284,6 @@ namespace Editor.Controls
             Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
 
             TextBlock label = new TextBlock() { Text = category.Name };
-
-            if (rndColor)
-                label.Foreground = new SolidColorBrush(Colors.White);
 
             viewbox.Child = icon;
             stack.Children.Add(viewbox);
@@ -300,6 +296,8 @@ namespace Editor.Controls
 
         private Grid FileTile(string path, Grid icon, Image image)
         {
+            image.Opacity = 0.5f;
+
             Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, -30) };
 
             Grid grid2 = new Grid();
@@ -309,8 +307,6 @@ namespace Editor.Controls
             StackPanel stack = new StackPanel() { Spacing = 5 };
 
             StackPanel stack2 = new StackPanel() { Spacing = 5, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center };
-
-            image.Opacity = 0.5f;
 
             Button button = new Button()
             {
@@ -352,7 +348,17 @@ namespace Editor.Controls
 
         private Grid FolderTile(string path, Grid icon)
         {
-            Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, -30) };
+            Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, -30)};
+
+            Grid grid2 = new Grid() { Padding = new Thickness(-1), CornerRadius = new CornerRadius(10) };
+
+            grid2.Background = new SolidColorBrush(new Color()
+            {
+                A = 255,
+                R = (byte)new Random().Next(32, 96),
+                B = (byte)new Random().Next(32, 96),
+                G = (byte)new Random().Next(32, 96)
+            });
 
             Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
 
@@ -362,20 +368,11 @@ namespace Editor.Controls
             {
                 Width = 145,
                 Height = 90,
-                Padding = new Thickness(0),
-                CornerRadius = new CornerRadius(10),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
             };
 
-            button.Background = new SolidColorBrush(new Color()
-            {
-                A = 255,
-                R = (byte)new Random().Next(64, 128),
-                B = (byte)new Random().Next(64, 128),
-                G = (byte)new Random().Next(64, 128)
-            });
-
+            
             button.Click += (s, e) =>
             {
                 _currentSubPath = Path.GetRelativePath(
@@ -394,7 +391,8 @@ namespace Editor.Controls
 
             viewbox.Child = icon;
             button.Content = viewbox;
-            stack.Children.Add(button);
+            grid2.Children.Add(button);
+            stack.Children.Add(grid2);
             stack.Children.Add(label);
             grid.Children.Add(stack);
 
@@ -491,9 +489,6 @@ namespace Editor.Controls
 
             FontIcon icon = new FontIcon() { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = glyph };
 
-            if (rndColor)
-                icon.Foreground = new SolidColorBrush(Colors.White);
-
             grid.Children.Add(icon);
 
             return grid;
@@ -504,9 +499,6 @@ namespace Editor.Controls
             Grid grid = new Grid();
 
             SymbolIcon symbolIcon = new SymbolIcon() { Symbol = symbol };
-
-            if (rndColor)
-                symbolIcon.Foreground = new SolidColorBrush(Colors.White);
 
             grid.Children.Add(symbolIcon);
 
