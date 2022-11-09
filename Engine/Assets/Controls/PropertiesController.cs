@@ -2,16 +2,17 @@
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
+using Windows.Storage;
+using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using ColorPicker = CommunityToolkit.WinUI.UI.Controls.ColorPicker;
 using Expander = Microsoft.UI.Xaml.Controls.Expander;
 using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Windows.Storage.Pickers;
 
 namespace Editor.Controls
 {
@@ -19,7 +20,7 @@ namespace Editor.Controls
     {
         public async void SelectImageAsync(Image image, TextBlock path)
         {
-            var picker = new Windows.Storage.Pickers.FileOpenPicker()
+            var picker = new FileOpenPicker()
             {
                 ViewMode = PickerViewMode.Thumbnail,
                 SuggestedStartLocation = PickerLocationId.PicturesLibrary,
@@ -31,11 +32,11 @@ namespace Editor.Controls
             var hwnd = WinRT.Interop.WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
             WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
-            Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
+            StorageFile file = await picker.PickSingleFileAsync();
 
             if (file != null)
             {
-                using (IRandomAccessStream fileStream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read))
+                using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
                 {
                     BitmapImage bitmapImage = new BitmapImage() { DecodePixelHeight = 48, DecodePixelWidth = 48 };
                     await bitmapImage.SetSourceAsync(fileStream);
@@ -47,7 +48,7 @@ namespace Editor.Controls
 
         public async void SelectFileAsync(TextBlock path)
         {
-            var picker = new Windows.Storage.Pickers.FileOpenPicker()
+            var picker = new FileOpenPicker()
             {
                 ViewMode = PickerViewMode.Thumbnail,
                 SuggestedStartLocation = PickerLocationId.Desktop,
@@ -59,7 +60,7 @@ namespace Editor.Controls
             var hwnd = WinRT.Interop.WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
             WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
-            Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
+            StorageFile file = await picker.PickSingleFileAsync();
 
             if (file != null)
             {
