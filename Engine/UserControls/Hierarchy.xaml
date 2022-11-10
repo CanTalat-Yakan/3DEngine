@@ -37,17 +37,52 @@
             <StackPanel Orientation="Vertical">
                 <Grid Padding="15"/>
 
-                <Expander Header="Scene" IsExpanded="False" HorizontalAlignment="Stretch">
-                    <StackPanel HorizontalAlignment="Stretch">
-                        <muxc:TreeView x:Name="x_TreeView_CoreHierarchy" SelectionMode="Single"/>
+                <Expander Header="Scene" IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                    <StackPanel>
+                        <muxc:TreeView x:Name="x_TreeView_Hierarchy" Tapped="x_TreeView_Hierarchy_Tapped" SelectionMode="Single" HorizontalAlignment="Stretch" >
+                            <muxc:TreeView.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Text="Cut" Icon="Cut"/>
+                                    <MenuFlyoutItem Text="Copy" Icon="Copy"/>
+                                    <MenuFlyoutItem Text="Paste" Icon="Paste"/>
+                                    <MenuFlyoutSeparator/>
+                                    <MenuFlyoutItem Text="Rename" Icon="Rename"/>
+                                    <MenuFlyoutItem Text="Delete" Icon="Delete"/>
+                                    <MenuFlyoutSeparator/>
+                                    <MenuFlyoutItem Text="Create Empty"/>
+                                    <MenuFlyoutItem Text="Create Empty Child"/>
+                                    <MenuFlyoutSeparator/>
+                                    <MenuFlyoutItem Text="Camera"/>
+                                    <MenuFlyoutSubItem Text="3D Object">
+                                        <MenuFlyoutItem Text="Plane"/>
+                                        <MenuFlyoutItem Text="Cube"/>
+                                        <MenuFlyoutItem Text="Sphere"/>
+                                        <MenuFlyoutItem Text="Cylinder"/>
+                                        <MenuFlyoutItem Text="Capsule"/>
+                                        <MenuFlyoutItem Text="Quad"/>
+                                    </MenuFlyoutSubItem>
+                                    <MenuFlyoutSubItem Text="Light">
+                                        <MenuFlyoutItem Text="Directional Light"/>
+                                        <MenuFlyoutItem Text="Point Light"/>
+                                        <MenuFlyoutItem Text="Spot Light"/>
+                                        <MenuFlyoutSeparator/>
+                                        <MenuFlyoutItem Text="Reflection Probe"/>
+                                    </MenuFlyoutSubItem>
+                                </MenuFlyout>
+                            </muxc:TreeView.ContextFlyout>
+                        </muxc:TreeView>
+
+                        <Button Content="Add Entity" Margin="10,10,10,10" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Expander>
 
-                <Button Content="Add SubScene" Margin="10,10,10,10" HorizontalAlignment="Center"/>
+                <NavigationViewItemSeparator Margin="10"/>
 
-                <Expander Header="SubScene" IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                <Button Content="Add SubScene" Margin="10" HorizontalAlignment="Center"/>
+
+                <Expander Header="SubScene" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
                     <StackPanel>
-                        <muxc:TreeView x:Name="x_TreeView_Hierarchy" Tapped="x_TreeView_Hierarchy_Tapped" SelectionMode="Single" HorizontalAlignment="Stretch" >
+                        <muxc:TreeView x:Name="x_TreeView_SubHierarchy" SelectionMode="Single" HorizontalAlignment="Stretch">
                             <muxc:TreeView.ContextFlyout>
                                 <MenuFlyout>
                                     <MenuFlyoutItem Text="Cut" Icon="Cut"/>

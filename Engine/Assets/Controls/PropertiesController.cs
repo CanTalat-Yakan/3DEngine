@@ -156,7 +156,7 @@ namespace Editor.Controls
         {
             Grid grid = new Grid();
 
-            NavigationViewItemSeparator seperator = new NavigationViewItemSeparator() { Margin = new Thickness(8) };
+            NavigationViewItemSeparator seperator = new NavigationViewItemSeparator() { Margin = new Thickness(10) };
 
             grid.Children.Add(seperator);
 
