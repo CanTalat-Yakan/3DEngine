@@ -14,32 +14,14 @@ namespace Editor.UserControls
     {
         public event PropertyChangedEventHandler EventPropertyChanged;
 
-        internal PropertiesController _properitesControl = new PropertiesController();
+        internal PropertiesController _propertiesControl;
 
-        public Properties()
+        public Properties(object content = null)
         {
             this.InitializeComponent();
 
-            List<Grid> collection = new List<Grid>();
-            collection.Add(_properitesControl.CreateColorButton());
-            collection.Add(_properitesControl.CreateNumberInput());
-            collection.Add(_properitesControl.CreateTextInput());
-            collection.Add(_properitesControl.CreateVec2Input());
-            collection.Add(_properitesControl.CreateVec3Input());
-            collection.Add(_properitesControl.CreateSlider());
-            collection.Add(_properitesControl.CreateBool());
-            collection.Add(_properitesControl.CreateTextureSlot());
-            collection.Add(_properitesControl.CreateReferenceSlot());
-            collection.Add(_properitesControl.CreateHeader());
-            collection.Add(_properitesControl.WrapExpander(_properitesControl.CreateEvent()));
-
-            x_StackPanel_Properties.Children.Add(_properitesControl.CreateScript("Example", collection.ToArray()));
-            x_StackPanel_Properties.Children.Add(_properitesControl.CreateScript("Another", _properitesControl.CreateSpacer()));
+            _propertiesControl = new PropertiesController(x_StackPanel_Properties, content);
         }
-
-        private void AppBarButton_Click_SelectImagePath(object sender, RoutedEventArgs e) { }//m_Control.SelectImage(Img_SelectTexture, x_TextBlock_TexturePath); }
-
-        private void AppBarButton_Click_SelectFilePath(object sender, RoutedEventArgs e) { }//m_Control.SelectFile(x_TextBlock_FilePath); }
 
         private void FirePropertyChanged([CallerMemberName] string memberName = null) { EventPropertyChanged?.Invoke(this, new PropertyChangedEventArgs(memberName)); }
     }

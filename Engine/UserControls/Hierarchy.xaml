@@ -34,15 +34,17 @@
         </Grid.ContextFlyout>
 
         <ScrollViewer Padding="4,0,4,0">
-            <StackPanel Orientation="Vertical" Spacing="16">
-                <Grid Padding="14"/>
+            <StackPanel Orientation="Vertical">
+                <Grid Padding="15"/>
 
-                <Expander Header="CoreScene" IsExpanded="False" HorizontalAlignment="Stretch">
+                <Expander Header="Scene" IsExpanded="False" HorizontalAlignment="Stretch">
                     <StackPanel HorizontalAlignment="Stretch">
                         <muxc:TreeView x:Name="x_TreeView_CoreHierarchy" SelectionMode="Single"/>
                     </StackPanel>
                 </Expander>
-                
+
+                <Button Content="Add SubScene" Margin="10,10,10,10" HorizontalAlignment="Center"/>
+
                 <Expander Header="SubScene" IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
                     <StackPanel>
                         <muxc:TreeView x:Name="x_TreeView_Hierarchy" SelectionMode="Single" HorizontalAlignment="Stretch" >
@@ -81,8 +83,6 @@
                         <Button Content="Add Entity" Margin="10,10,10,10" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Expander>
-
-                <Button Content="Add SubScene" Margin="10,10,10,10" HorizontalAlignment="Center"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>

@@ -315,6 +315,12 @@ namespace Editor.Controls
                 VerticalAlignment = VerticalAlignment.Center,
             };
 
+            button.Tapped += (s, e) =>
+            {
+                PropertiesController.Clear();
+                PropertiesController.Set(new Properties(path));
+            };
+
             button.DoubleTapped += (s, e) =>
             {
                 if (File.Exists(path))
@@ -607,6 +613,9 @@ namespace Editor.Controls
                 WriteFileFromTemplatesAsync(path);
 
                 CreateFileSystemEntryTilesAsync();
+
+                PropertiesController.Clear();
+                PropertiesController.Set(new Properties(path));
             }
         }
 

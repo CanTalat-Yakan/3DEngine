@@ -21,10 +21,9 @@ namespace Editor.Controls
         public ViewPort ViewPort;
         public Hierarchy Hierarchy;
         public Properties Properties;
+        public Grid PropertiesRoot;
         public Output Output;
         public Files Files;
-
-        private Grid _grid;
 
         public LayoutController(Grid content, ViewPort viewPort, Hierarchy hierarchy, Properties properties, Output output, Files files)
         {
@@ -34,19 +33,22 @@ namespace Editor.Controls
             Properties = properties;
             Output = output;
             Files = files;
+
+            PropertiesRoot = new Grid();
+            PropertiesRoot.Children.Add(Properties);
         }
 
         public void Initialize()
         {
-            _grid = CreateLayout(
+            Grid grid = CreateLayout(
                 WrapGrid(ViewPort),
                 WrapInTabView(
                     new TabViewItemDataTemplate() { Header = "Files", Content = Files, Symbol = Symbol.Document },
                     new TabViewItemDataTemplate() { Header = "Output", Content = Output, Symbol = Symbol.Message }),
                 WrapGrid(Hierarchy),
-                WrapGrid(Properties));
+                WrapGrid(PropertiesRoot));
 
-            Content.Children.Add(_grid);
+            Content.Children.Add(grid);
         }
 
         private Grid CreateLayout(params Grid[] panel)
