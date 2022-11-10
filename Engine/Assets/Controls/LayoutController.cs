@@ -43,8 +43,8 @@ namespace Editor.Controls
             Grid grid = CreateLayout(
                 WrapGrid(ViewPort),
                 WrapInTabView(
-                    new TabViewItemDataTemplate() { Header = "Files", Content = Files, Symbol = Symbol.Document },
-                    new TabViewItemDataTemplate() { Header = "Output", Content = Output, Symbol = Symbol.Message }),
+                    new TabViewItemDataTemplate() { Header = "Files⠀⠀⠀⠀", Content = Files, Symbol = Symbol.Document },
+                    new TabViewItemDataTemplate() { Header = "Output⠀⠀⠀⠀", Content = Output, Symbol = Symbol.Message }),
                 WrapGrid(Hierarchy),
                 WrapGrid(PropertiesRoot));
 

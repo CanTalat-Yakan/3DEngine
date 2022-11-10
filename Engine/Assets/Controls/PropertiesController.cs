@@ -20,6 +20,8 @@ using Microsoft.UI;
 using System.IO;
 using Path = System.IO.Path;
 using Editor.UserControls;
+using Microsoft.UI.Xaml.Input;
+using System.Diagnostics;
 
 namespace Editor.Controls
 {
@@ -31,8 +33,8 @@ namespace Editor.Controls
         {
             _stackPanel = stackPanel;
 
-            if(content is null)
-                CreateEntityProperties(null);
+            if (content is null)
+                CreateEmptyMessage();
             else if (content.GetType() == typeof(Entity))
                 CreateEntityProperties((Entity)content);
             else if (content.GetType() == typeof(string))
@@ -53,9 +55,9 @@ namespace Editor.Controls
 
             var transform = new Grid[]
             {
-                CreateVec3InputTransform("Position"),
-                CreateVec3InputTransform("Rotation"),
-                CreateVec3InputTransform("Scale")
+                CreateVec3InputTransform("Position", entity.Transform.Position.X, entity.Transform.Position.Y, entity.Transform.Position.Z),
+                CreateVec3InputTransform("Rotation", entity.Transform.Rotation.X, entity.Transform.Rotation.Y, entity.Transform.Rotation.Z),
+                CreateVec3InputTransform("Scale", entity.Transform.Scale.X, entity.Transform.Scale.Y, entity.Transform.Scale.Z)
             };
 
             var collection = new Grid[]
@@ -73,10 +75,10 @@ namespace Editor.Controls
                 WrapInExpander(CreateEvent())
             };
 
-            _stackPanel.Children.Add(CreateExpanderWithCheckBoxAndEditableHeader("Entity Name", properties));
+            _stackPanel.Children.Add(CreateExpanderWithCheckBoxAndEditableHeader(entity.Name, properties));
             _stackPanel.Children.Add(CreateSeperator());
             _stackPanel.Children.Add(CreateExpander("Transform", transform));
-            _stackPanel.Children.Add(CreateButton("Add Component"));
+            _stackPanel.Children.Add(CreateButton("Add Component", null));
             _stackPanel.Children.Add(CreateExpanderWithToggleButton("Example", collection));
             _stackPanel.Children.Add(CreateExpanderWithToggleButton("Another", CreateSpacer()));
         }
@@ -98,8 +100,29 @@ namespace Editor.Controls
 
             _stackPanel.Children.Add(CreateExpander(Path.GetFileName(path), properties));
             _stackPanel.Children.Add(CreateSeperator());
+            _stackPanel.Children.Add(CreateButton("Open File", (s, e) =>
+            {
+                if (File.Exists(path))
+                    Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
+            }));
         }
 
+        private void CreateEmptyMessage()
+        {
+            Grid grid = new Grid() { Margin = new Thickness(0, 20, 0, 0) };
+
+            StackPanel stack = new StackPanel() { HorizontalAlignment = HorizontalAlignment.Center };
+
+            TextBlock textBlock = new TextBlock() { Text = "Select a file or an entity", Opacity = 0.5f, HorizontalAlignment = HorizontalAlignment.Center };
+            TextBlock textBlock2 = new TextBlock() { Text = "to view its properties here.", Opacity = 0.5f, HorizontalAlignment = HorizontalAlignment.Center };
+
+            stack.Children.Add(textBlock);
+            stack.Children.Add(textBlock2);
+
+            grid.Children.Add(stack);
+
+            _stackPanel.Children.Add(grid);
+        }
 
         private Grid WrapInField(string s, params UIElement[] _content)
         {
@@ -188,13 +211,13 @@ namespace Editor.Controls
         private Grid CreateVec3InputTransform(string s = "Vector3", float x = 0, float y = 0, float z = 0)
         {
             Rectangle rectangleR = new Rectangle() { Fill = new SolidColorBrush(Colors.IndianRed), RadiusX = 2, RadiusY = 2, Width = 4 };
-            NumberBox numInput = new NumberBox() { Value = x, Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
+            NumberBox numInput = new NumberBox() { Value = MathF.Round(x, 4), Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
 
             Rectangle rectangleG = new Rectangle() { Fill = new SolidColorBrush(Colors.SeaGreen), RadiusX = 2, RadiusY = 2, Width = 4 };
-            NumberBox num2Input = new NumberBox() { Value = y, Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
+            NumberBox num2Input = new NumberBox() { Value = MathF.Round(y, 4), Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
 
             Rectangle rectangleB = new Rectangle() { Fill = new SolidColorBrush(Colors.DodgerBlue), RadiusX = 2, RadiusY = 2, Width = 4 };
-            NumberBox num3Input = new NumberBox() { Value = z, Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
+            NumberBox num3Input = new NumberBox() { Value = MathF.Round(z, 4), Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
 
             return WrapInField(s, rectangleR, numInput, rectangleG, num2Input, rectangleB, num3Input);
         }
@@ -345,11 +368,14 @@ namespace Editor.Controls
             return grid;
         }
 
-        private Grid CreateButton(string s = "Add")
+        private Grid CreateButton(string s, TappedEventHandler tapped)
         {
             Grid grid = new Grid();
 
             Button button = new Button() { Content = s, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(10) };
+
+            button.Tapped += tapped;
+
             AutoSuggestBox suggestBox = new AutoSuggestBox();
 
             //FlyoutBase kbase = new FlyoutBase();

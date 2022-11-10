@@ -143,5 +143,14 @@ namespace Engine.Utilities
         {
             Sky.Material = light ? _materialSky2 : _materialSky;
         }
+
+        public Entity GetFromID(Guid id)
+        {
+            foreach (var entity in EntityList)
+                if (entity.ID == id)
+                    return entity;
+
+            return null;
+        }
     }
 }

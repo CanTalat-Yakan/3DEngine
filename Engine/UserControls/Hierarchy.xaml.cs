@@ -1,6 +1,6 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using System;
+using Microsoft.UI.Xaml.Input;
 using Editor.Controls;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -10,19 +10,24 @@ namespace Editor.UserControls
 {
     public sealed partial class Hierarchy : UserControl
     {
-        private HierarchyController hierarchyControl;
-        private SceneController sceneControl;
+        private HierarchyController _hierarchyControl;
+        private SceneController _sceneControl;
 
         public Hierarchy()
         {
             this.InitializeComponent();
 
-            sceneControl = new SceneController();
-            hierarchyControl = new HierarchyController(x_TreeView_Hierarchy, sceneControl);
+            _sceneControl = new SceneController();
+            _hierarchyControl = new HierarchyController(x_TreeView_Hierarchy, _sceneControl);
 
             MainController.Instance.Content.Loaded += (s, e) =>
                 MainController.Instance.LayoutControl.ViewPort.Loaded += (s, e) =>
-                    hierarchyControl.Initialize();
+                    _hierarchyControl.Initialize();
+        }
+
+        private void x_TreeView_Hierarchy_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            _hierarchyControl.SetProperties();
         }
     }
 }

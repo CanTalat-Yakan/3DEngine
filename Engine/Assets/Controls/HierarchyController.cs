@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using System;
 using Engine.Utilities;
+using Editor.UserControls;
 
 namespace Editor.Controls
 {
@@ -10,8 +11,12 @@ namespace Editor.Controls
         public Guid? IDparent;
         public string Name;
 
-        public Entity Entity;
         public TreeViewNode Node;
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 
     internal class HierarchyController
@@ -34,17 +39,17 @@ namespace Editor.Controls
             var engineObjectList = Engine.Core.Instance.Scene.EntitytManager.EntityList;
             engineObjectList.EventOnAdd += (s, e) => { List_OnAdd(); };
 
-            foreach (var item in engineObjectList)
+            foreach (var entity in engineObjectList)
             {
-                var newEntry = new TreeEntry() { Name = item.Name, ID = item.ID, Entity = item };
-                if (item.Parent != null)
-                    newEntry.IDparent = item.Parent.ID;
+                var newEntry = new TreeEntry() { Name = entity.Name, ID = entity.ID };
+                if (entity.Parent != null)
+                    newEntry.IDparent = entity.Parent.ID;
 
                 SceneControl.Hierarchy.Add(newEntry);
             }
 
-            foreach (var item in SceneControl.Hierarchy)
-                item.Node = new TreeViewNode() { Content = item.Name, IsExpanded = true };
+            foreach (var entity in SceneControl.Hierarchy)
+                entity.Node = new TreeViewNode() { Content = entity, IsExpanded = true };
 
             TreeEntry tmp;
             foreach (var item in SceneControl.Hierarchy)
@@ -61,16 +66,25 @@ namespace Editor.Controls
                     Tree.RootNodes.Add(item.Node);
         }
 
+        public void SetProperties()
+        {
+            var id = ((TreeEntry)Tree.SelectedNode.Content).ID;
+            var entity = Engine.Core.Instance.Scene.EntitytManager.GetFromID(id);
+
+            PropertiesController.Clear();
+            PropertiesController.Set(new Properties(entity));
+        }
+
         private void List_OnAdd()
         {
             var entityList = Engine.Core.Instance.Scene.EntitytManager.EntityList;
 
-            var newEntity = entityList[entityList.Count - 1];
-            var newEntry = new TreeEntry() { Name = newEntity.Name, ID = newEntity.ID, Entity = newEntity };
-            if (newEntity.Parent != null)
-                newEntry.IDparent = newEntity.Parent.ID;
+            var entity = entityList[entityList.Count - 1];
+            var newEntry = new TreeEntry() { Name = entity.Name, ID = entity.ID };
+            if (entity.Parent != null)
+                newEntry.IDparent = entity.Parent.ID;
 
-            newEntry.Node = new TreeViewNode() { Content = newEntry.Name, IsExpanded = true };
+            newEntry.Node = new TreeViewNode() { Content = newEntry, IsExpanded = true };
             SceneControl.Hierarchy.Add(newEntry);
 
             TreeEntry tmp;
