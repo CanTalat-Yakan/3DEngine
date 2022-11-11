@@ -18,7 +18,7 @@ namespace Engine.Utilities
         public ID3D11Device2 Device { get; private set; }
         public ID3D11DeviceContext DeviceContext { get; private set; }
         public SwapChainPanel SwapChainPanel { get; private set; }
-        
+
         private readonly IDXGISwapChain2 _swapChain;
 
         private ID3D11Texture2D _renderTargetTexture;
@@ -134,7 +134,10 @@ namespace Engine.Utilities
 
             blendStateDesc.RenderTarget[0] = renTarDesc;
             _blendState = Device.CreateBlendState(blendStateDesc);
-            DeviceContext.OMSetBlendState(_blendState);
+            unsafe
+            {
+                DeviceContext.OMSetBlendState(_blendState);
+            }
             #endregion
 
             #region //Set ViewPort
@@ -201,7 +204,10 @@ namespace Engine.Utilities
             DeviceContext.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
             DeviceContext.IASetVertexBuffer(0, _vertexBuffer, _vertexStride, 0);
             DeviceContext.IASetIndexBuffer(_indexBuffer, Format.R16_UInt, 0);
-            DeviceContext.OMSetBlendState(_blendState);
+            unsafe
+            {
+                DeviceContext.OMSetBlendState(_blendState);
+            }
             DeviceContext.DrawIndexed(_indexCount, 0, 0);
         }
 
