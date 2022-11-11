@@ -47,7 +47,7 @@ Also, you need to install **Visual Studio 2022** with the following components:
 - [x] Windows 11 SDK (10.0.22621.0)
 - [x] .NET 6.0 SDK
 
-Additional expansions:
+Additional components:
 
 - [x] [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)
 
