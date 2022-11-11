@@ -72,7 +72,7 @@
                             </muxc:TreeView.ContextFlyout>
                         </muxc:TreeView>
 
-                        <Button Content="Add Entity" Margin="10,10,10,10" HorizontalAlignment="Center"/>
+                        <Button Content="Add Entity" Margin="10,10,10,10" Click="Button_Click" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Expander>
 

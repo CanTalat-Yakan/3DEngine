@@ -29,5 +29,10 @@ namespace Editor.UserControls
         {
             _hierarchyControl.SetProperties();
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Engine.Core.Instance.Scene.EntitytManager.CreateEmpty("New Entity");
+        }
     }
 }
