@@ -34,32 +34,32 @@
     <PackageReference Include="Aspose.3D" Version="22.10.0" />
     <PackageReference Include="Aspose.Imaging" Version="22.10.0" />
     <PackageReference Include="Aspose.PDF" Version="22.10.0" />
-    <PackageReference Include="Aspose.PSD" Version="22.10.0" />
+    <PackageReference Include="Aspose.PSD" Version="22.11.0" />
     <PackageReference Include="Aspose.Words" Version="22.11.0" />
     <PackageReference Include="Aspose.Zip" Version="22.10.0" />
     <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
     <PackageReference Include="ImGui.NET" Version="1.88.0" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.5" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.221109.1" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
     <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
-    <PackageReference Include="Vortice.D3DCompiler" Version="2.1.32" />
-    <PackageReference Include="Vortice.Direct2D1" Version="2.1.32" />
-    <PackageReference Include="Vortice.Direct3D11" Version="2.1.32" />
-    <PackageReference Include="Vortice.Direct3D12" Version="2.1.32" />
-    <PackageReference Include="Vortice.DirectComposition" Version="2.1.32" />
-    <PackageReference Include="Vortice.DirectInput" Version="2.1.32" />
-    <PackageReference Include="Vortice.DirectX" Version="2.1.32" />
-    <PackageReference Include="Vortice.Dxc" Version="2.1.32" />
-    <PackageReference Include="Vortice.DXGI" Version="2.1.32" />
+    <PackageReference Include="Vortice.D3DCompiler" Version="2.1.41" />
+    <PackageReference Include="Vortice.Direct2D1" Version="2.1.41" />
+    <PackageReference Include="Vortice.Direct3D11" Version="2.1.41" />
+    <PackageReference Include="Vortice.Direct3D12" Version="2.1.41" />
+    <PackageReference Include="Vortice.DirectComposition" Version="2.1.41" />
+    <PackageReference Include="Vortice.DirectInput" Version="2.1.41" />
+    <PackageReference Include="Vortice.DirectX" Version="2.1.41" />
+    <PackageReference Include="Vortice.Dxc" Version="2.1.41" />
+    <PackageReference Include="Vortice.DXGI" Version="2.1.41" />
     <PackageReference Include="Vortice.Mathematics" Version="1.4.19" />
-    <PackageReference Include="Vortice.MediaFoundation" Version="2.1.32" />
+    <PackageReference Include="Vortice.MediaFoundation" Version="2.1.41" />
     <PackageReference Include="Vortice.Multimedia" Version="1.8.54" />
     <PackageReference Include="Vortice.ShaderCompiler" Version="1.6.0" />
-    <PackageReference Include="Vortice.WinUI" Version="2.1.32" />
-    <PackageReference Include="Vortice.XAudio2" Version="2.1.32" />
-    <PackageReference Include="Vortice.XInput" Version="2.1.32" />
+    <PackageReference Include="Vortice.WinUI" Version="2.1.41" />
+    <PackageReference Include="Vortice.XAudio2" Version="2.1.41" />
+    <PackageReference Include="Vortice.XInput" Version="2.1.41" />
     <PackageReference Include="WinUIEx" Version="1.8.0" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
