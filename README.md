@@ -1,9 +1,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/CanTalat-Yakan/3DEngine/blob/main/LICENSE)
 # 3DEngine - Using
 
-# Windows App SDK - Calling all Windows developers!
-
-*Previously known as Project Reunion*.
+# Windows App SDK
 
 | Delight users with modern UI | Access new platform features | Backwards compatible |
 |:--:|:--:|:--:|
@@ -21,14 +19,14 @@ Plus, **create beautiful, modern apps for Windows 11 that are backwards compatib
 # Vortice.Windows
 
 
-**Vortice.Windows** is a collection of Win32 and UWP libraries with bindings support for [DXGI](https://docs.microsoft.com/en-us/windows/desktop/direct3ddxgi/d3d10-graphics-programming-guide-dxgi), [WIC](https://docs.microsoft.com/en-us/windows/desktop/wic/-wic-lh), [DirectWrite](https://docs.microsoft.com/en-us/windows/desktop/directwrite/direct-write-portal), [Direct2D](https://docs.microsoft.com/en-us/windows/desktop/direct2d/direct2d-portal), [Direct3D9](https://docs.microsoft.com/en-us/windows/win32/direct3d9/dx9-graphics), [Direct3D11](https://docs.microsoft.com/en-us/windows/desktop/direct3d11/atoc-dx-graphics-direct3d-11), [Direct3D12](https://docs.microsoft.com/en-us/windows/desktop/direct3d12/directx-12-programming-guide), [XInput](https://docs.microsoft.com/en-us/windows/win32/xinput/getting-started-with-xinput), [XAudio2](https://docs.microsoft.com/en-us/windows/win32/xaudio2/xaudio2-introduction), [X3DAudio](https://docs.microsoft.com/it-it/windows/win32/xaudio2/x3daudio), [DirectInput](https://docs.microsoft.com/en-us/previous-versions/windows/desktop/ee416842(v=vs.85)), [DirectStorage](https://devblogs.microsoft.com/directx/landing-page/), [DirectML](https://docs.microsoft.com/en-us/windows/ai/directml/dml-intro) and [UIAnimation](https://docs.microsoft.com/en-us/windows/win32/api/_uianimation).
+[**Vortice.Windows**](https://github.com/amerkoleci/Vortice.Windows) is a collection of Win32 and UWP libraries with bindings support for [DXGI](https://docs.microsoft.com/en-us/windows/desktop/direct3ddxgi/d3d10-graphics-programming-guide-dxgi), [WIC](https://docs.microsoft.com/en-us/windows/desktop/wic/-wic-lh), [DirectWrite](https://docs.microsoft.com/en-us/windows/desktop/directwrite/direct-write-portal), [Direct2D](https://docs.microsoft.com/en-us/windows/desktop/direct2d/direct2d-portal), [Direct3D9](https://docs.microsoft.com/en-us/windows/win32/direct3d9/dx9-graphics), [Direct3D11](https://docs.microsoft.com/en-us/windows/desktop/direct3d11/atoc-dx-graphics-direct3d-11), [Direct3D12](https://docs.microsoft.com/en-us/windows/desktop/direct3d12/directx-12-programming-guide), [XInput](https://docs.microsoft.com/en-us/windows/win32/xinput/getting-started-with-xinput), [XAudio2](https://docs.microsoft.com/en-us/windows/win32/xaudio2/xaudio2-introduction), [X3DAudio](https://docs.microsoft.com/it-it/windows/win32/xaudio2/x3daudio), [DirectInput](https://docs.microsoft.com/en-us/previous-versions/windows/desktop/ee416842(v=vs.85)), [DirectStorage](https://devblogs.microsoft.com/directx/landing-page/), [DirectML](https://docs.microsoft.com/en-us/windows/ai/directml/dml-intro) and [UIAnimation](https://docs.microsoft.com/en-us/windows/win32/api/_uianimation).
 
 This library targets netstandard2.0 and net6.0 using modern .NET API, see [CHANGELOG](https://github.com/amerkoleci/Vortice.Windows/blob/main/CHANGELOG.md) for list of changes between commits.
 
 
-# Universal Scene Description
+# Universal Scene Description (USD) 
 
-Universal Scene Description (USD) is an efficient, scalable system for
+[Universal Scene Description](https://developer.nvidia.com/usd) is an efficient, scalable system for
 authoring, reading, and streaming time-sampled scene description for
 interchange between graphics applications.
 
@@ -37,7 +35,21 @@ For more details, please visit the web site [here](http://openusd.org).
 
 # Aspose.3D .NET API for 3D File Formats
 
-[Aspose.3D for .NET](http://products.aspose.com/3d/net) empowers .NET applications to connect with 3D document formats. 3D .NET API lets engineers read, convert, build, alter and control the substance of the [3D document formats](https://docs.aspose.com/3d/net/supported-file-formats/) without any 3D modeling and rendering software installed on the machine.
+[Aspose.3D for .NET](https://github.com/aspose-3d/Aspose.3D-for-.NET) empowers .NET applications to connect with 3D document formats. 3D .NET API lets engineers read, convert, build, alter and control the substance of the [3D document formats](https://docs.aspose.com/3d/net/supported-file-formats/) without any 3D modeling and rendering software installed on the machine.
+
+
+## Build
+
+In order to compile, make sure **no spaces** are present in the solution path otherwise SharpGen will fail to generate bindings.
+Also, you need to install **Visual Studio 2022** with the following components:
+
+- [x] Visual C++ Toolset Component
+- [x] Windows 11 SDK (10.0.22621.0)
+- [x] .NET 6.0 SDK
+
+Additional components:
+
+- [x] [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)
 
 # Preview
-![alt text](https://drive.google.com/uc?export=view&id=1mcehLyJOGVpjFk7ZbLeMNDct9VOwXiiE)
+![alt text](https://drive.google.com/uc?export=view&id=11He0Xb4sZjYFZ8gkL4O_bxtW7YKWecx9)
