@@ -59,7 +59,7 @@ namespace Editor.Controls
 
             var b = PairVertical(
                 new GridDataTemeplate() { Content = panel[2], MinHeight = 0 },
-                new GridDataTemeplate() { Content = panel[3], MinHeight = 0, Length = new GridLength(1.5f, GridUnitType.Star) });
+                new GridDataTemeplate() { Content = panel[3], MinHeight = 0, Length = new GridLength(1, GridUnitType.Star) });
 
             return WrapSplitView(a, b);
         }
