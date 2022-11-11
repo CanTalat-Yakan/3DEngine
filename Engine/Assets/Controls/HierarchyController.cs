@@ -68,13 +68,11 @@ namespace Editor.Controls
 
         public void SetProperties()
         {
-            var content = (TreeEntry)Tree.SelectedNode.Content;
-
-            if (content is null)
+            if (Tree.SelectedNode is null)
                 return;
 
-            var id = content.ID;
-            var entity = Engine.Core.Instance.Scene.EntitytManager.GetFromID(id);
+            var treeEntry = (TreeEntry)Tree.SelectedNode.Content;
+            var entity = Engine.Core.Instance.Scene.EntitytManager.GetFromID(treeEntry.ID);
 
             PropertiesController.Clear();
             PropertiesController.Set(new Properties(entity));
