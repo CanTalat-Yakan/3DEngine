@@ -48,6 +48,7 @@ namespace Editor.Controls
         {
             var properties = new Grid[]
             {
+                CreateBool("Is Acitve", true),
                 CreateBool("Is Static"),
                 CreateEnum("Tag", "Untagged", "MainCamera", "Respawn", "Player", "Finish", "GameController"),
                 CreateEnum("Layer", "Default", "Transparent FX", "Ignore Raycast", "Water", "UI")
@@ -75,7 +76,7 @@ namespace Editor.Controls
                 WrapInExpander(CreateEvent())
             };
 
-            _stackPanel.Children.Add(CreateExpanderWithCheckBoxAndEditableHeader(entity.Name, properties));
+            _stackPanel.Children.Add(CreateExpanderWithEditableHeader(entity.Name, properties));
             _stackPanel.Children.Add(CreateSeperator());
             _stackPanel.Children.Add(CreateExpander("Transform", transform));
             _stackPanel.Children.Add(CreateButton("Add Component", null));
@@ -352,12 +353,12 @@ namespace Editor.Controls
             return grid;
         }
 
-        private Grid CreateExpanderWithCheckBoxAndEditableHeader(string s = "ExampleScript", params Grid[] properties)
+        private Grid CreateExpanderWithEditableHeader(string s = "ExampleScript", params Grid[] properties)
         {
             Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, 2) };
             StackPanel stack = new StackPanel() { Orientation = Orientation.Vertical, Spacing = 10 };
             Expander expander = new Expander() { Header = s, ExpandDirection = ExpandDirection.Down, HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Left };
-            expander.Header = new CheckBox() { Content = new TextBox() { Text = s, Width = 200, Margin = new Thickness(0) }, IsChecked = true };
+            expander.Header = new TextBox() { Text = s, Margin = new Thickness(0) };
 
             foreach (var item in properties)
                 stack.Children.Add(item);
