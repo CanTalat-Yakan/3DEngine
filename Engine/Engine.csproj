@@ -44,6 +44,7 @@
     <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.0.4" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.221116.1" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
+    <PackageReference Include="PhysX.Net-x64" Version="0.5.1" />
     <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
     <PackageReference Include="Vortice.D3DCompiler" Version="2.1.41" />
     <PackageReference Include="Vortice.Direct2D1" Version="2.1.41" />
