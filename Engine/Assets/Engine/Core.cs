@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Media;
 using Engine.Editor;
 using Engine.Utilities;
 using Editor.Controls;
+using System;
 
 namespace Engine
 {
@@ -16,11 +17,19 @@ namespace Engine
         public Renderer Renderer;
         public ImGui ImGui;
 
+        static T Parse<T>(string s, IFormatProvider? provider)
+            where T : IParsable<T>
+        {
+            return T.Parse(s, provider);
+        }
+
         public Core(SwapChainPanel swapChainPanel, TextBlock textBlock)
         {
+            var a = Parse<int>("4", null);
+
             if (Instance is null)
                 Instance = this;
-         
+
             Renderer = new Renderer(swapChainPanel);
             Input = new Input();
             Time = new Time();
