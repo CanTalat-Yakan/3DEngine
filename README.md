@@ -24,6 +24,11 @@ Plus, **create beautiful, modern apps for Windows 11 that are backwards compatib
 This library targets netstandard2.0 and net6.0 using modern .NET API, see [CHANGELOG](https://github.com/amerkoleci/Vortice.Windows/blob/main/CHANGELOG.md) for list of changes between commits.
 
 
+# Aspose.3D .NET API for 3D File Formats
+
+[Aspose.3D for .NET](https://github.com/aspose-3d/Aspose.3D-for-.NET) empowers .NET applications to connect with 3D document formats. 3D .NET API lets engineers read, convert, build, alter and control the substance of the [3D document formats](https://docs.aspose.com/3d/net/supported-file-formats/) without any 3D modeling and rendering software installed on the machine.
+
+
 # Universal Scene Description (USD) 
 
 [Universal Scene Description](https://developer.nvidia.com/usd) is an efficient, scalable system for
@@ -31,11 +36,6 @@ authoring, reading, and streaming time-sampled scene description for
 interchange between graphics applications.
 
 For more details, please visit the web site [here](http://openusd.org).
-
-
-# Aspose.3D .NET API for 3D File Formats
-
-[Aspose.3D for .NET](https://github.com/aspose-3d/Aspose.3D-for-.NET) empowers .NET applications to connect with 3D document formats. 3D .NET API lets engineers read, convert, build, alter and control the substance of the [3D document formats](https://docs.aspose.com/3d/net/supported-file-formats/) without any 3D modeling and rendering software installed on the machine.
 
 
 ## Build
