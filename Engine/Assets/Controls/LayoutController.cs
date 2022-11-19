@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
 using System;
 using Editor.UserControls;
+using Microsoft.UI.Xaml.Media;
 
 namespace Editor.Controls
 {
@@ -149,6 +150,8 @@ namespace Editor.Controls
         private Grid WrapInTabView(params TabViewItemDataTemplate[] i)
         {
             Grid grid = new Grid();
+            grid.Background = Application.Current.Resources["ApplicationPageBackgroundThemeBrush"] as SolidColorBrush;
+
             TabViewPageController tabViewPage = new TabViewPageController(i);
             grid.Children.Add(tabViewPage.Tab);
 
