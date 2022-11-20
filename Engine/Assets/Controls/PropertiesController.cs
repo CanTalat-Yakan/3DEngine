@@ -115,7 +115,7 @@ namespace Editor.Controls
             StackPanel stack = new StackPanel() { HorizontalAlignment = HorizontalAlignment.Center };
 
             TextBlock textBlock = new TextBlock() { Text = "Select a file or an entity", Opacity = 0.5f, HorizontalAlignment = HorizontalAlignment.Center };
-            TextBlock textBlock2 = new TextBlock() { Text = "to view its properties here.", Opacity = 0.5f, HorizontalAlignment = HorizontalAlignment.Center };
+            TextBlock textBlock2 = new TextBlock() { Text = "to view its properties.", Opacity = 0.5f, HorizontalAlignment = HorizontalAlignment.Center };
 
             stack.Children.Add(textBlock);
             stack.Children.Add(textBlock2);
