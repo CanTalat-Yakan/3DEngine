@@ -19,8 +19,8 @@ namespace Editor.UserControls
 
             ChangeColorWithTheme = x_Grid_ChangeColorWithTheme;
 
-            _filesControl = new FilesController(this, x_WrapPanel_Files);
-            
+            _filesControl = new FilesController(this, x_WrapPanel_Files, x_BreadcrumBar_Files);
+
             _filesControl.CreateCatergoryTiles(
                 new Category() { Name = "Scenes", Glyph = "\xEA86", FileTypes = new string[] { ".usd", ".usda", ".usdc", ".usdz" }, Creatable = true },
                 new Category() { Name = "Scripts", Symbol = Symbol.Document, FileTypes = new string[] { ".cs" }, Creatable = true },
@@ -34,7 +34,7 @@ namespace Editor.UserControls
                 new Category() { Name = "Fonts", Symbol = Symbol.Font, FileTypes = new string[] { ".ttf", ".otf" } },
                 new Category() { Name = "Shaders", Glyph = "\xE706", FileTypes = new string[] { ".hlsl" }, Creatable = true },
                 new Category() { Name = "Documents", Glyph = "\xF000", FileTypes = new string[] { ".txt", ".pdf", ".doc", ".docx" }, Creatable = true },
-                new Category() { Name = "Packages", Glyph = "\xE74C", FileTypes = new string[] { ".zip", ".7zip", ".rar" }});
+                new Category() { Name = "Packages", Glyph = "\xE74C", FileTypes = new string[] { ".zip", ".7zip", ".rar" } });
         }
 
         private void AppBarButton_Click_AddFiles(object sender, RoutedEventArgs e) { _filesControl.SelectFilesAsync(); }
@@ -42,5 +42,7 @@ namespace Editor.UserControls
         private void AppBarButton_Click_OpenFolder(object sender, RoutedEventArgs e) { _filesControl.OpenFolder(); }
 
         private void AppBarButton_Click_RefreshFiles(object sender, RoutedEventArgs e) { _filesControl.Refresh(); }
+
+        private void x_BreadcrumBar_Files_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args) { _filesControl.GoUpDirectoryAndRefresh(); }
     }
 }

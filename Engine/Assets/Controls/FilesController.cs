@@ -16,6 +16,8 @@ using System.Linq;
 using Editor.UserControls;
 using System.Text.RegularExpressions;
 using System.Text;
+using System.Collections.Generic;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Editor.Controls
 {
@@ -35,6 +37,9 @@ namespace Editor.Controls
         public string CurrentProjectTitle { get; private set; }
 
         public WrapPanel Wrap;
+
+        public BreadcrumbBar Bar;
+
         public Category[] Categories;
 
         private Files _files;
@@ -44,9 +49,10 @@ namespace Editor.Controls
 
         private static readonly string TEMPLATES = @"Assets\Engine\Resources\Templates";
 
-        public FilesController(Files files, WrapPanel wrap)
+        public FilesController(Files files, WrapPanel wrap, BreadcrumbBar bar)
         {
             Wrap = wrap;
+            Bar = bar;
 
             _files = files;
 
@@ -124,6 +130,8 @@ namespace Editor.Controls
                 CreateCatergoryTiles(Categories);
             else
                 CreateFileSystemEntryTilesAsync();
+
+            SetBreadcrumbBar();
         }
 
         public void ValidateCategoriesExist()
@@ -186,6 +194,8 @@ namespace Editor.Controls
 
                 Wrap.Children.Add(CategoryTile(category, icon));
             }
+
+            SetBreadcrumbBar();
         }
 
         public async void CreateFileSystemEntryTilesAsync()
@@ -417,19 +427,7 @@ namespace Editor.Controls
 
             button.Click += (s, e) =>
             {
-                if (!string.IsNullOrEmpty(_currentSubPath))
-                {
-                    _currentSubPath = GoUpDirectory(_currentSubPath);
-
-                    Refresh();
-                }
-                else
-                {
-                    _currentCategory = null;
-                    _currentSubPath = null;
-
-                    CreateCatergoryTiles(Categories);
-                }
+                GoUpDirectoryAndRefresh();
             };
 
             Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
@@ -719,6 +717,7 @@ namespace Editor.Controls
                     : "")
                 + Path.GetExtension(path));
         }
+
         private string IncrementFolderIfExists(string path)
         {
             var fileCount = 0;
@@ -738,6 +737,47 @@ namespace Editor.Controls
                     (fileCount > 0
                     ? " (" + (fileCount + 1).ToString() + ")"
                     : ""));
+        }
+
+        private void SetBreadcrumbBar()
+        {
+            if (_currentCategory is null)
+                Bar.ItemsSource = new string[] { };
+            else
+            {
+                var source = new string[] { _currentCategory.Value.Name };
+
+                Bar.ItemsSource = source;
+
+                if (!string.IsNullOrEmpty(_currentSubPath))
+                {
+                    var subPathSource = _currentSubPath.Split('\\');
+
+                    var newSource = new string[source.Length + subPathSource.Length];
+
+                    source.CopyTo(newSource, 0);
+                    subPathSource.CopyTo(newSource, source.Length);
+
+                    Bar.ItemsSource = newSource;
+                }
+            }
+        }
+
+        public void GoUpDirectoryAndRefresh()
+        {
+            if (!string.IsNullOrEmpty(_currentSubPath))
+            {
+                _currentSubPath = GoUpDirectory(_currentSubPath);
+
+                Refresh();
+            }
+            else
+            {
+                _currentCategory = null;
+                _currentSubPath = null;
+
+                CreateCatergoryTiles(Categories);
+            }
         }
     }
 }
