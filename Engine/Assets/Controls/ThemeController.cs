@@ -30,17 +30,17 @@ namespace Editor.Controls
 
             MainController.Instance.LayoutControl.TabsRoot.Background =
                 _page.RequestedTheme == ElementTheme.Light
-                    ? new SolidColorBrush(Windows.UI.Color.FromArgb(250, 245, 245, 245))
+                    ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 243, 243, 243))
                     : Application.Current.Resources["ApplicationPageBackgroundThemeBrush"] as SolidColorBrush;
 
             MainController.Instance.LayoutControl.Output.ChangeColorWithTheme.Background =
                 _page.RequestedTheme == ElementTheme.Light
-                    ? new SolidColorBrush(Windows.UI.Color.FromArgb(250, 250, 250, 250))
+                    ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 249, 249, 249))
                     : new SolidColorBrush(Windows.UI.Color.FromArgb(255, 40, 40, 40));
 
             MainController.Instance.LayoutControl.Files.ChangeColorWithTheme.Background =
                 _page.RequestedTheme == ElementTheme.Light
-                    ? new SolidColorBrush(Windows.UI.Color.FromArgb(250, 250, 250, 250))
+                    ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 249, 249, 249))
                     : new SolidColorBrush(Windows.UI.Color.FromArgb(255, 40, 40, 40));
 
             Engine.Core.Instance.Scene.EntitytManager.SetTheme(_page.RequestedTheme == ElementTheme.Light);
