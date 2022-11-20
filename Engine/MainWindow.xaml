@@ -32,7 +32,7 @@
             </NavigationView.PaneFooter>
 
 
-            <Frame x:Name="x_Frame_Main">
+            <Frame x:Name="x_Frame_Main" CornerRadius="5">
                 <Frame.Resources>
                     <ResourceDictionary Source="ms-appx:///Microsoft.UI.Xaml/DensityStyles/Compact.xaml" />
                 </Frame.Resources>
