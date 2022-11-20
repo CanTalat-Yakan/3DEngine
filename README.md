@@ -49,4 +49,6 @@ Also, you need to install **Visual Studio 2022** with the following components:
 - [x] [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)
 
 # Preview
-![alt text](https://drive.google.com/uc?export=view&id=11He0Xb4sZjYFZ8gkL4O_bxtW7YKWecx9)
+![image 1](https://drive.google.com/uc?export=view&id=1NMbuCpX85ogNBYBhUGeAWH8aa5aDiCpy)
+![image 2](https://drive.google.com/uc?export=view&id=1lXIM7N9LeDJlRniZIIwTS_lWgsLoZ2W1)
+![image 3](https://drive.google.com/uc?export=view&id=1AArAssRnvHsmtRe5rW1oggt5lR7GtNvI)
