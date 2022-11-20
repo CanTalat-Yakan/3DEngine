@@ -28,6 +28,11 @@ namespace Editor.Controls
             _page.RequestedTheme = _page.RequestedTheme == ElementTheme.Light ? ElementTheme.Dark : ElementTheme.Light;
             _configurationSource.Theme = _configurationSource.Theme == SystemBackdropTheme.Light ? SystemBackdropTheme.Dark : SystemBackdropTheme.Light;
 
+            MainController.Instance.LayoutControl.TabsRoot.Background =
+                _page.RequestedTheme == ElementTheme.Light
+                    ? new SolidColorBrush(Windows.UI.Color.FromArgb(250, 245, 245, 245))
+                    : Application.Current.Resources["ApplicationPageBackgroundThemeBrush"] as SolidColorBrush;
+
             MainController.Instance.LayoutControl.Output.ChangeColorWithTheme.Background =
                 _page.RequestedTheme == ElementTheme.Light
                     ? new SolidColorBrush(Windows.UI.Color.FromArgb(250, 250, 250, 250))

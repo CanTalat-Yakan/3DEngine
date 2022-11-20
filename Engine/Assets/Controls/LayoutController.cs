@@ -25,6 +25,7 @@ namespace Editor.Controls
         public Grid PropertiesRoot;
         public Output Output;
         public Files Files;
+        public Grid TabsRoot;
 
         public LayoutController(Grid content, ViewPort viewPort, Hierarchy hierarchy, Properties properties, Output output, Files files)
         {
@@ -37,13 +38,15 @@ namespace Editor.Controls
 
             PropertiesRoot = new Grid();
             PropertiesRoot.Children.Add(Properties);
+
+            TabsRoot = new Grid();
         }
 
         public void Initialize()
         {
             Grid grid = CreateLayout(
                 WrapGrid(ViewPort),
-                WrapInTabView(
+                WrapInTabView(TabsRoot,
                     new TabViewItemDataTemplate() { Header = "Files⠀⠀⠀⠀", Content = Files, Symbol = Symbol.Document },
                     new TabViewItemDataTemplate() { Header = "Output⠀⠀⠀⠀", Content = Output, Symbol = Symbol.Message }),
                 WrapGrid(Hierarchy),
@@ -147,17 +150,16 @@ namespace Editor.Controls
             return grid;
         }
 
-        private Grid WrapInTabView(params TabViewItemDataTemplate[] i)
+        private Grid WrapInTabView(Grid root, params TabViewItemDataTemplate[] i)
         {
-            Grid grid = new Grid();
-            grid.Background = Application.Current.Resources["ApplicationPageBackgroundThemeBrush"] as SolidColorBrush;
+            root.Background = Application.Current.Resources["ApplicationPageBackgroundThemeBrush"] as SolidColorBrush;
 
             TabViewPageController tabViewPage = new TabViewPageController(i);
-            grid.Children.Add(tabViewPage.Tab);
+            root.Children.Add(tabViewPage.Tab);
 
             //BindingOperations.SetBinding(grid, Grid.VisibilityProperty, new Binding() { ElementName = "x_AppBarToggleButton_Status_OpenPane", Path = new PropertyPath("IsChecked"), Converter = new BooleanToVisibilityConverter() });
 
-            return grid;
+            return root;
         }
 
         private Grid WrapSplitView(Grid content, Grid pane)
