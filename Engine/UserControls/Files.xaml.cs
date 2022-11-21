@@ -28,12 +28,12 @@ namespace Editor.UserControls
                 new Category() { Name = "Models", Glyph = "\xF158", FileTypes = new string[] { ".fbx", ".obj", ".blend", ".3ds", ".dae" }, Thumbnail = true },
                 new Category() { Name = "Animations", Glyph = "\xE805", FileTypes = new string[] { ".fbx", ".dae" } },
                 new Category() { Name = "Materials", Glyph = "\xF156", FileTypes = new string[] { ".mat" }, Thumbnail = true, Creatable = true },
-                new Category() { Name = "Textures", Glyph = "\xEB9F", FileTypes = new string[] { ".png", ".jpg", ".jpeg", ".tiff", ".tga", ".psd", ".bmp", }, Thumbnail = true },
+                new Category() { Name = "Textures", Symbol = Symbol.Pictures, FileTypes = new string[] { ".png", ".jpg", ".jpeg", ".tiff", ".tga", ".psd", ".bmp", }, Thumbnail = true },
                 new Category() { Name = "Audios", Symbol = Symbol.Audio, FileTypes = new string[] { ".m4a", ".mp3", ".wav", ".ogg" } },
                 new Category() { Name = "Videos", Symbol = Symbol.Video, FileTypes = new string[] { ".m4v", ".mp4", ".mov", ".avi" }, Thumbnail = false },
                 new Category() { Name = "Fonts", Symbol = Symbol.Font, FileTypes = new string[] { ".ttf", ".otf" } },
                 new Category() { Name = "Shaders", Glyph = "\xE706", FileTypes = new string[] { ".hlsl" }, Creatable = true },
-                new Category() { Name = "Documents", Glyph = "\xF000", FileTypes = new string[] { ".txt", ".pdf", ".doc", ".docx" }, Creatable = true },
+                new Category() { Name = "Documents", Symbol = Symbol.Document, FileTypes = new string[] { ".txt", ".pdf", ".doc", ".docx" }, Creatable = true },
                 new Category() { Name = "Packages", Glyph = "\xE74C", FileTypes = new string[] { ".zip", ".7zip", ".rar" } });
         }
 
