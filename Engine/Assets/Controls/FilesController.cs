@@ -3,7 +3,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Windows.UI;
 using System;
-using Microsoft.UI;
 using System.IO;
 using CommunityToolkit.WinUI.UI.Controls;
 using Windows.Storage;
@@ -16,8 +15,10 @@ using System.Linq;
 using Editor.UserControls;
 using System.Text.RegularExpressions;
 using System.Text;
-using System.Collections.Generic;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using Windows.System;
+using Microsoft.UI.Xaml.Input;
+using Windows.ApplicationModel.DataTransfer;
+using Aspose.Words.Shaping;
 
 namespace Editor.Controls
 {
@@ -119,6 +120,81 @@ namespace Editor.Controls
 
             if (Directory.Exists(path))
                 Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
+        }
+
+        public void OpenFolder(string path)
+        {
+            if (Directory.Exists(path))
+                Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
+        }
+
+        public async void PasteFolder(string path)
+        {
+            DataPackageView dataPackageView = Clipboard.GetContent();
+            if (dataPackageView.Contains(StandardDataFormats.Text))
+            {
+                var clipboard = await dataPackageView.GetTextAsync();
+
+                if (Directory.Exists(clipboard))
+                    if (dataPackageView.RequestedOperation == DataPackageOperation.Copy)
+                        CopyDirectory(clipboard, path);
+                    else if (dataPackageView.RequestedOperation == DataPackageOperation.Move)
+                        CopyDirectory(clipboard, path, true);
+            }
+        }
+
+        public void CopyDirectory(string sourcePath, string targetPath, bool deleteSourcePath = false)
+        {
+            // Create the target directory
+            Directory.CreateDirectory(targetPath = Path.Combine(targetPath, Path.GetFileName(sourcePath)));
+
+            // Now Create all of the directories
+            foreach (string dirPath in Directory.GetDirectories(sourcePath, "*", SearchOption.AllDirectories))
+                Directory.CreateDirectory(Path.Combine(targetPath, Path.GetRelativePath(sourcePath, dirPath)));
+
+            // Copy all the files & Replaces any files with the same name
+            foreach (string filePath in Directory.GetFiles(sourcePath, "*.*", SearchOption.AllDirectories))
+                File.Copy(filePath, Path.Combine(targetPath, Path.GetRelativePath(sourcePath, filePath)), true);
+
+            // Delete source directory after it is finished copying
+            if (deleteSourcePath)
+            {
+                DeleteDirectory(sourcePath);
+
+                Refresh();
+            }
+        }
+
+        public void DeleteDirectory(string path)
+        {
+            string[] files = Directory.GetFiles(path);
+            string[] dirs = Directory.GetDirectories(path);
+
+            foreach (string file in files)
+                File.Delete(file);
+
+            foreach (string dir in dirs)
+                DeleteDirectory(dir);
+
+            Directory.Delete(path, false);
+        }
+
+        public void OpenFile(string path)
+        {
+            if (File.Exists(path))
+                Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
+        }
+
+        public async void PasteFile()
+        {
+            DataPackageView dataPackageView = Clipboard.GetContent();
+            if (dataPackageView.Contains(StandardDataFormats.Text))
+            {
+                var clipboard = await dataPackageView.GetTextAsync();
+
+                if (Directory.Exists(clipboard))
+                    OutputController.Log(clipboard);
+            }
         }
 
         public void Refresh()
@@ -331,6 +407,61 @@ namespace Editor.Controls
                     Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
             };
 
+            MenuFlyoutItem[] items = new[] {
+                new MenuFlyoutItem() { Text = "Create File System Entry", Icon = new SymbolIcon(Symbol.NewFolder) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Open", Icon = new SymbolIcon(Symbol.OpenFile) },
+                new MenuFlyoutItem() { Text = "Show in Explorer", Icon = new FontIcon(){ Glyph = "\xE838", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Cut", Icon = new SymbolIcon(Symbol.Cut) },
+                new MenuFlyoutItem() { Text = "Copy", Icon = new SymbolIcon(Symbol.Copy) },
+                new MenuFlyoutItem() { Text = "Paste", Icon = new SymbolIcon(Symbol.Paste) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
+                new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Copy Path", Icon = new SymbolIcon(Symbol.Delete) },
+            };
+            //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
+            items[0].Click += (s, e) => { ContentDialogCreateNewFileOrFolderAsync(path); };
+
+            items[1].Click += (s, e) => { OpenFile(path); };
+            items[2].Click += (s, e) => { OpenFolder(GoUpDirectory(path)); };
+
+            items[3].Click += (s, e) =>
+            {
+                DataPackage data = new();
+                data.SetText(path);
+                data.RequestedOperation = DataPackageOperation.Move;
+                Clipboard.SetContent(data);
+            };
+            items[4].Click += (s, e) =>
+            {
+                DataPackage data = new();
+                data.SetText(path);
+                data.RequestedOperation = DataPackageOperation.Copy;
+                Clipboard.SetContent(data);
+            };
+            items[5].Click += (s, e) => { PasteFile(); };
+
+            items[6].Click += (s, e) => { ContentDialogRename(path); };
+            items[7].Click += (s, e) => { ContentDialogDelete(path); };
+
+            MenuFlyout menuFlyout = new();
+            foreach (var item in items)
+            {
+                menuFlyout.Items.Add(item);
+
+                if (item.Text == "Create File System Entry")
+                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
+                if (item.Text == "Show in Explorer")
+                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
+                if (item.Text == "Paste")
+                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
+            }
+
+            button.ContextFlyout = menuFlyout;
+
             TextBlock fileType = new TextBlock() { Text = Path.GetExtension(path) };
             TextBlock label = new TextBlock()
             {
@@ -384,6 +515,68 @@ namespace Editor.Controls
 
                 Refresh();
             };
+
+            MenuFlyoutItem[] items = new[] {
+                new MenuFlyoutItem() { Text = "Create File System Entry", Icon = new SymbolIcon(Symbol.NewFolder) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Open", Icon = new SymbolIcon(Symbol.OpenFile) },
+                new MenuFlyoutItem() { Text = "Show in Explorer", Icon = new FontIcon(){ Glyph = "\xE838", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Cut", Icon = new SymbolIcon(Symbol.Cut) },
+                new MenuFlyoutItem() { Text = "Copy", Icon = new SymbolIcon(Symbol.Copy) },
+                new MenuFlyoutItem() { Text = "Paste", Icon = new SymbolIcon(Symbol.Paste) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
+                new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Copy Path", Icon = new SymbolIcon(Symbol.Delete) },
+            };
+            //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
+            items[0].Click += (s, e) => { ContentDialogCreateNewFileOrFolderAsync(path); };
+
+            items[1].Click += (s, e) =>
+            {
+                _currentSubPath = Path.GetRelativePath(
+                    Path.Combine(RootPath, _currentCategory.Value.Name),
+                    path);
+
+                Refresh();
+            };
+            items[2].Click += (s, e) => { OpenFolder(path); };
+
+            items[3].Click += (s, e) =>
+            {
+                DataPackage data = new();
+                data.SetText(path);
+                data.RequestedOperation = DataPackageOperation.Move;
+                Clipboard.SetContent(data);
+            };
+            items[4].Click += (s, e) =>
+            {
+                DataPackage data = new();
+                data.SetText(path);
+                data.RequestedOperation = DataPackageOperation.Copy;
+                Clipboard.SetContent(data);
+            };
+            items[5].Click += (s, e) => { PasteFolder(path); };
+
+            items[6].Click += (s, e) => { ContentDialogRename(path); };
+            items[7].Click += (s, e) => { ContentDialogDelete(path); };
+
+            MenuFlyout menuFlyout = new();
+            foreach (var item in items)
+            {
+                menuFlyout.Items.Add(item);
+
+                if (item.Text == "Create File System Entry")
+                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
+                if (item.Text == "Show in Explorer")
+                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
+                if (item.Text == "Paste")
+                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
+            }
+
+            button.ContextFlyout = menuFlyout;
 
             TextBlock label = new TextBlock()
             {
@@ -528,7 +721,7 @@ namespace Editor.Controls
             var result = await contentDialog.ShowAsync();
         }
 
-        private async void ContentDialogCreateNewFileOrFolderAsync()
+        private async void ContentDialogCreateNewFileOrFolderAsync(string path = "")
         {
             var dialog = new ContentDialog()
             {
@@ -543,13 +736,13 @@ namespace Editor.Controls
             var result = await dialog.ShowAsync();
 
             if (result == ContentDialogResult.Primary)
-                ContentDialogCreateNewFileAsync();
+                ContentDialogCreateNewFileAsync(path);
             else if (result == ContentDialogResult.Secondary)
-                ContentDialogCreateNewFolderAsync();
+                ContentDialogCreateNewFolderAsync(path);
 
         }
 
-        private async void ContentDialogCreateNewFileAsync()
+        private async void ContentDialogCreateNewFileAsync(string path = "")
         {
             TextBox fileName;
 
@@ -583,10 +776,14 @@ namespace Editor.Controls
                         return;
                     }
 
-                string path = Path.Combine(RootPath, _currentCategory.Value.Name);
+                var pathProvided = string.IsNullOrEmpty(path);
+                if (pathProvided)
+                {
+                    path = Path.Combine(RootPath, _currentCategory.Value.Name);
 
-                if (_currentSubPath != null)
-                    path = Path.Combine(RootPath, _currentCategory.Value.Name, _currentSubPath);
+                    if (_currentSubPath != null)
+                        path = Path.Combine(RootPath, _currentCategory.Value.Name, _currentSubPath);
+                }
 
                 if (string.IsNullOrEmpty(fileName.Text))
                     path = Path.Combine(path, "New " + RemoveLastChar(_currentCategory.Value.Name) + _currentCategory.Value.FileTypes[0]);
@@ -599,14 +796,15 @@ namespace Editor.Controls
 
                 WriteFileFromTemplatesAsync(path);
 
-                CreateFileSystemEntryTilesAsync();
+                if (pathProvided)
+                    CreateFileSystemEntryTilesAsync();
 
                 PropertiesController.Clear();
                 PropertiesController.Set(new Properties(path));
             }
         }
 
-        private async void ContentDialogCreateNewFolderAsync()
+        private async void ContentDialogCreateNewFolderAsync(string path = "")
         {
             TextBox fileName;
 
@@ -640,10 +838,14 @@ namespace Editor.Controls
                         return;
                     }
 
-                string path = Path.Combine(RootPath, _currentCategory.Value.Name);
+                var pathProvided = string.IsNullOrEmpty(path);
+                if (pathProvided)
+                {
+                    path = Path.Combine(RootPath, _currentCategory.Value.Name);
 
-                if (_currentSubPath != null)
-                    path = Path.Combine(RootPath, _currentCategory.Value.Name, _currentSubPath);
+                    if (_currentSubPath != null)
+                        path = Path.Combine(RootPath, _currentCategory.Value.Name, _currentSubPath);
+                }
 
                 if (string.IsNullOrEmpty(fileName.Text))
                     path = Path.Combine(path, "New folder");
@@ -655,6 +857,67 @@ namespace Editor.Controls
                 path = IncrementFolderIfExists(path);
 
                 Directory.CreateDirectory(path);
+
+                if (pathProvided)
+                    CreateFileSystemEntryTilesAsync();
+            }
+        }
+
+        private async void ContentDialogRename(string path)
+        {
+            TextBox fileName;
+
+            var dialog = new ContentDialog()
+            {
+                XamlRoot = _files.XamlRoot,
+                Title = "Rename",
+                PrimaryButtonText = "Rename",
+                CloseButtonText = "Cancel",
+                DefaultButton = ContentDialogButton.Primary,
+                Content = fileName = new TextBox() { PlaceholderText = Path.GetFileNameWithoutExtension(path) },
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                // \w is equivalent of [0 - 9a - zA - Z_]."
+                if (!string.IsNullOrEmpty(fileName.Text))
+                    if (!Regex.Match(fileName.Text, @"^[\w\-.]+$").Success)
+                    {
+                        CreateDialogAsync(new ContentDialog()
+                        {
+                            XamlRoot = _files.XamlRoot,
+                            Title = "A folder can't contain any of the following characters",
+                            CloseButtonText = "Close",
+                            DefaultButton = ContentDialogButton.Close,
+                            Content = new TextBlock() { Text = "\\ / : * ? \" < > |" },
+                        });
+
+                        return;
+                    }
+
+                File.Move(path, Path.Combine(GoUpDirectory(path), fileName.Text) + Path.GetExtension(path));
+
+                CreateFileSystemEntryTilesAsync();
+            }
+        }
+        private async void ContentDialogDelete(string path)
+        {
+            var dialog = new ContentDialog()
+            {
+                XamlRoot = _files.XamlRoot,
+                Title = "Delete " + Path.GetFileName(path),
+                PrimaryButtonText = "Delete",
+                CloseButtonText = "Cancel",
+                DefaultButton = ContentDialogButton.Close,
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                File.Delete(path);
 
                 CreateFileSystemEntryTilesAsync();
             }
