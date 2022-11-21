@@ -261,7 +261,6 @@ namespace Editor.Controls
         private Grid CategoryTile(Category category, Grid icon)
         {
             Grid grid = new Grid() { Padding = new Thickness(-1), CornerRadius = new CornerRadius(10) };
-
             grid.Background = new SolidColorBrush(new Color()
             {
                 A = 255,
@@ -278,7 +277,6 @@ namespace Editor.Controls
                 VerticalAlignment = VerticalAlignment.Center,
                 DataContext = category,
             };
-
             button.Click += (s, e) =>
             {
                 _currentCategory = (Category)((Button)e.OriginalSource).DataContext;
@@ -306,31 +304,27 @@ namespace Editor.Controls
             image.Opacity = 0.5f;
 
             Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, -30) };
-
             Grid grid2 = new Grid();
 
             Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
 
             StackPanel stack = new StackPanel() { Spacing = 5 };
-
             StackPanel stack2 = new StackPanel() { Spacing = 5, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center };
 
             Button button = new Button()
             {
-                Width = 145,
-                Height = 90,
+                Width = 143,
+                Height = 73,
                 Padding = new Thickness(0),
                 CornerRadius = new CornerRadius(10),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
             };
-
             button.Tapped += (s, e) =>
             {
                 PropertiesController.Clear();
                 PropertiesController.Set(new Properties(path));
             };
-
             button.DoubleTapped += (s, e) =>
             {
                 if (File.Exists(path))
@@ -338,10 +332,10 @@ namespace Editor.Controls
             };
 
             TextBlock fileType = new TextBlock() { Text = Path.GetExtension(path) };
-
             TextBlock label = new TextBlock()
             {
                 Text = Path.GetFileNameWithoutExtension(path),
+                FontSize = 12,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 MaxWidth = 140,
             };
@@ -362,9 +356,7 @@ namespace Editor.Controls
         private Grid FolderTile(string path, Grid icon)
         {
             Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, -30) };
-
             Grid grid2 = new Grid() { Padding = new Thickness(-1), CornerRadius = new CornerRadius(10) };
-
             grid2.Background = new SolidColorBrush(new Color()
             {
                 A = 255,
@@ -380,12 +372,10 @@ namespace Editor.Controls
             Button button = new Button()
             {
                 Width = 145,
-                Height = 90,
+                Height = 75,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
             };
-
-
             button.Click += (s, e) =>
             {
                 _currentSubPath = Path.GetRelativePath(
@@ -398,6 +388,7 @@ namespace Editor.Controls
             TextBlock label = new TextBlock()
             {
                 Text = Path.GetFileName(path),
+                FontSize = 12,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 MaxWidth = 140,
             };
@@ -419,12 +410,11 @@ namespace Editor.Controls
             Button button = new Button()
             {
                 Width = 67,
-                Height = 90,
+                Height = 73,
                 CornerRadius = new CornerRadius(10),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
             };
-
             button.Click += (s, e) =>
             {
                 GoUpDirectoryAndRefresh();
@@ -445,13 +435,12 @@ namespace Editor.Controls
 
             Button button = new Button()
             {
-                Width = 68,
-                Height = 90,
+                Width = 66,
+                Height = 73,
                 CornerRadius = new CornerRadius(10),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
             };
-
             button.Click += (s, e) =>
             {
                 if (_currentCategory.Value.Creatable)
