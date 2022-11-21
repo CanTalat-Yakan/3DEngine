@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Collections.Generic;
 using Windows.Foundation;
 using Windows.System;
+using Windows.UI.Core;
 
 namespace Engine.Utilities
 {
@@ -45,6 +46,23 @@ namespace Engine.Utilities
             if (Instance is null)
                 Instance = this;
         }
+
+
+        private void WinKeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            var ctrlState = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Control);
+            var isCtrlDown = 
+                ctrlState == CoreVirtualKeyStates.Down || 
+                ctrlState == (CoreVirtualKeyStates.Down | CoreVirtualKeyStates.Locked);
+
+            if (isCtrlDown && e.Key == VirtualKey.C)
+            {
+                //Key Down
+
+                e.Handled = true;
+            }
+        }
+
 
         public void Update()
         {
