@@ -84,7 +84,7 @@ namespace Editor.Controls
             _stackPanel.Children.Add(CreateExpanderWithToggleButton("Another", CreateSpacer()));
         }
 
-        private void CreateFilePreviewer(string path)
+        private async void CreateFilePreviewer(string path)
         {
             FileInfo fileInfo = new FileInfo(path);
 
@@ -96,7 +96,7 @@ namespace Editor.Controls
                 CreateSpacer(),
                 CreateTextEqual("Creation time", fileInfo.CreationTime.ToShortDateString() + " " + fileInfo.CreationTime.ToShortTimeString() ),
                 CreateTextEqual("Last access time", fileInfo.LastAccessTime.ToShortDateString() + " " + fileInfo.LastAccessTime.ToShortTimeString()),
-                CreateTextEqual("Last update time", fileInfo.LastWriteTime.ToShortDateString() + " " + fileInfo.LastWriteTime.ToShortTimeString()),
+                CreateTextEqual("Last update time", fileInfo.LastWriteTime.ToShortDateString() + " " + fileInfo.LastWriteTime.ToShortTimeString())
             };
 
             _stackPanel.Children.Add(CreateExpander(Path.GetFileName(path), properties));
@@ -106,6 +106,16 @@ namespace Editor.Controls
                 if (File.Exists(path))
                     Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
             }));
+
+            if (fileInfo.Extension == ".txt" || fileInfo.Extension == ".cs")
+            {
+                string[] lines = await File.ReadAllLinesAsync(path);
+                string joinedLines = string.Join("\n", lines);
+
+                Grid[] preview = new Grid[] { CreateTextFull(joinedLines) };
+
+                _stackPanel.Children.Add(CreateExpander("Preview", preview));
+            }
         }
 
         private void CreateEmptyMessage()
@@ -176,6 +186,16 @@ namespace Editor.Controls
             TextBlock textInput = new TextBlock() { Text = placeholder, MaxWidth = 200 };
 
             return WrapInFieldEqual(s, textInput);
+        }
+
+        private Grid CreateTextFull(string s = "String")
+        {
+            TextBlock textInput = new TextBlock() { Text = s, Opacity = 0.5f, TextWrapping = TextWrapping.Wrap };
+
+            Grid grid = new Grid();
+            grid.Children.Add(textInput);
+
+            return grid;
         }
 
         private Grid CreateNumberInput(string s = "Float", float i = 0)
