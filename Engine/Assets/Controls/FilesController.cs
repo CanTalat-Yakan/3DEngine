@@ -879,7 +879,7 @@ namespace Editor.Controls
                 PrimaryButtonText = "Rename",
                 CloseButtonText = "Cancel",
                 DefaultButton = ContentDialogButton.Primary,
-                Content = fileName = new TextBox() { PlaceholderText = Path.GetFileNameWithoutExtension(path) },
+                Content = fileName = new TextBox() { Text = Path.GetFileNameWithoutExtension(path) },
             };
 
             var result = await dialog.ShowAsync();
@@ -907,6 +907,7 @@ namespace Editor.Controls
                 else
                 {
                     await RenameInsideFile(path, fileName.Text);
+
                     File.Move(path, Path.Combine(GoUpDirectory(path), fileName.Text) + Path.GetExtension(path));
                 }
 
@@ -951,14 +952,15 @@ namespace Editor.Controls
                     // writing data in string
                     string text = await File.ReadAllTextAsync(templatePath);
 
-                    string name = Path.GetFileNameWithoutExtension(path);
+                    string fileName = Path.GetFileNameWithoutExtension(path);
 
                     if (text.Contains("{{FileName}}"))
-                        text = text.Replace("{{FileName}}", Regex.Replace(name, @"[\s+\(\)]", ""));
+                        text = text.Replace("{{FileName}}", Regex.Replace(fileName, @"[\s+\(\)]", ""));
 
                     byte[] info = new UTF8Encoding(true).GetBytes(text);
 
                     fs.Write(info, 0, info.Length);
+                    fs.Close();
                 }
         }
 
@@ -970,14 +972,15 @@ namespace Editor.Controls
                     // writing data in string
                     string text = await File.ReadAllTextAsync(path);
 
-                    string name = Path.GetFileNameWithoutExtension(path);
+                    string fileName = Path.GetFileNameWithoutExtension(path);
 
-                    if (text.Contains(name))
-                        text = text.Replace(name, Regex.Replace(newFileName, @"[\s+\(\)]", ""));
+                    if (text.Contains(fileName))
+                        text = text.Replace(fileName, Regex.Replace(newFileName, @"[\s+\(\)]", ""));
 
                     byte[] info = new UTF8Encoding(true).GetBytes(text);
 
                     fs.Write(info, 0, info.Length);
+                    fs.Close();
                 }
         }
 
