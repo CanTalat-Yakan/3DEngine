@@ -745,7 +745,7 @@ namespace Editor.Controls
                 Bar.ItemsSource = new string[] { };
             else
             {
-                var source = new string[] { _currentCategory.Value.Name };
+                var source = new string[] { "Assets", _currentCategory.Value.Name };
 
                 Bar.ItemsSource = source;
 
