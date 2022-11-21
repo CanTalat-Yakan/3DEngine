@@ -106,6 +106,25 @@ namespace Editor.Controls
             Refresh();
         }
 
+        public async void PasteFileSystemEntry(string path)
+        {
+            DataPackageView dataPackageView = Clipboard.GetContent();
+            if (dataPackageView.Contains(StandardDataFormats.Text))
+            {
+                var sourcePath = await dataPackageView.GetTextAsync();
+                var sourcePathCatagory = Path.GetRelativePath(RootPath, sourcePath).Split("\\").First();
+                var targetPathCatagory = Path.GetRelativePath(RootPath, path).Split("\\").First();
+
+                if (sourcePathCatagory == targetPathCatagory)
+                    if (string.IsNullOrEmpty(Path.GetExtension(sourcePath)))
+                        PasteFolder(sourcePath, GetDirectory(path), dataPackageView.RequestedOperation);
+                    else
+                        PasteFile(sourcePath, GetDirectory(path), dataPackageView.RequestedOperation);
+
+                Refresh();
+            }
+        }
+
         public void OpenFolder()
         {
             var path = RootPath;
@@ -128,38 +147,27 @@ namespace Editor.Controls
                 Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
         }
 
-        public async void PasteFolder(string path)
+        public void PasteFolder(string sourcePath, string targetPath, DataPackageOperation requestedOperation)
         {
-            var targetPathCatagory = Path.GetRelativePath(RootPath, path).Split("\\").First();
-
-            DataPackageView dataPackageView = Clipboard.GetContent();
-            if (dataPackageView.Contains(StandardDataFormats.Text))
-            {
-                var clipboardPath = await dataPackageView.GetTextAsync();
-
-                var sourcePathCatagory = Path.GetRelativePath(RootPath, clipboardPath).Split("\\").First();
-
-                if (targetPathCatagory == sourcePathCatagory)
-                    if (Directory.Exists(clipboardPath))
-                        if (dataPackageView.RequestedOperation == DataPackageOperation.Copy)
-                            CopyDirectory(clipboardPath, path);
-                        else if (dataPackageView.RequestedOperation == DataPackageOperation.Move)
-                            CopyDirectory(clipboardPath, path, true);
-            }
+            if (Directory.Exists(sourcePath))
+                if (requestedOperation == DataPackageOperation.Copy)
+                    CopyDirectory(sourcePath, targetPath);
+                else if (requestedOperation == DataPackageOperation.Move)
+                    CopyDirectory(sourcePath, targetPath, true);
         }
 
         public void CopyDirectory(string sourcePath, string targetPath, bool deleteSourcePath = false)
         {
             // Create the target directory
-            Directory.CreateDirectory(targetPath = Path.Combine(targetPath, Path.GetFileName(sourcePath)));
+            Directory.CreateDirectory(IncrementFolderIfExists(targetPath = Path.Combine(targetPath, Path.GetFileName(sourcePath))));
 
             // Now Create all of the directories
             foreach (string dirPath in Directory.GetDirectories(sourcePath, "*", SearchOption.AllDirectories))
-                Directory.CreateDirectory(Path.Combine(targetPath, Path.GetRelativePath(sourcePath, dirPath)));
+                Directory.CreateDirectory(IncrementFolderIfExists(Path.Combine(targetPath, Path.GetRelativePath(sourcePath, dirPath))));
 
             // Copy all the files & Replaces any files with the same name
             foreach (string filePath in Directory.GetFiles(sourcePath, "*.*", SearchOption.AllDirectories))
-                File.Copy(filePath, Path.Combine(targetPath, Path.GetRelativePath(sourcePath, filePath)), true);
+                File.Copy(filePath, IncrementFileIfExists(Path.Combine(targetPath, Path.GetRelativePath(sourcePath, filePath))), true);
 
             // Delete source directory after it is finished copying
             if (deleteSourcePath)
@@ -191,16 +199,13 @@ namespace Editor.Controls
                 Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
         }
 
-        public async void PasteFile()
+        public void PasteFile(string sourcePath, string targetPath, DataPackageOperation requestedOperation)
         {
-            DataPackageView dataPackageView = Clipboard.GetContent();
-            if (dataPackageView.Contains(StandardDataFormats.Text))
-            {
-                var clipboard = await dataPackageView.GetTextAsync();
-
-                if (Directory.Exists(clipboard))
-                    OutputController.Log(clipboard);
-            }
+            if (File.Exists(sourcePath))
+                if (requestedOperation == DataPackageOperation.Copy)
+                    File.Copy(sourcePath, IncrementFileIfExists(Path.Combine(targetPath, Path.GetFileName(sourcePath))), true);
+                else if (requestedOperation == DataPackageOperation.Move && targetPath != GoUpDirectory(sourcePath))
+                    File.Move(sourcePath, IncrementFileIfExists(Path.Combine(targetPath, Path.GetFileName(sourcePath))), true);
         }
 
         public void Refresh()
@@ -426,7 +431,7 @@ namespace Editor.Controls
                 new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
                 new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
                 //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Copy Path", Icon = new SymbolIcon(Symbol.Delete) },
+                new MenuFlyoutItem() { Text = "Copy Path", Icon = new SymbolIcon(Symbol.Copy) },
             };
             //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
             items[0].Click += (s, e) => { ContentDialogCreateNewFileOrFolderAsync(path); };
@@ -448,7 +453,7 @@ namespace Editor.Controls
                 data.RequestedOperation = DataPackageOperation.Copy;
                 Clipboard.SetContent(data);
             };
-            items[5].Click += (s, e) => { PasteFile(); };
+            items[5].Click += (s, e) => { PasteFileSystemEntry(path); };
 
             items[6].Click += (s, e) => { ContentDialogRename(path); };
             items[7].Click += (s, e) => { ContentDialogDelete(path); };
@@ -564,7 +569,7 @@ namespace Editor.Controls
                 data.RequestedOperation = DataPackageOperation.Copy;
                 Clipboard.SetContent(data);
             };
-            items[5].Click += (s, e) => { PasteFolder(path); };
+            items[5].Click += (s, e) => { PasteFileSystemEntry(path); };
 
             items[6].Click += (s, e) => { ContentDialogRename(path); };
             items[7].Click += (s, e) => { ContentDialogDelete(path); };
@@ -707,6 +712,15 @@ namespace Editor.Controls
 
                 path = string.Join('\\', pathArr);
             }
+
+            return path;
+        }
+
+        private string GetDirectory(string path)
+        {
+            if (!string.IsNullOrEmpty(Path.GetExtension(path)))
+                path = GoUpDirectory(path);
+
             return path;
         }
 

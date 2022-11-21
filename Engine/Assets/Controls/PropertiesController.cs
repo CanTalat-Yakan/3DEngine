@@ -22,6 +22,8 @@ using Path = System.IO.Path;
 using Editor.UserControls;
 using Microsoft.UI.Xaml.Input;
 using System.Diagnostics;
+using System.Linq.Expressions;
+using System.Text;
 
 namespace Editor.Controls
 {
@@ -107,14 +109,16 @@ namespace Editor.Controls
                     Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
             }));
 
-            if (fileInfo.Extension == ".txt" || fileInfo.Extension == ".cs")
-            {
-                string text = await File.ReadAllTextAsync(path);
+            if (File.Exists(path))
+                if (fileInfo.Extension == ".txt" || fileInfo.Extension == ".cs")
+                {
+                    string[] lines = await File.ReadAllLinesAsync(path);
+                    string joinedLines = string.Join("\n", lines);
 
-                Grid[] preview = new Grid[] { CreateTextFull(text) };
+                    Grid[] preview = new Grid[] { CreateTextFull(joinedLines) };
 
-                _stackPanel.Children.Add(CreateExpander("Preview", preview));
-            }
+                    _stackPanel.Children.Add(CreateExpander("Preview", preview));
+                }
         }
 
         private void CreateEmptyMessage()
