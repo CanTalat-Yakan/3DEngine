@@ -159,7 +159,7 @@ namespace Editor.Controls
         public void CopyDirectory(string sourcePath, string targetPath, bool deleteSourcePath = false)
         {
             // Create the target directory
-            Directory.CreateDirectory(IncrementFolderIfExists(targetPath = Path.Combine(targetPath, Path.GetFileName(sourcePath))));
+            Directory.CreateDirectory(targetPath = IncrementFolderIfExists(Path.Combine(targetPath, Path.GetFileName(sourcePath))));
 
             // Now Create all of the directories
             foreach (string dirPath in Directory.GetDirectories(sourcePath, "*", SearchOption.AllDirectories))
@@ -439,24 +439,14 @@ namespace Editor.Controls
             items[1].Click += (s, e) => { OpenFile(path); };
             items[2].Click += (s, e) => { OpenFolder(GoUpDirectory(path)); };
 
-            items[3].Click += (s, e) =>
-            {
-                DataPackage data = new();
-                data.SetText(path);
-                data.RequestedOperation = DataPackageOperation.Move;
-                Clipboard.SetContent(data);
-            };
-            items[4].Click += (s, e) =>
-            {
-                DataPackage data = new();
-                data.SetText(path);
-                data.RequestedOperation = DataPackageOperation.Copy;
-                Clipboard.SetContent(data);
-            };
+            items[3].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Move); };
+            items[4].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Copy); };
             items[5].Click += (s, e) => { PasteFileSystemEntry(path); };
 
             items[6].Click += (s, e) => { ContentDialogRename(path); };
             items[7].Click += (s, e) => { ContentDialogDelete(path); };
+
+            items[8].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.None); };
 
             MenuFlyout menuFlyout = new();
             foreach (var item in items)
@@ -518,14 +508,7 @@ namespace Editor.Controls
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
             };
-            button.Click += (s, e) =>
-            {
-                _currentSubPath = Path.GetRelativePath(
-                    Path.Combine(RootPath, _currentCategory.Value.Name),
-                    path);
-
-                Refresh();
-            };
+            button.Click += (s, e) => { GoIntoDirectoryAndRefresh(path); };
 
             MenuFlyoutItem[] items = new[] {
                 new MenuFlyoutItem() { Text = "Create File System Entry", Icon = new SymbolIcon(Symbol.NewFolder) },
@@ -545,34 +528,17 @@ namespace Editor.Controls
             //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
             items[0].Click += (s, e) => { ContentDialogCreateNewFileOrFolderAsync(path); };
 
-            items[1].Click += (s, e) =>
-            {
-                _currentSubPath = Path.GetRelativePath(
-                    Path.Combine(RootPath, _currentCategory.Value.Name),
-                    path);
-
-                Refresh();
-            };
+            items[1].Click += (s, e) => { GoIntoDirectoryAndRefresh(path); };
             items[2].Click += (s, e) => { OpenFolder(path); };
 
-            items[3].Click += (s, e) =>
-            {
-                DataPackage data = new();
-                data.SetText(path);
-                data.RequestedOperation = DataPackageOperation.Move;
-                Clipboard.SetContent(data);
-            };
-            items[4].Click += (s, e) =>
-            {
-                DataPackage data = new();
-                data.SetText(path);
-                data.RequestedOperation = DataPackageOperation.Copy;
-                Clipboard.SetContent(data);
-            };
+            items[3].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Move); };
+            items[4].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Copy); };
             items[5].Click += (s, e) => { PasteFileSystemEntry(path); };
 
             items[6].Click += (s, e) => { ContentDialogRename(path); };
             items[7].Click += (s, e) => { ContentDialogDelete(path); };
+
+            items[8].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.None); };
 
             MenuFlyout menuFlyout = new();
             foreach (var item in items)
@@ -1083,6 +1049,24 @@ namespace Editor.Controls
 
                 CreateCatergoryTiles(Categories);
             }
+        }
+
+        private void GoIntoDirectoryAndRefresh(string path)
+        {
+            _currentSubPath = Path.GetRelativePath(
+                Path.Combine(RootPath, _currentCategory.Value.Name),
+                path);
+
+            Refresh();
+        }
+
+        private void CopyToClipboard(string path, DataPackageOperation requestedOpertion)
+        {
+            DataPackage data = new();
+            data.SetText(path);
+            data.RequestedOperation = requestedOpertion;
+
+            Clipboard.SetContent(data);
         }
     }
 }
