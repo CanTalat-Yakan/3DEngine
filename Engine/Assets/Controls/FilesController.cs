@@ -799,7 +799,7 @@ namespace Editor.Controls
 
                 path = IncrementFileIfExists(path);
 
-                WriteFileFromTemplatesAsync(path);
+                await WriteFileFromTemplatesAsync(path);
 
                 if (pathProvided)
                     CreateFileSystemEntryTilesAsync();
@@ -906,13 +906,17 @@ namespace Editor.Controls
                     Directory.Move(path, Path.Combine(GoUpDirectory(path), fileName.Text));
                 else
                 {
-                    RenameInsideFile(path, fileName.Text);
+                    await RenameInsideFile(path, fileName.Text);
                     File.Move(path, Path.Combine(GoUpDirectory(path), fileName.Text) + Path.GetExtension(path));
                 }
 
                 CreateFileSystemEntryTilesAsync();
+
+                PropertiesController.Clear();
+                PropertiesController.Set(new Properties(path));
             }
         }
+
         private async void ContentDialogDelete(string path)
         {
             var dialog = new ContentDialog()
@@ -937,7 +941,7 @@ namespace Editor.Controls
             }
         }
 
-        private async void WriteFileFromTemplatesAsync(string path)
+        private async Task WriteFileFromTemplatesAsync(string path)
         {
             string templatePath = Path.Combine(AppContext.BaseDirectory, TEMPLATES, _currentCategory.Value.Name + ".txt");
 
@@ -945,37 +949,36 @@ namespace Editor.Controls
                 if (File.Exists(templatePath))
                 {
                     // writing data in string
-                    string[] lines = await File.ReadAllLinesAsync(templatePath);
-                    string joinedLines = string.Join("\n", lines);
+                    string text = await File.ReadAllTextAsync(templatePath);
 
                     string name = Path.GetFileNameWithoutExtension(path);
 
-                    if (joinedLines.Contains("{{FileName}}"))
-                        joinedLines = joinedLines.Replace("{{FileName}}", Regex.Replace(name, @"[\s+\(\)]", ""));
+                    if (text.Contains("{{FileName}}"))
+                        text = text.Replace("{{FileName}}", Regex.Replace(name, @"[\s+\(\)]", ""));
 
-                    byte[] info = new UTF8Encoding(true).GetBytes(joinedLines);
+                    byte[] info = new UTF8Encoding(true).GetBytes(text);
 
                     fs.Write(info, 0, info.Length);
                 }
         }
 
-        private async void RenameInsideFile(string path, string newFileName)
+        private async Task RenameInsideFile(string path, string newFileName)
         {
             if (File.Exists(path))
-            //using (FileStream fs = File.Open(path, FileMode.Open))
-            {
-                //// writing data in string
-                //string text = await File.ReadAllTextAsync(path);
+                using (FileStream fs = File.Open(path, FileMode.Open))
+                {
+                    // writing data in string
+                    string text = await File.ReadAllTextAsync(path);
 
-                //string name = Path.GetFileNameWithoutExtension(path);
+                    string name = Path.GetFileNameWithoutExtension(path);
 
-                //if (text.Contains(name))
-                //    text = text.Replace(name, Regex.Replace(newFileName, @"[\s+\(\)]", ""));
+                    if (text.Contains(name))
+                        text = text.Replace(name, Regex.Replace(newFileName, @"[\s+\(\)]", ""));
 
-                //byte[] info = new UTF8Encoding(true).GetBytes(text);
+                    byte[] info = new UTF8Encoding(true).GetBytes(text);
 
-                //fs.Write(info, 0, info.Length);
-            }
+                    fs.Write(info, 0, info.Length);
+                }
         }
 
         private string RemoveLastChar(string s) { return s.Remove(s.Length - 1); }
