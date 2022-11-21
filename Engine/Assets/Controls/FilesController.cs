@@ -130,16 +130,21 @@ namespace Editor.Controls
 
         public async void PasteFolder(string path)
         {
+            var targetPathCatagory = Path.GetRelativePath(RootPath, path).Split("\\").First();
+
             DataPackageView dataPackageView = Clipboard.GetContent();
             if (dataPackageView.Contains(StandardDataFormats.Text))
             {
-                var clipboard = await dataPackageView.GetTextAsync();
+                var clipboardPath = await dataPackageView.GetTextAsync();
 
-                if (Directory.Exists(clipboard))
-                    if (dataPackageView.RequestedOperation == DataPackageOperation.Copy)
-                        CopyDirectory(clipboard, path);
-                    else if (dataPackageView.RequestedOperation == DataPackageOperation.Move)
-                        CopyDirectory(clipboard, path, true);
+                var sourcePathCatagory = Path.GetRelativePath(RootPath, clipboardPath).Split("\\").First();
+
+                if (targetPathCatagory == sourcePathCatagory)
+                    if (Directory.Exists(clipboardPath))
+                        if (dataPackageView.RequestedOperation == DataPackageOperation.Copy)
+                            CopyDirectory(clipboardPath, path);
+                        else if (dataPackageView.RequestedOperation == DataPackageOperation.Move)
+                            CopyDirectory(clipboardPath, path, true);
             }
         }
 
@@ -159,7 +164,8 @@ namespace Editor.Controls
             // Delete source directory after it is finished copying
             if (deleteSourcePath)
             {
-                DeleteDirectory(sourcePath);
+                if (!targetPath.Contains(sourcePath))
+                    DeleteDirectory(sourcePath);
 
                 Refresh();
             }
@@ -529,7 +535,7 @@ namespace Editor.Controls
                 new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
                 new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
                 //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Copy Path", Icon = new SymbolIcon(Symbol.Delete) },
+                new MenuFlyoutItem() { Text = "Copy Path", Icon = new SymbolIcon(Symbol.Copy) },
             };
             //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
             items[0].Click += (s, e) => { ContentDialogCreateNewFileOrFolderAsync(path); };
@@ -739,7 +745,6 @@ namespace Editor.Controls
                 ContentDialogCreateNewFileAsync(path);
             else if (result == ContentDialogResult.Secondary)
                 ContentDialogCreateNewFolderAsync(path);
-
         }
 
         private async void ContentDialogCreateNewFileAsync(string path = "")
@@ -897,7 +902,13 @@ namespace Editor.Controls
                         return;
                     }
 
-                File.Move(path, Path.Combine(GoUpDirectory(path), fileName.Text) + Path.GetExtension(path));
+                if (string.IsNullOrEmpty(Path.GetExtension(path)))
+                    Directory.Move(path, Path.Combine(GoUpDirectory(path), fileName.Text));
+                else
+                {
+                    RenameInsideFile(path, fileName.Text);
+                    File.Move(path, Path.Combine(GoUpDirectory(path), fileName.Text) + Path.GetExtension(path));
+                }
 
                 CreateFileSystemEntryTilesAsync();
             }
@@ -917,7 +928,10 @@ namespace Editor.Controls
 
             if (result == ContentDialogResult.Primary)
             {
-                File.Delete(path);
+                if (string.IsNullOrEmpty(Path.GetExtension(path)))
+                    DeleteDirectory(path);
+                else
+                    File.Delete(path);
 
                 CreateFileSystemEntryTilesAsync();
             }
@@ -943,6 +957,25 @@ namespace Editor.Controls
 
                     fs.Write(info, 0, info.Length);
                 }
+        }
+
+        private async void RenameInsideFile(string path, string newFileName)
+        {
+            if (File.Exists(path))
+            //using (FileStream fs = File.Open(path, FileMode.Open))
+            {
+                //// writing data in string
+                //string text = await File.ReadAllTextAsync(path);
+
+                //string name = Path.GetFileNameWithoutExtension(path);
+
+                //if (text.Contains(name))
+                //    text = text.Replace(name, Regex.Replace(newFileName, @"[\s+\(\)]", ""));
+
+                //byte[] info = new UTF8Encoding(true).GetBytes(text);
+
+                //fs.Write(info, 0, info.Length);
+            }
         }
 
         private string RemoveLastChar(string s) { return s.Remove(s.Length - 1); }
