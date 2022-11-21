@@ -109,10 +109,9 @@ namespace Editor.Controls
 
             if (fileInfo.Extension == ".txt" || fileInfo.Extension == ".cs")
             {
-                string[] lines = await File.ReadAllLinesAsync(path);
-                string joinedLines = string.Join("\n", lines);
+                string text = await File.ReadAllTextAsync(path);
 
-                Grid[] preview = new Grid[] { CreateTextFull(joinedLines) };
+                Grid[] preview = new Grid[] { CreateTextFull(text) };
 
                 _stackPanel.Children.Add(CreateExpander("Preview", preview));
             }
