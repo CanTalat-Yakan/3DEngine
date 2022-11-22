@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Editor.UserControls;
+using Microsoft.UI.Xaml;
 
 namespace Editor.Controls
 {
@@ -11,9 +12,10 @@ namespace Editor.Controls
         public PlayerController ControlPlayer;
         public Grid Content;
         public TextBlock Status;
+        public Viewbox StatusIcon;
         public MainWindow MainWindow;
         
-        public MainController(MainWindow mainWindow, Grid content, TextBlock status)
+        public MainController(MainWindow mainWindow, Grid content, TextBlock status, Viewbox icon)
         {
             if (Instance is null)
                 Instance = this;
@@ -21,6 +23,7 @@ namespace Editor.Controls
             MainWindow = mainWindow;
             Content = content;
             Status = status;
+            StatusIcon = icon;
 
             LayoutControl = new LayoutController(
                 Content,

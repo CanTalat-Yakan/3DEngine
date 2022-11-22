@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -36,6 +37,7 @@ namespace Editor.Controls
         private static Dictionary<SMessageInfo, List<DateTime>> s_messageCollection = new Dictionary<SMessageInfo, List<DateTime>>();
 
         private static TextBlock s_status;
+        private static Viewbox s_statusIcon;
         private static StackPanel s_stack;
         private static ScrollViewer s_scroll;
         private static AppBarToggleButton s_collapse;
@@ -58,6 +60,7 @@ namespace Editor.Controls
             _clearPlay = clearPlay;
 
             s_status = MainController.Instance.Status;
+            s_statusIcon = MainController.Instance.StatusIcon;
         }
 
         public static void Log(string m, EMessageType t = EMessageType.MESSAGE, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null)
@@ -186,6 +189,11 @@ namespace Editor.Controls
         private static void SetStatus(SMessageInfo m)
         {
             s_status.Text = m.Message;
+
+            if (m.Type == EMessageType.WARNING)
+                s_statusIcon.Child = new FontIcon() { Glyph = "\uE7BA" };
+            else
+                s_statusIcon.Child = new SymbolIcon() { Symbol = m.Type == EMessageType.MESSAGE ? Symbol.Message : Symbol.ReportHacked };
         }
 
         private async void OpenMessage(string path)

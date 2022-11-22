@@ -70,13 +70,14 @@ namespace Editor.UserControls
             OutputController.Log(i.ToString());
             if (i < 5)
                 OutputController.Log("Error Example!", EMessageType.ERROR);
-            if (i < 10 && i > 5)
+            else if (i < 10 && i > 5)
                 OutputController.Log("A Warning.", EMessageType.WARNING);
-            if (i < 15)
+            else if (i < 15)
                 OutputController.Log("This is a Message");
-            if (i > 15)
+            else if (i > 15)
                 Test();
         }
+
         private void Test()
         {
             OutputController.Log("Test");

@@ -19,7 +19,7 @@ namespace Editor
             ExtendsContentIntoTitleBar = true; // enable custom titlebar
             
             _themeControl = new ThemeController(this, x_Page_Main);
-            _mainControl = new MainController(this, x_Grid_Main, x_TextBlock_Status_Content);
+            _mainControl = new MainController(this, x_Grid_Main, x_TextBlock_Status_Content, x_TextBlock_StatusIcon_Content);
             _mainControl.ControlPlayer = new PlayerController(x_AppBarToggleButton_Status_Play, x_AppBarToggleButton_Status_Pause, x_AppBarButton_Status_Forward);
         }
 
