@@ -889,15 +889,15 @@ namespace Editor.Controls
                     Directory.Move(path, Path.Combine(GoUpDirectory(path), fileName.Text));
                 else
                 {
-                    await RenameInsideFile(path, fileName.Text);
+                    //await RenameInsideFile(path, fileName.Text);
 
                     File.Move(path, Path.Combine(GoUpDirectory(path), fileName.Text) + Path.GetExtension(path));
                 }
 
                 CreateFileSystemEntryTilesAsync();
 
-                PropertiesController.Clear();
-                PropertiesController.Set(new Properties(path));
+                //PropertiesController.Clear();
+                //PropertiesController.Set(new Properties(path));
             }
         }
 
