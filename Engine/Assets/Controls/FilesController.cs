@@ -522,6 +522,8 @@ namespace Editor.Controls
                 CornerRadius = new CornerRadius(10),
                 HorizontalContentAlignment = HorizontalAlignment.Stretch,
                 VerticalContentAlignment = VerticalAlignment.Stretch,
+                //CanDrag = true,
+                //AllowDrop = true,
             };
             button.Tapped += (s, e) =>
             {
@@ -533,6 +535,26 @@ namespace Editor.Controls
                 if (File.Exists(path))
                     Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
             };
+            //button.DragStarting += (s, e) =>
+            //{
+            //    e.AllowedOperations = DataPackageOperation.Copy;
+            //    //e.DragUI.SetContentFromBitmapImage = ;
+            //    e.Data.SetText(path);
+            //};
+            //button.Drop += (s, e) =>
+            //{
+            //    e.AcceptedOperation = DataPackageOperation.Copy;
+
+            //    if (e.DragUIOverride != null)
+            //    {
+            //        e.DragUIOverride.Caption = "Add file";
+            //        e.DragUIOverride.IsContentVisible = true;
+            //    }
+            //};
+            //button.DragLeave += (s, e) => 
+            //{
+            //    path = e.DataView.ToString();
+            //};
 
             #region // MenuFlyout
             MenuFlyoutItem[] items = new[] {
