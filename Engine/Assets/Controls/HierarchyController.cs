@@ -37,7 +37,7 @@ namespace Editor.Controls
         public void PopulateTree()
         {
             var engineObjectList = Engine.Core.Instance.Scene.EntitytManager.EntityList;
-            engineObjectList.EventOnAdd += (s, e) => { List_OnAdd(); };
+            engineObjectList.OnAddEvent += (s, e) => { List_OnAdd(); };
 
             foreach (var entity in engineObjectList)
             {
@@ -94,7 +94,7 @@ namespace Editor.Controls
         {
             var entityList = Engine.Core.Instance.Scene.EntitytManager.EntityList;
 
-            var entity = entityList[entityList.Count - 1];
+            var entity = entityList[^1];
             var newEntry = new TreeEntry() { Name = entity.Name, ID = entity.ID };
             if (entity.Parent != null)
                 newEntry.IDparent = entity.Parent.ID;
