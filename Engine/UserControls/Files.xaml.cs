@@ -1,6 +1,13 @@
 ﻿using Editor.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System.Collections.ObjectModel;
+using System;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -12,6 +19,7 @@ namespace Editor.UserControls
         public Grid ChangeColorWithTheme;
 
         internal FilesController _filesControl;
+        public List<StorageFile> DragDropFiles = new List<StorageFile>();
 
         public Files()
         {
@@ -43,6 +51,28 @@ namespace Editor.UserControls
 
         private void AppBarButton_Click_RefreshFiles(object sender, RoutedEventArgs e) { _filesControl.Refresh(); }
 
-        private void x_BreadcrumBar_Files_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args) { _filesControl.GoUpDirectoryAndRefresh(); }
+        private void BreadcrumBar_Files_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args) { _filesControl.GoUpDirectoryAndRefresh(); }
+
+        private void Grid_Main_DragOver(object sender, DragEventArgs e)
+        {
+            e.AcceptedOperation = DataPackageOperation.Copy;
+
+            if (e.DragUIOverride != null)
+            {
+                e.DragUIOverride.Caption = "Add file";
+                e.DragUIOverride.IsContentVisible = true;
+            }
+        }
+
+        private async void Grid_Main_DropAsync(object sender, DragEventArgs e)
+        {
+            if (e.DataView.Contains(StandardDataFormats.StorageItems))
+            {
+                var items = await e.DataView.GetStorageItemsAsync();
+                if (items.Count > 0)
+                    foreach (var file in items.OfType<StorageFile>())
+                        _filesControl.AddFileSystemEntry(file);
+            }
+        }
     }
 }

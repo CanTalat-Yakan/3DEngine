@@ -96,17 +96,41 @@ namespace Editor.Controls
                         foreach (var type in category.FileTypes)
                             if (type == file.FileType)
                             {
-                                string destCategoryPath = Path.Combine(RootPath, category.Name);
-                                string destFilePath = Path.Combine(destCategoryPath, file.Name);
+                                string targetPath = Path.Combine(RootPath, category.Name);
+                                targetPath = Path.Combine(targetPath, file.Name);
 
-                                File.Copy(file.Path, destFilePath, true);
+                                File.Copy(file.Path, targetPath, true);
                             }
             }
 
             Refresh();
         }
 
-        public async void PasteFileSystemEntry(string path)
+        public void AddFileSystemEntry(StorageFile file)
+        {
+            if (file is null)
+                return;
+
+            if (string.IsNullOrEmpty(file.FileType))
+                return;
+
+            foreach (var category in Categories)
+                foreach (var type in category.FileTypes)
+                    if (type == file.FileType)
+                    {
+                        string targetPath = Path.Combine(RootPath, category.Name);
+                        if (_currentCategory != null)
+                            if (_currentCategory.Value.Name == category.Name)
+                                if (!string.IsNullOrEmpty(_currentSubPath))
+                                    targetPath = Path.Combine(targetPath, _currentSubPath);
+
+                        PasteFile(file.Path, targetPath, DataPackageOperation.Copy);
+                    }
+
+            Refresh();
+        }
+
+        public async void PasteFileSystemEntryFromClipboard(string path)
         {
             DataPackageView dataPackageView = Clipboard.GetContent();
             if (dataPackageView.Contains(StandardDataFormats.Text))
@@ -435,7 +459,7 @@ namespace Editor.Controls
 
             items[3].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Move); };
             items[4].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Copy); };
-            items[5].Click += (s, e) => { PasteFileSystemEntry(path); };
+            items[5].Click += (s, e) => { PasteFileSystemEntryFromClipboard(path); };
 
             items[6].Click += (s, e) => { ContentDialogRename(path); };
             items[7].Click += (s, e) => { ContentDialogDelete(path); };
@@ -535,7 +559,7 @@ namespace Editor.Controls
 
             items[3].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Move); };
             items[4].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Copy); };
-            items[5].Click += (s, e) => { PasteFileSystemEntry(path); };
+            items[5].Click += (s, e) => { PasteFileSystemEntryFromClipboard(path); };
 
             items[6].Click += (s, e) => { ContentDialogRename(path); };
             items[7].Click += (s, e) => { ContentDialogDelete(path); };
@@ -627,7 +651,7 @@ namespace Editor.Controls
 
             items[2].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Move); };
             items[3].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Copy); };
-            items[4].Click += (s, e) => { PasteFileSystemEntry(path); };
+            items[4].Click += (s, e) => { PasteFileSystemEntryFromClipboard(path); };
 
             items[5].Click += (s, e) => { ContentDialogRename(path); };
             items[6].Click += (s, e) => { ContentDialogDelete(path); };
