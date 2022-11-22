@@ -179,7 +179,7 @@ namespace Editor.Controls
 
         private Grid CreateText(string s = "String", string placeholder = "Example")
         {
-            TextBlock textInput = new TextBlock() { Text = placeholder, MaxWidth = 200 };
+            TextBlock textInput = new TextBlock() { Text = placeholder, MaxWidth = 200, TextWrapping = TextWrapping.Wrap };
 
             return WrapInField(s, textInput);
         }
