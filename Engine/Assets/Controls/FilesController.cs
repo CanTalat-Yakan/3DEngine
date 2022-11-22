@@ -426,8 +426,9 @@ namespace Editor.Controls
                 //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Copy Path", Icon = new SymbolIcon(Symbol.Copy) },
             };
+
             //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
-            items[0].Click += (s, e) => { ContentDialogCreateNewFileOrFolderAsync(path); };
+            items[0].Click += (s, e) => { ContentDialogCreateNewFileOrFolderAndRefreshAsync(path); };
 
             items[1].Click += (s, e) => { GoIntoDirectoryAndRefresh(path); };
             items[2].Click += (s, e) => { OpenFolder(path); };
@@ -446,11 +447,9 @@ namespace Editor.Controls
             {
                 menuFlyout.Items.Add(item);
 
-                if (item.Text == "Create File System Entry")
-                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
-                if (item.Text == "Show in Explorer")
-                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
-                if (item.Text == "Paste")
+                if (item.Text == "Create File System Entry"
+                    || item.Text == "Show in Explorer"
+                    || item.Text == "Paste")
                     menuFlyout.Items.Add(new MenuFlyoutSeparator());
             }
 
@@ -527,8 +526,9 @@ namespace Editor.Controls
                 //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Copy Path", Icon = new SymbolIcon(Symbol.Copy) },
             };
+
             //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
-            items[0].Click += (s, e) => { ContentDialogCreateNewFileOrFolderAsync(path); };
+            items[0].Click += (s, e) => { ContentDialogCreateNewFileOrFolderAndRefreshAsync(path); };
 
             items[1].Click += (s, e) => { OpenFile(path); };
             items[2].Click += (s, e) => { OpenFolder(GoUpDirectory(path)); };
@@ -547,11 +547,9 @@ namespace Editor.Controls
             {
                 menuFlyout.Items.Add(item);
 
-                if (item.Text == "Create File System Entry")
-                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
-                if (item.Text == "Show in Explorer")
-                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
-                if (item.Text == "Paste")
+                if (item.Text == "Create File System Entry"
+                    || item.Text == "Show in Explorer"
+                    || item.Text == "Paste")
                     menuFlyout.Items.Add(new MenuFlyoutSeparator());
             }
 
@@ -623,7 +621,7 @@ namespace Editor.Controls
                 path = Path.Combine(path, _currentSubPath);
 
             //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
-            items[0].Click += (s, e) => { ContentDialogCreateNewFileOrFolderAsync(path); };
+            items[0].Click += (s, e) => { ContentDialogCreateNewFileOrFolderAndRefreshAsync(path); };
 
             items[1].Click += (s, e) => { OpenFolder(GoUpDirectory(path)); };
 
@@ -672,11 +670,9 @@ namespace Editor.Controls
             button.Click += (s, e) =>
             {
                 if (_currentCategory.Value.Creatable)
-                    ContentDialogCreateNewFileOrFolderAsync();
+                    ContentDialogCreateNewFileOrFolderAndRefreshAsync();
                 else
-                    ContentDialogCreateNewFolderAsync();
-
-                Refresh();
+                    ContentDialogCreateNewFolderAndRefreshAsync();
             };
 
             Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
@@ -765,7 +761,7 @@ namespace Editor.Controls
             var result = await contentDialog.ShowAsync();
         }
 
-        private async void ContentDialogCreateNewFileOrFolderAsync(string path = "")
+        private async void ContentDialogCreateNewFileOrFolderAndRefreshAsync(string path = "")
         {
             var dialog = new ContentDialog()
             {
@@ -782,7 +778,7 @@ namespace Editor.Controls
             if (result == ContentDialogResult.Primary)
                 ContentDialogCreateNewFileAsync(path);
             else if (result == ContentDialogResult.Secondary)
-                ContentDialogCreateNewFolderAsync(path);
+                ContentDialogCreateNewFolderAndRefreshAsync(path);
         }
 
         private async void ContentDialogCreateNewFileAsync(string path = "")
@@ -842,12 +838,14 @@ namespace Editor.Controls
                 if (pathProvided)
                     CreateFileSystemEntryTilesAsync();
 
+                Refresh();
+
                 PropertiesController.Clear();
                 PropertiesController.Set(new Properties(path));
             }
         }
 
-        private async void ContentDialogCreateNewFolderAsync(string path = "")
+        private async void ContentDialogCreateNewFolderAndRefreshAsync(string path = "")
         {
             TextBox fileName;
 
@@ -903,6 +901,8 @@ namespace Editor.Controls
 
                 if (pathProvided)
                     CreateFileSystemEntryTilesAsync();
+
+                Refresh();
             }
         }
 
