@@ -360,8 +360,9 @@ namespace Editor.Controls
             {
                 Width = 145,
                 Height = 90,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
+                Padding = new Thickness(10),
+                HorizontalContentAlignment = HorizontalAlignment.Stretch,
+                VerticalContentAlignment = VerticalAlignment.Stretch,
                 DataContext = category,
             };
             button.Click += (s, e) =>
@@ -371,125 +372,24 @@ namespace Editor.Controls
                 Refresh();
             };
 
-            StackPanel stack = new StackPanel() { Spacing = 5 };
+            Grid grid2 = new Grid() { HorizontalAlignment = HorizontalAlignment.Stretch };
 
-            Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
-
-            TextBlock label = new TextBlock() { Text = category.Name };
-
-            viewbox.Child = icon;
-            stack.Children.Add(viewbox);
-            stack.Children.Add(label);
-            button.Content = stack;
-            grid.Children.Add(button);
-
-            return grid;
-        }
-
-        private Grid FileTile(string path, Grid icon, Image image)
-        {
-            image.Opacity = 0.5f;
-
-            Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, -30) };
-            Grid grid2 = new Grid();
-
-            Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
-
-            StackPanel stack = new StackPanel() { Spacing = 5 };
-            StackPanel stack2 = new StackPanel() { Spacing = 5, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center };
-
-            Button button = new Button()
-            {
-                Width = 143,
-                Height = 73,
-                Padding = new Thickness(0),
-                CornerRadius = new CornerRadius(10),
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
-            button.Tapped += (s, e) =>
-            {
-                PropertiesController.Clear();
-                PropertiesController.Set(new Properties(path));
-            };
-            button.DoubleTapped += (s, e) =>
-            {
-                if (File.Exists(path))
-                    Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
-            };
-
-            MenuFlyoutItem[] items = new[] {
-                new MenuFlyoutItem() { Text = "Create File System Entry", Icon = new SymbolIcon(Symbol.NewFolder) },
-                //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Open", Icon = new SymbolIcon(Symbol.OpenFile) },
-                new MenuFlyoutItem() { Text = "Show in Explorer", Icon = new FontIcon(){ Glyph = "\xE838", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
-                //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Cut", Icon = new SymbolIcon(Symbol.Cut) },
-                new MenuFlyoutItem() { Text = "Copy", Icon = new SymbolIcon(Symbol.Copy) },
-                new MenuFlyoutItem() { Text = "Paste", Icon = new SymbolIcon(Symbol.Paste) },
-                //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
-                new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
-                //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Copy Path", Icon = new SymbolIcon(Symbol.Copy) },
-            };
-            //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
-            items[0].Click += (s, e) => { ContentDialogCreateNewFileOrFolderAsync(path); };
-
-            items[1].Click += (s, e) => { OpenFile(path); };
-            items[2].Click += (s, e) => { OpenFolder(GoUpDirectory(path)); };
-
-            items[3].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Move); };
-            items[4].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Copy); };
-            items[5].Click += (s, e) => { PasteFileSystemEntry(path); };
-
-            items[6].Click += (s, e) => { ContentDialogRename(path); };
-            items[7].Click += (s, e) => { ContentDialogDelete(path); };
-
-            items[8].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.None); };
-
-            MenuFlyout menuFlyout = new();
-            foreach (var item in items)
-            {
-                menuFlyout.Items.Add(item);
-
-                if (item.Text == "Create File System Entry")
-                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
-                if (item.Text == "Show in Explorer")
-                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
-                if (item.Text == "Paste")
-                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
-            }
-
-            button.ContextFlyout = menuFlyout;
-
-            TextBlock fileType = new TextBlock() { Text = Path.GetExtension(path) };
-            TextBlock label = new TextBlock()
-            {
-                Text = Path.GetFileNameWithoutExtension(path),
-                FontSize = 12,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                MaxWidth = 140,
-            };
+            Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24, HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top };
+            TextBlock label = new TextBlock() { Text = category.Name, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Bottom };
 
             viewbox.Child = icon;
-            stack2.Children.Add(viewbox);
-            stack2.Children.Add(fileType);
-            grid2.Children.Add(image);
-            grid2.Children.Add(stack2);
+            grid2.Children.Add(viewbox);
+            grid2.Children.Add(label);
             button.Content = grid2;
-            stack.Children.Add(button);
-            stack.Children.Add(label);
-            grid.Children.Add(stack);
+            grid.Children.Add(button);
 
             return grid;
         }
 
         private Grid FolderTile(string path, Grid icon)
         {
-            Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, -30) };
-            Grid grid2 = new Grid() { Padding = new Thickness(-1), CornerRadius = new CornerRadius(10) };
-            grid2.Background = new SolidColorBrush(new Color()
+            Grid grid = new Grid() { Padding = new Thickness(-1), CornerRadius = new CornerRadius(10) };
+            grid.Background = new SolidColorBrush(new Color()
             {
                 A = 255,
                 R = (byte)new Random().Next(32, 96),
@@ -497,19 +397,17 @@ namespace Editor.Controls
                 G = (byte)new Random().Next(32, 96)
             });
 
-            Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
-
-            StackPanel stack = new StackPanel() { Spacing = 5 };
-
             Button button = new Button()
             {
                 Width = 145,
                 Height = 75,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
+                Padding = new Thickness(10),
+                HorizontalContentAlignment = HorizontalAlignment.Stretch,
+                VerticalContentAlignment = VerticalAlignment.Stretch,
             };
             button.Click += (s, e) => { GoIntoDirectoryAndRefresh(path); };
 
+            #region // MenuFlyout
             MenuFlyoutItem[] items = new[] {
                 new MenuFlyoutItem() { Text = "Create File System Entry", Icon = new SymbolIcon(Symbol.NewFolder) },
                 //new MenuFlyoutSeparator(),
@@ -554,19 +452,124 @@ namespace Editor.Controls
             }
 
             button.ContextFlyout = menuFlyout;
+            #endregion
 
+            Grid grid2 = new Grid() { HorizontalAlignment = HorizontalAlignment.Stretch };
+
+            Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24, HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top };
             TextBlock label = new TextBlock()
             {
                 Text = Path.GetFileName(path),
                 FontSize = 12,
-                HorizontalAlignment = HorizontalAlignment.Center,
                 MaxWidth = 140,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Bottom
             };
 
             viewbox.Child = icon;
-            button.Content = viewbox;
-            grid2.Children.Add(button);
-            stack.Children.Add(grid2);
+            grid2.Children.Add(viewbox);
+            grid2.Children.Add(label);
+            button.Content = grid2;
+            grid.Children.Add(button);
+
+            return grid;
+        }
+
+        private Grid FileTile(string path, Grid icon, Image image)
+        {
+            image.Opacity = 0.5f;
+
+            Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, -30) };
+            Grid grid2 = new Grid() { Padding = new Thickness(10) };
+            Grid grid3 = new Grid();
+
+            Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24, HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top };
+            TextBlock fileType = new TextBlock() { Text = Path.GetExtension(path), HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Bottom };
+
+            StackPanel stack = new StackPanel() { Spacing = 5 };
+
+            Button button = new Button()
+            {
+                Width = 143,
+                Height = 73,
+                Padding = new Thickness(0),
+                CornerRadius = new CornerRadius(10),
+                HorizontalContentAlignment = HorizontalAlignment.Stretch,
+                VerticalContentAlignment = VerticalAlignment.Stretch,
+            };
+            button.Tapped += (s, e) =>
+            {
+                PropertiesController.Clear();
+                PropertiesController.Set(new Properties(path));
+            };
+            button.DoubleTapped += (s, e) =>
+            {
+                if (File.Exists(path))
+                    Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
+            };
+
+            #region // MenuFlyout
+            MenuFlyoutItem[] items = new[] {
+                new MenuFlyoutItem() { Text = "Create File System Entry", Icon = new SymbolIcon(Symbol.NewFolder) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Open", Icon = new SymbolIcon(Symbol.OpenFile) },
+                new MenuFlyoutItem() { Text = "Show in Explorer", Icon = new FontIcon(){ Glyph = "\xE838", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Cut", Icon = new SymbolIcon(Symbol.Cut) },
+                new MenuFlyoutItem() { Text = "Copy", Icon = new SymbolIcon(Symbol.Copy) },
+                new MenuFlyoutItem() { Text = "Paste", Icon = new SymbolIcon(Symbol.Paste) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
+                new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Copy Path", Icon = new SymbolIcon(Symbol.Copy) },
+            };
+            //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
+            items[0].Click += (s, e) => { ContentDialogCreateNewFileOrFolderAsync(path); };
+
+            items[1].Click += (s, e) => { OpenFile(path); };
+            items[2].Click += (s, e) => { OpenFolder(GoUpDirectory(path)); };
+
+            items[3].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Move); };
+            items[4].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Copy); };
+            items[5].Click += (s, e) => { PasteFileSystemEntry(path); };
+
+            items[6].Click += (s, e) => { ContentDialogRename(path); };
+            items[7].Click += (s, e) => { ContentDialogDelete(path); };
+
+            items[8].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.None); };
+
+            MenuFlyout menuFlyout = new();
+            foreach (var item in items)
+            {
+                menuFlyout.Items.Add(item);
+
+                if (item.Text == "Create File System Entry")
+                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
+                if (item.Text == "Show in Explorer")
+                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
+                if (item.Text == "Paste")
+                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
+            }
+
+            button.ContextFlyout = menuFlyout;
+            #endregion
+
+            TextBlock label = new TextBlock()
+            {
+                Text = Path.GetFileNameWithoutExtension(path),
+                FontSize = 12,
+                MaxWidth = 140,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+
+            viewbox.Child = icon;
+            grid2.Children.Add(viewbox);
+            grid2.Children.Add(fileType);
+            grid3.Children.Add(image);
+            grid3.Children.Add(grid2);
+            button.Content = grid3;
+            stack.Children.Add(button);
             stack.Children.Add(label);
             grid.Children.Add(stack);
 
