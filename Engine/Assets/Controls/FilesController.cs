@@ -211,7 +211,7 @@ namespace Editor.Controls
         public void Refresh()
         {
             ValidateCategoriesExist();
-            ValidateCorrectFileTypesAsync();
+            ValidateCorrectFileTypes();
 
             if (_currentCategory is null)
                 CreateCatergoryTiles(Categories);
@@ -230,33 +230,32 @@ namespace Editor.Controls
                     Directory.CreateDirectory(categoryPath);
         }
 
-        public async void ValidateCorrectFileTypesAsync()
+        public void ValidateCorrectFileTypes()
         {
             bool dirty = false;
 
-            foreach (var category in Categories)
-            {
-                var filePaths = Directory.EnumerateFiles(Path.Combine(RootPath, category.Name));
+            if (_currentCategory is null)
+                return;
 
-                foreach (var path in filePaths)
-                {
-                    var file = await StorageFile.GetFileFromPathAsync(path);
+            var targetPath = Path.Combine(RootPath, _currentCategory.Value.Name);
+            if (!string.IsNullOrEmpty(_currentSubPath))
+                targetPath = Path.Combine(targetPath, _currentSubPath);
 
-                    if (!category.FileTypes.Contains(file.FileType))
-                        foreach (var category2 in Categories)
-                            foreach (var fileTypes2 in category2.FileTypes)
-                                if (file.FileType == fileTypes2)
-                                {
-                                    File.Move(
-                                        file.Path,
-                                        IncrementFileIfExists(Path.Combine(RootPath, category2.Name, file.Name)));
+            var filePaths = Directory.EnumerateFiles(targetPath);
+            foreach (var path in filePaths)
+                if (!_currentCategory.Value.FileTypes.Contains(Path.GetExtension(path)))
+                    foreach (var category2 in Categories)
+                        foreach (var fileTypes2 in category2.FileTypes)
+                            if (Path.GetExtension(path) == fileTypes2)
+                            {
+                                File.Move(
+                                    path,
+                                    IncrementFileIfExists(Path.Combine(RootPath, category2.Name, Path.GetFileName(path))));
 
-                                    if (_currentCategory != null)
-                                        if (category.Equals(_currentCategory.Value) || category2.Equals(_currentCategory.Value))
-                                            dirty = true;
-                                }
-                }
-            }
+                                if (_currentCategory != null)
+                                    if (_currentCategory.Value.Equals(_currentCategory.Value) || category2.Equals(_currentCategory.Value))
+                                        dirty = true;
+                            }
 
             if (dirty)
                 CreateFileSystemEntryTilesAsync();
