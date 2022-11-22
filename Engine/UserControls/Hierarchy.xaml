@@ -80,7 +80,10 @@
 
                 <Button Content="Add SubScene" Margin="10" HorizontalAlignment="Center"/>
 
-                <Expander Header="SubScene" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                <Expander HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                    <Expander.Header>
+                        <ToggleButton Content="SubScene" IsChecked="True"/>
+                    </Expander.Header>
                     <StackPanel>
                         <muxc:TreeView x:Name="x_TreeView_SubHierarchy" SelectionMode="Single" HorizontalAlignment="Stretch">
                             <muxc:TreeView.ContextFlyout>
