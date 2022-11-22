@@ -2,6 +2,7 @@
 using System;
 using Engine.Utilities;
 using Editor.UserControls;
+using System.Collections.Generic;
 
 namespace Editor.Controls
 {
@@ -22,19 +23,18 @@ namespace Editor.Controls
     internal class HierarchyController
     {
         public TreeView Tree;
-        public SceneController SceneControl;
 
-        private TreeViewController _treeViewController = new TreeViewController();
+        public List<TreeEntry> Hierarchy;
 
-        public HierarchyController(TreeView tree, SceneController scene)
+
+        public HierarchyController(TreeView tree)
         {
             Tree = tree;
-            SceneControl = scene;
 
-            //_treeViewController.PopulateTreeView(Tree, SceneControl.ToStringArray(), '/');
+            Hierarchy = new List<TreeEntry>();
         }
 
-        public void Initialize()
+        public void PopulateTree()
         {
             var engineObjectList = Engine.Core.Instance.Scene.EntitytManager.EntityList;
             engineObjectList.EventOnAdd += (s, e) => { List_OnAdd(); };
@@ -45,25 +45,18 @@ namespace Editor.Controls
                 if (entity.Parent != null)
                     newEntry.IDparent = entity.Parent.ID;
 
-                SceneControl.Hierarchy.Add(newEntry);
+                Hierarchy.Add(newEntry);
             }
 
-            foreach (var entity in SceneControl.Hierarchy)
-                entity.Node = new TreeViewNode() { Content = entity, IsExpanded = true };
+            foreach (var entry in Hierarchy)
+                entry.Node = new TreeViewNode() { Content = entry, IsExpanded = true };
 
-            TreeEntry tmp;
-            foreach (var item in SceneControl.Hierarchy)
-                if ((tmp = SceneControl.GetParent(item)) != null)
-                {
-                    if (!Tree.RootNodes.Contains(tmp.Node))
-                        Tree.RootNodes.Add(tmp.Node);
-
-                    if (!tmp.Node.Children.Contains(item.Node))
-                        foreach (var child in SceneControl.GetChildren(tmp))
-                            tmp.Node.Children.Add(child.Node);
-                }
-                else if (!Tree.RootNodes.Contains(item.Node))
-                    Tree.RootNodes.Add(item.Node);
+            TreeEntry parent;
+            foreach (var entry in Hierarchy)
+                if ((parent = GetParent(entry)) is null)
+                    Tree.RootNodes.Add(entry.Node);
+                else
+                    parent.Node.Children.Add(entry.Node);
         }
 
         public void SetProperties()
@@ -78,6 +71,25 @@ namespace Editor.Controls
             PropertiesController.Set(new Properties(entity));
         }
 
+        public TreeEntry GetParent(TreeEntry node)
+        {
+            if (node.IDparent != null)
+                foreach (var item in Hierarchy)
+                    if (item.ID == node.IDparent.Value)
+                        return item;
+            return null;
+        }
+
+        public TreeEntry[] GetChildren(TreeEntry node)
+        {
+            List<TreeEntry> list = new List<TreeEntry>();
+            foreach (var item in Hierarchy)
+                if (item.IDparent != null)
+                    if (item.IDparent.Value == node.ID)
+                        list.Add(item);
+            return list.ToArray();
+        }
+
         private void List_OnAdd()
         {
             var entityList = Engine.Core.Instance.Scene.EntitytManager.EntityList;
@@ -88,18 +100,13 @@ namespace Editor.Controls
                 newEntry.IDparent = entity.Parent.ID;
 
             newEntry.Node = new TreeViewNode() { Content = newEntry, IsExpanded = true };
-            SceneControl.Hierarchy.Add(newEntry);
+            Hierarchy.Add(newEntry);
 
-            TreeEntry tmp;
-            if ((tmp = SceneControl.GetParent(newEntry)) != null)
-            {
-                if (!Tree.RootNodes.Contains(tmp.Node))
-                    Tree.RootNodes.Add(tmp.Node);
-
-                tmp.Node.Children.Add(newEntry.Node);
-            }
-            else if (!Tree.RootNodes.Contains(newEntry.Node))
+            TreeEntry parent;
+            if ((parent = GetParent(newEntry)) is null)
                 Tree.RootNodes.Add(newEntry.Node);
+            else
+                parent.Node.Children.Add(newEntry.Node);
         }
     }
 }

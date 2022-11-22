@@ -12,7 +12,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="Assets\Controls\FilesController.cs" />
-    <Content Remove="Assets\Controls\SceneController.cs" />
     <Content Remove="Assets\Controls\ThemeController.cs" />
   </ItemGroup>
   <ItemGroup>

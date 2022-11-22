@@ -11,28 +11,20 @@ namespace Editor.UserControls
     public sealed partial class Hierarchy : UserControl
     {
         private HierarchyController _hierarchyControl;
-        private SceneController _sceneControl;
 
         public Hierarchy()
         {
             this.InitializeComponent();
 
-            _sceneControl = new SceneController();
-            _hierarchyControl = new HierarchyController(x_TreeView_Hierarchy, _sceneControl);
+            _hierarchyControl = new HierarchyController(x_TreeView_Hierarchy);
 
             MainController.Instance.Content.Loaded += (s, e) =>
                 MainController.Instance.LayoutControl.ViewPort.Loaded += (s, e) =>
-                    _hierarchyControl.Initialize();
+                    _hierarchyControl.PopulateTree();
         }
 
-        private void x_TreeView_Hierarchy_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            _hierarchyControl.SetProperties();
-        }
+        private void x_TreeView_Hierarchy_Tapped(object sender, TappedRoutedEventArgs e) { _hierarchyControl.SetProperties(); }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            Engine.Core.Instance.Scene.EntitytManager.CreateEmpty("New Entity");
-        }
+        private void Button_Click(object sender, RoutedEventArgs e) { Engine.Core.Instance.Scene.EntitytManager.CreateEmpty("New Entity"); }
     }
 }
