@@ -15,10 +15,7 @@ using System.Linq;
 using Editor.UserControls;
 using System.Text.RegularExpressions;
 using System.Text;
-using Windows.System;
-using Microsoft.UI.Xaml.Input;
 using Windows.ApplicationModel.DataTransfer;
-using Aspose.Words.Shaping;
 
 namespace Editor.Controls
 {
@@ -41,6 +38,8 @@ namespace Editor.Controls
 
         public BreadcrumbBar Bar;
 
+        public Grid GridMain;
+
         public Category[] Categories;
 
         private Files _files;
@@ -50,8 +49,9 @@ namespace Editor.Controls
 
         private static readonly string TEMPLATES = @"Assets\Engine\Resources\Templates";
 
-        public FilesController(Files files, WrapPanel wrap, BreadcrumbBar bar)
+        public FilesController(Files files, Grid grid, WrapPanel wrap, BreadcrumbBar bar)
         {
+            GridMain = grid;
             Wrap = wrap;
             Bar = bar;
 
@@ -382,6 +382,10 @@ namespace Editor.Controls
             button.Content = grid2;
             grid.Children.Add(button);
 
+            #region // MenuFlyout
+            GridMain.ContextFlyout = null;
+            #endregion
+
             return grid;
         }
 
@@ -597,6 +601,58 @@ namespace Editor.Controls
             viewbox.Child = icon;
             button.Content = viewbox;
             grid.Children.Add(button);
+
+            #region // MenuFlyout
+            MenuFlyoutItem[] items = new[] {
+                new MenuFlyoutItem() { Text = "Create File System Entry", Icon = new SymbolIcon(Symbol.NewFolder) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Show in Explorer", Icon = new FontIcon(){ Glyph = "\xE838", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Cut", Icon = new SymbolIcon(Symbol.Cut) },
+                new MenuFlyoutItem() { Text = "Copy", Icon = new SymbolIcon(Symbol.Copy) },
+                new MenuFlyoutItem() { Text = "Paste", Icon = new SymbolIcon(Symbol.Paste) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
+                new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Copy Path", Icon = new SymbolIcon(Symbol.Copy) },
+            };
+
+            var path = Path.Combine(RootPath, _currentCategory.Value.Name);
+            if (!string.IsNullOrEmpty(_currentSubPath))
+                path = Path.Combine(path, _currentSubPath);
+
+            //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
+            items[0].Click += (s, e) => { ContentDialogCreateNewFileOrFolderAsync(path); };
+
+            items[1].Click += (s, e) => { OpenFolder(GoUpDirectory(path)); };
+
+            items[2].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Move); };
+            items[3].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Copy); };
+            items[4].Click += (s, e) => { PasteFileSystemEntry(path); };
+
+            items[5].Click += (s, e) => { ContentDialogRename(path); };
+            items[6].Click += (s, e) => { ContentDialogDelete(path); };
+
+            items[7].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.None); };
+
+            MenuFlyout menuFlyout = new();
+            foreach (var item in items)
+            {
+                if (string.IsNullOrEmpty(_currentSubPath))
+                    if (item.Text == "Cut" || item.Text == "Rename")
+                        continue;
+
+                menuFlyout.Items.Add(item);
+
+                if (item.Text == "Create File System Entry"
+                    || item.Text == "Show in Explorer"
+                    || item.Text == "Paste")
+                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
+            }
+
+            GridMain.ContextFlyout = menuFlyout;
+            #endregion
 
             return grid;
         }

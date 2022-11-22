@@ -18,7 +18,7 @@ namespace Editor.UserControls
         {
             this.InitializeComponent();
 
-            ChangeColorWithTheme = x_Grid_ChangeColorWithTheme;
+            ChangeColorWithTheme = x_Grid_Main;
 
             _outputControl = new OutputController(
                 x_Stackpanel_Output, 

@@ -28,7 +28,7 @@
             </CommandBar.SecondaryCommands>
         </CommandBar>
 
-        <Grid x:Name="x_Grid_ChangeColorWithTheme" Background="#282828">
+        <Grid x:Name="x_Grid_Main" Background="#282828">
             <ScrollViewer>
                 <StackPanel Orientation="Vertical" Spacing="10">
                     <BreadcrumbBar x:Name="x_BreadcrumBar_Files" Margin="20, 9, 20, -20" ItemClicked="x_BreadcrumBar_Files_ItemClicked"/>
