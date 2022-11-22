@@ -18,12 +18,12 @@ namespace Engine.Utilities
 
     internal class EventList<T> : List<T>
     {
-        public event EventHandler EventOnAdd;
+        public event EventHandler OnAddEvent;
 
         public new void Add(T item)
         {
-            if (null != EventOnAdd)
-                EventOnAdd(this, null);
+            if (null != OnAddEvent)
+                OnAddEvent(this, null);
 
             base.Add(item);
         }
