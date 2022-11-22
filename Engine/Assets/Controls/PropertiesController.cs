@@ -110,7 +110,11 @@ namespace Editor.Controls
             }));
 
             if (File.Exists(path))
-                if (fileInfo.Extension == ".txt" || fileInfo.Extension == ".cs")
+                if (fileInfo.Extension == ".cs" 
+                    || fileInfo.Extension == ".txt"
+                    || fileInfo.Extension == ".usd"
+                    || fileInfo.Extension == ".mat"
+                    || fileInfo.Extension == ".hlsl")
                 {
                     string[] lines = await File.ReadAllLinesAsync(path);
                     string joinedLines = string.Join("\n", lines);
