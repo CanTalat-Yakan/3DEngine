@@ -47,8 +47,8 @@ namespace Editor.Controls
             Grid grid = CreateLayout(
                 WrapGrid(ViewPort),
                 WrapInTabView(TabsRoot,
-                    new TabViewItemDataTemplate() { Header = "Files⠀⠀⠀⠀", Content = Files, Symbol = Symbol.Document },
-                    new TabViewItemDataTemplate() { Header = "Output⠀⠀⠀⠀", Content = Output, Symbol = Symbol.Message }),
+                    new TabViewItemDataTemplate() { Header = "Files", Content = Files, Symbol = Symbol.Document },
+                    new TabViewItemDataTemplate() { Header = "Output", Content = Output, Symbol = Symbol.Message }),
                 WrapGrid(Hierarchy),
                 WrapGrid(PropertiesRoot));
 
@@ -155,7 +155,7 @@ namespace Editor.Controls
             root.Background = Application.Current.Resources["ApplicationPageBackgroundThemeBrush"] as SolidColorBrush;
 
             TabViewPageController tabViewPage = new TabViewPageController(i);
-            root.Children.Add(tabViewPage.Tab);
+            root.Children.Add(tabViewPage.TabView);
 
             //BindingOperations.SetBinding(grid, Grid.VisibilityProperty, new Binding() { ElementName = "x_AppBarToggleButton_Status_OpenPane", Path = new PropertyPath("IsChecked"), Converter = new BooleanToVisibilityConverter() });
 
