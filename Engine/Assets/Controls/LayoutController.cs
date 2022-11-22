@@ -59,7 +59,7 @@ namespace Editor.Controls
         {
             var a = PairVertical(
                 new GridDataTemeplate() { Content = panel[0], MinHeight = 0 },
-                new GridDataTemeplate() { Content = panel[1], MinHeight = 0, Length = new GridLength(225, GridUnitType.Pixel) });
+                new GridDataTemeplate() { Content = panel[1], MinHeight = 0, Length = new GridLength(235, GridUnitType.Pixel) });
 
             var b = PairVertical(
                 new GridDataTemeplate() { Content = panel[2], MinHeight = 0 },
