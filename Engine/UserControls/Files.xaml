@@ -13,7 +13,7 @@
             <AppBarButton Label="Add Files" Icon="Add" Click="AppBarButton_Click_AddFiles"/>
             <AppBarButton Label="Open Folder" Click="AppBarButton_Click_OpenFolder">
                 <AppBarButton.Icon>
-                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE838;"/>
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEC50;"/>
                 </AppBarButton.Icon>
             </AppBarButton>
 

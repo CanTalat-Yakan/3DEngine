@@ -237,7 +237,7 @@ namespace Editor.Controls
                 new MenuFlyoutItem() { Text = "Create Entity" },
                 //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Save", Icon = new SymbolIcon(Symbol.Save) },
-                new MenuFlyoutItem() { Text = "Show in Files", Icon = new FontIcon(){ Glyph = "\xE838", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
+                new MenuFlyoutItem() { Text = "Show in Files", Icon = new SymbolIcon(Symbol.Document) },
                 //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
                 new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
