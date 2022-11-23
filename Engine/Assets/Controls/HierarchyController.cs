@@ -71,6 +71,8 @@ namespace Editor.Controls
             PropertiesController.Set(new Properties(entity));
         }
 
+        public void DeselectTreeViewNodes() => Tree.SelectedNode = null;
+
         public TreeEntry GetParent(TreeEntry node)
         {
             if (node.IDparent != null)

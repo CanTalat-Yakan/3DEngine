@@ -88,6 +88,8 @@ namespace Editor.Controls
 
         private async void CreateFilePreviewer(string path)
         {
+            MainController.Instance.LayoutControl.Hierarchy._hierarchyControl.DeselectTreeViewNodes();
+
             FileInfo fileInfo = new FileInfo(path);
 
             var properties = new Grid[]
