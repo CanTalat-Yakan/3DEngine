@@ -77,6 +77,7 @@ namespace Editor.Controls
                 foreach (var item in Hierarchy)
                     if (item.ID == node.IDparent.Value)
                         return item;
+
             return null;
         }
 
@@ -87,7 +88,18 @@ namespace Editor.Controls
                 if (item.IDparent != null)
                     if (item.IDparent.Value == node.ID)
                         list.Add(item);
+
             return list.ToArray();
+        }
+        public Entity GetEntity(TreeEntry node)
+        {
+            var engineObjectList = Engine.Core.Instance.Scene.EntitytManager.EntityList;
+
+            foreach (var entity in engineObjectList)
+                if (entity.ID == node.ID)
+                    return entity;
+
+            return null;
         }
 
         private void List_OnAdd()
@@ -107,6 +119,15 @@ namespace Editor.Controls
                 Tree.RootNodes.Add(newEntry.Node);
             else
                 parent.Node.Children.Add(newEntry.Node);
+        }
+
+        internal void SetNewParentTreeEntry(TreeViewNode newParent, params TreeViewNode[] treeViewNodes)
+        {
+            foreach (var node in treeViewNodes)
+            {
+                (newParent.Content as TreeEntry).IDparent = (node.Content as TreeEntry).ID;
+                GetEntity(node.Content as TreeEntry).Parent = GetEntity(newParent.Content as TreeEntry);
+            }
         }
     }
 }
