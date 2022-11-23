@@ -8,8 +8,8 @@ using Microsoft.UI.Xaml;
 using Editor.UserControls;
 using ColorPicker = CommunityToolkit.WinUI.UI.Controls.ColorPicker;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
-using Engine.Components;
 using Windows.Foundation;
+using Engine.Components;
 using Engine.Editor;
 
 namespace Editor.Controls

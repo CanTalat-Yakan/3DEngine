@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
+using System;
 using Engine.Data;
-using Assimp.Configs;
-using Aspose.ThreeD.Formats;
-using Aspose.ThreeD;
 
 namespace Engine.Helper
 {

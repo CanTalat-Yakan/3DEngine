@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using Vortice;
+using System;
 using Vortice.Direct3D11;
 using Vortice.DXGI;
 using Vortice.Mathematics;

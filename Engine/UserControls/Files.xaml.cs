@@ -1,10 +1,7 @@
 ﻿using Editor.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using System;
-using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
-using System.Linq;
 using System.Collections.Generic;
 
 // To learn more about WinUI, the WinUI project structure,

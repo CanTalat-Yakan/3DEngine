@@ -1,8 +1,8 @@
 ﻿using Microsoft.UI.Input;
 using Microsoft.UI.Xaml.Input;
-using System;
 using System.Numerics;
 using System.Collections.Generic;
+using System;
 using Windows.Foundation;
 using Windows.System;
 using Windows.UI.Core;

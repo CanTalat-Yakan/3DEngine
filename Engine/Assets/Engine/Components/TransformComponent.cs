@@ -1,5 +1,5 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
+using System;
 using Vortice.Mathematics;
 using Engine.Data;
 

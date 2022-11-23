@@ -3,7 +3,6 @@ using Microsoft.UI.Xaml.Media;
 using Engine.Editor;
 using Engine.Utilities;
 using Editor.Controls;
-using System;
 
 namespace Engine
 {

@@ -1,5 +1,5 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
 using SharpGen.Runtime;
 using System;
 using Vortice.Direct3D;
