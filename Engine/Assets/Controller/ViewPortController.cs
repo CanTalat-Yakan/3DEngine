@@ -44,10 +44,14 @@ namespace Editor.Controller
                 CreateButton(CreateIcon("\xE946"), CreateTextFull(out Profile)),
                 CreateButton(CreateIcon(Symbol.Video),
                     StackInGrid(
-                            CreateSlider("Field Of View", 90, 40, 110, (s, e) => { CameraComponent.s_FieldOfView = e.NewValue; }),
-                            CreateNumberInput("Movement Speed", 25, 1, 100, (s, e) => { CameraController.s_MovementSpeed = (float)e.NewValue; }))),
+                            CreateSlider("Field Of View", (float)CameraComponent.s_FieldOfView, 40, 110, (s, e) => { CameraComponent.s_FieldOfView = e.NewValue; }),
+                            CreateNumberInput("Movement Speed", CameraController.s_MovementSpeed, 1, 100, (s, e) => { CameraController.s_MovementSpeed = (float)e.NewValue; }))),
                 CreateAppBarSeperator(),
-                CreateToggleButton(CreateIcon("\xE706"), true),
+                CreateToggleButton(CreateIcon("\xE706")),
+                CreateToggleButton(CreateIcon("\xE81E")),
+                CreateAppBarSeperator(),
+                CreateButtonWithValue(CreateIcon("\xE80A"), 10, CreateNumberInput("Grid Interval", 10, 0.1f, 100, (s, e) => { CameraController.s_MovementSpeed = (float)e.NewValue; })),
+                CreateButtonWithValue(CreateIcon(Symbol.Rotate), 15, CreateNumberInput("Movement Speed", 15, 1, 90, (s, e) => { CameraController.s_MovementSpeed = (float)e.NewValue; })),
             };
 
             GridMain.Children.Add(WrapInStackPanelDockTopRight(topRight));
@@ -166,6 +170,21 @@ namespace Editor.Controller
             return button;
         }
 
+        private UIElement CreateButtonWithValue(Grid icon, float f, Grid content)
+        {
+            StackPanel stack = new() { Orientation = Orientation.Horizontal, FlowDirection = FlowDirection.LeftToRight, Spacing = 5 };
+            Viewbox viewbox = new() { Width = 16, Height = 16 };
+            viewbox.Child = icon;
+
+            stack.Children.Add(viewbox);
+            stack.Children.Add(new TextBlock() { Text = f.ToString() });
+
+            Button button = new() { Content = stack, FlowDirection = FlowDirection.LeftToRight };
+            button.Flyout = new Flyout() { Content = content, Placement = FlyoutPlacementMode.BottomEdgeAlignedRight };
+
+            return button;
+        }
+
         private UIElement CreateAppBarSeperator()
         {
             AppBarSeparator seperator = new();
@@ -225,17 +244,17 @@ namespace Editor.Controller
             return grid;
         }
 
-        private Grid CreateNumberInput(string s = "Float", float i = 0, float min = float.MinValue, float max = float.MaxValue, TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs> onValueChanged = null)
+        private Grid CreateNumberInput(string s = "Float", float f = 0, float min = float.MinValue, float max = float.MaxValue, TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs> onValueChanged = null)
         {
-            NumberBox numInput = new NumberBox() { Value = i, SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline, MaxWidth = 200 };
+            NumberBox numInput = new NumberBox() { Value = f, Minimum = min, Maximum = max, SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline, MaxWidth = 200 };
             numInput.ValueChanged += onValueChanged;
 
             return WrapInField(s, numInput);
         }
 
-        private Grid CreateSlider(string s = "Slider", float i = 0, float min = float.MinValue, float max = float.MaxValue, RangeBaseValueChangedEventHandler onValueChanged = null)
+        private Grid CreateSlider(string s = "Slider", float f = 0, float min = float.MinValue, float max = float.MaxValue, RangeBaseValueChangedEventHandler onValueChanged = null)
         {
-            Slider numInput = new Slider() { Value = i, Minimum = min, Maximum = max, Width = 200, Margin = new Thickness(0, 0, 0, -5.5) };
+            Slider numInput = new Slider() { Value = f, Minimum = min, Maximum = max, Width = 200, Margin = new Thickness(0, 0, 0, -5.5) };
             numInput.ValueChanged += onValueChanged;
 
             TextBlock numPreview = new TextBlock() { Padding = new Thickness(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
