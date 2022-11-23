@@ -934,7 +934,7 @@ namespace Editor.Controls
 
             if (e.DragUIOverride != null)
             {
-                e.DragUIOverride.Caption = "Add file";
+                e.DragUIOverride.Caption = "Add file(s)";
                 e.DragUIOverride.IsContentVisible = true;
             }
         }
