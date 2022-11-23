@@ -42,10 +42,12 @@ namespace Editor.Controls
             Hierarchy = new List<TreeEntry>();
         }
 
+        public void DeselectTreeViewNodes() => Tree.SelectedNode = null;
+
         public void PopulateTree()
         {
             var engineObjectList = Engine.Core.Instance.Scene.EntitytManager.EntityList;
-            engineObjectList.OnAddEvent += (s, e) => { List_OnAdd(); };
+            engineObjectList.OnAddEvent += (s, e) => { OnAdd(); };
 
             foreach (var entity in engineObjectList)
             {
@@ -79,10 +81,7 @@ namespace Editor.Controls
             PropertiesController.Set(new Properties(entity));
         }
 
-        public void DeselectTreeViewNodes() => Tree.SelectedNode = null;
-
-
-        private void List_OnAdd()
+        private void OnAdd()
         {
             var entityList = Engine.Core.Instance.Scene.EntitytManager.EntityList;
 
