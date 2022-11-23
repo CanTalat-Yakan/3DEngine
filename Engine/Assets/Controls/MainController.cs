@@ -1,6 +1,5 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Editor.UserControls;
-using Microsoft.UI.Xaml;
 
 namespace Editor.Controls
 {

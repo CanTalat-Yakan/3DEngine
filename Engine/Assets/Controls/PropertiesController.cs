@@ -1,29 +1,27 @@
 ﻿using CommunityToolkit.WinUI.UI.Controls;
+using Microsoft.UI;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Shapes;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
-using ColorPicker = CommunityToolkit.WinUI.UI.Controls.ColorPicker;
-using Expander = Microsoft.UI.Xaml.Controls.Expander;
-using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
-using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
-using Engine.Utilities;
-using Microsoft.UI;
-using System.IO;
-using Path = System.IO.Path;
 using Editor.UserControls;
-using Microsoft.UI.Xaml.Input;
-using System.Diagnostics;
-using System.Linq.Expressions;
-using System.Text;
+using Engine.Utilities;
+using ColorPicker = CommunityToolkit.WinUI.UI.Controls.ColorPicker;
+using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
+using Expander = Microsoft.UI.Xaml.Controls.Expander;
+using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
+using Path = System.IO.Path;
 
 namespace Editor.Controls
 {
@@ -46,6 +44,23 @@ namespace Editor.Controls
         public static void Clear() => MainController.Instance.LayoutControl.PropertiesRoot.Children.Clear();
 
         public static void Set(Properties properties) => MainController.Instance.LayoutControl.PropertiesRoot.Children.Add(properties);
+
+        private void CreateEmptyMessage()
+        {
+            Grid grid = new Grid() { Margin = new Thickness(0, 20, 0, 0) };
+
+            StackPanel stack = new StackPanel() { HorizontalAlignment = HorizontalAlignment.Center };
+
+            TextBlock textBlock = new TextBlock() { Text = "Select a file or an entity", Opacity = 0.5f, HorizontalAlignment = HorizontalAlignment.Center };
+            TextBlock textBlock2 = new TextBlock() { Text = "to view its properties.", Opacity = 0.5f, HorizontalAlignment = HorizontalAlignment.Center };
+
+            stack.Children.Add(textBlock);
+            stack.Children.Add(textBlock2);
+
+            grid.Children.Add(stack);
+
+            _stackPanel.Children.Add(grid);
+        }
 
         private void CreateEntityProperties(Entity entity)
         {
@@ -131,23 +146,6 @@ namespace Editor.Controls
 
     internal partial class PropertiesController
     {
-        private void CreateEmptyMessage()
-        {
-            Grid grid = new Grid() { Margin = new Thickness(0, 20, 0, 0) };
-
-            StackPanel stack = new StackPanel() { HorizontalAlignment = HorizontalAlignment.Center };
-
-            TextBlock textBlock = new TextBlock() { Text = "Select a file or an entity", Opacity = 0.5f, HorizontalAlignment = HorizontalAlignment.Center };
-            TextBlock textBlock2 = new TextBlock() { Text = "to view its properties.", Opacity = 0.5f, HorizontalAlignment = HorizontalAlignment.Center };
-
-            stack.Children.Add(textBlock);
-            stack.Children.Add(textBlock2);
-
-            grid.Children.Add(stack);
-
-            _stackPanel.Children.Add(grid);
-        }
-
         private Grid WrapInField(string s, params UIElement[] _content)
         {
             Grid grid = new Grid();
