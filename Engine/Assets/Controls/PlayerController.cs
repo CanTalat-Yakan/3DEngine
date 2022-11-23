@@ -37,8 +37,8 @@ namespace Editor.Controls
                 if (_output._clearPlay.IsChecked.Value)
                     _output.ClearOutput();
 
-            MainController.Instance.LayoutControl.ViewPort.BorderColor.BorderBrush = new SolidColorBrush(Colors.GreenYellow);
-            MainController.Instance.LayoutControl.ViewPort.BorderColor.BorderThickness = new Thickness(_play.IsChecked.Value ? 2 : 0);
+            MainController.Instance.LayoutControl.ViewPort._viewPortControl.GridMain.BorderBrush = new SolidColorBrush(Colors.GreenYellow);
+            MainController.Instance.LayoutControl.ViewPort._viewPortControl.GridMain.BorderThickness = new Thickness(_play.IsChecked.Value ? 2 : 0);
 
             SetStatusAppBarButtons(_play.IsChecked.Value);
 
@@ -50,7 +50,7 @@ namespace Editor.Controls
             PlayMode = _pause.IsChecked.Value ? EPlayMode.PAUSED : EPlayMode.PLAYING;
 
             _forward.IsEnabled = _pause.IsChecked.Value;
-            MainController.Instance.LayoutControl.ViewPort.BorderColor.BorderBrush = new SolidColorBrush(_pause.IsChecked.Value ? Colors.Orange : Colors.GreenYellow);
+            MainController.Instance.LayoutControl.ViewPort._viewPortControl.GridMain.BorderBrush = new SolidColorBrush(_pause.IsChecked.Value ? Colors.Orange : Colors.GreenYellow);
 
             SetStatus(_pause.IsChecked.Value ? "Paused Gamemode" : "Continued Gamemode");
         }

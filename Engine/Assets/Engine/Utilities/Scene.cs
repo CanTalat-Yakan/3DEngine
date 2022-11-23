@@ -12,7 +12,7 @@ namespace Engine.Utilities
         public string Profile;
 
         public CameraComponent Camera = new CameraComponent();
-        public ViewPortController CameraController;
+        public CameraController CameraController;
         public EntityManager EntitytManager = new EntityManager();
 
         private Entity _subParent;
@@ -20,7 +20,7 @@ namespace Engine.Utilities
 
         public void Awake()
         {
-            CameraController = new ViewPortController(Camera);
+            CameraController = new CameraController(Camera);
             Camera.Transform.Position = new Vector3(3, 4, 5);
             Camera.Transform.EulerAngles = new Vector3(35, -150, 0);
 

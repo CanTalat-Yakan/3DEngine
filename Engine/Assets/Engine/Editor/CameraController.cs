@@ -3,12 +3,10 @@ using System.Numerics;
 using Windows.System;
 using Engine.Components;
 using Engine.Utilities;
-using Windows.UI.Core;
-using Windows.Foundation;
 
 namespace Engine.Editor
 {
-    internal class ViewPortController
+    internal class CameraController
     {
         public static float s_MovementSpeed = 2;
 
@@ -21,7 +19,7 @@ namespace Engine.Editor
         private Vector3 _direction;
         private Vector3 _rotation;
 
-        public ViewPortController(CameraComponent camera)
+        public CameraController(CameraComponent camera)
         {
             _camera = camera;
             _input = Input.Instance;

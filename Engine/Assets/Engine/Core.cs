@@ -17,7 +17,7 @@ namespace Engine
         public Renderer Renderer;
         public ImGui ImGui;
 
-        public Core(SwapChainPanel swapChainPanel, TextBlock textBlock)
+        public Core(SwapChainPanel swapChainPanel, string profil)
         {
             if (Instance is null)
                 Instance = this;
@@ -55,11 +55,11 @@ namespace Engine
 
                 Renderer.Present();
 
-                textBlock.Text = Time.Profile;
-                textBlock.Text += "\n\n" + Renderer.Profile;
-                textBlock.Text += "\n\n" + Scene.Profile;
-                textBlock.Text += "\n\n" + Scene.Camera.Transform.Position.ToString();
-                textBlock.Text += "\n\n" + Scene.Camera.Transform.EulerAngles.ToString();
+                profil = Time.Profile;
+                profil += "\n\n" + Renderer.Profile;
+                profil += "\n\n" + Scene.Profile;
+                profil += "\n\n" + Scene.Camera.Transform.Position.ToString();
+                profil += "\n\n" + Scene.Camera.Transform.EulerAngles.ToString();
             };
         }
     }

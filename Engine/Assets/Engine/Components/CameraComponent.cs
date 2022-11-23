@@ -10,7 +10,7 @@ namespace Engine.Components
 {
     internal class CameraComponent
     {
-        public static double s_FieldOfView;
+        public static double s_FieldOfView = 90;
         public SViewConstantsBuffer ViewConstants;
 
         public TransformComponent Transform = new TransformComponent();

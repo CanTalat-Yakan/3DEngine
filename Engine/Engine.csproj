@@ -13,6 +13,7 @@
   <ItemGroup>
     <Content Remove="Assets\Controls\FilesController.cs" />
     <Content Remove="Assets\Controls\ThemeController.cs" />
+    <Content Remove="Assets\Controls\ViewPortController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Assets\Engine\Resources\Models\Cube.obj" />

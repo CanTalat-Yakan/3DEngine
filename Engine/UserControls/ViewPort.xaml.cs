@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
+using Editor.Controls;
 using Engine.Components;
 using Engine.Editor;
 
@@ -11,24 +12,21 @@ namespace Editor.UserControls
 {
     public sealed partial class ViewPort : UserControl
     {
-        public TextBlock DebugProfiling;
-        public Grid BorderColor;
-
         internal Engine.Core _engineCore;
+        internal ViewPortController _viewPortControl;
 
         public ViewPort()
         {
             this.InitializeComponent();
 
-            DebugProfiling = x_TextBlock_Debug_FPS;
-            BorderColor = x_Grid_ViewPort_BorderBrush;
+            _viewPortControl = new ViewPortController(this, x_Grid_ViewPort_Main);
 
             Loaded += Initialize;
         }
 
         private void Initialize(object sender, RoutedEventArgs e)
         {
-            _engineCore = new Engine.Core(x_SwapChainPanel_ViewPort, DebugProfiling);
+            _engineCore = new Engine.Core(x_SwapChainPanel_ViewPort, _viewPortControl.Profile.Text);
 
             PointerPressed += _engineCore.Input.PointerPressed;
             PointerWheelChanged += _engineCore.Input.PointerWheelChanged;
@@ -43,9 +41,5 @@ namespace Editor.UserControls
             //window.CoreWindow.GetKeyState(Windows.System.VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down);
             //Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(Windows.System.VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down);
         }
-
-        private void x_Slider_FOV_ValueChanged(object sender, RangeBaseValueChangedEventArgs e) => CameraComponent.s_FieldOfView = e.NewValue;
-
-        private void x_NumberBox_CameraSpeed_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) => ViewPortController.s_MovementSpeed = (float)args.NewValue;
     }
 }
