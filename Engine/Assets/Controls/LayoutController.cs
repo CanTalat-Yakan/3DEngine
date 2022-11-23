@@ -16,7 +16,7 @@ namespace Editor.Controls
         public UIElement Content;
     }
 
-    internal class LayoutController
+    internal partial class LayoutController
     {
         public Grid Content;
         public ViewPort ViewPort;
@@ -42,30 +42,45 @@ namespace Editor.Controls
             TabsRoot = new Grid();
         }
 
-        public void Initialize()
+        public void CreateLayout()
         {
-            Grid grid = CreateLayout(
-                WrapGrid(ViewPort),
-                WrapInTabView(TabsRoot,
-                    new TabViewItemDataTemplate() { Header = "Files", Content = Files, Symbol = Symbol.Document },
-                    new TabViewItemDataTemplate() { Header = "Output", Content = Output, Symbol = Symbol.Message }),
-                WrapGrid(Hierarchy),
-                WrapGrid(PropertiesRoot));
+            var tabView = WrapInTabView(TabsRoot,
+                new TabViewItemDataTemplate() { Content = Files, Header = "Files", Symbol = Symbol.Document },
+                new TabViewItemDataTemplate() { Content = Output, Header = "Output", Symbol = Symbol.Message });
 
-            Content.Children.Add(grid);
+            var content = PairVertical(
+                new GridDataTemeplate() { Content = WrapGrid(ViewPort), MinHeight = 0 },
+                new GridDataTemeplate() { Content = tabView, MinHeight = 0, Length = new GridLength(235, GridUnitType.Pixel) });
+
+            var pane = PairVertical(
+                new GridDataTemeplate() { Content = WrapGrid(Hierarchy), MinHeight = 0 },
+                new GridDataTemeplate() { Content = WrapGrid(PropertiesRoot), MinHeight = 0, Length = new GridLength(1, GridUnitType.Star) });
+
+            Content.Children.Add(WrapSplitView(content, pane));
         }
+    }
 
-        private Grid CreateLayout(params Grid[] panel)
+    internal partial class LayoutController
+    {
+        private Grid PairVertical(GridDataTemeplate top, GridDataTemeplate bottom)
         {
-            var a = PairVertical(
-                new GridDataTemeplate() { Content = panel[0], MinHeight = 0 },
-                new GridDataTemeplate() { Content = panel[1], MinHeight = 0, Length = new GridLength(235, GridUnitType.Pixel) });
+            Grid grid = new Grid() { };
+            grid.RowDefinitions.Add(new RowDefinition() { Height = top.Length, MinHeight = top.MinHeight });
+            grid.RowDefinitions.Add(new RowDefinition() { Height = bottom.Length, MinHeight = bottom.MinHeight });
 
-            var b = PairVertical(
-                new GridDataTemeplate() { Content = panel[2], MinHeight = 0 },
-                new GridDataTemeplate() { Content = panel[3], MinHeight = 0, Length = new GridLength(1, GridUnitType.Star) });
+            GridSplitter splitV = new GridSplitter() { VerticalAlignment = VerticalAlignment.Top, Opacity = 0.5f, CursorBehavior = GridSplitter.SplitterCursorBehavior.ChangeOnGripperHover };
 
-            return WrapSplitView(a, b);
+            ((Grid)bottom.Content).Margin = new Thickness(0, 16, 0, 0);
+            ((Grid)top.Content).Padding = new Thickness(0, 16, 0, 0);
+            grid.Padding = new Thickness(0, -16, 0, 0);
+
+            grid.Children.Add(top.Content);
+            grid.Children.Add(bottom.Content);
+            Grid.SetRow((FrameworkElement)bottom.Content, 1);
+            Grid.SetRow(splitV, 1);
+            grid.Children.Add(splitV);
+
+            return grid;
         }
 
         private Grid PairHorizontal(GridDataTemeplate left, GridDataTemeplate right)
@@ -125,27 +140,6 @@ namespace Editor.Controls
             grid.Children.Add(splitH);
             grid.Children.Add(splitH2);
 
-
-            return grid;
-        }
-
-        private Grid PairVertical(GridDataTemeplate top, GridDataTemeplate bottom)
-        {
-            Grid grid = new Grid() { };
-            grid.RowDefinitions.Add(new RowDefinition() { Height = top.Length, MinHeight = top.MinHeight });
-            grid.RowDefinitions.Add(new RowDefinition() { Height = bottom.Length, MinHeight = bottom.MinHeight });
-
-            GridSplitter splitV = new GridSplitter() { VerticalAlignment = VerticalAlignment.Top, Opacity = 0.5f, CursorBehavior = GridSplitter.SplitterCursorBehavior.ChangeOnGripperHover };
-
-            ((Grid)bottom.Content).Margin = new Thickness(0, 16, 0, 0);
-            ((Grid)top.Content).Padding = new Thickness(0, 16, 0, 0);
-            grid.Padding = new Thickness(0, -16, 0, 0);
-
-            grid.Children.Add(top.Content);
-            grid.Children.Add(bottom.Content);
-            Grid.SetRow((FrameworkElement)bottom.Content, 1);
-            Grid.SetRow(splitV, 1);
-            grid.Children.Add(splitV);
 
             return grid;
         }

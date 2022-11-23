@@ -29,7 +29,7 @@ namespace Editor.Controls
         public bool Creatable;
     }
 
-    internal class FilesController
+    internal partial class FilesController
     {
         public string RootPath { get; private set; }
         public string CurrentProjectTitle { get; private set; }
@@ -46,8 +46,6 @@ namespace Editor.Controls
 
         private Category? _currentCategory;
         private string _currentSubPath;
-
-        private static readonly string TEMPLATES = @"Assets\Engine\Resources\Templates";
 
         public FilesController(Files files, Grid grid, WrapPanel wrap, BreadcrumbBar bar)
         {
@@ -130,23 +128,30 @@ namespace Editor.Controls
             Refresh();
         }
 
-        public async void PasteFileSystemEntryFromClipboard(string path)
+        public void GoUpDirectoryAndRefresh()
         {
-            DataPackageView dataPackageView = Clipboard.GetContent();
-            if (dataPackageView.Contains(StandardDataFormats.Text))
+            if (!string.IsNullOrEmpty(_currentSubPath))
             {
-                var sourcePath = await dataPackageView.GetTextAsync();
-                var sourcePathCatagory = Path.GetRelativePath(RootPath, sourcePath).Split("\\").First();
-                var targetPathCatagory = Path.GetRelativePath(RootPath, path).Split("\\").First();
-
-                if (sourcePathCatagory == targetPathCatagory)
-                    if (string.IsNullOrEmpty(Path.GetExtension(sourcePath)))
-                        PasteFolder(sourcePath, GetDirectory(path), dataPackageView.RequestedOperation);
-                    else
-                        PasteFile(sourcePath, GetDirectory(path), dataPackageView.RequestedOperation);
+                _currentSubPath = GoUpDirectory(_currentSubPath);
 
                 Refresh();
             }
+            else
+            {
+                _currentCategory = null;
+                _currentSubPath = null;
+
+                CreateCatergoryTiles(Categories);
+            }
+        }
+
+        private void GoIntoDirectoryAndRefresh(string path)
+        {
+            _currentSubPath = Path.GetRelativePath(
+                Path.Combine(RootPath, _currentCategory.Value.Name),
+                path);
+
+            Refresh();
         }
 
         public void OpenFolder()
@@ -163,73 +168,6 @@ namespace Editor.Controls
 
             if (Directory.Exists(path))
                 Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
-        }
-
-        public void OpenFolder(string path)
-        {
-            if (Directory.Exists(path))
-                Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
-        }
-
-        public void PasteFolder(string sourcePath, string targetPath, DataPackageOperation requestedOperation)
-        {
-            if (Directory.Exists(sourcePath))
-                if (requestedOperation == DataPackageOperation.Copy)
-                    CopyDirectory(sourcePath, targetPath);
-                else if (requestedOperation == DataPackageOperation.Move)
-                    CopyDirectory(sourcePath, targetPath, true);
-        }
-
-        public void CopyDirectory(string sourcePath, string targetPath, bool deleteSourcePath = false)
-        {
-            // Create the target directory
-            Directory.CreateDirectory(targetPath = IncrementFolderIfExists(Path.Combine(targetPath, Path.GetFileName(sourcePath))));
-
-            // Now Create all of the directories
-            foreach (string dirPath in Directory.GetDirectories(sourcePath, "*", SearchOption.AllDirectories))
-                Directory.CreateDirectory(IncrementFolderIfExists(Path.Combine(targetPath, Path.GetRelativePath(sourcePath, dirPath))));
-
-            // Copy all the files & Replaces any files with the same name
-            foreach (string filePath in Directory.GetFiles(sourcePath, "*.*", SearchOption.AllDirectories))
-                File.Copy(filePath, IncrementFileIfExists(Path.Combine(targetPath, Path.GetRelativePath(sourcePath, filePath))), true);
-
-            // Delete source directory after it is finished copying
-            if (deleteSourcePath)
-            {
-                if (!targetPath.Contains(sourcePath))
-                    DeleteDirectory(sourcePath);
-
-                Refresh();
-            }
-        }
-
-        public void DeleteDirectory(string path)
-        {
-            string[] files = Directory.GetFiles(path);
-            string[] dirs = Directory.GetDirectories(path);
-
-            foreach (string file in files)
-                File.Delete(file);
-
-            foreach (string dir in dirs)
-                DeleteDirectory(dir);
-
-            Directory.Delete(path, false);
-        }
-
-        public void OpenFile(string path)
-        {
-            if (File.Exists(path))
-                Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
-        }
-
-        public void PasteFile(string sourcePath, string targetPath, DataPackageOperation requestedOperation)
-        {
-            if (File.Exists(sourcePath))
-                if (requestedOperation == DataPackageOperation.Copy)
-                    File.Copy(sourcePath, IncrementFileIfExists(Path.Combine(targetPath, Path.GetFileName(sourcePath))), true);
-                else if (requestedOperation == DataPackageOperation.Move && targetPath != GoUpDirectory(sourcePath))
-                    File.Move(sourcePath, IncrementFileIfExists(Path.Combine(targetPath, Path.GetFileName(sourcePath))), true);
         }
 
         public void Refresh()
@@ -294,16 +232,7 @@ namespace Editor.Controls
             Wrap.VerticalSpacing = 10;
 
             foreach (var category in Categories)
-            {
-                Grid icon;
-
-                if (string.IsNullOrEmpty(category.Glyph))
-                    icon = CreateIcon(category.Symbol);
-                else
-                    icon = CreateIcon(category.Glyph);
-
-                Wrap.Children.Add(CategoryTile(category, icon));
-            }
+                Wrap.Children.Add(CategoryTile(category, CreateIcon(category)));
 
             SetBreadcrumbBar();
         }
@@ -353,7 +282,7 @@ namespace Editor.Controls
 
             foreach (var path in filePaths)
             {
-                Grid icon = CreateIcon();
+                Grid icon = CreateIcon(_currentCategory.Value);
 
                 Image image = new Image() { Width = 145, Height = 90 };
 
@@ -361,7 +290,7 @@ namespace Editor.Controls
                 {
                     var file = await StorageFile.GetFileFromPathAsync(path);
 
-                    _ = PreviewFileToImageAsync(file, image);
+                    PreviewfileToImageAsync(file, image);
                 }
 
                 Wrap.Children.Add(FileTile(path, icon, image));
@@ -729,84 +658,6 @@ namespace Editor.Controls
 
             return grid;
         }
-
-        private Grid CreateIcon()
-        {
-            Grid grid = new Grid();
-
-            dynamic icon;
-
-            if (string.IsNullOrEmpty(_currentCategory.Value.Glyph))
-                icon = new SymbolIcon() { Symbol = _currentCategory.Value.Symbol };
-            else
-                icon = new FontIcon() { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = _currentCategory.Value.Glyph };
-
-            grid.Children.Add(icon);
-
-            return grid;
-        }
-
-        private Grid CreateIcon(string glyph)
-        {
-            Grid grid = new Grid();
-
-            FontIcon icon = new FontIcon() { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = glyph };
-
-            grid.Children.Add(icon);
-
-            return grid;
-        }
-
-        private Grid CreateIcon(Symbol symbol)
-        {
-            Grid grid = new Grid();
-
-            SymbolIcon symbolIcon = new SymbolIcon() { Symbol = symbol };
-
-            grid.Children.Add(symbolIcon);
-
-            return grid;
-        }
-
-        private string GoUpDirectory(string path)
-        {
-            if (!path.Contains('\\'))
-                path = null;
-            else
-            {
-                var pathArr = path.Split('\\').SkipLast(1);
-
-                path = string.Join('\\', pathArr);
-            }
-
-            return path;
-        }
-
-        private string GetDirectory(string path)
-        {
-            if (!string.IsNullOrEmpty(Path.GetExtension(path)))
-                path = GoUpDirectory(path);
-
-            return path;
-        }
-
-        private async Task PreviewFileToImageAsync(StorageFile file, Image image)
-        {
-            using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
-            {
-                BitmapImage bitmapImage = new BitmapImage() { DecodePixelWidth = (int)image.Width, DecodePixelHeight = (int)image.Height };
-
-                await bitmapImage.SetSourceAsync(fileStream);
-
-                image.Source = bitmapImage;
-            }
-        }
-
-        private async void CreateDialogAsync(ContentDialog contentDialog)
-        {
-            var result = await contentDialog.ShowAsync();
-        }
-
         private async void ContentDialogCreateNewFileOrFolderAndRefreshAsync(string path = "")
         {
             var dialog = new ContentDialog()
@@ -1048,7 +899,199 @@ namespace Editor.Controls
                 }
         }
 
-        private async Task RenameInsideFile(string path, string newFileName)
+        private void SetBreadcrumbBar()
+        {
+            if (_currentCategory is null)
+                Bar.ItemsSource = new string[] { };
+            else
+            {
+                var source = new string[] { "Assets", _currentCategory.Value.Name };
+
+                Bar.ItemsSource = source;
+
+                if (!string.IsNullOrEmpty(_currentSubPath))
+                {
+                    var subPathSource = _currentSubPath.Split('\\');
+
+                    var newSource = new string[source.Length + subPathSource.Length];
+
+                    source.CopyTo(newSource, 0);
+                    subPathSource.CopyTo(newSource, source.Length);
+
+                    Bar.ItemsSource = newSource;
+                }
+            }
+        }
+    }
+
+    internal partial class FilesController
+    {
+        private static readonly string TEMPLATES = @"Assets\Engine\Resources\Templates";
+
+        public async void PasteFileSystemEntryFromClipboard(string path)
+        {
+            DataPackageView dataPackageView = Clipboard.GetContent();
+            if (dataPackageView.Contains(StandardDataFormats.Text))
+            {
+                var sourcePath = await dataPackageView.GetTextAsync();
+                var sourcePathCatagory = Path.GetRelativePath(RootPath, sourcePath).Split("\\").First();
+                var targetPathCatagory = Path.GetRelativePath(RootPath, path).Split("\\").First();
+
+                if (sourcePathCatagory == targetPathCatagory)
+                    if (string.IsNullOrEmpty(Path.GetExtension(sourcePath)))
+                        PasteFolder(sourcePath, GetDirectory(path), dataPackageView.RequestedOperation);
+                    else
+                        PasteFile(sourcePath, GetDirectory(path), dataPackageView.RequestedOperation);
+
+                Refresh();
+            }
+        }
+
+        public void OpenFolder(string path)
+        {
+            if (Directory.Exists(path))
+                Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
+        }
+
+        public void OpenFile(string path)
+        {
+            if (File.Exists(path))
+                Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
+        }
+
+        public void CopyDirectory(string sourcePath, string targetPath, bool deleteSourcePath = false)
+        {
+            // Create the target directory
+            Directory.CreateDirectory(targetPath = IncrementFolderIfExists(Path.Combine(targetPath, Path.GetFileName(sourcePath))));
+
+            // Now Create all of the directories
+            foreach (string dirPath in Directory.GetDirectories(sourcePath, "*", SearchOption.AllDirectories))
+                Directory.CreateDirectory(IncrementFolderIfExists(Path.Combine(targetPath, Path.GetRelativePath(sourcePath, dirPath))));
+
+            // Copy all the files & Replaces any files with the same name
+            foreach (string filePath in Directory.GetFiles(sourcePath, "*.*", SearchOption.AllDirectories))
+                File.Copy(filePath, IncrementFileIfExists(Path.Combine(targetPath, Path.GetRelativePath(sourcePath, filePath))), true);
+
+            // Delete source directory after it is finished copying
+            if (deleteSourcePath)
+            {
+                if (!targetPath.Contains(sourcePath))
+                    DeleteDirectory(sourcePath);
+
+                Refresh();
+            }
+        }
+
+        public void DeleteDirectory(string path)
+        {
+            string[] files = Directory.GetFiles(path);
+            string[] dirs = Directory.GetDirectories(path);
+
+            foreach (string file in files)
+                File.Delete(file);
+
+            foreach (string dir in dirs)
+                DeleteDirectory(dir);
+
+            Directory.Delete(path, false);
+        }
+
+        public void PasteFolder(string sourcePath, string targetPath, DataPackageOperation requestedOperation)
+        {
+            if (Directory.Exists(sourcePath))
+                if (requestedOperation == DataPackageOperation.Copy)
+                    CopyDirectory(sourcePath, targetPath);
+                else if (requestedOperation == DataPackageOperation.Move)
+                    CopyDirectory(sourcePath, targetPath, true);
+        }
+
+        public void PasteFile(string sourcePath, string targetPath, DataPackageOperation requestedOperation)
+        {
+            if (File.Exists(sourcePath))
+                if (requestedOperation == DataPackageOperation.Copy)
+                    File.Copy(sourcePath, IncrementFileIfExists(Path.Combine(targetPath, Path.GetFileName(sourcePath))), true);
+                else if (requestedOperation == DataPackageOperation.Move && targetPath != GoUpDirectory(sourcePath))
+                    File.Move(sourcePath, IncrementFileIfExists(Path.Combine(targetPath, Path.GetFileName(sourcePath))), true);
+        }
+
+        private string GoUpDirectory(string path)
+        {
+            if (!path.Contains('\\'))
+                path = null;
+            else
+            {
+                var pathArr = path.Split('\\').SkipLast(1);
+
+                path = string.Join('\\', pathArr);
+            }
+
+            return path;
+        }
+
+        private string GetDirectory(string path)
+        {
+            if (!string.IsNullOrEmpty(Path.GetExtension(path)))
+                path = GoUpDirectory(path);
+
+            return path;
+        }
+
+        private Grid CreateIcon(Category _category)
+        {
+            Grid grid = new Grid();
+
+            dynamic icon;
+
+            if (string.IsNullOrEmpty(_category.Glyph))
+                icon = CreateIcon(_category.Symbol);
+            else
+                icon = CreateIcon(_category.Glyph);
+
+            grid.Children.Add(icon);
+
+            return grid;
+        }
+
+        private Grid CreateIcon(string glyph)
+        {
+            Grid grid = new Grid();
+
+            FontIcon icon = new FontIcon() { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = glyph };
+
+            grid.Children.Add(icon);
+
+            return grid;
+        }
+
+        private Grid CreateIcon(Symbol symbol)
+        {
+            Grid grid = new Grid();
+
+            SymbolIcon symbolIcon = new SymbolIcon() { Symbol = symbol };
+
+            grid.Children.Add(symbolIcon);
+
+            return grid;
+        }
+
+        private async void PreviewfileToImageAsync(StorageFile file, Image image)
+        {
+            using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
+            {
+                BitmapImage bitmapImage = new BitmapImage() { DecodePixelWidth = (int)image.Width, DecodePixelHeight = (int)image.Height };
+
+                await bitmapImage.SetSourceAsync(fileStream);
+
+                image.Source = bitmapImage;
+            }
+        }
+
+        private async void CreateDialogAsync(ContentDialog contentDialog)
+        {
+            var result = await contentDialog.ShowAsync();
+        }
+
+        private async void RenameInsideFile(string path, string newFileName)
         {
             if (File.Exists(path))
                 using (FileStream fs = File.Open(path, FileMode.Open))
@@ -1067,8 +1110,6 @@ namespace Editor.Controls
                     fs.Close();
                 }
         }
-
-        private string RemoveLastChar(string s) { return s.Remove(s.Length - 1); }
 
         private string IncrementFileIfExists(string path)
         {
@@ -1114,55 +1155,7 @@ namespace Editor.Controls
                     : ""));
         }
 
-        private void SetBreadcrumbBar()
-        {
-            if (_currentCategory is null)
-                Bar.ItemsSource = new string[] { };
-            else
-            {
-                var source = new string[] { "Assets", _currentCategory.Value.Name };
-
-                Bar.ItemsSource = source;
-
-                if (!string.IsNullOrEmpty(_currentSubPath))
-                {
-                    var subPathSource = _currentSubPath.Split('\\');
-
-                    var newSource = new string[source.Length + subPathSource.Length];
-
-                    source.CopyTo(newSource, 0);
-                    subPathSource.CopyTo(newSource, source.Length);
-
-                    Bar.ItemsSource = newSource;
-                }
-            }
-        }
-
-        public void GoUpDirectoryAndRefresh()
-        {
-            if (!string.IsNullOrEmpty(_currentSubPath))
-            {
-                _currentSubPath = GoUpDirectory(_currentSubPath);
-
-                Refresh();
-            }
-            else
-            {
-                _currentCategory = null;
-                _currentSubPath = null;
-
-                CreateCatergoryTiles(Categories);
-            }
-        }
-
-        private void GoIntoDirectoryAndRefresh(string path)
-        {
-            _currentSubPath = Path.GetRelativePath(
-                Path.Combine(RootPath, _currentCategory.Value.Name),
-                path);
-
-            Refresh();
-        }
+        private string RemoveLastChar(string s) { return s.Remove(s.Length - 1); }
 
         private void CopyToClipboard(string path, DataPackageOperation requestedOpertion)
         {
@@ -1172,5 +1165,5 @@ namespace Editor.Controls
 
             Clipboard.SetContent(data);
         }
-    }
+    } 
 }

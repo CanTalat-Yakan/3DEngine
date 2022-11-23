@@ -27,7 +27,7 @@ using System.Text;
 
 namespace Editor.Controls
 {
-    internal class PropertiesController
+    internal partial class PropertiesController
     {
         private StackPanel _stackPanel;
 
@@ -44,6 +44,7 @@ namespace Editor.Controls
         }
 
         public static void Clear() => MainController.Instance.LayoutControl.PropertiesRoot.Children.Clear();
+
         public static void Set(Properties properties) => MainController.Instance.LayoutControl.PropertiesRoot.Children.Add(properties);
 
         private void CreateEntityProperties(Entity entity)
@@ -126,7 +127,10 @@ namespace Editor.Controls
                     _stackPanel.Children.Add(CreateExpander("Preview", preview));
                 }
         }
+    }
 
+    internal partial class PropertiesController
+    {
         private void CreateEmptyMessage()
         {
             Grid grid = new Grid() { Margin = new Thickness(0, 20, 0, 0) };

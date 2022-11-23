@@ -33,7 +33,7 @@ namespace Editor.Controls
                 new Output(),
                 new Files());
 
-            LayoutControl.Initialize();
+            LayoutControl.CreateLayout();
         }
     }
 }
