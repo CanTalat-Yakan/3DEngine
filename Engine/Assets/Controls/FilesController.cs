@@ -381,19 +381,19 @@ namespace Editor.Controls
             };
 
             //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
-            items[0].Click += (s, e) => { ContentDialogCreateNewFileOrFolderAndRefreshAsync(path); };
+            items[0].Click += (s, e) => ContentDialogCreateNewFileOrFolderAndRefreshAsync(path);
 
-            items[1].Click += (s, e) => { GoIntoDirectoryAndRefresh(path); };
-            items[2].Click += (s, e) => { OpenFolder(path); };
+            items[1].Click += (s, e) => GoIntoDirectoryAndRefresh(path);
+            items[2].Click += (s, e) => OpenFolder(path);
 
-            items[3].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Move); };
-            items[4].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Copy); };
-            items[5].Click += (s, e) => { PasteFileSystemEntryFromClipboard(path); };
+            items[3].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Move);
+            items[4].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Copy);
+            items[5].Click += (s, e) => PasteFileSystemEntryFromClipboard(path);
 
-            items[6].Click += (s, e) => { ContentDialogRename(path); };
-            items[7].Click += (s, e) => { ContentDialogDelete(path); };
+            items[6].Click += (s, e) => ContentDialogRename(path);
+            items[7].Click += (s, e) => ContentDialogDelete(path);
 
-            items[8].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.None); };
+            items[8].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.None);
 
             MenuFlyout menuFlyout = new();
             foreach (var item in items)
@@ -503,19 +503,19 @@ namespace Editor.Controls
             };
 
             //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
-            items[0].Click += (s, e) => { ContentDialogCreateNewFileOrFolderAndRefreshAsync(path); };
+            items[0].Click += (s, e) => ContentDialogCreateNewFileOrFolderAndRefreshAsync(path);
 
-            items[1].Click += (s, e) => { OpenFile(path); };
-            items[2].Click += (s, e) => { OpenFolder(GoUpDirectory(path)); };
+            items[1].Click += (s, e) => OpenFile(path);
+            items[2].Click += (s, e) => OpenFolder(GoUpDirectory(path));
 
-            items[3].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Move); };
-            items[4].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Copy); };
-            items[5].Click += (s, e) => { PasteFileSystemEntryFromClipboard(path); };
+            items[3].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Move);
+            items[4].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Copy);
+            items[5].Click += (s, e) => PasteFileSystemEntryFromClipboard(path);
 
-            items[6].Click += (s, e) => { ContentDialogRename(path); };
-            items[7].Click += (s, e) => { ContentDialogDelete(path); };
+            items[6].Click += (s, e) => ContentDialogRename(path);
+            items[7].Click += (s, e) => ContentDialogDelete(path);
 
-            items[8].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.None); };
+            items[8].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.None);
 
             MenuFlyout menuFlyout = new();
             foreach (var item in items)
@@ -596,18 +596,18 @@ namespace Editor.Controls
                 path = Path.Combine(path, _currentSubPath);
 
             //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
-            items[0].Click += (s, e) => { ContentDialogCreateNewFileOrFolderAndRefreshAsync(path); };
+            items[0].Click += (s, e) => ContentDialogCreateNewFileOrFolderAndRefreshAsync(path);
 
-            items[1].Click += (s, e) => { OpenFolder(GoUpDirectory(path)); };
+            items[1].Click += (s, e) => OpenFolder(GoUpDirectory(path));
 
-            items[2].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Move); };
-            items[3].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.Copy); };
-            items[4].Click += (s, e) => { PasteFileSystemEntryFromClipboard(path); };
+            items[2].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Move);
+            items[3].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Copy);
+            items[4].Click += (s, e) => PasteFileSystemEntryFromClipboard(path);
 
-            items[5].Click += (s, e) => { ContentDialogRename(path); };
-            items[6].Click += (s, e) => { ContentDialogDelete(path); };
-
-            items[7].Click += (s, e) => { CopyToClipboard(path, DataPackageOperation.None); };
+            items[5].Click += (s, e) => ContentDialogRename(path);
+            items[6].Click += (s, e) => ContentDialogDelete(path);
+            
+            items[7].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.None);
 
             MenuFlyout menuFlyout = new();
             foreach (var item in items)
