@@ -45,13 +45,13 @@ namespace Editor.UserControls
                 new Category() { Name = "Packages", Glyph = "\xE74C", FileTypes = new string[] { ".zip", ".7zip", ".rar" } });
         }
 
-        private void AppBarButton_Click_AddFiles(object sender, RoutedEventArgs e) { _filesControl.SelectFilesAsync(); }
+        private void AppBarButton_Click_AddFiles(object sender, RoutedEventArgs e) => _filesControl.SelectFilesAsync();
 
-        private void AppBarButton_Click_OpenFolder(object sender, RoutedEventArgs e) { _filesControl.OpenFolder(); }
+        private void AppBarButton_Click_OpenFolder(object sender, RoutedEventArgs e) => _filesControl.OpenFolder(); 
 
-        private void AppBarButton_Click_RefreshFiles(object sender, RoutedEventArgs e) { _filesControl.Refresh(); }
+        private void AppBarButton_Click_RefreshFiles(object sender, RoutedEventArgs e) => _filesControl.Refresh();
 
-        private void BreadcrumBar_Files_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args) { _filesControl.GoUpDirectoryAndRefresh(); }
+        private void BreadcrumBar_Files_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args) => _filesControl.GoUpDirectoryAndRefresh();
 
         private void Grid_Main_DragOver(object sender, DragEventArgs e)
         {

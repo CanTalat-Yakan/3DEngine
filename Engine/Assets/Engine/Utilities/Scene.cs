@@ -61,13 +61,14 @@ namespace Engine.Utilities
 
             if (Input.Instance.GetKey(Windows.System.VirtualKey.C, EInputState.DOWN))
             {
-                OutputController.Log("Spawned Cube");
+                OutputController.Log("Spawned 10 Cubes");
 
-                EntitytManager.CreatePrimitive(EPrimitiveTypes.CUBE, _subParent).Transform = new TransformComponent
-                {
-                    EulerAngles = new Vector3(new Random().Next(1, 360), new Random().Next(1, 360), new Random().Next(1, 360)),
-                    Scale = new Vector3(new Random().Next(1, 3), new Random().Next(1, 3), new Random().Next(1, 3))
-                };
+                for (int i = 0; i < 10; i++)
+                    EntitytManager.CreatePrimitive(EPrimitiveTypes.CUBE, _subParent).Transform = new TransformComponent
+                    {
+                        EulerAngles = new Vector3(new Random().Next(1, 360), new Random().Next(1, 360), new Random().Next(1, 360)),
+                        Scale = new Vector3(new Random().Next(1, 3), new Random().Next(1, 3), new Random().Next(1, 3))
+                    };
             }
         }
 

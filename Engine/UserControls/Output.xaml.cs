@@ -83,11 +83,11 @@ namespace Editor.UserControls
             OutputController.Log("Test");
         }
 
-        private void AppBarButton_Output_Clear(object sender, RoutedEventArgs e) { _outputControl.ClearOutput(); }
+        private void AppBarButton_Output_Clear(object sender, RoutedEventArgs e) => _outputControl.ClearOutput();
 
-        private void AppBarToggleButton_Output_Collapse_Click(object sender, RoutedEventArgs e) { OutputController.IterateOutputMessages(); }
-
-        private void AppBarToggleButton_Filter_Click(object sender, RoutedEventArgs e) { OutputController.IterateOutputMessages(); }
+        private void AppBarToggleButton_Output_Collapse_Click(object sender, RoutedEventArgs e) => OutputController.IterateOutputMessages();
+        
+        private void AppBarToggleButton_Filter_Click(object sender, RoutedEventArgs e) => OutputController.IterateOutputMessages();
 
         private void AppBarToggleButton_Debug_ErrorPause_Click(object sender, RoutedEventArgs e) { }
 

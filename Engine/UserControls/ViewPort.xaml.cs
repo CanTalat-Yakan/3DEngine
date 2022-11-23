@@ -44,8 +44,8 @@ namespace Editor.UserControls
             //Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(Windows.System.VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down);
         }
 
-        private void x_Slider_FOV_ValueChanged(object sender, RangeBaseValueChangedEventArgs e) { CameraComponent.s_FieldOfView = e.NewValue; }
+        private void x_Slider_FOV_ValueChanged(object sender, RangeBaseValueChangedEventArgs e) => CameraComponent.s_FieldOfView = e.NewValue;
 
-        private void x_NumberBox_CameraSpeed_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) { ViewPortController.s_MovementSpeed = (float)args.NewValue; }
+        private void x_NumberBox_CameraSpeed_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) => ViewPortController.s_MovementSpeed = (float)args.NewValue;
     }
 }

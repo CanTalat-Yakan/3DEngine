@@ -23,6 +23,6 @@ namespace Editor.UserControls
             _propertiesControl = new PropertiesController(x_StackPanel_Properties, content);
         }
 
-        private void FirePropertyChanged([CallerMemberName] string memberName = null) { EventPropertyChanged?.Invoke(this, new PropertyChangedEventArgs(memberName)); }
+        private void FirePropertyChanged([CallerMemberName] string memberName = null) => EventPropertyChanged?.Invoke(this, new PropertyChangedEventArgs(memberName));
     }
 }
