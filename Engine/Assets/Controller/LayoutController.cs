@@ -5,7 +5,6 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
 using System;
 using Editor.UserControls;
-using Controls;
 
 namespace Editor.Controller
 {

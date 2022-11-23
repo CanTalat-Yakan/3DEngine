@@ -1,7 +1,7 @@
-﻿using Assets.Controls;
-using Controls;
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
+using System.Diagnostics;
 using WinUIEx;
+using Editor.Controller;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -16,9 +16,9 @@ namespace Editor
         public MainWindow()
         {
             this.InitializeComponent();
-            
+
             ExtendsContentIntoTitleBar = true; // enable custom titlebar
-            
+
             _themeControl = new ThemeController(this, x_Page_Main);
             _mainControl = new MainController(this, x_Grid_Main, x_TextBlock_Status_Content, x_TextBlock_StatusIcon_Content);
             _mainControl.ControlPlayer = new PlayerController(x_AppBarToggleButton_Status_Play, x_AppBarToggleButton_Status_Pause, x_AppBarButton_Status_Forward);
@@ -33,5 +33,7 @@ namespace Editor
         private void AppBarButton_Status_Kill_Click(object sender, RoutedEventArgs e) => _mainControl.ControlPlayer.Kill();
 
         private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) => _themeControl.SetRequstedTheme();
+
+        private void AppBarButton_Documentation_Click(object sender, RoutedEventArgs e) => Process.Start("http://github.com/CanTalat-Yakan/3DEngine/wiki");
     }
 }

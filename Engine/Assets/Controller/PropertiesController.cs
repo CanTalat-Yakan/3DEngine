@@ -21,7 +21,6 @@ using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
 using Expander = Microsoft.UI.Xaml.Controls.Expander;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 using Path = System.IO.Path;
-using Controls;
 
 namespace Editor.Controller
 {

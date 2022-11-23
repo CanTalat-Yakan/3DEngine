@@ -22,13 +22,10 @@
             <NavigationView.MenuItems>
                 <NavigationViewItem Icon="Home" Content="Home"/>
                 <NavigationViewItem Icon="Play" Content="Engine" IsSelected="True"/>
-                <NavigationViewItem Icon="ViewAll" Content="Templates"/>
             </NavigationView.MenuItems>
 
             <NavigationView.PaneFooter>
-                <StackPanel x:Name="FooterStackPanel" Orientation="Vertical" Visibility="Visible">
-                    <NavigationViewItem Icon="Library" Content="Documentation"/>
-                </StackPanel>
+                    <AppBarButton Icon="Library" Content="Documentation" Height="50" Width="44" Margin="2" Click="AppBarButton_Documentation_Click"/>
             </NavigationView.PaneFooter>
 
 

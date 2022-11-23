@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
 using Microsoft.UI;
 
-namespace Controls
+namespace Editor.Controller
 {
     internal enum EPlayMode
     {

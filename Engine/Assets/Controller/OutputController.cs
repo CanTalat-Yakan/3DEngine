@@ -11,7 +11,7 @@ using System;
 using Windows.Storage;
 using Windows.System;
 
-namespace Controls
+namespace Editor.Controller
 {
     internal enum EMessageType
     {

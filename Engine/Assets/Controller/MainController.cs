@@ -1,9 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Editor.UserControls;
-using Editor;
-using Editor.Controller;
 
-namespace Controls
+namespace Editor.Controller
 {
     internal class MainController
     {

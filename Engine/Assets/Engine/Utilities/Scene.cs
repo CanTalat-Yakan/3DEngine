@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Numerics;
-using Controls;
+using Editor.Controller;
 using Engine.Components;
 using Engine.Editor;
 
