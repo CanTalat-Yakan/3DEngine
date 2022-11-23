@@ -39,7 +39,7 @@
 
                 <Expander Header="Scene" IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
                     <StackPanel>
-                        <muxc:TreeView x:Name="x_TreeView_Hierarchy" Tapped="x_TreeView_Hierarchy_Tapped" SelectionMode="Single" HorizontalAlignment="Stretch" >
+                        <muxc:TreeView x:Name="x_TreeView_Hierarchy" Tapped="TreeView_Hierarchy_Tapped" DragItemsCompleted="TreeView_Hierarchy_DragItemsCompleted" SelectionMode="Single" HorizontalAlignment="Stretch" >
                             <muxc:TreeView.ContextFlyout>
                                 <MenuFlyout>
                                     <MenuFlyoutItem Text="Cut" Icon="Cut"/>

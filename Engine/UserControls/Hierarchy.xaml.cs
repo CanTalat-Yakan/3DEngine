@@ -23,8 +23,10 @@ namespace Editor.UserControls
                     _hierarchyControl.PopulateTree();
         }
 
-        private void x_TreeView_Hierarchy_Tapped(object sender, TappedRoutedEventArgs e) { _hierarchyControl.SetProperties(); }
-
         private void Button_Click(object sender, RoutedEventArgs e) { Engine.Core.Instance.Scene.EntitytManager.CreateEmpty("New Entity"); }
+
+        private void TreeView_Hierarchy_Tapped(object sender, TappedRoutedEventArgs e) { _hierarchyControl.SetProperties(); }
+
+        private void TreeView_Hierarchy_DragItemsCompleted(TreeView sender, TreeViewDragItemsCompletedEventArgs args) { _hierarchyControl.SetNewParentTreeEntry((TreeViewNode)args.NewParentItem, (TreeViewNode)args.Items); }
     }
 }
