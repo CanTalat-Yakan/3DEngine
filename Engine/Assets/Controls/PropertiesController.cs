@@ -149,7 +149,7 @@ namespace Editor.Controls
         {
             Grid grid = new Grid();
             StackPanel stack = new StackPanel() { Orientation = Orientation.Horizontal };
-            TextBlock header = new TextBlock() { Text = s + ":", Width = 80, VerticalAlignment = VerticalAlignment.Bottom };
+            TextBlock header = new TextBlock() { Text = s, Width = 80, VerticalAlignment = VerticalAlignment.Bottom };
 
             stack.Children.Add(header);
             foreach (var item in _content)
@@ -163,7 +163,7 @@ namespace Editor.Controls
         {
             Grid grid = new Grid();
             StackPanel stack = new StackPanel() { Orientation = Orientation.Horizontal };
-            TextBlock header = new TextBlock() { Text = s + ":", Width = 160, VerticalAlignment = VerticalAlignment.Bottom };
+            TextBlock header = new TextBlock() { Text = s, Width = 160, VerticalAlignment = VerticalAlignment.Bottom };
 
             stack.Children.Add(header);
             foreach (var item in _content)
