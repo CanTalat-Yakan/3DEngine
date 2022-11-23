@@ -41,7 +41,7 @@ namespace Editor.Controls
 
             UIElement[] topRight = new[]
             {
-                CreateButton(CreateIcon("\xE946"), CreateTextFull(ref Profile)),
+                CreateButton(CreateIcon("\xE946"), CreateTextFull(out Profile)),
                 CreateButton(CreateIcon(Symbol.Video),
                     StackInGrid(
                             CreateSlider("Field Of View", 90, 40, 110, (s, e) => { CameraComponent.s_FieldOfView = e.NewValue; }),
@@ -205,7 +205,7 @@ namespace Editor.Controls
             return WrapInField(s, textInput);
         }
 
-        private Grid CreateTextFull(ref TextBlock textBlock)
+        private Grid CreateTextFull(out TextBlock textBlock)
         {
             textBlock = new TextBlock();
 

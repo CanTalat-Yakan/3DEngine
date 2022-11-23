@@ -17,7 +17,7 @@ namespace Editor.UserControls
 
             _viewPortControl = new ViewPortController(this, x_Grid_Main);
 
-            Loaded += (s, e) => _engineCore = new Engine.Core(x_SwapChainPanel_ViewPort, _viewPortControl.Profile.Text);
+            Loaded += (s, e) => _engineCore = new Engine.Core(x_SwapChainPanel_ViewPort, _viewPortControl.Profile);
             Loaded += (s, e) => InitializeInput();
         }
 
