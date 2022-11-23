@@ -444,7 +444,11 @@ namespace Editor.Controls
 
         private Grid BackTile(Grid icon)
         {
-            GridMain.ContextFlyout = CreateRootMenuFlyout();
+            var path = Path.Combine(RootPath, _currentCategory.Value.Name);
+            if (!string.IsNullOrEmpty(_currentSubPath))
+                path = Path.Combine(path, _currentSubPath);
+
+            GridMain.ContextFlyout = CreateRootMenuFlyout(path);
 
             Grid grid = new Grid();
 
@@ -948,7 +952,7 @@ namespace Editor.Controls
             return menuFlyout;
         }
 
-        private MenuFlyout CreateRootMenuFlyout()
+        private MenuFlyout CreateRootMenuFlyout(string path)
         {
             MenuFlyoutItem[] items = new[] {
                 new MenuFlyoutItem() { Text = "Create File System Entry", Icon = new SymbolIcon(Symbol.NewFolder) },
@@ -964,11 +968,7 @@ namespace Editor.Controls
                 //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Copy Path", Icon = new SymbolIcon(Symbol.Copy) },
             };
-
-            var path = Path.Combine(RootPath, _currentCategory.Value.Name);
-            if (!string.IsNullOrEmpty(_currentSubPath))
-                path = Path.Combine(path, _currentSubPath);
-
+                        
             //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
             items[0].Click += (s, e) => ContentDialogCreateNewFileOrFolderAndRefreshAsync(path);
 
