@@ -236,7 +236,8 @@ namespace Editor.Controls
             MenuFlyoutItem[] items = new[] {
                 new MenuFlyoutItem() { Text = "Create Entity" },
                 //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Show in Explorer", Icon = new FontIcon(){ Glyph = "\xE838", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
+                new MenuFlyoutItem() { Text = "Save", Icon = new SymbolIcon(Symbol.Save) },
+                new MenuFlyoutItem() { Text = "Show in Files", Icon = new FontIcon(){ Glyph = "\xE838", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
                 //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
                 new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
@@ -245,11 +246,12 @@ namespace Editor.Controls
             items[0].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEmpty();
 
             //items[1].Click += (s, e) => OpenFolder(path);
+            //items[2].Click += (s, e) => OpenFolder(path);
 
-            //items[2].Click += (s, e) => ContentDialogRename(path);
-            //items[3].Click += (s, e) => ContentDialogDelete(path);
+            //items[3].Click += (s, e) => ContentDialogRename(path);
+            //items[4].Click += (s, e) => ContentDialogDelete(path);
 
-            //items[4].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.None);
+            //items[5].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.None);
 
             MenuFlyout menuFlyout = new();
             foreach (var item in items)
@@ -257,7 +259,7 @@ namespace Editor.Controls
                 menuFlyout.Items.Add(item);
 
                 if (item.Text == "Create Entity"
-                    || item.Text == "Show in Explorer")
+                    || item.Text == "Show in Files")
                     menuFlyout.Items.Add(new MenuFlyoutSeparator());
             }
 

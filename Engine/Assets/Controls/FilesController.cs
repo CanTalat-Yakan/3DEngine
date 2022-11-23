@@ -406,8 +406,6 @@ namespace Editor.Controls
                 CornerRadius = new CornerRadius(10),
                 HorizontalContentAlignment = HorizontalAlignment.Stretch,
                 VerticalContentAlignment = VerticalAlignment.Stretch,
-                //CanDrag = true,
-                //AllowDrop = true,
             };
             button.ContextFlyout = CreateDefaultMenuFlyout(path, true);
             button.Tapped += (s, e) =>
