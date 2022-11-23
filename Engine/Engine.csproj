@@ -11,9 +11,9 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Content Remove="Assets\Controls\FilesController.cs" />
-    <Content Remove="Assets\Controls\ThemeController.cs" />
-    <Content Remove="Assets\Controls\ViewPortController.cs" />
+    <Content Remove="Assets\Controller\FilesController.cs" />
+    <Content Remove="Assets\Controller\ThemeController.cs" />
+    <Content Remove="Assets\Controller\ViewPortController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Assets\Engine\Resources\Models\Cube.obj" />
@@ -28,6 +28,9 @@
     <None Remove="Assets\Engine\Resources\Templates\Scenes.txt" />
     <None Remove="Assets\Engine\Resources\Templates\Scripts.txt" />
     <None Remove="Assets\Engine\Resources\Templates\Shaders.txt" />
+    <None Remove="Assets\Frames\Home.xaml" />
+    <None Remove="Assets\Frames\Main.xaml" />
+    <None Remove="Assets\Frames\Settings.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -67,7 +70,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ContentDialog\" />
-    <Folder Include="Frame\" />
+    <Page Update="Frame\Settings.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 </Project>

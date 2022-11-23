@@ -17,7 +17,7 @@ using Windows.Storage.Streams;
 using Windows.Storage;
 using Editor.UserControls;
 
-namespace Editor.Controls
+namespace Editor.Controller
 {
     internal struct Category
     {

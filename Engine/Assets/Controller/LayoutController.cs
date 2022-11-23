@@ -5,8 +5,9 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
 using System;
 using Editor.UserControls;
+using Controls;
 
-namespace Editor.Controls
+namespace Editor.Controller
 {
     internal class GridDataTemeplate
     {

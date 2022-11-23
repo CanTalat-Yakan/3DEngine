@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
 using Microsoft.UI;
 
-namespace Editor.Controls
+namespace Controls
 {
     internal enum EPlayMode
     {
@@ -80,7 +80,7 @@ namespace Editor.Controls
 
             _pause.IsEnabled = b;
             _pause.IsChecked = false;
-            if(!b)
+            if (!b)
                 _forward.IsEnabled = b;
 
             _play.Label = b ? "Stop" : "Play";
