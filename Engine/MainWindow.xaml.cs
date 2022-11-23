@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using WinUIEx;
 using Editor.Controller;
+using System;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -34,6 +35,6 @@ namespace Editor
 
         private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) => _themeControl.SetRequstedTheme();
 
-        private void AppBarButton_Documentation_Click(object sender, RoutedEventArgs e) => Process.Start("http://github.com/CanTalat-Yakan/3DEngine/wiki");
+        private void AppBarButton_Documentation_Click(object sender, RoutedEventArgs e) => _ = Windows.System.Launcher.LaunchUriAsync(new System.Uri(@"https://3DEngine.wiki/"));
     }
 }

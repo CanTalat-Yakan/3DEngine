@@ -21,13 +21,16 @@
 
             <NavigationView.MenuItems>
                 <NavigationViewItem Icon="Home" Content="Home"/>
-                <NavigationViewItem Icon="Play" Content="Engine" IsSelected="True"/>
+                <NavigationViewItem Content="Engine" IsSelected="True">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE809;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
             </NavigationView.MenuItems>
 
             <NavigationView.PaneFooter>
                     <AppBarButton Icon="Library" Content="Documentation" Height="50" Width="44" Margin="2" Click="AppBarButton_Documentation_Click"/>
             </NavigationView.PaneFooter>
-
 
             <Frame x:Name="x_Frame_Main" CornerRadius="5">
                 <Frame.Resources>
