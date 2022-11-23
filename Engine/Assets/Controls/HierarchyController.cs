@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
 using Editor.UserControls;
@@ -51,7 +52,7 @@ namespace Editor.Controls
             var scene = new Grid[]
             {
                 CreateTreeView(out SceneTreeView),
-                CreateButton("Create New Entity", (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEmpty() )
+                CreateButton("Create Entity", (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEmpty() )
             };
 
             SceneTreeView.Tapped += (s, e) => SetProperties();
@@ -59,7 +60,7 @@ namespace Editor.Controls
 
             _stackPanel.Children.Add(CreateExpander("Scene", scene));
             _stackPanel.Children.Add(CreateSeperator());
-            _stackPanel.Children.Add(CreateButton("Add New Subscene", (s, e) => _stackPanel.Children.Add(CreateExpanderWithToggleButton("Subscene", CreateSubsceneTreeView()))));
+            _stackPanel.Children.Add(CreateButton("Add Subscene", (s, e) => _stackPanel.Children.Add(CreateExpanderWithToggleButton("Subscene", CreateSubsceneTreeView()))));
             _stackPanel.Children.Add(CreateExpanderWithToggleButton("Subscene", CreateSubsceneTreeView()));
         }
 
@@ -72,7 +73,7 @@ namespace Editor.Controls
             var subscene = new Grid[]
             {
                 CreateTreeView(out subsceneTreeView),
-                CreateButton("Create New Entity", null )
+                CreateButton("Create Entity", null )
             };
 
             subsceneTreeView.Tapped += (s, e) => SetProperties();
@@ -190,12 +191,118 @@ namespace Editor.Controls
                 GetEntity(node.Content as TreeEntry).Parent = GetEntity(newParent.Content as TreeEntry);
             }
         }
+        
+        private MenuFlyout CreateDefaultMenuFlyout(string path = "")
+        {
+            MenuFlyoutItem[] items = new[] {
+                new MenuFlyoutItem() { Text = "Create Parent Entity" },
+                new MenuFlyoutItem() { Text = "Create Child Entity" },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Cut", Icon = new SymbolIcon(Symbol.Cut) },
+                new MenuFlyoutItem() { Text = "Copy", Icon = new SymbolIcon(Symbol.Copy) },
+                new MenuFlyoutItem() { Text = "Paste", Icon = new SymbolIcon(Symbol.Paste) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
+                new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
+            };
+
+            items[0].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEmpty();
+            items[1].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEmpty();
+
+            //items[2].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Move);
+            //items[3].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Copy);
+            //items[4].Click += (s, e) => PasteFileSystemEntryFromClipboard(path);
+
+            //items[5].Click += (s, e) => ContentDialogRename(path);
+            //items[6].Click += (s, e) => ContentDialogDelete(path);
+
+            MenuFlyout menuFlyout = new();
+            foreach (var item in items)
+            {
+                menuFlyout.Items.Add(item);
+
+                if (item.Text == "Create Child Entity"
+                    || item.Text == "Paste")
+                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
+            }
+
+            menuFlyout = AppendDynamicMenuFlyoutSubItems(menuFlyout);
+
+            return menuFlyout;
+        }
+
+        private MenuFlyout CreateRootMenuFlyout(string path = "")
+        {
+            MenuFlyoutItem[] items = new[] {
+                new MenuFlyoutItem() { Text = "Create Entity" },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Show in Explorer", Icon = new FontIcon(){ Glyph = "\xE838", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
+                new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
+            };
+
+            items[0].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEmpty();
+
+            //items[1].Click += (s, e) => OpenFolder(path);
+
+            //items[2].Click += (s, e) => ContentDialogRename(path);
+            //items[3].Click += (s, e) => ContentDialogDelete(path);
+
+            //items[4].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.None);
+
+            MenuFlyout menuFlyout = new();
+            foreach (var item in items)
+            {
+                menuFlyout.Items.Add(item);
+
+                if (item.Text == "Create Entity"
+                    || item.Text == "Show in Explorer")
+                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
+            }
+
+            menuFlyout = AppendDynamicMenuFlyoutSubItems(menuFlyout);
+
+            return menuFlyout;
+        }
+
+        private MenuFlyout AppendDynamicMenuFlyoutSubItems(MenuFlyout menuFlyout)
+        {
+            MenuFlyoutItem[] objects = new[] {
+                new MenuFlyoutItem() { Text = "Plane"},
+                new MenuFlyoutItem() { Text = "Cube"},
+                new MenuFlyoutItem() { Text = "Sphere"},
+                new MenuFlyoutItem() { Text = "Cylinder"},
+                new MenuFlyoutItem() { Text = "Capsule"},
+                new MenuFlyoutItem() { Text = "Quad"},
+            };
+            var objectSubItem = new MenuFlyoutSubItem() { Text = "Objects" };
+            foreach (var item in objects)
+                objectSubItem.Items.Add(item);
+
+            MenuFlyoutItem[] Lights = new[] {
+                new MenuFlyoutItem() { Text = "Directional Light"},
+                new MenuFlyoutItem() { Text = "Point Light"},
+                new MenuFlyoutItem() { Text = "Spot Light"},
+            };
+            var lightSubItem = new MenuFlyoutSubItem() { Text = "Light" };
+            foreach (var item in Lights)
+                lightSubItem.Items.Add(item);
+
+            menuFlyout.Items.Add(new MenuFlyoutSeparator());
+            menuFlyout.Items.Add(objectSubItem);
+            menuFlyout.Items.Add(new MenuFlyoutSeparator());
+            menuFlyout.Items.Add(lightSubItem);
+
+            return menuFlyout;
+        }
 
         private Grid CreateTreeView(out TreeView tree)
         {
             Grid grid = new Grid();
 
             tree = new TreeView() { SelectionMode = TreeViewSelectionMode.Single, HorizontalAlignment = HorizontalAlignment.Stretch };
+            tree.ContextFlyout = CreateDefaultMenuFlyout();
 
             grid.Children.Add(tree);
 
@@ -265,6 +372,8 @@ namespace Editor.Controls
             expander.Content = stack;
             grid.Children.Add(expander);
 
+            grid.ContextFlyout = CreateRootMenuFlyout();
+
             return grid;
         }
 
@@ -281,6 +390,8 @@ namespace Editor.Controls
             expander.Content = stack;
             grid.Children.Add(expander);
 
+            grid.ContextFlyout = CreateRootMenuFlyout();
+
             return grid;
         }
 
@@ -296,6 +407,8 @@ namespace Editor.Controls
 
             expander.Content = stack;
             grid.Children.Add(expander);
+
+            grid.ContextFlyout = CreateRootMenuFlyout();
 
             return grid;
         }
