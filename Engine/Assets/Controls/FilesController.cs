@@ -361,53 +361,8 @@ namespace Editor.Controls
                 HorizontalContentAlignment = HorizontalAlignment.Stretch,
                 VerticalContentAlignment = VerticalAlignment.Stretch,
             };
-            button.Click += (s, e) => { GoIntoDirectoryAndRefresh(path); };
-
-            #region // MenuFlyout
-            MenuFlyoutItem[] items = new[] {
-                new MenuFlyoutItem() { Text = "Create File System Entry", Icon = new SymbolIcon(Symbol.NewFolder) },
-                //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Open", Icon = new SymbolIcon(Symbol.OpenFile) },
-                new MenuFlyoutItem() { Text = "Show in Explorer", Icon = new FontIcon(){ Glyph = "\xE838", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
-                //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Cut", Icon = new SymbolIcon(Symbol.Cut) },
-                new MenuFlyoutItem() { Text = "Copy", Icon = new SymbolIcon(Symbol.Copy) },
-                new MenuFlyoutItem() { Text = "Paste", Icon = new SymbolIcon(Symbol.Paste) },
-                //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
-                new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
-                //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Copy Path", Icon = new SymbolIcon(Symbol.Copy) },
-            };
-
-            //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
-            items[0].Click += (s, e) => ContentDialogCreateNewFileOrFolderAndRefreshAsync(path);
-
-            items[1].Click += (s, e) => GoIntoDirectoryAndRefresh(path);
-            items[2].Click += (s, e) => OpenFolder(path);
-
-            items[3].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Move);
-            items[4].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Copy);
-            items[5].Click += (s, e) => PasteFileSystemEntryFromClipboard(path);
-
-            items[6].Click += (s, e) => ContentDialogRename(path);
-            items[7].Click += (s, e) => ContentDialogDelete(path);
-
-            items[8].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.None);
-
-            MenuFlyout menuFlyout = new();
-            foreach (var item in items)
-            {
-                menuFlyout.Items.Add(item);
-
-                if (item.Text == "Create File System Entry"
-                    || item.Text == "Show in Explorer"
-                    || item.Text == "Paste")
-                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
-            }
-
-            button.ContextFlyout = menuFlyout;
-            #endregion
+            button.ContextFlyout = CreateDefaultMenuFlyout(path);
+            button.Click += (s, e) => GoIntoDirectoryAndRefresh(path);
 
             Grid grid2 = new Grid() { HorizontalAlignment = HorizontalAlignment.Stretch };
 
@@ -454,6 +409,7 @@ namespace Editor.Controls
                 //CanDrag = true,
                 //AllowDrop = true,
             };
+            button.ContextFlyout = CreateDefaultMenuFlyout(path, true);
             button.Tapped += (s, e) =>
             {
                 PropertiesController.Clear();
@@ -464,72 +420,6 @@ namespace Editor.Controls
                 if (File.Exists(path))
                     Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
             };
-            //button.DragStarting += (s, e) =>
-            //{
-            //    e.AllowedOperations = DataPackageOperation.Copy;
-            //    //e.DragUI.SetContentFromBitmapImage = ;
-            //    e.Data.SetText(path);
-            //};
-            //button.Drop += (s, e) =>
-            //{
-            //    e.AcceptedOperation = DataPackageOperation.Copy;
-
-            //    if (e.DragUIOverride != null)
-            //    {
-            //        e.DragUIOverride.Caption = "Add file";
-            //        e.DragUIOverride.IsContentVisible = true;
-            //    }
-            //};
-            //button.DragLeave += (s, e) => 
-            //{
-            //    path = e.DataView.ToString();
-            //};
-
-            #region // MenuFlyout
-            MenuFlyoutItem[] items = new[] {
-                new MenuFlyoutItem() { Text = "Create File System Entry", Icon = new SymbolIcon(Symbol.NewFolder) },
-                //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Open", Icon = new SymbolIcon(Symbol.OpenFile) },
-                new MenuFlyoutItem() { Text = "Show in Explorer", Icon = new FontIcon(){ Glyph = "\xE838", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
-                //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Cut", Icon = new SymbolIcon(Symbol.Cut) },
-                new MenuFlyoutItem() { Text = "Copy", Icon = new SymbolIcon(Symbol.Copy) },
-                new MenuFlyoutItem() { Text = "Paste", Icon = new SymbolIcon(Symbol.Paste) },
-                //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
-                new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
-                //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Copy Path", Icon = new SymbolIcon(Symbol.Copy) },
-            };
-
-            //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
-            items[0].Click += (s, e) => ContentDialogCreateNewFileOrFolderAndRefreshAsync(path);
-
-            items[1].Click += (s, e) => OpenFile(path);
-            items[2].Click += (s, e) => OpenFolder(GoUpDirectory(path));
-
-            items[3].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Move);
-            items[4].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Copy);
-            items[5].Click += (s, e) => PasteFileSystemEntryFromClipboard(path);
-
-            items[6].Click += (s, e) => ContentDialogRename(path);
-            items[7].Click += (s, e) => ContentDialogDelete(path);
-
-            items[8].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.None);
-
-            MenuFlyout menuFlyout = new();
-            foreach (var item in items)
-            {
-                menuFlyout.Items.Add(item);
-
-                if (item.Text == "Create File System Entry"
-                    || item.Text == "Show in Explorer"
-                    || item.Text == "Paste")
-                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
-            }
-
-            button.ContextFlyout = menuFlyout;
-            #endregion
 
             TextBlock label = new TextBlock()
             {
@@ -554,6 +444,8 @@ namespace Editor.Controls
 
         private Grid BackTile(Grid icon)
         {
+            GridMain.ContextFlyout = CreateRootMenuFlyout();
+
             Grid grid = new Grid();
 
             Button button = new Button()
@@ -574,58 +466,6 @@ namespace Editor.Controls
             viewbox.Child = icon;
             button.Content = viewbox;
             grid.Children.Add(button);
-
-            #region // MenuFlyout
-            MenuFlyoutItem[] items = new[] {
-                new MenuFlyoutItem() { Text = "Create File System Entry", Icon = new SymbolIcon(Symbol.NewFolder) },
-                //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Show in Explorer", Icon = new FontIcon(){ Glyph = "\xE838", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
-                //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Cut", Icon = new SymbolIcon(Symbol.Cut) },
-                new MenuFlyoutItem() { Text = "Copy", Icon = new SymbolIcon(Symbol.Copy) },
-                new MenuFlyoutItem() { Text = "Paste", Icon = new SymbolIcon(Symbol.Paste) },
-                //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
-                new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
-                //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Copy Path", Icon = new SymbolIcon(Symbol.Copy) },
-            };
-
-            var path = Path.Combine(RootPath, _currentCategory.Value.Name);
-            if (!string.IsNullOrEmpty(_currentSubPath))
-                path = Path.Combine(path, _currentSubPath);
-
-            //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
-            items[0].Click += (s, e) => ContentDialogCreateNewFileOrFolderAndRefreshAsync(path);
-
-            items[1].Click += (s, e) => OpenFolder(GoUpDirectory(path));
-
-            items[2].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Move);
-            items[3].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Copy);
-            items[4].Click += (s, e) => PasteFileSystemEntryFromClipboard(path);
-
-            items[5].Click += (s, e) => ContentDialogRename(path);
-            items[6].Click += (s, e) => ContentDialogDelete(path);
-            
-            items[7].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.None);
-
-            MenuFlyout menuFlyout = new();
-            foreach (var item in items)
-            {
-                if (string.IsNullOrEmpty(_currentSubPath))
-                    if (item.Text == "Cut" || item.Text == "Rename")
-                        continue;
-
-                menuFlyout.Items.Add(item);
-
-                if (item.Text == "Create File System Entry"
-                    || item.Text == "Show in Explorer"
-                    || item.Text == "Paste")
-                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
-            }
-
-            GridMain.ContextFlyout = menuFlyout;
-            #endregion
 
             return grid;
         }
@@ -1058,6 +898,109 @@ namespace Editor.Controls
             return path;
         }
 
+        private MenuFlyout CreateDefaultMenuFlyout(string path, bool hasExtension = false)
+        {
+            MenuFlyoutItem[] items = new[] {
+                new MenuFlyoutItem() { Text = "Create File System Entry", Icon = new SymbolIcon(Symbol.NewFolder) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Open", Icon = new SymbolIcon(Symbol.OpenFile) },
+                new MenuFlyoutItem() { Text = "Show in Explorer", Icon = new FontIcon(){ Glyph = "\xE838", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Cut", Icon = new SymbolIcon(Symbol.Cut) },
+                new MenuFlyoutItem() { Text = "Copy", Icon = new SymbolIcon(Symbol.Copy) },
+                new MenuFlyoutItem() { Text = "Paste", Icon = new SymbolIcon(Symbol.Paste) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
+                new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Copy Path", Icon = new SymbolIcon(Symbol.Copy) },
+            };
+
+            //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
+            items[0].Click += (s, e) => ContentDialogCreateNewFileOrFolderAndRefreshAsync(path);
+
+            if(hasExtension)
+                items[1].Click += (s, e) => OpenFile(path);
+            else
+                items[1].Click += (s, e) => GoIntoDirectoryAndRefresh(path);
+            items[2].Click += (s, e) => OpenFolder(hasExtension ? GoUpDirectory(path) : path);
+
+            items[3].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Move);
+            items[4].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Copy);
+            items[5].Click += (s, e) => PasteFileSystemEntryFromClipboard(path);
+
+            items[6].Click += (s, e) => ContentDialogRename(path);
+            items[7].Click += (s, e) => ContentDialogDelete(path);
+
+            items[8].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.None);
+
+            MenuFlyout menuFlyout = new();
+            foreach (var item in items)
+            {
+                menuFlyout.Items.Add(item);
+
+                if (item.Text == "Create File System Entry"
+                    || item.Text == "Show in Explorer"
+                    || item.Text == "Paste")
+                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
+            }
+
+            return menuFlyout;
+        }
+
+        private MenuFlyout CreateRootMenuFlyout()
+        {
+            MenuFlyoutItem[] items = new[] {
+                new MenuFlyoutItem() { Text = "Create File System Entry", Icon = new SymbolIcon(Symbol.NewFolder) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Show in Explorer", Icon = new FontIcon(){ Glyph = "\xE838", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Cut", Icon = new SymbolIcon(Symbol.Cut) },
+                new MenuFlyoutItem() { Text = "Copy", Icon = new SymbolIcon(Symbol.Copy) },
+                new MenuFlyoutItem() { Text = "Paste", Icon = new SymbolIcon(Symbol.Paste) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
+                new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Copy Path", Icon = new SymbolIcon(Symbol.Copy) },
+            };
+
+            var path = Path.Combine(RootPath, _currentCategory.Value.Name);
+            if (!string.IsNullOrEmpty(_currentSubPath))
+                path = Path.Combine(path, _currentSubPath);
+
+            //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
+            items[0].Click += (s, e) => ContentDialogCreateNewFileOrFolderAndRefreshAsync(path);
+
+            items[1].Click += (s, e) => OpenFolder(GoUpDirectory(path));
+
+            items[2].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Move);
+            items[3].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Copy);
+            items[4].Click += (s, e) => PasteFileSystemEntryFromClipboard(path);
+
+            items[5].Click += (s, e) => ContentDialogRename(path);
+            items[6].Click += (s, e) => ContentDialogDelete(path);
+
+            items[7].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.None);
+
+            MenuFlyout menuFlyout = new();
+            foreach (var item in items)
+            {
+                if (string.IsNullOrEmpty(_currentSubPath))
+                    if (item.Text == "Cut" || item.Text == "Rename")
+                        continue;
+
+                menuFlyout.Items.Add(item);
+
+                if (item.Text == "Create File System Entry"
+                    || item.Text == "Show in Explorer"
+                    || item.Text == "Paste")
+                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
+            }
+
+            return menuFlyout;
+        }
+
         private Grid CreateIcon(Category _category)
         {
             Grid grid = new Grid();
@@ -1187,5 +1130,5 @@ namespace Editor.Controls
 
             Clipboard.SetContent(data);
         }
-    } 
+    }
 }
