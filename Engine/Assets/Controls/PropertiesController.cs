@@ -109,13 +109,13 @@ namespace Editor.Controls
 
             var properties = new Grid[]
             {
-                CreateText("File name", Path.GetFileNameWithoutExtension(path)),
-                CreateText("File type", Path.GetExtension(path)),
-                CreateText("File size", SizeSuffix(fileInfo.Length)),
+                CreateText("File name:", Path.GetFileNameWithoutExtension(path)),
+                CreateText("File type:", Path.GetExtension(path)),
+                CreateText("File size:", SizeSuffix(fileInfo.Length)),
                 CreateSpacer(),
-                CreateTextEqual("Creation time", fileInfo.CreationTime.ToShortDateString() + " " + fileInfo.CreationTime.ToShortTimeString() ),
-                CreateTextEqual("Last access time", fileInfo.LastAccessTime.ToShortDateString() + " " + fileInfo.LastAccessTime.ToShortTimeString()),
-                CreateTextEqual("Last update time", fileInfo.LastWriteTime.ToShortDateString() + " " + fileInfo.LastWriteTime.ToShortTimeString())
+                CreateTextEqual("Creation time:", fileInfo.CreationTime.ToShortDateString() + " " + fileInfo.CreationTime.ToShortTimeString() ),
+                CreateTextEqual("Last access time:", fileInfo.LastAccessTime.ToShortDateString() + " " + fileInfo.LastAccessTime.ToShortTimeString()),
+                CreateTextEqual("Last update time:", fileInfo.LastWriteTime.ToShortDateString() + " " + fileInfo.LastWriteTime.ToShortTimeString())
             };
 
             _stackPanel.Children.Add(CreateExpander(Path.GetFileName(path), properties));
