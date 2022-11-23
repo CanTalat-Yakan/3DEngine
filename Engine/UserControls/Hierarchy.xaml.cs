@@ -23,7 +23,7 @@ namespace Editor.UserControls
                     _hierarchyControl.PopulateTree();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e) => Engine.Core.Instance.Scene.EntitytManager.CreateEmpty("New Entity");
+        private void Button_Click(object sender, RoutedEventArgs e) => Engine.Core.Instance.Scene.EntitytManager.CreateEmpty();
 
         private void TreeView_Hierarchy_Tapped(object sender, TappedRoutedEventArgs e) => _hierarchyControl.SetProperties();
 

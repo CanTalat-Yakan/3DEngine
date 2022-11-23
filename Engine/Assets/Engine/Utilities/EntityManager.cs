@@ -45,11 +45,11 @@ namespace Engine.Utilities
         private static readonly string SHADER_LIT = @"Shader\Lit.hlsl";
         private static readonly string SHADER_SIMPLELIT = @"Shader\SimpleLit.hlsl";
         private static readonly string SHADER_UNLIT = @"Shader\Unlit.hlsl";
-         
+
         private static readonly string IMAGE_DEFAULT = @"Textures\dark.png";
         private static readonly string IMAGE_SKY = @"Textures\SkyGradient.png";
         private static readonly string IMAGE_SKY_LIGHT = @"Textures\SkyGradient_Light.png";
-         
+
         private static readonly string OBJ_SPECIAL = @"Models\Lowpoly_tree_sample.obj";
         private static readonly string OBJ_CUBE = @"Models\Cube.obj";
         private static readonly string OBJ_SPHERE = @"Models\Sphere.obj";
@@ -71,10 +71,11 @@ namespace Engine.Utilities
             Entity gObject = refEntity.Clone();
 
             EntityList.Add(gObject);
+
             return gObject;
         }
 
-        public Entity CreateEmpty(string name = "Entity")
+        public Entity CreateEmpty(string name = "New Entity")
         {
             Entity gObject = new Entity()
             {
@@ -83,6 +84,7 @@ namespace Engine.Utilities
             };
 
             EntityList.Add(gObject);
+
             return gObject;
         }
 
@@ -95,15 +97,15 @@ namespace Engine.Utilities
             {
                 case EPrimitiveTypes.SPECIAL:
                     gObject.Mesh = _meshSpecial;
-                    gObject.Name = "special" + EntityList.Count.ToString();
+                    gObject.Name = "special";
                     break;
                 case EPrimitiveTypes.CUBE:
                     gObject.Mesh = _meshCube;
-                    gObject.Name = "Cube" + EntityList.Count.ToString();
+                    gObject.Name = "Cube";
                     break;
                 case EPrimitiveTypes.SPHERE:
                     gObject.Mesh = _meshSphere;
-                    gObject.Name = "Sphere" + EntityList.Count.ToString();
+                    gObject.Name = "Sphere";
                     break;
                 case EPrimitiveTypes.PLANE:
                     break;
@@ -116,6 +118,7 @@ namespace Engine.Utilities
             }
 
             EntityList.Add(gObject);
+
             return gObject;
         }
 
@@ -139,10 +142,7 @@ namespace Engine.Utilities
             Sky.Transform.Scale = new Vector3(-1000, -1000, -1000);
         }
 
-        public void SetTheme(bool light)
-        {
-            Sky.Material = light ? _materialSky2 : _materialSky;
-        }
+        public void SetTheme(bool light) => Sky.Material = light ? _materialSky2 : _materialSky;
 
         public Entity GetFromID(Guid id)
         {
