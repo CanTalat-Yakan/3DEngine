@@ -1,7 +1,9 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Editor.UserControls;
+using Editor;
+using Editor.Controller;
 
-namespace Editor.Controls
+namespace Controls
 {
     internal class MainController
     {
@@ -13,7 +15,7 @@ namespace Editor.Controls
         public TextBlock Status;
         public Viewbox StatusIcon;
         public MainWindow MainWindow;
-        
+
         public MainController(MainWindow mainWindow, Grid content, TextBlock status, Viewbox icon)
         {
             if (Instance is null)

@@ -3,7 +3,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
 using Editor.UserControls;
@@ -12,7 +11,7 @@ using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
 using Expander = Microsoft.UI.Xaml.Controls.Expander;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 
-namespace Editor.Controls
+namespace Editor.Controller
 {
     internal class TreeEntry
     {
@@ -30,7 +29,6 @@ namespace Editor.Controls
 
     internal partial class HierarchyController
     {
-
         public TreeView SceneTreeView;
         public List<TreeView> SubsceneTreeViews;
 

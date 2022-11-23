@@ -12,7 +12,7 @@ using Engine.Components;
 using Windows.Foundation;
 using Engine.Editor;
 
-namespace Editor.Controls
+namespace Editor.Controller
 {
     internal partial class ViewPortController
     {

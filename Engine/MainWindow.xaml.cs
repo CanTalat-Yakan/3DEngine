@@ -1,4 +1,5 @@
-﻿using Editor.Controls;
+﻿using Assets.Controls;
+using Controls;
 using Microsoft.UI.Xaml;
 using WinUIEx;
 

@@ -17,7 +17,7 @@ using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Editor.UserControls;
 
-namespace Editor.Controls
+namespace Editor.Controller
 {
     internal struct Category
     {
