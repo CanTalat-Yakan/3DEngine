@@ -30,10 +30,10 @@ namespace Editor.UserControls
             _filesControl.CreateCatergoryTiles(
                 new Category() { Name = "Scenes", Glyph = "\xEA86", FileTypes = new string[] { ".usd", ".usda", ".usdc", ".usdz" }, Creatable = true },
                 new Category() { Name = "Scripts", Symbol = Symbol.Document, FileTypes = new string[] { ".cs" }, Creatable = true },
-                new Category() { Name = "Prefabs", Glyph = "\xE734", FileTypes = new string[] { ".prefab" }, Thumbnail = true },
-                new Category() { Name = "Models", Glyph = "\xF158", FileTypes = new string[] { ".fbx", ".obj", ".blend", ".3ds", ".dae" }, Thumbnail = true },
+                new Category() { Name = "Prefabs", Glyph = "\xE734", FileTypes = new string[] { ".prefab" } },
+                new Category() { Name = "Models", Glyph = "\xF158", FileTypes = new string[] { ".fbx", ".obj", ".blend", ".3ds", ".dae" } },
                 new Category() { Name = "Animations", Glyph = "\xE805", FileTypes = new string[] { ".fbx", ".dae" } },
-                new Category() { Name = "Materials", Glyph = "\xF156", FileTypes = new string[] { ".mat" }, Thumbnail = true, Creatable = true },
+                new Category() { Name = "Materials", Glyph = "\xF156", FileTypes = new string[] { ".mat" }, Creatable = true },
                 new Category() { Name = "Textures", Symbol = Symbol.Pictures, FileTypes = new string[] { ".png", ".jpg", ".jpeg", ".tiff", ".tga", ".psd", ".bmp", }, Thumbnail = true },
                 new Category() { Name = "Audios", Symbol = Symbol.Audio, FileTypes = new string[] { ".m4a", ".mp3", ".wav", ".ogg" } },
                 new Category() { Name = "Videos", Symbol = Symbol.Video, FileTypes = new string[] { ".m4v", ".mp4", ".mov", ".avi" }, Thumbnail = false },
