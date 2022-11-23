@@ -928,6 +928,28 @@ namespace Editor.Controls
     {
         private static readonly string TEMPLATES = @"Assets\Engine\Resources\Templates";
 
+        public void OnDragOver(DragEventArgs e)
+        {
+            e.AcceptedOperation = DataPackageOperation.Copy;
+
+            if (e.DragUIOverride != null)
+            {
+                e.DragUIOverride.Caption = "Add file";
+                e.DragUIOverride.IsContentVisible = true;
+            }
+        }
+
+        public async void OnDropAsync(DragEventArgs e)
+        {
+            if (e.DataView.Contains(StandardDataFormats.StorageItems))
+            {
+                var items = await e.DataView.GetStorageItemsAsync();
+                if (items.Count > 0)
+                    foreach (var file in items.OfType<StorageFile>())
+                        AddFileSystemEntry(file);
+            }
+        }
+
         public async void PasteFileSystemEntryFromClipboard(string path)
         {
             DataPackageView dataPackageView = Clipboard.GetContent();

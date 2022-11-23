@@ -51,26 +51,8 @@ namespace Editor.UserControls
 
         private void BreadcrumBar_Files_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args) => _filesControl.GoUpDirectoryAndRefresh();
 
-        private void Grid_Main_DragOver(object sender, DragEventArgs e)
-        {
-            e.AcceptedOperation = DataPackageOperation.Copy;
+        private void Grid_Main_DragOver(object sender, DragEventArgs e) => _filesControl.OnDragOver(e);
 
-            if (e.DragUIOverride != null)
-            {
-                e.DragUIOverride.Caption = "Add file";
-                e.DragUIOverride.IsContentVisible = true;
-            }
-        }
-
-        private async void Grid_Main_DropAsync(object sender, DragEventArgs e)
-        {
-            if (e.DataView.Contains(StandardDataFormats.StorageItems))
-            {
-                var items = await e.DataView.GetStorageItemsAsync();
-                if (items.Count > 0)
-                    foreach (var file in items.OfType<StorageFile>())
-                        _filesControl.AddFileSystemEntry(file);
-            }
-        }
+        private async void Grid_Main_DropAsync(object sender, DragEventArgs e) => _filesControl.OnDropAsync(e);
     }
 }
