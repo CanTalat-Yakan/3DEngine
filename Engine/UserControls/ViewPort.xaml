@@ -9,7 +9,7 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid x:Name="x_Grid_ViewPort_Main">
+    <Grid x:Name="x_Grid_Main">
         <muxc:SwapChainPanel x:Name="x_SwapChainPanel_ViewPort" MinHeight="1"/>
     </Grid>
 </UserControl>

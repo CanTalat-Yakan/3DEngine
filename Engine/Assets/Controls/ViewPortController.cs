@@ -21,10 +21,10 @@ namespace Editor.Controls
 
         private ViewPort _viewPort;
 
-        public ViewPortController(ViewPort viewPort, Grid main)
+        public ViewPortController(ViewPort viewPort, Grid grid)
         {
             _viewPort = viewPort;
-            GridMain = main;
+            GridMain = grid;
 
             CreateViewPortSettings();
         }
@@ -46,7 +46,7 @@ namespace Editor.Controls
                     StackInGrid(
                             CreateSlider("Field Of View", 90, 40, 110, (s, e) => { CameraComponent.s_FieldOfView = e.NewValue; }),
                             CreateNumberInput("Movement Speed", 25, 1, 100, (s, e) => { CameraController.s_MovementSpeed = (float)e.NewValue; }))),
-                CreateverticalSeperator(),
+                CreateAppBarSeperator(),
                 CreateToggleButton(CreateIcon("\xE706"), true),
             };
 
@@ -166,9 +166,9 @@ namespace Editor.Controls
             return button;
         }
 
-        private UIElement CreateverticalSeperator()
+        private UIElement CreateAppBarSeperator()
         {
-            AppBarSeparator seperator = new() { Margin = new Thickness(10) };
+            AppBarSeparator seperator = new();
 
             return seperator;
         }
