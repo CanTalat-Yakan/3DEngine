@@ -53,6 +53,7 @@ namespace Editor.Controller
                 CreateAppBarSeperator(),
                 CreateButtonWithValue(CreateIcon("\xE80A"), 10, CreateNumberInput("Grid Interval", 10, 1, 100, (s, e) => { CameraController.s_MovementSpeed = (float)e.NewValue; })),
                 CreateButtonWithValue(CreateIcon(Symbol.Rotate), 15, CreateNumberInput("Rotation Interval", 15, 1, 90, (s, e) => { CameraController.s_MovementSpeed = (float)e.NewValue; })),
+                CreateAppBarSeperator(),
                 CreateToggleButton(CreateIcon(Symbol.Globe), true),
             };
 
