@@ -1,5 +1,4 @@
-﻿using Microsoft.UI;
-using Microsoft.UI.Text;
+﻿using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -30,24 +29,72 @@ namespace Editor.Controls
 
     internal partial class HierarchyController
     {
-        public TreeView Tree;
+
+        public TreeView SceneTreeView;
+        public List<TreeView> SubsceneTreeViews;
 
         public List<TreeEntry> Hierarchy;
 
+        private StackPanel _stackPanel;
 
-        public HierarchyController(TreeView tree)
+        public HierarchyController(StackPanel stackPanel)
         {
-            Tree = tree;
+            _stackPanel = stackPanel;
 
             Hierarchy = new List<TreeEntry>();
+
+            CreateSceneTreeViews();
         }
 
-        public void DeselectTreeViewNodes() => Tree.SelectedNode = null;
+        private void CreateSceneTreeViews()
+        {
+            var scene = new Grid[]
+            {
+                CreateTreeView(out SceneTreeView),
+                CreateButton("Create New Entity", (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEmpty() )
+            };
+
+            SceneTreeView.Tapped += (s, e) => SetProperties();
+            SceneTreeView.DragItemsCompleted += (s, e) => SetNewParentTreeEntry((TreeViewNode)e.NewParentItem, (TreeViewNode)e.Items);
+
+            _stackPanel.Children.Add(CreateExpander("Scene", scene));
+            _stackPanel.Children.Add(CreateSeperator());
+            _stackPanel.Children.Add(CreateButton("Add New Subscene", (s, e) => _stackPanel.Children.Add(CreateExpanderWithToggleButton("Subscene", CreateSubsceneTreeView()))));
+            _stackPanel.Children.Add(CreateExpanderWithToggleButton("Subscene", CreateSubsceneTreeView()));
+        }
+
+        private Grid[] CreateSubsceneTreeView()
+        {
+            SubsceneTreeViews = new List<TreeView>();
+
+            TreeView subsceneTreeView;
+
+            var subscene = new Grid[]
+            {
+                CreateTreeView(out subsceneTreeView),
+                CreateButton("Create New Entity", null )
+            };
+
+            subsceneTreeView.Tapped += (s, e) => SetProperties();
+            subsceneTreeView.DragItemsCompleted += (s, e) => SetNewParentTreeEntry((TreeViewNode)e.NewParentItem, (TreeViewNode)e.Items);
+
+            SubsceneTreeViews.Add(subsceneTreeView);
+
+            return subscene;
+        }
+
+        public void DeselectTreeViewNodes()
+        {
+            SceneTreeView.SelectedNode = null;
+
+            foreach (var subsceneTreeView in SubsceneTreeViews)
+                subsceneTreeView.SelectedNode = null;
+        }
 
         public void PopulateTree()
         {
             var engineObjectList = Engine.Core.Instance.Scene.EntitytManager.EntityList;
-            engineObjectList.OnAddEvent += (s, e) => { OnAdd(); };
+            engineObjectList.OnAddEvent += (s, e) => OnAdd();
 
             foreach (var entity in engineObjectList)
             {
@@ -64,17 +111,17 @@ namespace Editor.Controls
             TreeEntry parent;
             foreach (var entry in Hierarchy)
                 if ((parent = GetParent(entry)) is null)
-                    Tree.RootNodes.Add(entry.Node);
+                    SceneTreeView.RootNodes.Add(entry.Node);
                 else
                     parent.Node.Children.Add(entry.Node);
         }
 
         public void SetProperties()
         {
-            if (Tree.SelectedNode is null)
+            if (SceneTreeView.SelectedNode is null)
                 return;
 
-            var treeEntry = (TreeEntry)Tree.SelectedNode.Content;
+            var treeEntry = (TreeEntry)SceneTreeView.SelectedNode.Content;
             var entity = Engine.Core.Instance.Scene.EntitytManager.GetFromID(treeEntry.ID);
 
             PropertiesController.Clear();
@@ -95,7 +142,7 @@ namespace Editor.Controls
 
             TreeEntry parent;
             if ((parent = GetParent(newEntry)) is null)
-                Tree.RootNodes.Add(newEntry.Node);
+                SceneTreeView.RootNodes.Add(newEntry.Node);
             else
                 parent.Node.Children.Add(newEntry.Node);
         }
@@ -144,6 +191,17 @@ namespace Editor.Controls
             }
         }
 
+        private Grid CreateTreeView(out TreeView tree)
+        {
+            Grid grid = new Grid();
+
+            tree = new TreeView() { SelectionMode = TreeViewSelectionMode.Single, HorizontalAlignment = HorizontalAlignment.Stretch };
+
+            grid.Children.Add(tree);
+
+            return grid;
+        }
+
         private Grid CreateSeperator()
         {
             Grid grid = new Grid();
@@ -157,9 +215,10 @@ namespace Editor.Controls
 
         private Grid CreateTextFull(string s = "String")
         {
+            Grid grid = new Grid();
+
             TextBlock textInput = new TextBlock() { Text = s, Opacity = 0.5f, TextWrapping = TextWrapping.Wrap };
 
-            Grid grid = new Grid();
             grid.Children.Add(textInput);
 
             return grid;
@@ -197,7 +256,7 @@ namespace Editor.Controls
         {
             Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, 2) };
             StackPanel stack = new StackPanel() { Orientation = Orientation.Vertical, Spacing = 10 };
-            Expander expander = new Expander() { Header = s, ExpandDirection = ExpandDirection.Down, HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Left };
+            Expander expander = new Expander() { Header = s, ExpandDirection = ExpandDirection.Down, HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch };
             expander.IsExpanded = true;
 
             foreach (var item in properties)
@@ -213,7 +272,7 @@ namespace Editor.Controls
         {
             Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, 2) };
             StackPanel stack = new StackPanel() { Orientation = Orientation.Vertical, Spacing = 10 };
-            Expander expander = new Expander() { Header = s, ExpandDirection = ExpandDirection.Down, HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Left };
+            Expander expander = new Expander() { Header = s, ExpandDirection = ExpandDirection.Down, HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch };
             expander.Header = new ToggleButton() { Content = s, IsChecked = true };
 
             foreach (var item in properties)
@@ -229,7 +288,7 @@ namespace Editor.Controls
         {
             Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, 2) };
             StackPanel stack = new StackPanel() { Orientation = Orientation.Vertical, Spacing = 10 };
-            Expander expander = new Expander() { Header = s, ExpandDirection = ExpandDirection.Down, HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Left };
+            Expander expander = new Expander() { Header = s, ExpandDirection = ExpandDirection.Down, HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch };
             expander.Header = new TextBox() { Text = s, Margin = new Thickness(0) };
 
             foreach (var item in properties)
