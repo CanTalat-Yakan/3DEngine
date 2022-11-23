@@ -33,6 +33,11 @@ namespace Editor.Controller
         {
             UIElement[] topLeft = new[]
             {
+                CreateButton(CreateIcon(Symbol.Video),
+                    StackInGrid(
+                            CreateSlider("Field Of View", (float)CameraComponent.s_FieldOfView, 40, 110, (s, e) => { CameraComponent.s_FieldOfView = e.NewValue; }),
+                            CreateNumberInput("Movement Speed", CameraController.s_MovementSpeed, 1, 100, (s, e) => { CameraController.s_MovementSpeed = (float)e.NewValue; }))),
+                CreateAppBarSeperator(),
                 CreateComboBox(new string[] { "Perspective", "Orthogonal" }),
                 CreateComboBox(new string[] { "Lit", "Unlit", "Wireframe", "Shaded Wireframe" }),
             };
@@ -42,15 +47,11 @@ namespace Editor.Controller
             UIElement[] topRight = new[]
             {
                 CreateButton(CreateIcon("\xE946"), CreateTextFull(out Profile)),
-                CreateButton(CreateIcon(Symbol.Video),
-                    StackInGrid(
-                            CreateSlider("Field Of View", (float)CameraComponent.s_FieldOfView, 40, 110, (s, e) => { CameraComponent.s_FieldOfView = e.NewValue; }),
-                            CreateNumberInput("Movement Speed", CameraController.s_MovementSpeed, 1, 100, (s, e) => { CameraController.s_MovementSpeed = (float)e.NewValue; }))),
                 CreateAppBarSeperator(),
                 CreateToggleButton(CreateIcon("\xEA80"), true),
                 CreateToggleButton(CreateIcon("\xE81E"), true),
                 CreateAppBarSeperator(),
-                CreateButtonWithValue(CreateIcon("\xE80A"), 10, CreateNumberInput("Grid Interval", 10, 0.1f, 100, (s, e) => { CameraController.s_MovementSpeed = (float)e.NewValue; })),
+                CreateButtonWithValue(CreateIcon("\xE80A"), 10, CreateNumberInput("Grid Interval", 10, 1, 100, (s, e) => { CameraController.s_MovementSpeed = (float)e.NewValue; })),
                 CreateButtonWithValue(CreateIcon(Symbol.Rotate), 15, CreateNumberInput("Rotation Interval", 15, 1, 90, (s, e) => { CameraController.s_MovementSpeed = (float)e.NewValue; })),
                 CreateToggleButton(CreateIcon(Symbol.Globe), true),
             };
