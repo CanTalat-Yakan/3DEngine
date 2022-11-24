@@ -943,7 +943,8 @@ namespace Editor.Controller
 
                 if (item.Text == "Create File System Entry"
                     || item.Text == "Show in Explorer"
-                    || item.Text == "Paste")
+                    || item.Text == "Paste"
+                    || item.Text == "Delete")
                     menuFlyout.Items.Add(new MenuFlyoutSeparator());
             }
 
@@ -992,7 +993,8 @@ namespace Editor.Controller
 
                 if (item.Text == "Create File System Entry"
                     || item.Text == "Show in Explorer"
-                    || item.Text == "Paste")
+                    || item.Text == "Paste"
+                    || item.Text == "Delete")
                     menuFlyout.Items.Add(new MenuFlyoutSeparator());
             }
 

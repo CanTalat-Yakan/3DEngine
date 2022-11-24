@@ -193,34 +193,34 @@ namespace Editor.Controller
         private MenuFlyout CreateDefaultMenuFlyout(string path = "")
         {
             MenuFlyoutItem[] items = new[] {
-                new MenuFlyoutItem() { Text = "Create Parent Entity" },
-                new MenuFlyoutItem() { Text = "Create Child Entity" },
-                //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Cut", Icon = new SymbolIcon(Symbol.Cut) },
                 new MenuFlyoutItem() { Text = "Copy", Icon = new SymbolIcon(Symbol.Copy) },
                 new MenuFlyoutItem() { Text = "Paste", Icon = new SymbolIcon(Symbol.Paste) },
                 //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
                 new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Create Entity" },
+                new MenuFlyoutItem() { Text = "Create Child Entity" },
             };
 
-            items[0].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEmpty();
-            items[1].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEmpty();
+            //items[0].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Move);
+            //items[1].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Copy);
+            //items[2].Click += (s, e) => PasteFileSystemEntryFromClipboard(path);
 
-            //items[2].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Move);
-            //items[3].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.Copy);
-            //items[4].Click += (s, e) => PasteFileSystemEntryFromClipboard(path);
+            //items[3].Click += (s, e) => ContentDialogRename(path);
+            //items[4].Click += (s, e) => ContentDialogDelete(path);
 
-            //items[5].Click += (s, e) => ContentDialogRename(path);
-            //items[6].Click += (s, e) => ContentDialogDelete(path);
+            items[5].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEmpty();
+            items[6].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEmpty();
 
             MenuFlyout menuFlyout = new();
             foreach (var item in items)
             {
                 menuFlyout.Items.Add(item);
 
-                if (item.Text == "Create Child Entity"
-                    || item.Text == "Paste")
+                if (item.Text == "Paste"
+                    || item.Text == "Delete")
                     menuFlyout.Items.Add(new MenuFlyoutSeparator());
             }
 
@@ -232,32 +232,30 @@ namespace Editor.Controller
         private MenuFlyout CreateRootMenuFlyout(string path = "")
         {
             MenuFlyoutItem[] items = new[] {
-                new MenuFlyoutItem() { Text = "Create Entity" },
-                //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Save", Icon = new SymbolIcon(Symbol.Save) },
                 new MenuFlyoutItem() { Text = "Show in Files", Icon = new SymbolIcon(Symbol.Document) },
                 //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
                 new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Create Entity" },
             };
 
-            items[0].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEmpty();
-
+            //items[0].Click += (s, e) => OpenFolder(path);
             //items[1].Click += (s, e) => OpenFolder(path);
-            //items[2].Click += (s, e) => OpenFolder(path);
 
-            //items[3].Click += (s, e) => ContentDialogRename(path);
-            //items[4].Click += (s, e) => ContentDialogDelete(path);
+            //items[2].Click += (s, e) => ContentDialogRename(path);
+            //items[3].Click += (s, e) => ContentDialogDelete(path);
 
-            //items[5].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.None);
+            items[4].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEmpty();
 
             MenuFlyout menuFlyout = new();
             foreach (var item in items)
             {
                 menuFlyout.Items.Add(item);
 
-                if (item.Text == "Create Entity"
-                    || item.Text == "Show in Files")
+                if (item.Text == "Show in Files"
+                    || item.Text == "Delete")
                     menuFlyout.Items.Add(new MenuFlyoutSeparator());
             }
 
@@ -291,7 +289,6 @@ namespace Editor.Controller
 
             menuFlyout.Items.Add(new MenuFlyoutSeparator());
             menuFlyout.Items.Add(objectSubItem);
-            menuFlyout.Items.Add(new MenuFlyoutSeparator());
             menuFlyout.Items.Add(lightSubItem);
 
             return menuFlyout;
