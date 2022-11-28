@@ -38,7 +38,7 @@ interchange between graphics applications.
 For more details, please visit the web site [here](http://openusd.org).
 
 
-## Build
+# Build
 
 In order to compile, make sure **no spaces** are present in the solution path otherwise SharpGen will fail to generate bindings.
 Also, you need to install **Visual Studio 2022** with the following components:
