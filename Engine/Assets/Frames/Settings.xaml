@@ -7,7 +7,21 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid>
+    <StackPanel Spacing="20" Padding="50">
+        <TextBlock FontSize="32" Text="Settings"/>
 
-    </Grid>
+        <Grid/>
+
+        <Expander HorizontalAlignment="Stretch">
+            <Expander.Header>
+                <StackPanel Padding="20" Spacing="20" Orientation="Horizontal">
+                    <SymbolIcon Symbol="Globe"/>
+                    <StackPanel>
+                        <TextBlock Text="Project Settings" FontSize="18"/>
+                        <TextBlock Text="Name, Window, Player, Graphics API"/>
+                    </StackPanel>
+                </StackPanel>
+            </Expander.Header>
+        </Expander>
+    </StackPanel>
 </Frame>
