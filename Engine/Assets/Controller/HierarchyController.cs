@@ -10,7 +10,6 @@ using Engine.Utilities;
 using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
 using Expander = Microsoft.UI.Xaml.Controls.Expander;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Editor.Controller
 {

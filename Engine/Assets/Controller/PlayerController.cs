@@ -42,7 +42,7 @@ namespace Editor.Controller
 
             SetStatusAppBarButtons(_play.IsChecked.Value);
 
-            SetStatus(_play.IsChecked.Value ? "Now Playing..." : "Stopped Gamemode");
+            OutputController.Log(_play.IsChecked.Value ? "Now Playing..." : "Stopped Gamemode");
         }
 
         public void Pause()
@@ -52,7 +52,7 @@ namespace Editor.Controller
             _forward.IsEnabled = _pause.IsChecked.Value;
             MainController.Instance.LayoutControl.ViewPort._viewPortControl.GridMain.BorderBrush = new SolidColorBrush(_pause.IsChecked.Value ? Colors.Orange : Colors.GreenYellow);
 
-            SetStatus(_pause.IsChecked.Value ? "Paused Gamemode" : "Continued Gamemode");
+            OutputController.Log(_pause.IsChecked.Value ? "Paused Gamemode" : "Continued Gamemode");
         }
 
         public void Forward()
@@ -62,7 +62,7 @@ namespace Editor.Controller
 
             OutputController.Log("Stepped Forward..");
 
-            SetStatus("Stepped Forward");
+            OutputController.Log("Stepped Forward");
         }
 
         public void Kill()
@@ -71,7 +71,7 @@ namespace Editor.Controller
 
             SetStatusAppBarButtons(false);
 
-            SetStatus("Killed Process of GameInstance!");
+            OutputController.Log("Killed Process of GameInstance!");
         }
 
         private void SetStatusAppBarButtons(bool b)
@@ -85,11 +85,6 @@ namespace Editor.Controller
 
             _play.Label = b ? "Stop" : "Play";
             _play.Icon = b ? new SymbolIcon(Symbol.Stop) : new SymbolIcon(Symbol.Play);
-        }
-
-        private void SetStatus(string _s)
-        {
-            _status.Text = _s;
         }
     }
 }

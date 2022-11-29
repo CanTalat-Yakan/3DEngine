@@ -10,6 +10,6 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid x:Name="x_Grid_Main">
-        <muxc:SwapChainPanel x:Name="x_SwapChainPanel_ViewPort" MinHeight="1"/>
+        <muxc:SwapChainPanel x:Name="x_SwapChainPanel_ViewPort" MinHeight="1" MinWidth="1"/>
     </Grid>
 </UserControl>

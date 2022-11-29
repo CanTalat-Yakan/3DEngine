@@ -12,15 +12,13 @@ namespace Editor.Controller
         public Grid Content;
         public TextBlock Status;
         public Viewbox StatusIcon;
-        public MainWindow MainWindow;
 
-        public MainController(MainWindow mainWindow, Grid content, TextBlock status, Viewbox icon)
+        public MainController(Grid content, TextBlock status, Viewbox icon)
         {
             if (Instance is null)
                 Instance = this;
 
-            MainWindow = mainWindow;
-            Content = content;
+           Content = content;
             Status = status;
             StatusIcon = icon;
 
