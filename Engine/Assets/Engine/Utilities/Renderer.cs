@@ -199,16 +199,16 @@ namespace Engine.Utilities
             DeviceContext.RSSetState(Device.CreateRasterizerState(rasterizerDescWireframe));
         }
 
-        public void RenderMesh(ID3D11Buffer _vertexBuffer, int _vertexStride, ID3D11Buffer _indexBuffer, int _indexCount)
+        public void RenderMesh(ID3D11Buffer vertexBuffer, int vertexStride, ID3D11Buffer indexBuffer, int indexCount, int vertexOffset = 0, int indexOffset = 0)
         {
             DeviceContext.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
-            DeviceContext.IASetVertexBuffer(0, _vertexBuffer, _vertexStride, 0);
-            DeviceContext.IASetIndexBuffer(_indexBuffer, Format.R16_UInt, 0);
+            DeviceContext.IASetVertexBuffer(0, vertexBuffer, vertexStride, vertexOffset);
+            DeviceContext.IASetIndexBuffer(indexBuffer, Format.R16_UInt, indexOffset);
             unsafe
             {
                 DeviceContext.OMSetBlendState(_blendState);
             }
-            DeviceContext.DrawIndexed(_indexCount, 0, 0);
+            DeviceContext.DrawIndexed(indexCount, 0, 0);
         }
 
         public void OnSwapChainPanelSizeChanged(object sender, SizeChangedEventArgs e)

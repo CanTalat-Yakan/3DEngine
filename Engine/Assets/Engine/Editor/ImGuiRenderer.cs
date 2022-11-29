@@ -190,8 +190,10 @@ namespace Engine.Editor
         {
             int stride = sizeof(ImDrawVert);
             int offset = 0;
+
             ctx.IASetInputLayout(inputLayout);
-            //ctx.IASetVertexBuffers(2, 1, new[] { vertexBuffer }, new[] { stride }, new[] { offset });
+            //ctx.IASetVertexBuffers(0, 1, new[] { vertexBuffer }, new[] { stride }, new[] { offset });
+            //ctx.IASetVertexBuffer(0, vertexBuffer, stride, offset);
             ctx.IASetIndexBuffer(indexBuffer, sizeof(ImDrawIdx) == 2 ? Format.R16_UInt : Format.R32_UInt, 0);
             ctx.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
             ctx.VSSetShader(vertexShader);
@@ -203,9 +205,9 @@ namespace Engine.Editor
             ctx.DSSetShader(null);
             ctx.CSSetShader(null);
 
-            ctx.OMSetBlendState(blendState);
-            ctx.OMSetDepthStencilState(depthStencilState);
-            ctx.RSSetState(rasterizerState);
+            //ctx.OMSetBlendState(blendState);
+            //ctx.OMSetDepthStencilState(depthStencilState);
+            //ctx.RSSetState(rasterizerState);
         }
 
         void CreateFontsTexture()
@@ -274,7 +276,7 @@ namespace Engine.Editor
         {
             //Compiler.Compile(vertexShaderCode, "main", "vs", "vs_4_0", out vertexShaderBlob, out var errorBlob);
             //if (vertexShaderBlob == null)
-                //throw new Exception("error compiling vertex shader");
+            //throw new Exception("error compiling vertex shader");
             ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(SHADER_IMGUI, "VS", "vs_4_0");
 
             vertexShader = device.CreateVertexShader(vertexShaderByteCode.Span);
@@ -290,7 +292,7 @@ namespace Engine.Editor
 
             var constBufferDesc = new BufferDescription
             {
-                ByteWidth= VertexConstantBufferSize,
+                ByteWidth = VertexConstantBufferSize,
                 Usage = ResourceUsage.Dynamic,
                 BindFlags = BindFlags.ConstantBuffer,
                 CPUAccessFlags = CpuAccessFlags.Write
@@ -299,7 +301,7 @@ namespace Engine.Editor
 
             //Compiler.Compile(pixelShaderCode, "main", "ps", "ps_4_0", out pixelShaderBlob, out errorBlob);
             //if (pixelShaderBlob == null)
-                //throw new Exception("error compiling pixel shader");
+            //throw new Exception("error compiling pixel shader");
             ReadOnlyMemory<byte> pixelShaderByteCode = CompileBytecode(SHADER_IMGUI, "PS", "ps_4_0");
 
             pixelShader = device.CreatePixelShader(pixelShaderByteCode.Span);
