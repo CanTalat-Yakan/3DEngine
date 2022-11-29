@@ -65,7 +65,7 @@ namespace Engine
                 Scene.Render();
 
                 UpdateImGui();
-                //ImGuiRenderer.Render(ImGui.GetDrawData());
+                ImGuiRenderer.Render(ImGui.GetDrawData());
 
                 Renderer.Present();
 
