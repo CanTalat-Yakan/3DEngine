@@ -75,12 +75,13 @@ namespace Engine.Utilities
             return gObject;
         }
 
-        public Entity CreateEmpty(string name = "New Entity")
+        public Entity CreateEntity(Entity parent = null, string name = "New Entity")
         {
             Entity gObject = new Entity()
             {
                 Name = name,
                 Material = _materialDefault,
+                Parent = parent
             };
 
             EntityList.Add(gObject);

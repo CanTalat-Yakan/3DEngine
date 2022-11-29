@@ -33,7 +33,7 @@ namespace Engine.Utilities
             _special.Transform.Scale *= 0.1f;
             _special.Transform.Position.Y += 0.5f;
 
-            Entity parent = EntitytManager.CreateEmpty("Content");
+            Entity parent = EntitytManager.CreateEntity(null, "Content");
 
             EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(0, 0, 1);
             EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(0, 0, -3);
@@ -42,7 +42,7 @@ namespace Engine.Utilities
             EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(2, 0, 0);
             EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(-1, 1, 0);
 
-            _subParent = EntitytManager.CreateEmpty("Cubes");
+            _subParent = EntitytManager.CreateEntity(null, "Cubes");
             _subParent.Parent = parent;
 
             EntitytManager.CreatePrimitive(EPrimitiveTypes.CUBE, _subParent);
