@@ -8,14 +8,14 @@ using Engine.Utilities;
 
 namespace Engine.Editor
 {
-    internal class ImGui
+    internal class ImGuiEditor
     {
         private Renderer _d3d;
         private InputLayoutDescription _inputLayoutDescription;
         private ID3D11Texture2D _fontTexture;
         private Mesh _imguiMesh;
 
-        public ImGui()
+        public ImGuiEditor()
         {
             #region //Create Instance
             _d3d = Renderer.Instance;

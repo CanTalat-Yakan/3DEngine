@@ -3,6 +3,13 @@ using Microsoft.UI.Xaml.Media;
 using Engine.Editor;
 using Engine.Utilities;
 using Editor.Controller;
+using System;
+using ImGuiNET;
+using System.Numerics;
+using System.Diagnostics;
+using System.Drawing;
+using Vortice.DXGI;
+using Vortice.Mathematics;
 
 namespace Engine
 {
@@ -14,20 +21,27 @@ namespace Engine
         public Time Time;
         public Scene Scene;
         public Renderer Renderer;
-        public ImGui ImGui;
+        public ImGuiRenderer ImGuiRenderer;
+
+        IntPtr imGuiContext;
 
         public Core(SwapChainPanel swapChainPanel, TextBlock profile)
         {
             if (Instance is null)
                 Instance = this;
 
-            Renderer = new Renderer(swapChainPanel);
-            Input = new Input();
-            Time = new Time();
-            Scene = new Scene();
-            ImGui = new ImGui();
+            imGuiContext = ImGui.CreateContext();
+            ImGui.SetCurrentContext(imGuiContext);
+
+            Renderer = new(swapChainPanel);
+            Input = new();
+            Time = new();
+            Scene = new();
+            ImGuiRenderer = new();
 
             OutputController.Log("Engine Initialized...");
+
+            ImGui.GetIO().DisplaySize = new Vector2((float)swapChainPanel.ActualWidth, (float)swapChainPanel.ActualHeight);
 
             Scene.Awake();
             Scene.Start();
@@ -50,7 +64,8 @@ namespace Engine
                 Renderer.SetWireframe();
                 Scene.Render();
 
-                ImGui.Draw();
+                UpdateImGui();
+                //ImGuiRenderer.Render(ImGui.GetDrawData());
 
                 Renderer.Present();
 
@@ -60,6 +75,17 @@ namespace Engine
                 profile.Text += "\n\n" + Scene.Camera.Transform.Position.ToString();
                 profile.Text += "\n\n" + Scene.Camera.Transform.EulerAngles.ToString();
             };
+        }
+
+        public virtual void UpdateImGui()
+        {
+            ImGui.SetCurrentContext(imGuiContext);
+            var io = ImGui.GetIO();
+
+            io.DeltaTime = (float)Time.s_Delta;
+
+            ImGui.NewFrame();
+            ImGui.Render();
         }
     }
 }

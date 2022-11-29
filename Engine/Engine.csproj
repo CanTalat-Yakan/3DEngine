@@ -14,6 +14,7 @@
     <Content Remove="Assets\Controller\FilesController.cs" />
     <Content Remove="Assets\Controller\ThemeController.cs" />
     <Content Remove="Assets\Controller\ViewPortController.cs" />
+    <Content Remove="Assets\Engine\Editor\ImGuiRenderer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Assets\Engine\Resources\Models\Cube.obj" />
@@ -23,6 +24,7 @@
     <None Remove="Assets\Engine\Resources\Models\SmallSphere.obj" />
     <None Remove="Assets\Engine\Resources\Models\Sphere.obj" />
     <None Remove="Assets\Engine\Resources\Models\sponza.obj" />
+    <None Remove="Assets\Engine\Resources\Shader\ImGui.hlsl" />
     <None Remove="Assets\Engine\Resources\Shader\ShaderHelper.hlsl" />
     <None Remove="Assets\Engine\Resources\Templates\Materials.txt" />
     <None Remove="Assets\Engine\Resources\Templates\Scenes.txt" />
