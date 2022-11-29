@@ -191,8 +191,10 @@ namespace Editor.Controller
 
             if (m.Type == EMessageType.WARNING)
                 s_statusIcon.Child = new FontIcon() { Glyph = "\uE7BA" };
-            else
-                s_statusIcon.Child = new SymbolIcon() { Symbol = m.Type == EMessageType.MESSAGE ? Symbol.Message : Symbol.ReportHacked };
+            else if (m.Type == EMessageType.MESSAGE)
+                s_statusIcon.Child = new SymbolIcon() { Symbol = Symbol.Message };
+            else if (m.Type == EMessageType.ERROR)
+                s_statusIcon.Child = new SymbolIcon() { Symbol = Symbol.ReportHacked };
         }
 
         private async void OpenMessage(string path)
@@ -206,11 +208,15 @@ namespace Editor.Controller
         private static UIElement CreateMessage(DateTime d, SMessageInfo m, int? i)
         {
             //Content of the message
-            StackPanel stack = new StackPanel() { Orientation = Orientation.Horizontal, Spacing = 10, Margin = new Thickness(10, 0, 0, 0) };
+            StackPanel stack = new StackPanel() { Orientation = Orientation.Horizontal, Spacing = 10, Margin = new Thickness(10, 0, 0, 0), Padding = new Thickness(5) };
+            Viewbox viewbox = new Viewbox() { Width = 14, Height = 14 };
             if (m.Type == EMessageType.WARNING)
-                stack.Children.Add(new FontIcon() { Glyph = "\uE7BA" });
-            else
-                stack.Children.Add(new SymbolIcon() { Symbol = m.Type == EMessageType.MESSAGE ? Symbol.Message : Symbol.ReportHacked });
+                viewbox.Child = new FontIcon() { Glyph = "\uE7BA" };
+            else if (m.Type == EMessageType.MESSAGE)
+                viewbox.Child = new SymbolIcon() { Symbol = Symbol.Message };
+            else if (m.Type == EMessageType.ERROR)
+                viewbox.Child = new SymbolIcon() { Symbol = Symbol.ReportHacked };
+            stack.Children.Add(viewbox);
             stack.Children.Add(new TextBlock() { Text = "[" + d.TimeOfDay.ToString("hh\\:mm\\:ss").ToString() + "]" });
             stack.Children.Add(new TextBlock() { Text = m.Message });
 
@@ -226,7 +232,7 @@ namespace Editor.Controller
             grid.Children.Add(stack);
             //If there is a count the number gets shown on the right
             if (i != null)
-                grid.Children.Add(new TextBlock() { Margin = new Thickness(0, 0, 10, 0), MinWidth = 25, HorizontalAlignment = HorizontalAlignment.Right, Text = i.ToString() });
+                grid.Children.Add(new TextBlock() { Margin = new Thickness(0, 0, 10, 0), Padding = new Thickness(5), MinWidth = 25, HorizontalAlignment = HorizontalAlignment.Right, Text = i.ToString() });
             //Set flyout to button that stretches along the grid
             grid.Children.Add(new Button()
             {
