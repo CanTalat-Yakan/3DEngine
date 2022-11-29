@@ -4,10 +4,48 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Frames"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid>
+    <Frame.Resources>
+        <ResourceDictionary Source="ms-appx:///Microsoft.UI.Xaml/DensityStyles/Compact.xaml" />
+    </Frame.Resources>
 
-    </Grid>
+    <controls:DockPanel MinWidth="820" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <!--STATUS -->
+        <Grid controls:DockPanel.Dock="Bottom">
+            <CommandBar>
+                <CommandBar.PrimaryCommands>
+                    <AppBarToggleButton Name="x_AppBarToggleButton_Status_Play" Icon="Play" Label="Play" Click="AppBarToggleButton_Status_Play_Click"/>
+                    <AppBarToggleButton x:Name="x_AppBarToggleButton_Status_Pause" Icon="Pause" Label="Pause" IsEnabled="False" Click="AppBarToggleButton_Status_Pause_Click"/>
+                    <AppBarButton x:Name="x_AppBarButton_Status_Forward" Icon="Forward" Label="Forward" IsEnabled="False" Click="AppBarButton_Status_Forward_Click"/>
+                </CommandBar.PrimaryCommands>
+
+                <CommandBar.SecondaryCommands>
+                    <AppBarToggleButton x:Name="x_AppBarToggleButton_Status_OpenPane" Label="Open Pane" IsChecked="True">
+                        <AppBarToggleButton.KeyboardAccelerators>
+                            <KeyboardAccelerator Key="Tab" Modifiers="Control" />
+                        </AppBarToggleButton.KeyboardAccelerators>
+                    </AppBarToggleButton>
+                    <AppBarToggleButton Label="Toggle Theme" Click="AppBarToggleButton_Status_Light">
+                        <AppBarToggleButton.KeyboardAccelerators>
+                            <KeyboardAccelerator Key="T" Modifiers="Control" />
+                        </AppBarToggleButton.KeyboardAccelerators>
+                    </AppBarToggleButton>
+                </CommandBar.SecondaryCommands>
+
+                <CommandBar.Content>
+                    <StackPanel Orientation="Horizontal" Padding="12,0,0,0">
+                        <Viewbox x:Name="x_TextBlock_StatusIcon_Content" MaxHeight="16" MaxWidth="16"/>
+                        <TextBlock x:Name="x_TextBlock_Status_Content" Text="" Margin="12,14"/>
+                    </StackPanel>
+                </CommandBar.Content>
+            </CommandBar>
+        </Grid>
+
+        <!--MAIN-->
+        <Grid x:Name="x_Grid_Main" HorizontalAlignment="Stretch"/>
+    </controls:DockPanel>
 </Frame>
