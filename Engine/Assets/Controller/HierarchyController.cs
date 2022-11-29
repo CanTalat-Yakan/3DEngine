@@ -10,6 +10,7 @@ using Engine.Utilities;
 using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
 using Expander = Microsoft.UI.Xaml.Controls.Expander;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Editor.Controller
 {
@@ -36,6 +37,8 @@ namespace Editor.Controller
 
         private StackPanel _stackPanel;
 
+        private TreeViewNode _itemInvoked = null;
+
         public HierarchyController(StackPanel stackPanel)
         {
             _stackPanel = stackPanel;
@@ -50,9 +53,10 @@ namespace Editor.Controller
             var scene = new Grid[]
             {
                 CreateTreeView(out SceneTreeView),
-                CreateButton("Create Entity", (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEmpty() )
+                CreateButton("Create Entity", (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEntity() )
             };
-
+            SceneTreeView.PointerPressed += (s, e) => GetInvokedItem(s, e);
+            SceneTreeView.ContextFlyout = CreateDefaultMenuFlyout();
             SceneTreeView.Tapped += (s, e) => SetProperties();
             SceneTreeView.DragItemsCompleted += (s, e) => SetNewParentTreeEntry((TreeViewNode)e.NewParentItem, (TreeViewNode)e.Items);
 
@@ -60,6 +64,22 @@ namespace Editor.Controller
             _stackPanel.Children.Add(CreateSeperator());
             _stackPanel.Children.Add(CreateButton("Add Subscene", (s, e) => _stackPanel.Children.Add(CreateExpanderWithToggleButton("Subscene", CreateSubsceneTreeView()))));
             _stackPanel.Children.Add(CreateExpanderWithToggleButton("Subscene", CreateSubsceneTreeView()));
+        }
+
+        private void GetInvokedItem(object sender, PointerRoutedEventArgs e)
+        {
+            var properties = e.GetCurrentPoint((UIElement)sender).Properties;
+            if (properties.IsRightButtonPressed)
+            {
+                var dc = ((FrameworkElement)e.OriginalSource).DataContext;
+
+                if (dc is null)
+                    return;
+
+                var c = ((TreeViewNode)dc).Content as TreeEntry;
+
+                _itemInvoked = c.Node;
+            }
         }
 
         private Grid[] CreateSubsceneTreeView()
@@ -74,6 +94,8 @@ namespace Editor.Controller
                 CreateButton("Create Entity", null )
             };
 
+            subsceneTreeView.ItemInvoked += (s, e) => _itemInvoked = e.InvokedItem as TreeViewNode;
+            subsceneTreeView.ContextFlyout = CreateDefaultMenuFlyout();
             subsceneTreeView.Tapped += (s, e) => SetProperties();
             subsceneTreeView.DragItemsCompleted += (s, e) => SetNewParentTreeEntry((TreeViewNode)e.NewParentItem, (TreeViewNode)e.Items);
 
@@ -170,12 +192,12 @@ namespace Editor.Controller
             return list.ToArray();
         }
 
-        public Entity GetEntity(TreeEntry node)
+        public Entity GetEntity(TreeEntry entry)
         {
             var engineObjectList = Engine.Core.Instance.Scene.EntitytManager.EntityList;
 
             foreach (var entity in engineObjectList)
-                if (entity.ID == node.ID)
+                if (entity.ID == entry.ID)
                     return entity;
 
             return null;
@@ -190,7 +212,7 @@ namespace Editor.Controller
             }
         }
         
-        private MenuFlyout CreateDefaultMenuFlyout(string path = "")
+        private MenuFlyout CreateDefaultMenuFlyout()
         {
             MenuFlyoutItem[] items = new[] {
                 new MenuFlyoutItem() { Text = "Cut", Icon = new SymbolIcon(Symbol.Cut) },
@@ -211,8 +233,8 @@ namespace Editor.Controller
             //items[3].Click += (s, e) => ContentDialogRename(path);
             //items[4].Click += (s, e) => ContentDialogDelete(path);
 
-            items[5].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEmpty();
-            items[6].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEmpty();
+            items[5].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEntity(GetEntity(_itemInvoked.Parent.Content as TreeEntry));
+            items[6].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEntity(GetEntity(_itemInvoked.Content as TreeEntry));
 
             MenuFlyout menuFlyout = new();
             foreach (var item in items)
@@ -247,7 +269,7 @@ namespace Editor.Controller
             //items[2].Click += (s, e) => ContentDialogRename(path);
             //items[3].Click += (s, e) => ContentDialogDelete(path);
 
-            items[4].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEmpty();
+            items[4].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEntity();
 
             MenuFlyout menuFlyout = new();
             foreach (var item in items)
@@ -299,7 +321,6 @@ namespace Editor.Controller
             Grid grid = new Grid();
 
             tree = new TreeView() { SelectionMode = TreeViewSelectionMode.Single, HorizontalAlignment = HorizontalAlignment.Stretch };
-            tree.ContextFlyout = CreateDefaultMenuFlyout();
 
             grid.Children.Add(tree);
 
