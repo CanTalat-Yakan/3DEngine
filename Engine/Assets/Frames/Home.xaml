@@ -10,7 +10,7 @@
     mc:Ignorable="d">
 
 
-    <controls:DockPanel MinWidth="820" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <controls:DockPanel MinWidth="820">
         <!--STATUS -->
         <Grid controls:DockPanel.Dock="Bottom">
             <CommandBar>
