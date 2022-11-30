@@ -9,109 +9,149 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <StackPanel Spacing="20" Padding="50">
-        <TextBlock FontSize="32" Text="Settings"/>
-
-        <Grid/>
-
-        <Expander HorizontalAlignment="Stretch">
-            <Expander.Header>
-                <StackPanel Padding="20" Spacing="20" Orientation="Horizontal">
-                    <SymbolIcon Symbol="Globe"/>
-                    <StackPanel>
-                        <TextBlock Text="Project Settings" FontSize="18"/>
-                        <TextBlock Text="Name, Window, Player, Graphics API"/>
-                    </StackPanel>
-                </StackPanel>
-            </Expander.Header>
-        </Expander>
-
-        <Grid/>
-
-        <StackPanel Spacing="10">
-            <TextBlock FontSize="24" Text="Theme Mode"/>
-
-            <RadioButtons>
-                <RadioButton Content="Light"/>
-                <RadioButton Content="Dark" IsChecked="True"/>
-                <RadioButton Content="Use system setting"/>
-            </RadioButtons>
-        </StackPanel>
-
-        <Grid/>
-
-        <StackPanel Spacing="10">
-            <TextBlock FontSize="24" Text="Sound"/>
-
-            <TextBlock Text="Controls provide audible feedback"/>
-
-            <ToggleSwitch/>
-        </StackPanel>
-
-        <Grid/>
-
-        <StackPanel Spacing="10">
-            <TextBlock FontSize="24" Text="Teaching Tips"/>
-
-            <Button Content="Reset Teaching Tips"/>
-        </StackPanel>
-
-        <Grid/>
-
-        <StackPanel Spacing="10">
-            <TextBlock FontSize="24" Text="About"/>
-
-            <TextBlock Text="This app is student project and is still in development. Check out the website to see future plans of this Engine."/>
-
-            <TextBlock Text="Source code: "/>
-
-            <TextBlock Text="Website: "/>
-
-            <TextBlock Text="Documentation: "/>
-        </StackPanel>
-
-        <Grid/>
-
-        <StackPanel Spacing="10">
-            <TextBlock FontSize="24" Text="Found a bug? Want a new feature?"/>
-
-            <TextBlock Text="If you have found a bug within the 3D Engine, please file an issue on GitHub:"/>
-
-            <TextBlock Text="If you would like a new feature request it on GitHub:"/>
-        </StackPanel>
-
-        <Grid/>
-
-        <StackPanel Spacing="10">
-            <TextBlock FontSize="24" Text="Dependencies and References"/>
-
-            <TextBlock Text="Vortice.Windows"/>
-
-            <TextBlock Text="Windows App SDK"/>
-
-            <TextBlock Text="WinUI 3"/>
-
-            <TextBlock Text="Universal Scene Description"/>
-
-            <TextBlock Text="Aspose.3D"/>
-        </StackPanel>
-
-        <Grid/>
-
-        <StackPanel Spacing="10">
-            <TextBlock FontSize="24" Text="Disclaimer"/>
-
-            <TextBlock Text="THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,"/>
-
-            <TextBlock Text="FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,"/>
-
-            <TextBlock Text="WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."/>
+    <ScrollViewer>
+        <StackPanel Spacing="20" Padding="50">
+            <TextBlock FontSize="32" Text="Settings"/>
 
             <Grid/>
 
-            <TextBlock Text="MIT License"/>
+            <StackPanel Spacing="5">
+                <Expander HorizontalAlignment="Stretch">
+                    <Expander.Header>
+                        <StackPanel Padding="15" Spacing="20" Orientation="Horizontal">
+                            <SymbolIcon Symbol="Globe"/>
+                            <StackPanel>
+                                <TextBlock Text="Project Settings"/>
+                                <TextBlock Text="Window, C# Project Generation, Shader Compilation" FontSize="12"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Expander.Header>
+                </Expander>
 
-            <TextBlock Text="Copyright (c) 2022 CanTalat-Yakan"/>
+                <Expander HorizontalAlignment="Stretch">
+                    <Expander.Header>
+                        <StackPanel Padding="15" Spacing="20" Orientation="Horizontal">
+                            <SymbolIcon Symbol="AllApps"/>
+                            <StackPanel>
+                                <TextBlock Text="Editor"/>
+                                <TextBlock Text="Name, Window, Player, Graphics API" FontSize="12"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Expander.Header>
+                </Expander>
+
+                <Expander HorizontalAlignment="Stretch">
+                    <Expander.Header>
+                        <StackPanel Padding="15" Spacing="20" Orientation="Horizontal">
+                            <SymbolIcon Symbol="MapDrive"/>
+                            <StackPanel>
+                                <TextBlock Text="Storage"/>
+                                <TextBlock Text="Storage space, drives, configuration rules" FontSize="12"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Expander.Header>
+                </Expander>
+
+                <Expander HorizontalAlignment="Stretch">
+                    <Expander.Header>
+                        <StackPanel Padding="15" Spacing="20" Orientation="Horizontal">
+                            <SymbolIcon Symbol="Play"/>
+                            <StackPanel>
+                                <TextBlock Text="Player"/>
+                                <TextBlock Text="Name, Resolution, Splash, Other Settings" FontSize="12"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Expander.Header>
+                </Expander>
+            </StackPanel>
+
+            <Grid/>
+
+            <StackPanel Spacing="10">
+                <TextBlock FontSize="20" FontWeight="SemiBold" Text="Theme Mode"/>
+
+                <RadioButtons>
+                    <RadioButton Content="Light"/>
+                    <RadioButton Content="Dark" IsChecked="True"/>
+                    <RadioButton Content="Use system setting"/>
+                </RadioButtons>
+            </StackPanel>
+
+            <Grid/>
+
+            <StackPanel Spacing="10">
+                <TextBlock FontSize="20" FontWeight="SemiBold" Text="Sound"/>
+
+                <TextBlock Text="Controls provide audible feedback"/>
+
+                <ToggleSwitch/>
+            </StackPanel>
+
+            <Grid/>
+
+            <StackPanel Spacing="10">
+                <TextBlock FontSize="20" FontWeight="SemiBold" Text="Teaching Tips"/>
+
+                <Button Content="Reset Teaching Tips"/>
+            </StackPanel>
+
+            <Grid/>
+
+            <StackPanel Spacing="10">
+                <TextBlock FontSize="20" FontWeight="SemiBold" Text="About"/>
+
+                <TextBlock Text="This app is student project and is still in development. Check out the website to see future plans of this Engine."/>
+
+                <TextBlock Text="Source code: "/>
+
+                <TextBlock Text="Website: "/>
+
+                <TextBlock Text="Documentation: "/>
+            </StackPanel>
+
+            <Grid/>
+
+            <StackPanel Spacing="10">
+                <TextBlock FontSize="20" FontWeight="SemiBold" Text="Found a bug? Want a new feature?"/>
+
+                <TextBlock Text="If you have found a bug within the 3D Engine, please file an issue on GitHub:"/>
+
+                <TextBlock Text="If you would like a new feature request it on GitHub:"/>
+            </StackPanel>
+
+            <Grid/>
+
+            <StackPanel Spacing="10">
+                <TextBlock FontSize="20" FontWeight="SemiBold" Text="Dependencies and References"/>
+
+                <TextBlock Text="Vortice.Windows"/>
+
+                <TextBlock Text="Windows App SDK"/>
+
+                <TextBlock Text="WinUI 3"/>
+
+                <TextBlock Text="Universal Scene Description"/>
+
+                <TextBlock Text="Aspose.3D"/>
+            </StackPanel>
+
+            <Grid/>
+
+            <StackPanel Spacing="10">
+                <TextBlock FontSize="20" FontWeight="SemiBold" Text="Disclaimer"/>
+
+                <TextBlock Text="THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,"/>
+
+                <TextBlock Text="FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,"/>
+
+                <TextBlock Text="WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."/>
+
+                <Grid/>
+
+                <TextBlock Text="MIT License"/>
+
+                <TextBlock Text="Copyright (c) 2022 CanTalat-Yakan"/>
+            </StackPanel>
         </StackPanel>
-    </StackPanel>
+    </ScrollViewer>
 </Frame>
