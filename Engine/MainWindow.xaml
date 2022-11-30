@@ -11,16 +11,26 @@
 
     <Page x:Name="x_Page_Main">
         <NavigationView x:Name="x_NavigationView_Main"
+                        PaneTitle="3D Engine"
                         SelectionChanged="x_NavigationView_Main_SelectionChanged"
+                        Header="Test"
+                        AlwaysShowHeader="False"
+                        ExpandedModeThresholdWidth="500"
                         IsSettingsVisible="True"
                         IsBackEnabled="False"
                         IsBackButtonVisible="Collapsed"
-                        PaneDisplayMode="LeftCompact"
-                        OpenPaneLength="200">
+                        PaneDisplayMode="LeftCompact">
 
             <NavigationView.MenuItems>
                 <NavigationViewItem Tag="home" Content="Home" Icon="Home" IsSelected="True"/>
-                <NavigationViewItem Tag="engine" Content="Engine">
+
+                <NavigationViewItem Tag="documentation" Content="Documentation" Icon="Library"/>
+
+                <NavigationViewItemSeparator/>
+
+                <NavigationViewItemHeader Content="Engine"/>
+
+                <NavigationViewItem Tag="engine" Content="New Project">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE809;"/>
                     </NavigationViewItem.Icon>
@@ -28,10 +38,17 @@
             </NavigationView.MenuItems>
 
             <NavigationView.PaneFooter>
-                <AppBarButton Content="Documentation" Icon="Library" Height="50" Width="44" Margin="2" Click="AppBarButton_Documentation_Click"/>
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                    <AppBarButton Content="Help" Icon="Help" Height="50" Width="44" Margin="2" Click="AppBarButton_Help_Click"/>
+                    <TextBlock Text="Help" VerticalAlignment="Center"/>
+                </StackPanel>
             </NavigationView.PaneFooter>
 
-            <Frame x:Name="x_Frame_Content"/>
+            <NavigationView.AutoSuggestBox>
+                <AutoSuggestBox QueryIcon="Find" AutomationProperties.Name="Search"/>
+            </NavigationView.AutoSuggestBox>
+
+            <Frame x:Name="x_Frame_Content" CornerRadius="5"/>
         </NavigationView>
     </Page>
 </winex:WindowEx>

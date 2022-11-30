@@ -4,65 +4,96 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Frames"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <StackPanel Spacing="20" Padding="50">
-        <Grid HorizontalAlignment="Stretch" CornerRadius="10">
-            <Image Height="250" Stretch="UniformToFill" Source="/Assets/Engine/Resources/Textures/BG.png" />
-            <StackPanel Padding="50">
-                <TextBlock FontSize="32" Foreground="White" Text="3D Engine"/>
-                <TextBlock FontSize="24" Foreground="White" Text=".Net 7  C# 11  WinUI 3  "/>
+
+    <controls:DockPanel MinWidth="820">
+        <!--STATUS -->
+        <Grid controls:DockPanel.Dock="Bottom">
+            <CommandBar>
+                <CommandBar.PrimaryCommands>
+                </CommandBar.PrimaryCommands>
+
+                <CommandBar.SecondaryCommands>
+                    <AppBarToggleButton Label="Toggle Theme" Click="AppBarToggleButton_Status_Light">
+                        <AppBarToggleButton.KeyboardAccelerators>
+                            <KeyboardAccelerator Key="T" Modifiers="Control" />
+                        </AppBarToggleButton.KeyboardAccelerators>
+                    </AppBarToggleButton>
+                </CommandBar.SecondaryCommands>
+
+                <CommandBar.Content>
+                    <StackPanel Orientation="Horizontal" Padding="12,0,0,0">
+                        <Viewbox x:Name="x_TextBlock_StatusIcon_Content" MaxHeight="16" MaxWidth="16"/>
+                        <TextBlock x:Name="x_TextBlock_Status_Content" Text="" Margin="12,14"/>
+                    </StackPanel>
+                </CommandBar.Content>
+            </CommandBar>
+        </Grid>
+
+        <!--MAIN-->
+        <Grid x:Name="x_Grid_Main" HorizontalAlignment="Stretch">
+            <StackPanel Spacing="20" Padding="50">
+                <Grid HorizontalAlignment="Stretch" CornerRadius="10">
+                    <Image Height="250" Stretch="UniformToFill" Source="/Assets/Engine/Resources/Textures/BG.png" />
+                    <StackPanel Padding="50">
+                        <TextBlock FontSize="32" Foreground="White" Text="3D Engine"/>
+                        <TextBlock FontSize="24" Foreground="White" Text=".Net 7  C# 11  WinUI 3  "/>
+                    </StackPanel>
+                </Grid>
+
+                <StackPanel Spacing="20" Orientation="Horizontal">
+                    <Button>
+                        <StackPanel Spacing="5" Orientation="Horizontal">
+                            <TextBlock Text="Gettings Started"/>
+                            <SymbolIcon Symbol="Link"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button>
+                        <StackPanel Spacing="5" Orientation="Horizontal">
+                            <TextBlock Text="GitHub Repo"/>
+                            <SymbolIcon Symbol="Link"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button>
+                        <StackPanel Spacing="5" Orientation="Horizontal">
+                            <TextBlock Text="Documentation"/>
+                            <SymbolIcon Symbol="Link"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <Grid/>
+
+                <TextBlock FontSize="32" Text="Projects"/>
+
+                <StackPanel Spacing="10" Orientation="Horizontal">
+                    <Button>
+                        <Button.Content>
+                            <Grid Height="40" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                                <SymbolIcon Symbol="Add" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Button.Content>
+                    </Button>
+
+                    <Button>
+                        <Button.Content>
+                            <Grid Width="300" Height="40" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                                <TextBlock Text="New Project" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7FC;" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                            </Grid>
+                        </Button.Content>
+                    </Button>
+                </StackPanel>
+
+                <Grid/>
             </StackPanel>
         </Grid>
-        
-        <StackPanel Spacing="20" Orientation="Horizontal">
-            <Button>
-                <StackPanel Spacing="5" Orientation="Horizontal">
-                    <TextBlock Text="Gettings Started"/>
-                    <SymbolIcon Symbol="Link"/>
-                </StackPanel>
-            </Button>
+    </controls:DockPanel>
 
-            <Button>
-                <StackPanel Spacing="5" Orientation="Horizontal">
-                    <TextBlock Text="GitHub Repo"/>
-                    <SymbolIcon Symbol="Link"/>
-                </StackPanel>
-            </Button>
-
-            <Button>
-                <StackPanel Spacing="5" Orientation="Horizontal">
-                    <TextBlock Text="Documentation"/>
-                    <SymbolIcon Symbol="Link"/>
-                </StackPanel>
-            </Button>
-        </StackPanel>
-
-        <Grid/>
-
-        <TextBlock FontSize="32" Text="Projects"/>
-
-        <StackPanel Spacing="10" Orientation="Horizontal">
-        <Button>
-            <Button.Content>
-                <Grid Height="40" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                    <SymbolIcon Symbol="Add" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Grid>
-            </Button.Content>
-        </Button>
-            
-        <Button>
-            <Button.Content>
-                <Grid Width="300" Height="40" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                    <TextBlock Text="New Project" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
-                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7FC;" HorizontalAlignment="Right" VerticalAlignment="Top"/>
-                </Grid>
-            </Button.Content>
-        </Button>
-        </StackPanel>
-
-        <Grid/>
-
-    </StackPanel>
 </Frame>

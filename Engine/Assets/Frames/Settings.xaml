@@ -4,6 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Frames"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
@@ -23,5 +25,93 @@
                 </StackPanel>
             </Expander.Header>
         </Expander>
+
+        <Grid/>
+
+        <StackPanel Spacing="10">
+            <TextBlock FontSize="24" Text="Theme Mode"/>
+
+            <RadioButtons>
+                <RadioButton Content="Light"/>
+                <RadioButton Content="Dark" IsChecked="True"/>
+                <RadioButton Content="Use system setting"/>
+            </RadioButtons>
+        </StackPanel>
+
+        <Grid/>
+
+        <StackPanel Spacing="10">
+            <TextBlock FontSize="24" Text="Sound"/>
+
+            <TextBlock Text="Controls provide audible feedback"/>
+
+            <ToggleSwitch/>
+        </StackPanel>
+
+        <Grid/>
+
+        <StackPanel Spacing="10">
+            <TextBlock FontSize="24" Text="Teaching Tips"/>
+
+            <Button Content="Reset Teaching Tips"/>
+        </StackPanel>
+
+        <Grid/>
+
+        <StackPanel Spacing="10">
+            <TextBlock FontSize="24" Text="About"/>
+
+            <TextBlock Text="This app is student project and is still in development. Check out the website to see future plans of this Engine."/>
+
+            <TextBlock Text="Source code: "/>
+
+            <TextBlock Text="Website: "/>
+
+            <TextBlock Text="Documentation: "/>
+        </StackPanel>
+
+        <Grid/>
+
+        <StackPanel Spacing="10">
+            <TextBlock FontSize="24" Text="Found a bug? Want a new feature?"/>
+
+            <TextBlock Text="If you have found a bug within the 3D Engine, please file an issue on GitHub:"/>
+
+            <TextBlock Text="If you would like a new feature request it on GitHub:"/>
+        </StackPanel>
+
+        <Grid/>
+
+        <StackPanel Spacing="10">
+            <TextBlock FontSize="24" Text="Dependencies and References"/>
+
+            <TextBlock Text="Vortice.Windows"/>
+
+            <TextBlock Text="Windows App SDK"/>
+
+            <TextBlock Text="WinUI 3"/>
+
+            <TextBlock Text="Universal Scene Description"/>
+
+            <TextBlock Text="Aspose.3D"/>
+        </StackPanel>
+
+        <Grid/>
+
+        <StackPanel Spacing="10">
+            <TextBlock FontSize="24" Text="Disclaimer"/>
+
+            <TextBlock Text="THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,"/>
+
+            <TextBlock Text="FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,"/>
+
+            <TextBlock Text="WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."/>
+
+            <Grid/>
+
+            <TextBlock Text="MIT License"/>
+
+            <TextBlock Text="Copyright (c) 2022 CanTalat-Yakan"/>
+        </StackPanel>
     </StackPanel>
 </Frame>
