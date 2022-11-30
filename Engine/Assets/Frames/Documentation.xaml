@@ -5,7 +5,9 @@
     xmlns:local="using:Frames"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d">
 
-    <WebView2 Source="https://can-talat-yakan.gitbook.io/engine/" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+    <WebView2 Source="https://cans-organization.gitbook.io/documentation/" Margin="0,0,0,-100" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
 </Frame>
