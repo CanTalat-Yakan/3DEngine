@@ -11,7 +11,7 @@ namespace Editor
 {
     public sealed partial class MainWindow : WindowEx
     {
-        private ThemeController _themeControl;
+        internal ThemeController _themeControl;
 
         private Frames.Main _main;
 
@@ -23,11 +23,8 @@ namespace Editor
 
             _themeControl = new ThemeController(this, x_Page_Main);
 
-            _main = new();
-
+            _main = new(this);
         }
-
-        private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) => _themeControl.SetRequstedTheme();
 
         private void AppBarButton_Documentation_Click(object sender, RoutedEventArgs e) => _ = Launcher.LaunchUriAsync(new System.Uri(@"https://3DEngine.wiki/"));
 

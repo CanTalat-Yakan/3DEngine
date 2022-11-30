@@ -43,7 +43,8 @@ namespace Editor.Controller
                     ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 249, 249, 249))
                     : new SolidColorBrush(Windows.UI.Color.FromArgb(255, 40, 40, 40));
 
-            Engine.Core.Instance.Scene.EntitytManager.SetTheme(_page.RequestedTheme == ElementTheme.Light);
+            if (Engine.Core.Instance != null)
+                Engine.Core.Instance.Scene.EntitytManager.SetTheme(_page.RequestedTheme == ElementTheme.Light);
         }
 
         private bool Initialize()
