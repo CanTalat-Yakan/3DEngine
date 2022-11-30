@@ -15,6 +15,8 @@
     <Content Remove="Assets\Controller\ThemeController.cs" />
     <Content Remove="Assets\Controller\ViewPortController.cs" />
     <Content Remove="Assets\Engine\Editor\ImGuiRenderer.cs" />
+    <Content Remove="Assets\Frames\Documentation.xaml" />
+    <Content Remove="Assets\Frames\Documentation.xaml.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Assets\Engine\Resources\Models\Cube.obj" />
@@ -30,6 +32,7 @@
     <None Remove="Assets\Engine\Resources\Templates\Scenes.txt" />
     <None Remove="Assets\Engine\Resources\Templates\Scripts.txt" />
     <None Remove="Assets\Engine\Resources\Templates\Shaders.txt" />
+    <None Remove="Assets\Frames\Documentation.xaml" />
     <None Remove="Assets\Frames\Home.xaml" />
     <None Remove="Assets\Frames\Main.xaml" />
     <None Remove="Assets\Frames\Settings.xaml" />
@@ -64,6 +67,12 @@
     <PackageReference Include="Vortice.XInput" Version="2.1.41" />
     <PackageReference Include="WinUIEx" Version="1.8.0" />
     <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Assets\Frames\Documentation.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>

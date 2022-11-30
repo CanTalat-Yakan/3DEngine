@@ -26,7 +26,7 @@ namespace Editor
             _main = new(this);
         }
 
-        private void AppBarButton_Documentation_Click(object sender, RoutedEventArgs e) => _ = Launcher.LaunchUriAsync(new System.Uri(@"https://3DEngine.wiki/"));
+        private void AppBarButton_Help_Click(object sender, RoutedEventArgs e) => _ = Launcher.LaunchUriAsync(new System.Uri(@"https://3DEngine.wiki/"));
 
         private void x_NavigationView_Main_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
@@ -41,6 +41,10 @@ namespace Editor
                 {
                     case "home":
                         x_Frame_Content.Content = new Frames.Home();
+                        x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
+                        break;
+                    case "documentation":
+                        x_Frame_Content.Content = new Frames.Documentation();
                         x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
                         break;
                     case "engine":

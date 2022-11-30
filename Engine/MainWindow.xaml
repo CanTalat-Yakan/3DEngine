@@ -22,9 +22,11 @@
                         PaneDisplayMode="LeftCompact">
 
             <NavigationView.MenuItems>
-                <!--<NavigationViewItemSeparator/>-->
-
                 <NavigationViewItem Tag="home" Content="Home" Icon="Home" IsSelected="True"/>
+
+                <NavigationViewItem Tag="documentation" Content="Documentation" Icon="Library"/>
+
+                <NavigationViewItemSeparator/>
 
                 <NavigationViewItemHeader Content="Engine"/>
 
@@ -37,8 +39,8 @@
 
             <NavigationView.PaneFooter>
                 <StackPanel Orientation="Horizontal" Spacing="5">
-                    <AppBarButton Content="Documentation" Icon="Library" Height="50" Width="44" Margin="2" Click="AppBarButton_Documentation_Click"/>
-                    <TextBlock Text="Documentation" VerticalAlignment="Center"/>
+                    <AppBarButton Content="Help" Icon="Help" Height="50" Width="44" Margin="2" Click="AppBarButton_Help_Click"/>
+                    <TextBlock Text="Help" VerticalAlignment="Center"/>
                 </StackPanel>
             </NavigationView.PaneFooter>
 
