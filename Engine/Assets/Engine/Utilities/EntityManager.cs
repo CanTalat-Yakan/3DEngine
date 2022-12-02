@@ -22,10 +22,10 @@ namespace Engine.Utilities
 
         public new void Add(T item)
         {
+            base.Add(item);
+
             if (null != OnAddEvent)
                 OnAddEvent(this, null);
-
-            base.Add(item);
         }
     }
 
