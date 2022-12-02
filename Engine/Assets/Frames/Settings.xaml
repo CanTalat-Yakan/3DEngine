@@ -46,7 +46,7 @@
                             <SymbolIcon Symbol="MapDrive"/>
                             <StackPanel>
                                 <TextBlock Text="Storage"/>
-                                <TextBlock Text="Storage space, drives, configuration rules" FontSize="12"/>
+                                <TextBlock Text="Storage Space, Drives, Configuration Rules" FontSize="12"/>
                             </StackPanel>
                         </StackPanel>
                     </Expander.Header>
