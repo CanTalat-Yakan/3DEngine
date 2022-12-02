@@ -40,8 +40,8 @@
                 <Grid HorizontalAlignment="Stretch" CornerRadius="10">
                     <Image Height="250" Stretch="UniformToFill" Source="/Assets/Engine/Resources/Textures/BG.png" />
                     <StackPanel Padding="50">
-                        <TextBlock FontSize="32" Foreground="White" Text="3D Engine"/>
-                        <TextBlock FontSize="24" Foreground="White" Text=".Net 7  C# 11  WinUI 3  "/>
+                        <TextBlock FontSize="28" FontWeight="SemiBold" Foreground="Black" Text="3D Engine"/>
+                        <TextBlock FontSize="20" FontWeight="SemiBold" Foreground="Black" Text=".Net 7  C# 11  WinUI 3  "/>
                     </StackPanel>
                 </Grid>
 
