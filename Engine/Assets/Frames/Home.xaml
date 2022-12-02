@@ -55,10 +55,10 @@
 
                 <Grid/>
 
-                <TextBlock FontSize="32" Text="Projects"/>
+                <TextBlock FontSize="20" FontWeight="SemiBold" Text="Projects"/>
 
                 <StackPanel Spacing="10" Orientation="Horizontal">
-                    <Button>
+                    <Button VerticalAlignment="Stretch">
                         <Button.Content>
                             <Grid Height="40" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                                 <SymbolIcon Symbol="Add" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -66,12 +66,15 @@
                         </Button.Content>
                     </Button>
 
-                    <Button>
+                    <Button Padding="4">
                         <Button.Content>
-                            <Grid Width="300" Height="40" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                                <TextBlock Text="New Project" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
-                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7FC;" HorizontalAlignment="Right" VerticalAlignment="Top"/>
-                            </Grid>
+                            <StackPanel Width="300" Padding="10" Spacing="20" Orientation="Horizontal">
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7FC;"/>
+                                <StackPanel>
+                                    <TextBlock Text="New Project"/>
+                                    <TextBlock Text="01.12.2022 14:36" FontSize="12"/>
+                                </StackPanel>
+                            </StackPanel>
                         </Button.Content>
                     </Button>
                 </StackPanel>
