@@ -37,7 +37,7 @@
         <!--MAIN-->
         <Grid x:Name="x_Grid_Main" HorizontalAlignment="Stretch">
             <StackPanel Spacing="20" Padding="50">
-                <Grid HorizontalAlignment="Stretch" CornerRadius="10">
+                <Grid HorizontalAlignment="Stretch" CornerRadius="5">
                     <Image Height="250" Stretch="UniformToFill" Source="/Assets/Engine/Resources/Textures/BG.png" />
                     <StackPanel Padding="50">
                         <TextBlock FontSize="28" FontWeight="SemiBold" Foreground="Black" Text="3D Engine"/>
@@ -46,11 +46,11 @@
                 </Grid>
 
                 <StackPanel Spacing="20" Orientation="Horizontal">
-                    <Button Content="Gettings Started"/>
+                    <Button Content="Gettings Started" FontWeight="Medium"/>
 
-                    <Button Content="GitHub Repo"/>
+                    <Button Content="GitHub Repo" FontWeight="Medium"/>
 
-                    <Button Content="Documentation"/>
+                    <Button Content="Documentation" FontWeight="Medium"/>
                 </StackPanel>
 
                 <Grid/>
@@ -70,8 +70,8 @@
                         <Button.Content>
                             <StackPanel Width="300" Padding="10" Spacing="20" Orientation="Horizontal">
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7FC;"/>
-                                <StackPanel>
-                                    <TextBlock Text="New Project"/>
+                                <StackPanel Spacing="5">
+                                    <TextBlock Text="New Project" FontWeight="SemiBold"/>
                                     <TextBlock Text="01.12.2022 14:36" FontSize="12"/>
                                 </StackPanel>
                             </StackPanel>
