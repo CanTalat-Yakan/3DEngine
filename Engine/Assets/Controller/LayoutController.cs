@@ -64,11 +64,12 @@ namespace Editor.Controller
     {
         private Grid PairVertical(GridDataTemeplate top, GridDataTemeplate bottom)
         {
+            RowDefinition bottomRowDefinition;
             Grid grid = new Grid() { };
             grid.RowDefinitions.Add(new RowDefinition() { Height = top.Length, MinHeight = top.MinHeight });
-            grid.RowDefinitions.Add(new RowDefinition() { Height = bottom.Length, MinHeight = bottom.MinHeight });
+            grid.RowDefinitions.Add(bottomRowDefinition = new RowDefinition() { Height = bottom.Length, MinHeight = bottom.MinHeight });
 
-            GridSplitter splitV = new GridSplitter() { VerticalAlignment = VerticalAlignment.Top, Opacity = 0.5f, CursorBehavior = GridSplitter.SplitterCursorBehavior.ChangeOnGripperHover };
+            GridSplitter splitV = new GridSplitter() { VerticalAlignment = VerticalAlignment.Top, CursorBehavior = GridSplitter.SplitterCursorBehavior.ChangeOnGripperHover };
 
             ((Grid)bottom.Content).Margin = new Thickness(0, 16, 0, 0);
             ((Grid)top.Content).Padding = new Thickness(0, 16, 0, 0);
@@ -79,6 +80,8 @@ namespace Editor.Controller
             Grid.SetRow((FrameworkElement)bottom.Content, 1);
             Grid.SetRow(splitV, 1);
             grid.Children.Add(splitV);
+
+            BindingOperations.SetBinding(bottomRowDefinition, RowDefinition.HeightProperty, new Binding() { ElementName = "x_AppBarToggleButton_Status_OpenPane", Path = new PropertyPath("IsChecked"), Converter = new BooleanToRowHeightConverter(bottom.Length) });
 
             return grid;
         }
@@ -151,7 +154,7 @@ namespace Editor.Controller
             TabViewPageController tabViewPage = new TabViewPageController(i);
             root.Children.Add(tabViewPage.TabView);
 
-            //BindingOperations.SetBinding(grid, Grid.VisibilityProperty, new Binding() { ElementName = "x_AppBarToggleButton_Status_OpenPane", Path = new PropertyPath("IsChecked"), Converter = new BooleanToVisibilityConverter() });
+            //BindingOperations.SetBinding(root, Grid.VisibilityProperty, new Binding() { ElementName = "x_AppBarToggleButton_Status_OpenPane", Path = new PropertyPath("IsChecked"), Converter = new BooleanToVisibilityConverter() });
 
             return root;
         }
@@ -194,6 +197,37 @@ namespace Editor.Controller
         {
             if (value is Visibility)
                 return (Visibility)value == Visibility.Visible;
+            else
+                return false;
+        }
+    }
+
+    internal sealed class BooleanToRowHeightConverter : IValueConverter
+    {
+        GridLength _initialValue;
+
+        public BooleanToRowHeightConverter(GridLength initialValue)
+        {
+            _initialValue = initialValue;
+        }
+
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            bool bValue = false;
+            if (value is bool)
+                bValue = (bool)value;
+            else if (value is Nullable<bool>)
+            {
+                Nullable<bool> tmp = (Nullable<bool>)value;
+                bValue = tmp.HasValue ? tmp.Value : false;
+            }
+            return (bValue) ? _initialValue : new GridLength(0);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            if (value is GridLength)
+                return (GridLength)value == _initialValue;
             else
                 return false;
         }
