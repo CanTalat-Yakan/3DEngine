@@ -287,6 +287,45 @@ namespace Editor.Controller
             return menuFlyout;
         }
 
+        private MenuFlyout CreateSubRootMenuFlyout(string path = "")
+        {
+            MenuFlyoutItem[] items = new[] {
+                new MenuFlyoutItem() { Text = "Save", Icon = new SymbolIcon(Symbol.Save) },
+                new MenuFlyoutItem() { Text = "Show in Files", Icon = new SymbolIcon(Symbol.Document) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
+                new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Unload" },
+                new MenuFlyoutItem() { Text = "Load" },
+                //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Create Entity" },
+            };
+
+            //items[0].Click += (s, e) => OpenFolder(path);
+            //items[1].Click += (s, e) => OpenFolder(path);
+
+            //items[2].Click += (s, e) => ContentDialogRename(path);
+            //items[3].Click += (s, e) => ContentDialogDelete(path);
+
+            items[6].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEntity();
+
+            MenuFlyout menuFlyout = new();
+            foreach (var item in items)
+            {
+                menuFlyout.Items.Add(item);
+
+                if (item.Text == "Show in Files"
+                    || item.Text == "Delete"
+                    || item.Text == "Load")
+                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
+            }
+
+            menuFlyout = AppendDynamicMenuFlyoutSubItems(menuFlyout);
+
+            return menuFlyout;
+        }
+
         private MenuFlyout AppendDynamicMenuFlyoutSubItems(MenuFlyout menuFlyout)
         {
             MenuFlyoutItem[] objects = new[] {
@@ -409,7 +448,7 @@ namespace Editor.Controller
             expander.Content = stack;
             grid.Children.Add(expander);
 
-            grid.ContextFlyout = CreateRootMenuFlyout();
+            grid.ContextFlyout = CreateSubRootMenuFlyout();
 
             return grid;
         }
