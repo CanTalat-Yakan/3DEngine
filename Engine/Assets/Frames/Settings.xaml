@@ -100,7 +100,8 @@
             <StackPanel Spacing="10">
                 <TextBlock FontSize="20" FontWeight="SemiBold" Text="About"/>
 
-                <TextBlock Text="This app is student project and is still in development. Check out the website to see future plans of this Engine."/>
+                <TextBlock TextWrapping="WrapWholeWords" HorizontalAlignment="Left"
+                           Text="This app is student project and is still in development. Check out the website to see future plans of this Engine."/>
 
                 <TextBlock Text="Source code: "/>
 
@@ -140,11 +141,8 @@
             <StackPanel Spacing="10">
                 <TextBlock FontSize="20" FontWeight="SemiBold" Text="Disclaimer"/>
 
-                <TextBlock Text="THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,"/>
-
-                <TextBlock Text="FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,"/>
-
-                <TextBlock Text="WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."/>
+                <TextBlock MaxWidth="1000" TextWrapping="WrapWholeWords" HorizontalAlignment="Left"
+                           Text="THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."/>
 
                 <Grid/>
 
