@@ -60,12 +60,12 @@ namespace Editor.Controller
             SceneTreeView.Tapped += (s, e) => SetProperties();
             SceneTreeView.DragItemsCompleted += (s, e) => SetNewParentTreeEntry((TreeViewNode)e.NewParentItem, (TreeViewNode)e.Items);
 
-            _stackPanel.Children.Add(CreateExpander("Scene", scene));
+            _stackPanel.Children.Add(scene.StackInGrid().WrapInExpander("Scene").AddContentFlyout(CreateRootMenuFlyout()));
             _stackPanel.Children.Add(CreateSeperator());
-            _stackPanel.Children.Add(CreateButton("Add Subscene", (s, e) => _stackPanel.Children.Add(CreateExpanderWithToggleButton("Subscene", CreateSubsceneTreeView()))));
-            _stackPanel.Children.Add(CreateExpanderWithToggleButton("Subscene", CreateSubsceneTreeView()));
+            _stackPanel.Children.Add(CreateButton("Add Subscene", (s, e) => _stackPanel.Children.Add(CreateSubsceneTreeView().StackInGrid().WrapInExpanderWithToggleButton("Subscene").AddContentFlyout(CreateSubRootMenuFlyout()))));
+            _stackPanel.Children.Add(CreateSubsceneTreeView().StackInGrid().WrapInExpanderWithToggleButton("Subscene").AddContentFlyout(CreateSubRootMenuFlyout()));
         }
-
+        
         private void GetInvokedItemAndSetContextFlyout(object sender, PointerRoutedEventArgs e)
         {
             var properties = e.GetCurrentPoint((UIElement)sender).Properties;
@@ -170,7 +170,7 @@ namespace Editor.Controller
         }
     }
 
-    internal partial class HierarchyController
+    internal partial class HierarchyController : HelperController
     {
         public TreeEntry GetParent(TreeEntry node)
         {
@@ -258,9 +258,6 @@ namespace Editor.Controller
                 new MenuFlyoutItem() { Text = "Save", Icon = new SymbolIcon(Symbol.Save) },
                 new MenuFlyoutItem() { Text = "Show in Files", Icon = new SymbolIcon(Symbol.Document) },
                 //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
-                new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
-                //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Create Entity" },
             };
 
@@ -270,7 +267,7 @@ namespace Editor.Controller
             //items[2].Click += (s, e) => ContentDialogRename(path);
             //items[3].Click += (s, e) => ContentDialogDelete(path);
 
-            items[4].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEntity();
+            items[2].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEntity();
 
             MenuFlyout menuFlyout = new();
             foreach (var item in items)
@@ -293,9 +290,6 @@ namespace Editor.Controller
                 new MenuFlyoutItem() { Text = "Save", Icon = new SymbolIcon(Symbol.Save) },
                 new MenuFlyoutItem() { Text = "Show in Files", Icon = new SymbolIcon(Symbol.Document) },
                 //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
-                new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
-                //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Unload" },
                 new MenuFlyoutItem() { Text = "Load" },
                 //new MenuFlyoutSeparator(),
@@ -308,7 +302,7 @@ namespace Editor.Controller
             //items[2].Click += (s, e) => ContentDialogRename(path);
             //items[3].Click += (s, e) => ContentDialogDelete(path);
 
-            items[6].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEntity();
+            items[4].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEntity();
 
             MenuFlyout menuFlyout = new();
             foreach (var item in items)
@@ -354,121 +348,6 @@ namespace Editor.Controller
             menuFlyout.Items.Add(lightSubItem);
 
             return menuFlyout;
-        }
-
-        private Grid CreateTreeView(out TreeView tree)
-        {
-            Grid grid = new Grid();
-
-            tree = new TreeView() { SelectionMode = TreeViewSelectionMode.Single, HorizontalAlignment = HorizontalAlignment.Stretch };
-
-            grid.Children.Add(tree);
-
-            return grid;
-        }
-
-        private Grid CreateSeperator()
-        {
-            Grid grid = new Grid();
-
-            NavigationViewItemSeparator seperator = new NavigationViewItemSeparator() { Margin = new Thickness(10) };
-
-            grid.Children.Add(seperator);
-
-            return grid;
-        }
-
-        private Grid CreateTextFull(string s = "String")
-        {
-            Grid grid = new Grid();
-
-            TextBlock textInput = new TextBlock() { Text = s, Opacity = 0.5f, TextWrapping = TextWrapping.Wrap };
-
-            grid.Children.Add(textInput);
-
-            return grid;
-        }
-
-        private Grid CreateHeader(string s = "Header")
-        {
-            Grid grid = new Grid();
-            TextBlock header = new TextBlock() { Text = s, FontSize = 18, FontWeight = FontWeights.Bold, Margin = new Thickness(0, 20, 0, 0) };
-
-            grid.Children.Add(header);
-
-            return grid;
-        }
-
-        private Grid CreateSpacer()
-        {
-            Grid grid = new Grid() { Height = 10 };
-
-            return grid;
-        }
-
-        private Grid WrapInExpander(Grid content, string s = "Expander")
-        {
-            Grid grid = new Grid();
-            Expander expander = new Expander() { Header = s, HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Left };
-
-            expander.Content = content;
-            grid.Children.Add(expander);
-
-            return grid;
-        }
-
-        private Grid CreateExpander(string s = "Scene", params Grid[] properties)
-        {
-            Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, 2) };
-            StackPanel stack = new StackPanel() { Orientation = Orientation.Vertical, Spacing = 10 };
-            Expander expander = new Expander() { Header = s, ExpandDirection = ExpandDirection.Down, HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch };
-            expander.IsExpanded = true;
-
-            foreach (var item in properties)
-                stack.Children.Add(item);
-
-            expander.Content = stack;
-            grid.Children.Add(expander);
-
-            grid.ContextFlyout = CreateRootMenuFlyout();
-
-            return grid;
-        }
-
-        private Grid CreateExpanderWithToggleButton(string s = "SubScene", params Grid[] properties)
-        {
-            Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, 2) };
-            StackPanel stack = new StackPanel() { Orientation = Orientation.Vertical, Spacing = 10 };
-            Expander expander = new Expander() { Header = s, ExpandDirection = ExpandDirection.Down, HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch };
-            expander.Header = new ToggleButton() { Content = s, IsChecked = true };
-
-            foreach (var item in properties)
-                stack.Children.Add(item);
-
-            expander.Content = stack;
-            grid.Children.Add(expander);
-
-            grid.ContextFlyout = CreateSubRootMenuFlyout();
-
-            return grid;
-        }
-
-        private Grid CreateButton(string s, TappedEventHandler tapped)
-        {
-            Grid grid = new Grid();
-
-            Button button = new Button() { Content = s, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(10) };
-
-            button.Tapped += tapped;
-
-            AutoSuggestBox suggestBox = new AutoSuggestBox();
-
-            //FlyoutBase kbase = new FlyoutBase();
-            //button.Flyout = suggestBox;
-
-            grid.Children.Add(button);
-
-            return grid;
         }
     }
 }

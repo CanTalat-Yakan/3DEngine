@@ -12,6 +12,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="Assets\Controller\FilesController.cs" />
+    <Content Remove="Assets\Controller\HelperController.cs" />
     <Content Remove="Assets\Controller\ThemeController.cs" />
     <Content Remove="Assets\Controller\ViewPortController.cs" />
     <Content Remove="Assets\Engine\Editor\ImGuiRenderer.cs" />
