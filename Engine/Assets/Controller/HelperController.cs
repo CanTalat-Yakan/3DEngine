@@ -101,18 +101,18 @@ namespace Editor.Controller
             return seperator;
         }
 
-        internal virtual Grid CreateText(string placeholder = "Example")
+        internal virtual UIElement CreateText(string placeholder = "Example")
         {
             TextBlock textInput = new() { Text = placeholder, MaxWidth = 200, TextWrapping = TextWrapping.Wrap };
 
-            return StackInGrid(textInput);
+            return textInput;
         }
 
-        internal virtual Grid CreateTextEqual(string s = "String", string placeholder = "Example")
+        internal virtual UIElement CreateTextEqual(string placeholder = "Example")
         {
             TextBlock textInput = new TextBlock() { Text = placeholder, MaxWidth = 200 };
 
-            return textInput.WrapInFieldEqual(s);
+            return textInput;
         }
 
         internal virtual UIElement CreateTextFull(out TextBlock textBlock)

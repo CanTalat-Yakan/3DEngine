@@ -113,9 +113,9 @@ namespace Editor.Controller
                 CreateText(Path.GetExtension(path)).WrapInField("File type:"),
                 CreateText(SizeSuffix(fileInfo.Length)).WrapInField("File size:"),
                 CreateSpacer(), 
-                CreateTextEqual(fileInfo.CreationTime.ToShortDateString() + " " + fileInfo.CreationTime.ToShortTimeString()).WrapInField("Creation time:"),
-                CreateTextEqual(fileInfo.LastAccessTime.ToShortDateString() + " " + fileInfo.LastAccessTime.ToShortTimeString()).WrapInField("Last access time:"),
-                CreateTextEqual(fileInfo.LastWriteTime.ToShortDateString() + " " + fileInfo.LastWriteTime.ToShortTimeString()).WrapInField("Last update time:") 
+                CreateTextEqual(fileInfo.CreationTime.ToShortDateString() + " " + fileInfo.CreationTime.ToShortTimeString()).WrapInFieldEqual("Creation time:"),
+                CreateTextEqual(fileInfo.LastAccessTime.ToShortDateString() + " " + fileInfo.LastAccessTime.ToShortTimeString()).WrapInFieldEqual("Last access time:"),
+                CreateTextEqual(fileInfo.LastWriteTime.ToShortDateString() + " " + fileInfo.LastWriteTime.ToShortTimeString()).WrapInFieldEqual("Last update time:") 
             };
 
             _stackPanel.Children.Add(properties.StackInGrid().WrapInExpander(Path.GetFileName(path)));
