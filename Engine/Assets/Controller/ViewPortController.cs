@@ -11,6 +11,7 @@ using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 using Windows.Foundation;
 using Engine.Components;
 using Engine.Editor;
+using Microsoft.UI.Xaml.Data;
 
 namespace Editor.Controller
 {
@@ -72,7 +73,7 @@ namespace Editor.Controller
                 Spacing = 6,
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Top,
-                Margin = new Thickness(32, 32, 8, 8)
+                Margin = new Thickness(32, 8, 8, 8)
             };
 
             foreach (var item in content)
@@ -90,7 +91,7 @@ namespace Editor.Controller
                 Spacing = 6,
                 HorizontalAlignment = HorizontalAlignment.Right,
                 VerticalAlignment = VerticalAlignment.Top,
-                Margin = new Thickness(8, 32, 32, 8)
+                Margin = new Thickness(8, 8, 32, 8)
             };
 
             foreach (var item in content)
@@ -108,7 +109,7 @@ namespace Editor.Controller
                 Spacing = 6,
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Bottom,
-                Margin = new Thickness(32, 8, 8, 32)
+                Margin = new Thickness(32, 8, 8, 8)
             };
 
             foreach (var item in content)
@@ -126,7 +127,7 @@ namespace Editor.Controller
                 Spacing = 6,
                 HorizontalAlignment = HorizontalAlignment.Right,
                 VerticalAlignment = VerticalAlignment.Bottom,
-                Margin = new Thickness(8, 8, 32, 32)
+                Margin = new Thickness(8, 8, 32, 8)
             };
 
             foreach (var item in content)

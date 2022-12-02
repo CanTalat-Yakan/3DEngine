@@ -163,7 +163,9 @@ namespace Editor.Controller
         {
             Grid grid = new Grid();
             SplitView split = new SplitView() { OpenPaneLength = 333, IsPaneOpen = true, DisplayMode = SplitViewDisplayMode.Inline, PanePlacement = SplitViewPanePlacement.Right, Pane = pane, Content = content };
+
             BindingOperations.SetBinding(split, SplitView.IsPaneOpenProperty, new Binding() { ElementName = "x_AppBarToggleButton_Status_OpenPane", Path = new PropertyPath("IsChecked") });
+
             grid.Children.Add(split);
 
             return grid;

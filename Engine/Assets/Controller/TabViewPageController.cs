@@ -63,7 +63,7 @@ namespace Editor.Controller
         {
             TabViewItem newItem = new TabViewItem
             {
-                Header = i.Header + "⠀⠀⠀⠀",
+                Header = i.Header + "⠀⠀⠀⠀⠀⠀⠀⠀",
                 Content = i.Content,
                 IconSource = new SymbolIconSource() { Symbol = i.Symbol },
                 IsClosable = false
