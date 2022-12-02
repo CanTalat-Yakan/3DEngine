@@ -32,7 +32,7 @@
 
                 <NavigationViewItem Tag="engine" Content="New Project">
                     <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE809;"/>
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74C;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
             </NavigationView.MenuItems>

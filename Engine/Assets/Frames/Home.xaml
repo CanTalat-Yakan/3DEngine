@@ -28,6 +28,7 @@
                 <CommandBar.Content>
                     <StackPanel Orientation="Horizontal" Padding="12,0,0,0">
                         <Viewbox x:Name="x_TextBlock_StatusIcon_Content" MaxHeight="16" MaxWidth="16"/>
+
                         <TextBlock x:Name="x_TextBlock_Status_Content" Text="" Margin="12,14"/>
                     </StackPanel>
                 </CommandBar.Content>
@@ -39,8 +40,10 @@
             <StackPanel Spacing="20" Padding="50">
                 <Grid HorizontalAlignment="Stretch" CornerRadius="5">
                     <Image Height="250" Stretch="UniformToFill" Source="/Assets/Engine/Resources/Textures/BG.png" />
+
                     <StackPanel Padding="50">
                         <TextBlock FontSize="28" FontWeight="SemiBold" Foreground="Black" Text="3D Engine"/>
+
                         <TextBlock FontSize="20" FontWeight="SemiBold" Foreground="Black" Text=".Net 7  C# 11  WinUI 3  "/>
                     </StackPanel>
                 </Grid>
@@ -69,9 +72,11 @@
                     <Button Padding="4">
                         <Button.Content>
                             <StackPanel Width="300" Padding="10" Spacing="20" Orientation="Horizontal">
-                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE7FC;"/>
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74C;"/>
+
                                 <StackPanel Spacing="5">
                                     <TextBlock Text="New Project" FontWeight="SemiBold"/>
+
                                     <TextBlock Text="01.12.2022 14:36" FontSize="12"/>
                                 </StackPanel>
                             </StackPanel>
