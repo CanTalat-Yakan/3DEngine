@@ -45,7 +45,7 @@
             </NavigationView.PaneFooter>
 
             <NavigationView.AutoSuggestBox>
-                <AutoSuggestBox QueryIcon="Find" AutomationProperties.Name="Search"/>
+                <AutoSuggestBox QueryIcon="Find" PlaceholderText="Search" AutomationProperties.Name="Search"/>
             </NavigationView.AutoSuggestBox>
 
             <Frame x:Name="x_Frame_Content" CornerRadius="5"/>
