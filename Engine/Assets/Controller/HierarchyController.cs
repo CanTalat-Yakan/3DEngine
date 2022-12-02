@@ -10,6 +10,8 @@ using Engine.Utilities;
 using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
 using Expander = Microsoft.UI.Xaml.Controls.Expander;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
+using Microsoft.UI.Xaml.Media;
+using Windows.Foundation;
 
 namespace Editor.Controller
 {
@@ -54,8 +56,7 @@ namespace Editor.Controller
                 CreateTreeView(out SceneTreeView),
                 CreateButton("Create Entity", (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEntity() )
             };
-            SceneTreeView.PointerPressed += (s, e) => GetInvokedItem(s, e);
-            SceneTreeView.ContextFlyout = CreateDefaultMenuFlyout();
+            SceneTreeView.PointerPressed += (s, e) => GetInvokedItemAndSetContextFlyout(s, e);
             SceneTreeView.Tapped += (s, e) => SetProperties();
             SceneTreeView.DragItemsCompleted += (s, e) => SetNewParentTreeEntry((TreeViewNode)e.NewParentItem, (TreeViewNode)e.Items);
 
@@ -65,19 +66,20 @@ namespace Editor.Controller
             _stackPanel.Children.Add(CreateExpanderWithToggleButton("Subscene", CreateSubsceneTreeView()));
         }
 
-        private void GetInvokedItem(object sender, PointerRoutedEventArgs e)
+        private void GetInvokedItemAndSetContextFlyout(object sender, PointerRoutedEventArgs e)
         {
             var properties = e.GetCurrentPoint((UIElement)sender).Properties;
             if (properties.IsRightButtonPressed)
             {
                 var dc = ((FrameworkElement)e.OriginalSource).DataContext;
-
                 if (dc is null)
                     return;
 
                 var c = ((TreeViewNode)dc).Content as TreeEntry;
-
                 _itemInvoked = c.Node;
+
+                ((TreeView)sender).ContextFlyout = CreateDefaultMenuFlyout();
+                ((TreeView)sender).ContextFlyout.Opened += (s, e) => ((TreeView)sender).ContextFlyout = null;
             }
         }
 
