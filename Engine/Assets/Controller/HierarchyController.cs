@@ -417,7 +417,7 @@ namespace Editor.Controller
             return grid;
         }
 
-        private Grid CreateExpander(string s = "ExampleScript", params Grid[] properties)
+        private Grid CreateExpander(string s = "Scene", params Grid[] properties)
         {
             Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, 2) };
             StackPanel stack = new StackPanel() { Orientation = Orientation.Vertical, Spacing = 10 };
@@ -435,7 +435,7 @@ namespace Editor.Controller
             return grid;
         }
 
-        private Grid CreateExpanderWithToggleButton(string s = "ExampleScript", params Grid[] properties)
+        private Grid CreateExpanderWithToggleButton(string s = "SubScene", params Grid[] properties)
         {
             Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, 2) };
             StackPanel stack = new StackPanel() { Orientation = Orientation.Vertical, Spacing = 10 };
@@ -449,24 +449,6 @@ namespace Editor.Controller
             grid.Children.Add(expander);
 
             grid.ContextFlyout = CreateSubRootMenuFlyout();
-
-            return grid;
-        }
-
-        private Grid CreateExpanderWithEditableHeader(string s = "ExampleScript", params Grid[] properties)
-        {
-            Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, 2) };
-            StackPanel stack = new StackPanel() { Orientation = Orientation.Vertical, Spacing = 10 };
-            Expander expander = new Expander() { Header = s, ExpandDirection = ExpandDirection.Down, HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch };
-            expander.Header = new TextBox() { Text = s, Margin = new Thickness(0) };
-
-            foreach (var item in properties)
-                stack.Children.Add(item);
-
-            expander.Content = stack;
-            grid.Children.Add(expander);
-
-            grid.ContextFlyout = CreateRootMenuFlyout();
 
             return grid;
         }
