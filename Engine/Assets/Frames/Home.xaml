@@ -46,26 +46,11 @@
                 </Grid>
 
                 <StackPanel Spacing="20" Orientation="Horizontal">
-                    <Button>
-                        <StackPanel Spacing="5" Orientation="Horizontal">
-                            <TextBlock Text="Gettings Started"/>
-                            <SymbolIcon Symbol="Link"/>
-                        </StackPanel>
-                    </Button>
+                    <Button Content="Gettings Started"/>
 
-                    <Button>
-                        <StackPanel Spacing="5" Orientation="Horizontal">
-                            <TextBlock Text="GitHub Repo"/>
-                            <SymbolIcon Symbol="Link"/>
-                        </StackPanel>
-                    </Button>
+                    <Button Content="GitHub Repo"/>
 
-                    <Button>
-                        <StackPanel Spacing="5" Orientation="Horizontal">
-                            <TextBlock Text="Documentation"/>
-                            <SymbolIcon Symbol="Link"/>
-                        </StackPanel>
-                    </Button>
+                    <Button Content="Documentation"/>
                 </StackPanel>
 
                 <Grid/>
