@@ -20,7 +20,28 @@ namespace Editor.Controller
             _mainWindow = mainWindow;
             _page = page;
 
-            Initialize();
+            if (MicaController.IsSupported())
+            {
+                _wsdqHelper = new WindowsSystemDispatcherQueueHelper();
+                _wsdqHelper.EnsureWindowsSystemDispatcherQueueController();
+
+                // Hooking up the policy object
+                _configurationSource = new SystemBackdropConfiguration();
+
+                _mainWindow.Activated += Window_Activated;
+                _mainWindow.Closed += Window_Closed;
+                //_frame.ActualThemeChanged += Window_ThemeChanged;
+
+                // Initial configuration state.
+                _configurationSource.IsInputActive = true;
+
+                _micaController = new MicaController();
+
+                // Enable the system backdrop.
+                // Note: Be sure to have "using WinRT;" to support the Window.As<...>() call.
+                _micaController.AddSystemBackdropTarget(_mainWindow.As<Microsoft.UI.Composition.ICompositionSupportsSystemBackdrop>());
+                _micaController.SetSystemBackdropConfiguration(_configurationSource);
+            }
         }
 
         public void SetRequstedTheme()
@@ -45,36 +66,6 @@ namespace Editor.Controller
 
             if (Engine.Core.Instance != null)
                 Engine.Core.Instance.Scene.EntitytManager.SetTheme(_page.RequestedTheme == ElementTheme.Light);
-        }
-
-        private bool Initialize()
-        {
-            if (MicaController.IsSupported())
-            {
-                _wsdqHelper = new WindowsSystemDispatcherQueueHelper();
-                _wsdqHelper.EnsureWindowsSystemDispatcherQueueController();
-
-                // Hooking up the policy object
-                _configurationSource = new SystemBackdropConfiguration();
-
-                _mainWindow.Activated += Window_Activated;
-                _mainWindow.Closed += Window_Closed;
-                //_frame.ActualThemeChanged += Window_ThemeChanged;
-
-                // Initial configuration state.
-                _configurationSource.IsInputActive = true;
-
-                _micaController = new MicaController();
-
-                // Enable the system backdrop.
-                // Note: Be sure to have "using WinRT;" to support the Window.As<...>() call.
-                _micaController.AddSystemBackdropTarget(_mainWindow.As<Microsoft.UI.Composition.ICompositionSupportsSystemBackdrop>());
-                _micaController.SetSystemBackdropConfiguration(_configurationSource);
-                return true; // succeeded
-
-            }
-
-            return false; // Mica is not supported on this system
         }
 
         private void Window_Activated(object sender, WindowActivatedEventArgs args)
