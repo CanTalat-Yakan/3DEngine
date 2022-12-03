@@ -23,6 +23,8 @@ namespace Engine.Components
 
         public void Update()
         {
+            //EulerAngles = Rotation.ToEuler();
+
             Forward = Vector3.Normalize(new Vector3(
                 MathF.Sin(MathHelper.ToRadians(EulerAngles.Y)) * MathF.Cos(MathHelper.ToRadians(EulerAngles.X)),
                 MathF.Sin(MathHelper.ToRadians(-EulerAngles.X)),
@@ -38,7 +40,18 @@ namespace Engine.Components
             Matrix4x4 scaleMatrix = Matrix4x4.CreateScale(Scale);
 
             WorldMatrix = Matrix4x4.Transpose(scaleMatrix * rotationMatrix * translationMatrix);
-            if (Parent != null) WorldMatrix = WorldMatrix * Parent.WorldMatrix;
+            if (Parent != null)
+                WorldMatrix = CalculateWorldMatrix(WorldMatrix, Parent);
+        }
+
+        Matrix4x4 CalculateWorldMatrix(Matrix4x4 localPosition, TransformComponent parent)
+        {
+            localPosition = Matrix4x4.Multiply(localPosition, parent.WorldMatrix);
+
+            if (parent.Parent != null)
+                localPosition = CalculateWorldMatrix(localPosition, parent.Parent);
+
+            return localPosition;
         }
 
         public override string ToString()
