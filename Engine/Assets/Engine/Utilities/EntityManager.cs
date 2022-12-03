@@ -89,9 +89,10 @@ namespace Engine.Utilities
             return gObject;
         }
 
-        public Entity CreatePrimitive(EPrimitiveTypes type)
+        public Entity CreatePrimitive(EPrimitiveTypes type, Entity parent = null)
         {
             Entity gObject = new Entity();
+            gObject.Parent = parent;
             gObject.Material = _materialDefault;
 
             switch (type)
@@ -119,14 +120,6 @@ namespace Engine.Utilities
             }
 
             EntityList.Add(gObject);
-
-            return gObject;
-        }
-
-        public Entity CreatePrimitive(EPrimitiveTypes type, Entity parent)
-        {
-            var gObject = CreatePrimitive(type);
-            gObject.Parent = parent;
 
             return gObject;
         }
