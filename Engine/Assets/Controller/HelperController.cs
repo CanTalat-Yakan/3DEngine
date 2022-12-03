@@ -13,6 +13,7 @@ using ColorPicker = CommunityToolkit.WinUI.UI.Controls.ColorPicker;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
 using Expander = Microsoft.UI.Xaml.Controls.Expander;
+using System.Numerics;
 
 namespace Editor.Controller
 {
@@ -161,33 +162,53 @@ namespace Editor.Controller
             return StackInGrid(textInput);
         }
 
-        internal virtual Grid CreateVec2Input(float x = 0, float y = 0)
+        internal virtual Grid CreateVec2Input(Vector2 v = new Vector2())
         {
-            NumberBox numInput = new() { Value = x, Margin = new Thickness(0, 0, 4, 0), MaxWidth = 98 };
-            NumberBox num2Input = new() { Value = y, Margin = new Thickness(0, 0, 4, 0), MaxWidth = 98 };
+            NumberBox numInput = new() { Value = v.X, Margin = new Thickness(0, 0, 4, 0), MaxWidth = 98 };
+            NumberBox num2Input = new() { Value = v.Y, Margin = new Thickness(0, 0, 4, 0), MaxWidth = 98 };
 
             return StackInGrid(numInput, num2Input);
         }
 
-        internal virtual Grid CreateVec3Input(float x = 0, float y = 0, float z = 0)
+        internal virtual Grid CreateVec3Input(Vector3 v = new Vector3())
         {
-            NumberBox numInput = new() { Value = x, Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
-            NumberBox num2Input = new() { Value = y, Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
-            NumberBox num3Input = new() { Value = z, Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
+            NumberBox numInput = new() { Value = v.X, Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
+            NumberBox num2Input = new() { Value = v.Y, Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
+            NumberBox num3Input = new() { Value = v.Z, Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
 
             return StackInGrid(numInput, num2Input, num3Input);
         }
 
-        internal virtual Grid CreateVec3InputTransform(float x = 0, float y = 0, float z = 0)
+        internal virtual Grid CreateVec3InputTransform(Vector3 v = new Vector3())
         {
             Rectangle rectangleR = new Rectangle() { Fill = new SolidColorBrush(Colors.IndianRed), RadiusX = 2, RadiusY = 2, Width = 4 };
-            NumberBox numInput = new NumberBox() { Value = MathF.Round(x, 4), Margin = new Thickness(0, 0, 4, 0), Width = 64 };
+            NumberBox numInput = new NumberBox() { Value = MathF.Round(v.X, 4), Margin = new Thickness(0, 0, 4, 0), Width = 64 };
 
             Rectangle rectangleG = new Rectangle() { Fill = new SolidColorBrush(Colors.SeaGreen), RadiusX = 2, RadiusY = 2, Width = 4 };
-            NumberBox num2Input = new NumberBox() { Value = MathF.Round(y, 4), Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
+            NumberBox num2Input = new NumberBox() { Value = MathF.Round(v.Y, 4), Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
 
             Rectangle rectangleB = new Rectangle() { Fill = new SolidColorBrush(Colors.DodgerBlue), RadiusX = 2, RadiusY = 2, Width = 4 };
-            NumberBox num3Input = new NumberBox() { Value = MathF.Round(z, 4), Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
+            NumberBox num3Input = new NumberBox() { Value = MathF.Round(v.Z, 4), Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
+
+            return StackInGrid(rectangleR, numInput, rectangleG, num2Input, rectangleB, num3Input);
+        }
+
+        internal virtual Grid CreateVec3InputTransform(Vector3 v = new Vector3(), params TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs>[] e)
+        {
+            Rectangle rectangleR = new Rectangle() { Fill = new SolidColorBrush(Colors.IndianRed), RadiusX = 2, RadiusY = 2, Width = 4 };
+            NumberBox numInput = new NumberBox() { Value = MathF.Round(v.X, 4), Margin = new Thickness(0, 0, 4, 0), Width = 64 };
+            if (e[0] != null)
+                numInput.ValueChanged += e[0];
+
+            Rectangle rectangleG = new Rectangle() { Fill = new SolidColorBrush(Colors.SeaGreen), RadiusX = 2, RadiusY = 2, Width = 4 };
+            NumberBox num2Input = new NumberBox() { Value = MathF.Round(v.Y, 4), Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
+            if (e[1] != null)
+                num2Input.ValueChanged += e[1];
+
+            Rectangle rectangleB = new Rectangle() { Fill = new SolidColorBrush(Colors.DodgerBlue), RadiusX = 2, RadiusY = 2, Width = 4 };
+            NumberBox num3Input = new NumberBox() { Value = MathF.Round(v.Z, 4), Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
+            if (e[2] != null)
+                num3Input.ValueChanged += e[2];
 
             return StackInGrid(rectangleR, numInput, rectangleG, num2Input, rectangleB, num3Input);
         }
@@ -211,9 +232,9 @@ namespace Editor.Controller
             return StackInGrid(comboBox);
         }
 
-        internal virtual Grid CreateEvent(string s2 = "Event", RoutedEventHandler e = null)
+        internal virtual Grid CreateEvent(string s = "Event", RoutedEventHandler e = null)
         {
-            Button button = new Button() { Content = s2 };
+            Button button = new Button() { Content = s };
             button.Click += e;
 
             return StackInGrid(button);
@@ -256,13 +277,7 @@ namespace Editor.Controller
             Grid grid = new();
 
             Button button = new() { Content = s, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(10) };
-
             button.Tapped += tapped;
-
-            AutoSuggestBox suggestBox = new();
-
-            //FlyoutBase kbase = new FlyoutBase();
-            //button.Flyout = suggestBox;
 
             grid.Children.Add(button);
 

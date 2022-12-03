@@ -21,6 +21,7 @@ using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
 using Expander = Microsoft.UI.Xaml.Controls.Expander;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 using Path = System.IO.Path;
+using Vortice.Mathematics;
 
 namespace Editor.Controller
 {
@@ -73,9 +74,21 @@ namespace Editor.Controller
 
             var transform = new Grid[]
             {
-                CreateVec3InputTransform(entity.Transform.Position.X, entity.Transform.Position.Y, entity.Transform.Position.Z).WrapInField("Position"),
-                CreateVec3InputTransform(entity.Transform.Rotation.X, entity.Transform.Rotation.Y, entity.Transform.Rotation.Z).WrapInField("Rotation"),
-                CreateVec3InputTransform(entity.Transform.Scale.X, entity.Transform.Scale.Y, entity.Transform.Scale.Z).WrapInField("Scale")
+                CreateVec3InputTransform(
+                    entity.Transform.Position,
+                    (s, e) => entity.Transform.Position.X = (float)e.NewValue,
+                    (s, e) => entity.Transform.Position.Y = (float)e.NewValue,
+                    (s, e) => entity.Transform.Position.Z = (float)e.NewValue).WrapInField("Position"),
+                CreateVec3InputTransform(
+                    entity.Transform.Rotation.ToEuler(),
+                    (s, e) => entity.Transform.Rotation.X = (float)e.NewValue,
+                    (s, e) => entity.Transform.Rotation.Y = (float)e.NewValue,
+                    (s, e) => entity.Transform.Rotation.Z = (float)e.NewValue).WrapInField("Rotation"),
+                CreateVec3InputTransform(
+                    entity.Transform.Scale,
+                    (s, e) => entity.Transform.Scale.X = (float)e.NewValue,
+                    (s, e) => entity.Transform.Scale.Y = (float)e.NewValue,
+                    (s, e) => entity.Transform.Scale.Z = (float)e.NewValue).WrapInField("Scale"),
             };
 
             var collection = new Grid[]
@@ -112,10 +125,10 @@ namespace Editor.Controller
                 CreateText(Path.GetFileNameWithoutExtension(path)).WrapInField("File name:"),
                 CreateText(Path.GetExtension(path)).WrapInField("File type:"),
                 CreateText(SizeSuffix(fileInfo.Length)).WrapInField("File size:"),
-                CreateSpacer(), 
+                CreateSpacer(),
                 CreateTextEqual(fileInfo.CreationTime.ToShortDateString() + " " + fileInfo.CreationTime.ToShortTimeString()).WrapInFieldEqual("Creation time:"),
                 CreateTextEqual(fileInfo.LastAccessTime.ToShortDateString() + " " + fileInfo.LastAccessTime.ToShortTimeString()).WrapInFieldEqual("Last access time:"),
-                CreateTextEqual(fileInfo.LastWriteTime.ToShortDateString() + " " + fileInfo.LastWriteTime.ToShortTimeString()).WrapInFieldEqual("Last update time:") 
+                CreateTextEqual(fileInfo.LastWriteTime.ToShortDateString() + " " + fileInfo.LastWriteTime.ToShortTimeString()).WrapInFieldEqual("Last update time:")
             };
 
             _stackPanel.Children.Add(properties.StackInGrid().WrapInExpander(Path.GetFileName(path)));
@@ -127,7 +140,7 @@ namespace Editor.Controller
             }));
 
             if (File.Exists(path))
-                if (fileInfo.Extension == ".cs" 
+                if (fileInfo.Extension == ".cs"
                     || fileInfo.Extension == ".txt"
                     || fileInfo.Extension == ".usd"
                     || fileInfo.Extension == ".mat"
