@@ -90,7 +90,7 @@ namespace Editor.Controller
                 CreateTextureSlot().WrapInField("Texture"),
                 CreateReferenceSlot().WrapInField("Reference"),
                 CreateHeader(),
-                CreateEvent().WrapInField("Event").WrapInExpanderWithNoHeader()
+                CreateEvent().WrapInField("Event").WrapInExpander("Expander")
             };
 
             _stackPanel.Children.Add(properties.StackInGrid().WrapInExpanderWithEditableHeader(entity.Name));

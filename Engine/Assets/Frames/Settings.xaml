@@ -100,9 +100,6 @@
             <StackPanel Spacing="10">
                 <TextBlock FontSize="20" FontWeight="SemiBold" Text="About"/>
 
-                <TextBlock TextWrapping="WrapWholeWords" HorizontalAlignment="Left"
-                           Text="This app is student project and is still in development. Check out the website to see future plans of this Engine."/>
-
                 <TextBlock Text="Source code: "/>
 
                 <TextBlock Text="Website: "/>

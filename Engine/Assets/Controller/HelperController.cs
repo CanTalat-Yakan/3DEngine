@@ -181,7 +181,7 @@ namespace Editor.Controller
         internal virtual Grid CreateVec3InputTransform(float x = 0, float y = 0, float z = 0)
         {
             Rectangle rectangleR = new Rectangle() { Fill = new SolidColorBrush(Colors.IndianRed), RadiusX = 2, RadiusY = 2, Width = 4 };
-            NumberBox numInput = new NumberBox() { Value = MathF.Round(x, 4), Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
+            NumberBox numInput = new NumberBox() { Value = MathF.Round(x, 4), Margin = new Thickness(0, 0, 4, 0), Width = 64 };
 
             Rectangle rectangleG = new Rectangle() { Fill = new SolidColorBrush(Colors.SeaGreen), RadiusX = 2, RadiusY = 2, Width = 4 };
             NumberBox num2Input = new NumberBox() { Value = MathF.Round(y, 4), Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
@@ -405,20 +405,14 @@ namespace Editor.Controller
         public static Grid WrapInExpander(this Grid content, string text)
         {
             Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, 2) };
-            Expander expander = new Expander() { Header = text, ExpandDirection = ExpandDirection.Down, HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch };
-            expander.IsExpanded = true;
-            expander.Content = content;
-
-            grid.Children.Add(expander);
-
-            return grid;
-        }
-
-        public static Grid WrapInExpanderWithNoHeader(this Grid content)
-        {
-            Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, 2) };
-            Expander expander = new Expander() { ExpandDirection = ExpandDirection.Down, HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch };
-            expander.Header = new Grid() { Padding = new Thickness(0) };
+            Expander expander = new Expander()
+            {
+                Header = text,
+                Padding = new Thickness(15),
+                ExpandDirection = ExpandDirection.Down,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                HorizontalContentAlignment = HorizontalAlignment.Stretch
+            };
             expander.IsExpanded = true;
             expander.Content = content;
 
@@ -430,7 +424,13 @@ namespace Editor.Controller
         public static Grid WrapInExpanderWithToggleButton(this Grid content, string text)
         {
             Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, 2) };
-            Expander expander = new Expander() { ExpandDirection = ExpandDirection.Down, HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch };
+            Expander expander = new Expander()
+            {
+                Padding = new Thickness(15),
+                ExpandDirection = ExpandDirection.Down,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                HorizontalContentAlignment = HorizontalAlignment.Stretch
+            };
             expander.Header = new ToggleButton() { Content = text, IsChecked = true };
             expander.Content = content;
 
@@ -442,7 +442,13 @@ namespace Editor.Controller
         public static Grid WrapInExpanderWithEditableHeader(this Grid content, string text)
         {
             Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, 2) };
-            Expander expander = new Expander() { ExpandDirection = ExpandDirection.Down, HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch };
+            Expander expander = new Expander()
+            {
+                Padding = new Thickness(15),
+                ExpandDirection = ExpandDirection.Down,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                HorizontalContentAlignment = HorizontalAlignment.Stretch
+            };
             expander.Header = new TextBox() { Text = text, Margin = new Thickness(0) };
             expander.Content = content;
 
@@ -450,10 +456,10 @@ namespace Editor.Controller
 
             return grid;
         }
-        
+
         public static UIElement AddContentFlyout(this UIElement content, FlyoutBase flyout)
         {
-            content.ContextFlyout= flyout;
+            content.ContextFlyout = flyout;
 
             return content;
         }
