@@ -10,7 +10,9 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI;
 using System.Diagnostics;
 using System.IO;
+using System.Numerics;
 using System;
+using Vortice.Mathematics;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.Storage;
@@ -21,7 +23,6 @@ using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
 using Expander = Microsoft.UI.Xaml.Controls.Expander;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 using Path = System.IO.Path;
-using Vortice.Mathematics;
 
 namespace Editor.Controller
 {
@@ -81,9 +82,9 @@ namespace Editor.Controller
                     (s, e) => entity.Transform.Position.Z = (float)e.NewValue).WrapInField("Position"),
                 CreateVec3InputTransform(
                     entity.Transform.Rotation.ToEuler(),
-                    (s, e) => entity.Transform.Rotation.X = (float)e.NewValue,
-                    (s, e) => entity.Transform.Rotation.Y = (float)e.NewValue,
-                    (s, e) => entity.Transform.Rotation.Z = (float)e.NewValue).WrapInField("Rotation"),
+                    (s, e) => Quaternion.Add(entity.Transform.Rotation, Quaternion.CreateFromAxisAngle(Vector3.UnitX, (float)e.NewValue)),
+                    (s, e) => Quaternion.Add(entity.Transform.Rotation, Quaternion.CreateFromAxisAngle(Vector3.UnitY, (float)e.NewValue)),
+                    (s, e) => Quaternion.Add(entity.Transform.Rotation, Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)e.NewValue))).WrapInField("Rotation"),
                 CreateVec3InputTransform(
                     entity.Transform.Scale,
                     (s, e) => entity.Transform.Scale.X = (float)e.NewValue,
