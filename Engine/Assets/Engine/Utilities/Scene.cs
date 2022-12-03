@@ -76,13 +76,19 @@ namespace Engine.Utilities
 
         public void LateUpdate()
         {
-            Profile = "Objects: " + EntitytManager.EntityList.Count().ToString();
-
             int vertexCount = 0;
+            int indexCount = 0;
+
             foreach (var item in EntitytManager.EntityList)
                 if (item.IsEnabled && item.Mesh != null)
+                {
                     vertexCount += item.Mesh.VertexCount;
+                    indexCount += item.Mesh.IndexCount;
+                }
+
+            Profile = "Objects: " + EntitytManager.EntityList.Count().ToString();
             Profile += "\n" + "Vertices: " + vertexCount;
+            Profile += "\n" + "Indices: " + indexCount;
         }
 
         public void Render()
