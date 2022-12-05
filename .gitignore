@@ -347,3 +347,5 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+Engine (Package)/Package.appxmanifest
+Engine (Package)/3DEngine (Package).wapproj
