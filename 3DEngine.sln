@@ -5,7 +5,7 @@ VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "3DEngine (Package)", "Engine (Package)\3DEngine (Package).wapproj", "{14EE583E-B643-4AB7-9BC6-FA511A7B3474}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "3D Engine", "Engine\3D Engine.csproj", "{3F355F49-0D13-4FDD-B049-1F28D95CD245}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "3DEngine", "Engine\3DEngine.csproj", "{3F355F49-0D13-4FDD-B049-1F28D95CD245}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -7,12 +7,12 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Name="ddde1ef4-909a-4e29-b403-a6226d47b292"
-    Publisher="CN=can"
-    Version="1.0.0.0" />
+    Name="28256CanTalatYakan.3DEngine"
+    Publisher="CN=23C2E488-4634-4E6B-B5F4-5E7FEAF2047C"
+    Version="1.0.9.0" />
 
   <Properties>
-    <DisplayName>3D Engine (Package)</DisplayName>
+    <DisplayName>3D Engine</DisplayName>
     <PublisherDisplayName>Can Talat Yakan</PublisherDisplayName>
     <Logo>Images\StoreLogo.png</Logo>
   </Properties>
@@ -32,7 +32,7 @@
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
         DisplayName="3D Engine"
-        Description="3D Engine (Package)"
+        Description="3DEngine (Package)"
         BackgroundColor="transparent"
         Square150x150Logo="Images\Square150x150Logo.png"
         Square44x44Logo="Images\Square44x44Logo.png">
