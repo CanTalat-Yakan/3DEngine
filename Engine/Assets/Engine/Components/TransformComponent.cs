@@ -40,7 +40,7 @@ namespace Engine.Components
             Matrix4x4 scaleMatrix = Matrix4x4.CreateScale(Scale);
 
             WorldMatrix = Matrix4x4.Transpose(scaleMatrix * rotationMatrix * translationMatrix);
-            if (Parent != null)
+            if (Parent != null && Parent != this)
                 WorldMatrix = CalculateWorldMatrix(WorldMatrix, Parent);
         }
 
@@ -48,7 +48,7 @@ namespace Engine.Components
         {
             localPosition = Matrix4x4.Multiply(localPosition, parent.WorldMatrix);
 
-            if (parent.Parent != null)
+            if (parent.Parent != null && Parent != this)
                 localPosition = CalculateWorldMatrix(localPosition, parent.Parent);
 
             return localPosition;
