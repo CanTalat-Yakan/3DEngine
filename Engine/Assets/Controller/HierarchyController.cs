@@ -69,23 +69,14 @@ namespace Editor.Controller
             SceneEntry = new SceneEntry() { ID = SceneManager.Scene.ID, Name = SceneManager.Scene.Name, Hierarchy = new List<TreeEntry>() };
             SubsceneEntries = new List<SceneEntry>();
 
-            CreateSceneTreeViews();
+            CreateDefaultHierarchy();
 
             PopulateTree(SceneEntry);
         }
 
-        private void CreateSceneTreeViews()
+        private void CreateDefaultHierarchy()
         {
-            var scene = new Grid[]
-            {
-                CreateTreeView(out SceneEntry.TreeView),
-                CreateButton("Create Entity", (s, e) => SceneManager.Scene.EntitytManager.CreateEntity() )
-            };
-            SceneEntry.TreeView.PointerPressed += (s, e) => GetInvokedItemAndSetContextFlyout(s, e);
-            SceneEntry.TreeView.Tapped += (s, e) => SetProperties();
-            SceneEntry.TreeView.DragItemsCompleted += (s, e) => SetNewParentTreeEntry((TreeViewNode)e.NewParentItem, e.Items.Cast<TreeViewNode>().ToArray());
-
-            _stackPanel.Children.Add(scene.StackInGrid().WrapInExpander("Scene").AddContentFlyout(CreateRootMenuFlyout()));
+            _stackPanel.Children.Add(CreateSceneTreeView(SceneEntry).StackInGrid().WrapInExpander("Scene").AddContentFlyout(CreateRootMenuFlyout()));
             _stackPanel.Children.Add(CreateSeperator());
             _stackPanel.Children.Add(CreateButton("Add Subscene", (s, e) => ContentDialogCreateNewSubscene()));
             _stackPanel.Children.Add(CreateSubsceneTreeView(out SceneEntry subSceneEntry).StackInGrid().WrapInExpanderWithToggleButton("Subscene").AddContentFlyout(CreateSubRootMenuFlyout(subSceneEntry)));
@@ -108,26 +99,35 @@ namespace Editor.Controller
             }
         }
 
-        private Grid[] CreateSubsceneTreeView(out SceneEntry subSceneEntry, string name = "Subscene")
+        private Grid[] CreateSceneTreeView(in SceneEntry sceneEntry, Scene scene = null)
         {
-            subSceneEntry = new SceneEntry() { ID = new Guid(), Name = name, Hierarchy = new List<TreeEntry>() };
-            var subScene = SceneManager.AddSubscene(subSceneEntry.ID);
+            if (scene is null) scene = SceneManager.Scene;
 
-            var subscene = new Grid[]
+            var sceneGrid = new Grid[]
             {
-                CreateTreeView(out subSceneEntry.TreeView),
-                CreateButton("Create Entity", (s, e) => subScene.EntitytManager.CreateEntity() )
+                CreateTreeView(out sceneEntry.TreeView),
+                CreateButton("Create Entity", (s, e) => scene.EntitytManager.CreateEntity() )
             };
+            sceneEntry.TreeView.PointerPressed += (s, e) => GetInvokedItemAndSetContextFlyout(s, e);
+            sceneEntry.TreeView.Tapped += (s, e) => SetProperties((TreeView)s);
+            sceneEntry.TreeView.DragItemsCompleted += (s, e) => SetNewParentTreeEntry((TreeViewNode)e.NewParentItem, e.Items.Cast<TreeViewNode>().ToArray());
 
-            subSceneEntry.TreeView.PointerPressed += (s, e) => GetInvokedItemAndSetContextFlyout(s, e);
-            subSceneEntry.TreeView.Tapped += (s, e) => SetProperties();
-            subSceneEntry.TreeView.DragItemsCompleted += (s, e) => SetNewParentTreeEntry((TreeViewNode)e.NewParentItem, e.Items.Cast<TreeViewNode>().ToArray());
+            return sceneGrid;
+        }
 
-            SubsceneEntries.Add(subSceneEntry);
+        private Grid[] CreateSubsceneTreeView(out SceneEntry subsceneEntry, string name = "Subscene", bool enable = true)
+        {
+            subsceneEntry = new SceneEntry() { ID = new Guid(), Name = name, Hierarchy = new List<TreeEntry>() };
+            subsceneEntry.ID = Guid.NewGuid();
 
-            PopulateTree(subSceneEntry);
+            var subScene = SceneManager.AddSubscene(subsceneEntry.ID, name, enable);
+            var subsceneGrid = CreateSceneTreeView(subsceneEntry, subScene);
 
-            return subscene;
+            SubsceneEntries.Add(subsceneEntry);
+
+            PopulateTree(subsceneEntry);
+
+            return subsceneGrid;
         }
 
         public void DeselectTreeViewNodes()
@@ -165,12 +165,14 @@ namespace Editor.Controller
                     parent.Node.Children.Add(entry.Node);
         }
 
-        public void SetProperties()
+        public void SetProperties(TreeView treeView)
         {
-            if (SceneEntry.TreeView.SelectedNode is null)
-                return;
+            var treeViewNode = treeView.SelectedNode;
 
-            var treeEntry = (TreeEntry)SceneEntry.TreeView.SelectedNode.Content;
+            DeselectTreeViewNodes();
+            treeView.SelectedNode = treeViewNode;
+
+            var treeEntry = (TreeEntry)treeViewNode.Content;
             var entity = GetEntity(treeEntry);
 
             PropertiesController.Clear();

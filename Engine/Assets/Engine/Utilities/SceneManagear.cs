@@ -18,10 +18,13 @@ namespace Engine.Utilities
             Subscenes = new List<Scene>();
         }
 
-        public static Scene AddSubscene(Guid guid = new Guid(), string name = "Subscene")
+        public static Scene AddSubscene(Guid guid = new Guid(), string name = "Subscene", bool enable = true)
         {
+            if(guid.Equals(Guid.Empty))
+                guid = Guid.NewGuid();
+
             Scene scene;
-            Subscenes.Add(scene = new Scene() { ID = guid, Name = name, IsEnabled = true, EntitytManager = new EntityManager() });
+            Subscenes.Add(scene = new Scene() { ID = guid, Name = name, IsEnabled = enable, EntitytManager = new EntityManager() });
 
             return scene;
         }
