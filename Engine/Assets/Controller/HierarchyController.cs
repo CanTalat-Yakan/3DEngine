@@ -7,19 +7,9 @@ using System;
 using System.Collections.Generic;
 using Editor.UserControls;
 using Engine.Utilities;
-using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
-using Expander = Microsoft.UI.Xaml.Controls.Expander;
-using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
-using Microsoft.UI.Xaml.Media;
-using Windows.Foundation;
-using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
-using Microsoft.Diagnostics.Runtime;
-using System.IO;
 using System.Text.RegularExpressions;
-using static Assimp.Metadata;
-using WinRT;
-using Vortice;
+using System.Linq;
 
 namespace Editor.Controller
 {
@@ -143,7 +133,7 @@ namespace Editor.Controller
             Scene scene = SceneManager.GetByID(sceneEntry.ID);
 
             scene.EntitytManager.EntityList.OnAddEvent += (s, e) => OnAdd(sceneEntry);
-            scene.EntitytManager.EntityList.OnRemoveEvent += (s, e) => OnRemove(sceneEntry, e.As<Entity>());
+            scene.EntitytManager.EntityList.OnRemoveEvent += (s, e) => OnRemove(sceneEntry, (Entity)e);
 
             foreach (var entity in scene.EntitytManager.EntityList)
             {
