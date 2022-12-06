@@ -123,13 +123,13 @@ namespace Editor.Controller
 
             var properties = new Grid[]
             {
-                CreateText(Path.GetFileNameWithoutExtension(path)).WrapInField("File name:"),
-                CreateText(Path.GetExtension(path)).WrapInField("File type:"),
-                CreateText(SizeSuffix(fileInfo.Length)).WrapInField("File size:"),
+                CreateText(Path.GetFileNameWithoutExtension(path)).WrapInFieldEqual("File name:"),
+                CreateText(Path.GetExtension(path)).WrapInFieldEqual("File type:"),
+                CreateText(SizeSuffix(fileInfo.Length)).WrapInFieldEqual("File size:"),
                 CreateSpacer(),
-                CreateTextEqual(fileInfo.CreationTime.ToShortDateString() + " " + fileInfo.CreationTime.ToShortTimeString()).WrapInFieldEqual("Creation time:"),
-                CreateTextEqual(fileInfo.LastAccessTime.ToShortDateString() + " " + fileInfo.LastAccessTime.ToShortTimeString()).WrapInFieldEqual("Last access time:"),
-                CreateTextEqual(fileInfo.LastWriteTime.ToShortDateString() + " " + fileInfo.LastWriteTime.ToShortTimeString()).WrapInFieldEqual("Last update time:")
+                CreateTextEqual(fileInfo.CreationTime.ToShortDateString() + "⠀" + fileInfo.CreationTime.ToShortTimeString()).WrapInFieldEqual("Creation time:"),
+                CreateTextEqual(fileInfo.LastAccessTime.ToShortDateString() + "⠀" + fileInfo.LastAccessTime.ToShortTimeString()).WrapInFieldEqual("Last access time:"),
+                CreateTextEqual(fileInfo.LastWriteTime.ToShortDateString() + "⠀" + fileInfo.LastWriteTime.ToShortTimeString()).WrapInFieldEqual("Last update time:")
             };
 
             _stackPanel.Children.Add(properties.StackInGrid().WrapInExpander(Path.GetFileName(path)));
