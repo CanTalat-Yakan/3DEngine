@@ -12,6 +12,7 @@ using Expander = Microsoft.UI.Xaml.Controls.Expander;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 using Microsoft.UI.Xaml.Media;
 using Windows.Foundation;
+using System.Linq;
 
 namespace Editor.Controller
 {
@@ -58,7 +59,7 @@ namespace Editor.Controller
             };
             SceneTreeView.PointerPressed += (s, e) => GetInvokedItemAndSetContextFlyout(s, e);
             SceneTreeView.Tapped += (s, e) => SetProperties();
-            SceneTreeView.DragItemsCompleted += (s, e) => SetNewParentTreeEntry((TreeViewNode)e.NewParentItem, (TreeViewNode)e.Items);
+            SceneTreeView.DragItemsCompleted += (s, e) => SetNewParentTreeEntry((TreeViewNode)e.NewParentItem, e.Items.Cast<TreeViewNode>().ToArray());
 
             _stackPanel.Children.Add(scene.StackInGrid().WrapInExpander("Scene").AddContentFlyout(CreateRootMenuFlyout()));
             _stackPanel.Children.Add(CreateSeperator());
