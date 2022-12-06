@@ -18,14 +18,23 @@ namespace Engine.Utilities
 
     internal class EventList<T> : List<T>
     {
-        public event EventHandler OnAddEvent;
+        public event EventHandler<T> OnAddEvent;
+        public event EventHandler<T> OnRemoveEvent;
 
         public new void Add(T item)
         {
             base.Add(item);
 
             if (null != OnAddEvent)
-                OnAddEvent(this, null);
+                OnAddEvent(this, item);
+        }
+
+        public new void Remove(T item)
+        {
+            base.Remove(item);
+
+            if (null != OnRemoveEvent)
+                OnRemoveEvent(this, item);
         }
     }
 
@@ -66,9 +75,10 @@ namespace Engine.Utilities
             _meshSphere = new MeshComponent(ModelLoader.LoadFilePro(OBJ_SPHERE));
         }
 
-        public Entity Duplicate(Entity refEntity)
+        public Entity Duplicate(Entity refEntity, Entity parent = null)
         {
             Entity gObject = refEntity.Clone();
+            gObject.Parent= parent;
 
             EntityList.Add(gObject);
 
@@ -145,6 +155,11 @@ namespace Engine.Utilities
                     return entity;
 
             return null;
+        }
+
+        public void Destroy(Entity sourceEntity)
+        {
+            EntityList.Remove(sourceEntity);
         }
     }
 }

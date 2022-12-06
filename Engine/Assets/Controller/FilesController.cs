@@ -542,14 +542,14 @@ namespace Editor.Controller
                 if (!string.IsNullOrEmpty(fileName.Text))
                     if (!Regex.Match(fileName.Text, @"^[\w\-.]+$").Success)
                     {
-                        CreateDialogAsync(new ContentDialog()
+                        new ContentDialog()
                         {
                             XamlRoot = _files.XamlRoot,
                             Title = "A file can't contain any of the following characters",
                             CloseButtonText = "Close",
                             DefaultButton = ContentDialogButton.Close,
                             Content = new TextBlock() { Text = "\\ / : * ? \" < > |" },
-                        });
+                        }.CreateDialogAsync();
 
                         return;
                     }
@@ -606,14 +606,14 @@ namespace Editor.Controller
                 if (!string.IsNullOrEmpty(fileName.Text))
                     if (!Regex.Match(fileName.Text, @"^[\w\-.]+$").Success)
                     {
-                        CreateDialogAsync(new ContentDialog()
+                        new ContentDialog()
                         {
                             XamlRoot = _files.XamlRoot,
                             Title = "A folder can't contain any of the following characters",
                             CloseButtonText = "Close",
                             DefaultButton = ContentDialogButton.Close,
                             Content = new TextBlock() { Text = "\\ / : * ? \" < > |" },
-                        });
+                        }.CreateDialogAsync();
 
                         return;
                     }
@@ -667,14 +667,14 @@ namespace Editor.Controller
                 if (!string.IsNullOrEmpty(fileName.Text))
                     if (!Regex.Match(fileName.Text, @"^[\w\-.]+$").Success)
                     {
-                        CreateDialogAsync(new ContentDialog()
+                        new ContentDialog()
                         {
                             XamlRoot = _files.XamlRoot,
                             Title = "A folder can't contain any of the following characters",
                             CloseButtonText = "Close",
                             DefaultButton = ContentDialogButton.Close,
                             Content = new TextBlock() { Text = "\\ / : * ? \" < > |" },
-                        });
+                        }.CreateDialogAsync();
 
                         return;
                     }
@@ -1049,11 +1049,6 @@ namespace Editor.Controller
 
                 image.Source = bitmapImage;
             }
-        }
-
-        private async void CreateDialogAsync(ContentDialog contentDialog)
-        {
-            var result = await contentDialog.ShowAsync();
         }
 
         private async void RenameInsideFile(string path, string newFileName)

@@ -478,5 +478,10 @@ namespace Editor.Controller
 
             return content;
         }
+
+        public static async void CreateDialogAsync(this ContentDialog contentDialog)
+        {
+            var result = await contentDialog.ShowAsync();
+        }
     }
 }

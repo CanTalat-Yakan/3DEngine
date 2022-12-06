@@ -14,7 +14,7 @@ namespace Editor.UserControls
         {
             this.InitializeComponent();
 
-            _hierarchyControl = new HierarchyController(x_StackPanel_Hierarchy);
+            _hierarchyControl = new HierarchyController(this, x_StackPanel_Hierarchy);
 
             MainController.Instance.Content.Loaded += (s, e) =>
                 MainController.Instance.LayoutControl.ViewPort.Loaded += (s, e) =>
