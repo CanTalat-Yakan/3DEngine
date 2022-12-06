@@ -905,8 +905,8 @@ namespace Editor.Controller
             MenuFlyoutItem[] items = new[] {
                 new MenuFlyoutItem() { Text = "Create File System Entry", Icon = new SymbolIcon(Symbol.NewFolder) },
                 //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Open", Icon = new SymbolIcon(Symbol.OpenFile) },
-                new MenuFlyoutItem() { Text = "Show in Explorer", Icon = new FontIcon(){ Glyph = "\xEC50", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
+                new MenuFlyoutItem() { Text = "Open file", Icon = new SymbolIcon(Symbol.OpenFile) },
+                new MenuFlyoutItem() { Text = "Open folder location", Icon = new FontIcon(){ Glyph = "\xEC50", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
                 //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Cut", Icon = new SymbolIcon(Symbol.Cut) },
                 new MenuFlyoutItem() { Text = "Copy", Icon = new SymbolIcon(Symbol.Copy) },
@@ -915,7 +915,7 @@ namespace Editor.Controller
                 new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
                 new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
                 //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Copy Path", Icon = new SymbolIcon(Symbol.Copy) },
+                new MenuFlyoutItem() { Text = "Copy as Path", Icon = new SymbolIcon(Symbol.Copy) },
             };
 
             //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
@@ -942,7 +942,7 @@ namespace Editor.Controller
                 menuFlyout.Items.Add(item);
 
                 if (item.Text == "Create File System Entry"
-                    || item.Text == "Show in Explorer"
+                    || item.Text == "Open folder Location"
                     || item.Text == "Paste"
                     || item.Text == "Delete")
                     menuFlyout.Items.Add(new MenuFlyoutSeparator());
@@ -956,7 +956,7 @@ namespace Editor.Controller
             MenuFlyoutItem[] items = new[] {
                 new MenuFlyoutItem() { Text = "Create File System Entry", Icon = new SymbolIcon(Symbol.NewFolder) },
                 //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Show in Explorer", Icon = new FontIcon(){ Glyph = "\xEC50", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
+                new MenuFlyoutItem() { Text = "Open folder Location", Icon = new FontIcon(){ Glyph = "\xEC50", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
                 //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Cut", Icon = new SymbolIcon(Symbol.Cut) },
                 new MenuFlyoutItem() { Text = "Copy", Icon = new SymbolIcon(Symbol.Copy) },
@@ -965,7 +965,7 @@ namespace Editor.Controller
                 new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
                 new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
                 //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Copy Path", Icon = new SymbolIcon(Symbol.Copy) },
+                new MenuFlyoutItem() { Text = "Copy as Path", Icon = new SymbolIcon(Symbol.Copy) },
             };
                         
             //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
@@ -992,7 +992,7 @@ namespace Editor.Controller
                 menuFlyout.Items.Add(item);
 
                 if (item.Text == "Create File System Entry"
-                    || item.Text == "Show in Explorer"
+                    || item.Text == "Open folder Location"
                     || item.Text == "Paste"
                     || item.Text == "Delete")
                     menuFlyout.Items.Add(new MenuFlyoutSeparator());
