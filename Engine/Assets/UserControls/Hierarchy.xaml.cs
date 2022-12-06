@@ -1,5 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Editor.Controller;
+using Engine.Utilities;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -14,11 +15,11 @@ namespace Editor.UserControls
         {
             this.InitializeComponent();
 
-            _hierarchyControl = new HierarchyController(this, x_StackPanel_Hierarchy);
-
             MainController.Instance.Content.Loaded += (s, e) =>
                 MainController.Instance.LayoutControl.ViewPort.Loaded += (s, e) =>
-                    _hierarchyControl.PopulateTree();
+                {
+                    _hierarchyControl = new HierarchyController(this, x_StackPanel_Hierarchy);
+                };
         }
     }
 }

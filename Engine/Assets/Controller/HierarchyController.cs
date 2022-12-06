@@ -19,6 +19,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using static Assimp.Metadata;
 using WinRT;
+using Vortice;
 
 namespace Editor.Controller
 {
@@ -65,10 +66,12 @@ namespace Editor.Controller
             _hierarchy = hierarchy;
             _stackPanel = stackPanel;
 
-            SceneEntry = new SceneEntry() { ID = new Guid(), Hierarchy = new List<TreeEntry>() };
+            SceneEntry = new SceneEntry() { ID = SceneManager.Scene.ID, Name = SceneManager.Scene.Name, Hierarchy = new List<TreeEntry>() };
             SubsceneEntries = new List<SceneEntry>();
 
             CreateSceneTreeViews();
+
+            PopulateTree(SceneEntry);
         }
 
         private void CreateSceneTreeViews()
@@ -76,7 +79,7 @@ namespace Editor.Controller
             var scene = new Grid[]
             {
                 CreateTreeView(out SceneEntry.TreeView),
-                CreateButton("Create Entity", (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEntity() )
+                CreateButton("Create Entity", (s, e) => SceneManager.Scene.EntitytManager.CreateEntity() )
             };
             SceneEntry.TreeView.PointerPressed += (s, e) => GetInvokedItemAndSetContextFlyout(s, e);
             SceneEntry.TreeView.Tapped += (s, e) => SetProperties();
@@ -84,7 +87,7 @@ namespace Editor.Controller
 
             _stackPanel.Children.Add(scene.StackInGrid().WrapInExpander("Scene").AddContentFlyout(CreateRootMenuFlyout()));
             _stackPanel.Children.Add(CreateSeperator());
-            _stackPanel.Children.Add(CreateButton("Add Subscene", (s, e) => _stackPanel.Children.Add(CreateSubsceneTreeView(out SceneEntry subSceneEntry).StackInGrid().WrapInExpanderWithToggleButton("Subscene").AddContentFlyout(CreateSubRootMenuFlyout(subSceneEntry)))));
+            _stackPanel.Children.Add(CreateButton("Add Subscene", (s, e) => ContentDialogCreateNewSubscene()));
             _stackPanel.Children.Add(CreateSubsceneTreeView(out SceneEntry subSceneEntry).StackInGrid().WrapInExpanderWithToggleButton("Subscene").AddContentFlyout(CreateSubRootMenuFlyout(subSceneEntry)));
         }
 
@@ -105,21 +108,24 @@ namespace Editor.Controller
             }
         }
 
-        private Grid[] CreateSubsceneTreeView(out SceneEntry subSceneEntry)
+        private Grid[] CreateSubsceneTreeView(out SceneEntry subSceneEntry, string name = "Subscene")
         {
-            subSceneEntry = new SceneEntry() { ID = new Guid(), Hierarchy = new List<TreeEntry>() };
+            subSceneEntry = new SceneEntry() { ID = new Guid(), Name = name, Hierarchy = new List<TreeEntry>() };
+            var subScene = SceneManager.AddSubscene(subSceneEntry.ID);
 
             var subscene = new Grid[]
             {
                 CreateTreeView(out subSceneEntry.TreeView),
-                CreateButton("Create Entity", null )
+                CreateButton("Create Entity", (s, e) => subScene.EntitytManager.CreateEntity() )
             };
 
             subSceneEntry.TreeView.PointerPressed += (s, e) => GetInvokedItemAndSetContextFlyout(s, e);
             subSceneEntry.TreeView.Tapped += (s, e) => SetProperties();
-            subSceneEntry.TreeView.DragItemsCompleted += (s, e) => SetNewParentTreeEntry((TreeViewNode)e.NewParentItem, (TreeViewNode)e.Items);
+            subSceneEntry.TreeView.DragItemsCompleted += (s, e) => SetNewParentTreeEntry((TreeViewNode)e.NewParentItem, e.Items.Cast<TreeViewNode>().ToArray());
 
             SubsceneEntries.Add(subSceneEntry);
+
+            PopulateTree(subSceneEntry);
 
             return subscene;
         }
@@ -132,28 +138,29 @@ namespace Editor.Controller
                 subsceneTreeView.TreeView.SelectedNode = null;
         }
 
-        public void PopulateTree()
+        public void PopulateTree(SceneEntry sceneEntry)
         {
-            var engineObjectList = Engine.Core.Instance.Scene.EntitytManager.EntityList;
-            engineObjectList.OnAddEvent += (s, e) => OnAdd();
-            engineObjectList.OnRemoveEvent += (s, e) => OnRemove(e.As<Entity>());
+            Scene scene = SceneManager.GetByID(sceneEntry.ID);
 
-            foreach (var entity in engineObjectList)
+            scene.EntitytManager.EntityList.OnAddEvent += (s, e) => OnAdd(sceneEntry);
+            scene.EntitytManager.EntityList.OnRemoveEvent += (s, e) => OnRemove(sceneEntry, e.As<Entity>());
+
+            foreach (var entity in scene.EntitytManager.EntityList)
             {
                 var newEntry = new TreeEntry() { Name = entity.Name, ID = entity.ID };
                 if (entity.Parent != null)
                     newEntry.IDparent = entity.Parent.ID;
 
-                SceneEntry.Hierarchy.Add(newEntry);
+                sceneEntry.Hierarchy.Add(newEntry);
             }
 
-            foreach (var entry in SceneEntry.Hierarchy)
+            foreach (var entry in sceneEntry.Hierarchy)
                 entry.Node = new TreeViewNode() { Content = entry, IsExpanded = true };
 
             TreeEntry parent;
-            foreach (var entry in SceneEntry.Hierarchy)
+            foreach (var entry in sceneEntry.Hierarchy)
                 if ((parent = GetParent(entry)) is null)
-                    SceneEntry.TreeView.RootNodes.Add(entry.Node);
+                    sceneEntry.TreeView.RootNodes.Add(entry.Node);
                 else
                     parent.Node.Children.Add(entry.Node);
         }
@@ -170,34 +177,34 @@ namespace Editor.Controller
             PropertiesController.Set(new Properties(entity));
         }
 
-        private void OnAdd()
+        private void OnAdd(SceneEntry sceneEntry)
         {
-            var entityList = Engine.Core.Instance.Scene.EntitytManager.EntityList;
+            Scene scene = SceneManager.GetByID(sceneEntry.ID);
 
-            var entity = entityList[^1];
+            var entity = scene.EntitytManager.EntityList[^1];
             var newEntry = new TreeEntry() { Name = entity.Name, ID = entity.ID };
             if (entity.Parent != null)
                 newEntry.IDparent = entity.Parent.ID;
 
             newEntry.Node = new TreeViewNode() { Content = newEntry, IsExpanded = true };
-            SceneEntry.Hierarchy.Add(newEntry);
+            sceneEntry.Hierarchy.Add(newEntry);
 
             TreeEntry parent;
             if ((parent = GetParent(newEntry)) is null)
-                SceneEntry.TreeView.RootNodes.Add(newEntry.Node);
+                sceneEntry.TreeView.RootNodes.Add(newEntry.Node);
             else
                 parent.Node.Children.Add(newEntry.Node);
         }
 
-        private void OnRemove(Entity entity)
+        private void OnRemove(SceneEntry sceneEntry, Entity entity)
         {
             var entry = GetTreeEntry(entity.ID);
 
-            SceneEntry.Hierarchy.Remove(entry);
+            sceneEntry.Hierarchy.Remove(entry);
 
             TreeEntry parent;
             if ((parent = GetParent(entry)) is null)
-                SceneEntry.TreeView.RootNodes.Remove(entry.Node);
+                sceneEntry.TreeView.RootNodes.Remove(entry.Node);
             else
                 parent.Node.Children.Remove(entry.Node);
         }
@@ -241,26 +248,23 @@ namespace Editor.Controller
             return null;
         }
 
-        public Entity GetEntity(TreeEntry entry)
+        public Entity GetEntity(Guid guid)
         {
-            var engineObjectList = Engine.Core.Instance.Scene.EntitytManager.EntityList;
-
-            foreach (var entity in engineObjectList)
-                if (entity.ID == entry.ID)
+            foreach (var entity in SceneManager.Scene.EntitytManager.EntityList)
+                if (entity.ID == guid)
                     return entity;
+
+            foreach (var subscene in SceneManager.Subscenes)
+                foreach (var entity in subscene.EntitytManager.EntityList)
+                    if (entity.ID == guid)
+                        return entity;
 
             return null;
         }
 
-        public Entity GetEntity(Guid guid)
+        public Entity GetEntity(TreeEntry entry)
         {
-            var engineObjectList = Engine.Core.Instance.Scene.EntitytManager.EntityList;
-
-            foreach (var entity in engineObjectList)
-                if (entity.ID == guid)
-                    return entity;
-
-            return null;
+            return GetEntity(entry.ID);
         }
 
         public void SetNewParentTreeEntry(TreeViewNode newParent, params TreeViewNode[] treeViewNodes)
@@ -293,8 +297,8 @@ namespace Editor.Controller
             items[3].Click += (s, e) => ContentDialogRename(_itemInvoked);
             items[4].Click += (s, e) => ContentDialogDelete(_itemInvoked);
 
-            items[5].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEntity(GetEntity(_itemInvoked.Node.Parent.Content as TreeEntry));
-            items[6].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEntity(GetEntity(_itemInvoked));
+            items[5].Click += (s, e) => SceneManager.Scene.EntitytManager.CreateEntity(GetEntity(_itemInvoked.Node.Parent.Content as TreeEntry));
+            items[6].Click += (s, e) => SceneManager.Scene.EntitytManager.CreateEntity(GetEntity(_itemInvoked));
 
             MenuFlyout menuFlyout = new();
             foreach (var item in items)
@@ -327,7 +331,7 @@ namespace Editor.Controller
 
             items[2].Click += (s, e) => PasteEntityFromClipboard(SceneEntry);
 
-            items[3].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEntity();
+            items[3].Click += (s, e) => SceneManager.Scene.EntitytManager.CreateEntity();
 
             MenuFlyout menuFlyout = new();
             foreach (var item in items)
@@ -366,7 +370,7 @@ namespace Editor.Controller
 
             items[4].Click += (s, e) => PasteEntityFromClipboard(sceneEntry);
 
-            items[5].Click += (s, e) => Engine.Core.Instance.Scene.EntitytManager.CreateEntity();
+            items[5].Click += (s, e) => SceneManager.Scene.EntitytManager.CreateEntity();
 
             MenuFlyout menuFlyout = new();
             foreach (var item in items)
@@ -412,6 +416,48 @@ namespace Editor.Controller
             menuFlyout.Items.Add(lightSubItem);
 
             return menuFlyout;
+        }
+
+        private async void ContentDialogCreateNewSubscene()
+        {
+            TextBox subsceneName;
+
+            var dialog = new ContentDialog()
+            {
+                XamlRoot = _hierarchy.XamlRoot,
+                Title = "Create new Subscene",
+                PrimaryButtonText = "Create",
+                CloseButtonText = "Cancel",
+                DefaultButton = ContentDialogButton.Primary,
+                Content = subsceneName = new TextBox() { Text = "Subscene" },
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                // \w is equivalent of [0 - 9a - zA - Z_]."
+                if (!string.IsNullOrEmpty(subsceneName.Text))
+                    if (!Regex.Match(subsceneName.Text, @"^[\w\-.]+$").Success)
+                    {
+                        new ContentDialog()
+                        {
+                            XamlRoot = _hierarchy.XamlRoot,
+                            Title = "A subscene can't contain any of the following characters",
+                            CloseButtonText = "Close",
+                            DefaultButton = ContentDialogButton.Close,
+                            Content = new TextBlock() { Text = "\\ / : * ? \" < > |" },
+                        }.CreateDialogAsync();
+
+                        return;
+                    }
+
+                _stackPanel.Children.Add(
+                    CreateSubsceneTreeView(out SceneEntry subSceneEntry, subsceneName.Text).
+                    StackInGrid().
+                    WrapInExpanderWithToggleButton(subsceneName.Text).
+                    AddContentFlyout(CreateSubRootMenuFlyout(subSceneEntry)));
+            }
         }
 
         private async void ContentDialogRename(TreeEntry entry)
@@ -469,7 +515,7 @@ namespace Editor.Controller
             if (result == ContentDialogResult.Primary)
             {
                 entry.Node = null;
-                Engine.Core.Instance.Scene.EntitytManager.Destroy(GetEntity(entry.ID));
+                SceneManager.Scene.EntitytManager.Destroy(GetEntity(entry.ID));
             }
         }
 
@@ -480,7 +526,7 @@ namespace Editor.Controller
 
             if (sourceEntity != null)
                 if (requestedOperation == DataPackageOperation.Copy)
-                    Engine.Core.Instance.Scene.EntitytManager.Duplicate(sourceEntity, targetEntity);
+                    SceneManager.Scene.EntitytManager.Duplicate(sourceEntity, targetEntity);
                 else if (requestedOperation == DataPackageOperation.Move)
                 {
                     sourceEntity.Parent = targetEntity;
@@ -493,11 +539,11 @@ namespace Editor.Controller
 
             if (sourceEntity != null)
                 if (requestedOperation == DataPackageOperation.Copy)
-                    Engine.Core.Instance.Scene.EntitytManager.Duplicate(sourceEntity);
+                    SceneManager.Scene.EntitytManager.Duplicate(sourceEntity);
                 else if (requestedOperation == DataPackageOperation.Move)
                 {
-                    Engine.Core.Instance.Scene.EntitytManager.Duplicate(sourceEntity);
-                    Engine.Core.Instance.Scene.EntitytManager.Destroy(sourceEntity);
+                    SceneManager.Scene.EntitytManager.Duplicate(sourceEntity);
+                    SceneManager.Scene.EntitytManager.Destroy(sourceEntity);
                 }
         }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Composition.SystemBackdrops;
+﻿using Engine.Utilities;
+using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -65,7 +66,7 @@ namespace Editor.Controller
                     : new SolidColorBrush(Windows.UI.Color.FromArgb(255, 40, 40, 40));
 
             if (Engine.Core.Instance != null)
-                Engine.Core.Instance.Scene.EntitytManager.SetTheme(_page.RequestedTheme == ElementTheme.Light);
+                SceneManager.Scene.EntitytManager.SetTheme(_page.RequestedTheme == ElementTheme.Light);
         }
 
         private void Window_Activated(object sender, WindowActivatedEventArgs args)

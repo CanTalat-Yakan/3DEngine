@@ -7,74 +7,33 @@ using Engine.Editor;
 
 namespace Engine.Utilities
 {
-    internal class Scene
+    internal class Scene : ICloneable
     {
-        public string Profile;
+        public Guid ID = Guid.NewGuid();
 
-        public CameraComponent Camera = new CameraComponent();
-        public CameraController CameraController;
         public EntityManager EntitytManager = new EntityManager();
 
-        private Entity _subParent;
-        private Entity _special;
+        public string Name = "Scene";
+        public bool IsEnabled = true;
 
-        public void Awake()
-        {
-            CameraController = new CameraController(Camera);
-            Camera.Transform.Position = new Vector3(3, 4, 5);
-            Camera.Transform.EulerAngles = new Vector3(35, -150, 0);
+        private string _profile;
 
-            EntitytManager.CreateSky();
-        }
+        public Entity Clone() { return (Entity)this.MemberwiseClone(); }
+        object ICloneable.Clone() { return Clone(); }
 
-        public void Start()
-        {
-            _special = EntitytManager.CreatePrimitive(EPrimitiveTypes.SPECIAL);
-            _special.Transform.Scale *= 0.1f;
-            _special.Transform.Position.Y += 0.5f;
+        public virtual void Awake() { }
 
-            Entity parent = EntitytManager.CreateEntity(null, "Content");
+        public virtual void Start() { }
 
-            EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(0, 0, 1);
-            EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(0, 0, -3);
-            EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(0, 2.5f, 0);
-            EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(0, -4, 0);
-            EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(2, 0, 0);
-            EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(-1, 1, 0);
+        public virtual void Update() { }
 
-            _subParent = EntitytManager.CreateEntity(null, "Cubes");
-            _subParent.Parent = parent;
+        public virtual void LateUpdate() { }
 
-            EntitytManager.CreatePrimitive(EPrimitiveTypes.CUBE, _subParent);
-        }
+        public void Load() { }
 
-        public void Update()
-        {
-            CameraController.Update();
-            Camera.RecreateViewConstants();
-            EntitytManager.Sky.Transform.Position = Camera.Transform.Position;
+        public void Unload() { }
 
-            if (Input.Instance.GetKey(Windows.System.VirtualKey.F, EInputState.DOWN))
-                _special.Transform.Position += _special.Transform.Forward;
-            if (Input.Instance.GetKey(Windows.System.VirtualKey.G, EInputState.DOWN))
-                _special.Transform.Position += _special.Transform.Right;
-            if (Input.Instance.GetKey(Windows.System.VirtualKey.V, EInputState.DOWN))
-                Camera.Transform.Position += Camera.Transform.Right;
-
-            if (Input.Instance.GetKey(Windows.System.VirtualKey.C, EInputState.DOWN))
-            {
-                OutputController.Log("Spawned 10 Cubes");
-
-                for (int i = 0; i < 10; i++)
-                    EntitytManager.CreatePrimitive(EPrimitiveTypes.CUBE, _subParent).Transform = new TransformComponent
-                    {
-                        EulerAngles = new Vector3(new Random().Next(1, 360), new Random().Next(1, 360), new Random().Next(1, 360)),
-                        Scale = new Vector3(new Random().Next(1, 3), new Random().Next(1, 3), new Random().Next(1, 3))
-                    };
-            }
-        }
-
-        public void LateUpdate()
+        public string Profile()
         {
             int vertexCount = 0;
             int indexCount = 0;
@@ -86,9 +45,11 @@ namespace Engine.Utilities
                     indexCount += item.Mesh.IndexCount;
                 }
 
-            Profile = "Objects: " + EntitytManager.EntityList.Count().ToString();
-            Profile += "\n" + "Vertices: " + vertexCount;
-            Profile += "\n" + "Indices: " + indexCount;
+            _profile = "Objects: " + EntitytManager.EntityList.Count().ToString();
+            _profile += "\n" + "Vertices: " + vertexCount;
+            _profile += "\n" + "Indices: " + indexCount;
+
+            return _profile;
         }
 
         public void Render()
@@ -97,7 +58,8 @@ namespace Engine.Utilities
                 if (item.IsEnabled && item.Mesh != null)
                     item.Update_Render();
 
-            EntitytManager.Sky.Update_Render();
+            if (EntitytManager.Sky != null)
+                EntitytManager.Sky.Update_Render();
         }
     }
 }

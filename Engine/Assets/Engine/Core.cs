@@ -19,7 +19,7 @@ namespace Engine
 
         public Input Input;
         public Time Time;
-        public Scene Scene;
+        public SceneManager SceneManager;
         public Renderer Renderer;
         public ImGuiRenderer ImGuiRenderer;
 
@@ -36,15 +36,15 @@ namespace Engine
             Renderer = new(swapChainPanel);
             Input = new();
             Time = new();
-            Scene = new();
+            SceneManager = new(new CustomScene());
             ImGuiRenderer = new();
 
             OutputController.Log("Engine Initialized...");
 
             ImGui.GetIO().DisplaySize = new Vector2((float)swapChainPanel.ActualWidth, (float)swapChainPanel.ActualHeight);
 
-            Scene.Awake();
-            Scene.Start();
+            SceneManager.Awake();
+            SceneManager.Start();
 
             CompositionTarget.Rendering += (s, e) =>
             {
@@ -52,17 +52,17 @@ namespace Engine
 
                 Input.Update();
 
-                Scene.Update();
-                Scene.LateUpdate();
+                SceneManager.Update();
+                SceneManager.LateUpdate();
 
                 Input.LateUpdate();
 
                 Time.Update();
 
                 Renderer.SetSolid();
-                Scene.Render();
+                SceneManager.Render();
                 Renderer.SetWireframe();
-                Scene.Render();
+                SceneManager.Render();
 
                 UpdateImGui();
                 ImGuiRenderer.Render(ImGui.GetDrawData());
@@ -71,9 +71,9 @@ namespace Engine
 
                 profile.Text = Time.Profile;
                 profile.Text += "\n\n" + Renderer.Profile;
-                profile.Text += "\n\n" + Scene.Profile;
-                profile.Text += "\n\n" + Scene.Camera.Transform.Position.ToString();
-                profile.Text += "\n\n" + Scene.Camera.Transform.EulerAngles.ToString();
+                profile.Text += "\n\n" + SceneManager.Profile();
+                //profile.Text += "\n\n" + SceneManager.Camera.Transform.Position.ToString();
+                //profile.Text += "\n\n" + SceneManager.Camera.Transform.EulerAngles.ToString();
             };
         }
 
