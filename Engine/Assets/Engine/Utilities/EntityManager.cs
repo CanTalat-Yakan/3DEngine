@@ -21,18 +21,20 @@ namespace Engine.Utilities
         public event EventHandler<T> OnAddEvent;
         public event EventHandler<T> OnRemoveEvent;
 
-        public new void Add(T item)
+        public void Add(T item, bool invokeEvent = true)
         {
             base.Add(item);
 
             if (null != OnAddEvent)
-                OnAddEvent(this, item);
+                if (invokeEvent)
+                    OnAddEvent(this, item);
         }
 
-        public new void Remove(T item)
+        public void Remove(T item, bool invokeEvent = true)
         {
             if (null != OnRemoveEvent)
-                OnRemoveEvent(this, item);
+                if (invokeEvent)
+                    OnRemoveEvent(this, item);
 
             base.Remove(item);
         }
@@ -78,7 +80,7 @@ namespace Engine.Utilities
         public Entity Duplicate(Entity refEntity, Entity parent = null)
         {
             Entity gObject = refEntity.Clone();
-            gObject.Parent= parent;
+            gObject.Parent = parent;
 
             EntityList.Add(gObject);
 

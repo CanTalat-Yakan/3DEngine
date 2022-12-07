@@ -87,7 +87,7 @@ namespace Engine.Utilities
             return Scene.Profile();
         }
 
-        internal static Scene GetByID(Guid guid)
+        public static Scene GetFromID(Guid guid)
         {
             if (Scene.ID == guid)
                 return Scene;

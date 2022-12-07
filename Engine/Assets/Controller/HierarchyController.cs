@@ -128,7 +128,7 @@ namespace Editor.Controller
 
         public void PopulateTree(SceneEntry sceneEntry)
         {
-            Scene scene = SceneManager.GetByID(sceneEntry.ID);
+            Scene scene = SceneManager.GetFromID(sceneEntry.ID);
 
             scene.EntitytManager.EntityList.OnAddEvent += (s, e) => AddTreeEntry(sceneEntry, (Entity)e);
             scene.EntitytManager.EntityList.OnRemoveEvent += (s, e) => RemoveTreeEntry(sceneEntry, (Entity)e);
@@ -270,7 +270,7 @@ namespace Editor.Controller
         public Entity GetEntity(Guid guid, SceneEntry sceneEntry = null)
         {
             if (sceneEntry != null)
-                foreach (var entity in SceneManager.GetByID(sceneEntry.ID).EntitytManager.EntityList)
+                foreach (var entity in SceneManager.GetFromID(sceneEntry.ID).EntitytManager.EntityList)
                     if (entity.ID == guid)
                         return entity;
 
@@ -301,6 +301,23 @@ namespace Editor.Controller
             {
                 (newParent.Content as TreeEntry).IDparent = (node.Content as TreeEntry).ID;
                 GetEntity(node.Content as TreeEntry).Parent = GetEntity(newParent.Content as TreeEntry);
+            }
+        }
+
+        public void SetNewSceneEntryRecurisivally(SceneEntry sourceSceneEntry, SceneEntry targetSceneEntry, params TreeViewNode[] treeViewNodes)
+        {
+            foreach (var node in treeViewNodes)
+            {
+                TreeEntry treeEntry = node.Content as TreeEntry;
+
+                if (treeEntry.Node.Children.Count != 0)
+                    SetNewSceneEntryRecurisivally(sourceSceneEntry, targetSceneEntry, treeEntry.Node.Children.ToArray());
+
+                Scene sourceScene = SceneManager.GetFromID(sourceSceneEntry.ID);
+                Scene targetScene = SceneManager.GetFromID(targetSceneEntry.ID);
+
+                sourceScene.EntitytManager.EntityList.Remove(sourceScene.EntitytManager.GetFromID(treeEntry.ID), false);
+                targetScene.EntitytManager.EntityList.Add(targetScene.EntitytManager.GetFromID(treeEntry.ID), false);
             }
         }
 
@@ -367,7 +384,7 @@ namespace Editor.Controller
                 menuFlyout.Items.Add(item);
 
                 if (item.Text == "Show in Files"
-                    || item.Text == "Delete")
+                    || item.Text == "Paste")
                     menuFlyout.Items.Add(new MenuFlyoutSeparator());
             }
 
@@ -382,10 +399,10 @@ namespace Editor.Controller
                 new MenuFlyoutItem() { Text = "Save", Icon = new SymbolIcon(Symbol.Save) },
                 new MenuFlyoutItem() { Text = "Show in Files", Icon = new SymbolIcon(Symbol.Document) },
                 //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Paste", Icon = new SymbolIcon(Symbol.Paste) },
+                //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Unload" },
                 new MenuFlyoutItem() { Text = "Load" },
-                //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Paste", Icon = new SymbolIcon(Symbol.Paste) },
                 //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Create Entity" },
             };
@@ -393,10 +410,10 @@ namespace Editor.Controller
             //items[0].Click += (s, e) => OpenFolder(path);
             //items[1].Click += (s, e) => OpenFolder(path);
 
-            //items[2].Click += (s, e) => ContentDialogRename(path);
-            //items[3].Click += (s, e) => ContentDialogDelete(path);
+            items[2].Click += (s, e) => PasteEntityFromClipboard(sceneEntry);
 
-            items[4].Click += (s, e) => PasteEntityFromClipboard(sceneEntry);
+            //items[3].Click += (s, e) => ContentDialogRename(path);
+            //items[4].Click += (s, e) => ContentDialogDelete(path);
 
             items[5].Click += (s, e) => SceneManager.Scene.EntitytManager.CreateEntity();
 
@@ -406,8 +423,8 @@ namespace Editor.Controller
                 menuFlyout.Items.Add(item);
 
                 if (item.Text == "Show in Files"
-                    || item.Text == "Load"
-                    || item.Text == "Paste")
+                    || item.Text == "Paste"
+                    || item.Text == "Load")
                     menuFlyout.Items.Add(new MenuFlyoutSeparator());
             }
 
@@ -557,19 +574,31 @@ namespace Editor.Controller
             if (sourceEntity != null)
                 if (requestedOperation == DataPackageOperation.Copy)
                 {
-                    var newEntity = SceneManager.GetByID(sourceSceneEntry.ID).EntitytManager.Duplicate(sourceEntity, targetEntity);
+                    var newEntity = SceneManager.GetFromID(sourceSceneEntry.ID).EntitytManager.Duplicate(sourceEntity, targetEntity);
                     var newTreeEntry = GetTreeEntry(newEntity.ID, sourceSceneEntry);
 
-                    newTreeEntry.Node.Parent.Children.Remove(newTreeEntry.Node);
-                    targetTreeEntry.Node.Children.Add(newTreeEntry.Node);
+                    if (sourceSceneEntry.ID != targetSceneEntry.ID)
+                    {
+                        newTreeEntry.Node.Parent.Children.Remove(newTreeEntry.Node);
+                        targetTreeEntry.Node.Children.Add(newTreeEntry.Node);
+
+                        //if (newTreeEntry.Node.Children.Count != 0)
+                        //    SetNewSceneEntryRecurisivally(sourceSceneEntry, targetSceneEntry, newTreeEntry.Node.Children.ToArray());
+                    }
                 }
                 else if (requestedOperation == DataPackageOperation.Move)
                 {
                     sourceTreeEntry.IDparent = targetTreeEntry.ID;
                     sourceEntity.Parent = targetEntity;
 
-                    sourceTreeEntry.Node.Parent.Children.Remove(sourceTreeEntry.Node);
-                    targetTreeEntry.Node.Children.Add(sourceTreeEntry.Node);
+                    if (sourceSceneEntry.ID != targetSceneEntry.ID)
+                    {
+                        sourceTreeEntry.Node.Parent.Children.Remove(sourceTreeEntry.Node);
+                        targetTreeEntry.Node.Children.Add(sourceTreeEntry.Node);
+
+                        //if (sourceTreeEntry.Node.Children.Count != 0)
+                        //    SetNewSceneEntryRecurisivally(sourceSceneEntry, targetSceneEntry, sourceTreeEntry.Node.Children.ToArray());
+                    }
                 }
         }
 
@@ -577,23 +606,34 @@ namespace Editor.Controller
         {
             GetEntries(out TreeEntry sourceTreeEntry, out SceneEntry sourceSceneEntry, sourceGuid);
             GetEntity(out Entity sourceEntity, sourceGuid, sourceSceneEntry);
-
             if (sourceEntity != null)
                 if (requestedOperation == DataPackageOperation.Copy)
                 {
-                    var newEntity = SceneManager.GetByID(sourceSceneEntry.ID).EntitytManager.Duplicate(sourceEntity);
+                    var newEntity = SceneManager.GetFromID(sourceSceneEntry.ID).EntitytManager.Duplicate(sourceEntity);
                     var newTreeEntry = GetTreeEntry(newEntity.ID, sourceSceneEntry);
 
-                    newTreeEntry.Node.Parent.Children.Remove(newTreeEntry.Node);
-                    targetSceneEntry.TreeView.RootNodes.Add(newTreeEntry.Node);
+                    if (sourceSceneEntry.ID != targetSceneEntry.ID)
+                    {
+                        newTreeEntry.Node.Parent.Children.Remove(newTreeEntry.Node);
+                        targetSceneEntry.TreeView.RootNodes.Add(newTreeEntry.Node);
+
+                        //if (newTreeEntry.Node.Children.Count != 0)
+                        //    SetNewSceneEntryRecurisivally(sourceSceneEntry, targetSceneEntry, newTreeEntry.Node.Children.ToArray());
+                    }
                 }
                 else if (requestedOperation == DataPackageOperation.Move)
                 {
                     sourceTreeEntry.IDparent = null;
                     sourceEntity.Parent = null;
 
-                    sourceTreeEntry.Node.Parent.Children.Remove(sourceTreeEntry.Node);
-                    targetSceneEntry.TreeView.RootNodes.Add(sourceTreeEntry.Node);
+                    if (sourceSceneEntry.ID != targetSceneEntry.ID)
+                    {
+                        sourceTreeEntry.Node.Parent.Children.Remove(sourceTreeEntry.Node);
+                        targetSceneEntry.TreeView.RootNodes.Add(sourceTreeEntry.Node);
+
+                        //if (sourceTreeEntry.Node.Children.Count != 0)
+                        //    SetNewSceneEntryRecurisivally(sourceSceneEntry, targetSceneEntry, sourceTreeEntry.Node.Children.ToArray());
+                    }
                 }
         }
 
