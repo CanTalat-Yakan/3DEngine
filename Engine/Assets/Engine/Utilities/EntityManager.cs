@@ -31,10 +31,10 @@ namespace Engine.Utilities
 
         public new void Remove(T item)
         {
-            base.Remove(item);
-
             if (null != OnRemoveEvent)
                 OnRemoveEvent(this, item);
+
+            base.Remove(item);
         }
     }
 

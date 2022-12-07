@@ -18,8 +18,14 @@ namespace Engine.Utilities
 
         private string _profile;
 
-        public Entity Clone() { return (Entity)this.MemberwiseClone(); }
         object ICloneable.Clone() { return Clone(); }
+        public Scene Clone()
+        {
+            var newScene = (Scene)this.MemberwiseClone();
+            newScene.ID = Guid.NewGuid();
+
+            return newScene;
+        }
 
         public virtual void Awake() { }
 

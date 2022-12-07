@@ -17,8 +17,15 @@ namespace Engine.Utilities
         public bool IsEnabled = true;
         public bool IsStatic = false;
 
-        public Entity Clone() { return (Entity)this.MemberwiseClone(); }
         object ICloneable.Clone() { return Clone(); }
+        public Entity Clone()
+        {
+            var newEntity = (Entity)this.MemberwiseClone();
+            newEntity.ID = Guid.NewGuid();
+            newEntity.Transform = new TransformComponent() { Position = Transform.Position, Rotation = Transform.Rotation, Scale = Transform.Scale };
+
+            return newEntity;
+        }
 
         public void Update_Render()
         {
