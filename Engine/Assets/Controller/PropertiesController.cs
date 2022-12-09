@@ -101,8 +101,12 @@ namespace Editor.Controller
             _stackPanel.Children.Add(CreateSeperator());
             _stackPanel.Children.Add(transform.StackInGrid().WrapInExpander("Transform"));
             _stackPanel.Children.Add(CreateButton("Add Component", null));
-            _stackPanel.Children.Add(collection.StackInGrid().WrapInExpanderWithToggleButton("Example"));
-            _stackPanel.Children.Add(CreateSpacer().WrapInExpanderWithToggleButton("Another"));
+
+            var components = entity.GetComponents();
+            for (int i = 1; i < components.Length; i++)
+                _stackPanel.Children.Add(new Grid().WrapInExpanderWithToggleButton(components[i].ToString()));
+
+            _stackPanel.Children.Add(collection.StackInGrid().WrapInExpanderWithToggleButton("Expander"));
         }
 
         private async void CreateFilePreviewer(string path)

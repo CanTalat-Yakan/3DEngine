@@ -48,6 +48,22 @@ namespace Engine.ECS
             return null;
         }
 
+        public T[] GetComponents<T>() where T : Component
+        {
+            List<T> components = new();
+
+            foreach (Component component in _components)
+                if (component.GetType().Equals(typeof(T)))
+                    components.Add((T)component);
+
+            return components.ToArray();
+        }
+
+        public Component[] GetComponents()
+        {
+            return _components.ToArray();
+        }
+
         object ICloneable.Clone() { return Clone(); }
 
         public Entity Clone()
@@ -58,7 +74,6 @@ namespace Engine.ECS
 
             return newEntity;
         }
-
         //public void Update_Render()
         //{
         //    if (!IsStatic)
