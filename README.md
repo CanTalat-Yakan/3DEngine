@@ -37,6 +37,9 @@ interchange between graphics applications.
 
 For more details, please visit the web site [here](http://openusd.org).
 
+# Entity Component System (ECS)
+
+The Entity Component System is an architectural pattern often used in video game development. It facilitates code reusability by separating the data from the behavior. In addition, ECS obeys the "composition over inheritance principle," providing improved flexibility and helping developers identify entities in a game's scene where all the objects are classified as entities. One reason ECS is faster than a game object component system is that you put all the data you need together in the same place in memory. Doing so avoids the performance overhead of having to search around to find it.
 
 # Build
 
