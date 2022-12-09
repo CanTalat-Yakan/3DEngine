@@ -72,14 +72,25 @@ namespace Engine.Utilities
             _materialSkyLight = new Material(SHADER_UNLIT, IMAGE_SKY_LIGHT);
         }
 
+        public T[] FindComponent<T>() where T : Component
+        {
+            List<T> components = new();
+            foreach (var entity in EntityList)
+            foreach (var component in entity.GetComponents<T>())
+                if (component.GetType().Equals(typeof(T)))
+                    components.Add((T)component);
+
+            return components.ToArray();
+        }
+
         public Entity Duplicate(Entity refEntity, Entity parent = null)
         {
-            Entity gObject = refEntity.Clone();
-            gObject.Parent = parent;
+            Entity clonedEntity = refEntity.Clone();
+            clonedEntity.Parent = parent;
 
-            EntityList.Add(gObject);
+            EntityList.Add(clonedEntity);
 
-            return gObject;
+            return clonedEntity;
         }
 
         public Entity CreateEntity(Entity parent = null, string name = "New Entity")

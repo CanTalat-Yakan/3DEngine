@@ -59,8 +59,8 @@ namespace Editor.Controller
             {
                 CreateBool(true).WrapInField("Is Acitve"),
                 CreateBool().WrapInField("Is Static"),
-                CreateEnum("Untagged", "MainCamera", "Respawn", "Player", "Finish", "GameController").WrapInField("Tag"),
-                CreateEnum("Default", "Transparent FX", "Ignore Raycast", "Water", "UI").WrapInField("Layer")
+                CreateEnum(Enum.GetNames(typeof(ETags))).WrapInField("Tag"),
+                CreateEnum(Enum.GetNames(typeof(ELayers))).WrapInField("Layer")
             };
 
             var transform = new Grid[]

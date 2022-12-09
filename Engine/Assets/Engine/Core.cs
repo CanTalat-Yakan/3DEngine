@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Drawing;
 using Vortice.DXGI;
 using Vortice.Mathematics;
+using Engine.Components;
 
 namespace Engine
 {
@@ -37,7 +38,7 @@ namespace Engine
             Input = new();
             Time = new();
             SceneManager = new(new Scene());
-            SceneManager.Scene.EntitytManager.CreateEntity(null, "Boot").AddComponent(new CustomScene());
+            SceneManager.Scene.EntitytManager.CreateEntity(null, "Boot").AddComponent(new SceneBoot());
             ImGuiRenderer = new();
 
             OutputController.Log("Engine Initialized...");
@@ -73,8 +74,8 @@ namespace Engine
                 profile.Text = Time.Profile;
                 profile.Text += "\n\n" + Renderer.Profile;
                 profile.Text += "\n\n" + SceneManager.Profile();
-                //profile.Text += "\n\n" + SceneManager.Camera.Transform.Position.ToString();
-                //profile.Text += "\n\n" + SceneManager.Camera.Transform.EulerAngles.ToString();
+                //profile.Text += "\n\n" + Camera.Main.Entity.Transform.Position.ToString();
+                //profile.Text += "\n\n" + Camera.Main.Entity.Transform.EulerAngles.ToString();
             };
         }
 

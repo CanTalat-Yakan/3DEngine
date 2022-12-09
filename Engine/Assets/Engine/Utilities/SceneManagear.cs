@@ -54,10 +54,6 @@ namespace Engine.Utilities
             CameraSystem.Awake();
             MeshSystem.Awake();
             ScriptSystem.Awake();
-
-            //Scene.Awake();
-            //foreach (var subscenes in Subscenes)
-            //    subscenes.Awake();
         }
 
         public void Start()
@@ -66,10 +62,6 @@ namespace Engine.Utilities
             CameraSystem.Start();
             MeshSystem.Start();
             ScriptSystem.Start();
-
-            //Scene.Start();
-            //foreach (var subscenes in Subscenes)
-            //    subscenes.Start();
         }
 
         public void Update()
@@ -78,10 +70,6 @@ namespace Engine.Utilities
             CameraSystem.Update();
             MeshSystem.Update();
             ScriptSystem.Update();
-
-            //Scene.Update();
-            //foreach (var subscenes in Subscenes)
-            //    subscenes.Update();
         }
 
         public void LateUpdate()
@@ -90,25 +78,11 @@ namespace Engine.Utilities
             CameraSystem.LateUpdate();
             MeshSystem.LateUpdate();
             ScriptSystem.LateUpdate();
-
-            //Scene.LateUpdate();
-            //foreach (var subscenes in Subscenes)
-            //    subscenes.LateUpdate();
         }
 
         public void Render()
         {
             MeshSystem.Render();
-
-            //foreach (var item in EntitytManager.EntityList)
-            //    if (item.IsEnabled && item.Mesh != null)
-            //        item.Update_Render();
-
-            //if (EntitytManager.Sky != null)
-            //    EntitytManager.Sky.Update_Render();
-
-            //foreach (var subscenes in Subscenes)
-            //    subscenes.Render();
         }
 
         public string Profile()

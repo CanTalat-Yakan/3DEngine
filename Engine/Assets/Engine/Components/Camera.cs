@@ -11,10 +11,11 @@ namespace Engine.Components
 {
     internal class Camera : Component
     {
-        public static double s_FieldOfView = 90;
-        public SViewConstantsBuffer ViewConstants;
+        public static Camera Main { get; private set; }
 
-        //public Transform Transform = new Transform();
+        public static double s_FieldOfView = 90;
+
+        public SViewConstantsBuffer ViewConstants;
 
         private Renderer _d3d;
         private ID3D11Buffer _view;
@@ -30,15 +31,16 @@ namespace Engine.Components
             _view = _d3d.Device.CreateConstantBuffer<SViewConstantsBuffer>();
         }
 
-        public override void LateUpdate()
+        public override void Awake()
         {
-            RecreateViewConstants();
+            //if (Entity.Tag == ETags.MainCamera)
+                //Main = this;
         }
+
+        public override void LateUpdate() => RecreateViewConstants();
 
         public void RecreateViewConstants()
         {
-            //Transform.Update();
-
             #region //Set ViewConstantBuffer
             var view = Matrix4x4.CreateLookAt(
                 Entity.Transform.Position,
@@ -62,7 +64,7 @@ namespace Engine.Components
             // T = Transpose
             // (World * View * Projection)T = ProjectionT * ViewT * WorldT. World is in PerModelConstantBuffer
             // T(v*p), because HLSL calculates matrix mul in collumn-major and system.numerics returns row-major
-            var viewProjection = Matrix4x4.Transpose(view * projection); 
+            var viewProjection = Matrix4x4.Transpose(view * projection);
 
             ViewConstants = new SViewConstantsBuffer() { ViewProjection = viewProjection, CameraPisiton = Entity.Transform.Position };
             #endregion

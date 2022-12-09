@@ -11,6 +11,7 @@ namespace Engine.Components
         public Transform Parent;
 
         public SPerModelConstantBuffer ConstantsBuffer { get => new SPerModelConstantBuffer() { ModelView = WorldMatrix }; }
+
         public Vector3 Forward { get; private set; }
         public Vector3 Right { get; private set; }
         public Vector3 LocalUp { get; private set; }
