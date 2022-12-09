@@ -10,6 +10,7 @@ using Engine.Utilities;
 using Windows.ApplicationModel.DataTransfer;
 using System.Text.RegularExpressions;
 using System.Linq;
+using Engine.ECS;
 
 namespace Editor.Controller
 {

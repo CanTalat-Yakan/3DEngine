@@ -2,12 +2,13 @@
 using System;
 using Vortice.Mathematics;
 using Engine.Data;
+using Engine.ECS;
 
 namespace Engine.Components
 {
-    internal class TransformComponent
+    internal class Transform : Component
     {
-        public TransformComponent Parent;
+        public Transform Parent;
 
         public SPerModelConstantBuffer ConstantsBuffer { get => new SPerModelConstantBuffer() { ModelView = WorldMatrix }; }
         public Vector3 Forward { get; private set; }
@@ -21,8 +22,13 @@ namespace Engine.Components
         public Vector3 EulerAngles = Vector3.Zero;
         public Vector3 Scale = Vector3.One;
 
-        public void Update()
+        public Transform() => TransformSystem.Register(this);
+
+        public override void Update()
         {
+            if (this.Entity.Parent != null)
+                Parent = this.Entity.Parent.Transform;
+
             //EulerAngles = Rotation.ToEuler();
 
             Forward = Vector3.Normalize(new Vector3(
@@ -44,7 +50,7 @@ namespace Engine.Components
                 WorldMatrix = CalculateWorldMatrix(WorldMatrix, Parent);
         }
 
-        Matrix4x4 CalculateWorldMatrix(Matrix4x4 localPosition, TransformComponent parent)
+        Matrix4x4 CalculateWorldMatrix(Matrix4x4 localPosition, Transform parent)
         {
             localPosition = Matrix4x4.Multiply(localPosition, parent.WorldMatrix);
 

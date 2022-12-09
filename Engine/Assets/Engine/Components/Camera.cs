@@ -5,38 +5,44 @@ using Vortice.Direct3D11;
 using Vortice.Mathematics;
 using Engine.Data;
 using Engine.Utilities;
+using Engine.ECS;
 
 namespace Engine.Components
 {
-    internal class CameraComponent
+    internal class Camera : Component
     {
         public static double s_FieldOfView = 90;
         public SViewConstantsBuffer ViewConstants;
 
-        public TransformComponent Transform = new TransformComponent();
+        //public Transform Transform = new Transform();
 
         private Renderer _d3d;
         private ID3D11Buffer _view;
 
-        public CameraComponent()
+        public Camera()
         {
+            CameraSystem.Register(this);
+
             #region //Get Instances
             _d3d = Renderer.Instance;
             #endregion
 
             _view = _d3d.Device.CreateConstantBuffer<SViewConstantsBuffer>();
+        }
 
+        public override void LateUpdate()
+        {
             RecreateViewConstants();
         }
 
         public void RecreateViewConstants()
         {
-            Transform.Update();
+            //Transform.Update();
 
             #region //Set ViewConstantBuffer
             var view = Matrix4x4.CreateLookAt(
-                Transform.Position,
-                Transform.Position + Transform.Forward,
+                Entity.Transform.Position,
+                Entity.Transform.Position + Entity.Transform.Forward,
                 Vector3.UnitY);
 
             var aspect = (float)(_d3d.SwapChainPanel.ActualWidth / _d3d.SwapChainPanel.ActualHeight);
@@ -58,7 +64,7 @@ namespace Engine.Components
             // T(v*p), because HLSL calculates matrix mul in collumn-major and system.numerics returns row-major
             var viewProjection = Matrix4x4.Transpose(view * projection); 
 
-            ViewConstants = new SViewConstantsBuffer() { ViewProjection = viewProjection, CameraPisiton = Transform.Position };
+            ViewConstants = new SViewConstantsBuffer() { ViewProjection = viewProjection, CameraPisiton = Entity.Transform.Position };
             #endregion
 
             unsafe

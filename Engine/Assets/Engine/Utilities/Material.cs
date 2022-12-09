@@ -6,11 +6,10 @@ using System.Runtime.CompilerServices;
 using System;
 using Engine.Data;
 using Engine.Helper;
-using Engine.Utilities;
 
-namespace Engine.Components
+namespace Engine.Utilities
 {
-    internal class MaterialComponent
+    internal class Material
     {
         private Renderer _d3d;
 
@@ -24,7 +23,7 @@ namespace Engine.Components
         private ID3D11SamplerState _sampler;
         private ID3D11Buffer _model;
 
-        public MaterialComponent(string shaderFileName, string imageFileName, bool includeGeometryShader = false)
+        public Material(string shaderFileName, string imageFileName, bool includeGeometryShader = false)
         {
             #region //Get Instances
             _d3d = Renderer.Instance;
@@ -91,7 +90,7 @@ namespace Engine.Components
             #endregion
         }
 
-        public void Render(SPerModelConstantBuffer data)
+        public void Render(SPerModelConstantBuffer constantBuffer)
         {
             _d3d.DeviceContext.IASetInputLayout(_inputLayout);
             _d3d.DeviceContext.VSSetShader(_vertexShader);
@@ -102,7 +101,7 @@ namespace Engine.Components
             {
                 // Update constant buffer data
                 MappedSubresource mappedResource = _d3d.DeviceContext.Map(_model, MapMode.WriteDiscard);
-                Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref data);
+                Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref constantBuffer);
                 _d3d.DeviceContext.Unmap(_model, 0);
             }
             _d3d.DeviceContext.VSSetConstantBuffer(1, _model);
@@ -122,7 +121,7 @@ namespace Engine.Components
             shaderFlags |= ShaderFlags.Debug;
             shaderFlags |= ShaderFlags.SkipValidation;
 #else
-        shaderFlags |= ShaderFlags.OptimizationLevel3;
+            shaderFlags |= ShaderFlags.OptimizationLevel3;
 #endif
 
             return Compiler.CompileFromFile(fileName, entryPoint, profile, shaderFlags);

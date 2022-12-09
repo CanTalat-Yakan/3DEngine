@@ -36,7 +36,7 @@ namespace Editor.Controller
             {
                 CreateButton(CreateIcon(Symbol.Video),
                     StackInGridVertical(
-                            CreateSlider((float)CameraComponent.s_FieldOfView, 40, 110, (s, e) => { CameraComponent.s_FieldOfView = e.NewValue; }).WrapInGridVertical("Field Of View"),
+                            CreateSlider((float)Camera.s_FieldOfView, 40, 110, (s, e) => { Camera.s_FieldOfView = e.NewValue; }).WrapInGridVertical("Field Of View"),
                             CreateNumberInput(CameraController.s_MovementSpeed, 1, 100, (s, e) => { CameraController.s_MovementSpeed = (float)e.NewValue; }).WrapInGridVertical("Movement Speed"))),
                 CreateAppBarSeperator(),
                 CreateComboBox(new string[] { "Perspective", "Orthogonal" }),

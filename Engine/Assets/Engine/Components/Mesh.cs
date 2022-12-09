@@ -3,11 +3,14 @@ using System.Runtime.CompilerServices;
 using Vortice.Direct3D11;
 using Engine.Data;
 using Engine.Utilities;
+using Engine.ECS;
 
 namespace Engine.Components
 {
-    internal class MeshComponent
+    internal class Mesh : Component
     {
+        public Material Material;
+
         public ID3D11Buffer VertexBuffer;
         public ID3D11Buffer IndexBuffer;
 
@@ -18,7 +21,9 @@ namespace Engine.Components
 
         private Renderer _d3d;
 
-        public MeshComponent(MeshInfo _obj)
+        public Mesh() => MeshSystem.Register(this);
+
+        public Mesh(MeshInfo _obj)
         {
             #region //Get Instance of DirectX
             _d3d = Renderer.Instance;
@@ -45,11 +50,13 @@ namespace Engine.Components
             #endregion
         }
 
-        public void Render()
+        public override void LateUpdate()
         {
             _d3d.RenderMesh(
                 VertexBuffer, VertexStride,
                 IndexBuffer, IndexCount);
+
+            Material.Render(Entity.Transform.ConstantsBuffer);
         }
     }
 }

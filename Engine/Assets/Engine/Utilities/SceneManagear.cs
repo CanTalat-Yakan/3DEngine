@@ -1,9 +1,6 @@
-﻿using Editor.Controller;
-using Microsoft.UI.Composition.Scenes;
+﻿using System.Collections.Generic;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
+using Engine.ECS;
 
 namespace Engine.Utilities
 {
@@ -20,7 +17,7 @@ namespace Engine.Utilities
 
         public static Scene AddSubscene(Guid guid = new Guid(), string name = "Subscene", bool enable = true)
         {
-            if(guid.Equals(Guid.Empty))
+            if (guid.Equals(Guid.Empty))
                 guid = Guid.NewGuid();
 
             Scene scene;
@@ -29,57 +26,89 @@ namespace Engine.Utilities
             return scene;
         }
 
-        public static void RemoveSubscene(Guid guid)
-        {
-            foreach (var subscene in Subscenes)
-                if (subscene.ID == guid)
-                    Subscenes.Remove(subscene);
-        }
-
         public static void LoadScene(Scene scene)
         {
-            Scene = scene != null ? scene : new Scene() { ID = new Guid(), Name = "Core", IsEnabled = true, EntitytManager = new EntityManager() };
+            Scene = scene;
             Subscenes = new List<Scene>();
+        }
+
+        public static void LoadSubscene(Scene subscene)
+        {
+            subscene.Load();
+            Subscenes.Add(subscene);
+        }
+
+        public static void UnloadSubscene(Scene subscene)
+        {
+            subscene.Unload();
+        }
+
+        public static void RemoveScene(Guid guid)
+        {
+            Subscenes.Remove(GetFromID(guid));
         }
 
         public void Awake()
         {
-            Scene.Awake();
+            TransformSystem.Awake();
+            CameraSystem.Awake();
+            MeshSystem.Awake();
+            ScriptSystem.Awake();
 
-            foreach (var subscenes in Subscenes)
-                subscenes.Awake();
+            //Scene.Awake();
+            //foreach (var subscenes in Subscenes)
+            //    subscenes.Awake();
         }
 
         public void Start()
         {
-            Scene.Start();
+            TransformSystem.Start();
+            CameraSystem.Start();
+            MeshSystem.Start();
+            ScriptSystem.Start();
 
-            foreach (var subscenes in Subscenes)
-                subscenes.Start();
+            //Scene.Start();
+            //foreach (var subscenes in Subscenes)
+            //    subscenes.Start();
         }
 
         public void Update()
         {
-            Scene.Update();
+            TransformSystem.Update();
+            CameraSystem.Update();
+            MeshSystem.Update();
+            ScriptSystem.Update();
 
-            foreach (var subscenes in Subscenes)
-                subscenes.Update();
+            //Scene.Update();
+            //foreach (var subscenes in Subscenes)
+            //    subscenes.Update();
         }
-        
+
         public void LateUpdate()
         {
-            Scene.LateUpdate();
+            TransformSystem.LateUpdate();
+            CameraSystem.LateUpdate();
+            MeshSystem.LateUpdate();
+            ScriptSystem.LateUpdate();
 
-            foreach (var subscenes in Subscenes)
-                subscenes.LateUpdate();
+            //Scene.LateUpdate();
+            //foreach (var subscenes in Subscenes)
+            //    subscenes.LateUpdate();
         }
 
         public void Render()
         {
-            Scene.Render();
+            MeshSystem.Render();
 
-            foreach (var subscenes in Subscenes)
-                subscenes.Render();
+            //foreach (var item in EntitytManager.EntityList)
+            //    if (item.IsEnabled && item.Mesh != null)
+            //        item.Update_Render();
+
+            //if (EntitytManager.Sky != null)
+            //    EntitytManager.Sky.Update_Render();
+
+            //foreach (var subscenes in Subscenes)
+            //    subscenes.Render();
         }
 
         public string Profile()
@@ -96,7 +125,7 @@ namespace Engine.Utilities
                 if (subscene.ID == guid)
                     return subscene;
 
-            return null;    
+            return null;
         }
     }
 }

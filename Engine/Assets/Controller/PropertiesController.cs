@@ -1,13 +1,7 @@
-﻿using CommunityToolkit.WinUI.UI.Controls;
-using Microsoft.UI.Text;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Input;
+﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
-using Microsoft.UI.Xaml.Shapes;
 using Microsoft.UI.Xaml;
-using Microsoft.UI;
 using System.Diagnostics;
 using System.IO;
 using System.Numerics;
@@ -16,12 +10,8 @@ using Vortice.Mathematics;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.Storage;
+using Engine.ECS;
 using Editor.UserControls;
-using Engine.Utilities;
-using ColorPicker = CommunityToolkit.WinUI.UI.Controls.ColorPicker;
-using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
-using Expander = Microsoft.UI.Xaml.Controls.Expander;
-using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 using Path = System.IO.Path;
 
 namespace Editor.Controller

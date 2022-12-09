@@ -36,7 +36,8 @@ namespace Engine
             Renderer = new(swapChainPanel);
             Input = new();
             Time = new();
-            SceneManager = new(new CustomScene());
+            SceneManager = new(new Scene());
+            SceneManager.Scene.EntitytManager.CreateEntity(null, "SCENE BOOTER").AddComponent(new CustomScene());
             ImGuiRenderer = new();
 
             OutputController.Log("Engine Initialized...");
