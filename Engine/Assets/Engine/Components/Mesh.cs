@@ -21,10 +21,10 @@ namespace Engine.Components
 
         private Renderer _d3d;
 
-        public Mesh() => MeshSystem.Register(this);
-
         public Mesh(MeshInfo _obj)
         {
+            MeshSystem.Register(this);
+
             #region //Get Instance of DirectX
             _d3d = Renderer.Instance;
             #endregion
@@ -50,13 +50,13 @@ namespace Engine.Components
             #endregion
         }
 
-        public override void LateUpdate()
+        public override void Render()
         {
-            _d3d.RenderMesh(
+            Material.Set(Entity.Transform.ConstantsBuffer);
+
+            _d3d.Draw(
                 VertexBuffer, VertexStride,
                 IndexBuffer, IndexCount);
-
-            Material.Render(Entity.Transform.ConstantsBuffer);
         }
     }
 }

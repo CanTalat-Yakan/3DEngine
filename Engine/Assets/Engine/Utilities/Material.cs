@@ -90,7 +90,7 @@ namespace Engine.Utilities
             #endregion
         }
 
-        public void Render(SPerModelConstantBuffer constantBuffer)
+        public void Set(SPerModelConstantBuffer constantBuffer)
         {
             _d3d.DeviceContext.IASetInputLayout(_inputLayout);
             _d3d.DeviceContext.VSSetShader(_vertexShader);

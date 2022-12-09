@@ -50,10 +50,7 @@ namespace Engine.Utilities
         private Material _materialDefault;
         private Material _materialReflection;
         private Material _materialSky;
-        private Material _materialSky2;
-        private Mesh _meshSphere;
-        private Mesh _meshCube;
-        private Mesh _meshSpecial;
+        private Material _materialSkyLight;
 
         private static readonly string SHADER_LIT = @"Shader\Lit.hlsl";
         private static readonly string SHADER_SIMPLELIT = @"Shader\SimpleLit.hlsl";
@@ -72,11 +69,7 @@ namespace Engine.Utilities
             _materialDefault = new Material(SHADER_SIMPLELIT, IMAGE_DEFAULT);
             _materialReflection = new Material(SHADER_LIT, IMAGE_SKY);
             _materialSky = new Material(SHADER_UNLIT, IMAGE_SKY);
-            _materialSky2 = new Material(SHADER_UNLIT, IMAGE_SKY_LIGHT);
-
-            _meshSpecial = new Mesh(ModelLoader.LoadFilePro(OBJ_SPECIAL));
-            _meshCube = new Mesh(ModelLoader.LoadFilePro(OBJ_CUBE));
-            _meshSphere = new Mesh(ModelLoader.LoadFilePro(OBJ_SPHERE));
+            _materialSkyLight = new Material(SHADER_UNLIT, IMAGE_SKY_LIGHT);
         }
 
         public Entity Duplicate(Entity refEntity, Entity parent = null)
@@ -111,15 +104,15 @@ namespace Engine.Utilities
             {
                 case EPrimitiveTypes.SPECIAL:
                     newEntity.Name = "special";
-                    newEntity.AddComponent(_meshSpecial);
+                    newEntity.AddComponent(new Mesh(ModelLoader.LoadFilePro(OBJ_SPECIAL)));
                     break;
                 case EPrimitiveTypes.CUBE:
                     newEntity.Name = "Cube";
-                    newEntity.AddComponent(_meshCube);
+                    newEntity.AddComponent(new Mesh(ModelLoader.LoadFilePro(OBJ_CUBE)));
                     break;
                 case EPrimitiveTypes.SPHERE:
                     newEntity.Name = "Sphere";
-                    newEntity.AddComponent(_meshSphere);
+                    newEntity.AddComponent(new Mesh(ModelLoader.LoadFilePro(OBJ_SPHERE)));
                     break;
                 case EPrimitiveTypes.PLANE:
                     break;
@@ -141,7 +134,7 @@ namespace Engine.Utilities
         public void CreateSky()
         {
             Sky = new Entity() { Name = "Sky" };
-            Sky.AddComponent(_meshSphere);
+            Sky.AddComponent(new Mesh(ModelLoader.LoadFilePro(OBJ_SPHERE)));
             Sky.GetComponent<Mesh>().Material = _materialSky;
 
             Sky.Transform.Scale = new Vector3(-1000, -1000, -1000);
@@ -156,7 +149,7 @@ namespace Engine.Utilities
             return null;
         }
 
-        public void SetTheme(bool light) => Sky.GetComponent<Mesh>().Material = light ? _materialSky2 : _materialSky;
+        public void SetTheme(bool light) => Sky.GetComponent<Mesh>().Material = light ? _materialSkyLight : _materialSky;
 
         public void Destroy(Entity sourceEntity) => EntityList.Remove(sourceEntity);
     }

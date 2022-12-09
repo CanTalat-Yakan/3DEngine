@@ -199,7 +199,7 @@ namespace Engine.Utilities
             DeviceContext.RSSetState(Device.CreateRasterizerState(rasterizerDescWireframe));
         }
 
-        public void RenderMesh(ID3D11Buffer vertexBuffer, int vertexStride, ID3D11Buffer indexBuffer, int indexCount, int vertexOffset = 0, int indexOffset = 0)
+        public void Draw(ID3D11Buffer vertexBuffer, int vertexStride, ID3D11Buffer indexBuffer, int indexCount, int vertexOffset = 0, int indexOffset = 0)
         {
             DeviceContext.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
             DeviceContext.IASetVertexBuffer(0, vertexBuffer, vertexStride, vertexOffset);
