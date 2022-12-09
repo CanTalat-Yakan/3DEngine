@@ -74,8 +74,6 @@ namespace Engine
                 profile.Text = Time.Profile;
                 profile.Text += "\n\n" + Renderer.Profile;
                 profile.Text += "\n\n" + SceneManager.Profile();
-                //profile.Text += "\n\n" + Camera.Main.Entity.Transform.Position.ToString();
-                //profile.Text += "\n\n" + Camera.Main.Entity.Transform.EulerAngles.ToString();
             };
         }
 

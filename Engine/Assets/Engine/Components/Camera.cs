@@ -33,8 +33,8 @@ namespace Engine.Components
 
         public override void Awake()
         {
-            //if (Entity.Tag == ETags.MainCamera)
-                //Main = this;
+            if (Entity.Tag == ETags.MainCamera)
+                Main = this;
         }
 
         public override void LateUpdate() => RecreateViewConstants();
