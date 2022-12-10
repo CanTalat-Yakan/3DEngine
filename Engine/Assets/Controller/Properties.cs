@@ -11,7 +11,6 @@ using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.Storage;
 using Engine.ECS;
-using Editor.ModelView;
 using Path = System.IO.Path;
 
 namespace Editor.Controller

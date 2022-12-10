@@ -2,8 +2,8 @@
 using Microsoft.UI.Xaml;
 using SharpGen.Runtime;
 using System;
-using Vortice.Direct3D;
 using Vortice.Direct3D11;
+using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
 

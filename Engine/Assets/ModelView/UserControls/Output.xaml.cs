@@ -1,7 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 using System;
-using Editor.Controller;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -42,13 +41,13 @@ namespace Editor.ModelView
 
         private void Tick(object sender, object e)
         {
-            if (Controller.Main.Instance.ControlPlayer.PlayMode == EPlayMode.PLAYING)
+            if (Controller.Main.Instance.ControlPlayer.PlayMode == Controller.EPlayMode.PLAYING)
                 Update();
         }
 
         private void TickSec(object sender, object e)
         {
-            if (Controller.Main.Instance.ControlPlayer.PlayMode == EPlayMode.PLAYING)
+            if (Controller.Main.Instance.ControlPlayer.PlayMode == Controller.EPlayMode.PLAYING)
                 UpdateSec();
         }
 
@@ -69,9 +68,9 @@ namespace Editor.ModelView
 
             Controller.Output.Log(i.ToString());
             if (i < 5)
-                Controller.Output.Log("Error Example!", EMessageType.ERROR);
+                Controller.Output.Log("Error Example!", Controller.EMessageType.ERROR);
             else if (i < 10 && i > 5)
-                Controller.Output.Log("A Warning.", EMessageType.WARNING);
+                Controller.Output.Log("A Warning.", Controller.EMessageType.WARNING);
             else if (i < 15)
                 Controller.Output.Log("This is a Message");
             else if (i > 15)

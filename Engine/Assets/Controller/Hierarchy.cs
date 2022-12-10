@@ -1,20 +1,16 @@
-﻿using Microsoft.UI.Text;
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
-using System;
 using System.Collections.Generic;
-using Editor.ModelView;
-using Engine.Utilities;
-using Windows.ApplicationModel.DataTransfer;
-using System.Text.RegularExpressions;
-using System.Linq;
-using Engine.ECS;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Text.RegularExpressions;
+using System.Linq;
+using System;
+using Windows.ApplicationModel.DataTransfer;
 using Engine.Components;
+using Engine.ECS;
+using Engine.Utilities;
 
 namespace Editor.Controller
 {

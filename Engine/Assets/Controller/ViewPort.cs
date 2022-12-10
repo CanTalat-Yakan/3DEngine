@@ -1,17 +1,7 @@
-﻿using CommunityToolkit.WinUI.UI.Controls;
-using Microsoft.UI.Text;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
+﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
-using Editor.ModelView;
-using ColorPicker = CommunityToolkit.WinUI.UI.Controls.ColorPicker;
-using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
-using Windows.Foundation;
 using Engine.Components;
 using Engine.Editor;
-using Microsoft.UI.Xaml.Data;
 
 namespace Editor.Controller
 {

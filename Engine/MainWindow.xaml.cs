@@ -2,7 +2,6 @@
 using Microsoft.UI.Xaml;
 using Windows.System;
 using WinUIEx;
-using Editor.Controller;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -11,7 +10,7 @@ namespace Editor
 {
     public sealed partial class MainWindow : WindowEx
     {
-        internal Theme _themeControl;
+        internal Controller.Theme _themeControl;
 
         private ModelView.Main _main;
 
@@ -21,7 +20,7 @@ namespace Editor
 
             ExtendsContentIntoTitleBar = true; // enable custom titlebar
 
-            _themeControl = new Theme(this, x_Page_Main);
+            _themeControl = new Controller.Theme(this, x_Page_Main);
 
             _main = new(this);
         }

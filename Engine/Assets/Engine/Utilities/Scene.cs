@@ -1,10 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Numerics;
-using Editor.Controller;
+﻿using System.Linq;
+using System;
 using Engine.Components;
-using Engine.ECS;
-using Engine.Editor;
 
 namespace Engine.Utilities
 {

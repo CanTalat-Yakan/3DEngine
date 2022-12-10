@@ -4,8 +4,8 @@ using System;
 using Vortice.Direct3D11;
 using Vortice.Mathematics;
 using Engine.Data;
-using Engine.Utilities;
 using Engine.ECS;
+using Engine.Utilities;
 
 namespace Engine.Components
 {

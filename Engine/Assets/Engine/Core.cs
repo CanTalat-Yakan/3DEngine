@@ -1,16 +1,11 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using Engine.Editor;
-using Engine.Utilities;
 using Editor.Controller;
-using System;
 using ImGuiNET;
 using System.Numerics;
-using System.Diagnostics;
-using System.Drawing;
-using Vortice.DXGI;
-using Vortice.Mathematics;
-using Engine.Components;
+using System;
+using Engine.Editor;
+using Engine.Utilities;
 
 namespace Engine
 {
