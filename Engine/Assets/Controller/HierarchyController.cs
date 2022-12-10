@@ -38,6 +38,7 @@ namespace Editor.Controller
 
         public TreeView TreeView;
         public List<TreeEntry> Hierarchy;
+        public ObservableCollection<TreeViewIconNode> DataSource;
 
         public override string ToString()
         {
@@ -50,8 +51,6 @@ namespace Editor.Controller
         public SceneEntry SceneEntry;
         public List<SceneEntry> SubsceneEntries;
 
-        public ObservableCollection<TreeViewIconNode> DataSource;
-
         private Hierarchy _hierarchy;
         private StackPanel _stackPanel;
 
@@ -62,9 +61,7 @@ namespace Editor.Controller
             _hierarchy = hierarchy;
             _stackPanel = stackPanel;
 
-            DataSource = new();
-
-            SceneEntry = new SceneEntry() { ID = SceneManager.Scene.ID, Name = SceneManager.Scene.Name, Hierarchy = new List<TreeEntry>() };
+            SceneEntry = new SceneEntry() { ID = SceneManager.Scene.ID, Name = SceneManager.Scene.Name, Hierarchy = new List<TreeEntry>(), DataSource = new() };
             SubsceneEntries = new List<SceneEntry>();
 
             CreateDefaultHierarchy();
@@ -101,9 +98,10 @@ namespace Editor.Controller
 
             var sceneGrid = new Grid[]
             {
-                CreateTreeView(out sceneEntry.TreeView),
+                CreateTreeView(out sceneEntry.TreeView, _hierarchy.Resources["x_TreeViewIconNodeTemplateSelector"] as TreeViewIconNodeTemplateSelector),
                 CreateButton("Create Entity", (s, e) => scene.EntitytManager.CreateEntity() )
             };
+            sceneEntry.TreeView.ItemsSource = sceneEntry.DataSource;
             sceneEntry.TreeView.PointerPressed += (s, e) => GetInvokedItemAndSetContextFlyout(s, e);
             sceneEntry.TreeView.Tapped += (s, e) => SetProperties((TreeView)s);
             sceneEntry.TreeView.DragItemsCompleted += (s, e) => SetNewParentTreeEntry((TreeViewNode)e.NewParentItem, e.Items.Cast<TreeViewNode>().ToArray());
@@ -115,8 +113,7 @@ namespace Editor.Controller
 
         private Grid[] CreateSubsceneHierarchy(out SceneEntry subsceneEntry, string name = "Subscene", bool enable = true)
         {
-            subsceneEntry = new SceneEntry() { ID = new Guid(), Name = name, Hierarchy = new List<TreeEntry>() };
-            subsceneEntry.ID = Guid.NewGuid();
+            subsceneEntry = new SceneEntry() { ID = Guid.NewGuid(), Name = name, Hierarchy = new List<TreeEntry>(), DataSource = new() };
 
             var subScene = SceneManager.AddSubscene(subsceneEntry.ID, name, enable);
             var subsceneGrid = CreateSceneHierarchy(subsceneEntry, subScene);
@@ -155,13 +152,11 @@ namespace Editor.Controller
 
             sceneEntry.Hierarchy.Add(treeEntry);
 
-            DataSource.Add(treeEntry.IconNode);
-
             TreeEntry parent;
-            if ((parent = GetParent(treeEntry)) is null)
-                sceneEntry.TreeView.RootNodes.Add(treeEntry.Node);
+            if ((parent = GetParent(treeEntry)) != null)
+                parent.IconNode.Children.Add(treeEntry.IconNode);
             else
-                parent.Node.Children.Add(treeEntry.Node);
+                sceneEntry.DataSource.Add(treeEntry.IconNode);
 
             return treeEntry;
         }

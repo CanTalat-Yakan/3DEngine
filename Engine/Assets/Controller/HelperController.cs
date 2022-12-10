@@ -284,11 +284,11 @@ namespace Editor.Controller
             return grid;
         }
 
-        internal virtual Grid CreateTreeView(out TreeView tree)
+        internal virtual Grid CreateTreeView(out TreeView tree, DataTemplateSelector templateSelector = null)
         {
             Grid grid = new Grid();
 
-            tree = new TreeView() { SelectionMode = TreeViewSelectionMode.Single, HorizontalAlignment = HorizontalAlignment.Stretch };
+            tree = new TreeView() { ItemTemplateSelector = templateSelector, SelectionMode = TreeViewSelectionMode.Single, HorizontalAlignment = HorizontalAlignment.Stretch };
 
             grid.Children.Add(tree);
 

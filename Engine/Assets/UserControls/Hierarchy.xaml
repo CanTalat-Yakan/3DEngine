@@ -11,7 +11,7 @@
     mc:Ignorable="d">
 
     <UserControl.Resources>
-        <DataTemplate x:Key="FolderTemplate" x:DataType="controller:TreeViewIconNode">
+        <DataTemplate x:Key="x_FolderTemplate" x:DataType="controller:TreeViewIconNode">
             <TreeViewItem AutomationProperties.Name="{x:Bind Name}" ItemsSource="{x:Bind Children}" IsExpanded="True">
                 <StackPanel Orientation="Horizontal">
                     <SymbolIcon Symbol="Folder"/>
@@ -21,7 +21,7 @@
             </TreeViewItem>
         </DataTemplate>
 
-        <DataTemplate x:Key="FileTemplate" x:DataType="controller:TreeViewIconNode">
+        <DataTemplate x:Key="x_FileTemplate" x:DataType="controller:TreeViewIconNode">
             <TreeViewItem AutomationProperties.Name="{x:Bind Name}">
                 <StackPanel Orientation="Horizontal">
                     <SymbolIcon Symbol="Page"/>
@@ -31,13 +31,13 @@
             </TreeViewItem>
         </DataTemplate>
 
-        <controller:TreeViewIconNodeTemplateSelector x:Key="TreeViewIconNodeTemplateSelector" FolderTemplate="{StaticResource FolderTemplate}" FileTemplate="{StaticResource FileTemplate}" />
+        <controller:TreeViewIconNodeTemplateSelector x:Key="x_TreeViewIconNodeTemplateSelector" FolderTemplate="{StaticResource x_FolderTemplate}" FileTemplate="{StaticResource x_FileTemplate}" />
     </UserControl.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <ScrollViewer Padding="4,0,4,0">
             <StackPanel x:Name="x_StackPanel_Hierarchy" Orientation="Vertical">
-                <TreeView x:Name="x_TreeView_IconNode" ItemTemplateSelector="{StaticResource TreeViewIconNodeTemplateSelector}"/>
+                <TreeView x:Name="x_TreeView_IconNode" ItemTemplateSelector="{StaticResource x_TreeViewIconNodeTemplateSelector}"/>
 
                 <Grid Padding="15"/>
             </StackPanel>
