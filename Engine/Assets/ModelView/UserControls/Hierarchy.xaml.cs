@@ -5,19 +5,19 @@ using Engine.Utilities;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Editor.UserControls
+namespace Editor.ModelView
 {
     public sealed partial class Hierarchy : UserControl
     {
-        internal HierarchyController _hierarchyControl;
+        internal Controller.Hierarchy _hierarchyControl;
 
         public Hierarchy()
         {
             this.InitializeComponent();
 
-            MainController.Instance.Content.Loaded += (s, e) =>
-                MainController.Instance.LayoutControl.ViewPort.Loaded += (s, e) =>
-                    _hierarchyControl = new HierarchyController(this, x_StackPanel_Hierarchy);
+            Controller.Main.Instance.Content.Loaded += (s, e) =>
+                Controller.Main.Instance.LayoutControl.ViewPort.Loaded += (s, e) =>
+                    _hierarchyControl = new Controller.Hierarchy(this, x_StackPanel_Hierarchy);
         }
     }
 }

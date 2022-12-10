@@ -7,14 +7,14 @@ using System.Collections.Generic;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Editor.UserControls
+namespace Editor.ModelView
 {
     public sealed partial class Files : UserControl
     {
         public Grid ChangeColorWithTheme;
 
-        internal FilesController _filesControl;
-        public List<StorageFile> DragDropFiles = new List<StorageFile>();
+        internal Controller.Files _filesControl;
+        public List<StorageFile> DragDropFiles = new();
 
         public Files()
         {
@@ -22,7 +22,7 @@ namespace Editor.UserControls
 
             ChangeColorWithTheme = x_Grid_Main;
 
-            _filesControl = new FilesController(this, x_Grid_Main, x_WrapPanel_Files, x_BreadcrumBar_Files);
+            _filesControl = new Controller.Files(this, x_Grid_Main, x_WrapPanel_Files, x_BreadcrumBar_Files);
 
             _filesControl.CreateCatergoryTiles(
                 new Category() { Name = "Scenes", Glyph = "\xEA86", FileTypes = new string[] { ".usd", ".usda", ".usdc", ".usdz" }, Creatable = true },

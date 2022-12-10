@@ -31,7 +31,7 @@ namespace Editor.Controller
         public string GetInfo() { return Script.Split("\\").Last() + $":{Line} ({Method})"; }
     }
 
-    internal class OutputController
+    internal class Output
     {
         private static Dictionary<SMessageInfo, List<DateTime>> s_messageCollection = new Dictionary<SMessageInfo, List<DateTime>>();
 
@@ -47,7 +47,7 @@ namespace Editor.Controller
 
         internal AppBarToggleButton _clearPlay;
 
-        public OutputController(StackPanel stack, ScrollViewer scroll, AppBarToggleButton collapse, AppBarToggleButton filterMessages, AppBarToggleButton filterWarnings, AppBarToggleButton filterErrors, AppBarToggleButton pauseError, AppBarToggleButton clearPlay)
+        public Output(StackPanel stack, ScrollViewer scroll, AppBarToggleButton collapse, AppBarToggleButton filterMessages, AppBarToggleButton filterWarnings, AppBarToggleButton filterErrors, AppBarToggleButton pauseError, AppBarToggleButton clearPlay)
         {
             s_stack = stack;
             s_scroll = scroll;
@@ -58,8 +58,8 @@ namespace Editor.Controller
             s_pauseError = pauseError;
             _clearPlay = clearPlay;
 
-            s_status = MainController.Instance.Status;
-            s_statusIcon = MainController.Instance.StatusIcon;
+            s_status = Main.Instance.Status;
+            s_statusIcon = Main.Instance.StatusIcon;
         }
 
         public static void Log(string m, EMessageType t = EMessageType.MESSAGE, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null)
@@ -68,7 +68,7 @@ namespace Editor.Controller
 
             if (s_pauseError.IsChecked.Value)
                 if (t == EMessageType.ERROR)
-                    MainController.Instance.ControlPlayer.Pause();
+                    Main.Instance.ControlPlayer.Pause();
 
             if (!s_messageCollection.ContainsKey(message))
                 s_messageCollection.Add(message, new List<DateTime>() { DateTime.Now });

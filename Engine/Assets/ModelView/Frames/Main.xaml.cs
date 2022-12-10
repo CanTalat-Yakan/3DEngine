@@ -1,23 +1,22 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Editor;
-using Editor.Controller;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Frames
+namespace Editor.ModelView
 {
     public sealed partial class Main : Frame
     {
-        private MainController _mainControl;
+        private Controller.Main _mainControl;
 
         public Main(MainWindow mainWindow)
         {
             this.InitializeComponent();
 
-            _mainControl = new MainController(mainWindow, x_Grid_Main, x_TextBlock_Status_Content, x_TextBlock_StatusIcon_Content);
-            _mainControl.ControlPlayer = new PlayerController(x_AppBarToggleButton_Status_Play, x_AppBarToggleButton_Status_Pause, x_AppBarButton_Status_Forward);
+            _mainControl = new Controller.Main(mainWindow, x_Grid_Main, x_TextBlock_Status_Content, x_TextBlock_StatusIcon_Content);
+            _mainControl.ControlPlayer = new Controller.Player(x_AppBarToggleButton_Status_Play, x_AppBarToggleButton_Status_Pause, x_AppBarButton_Status_Forward);
         }
 
         private void AppBarToggleButton_Status_Play_Click(object sender, RoutedEventArgs e) => _mainControl.ControlPlayer.Play();
@@ -28,7 +27,7 @@ namespace Frames
 
         private void AppBarButton_Status_Kill_Click(object sender, RoutedEventArgs e) => _mainControl.ControlPlayer.Kill();
 
-        private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) { MainController.Instance.MainWindow._themeControl.SetRequstedTheme(); }
+        private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) { Controller.Main.Instance.MainWindow._themeControl.SetRequstedTheme(); }
 
     }
 }

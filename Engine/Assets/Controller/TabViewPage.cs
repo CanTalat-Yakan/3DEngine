@@ -14,11 +14,11 @@ namespace Editor.Controller
         public Symbol Symbol;
     }
 
-    internal class TabViewPageController
+    internal class TabViewPage
     {
         public TabView TabView;
 
-        public TabViewPageController(params TabViewItemDataTemplate[] icollection)
+        public TabViewPage(params TabViewItemDataTemplate[] icollection)
         {
             TabView = new TabView()
             {

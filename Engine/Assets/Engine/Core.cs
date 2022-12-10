@@ -41,7 +41,7 @@ namespace Engine
             SceneManager.Scene.EntitytManager.CreateEntity(null, "Boot").AddComponent(new SceneBoot());
             ImGuiRenderer = new();
 
-            OutputController.Log("Engine Initialized...");
+            Output.Log("Engine Initialized...");
 
             ImGui.GetIO().DisplaySize = new Vector2((float)swapChainPanel.ActualWidth, (float)swapChainPanel.ActualHeight);
 

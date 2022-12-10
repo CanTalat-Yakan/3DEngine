@@ -5,7 +5,7 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using System;
 using System.Collections.Generic;
-using Editor.UserControls;
+using Editor.ModelView;
 using Engine.Utilities;
 using Windows.ApplicationModel.DataTransfer;
 using System.Text.RegularExpressions;
@@ -42,17 +42,17 @@ namespace Editor.Controller
         }
     }
 
-    internal partial class HierarchyController
+    internal partial class Hierarchy
     {
         public SceneEntry SceneEntry;
         public List<SceneEntry> SubsceneEntries;
 
-        private Hierarchy _hierarchy;
+        private ModelView.Hierarchy _hierarchy;
         private StackPanel _stackPanel;
 
         private TreeEntry _itemInvoked = null;
 
-        public HierarchyController(Hierarchy hierarchy, StackPanel stackPanel)
+        public Hierarchy(ModelView.Hierarchy hierarchy, StackPanel stackPanel)
         {
             _hierarchy = hierarchy;
             _stackPanel = stackPanel;
@@ -186,8 +186,8 @@ namespace Editor.Controller
             var treeViewIconNode = (TreeViewIconNode)selectedNode.Content;
             var entity = GetEntity(treeViewIconNode.TreeEntry);
 
-            PropertiesController.Clear();
-            PropertiesController.Set(new Properties(entity));
+            Properties.Clear();
+            Properties.Set(new ModelView.Properties(entity));
         }
     }
 
@@ -258,7 +258,7 @@ namespace Editor.Controller
         protected override DataTemplate SelectTemplateCore(object item) { return IconNodeTemplate; }
     }
 
-    internal partial class HierarchyController : HelperController
+    internal partial class Hierarchy : Controller.Helper
     {
         public TreeEntry GetParent(TreeEntry treeEntry)
         {

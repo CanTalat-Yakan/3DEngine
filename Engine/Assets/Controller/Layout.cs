@@ -4,7 +4,6 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
 using System;
-using Editor.UserControls;
 
 namespace Editor.Controller
 {
@@ -16,18 +15,23 @@ namespace Editor.Controller
         public UIElement Content;
     }
 
-    internal partial class LayoutController
+    internal partial class Layout
     {
         public Grid Content;
-        public ViewPort ViewPort;
-        public Hierarchy Hierarchy;
-        public Properties Properties;
+        public ModelView.ViewPort ViewPort;
+        public ModelView.Hierarchy Hierarchy;
+        public ModelView.Properties Properties;
         public Grid PropertiesRoot;
-        public Output Output;
-        public Files Files;
+        public ModelView.Output Output;
+        public ModelView.Files Files;
         public Grid TabsRoot;
 
-        public LayoutController(Grid content, ViewPort viewPort, Hierarchy hierarchy, Properties properties, Output output, Files files)
+        public Layout(Grid content, 
+            ModelView.ViewPort viewPort, 
+            ModelView.Hierarchy hierarchy, 
+            ModelView.Properties properties, 
+            ModelView.Output output, 
+            ModelView.Files files)
         {
             Content = content;
             ViewPort = viewPort;
@@ -60,7 +64,7 @@ namespace Editor.Controller
         }
     }
 
-    internal partial class LayoutController
+    internal partial class Layout
     {
         private Grid PairVertical(GridDataTemeplate top, GridDataTemeplate bottom)
         {
@@ -151,7 +155,7 @@ namespace Editor.Controller
         {
             root.Background = Application.Current.Resources["ApplicationPageBackgroundThemeBrush"] as SolidColorBrush;
 
-            TabViewPageController tabViewPage = new TabViewPageController(i);
+            TabViewPage tabViewPage = new TabViewPage(i);
             root.Children.Add(tabViewPage.TabView);
 
             //BindingOperations.SetBinding(root, Grid.VisibilityProperty, new Binding() { ElementName = "x_AppBarToggleButton_Status_OpenPane", Path = new PropertyPath("IsChecked"), Converter = new BooleanToVisibilityConverter() });

@@ -11,16 +11,16 @@ using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.Storage;
 using Engine.ECS;
-using Editor.UserControls;
+using Editor.ModelView;
 using Path = System.IO.Path;
 
 namespace Editor.Controller
 {
-    internal partial class PropertiesController
+    internal partial class Properties
     {
         private StackPanel _stackPanel;
 
-        public PropertiesController(StackPanel stackPanel, object content)
+        public Properties(StackPanel stackPanel, object content)
         {
             _stackPanel = stackPanel;
 
@@ -32,9 +32,9 @@ namespace Editor.Controller
                 CreateFilePreviewer((string)content);
         }
 
-        public static void Clear() => MainController.Instance.LayoutControl.PropertiesRoot.Children.Clear();
+        public static void Clear() => Main.Instance.LayoutControl.PropertiesRoot.Children.Clear();
 
-        public static void Set(Properties properties) => MainController.Instance.LayoutControl.PropertiesRoot.Children.Add(properties);
+        public static void Set(ModelView.Properties properties) => Main.Instance.LayoutControl.PropertiesRoot.Children.Add(properties);
 
         private void CreateEmptyMessage()
         {
@@ -111,7 +111,7 @@ namespace Editor.Controller
 
         private async void CreateFilePreviewer(string path)
         {
-            MainController.Instance.LayoutControl.Hierarchy._hierarchyControl.DeselectTreeViewNodes();
+            Main.Instance.LayoutControl.Hierarchy._hierarchyControl.DeselectTreeViewNodes();
 
             FileInfo fileInfo = new FileInfo(path);
 
@@ -151,7 +151,7 @@ namespace Editor.Controller
         }
     }
 
-    internal partial class PropertiesController : HelperController
+    internal partial class Properties : Controller.Helper
     {
         private Grid CreateTextureSlot()
         {

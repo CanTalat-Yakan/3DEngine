@@ -6,7 +6,7 @@ using Editor.Controller;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Frames
+namespace Editor.ModelView
 {
     public sealed partial class Home : Frame
     {
@@ -15,6 +15,6 @@ namespace Frames
             this.InitializeComponent();
         }
 
-        private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) { MainController.Instance.MainWindow._themeControl.SetRequstedTheme(); }
+        private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) { Controller.Main.Instance.MainWindow._themeControl.SetRequstedTheme(); }
     }
 }

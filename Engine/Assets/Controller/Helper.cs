@@ -17,7 +17,7 @@ using Expander = Microsoft.UI.Xaml.Controls.Expander;
 
 namespace Editor.Controller
 {
-    internal class HelperController
+    internal class Helper
     {
         internal virtual Grid StackInGrid(params UIElement[] content)
         {

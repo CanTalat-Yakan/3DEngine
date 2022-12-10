@@ -8,7 +8,7 @@ using WinRT;
 
 namespace Editor.Controller
 {
-    internal class ThemeController
+    internal class Theme
     {
         private WindowsSystemDispatcherQueueHelper _wsdqHelper;
         private MicaController _micaController;
@@ -16,7 +16,7 @@ namespace Editor.Controller
         private Page _page;
         private MainWindow _mainWindow;
 
-        public ThemeController(MainWindow mainWindow, Page page)
+        public Theme(MainWindow mainWindow, Page page)
         {
             _mainWindow = mainWindow;
             _page = page;
@@ -50,17 +50,17 @@ namespace Editor.Controller
             _page.RequestedTheme = _page.RequestedTheme == ElementTheme.Light ? ElementTheme.Dark : ElementTheme.Light;
             _configurationSource.Theme = _configurationSource.Theme == SystemBackdropTheme.Light ? SystemBackdropTheme.Dark : SystemBackdropTheme.Light;
 
-            MainController.Instance.LayoutControl.TabsRoot.Background =
+            Main.Instance.LayoutControl.TabsRoot.Background =
                 _page.RequestedTheme == ElementTheme.Light
                     ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 243, 243, 243))
                     : Application.Current.Resources["ApplicationPageBackgroundThemeBrush"] as SolidColorBrush;
 
-            MainController.Instance.LayoutControl.Output.ChangeColorWithTheme.Background =
+            Main.Instance.LayoutControl.Output.ChangeColorWithTheme.Background =
                 _page.RequestedTheme == ElementTheme.Light
                     ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 249, 249, 249))
                     : new SolidColorBrush(Windows.UI.Color.FromArgb(255, 40, 40, 40));
 
-            MainController.Instance.LayoutControl.Files.ChangeColorWithTheme.Background =
+            Main.Instance.LayoutControl.Files.ChangeColorWithTheme.Background =
                 _page.RequestedTheme == ElementTheme.Light
                     ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 249, 249, 249))
                     : new SolidColorBrush(Windows.UI.Color.FromArgb(255, 40, 40, 40));

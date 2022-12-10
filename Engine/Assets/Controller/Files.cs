@@ -15,7 +15,7 @@ using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.Storage;
-using Editor.UserControls;
+using Editor.ModelView;
 
 namespace Editor.Controller
 {
@@ -29,7 +29,7 @@ namespace Editor.Controller
         public bool Creatable;
     }
 
-    internal partial class FilesController
+    internal partial class Files
     {
         public string RootPath { get; private set; }
         public string CurrentProjectTitle { get; private set; }
@@ -42,12 +42,12 @@ namespace Editor.Controller
 
         public Category[] Categories;
 
-        private Files _files;
+        private ModelView.Files _files;
 
         private Category? _currentCategory;
         private string _currentSubPath;
 
-        public FilesController(Files files, Grid grid, WrapPanel wrap, BreadcrumbBar bar)
+        public Files(ModelView.Files files, Grid grid, WrapPanel wrap, BreadcrumbBar bar)
         {
             GridMain = grid;
             Wrap = wrap;
@@ -410,8 +410,8 @@ namespace Editor.Controller
             button.ContextFlyout = CreateDefaultMenuFlyout(path, true);
             button.Tapped += (s, e) =>
             {
-                PropertiesController.Clear();
-                PropertiesController.Set(new Properties(path));
+                Properties.Clear();
+                Properties.Set(new ModelView.Properties(path));
             };
             button.DoubleTapped += (s, e) =>
             {
@@ -579,8 +579,8 @@ namespace Editor.Controller
 
                 Refresh();
 
-                PropertiesController.Clear();
-                PropertiesController.Set(new Properties(path));
+                Properties.Clear();
+                Properties.Set(new ModelView.Properties(path));
             }
         }
 
@@ -766,7 +766,7 @@ namespace Editor.Controller
         }
     }
 
-    internal partial class FilesController
+    internal partial class Files
     {
         private static readonly string TEMPLATES = @"Assets\Engine\Resources\Templates";
 

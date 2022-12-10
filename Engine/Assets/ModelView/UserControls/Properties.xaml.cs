@@ -6,19 +6,19 @@ using Editor.Controller;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Editor.UserControls
+namespace Editor.ModelView
 {
     public sealed partial class Properties : UserControl
     {
         public event PropertyChangedEventHandler EventPropertyChanged;
 
-        internal PropertiesController _propertiesControl;
+        internal Controller.Properties _propertiesControl;
 
         public Properties(object content = null)
         {
             this.InitializeComponent();
 
-            _propertiesControl = new PropertiesController(x_StackPanel_Properties, content);
+            _propertiesControl = new Controller.Properties(x_StackPanel_Properties, content);
         }
 
         private void FirePropertyChanged([CallerMemberName] string memberName = null) => EventPropertyChanged?.Invoke(this, new PropertyChangedEventArgs(memberName));

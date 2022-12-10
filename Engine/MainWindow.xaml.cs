@@ -11,9 +11,9 @@ namespace Editor
 {
     public sealed partial class MainWindow : WindowEx
     {
-        internal ThemeController _themeControl;
+        internal Theme _themeControl;
 
-        private Frames.Main _main;
+        private ModelView.Main _main;
 
         public MainWindow()
         {
@@ -21,7 +21,7 @@ namespace Editor
 
             ExtendsContentIntoTitleBar = true; // enable custom titlebar
 
-            _themeControl = new ThemeController(this, x_Page_Main);
+            _themeControl = new Theme(this, x_Page_Main);
 
             _main = new(this);
         }
@@ -32,7 +32,7 @@ namespace Editor
         {
             if (args.IsSettingsSelected == true)
             {
-                x_Frame_Content.Content = new Frames.Settings();
+                x_Frame_Content.Content = new ModelView.Settings();
                 x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
             }
 
@@ -40,11 +40,11 @@ namespace Editor
                 switch (args.SelectedItemContainer.Tag)
                 {
                     case "home":
-                        x_Frame_Content.Content = new Frames.Home();
+                        x_Frame_Content.Content = new ModelView.Home();
                         x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
                         break;
                     case "documentation":
-                        x_Frame_Content.Content = new Frames.Documentation();
+                        x_Frame_Content.Content = new ModelView.Documentation();
                         x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
                         break;
                     case "engine":

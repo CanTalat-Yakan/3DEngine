@@ -12,7 +12,7 @@ namespace Editor.Controller
         PAUSED
     }
 
-    internal class PlayerController
+    internal class Player
     {
         public EPlayMode PlayMode;
 
@@ -20,15 +20,15 @@ namespace Editor.Controller
         private AppBarToggleButton _pause;
         private AppBarButton _forward;
         private TextBlock _status;
-        private OutputController _output;
+        private Output _output;
 
-        public PlayerController(AppBarToggleButton play, AppBarToggleButton pause, AppBarButton forward)
+        public Player(AppBarToggleButton play, AppBarToggleButton pause, AppBarButton forward)
         {
             _play = play;
             _pause = pause;
             _forward = forward;
-            _output = MainController.Instance.LayoutControl.Output._outputControl;
-            _status = MainController.Instance.Status;
+            _output = Main.Instance.LayoutControl.Output._outputControl;
+            _status = Main.Instance.Status;
         }
 
         public void Play()
@@ -37,12 +37,12 @@ namespace Editor.Controller
                 if (_output._clearPlay.IsChecked.Value)
                     _output.ClearOutput();
 
-            MainController.Instance.LayoutControl.ViewPort._viewPortControl.GridMain.BorderBrush = new SolidColorBrush(Colors.GreenYellow);
-            MainController.Instance.LayoutControl.ViewPort._viewPortControl.GridMain.BorderThickness = new Thickness(_play.IsChecked.Value ? 2 : 0);
+            Main.Instance.LayoutControl.ViewPort._viewPortControl.GridMain.BorderBrush = new SolidColorBrush(Colors.GreenYellow);
+            Main.Instance.LayoutControl.ViewPort._viewPortControl.GridMain.BorderThickness = new Thickness(_play.IsChecked.Value ? 2 : 0);
 
             SetStatusAppBarButtons(_play.IsChecked.Value);
 
-            OutputController.Log(_play.IsChecked.Value ? "Now Playing..." : "Stopped Gamemode");
+            Output.Log(_play.IsChecked.Value ? "Now Playing..." : "Stopped Gamemode");
         }
 
         public void Pause()
@@ -50,9 +50,9 @@ namespace Editor.Controller
             PlayMode = _pause.IsChecked.Value ? EPlayMode.PAUSED : EPlayMode.PLAYING;
 
             _forward.IsEnabled = _pause.IsChecked.Value;
-            MainController.Instance.LayoutControl.ViewPort._viewPortControl.GridMain.BorderBrush = new SolidColorBrush(_pause.IsChecked.Value ? Colors.Orange : Colors.GreenYellow);
+            Main.Instance.LayoutControl.ViewPort._viewPortControl.GridMain.BorderBrush = new SolidColorBrush(_pause.IsChecked.Value ? Colors.Orange : Colors.GreenYellow);
 
-            OutputController.Log(_pause.IsChecked.Value ? "Paused Gamemode" : "Continued Gamemode");
+            Output.Log(_pause.IsChecked.Value ? "Paused Gamemode" : "Continued Gamemode");
         }
 
         public void Forward()
@@ -60,9 +60,9 @@ namespace Editor.Controller
             if (PlayMode != EPlayMode.PAUSED)
                 return;
 
-            OutputController.Log("Stepped Forward..");
+            Output.Log("Stepped Forward..");
 
-            OutputController.Log("Stepped Forward");
+            Output.Log("Stepped Forward");
         }
 
         public void Kill()
@@ -71,7 +71,7 @@ namespace Editor.Controller
 
             SetStatusAppBarButtons(false);
 
-            OutputController.Log("Killed Process of GameInstance!");
+            Output.Log("Killed Process of GameInstance!");
         }
 
         private void SetStatusAppBarButtons(bool b)

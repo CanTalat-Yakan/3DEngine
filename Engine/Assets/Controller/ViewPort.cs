@@ -5,7 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
-using Editor.UserControls;
+using Editor.ModelView;
 using ColorPicker = CommunityToolkit.WinUI.UI.Controls.ColorPicker;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 using Windows.Foundation;
@@ -15,14 +15,14 @@ using Microsoft.UI.Xaml.Data;
 
 namespace Editor.Controller
 {
-    internal partial class ViewPortController
+    internal partial class ViewPort
     {
         public TextBlock Profile;
         public Grid GridMain;
 
-        private ViewPort _viewPort;
+        private ModelView.ViewPort _viewPort;
 
-        public ViewPortController(ViewPort viewPort, Grid grid)
+        public ViewPort(ModelView.ViewPort viewPort, Grid grid)
         {
             _viewPort = viewPort;
             GridMain = grid;
@@ -62,7 +62,7 @@ namespace Editor.Controller
         }
     }
 
-    internal partial class ViewPortController : HelperController
+    internal partial class ViewPort : Controller.Helper
     {
         private StackPanel WrapInStackPanelDockTopLeft(params UIElement[] content)
         {

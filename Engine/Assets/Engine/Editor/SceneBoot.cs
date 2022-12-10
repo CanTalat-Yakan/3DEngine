@@ -64,7 +64,7 @@ namespace Engine.Editor
 
             if (Input.Instance.GetKey(Windows.System.VirtualKey.C, EInputState.DOWN))
             {
-                OutputController.Log("Spawned 10 Cubes");
+                Output.Log("Spawned 10 Cubes");
 
                 for (int i = 0; i < 10; i++)
                 {
