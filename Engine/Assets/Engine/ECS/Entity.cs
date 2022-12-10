@@ -13,12 +13,13 @@ namespace Engine.ECS
         Finish,
         GameController
     }
+
     internal enum ELayers
     {
-        Default, 
-        TransparentFX, 
-        IgnoreRaycast, 
-        Water, 
+        Default,
+        TransparentFX,
+        IgnoreRaycast,
+        Water,
         UI
     }
 
