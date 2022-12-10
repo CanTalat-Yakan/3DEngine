@@ -11,61 +11,29 @@
     mc:Ignorable="d">
 
     <UserControl.Resources>
-        <DataTemplate x:Key="x_FolderTemplate" x:DataType="controller:TreeViewIconNode">
-            <TreeViewItem AutomationProperties.Name="{x:Bind Name}" ItemsSource="{x:Bind Children}" IsExpanded="{x:Bind IsExpanded}">
-                <StackPanel Orientation="Horizontal">
-                    <SymbolIcon Symbol="Folder"/>
-                    <TextBlock Margin="0,0,10,0"/>
-                    <TextBlock Text="{x:Bind Name}" />
-                </StackPanel>
-            </TreeViewItem>
+        <DataTemplate x:Key="x_IconNodeTemplate" x:DataType="controller:TreeViewIconNode">
+                <TreeViewItem AutomationProperties.Name="{x:Bind Name}" ItemsSource="{x:Bind Children}" IsExpanded="{x:Bind IsExpanded}">
+                    <Grid HorizontalAlignment="Stretch" Opacity="{x:Bind Opacity}">
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal">
+                                <SymbolIcon Symbol="Folder" Visibility="{x:Bind Folder}" Margin="0,0,10,0"/>
+
+                                <TextBlock Text="{x:Bind Name}" Margin="0,0,10,0"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <SymbolIcon Symbol="Video" Visibility="{x:Bind Camera}" Margin="0,0,10,0"/>
+
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xF158;" Visibility="{x:Bind Mesh}" Margin="0,0,10,0"/>
+
+                            <SymbolIcon Symbol="Document" Visibility="{x:Bind Scripts}" Margin="0,0,10,0"/>
+                        </StackPanel>
+                    </Grid>
+                </TreeViewItem>
         </DataTemplate>
 
-        <DataTemplate x:Key="x_TransformTemplate" x:DataType="controller:TreeViewIconNode">
-            <TreeViewItem AutomationProperties.Name="{x:Bind Name}" ItemsSource="{x:Bind Children}" IsExpanded="{x:Bind IsExpanded}">
-                <StackPanel Orientation="Horizontal">
-                    <SymbolIcon Symbol="Page"/>
-                    <TextBlock Margin="20,0,10,0"/>
-                    <TextBlock Text="{x:Bind Name}" />
-                </StackPanel>
-            </TreeViewItem>
-        </DataTemplate>
-
-        <DataTemplate x:Key="x_ScriptTemplate" x:DataType="controller:TreeViewIconNode">
-            <TreeViewItem AutomationProperties.Name="{x:Bind Name}" ItemsSource="{x:Bind Children}" IsExpanded="{x:Bind IsExpanded}">
-                <StackPanel Orientation="Horizontal">
-                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xF158;"/>
-                    <TextBlock Margin="0,0,10,0"/>
-                    <TextBlock Text="{x:Bind Name}"/>
-                </StackPanel>
-            </TreeViewItem>
-        </DataTemplate>
-
-        <DataTemplate x:Key="x_MeshTemplate" x:DataType="controller:TreeViewIconNode">
-            <TreeViewItem AutomationProperties.Name="{x:Bind Name}" ItemsSource="{x:Bind Children}" IsExpanded="{x:Bind IsExpanded}">
-                <StackPanel Orientation="Horizontal">
-                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xF158;"/>
-                    <TextBlock Margin="0,0,10,0"/>
-                    <TextBlock Text="{x:Bind Name}"/>
-                </StackPanel>
-            </TreeViewItem>
-        </DataTemplate>
-
-        <DataTemplate x:Key="x_CameraTemplate" x:DataType="controller:TreeViewIconNode">
-            <TreeViewItem AutomationProperties.Name="{x:Bind Name}" ItemsSource="{x:Bind Children}" IsExpanded="{x:Bind IsExpanded}">
-                <StackPanel Orientation="Horizontal">
-                    <SymbolIcon Symbol="Video"/>
-                    <TextBlock Margin="0,0,10,0"/>
-                    <TextBlock Text="{x:Bind Name}"/>
-                </StackPanel>
-            </TreeViewItem>
-        </DataTemplate>
-
-        <controller:TreeViewIconNodeTemplateSelector x:Key="x_TreeViewIconNodeTemplateSelector" 
-                                                     FolderTemplate="{StaticResource x_FolderTemplate}" 
-                                                     TransformTemplate="{StaticResource x_TransformTemplate}" 
-                                                     MeshTemplate="{StaticResource x_MeshTemplate}" 
-                                                     CameraTemplate="{StaticResource x_CameraTemplate}"/>
+        <controller:TreeViewIconNodeTemplateSelector x:Key="x_TreeViewIconNodeTemplateSelector" IconNodeTemplate="{StaticResource x_IconNodeTemplate}"/>
     </UserControl.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">

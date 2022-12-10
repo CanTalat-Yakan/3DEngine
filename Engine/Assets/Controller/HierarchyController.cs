@@ -13,6 +13,7 @@ using System.Linq;
 using Engine.ECS;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using Engine.Components;
 
 namespace Editor.Controller
@@ -139,19 +140,14 @@ namespace Editor.Controller
         private TreeEntry AddTreeEntry(SceneEntry sceneEntry, Entity entity)
         {
             var treeEntry = new TreeEntry() { Name = entity.Name, ID = entity.ID };
-            treeEntry.IconNode = new TreeViewIconNode() { Name = treeEntry.Name, TreeEntry = treeEntry, IsExpanded = true };
+            treeEntry.IconNode = new TreeViewIconNode() { Name = treeEntry.Name, TreeEntry = treeEntry, IsExpanded = false };
+            treeEntry.IconNode.IsActive = true;
             treeEntry.IDparent = entity.Parent != null ? entity.Parent.ID : null;
 
-            if (entity.GetComponent<Camera>() != null)
-                treeEntry.IconNode.Type = TreeViewIconNodeType.Camera;
-            else if (entity.GetComponent<Mesh>() != null)
-                treeEntry.IconNode.Type = TreeViewIconNodeType.Mesh;
-            else if (entity.GetComponents().Length > 1)
-                treeEntry.IconNode.Type = TreeViewIconNodeType.Folder;
-            else if (treeEntry.IconNode.Children.Count > 0)
-                treeEntry.IconNode.Type = TreeViewIconNodeType.Folder;
-            else
-                treeEntry.IconNode.Type = TreeViewIconNodeType.Transform;
+            var components = entity.GetComponents();
+            treeEntry.IconNode.Camera = components.OfType<Camera>().Any() ? Visibility.Visible : Visibility.Collapsed;
+            treeEntry.IconNode.Mesh = components.OfType<Mesh>().Any() ? Visibility.Visible : Visibility.Collapsed;
+            treeEntry.IconNode.ScriptsCount = components.Length;
 
             sceneEntry.Hierarchy.Add(treeEntry);
 
@@ -195,23 +191,35 @@ namespace Editor.Controller
         }
     }
 
-    internal enum TreeViewIconNodeType
-    {
-        Folder,
-        Transform,
-        Script,
-        Mesh,
-        Camera
-    };
-
     internal class TreeViewIconNode : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public TreeViewIconNodeType Type { get; set; }
-
         public TreeEntry TreeEntry { get; set; }
+
+        public Visibility Camera;
+        public Visibility Mesh;
+
+        public Visibility Folder { get => Children.Count > 0 ? Visibility.Visible : Visibility.Collapsed; }
+
+        public int ScriptsCount;
+        public Visibility Scripts
+        {
+            get
+            {
+                int i = 1;
+
+                if (Camera == Visibility.Visible) i++;
+                if (Mesh == Visibility.Visible) i++;
+
+                return ScriptsCount > i ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
         public string Name { get; set; }
+        public bool IsActive { get; set; }
+        public float Opacity { get => IsActive ? 1 : 0.5f; }
+
 
         private ObservableCollection<TreeViewIconNode> _children;
         public ObservableCollection<TreeViewIconNode> Children
@@ -240,37 +248,14 @@ namespace Editor.Controller
             }
         }
 
-        private void NotifyPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        private void NotifyPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     class TreeViewIconNodeTemplateSelector : DataTemplateSelector
     {
-        public DataTemplate FolderTemplate { get; set; }
-        public DataTemplate TransformTemplate { get; set; }
-        public DataTemplate MeshTemplate { get; set; }
-        public DataTemplate CameraTemplate { get; set; }
+        public DataTemplate IconNodeTemplate { get; set; }
 
-        protected override DataTemplate SelectTemplateCore(object item)
-        {
-            var treeViewIconNode = (TreeViewIconNode)item;
-
-            switch (treeViewIconNode.Type)
-            {
-                case TreeViewIconNodeType.Folder:
-                    return FolderTemplate;
-                case TreeViewIconNodeType.Transform:
-                    return TransformTemplate;
-                case TreeViewIconNodeType.Mesh:
-                    return MeshTemplate;
-                case TreeViewIconNodeType.Camera:
-                    return CameraTemplate;
-                default:
-                    return null;
-            }
-        }
+        protected override DataTemplate SelectTemplateCore(object item) { return IconNodeTemplate; }
     }
 
     internal partial class HierarchyController : HelperController
