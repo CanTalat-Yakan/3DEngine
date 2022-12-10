@@ -636,7 +636,12 @@ namespace Editor.Controller
 
                     if (sourceSceneEntry.ID != targetSceneEntry.ID)
                     {
-                        GetParent(newTreeEntry).IconNode.Children.Remove(newTreeEntry.IconNode);
+                        var parent = GetParent(newTreeEntry);
+                        if (parent != null)
+                            parent.IconNode.Children.Remove(newTreeEntry.IconNode);
+                        else
+                            sourceSceneEntry.DataSource.Remove(newTreeEntry.IconNode);
+
                         targetTreeEntry.IconNode.Children.Add(newTreeEntry.IconNode);
 
                         //if (newTreeEntry.Node.Children.Count != 0)
@@ -650,7 +655,12 @@ namespace Editor.Controller
 
                     if (sourceSceneEntry.ID != targetSceneEntry.ID)
                     {
-                        GetParent(sourceTreeEntry).IconNode.Children.Remove(sourceTreeEntry.IconNode);
+                        var parent = GetParent(sourceTreeEntry);
+                        if (parent != null)
+                            parent.IconNode.Children.Remove(sourceTreeEntry.IconNode);
+                        else
+                            sourceSceneEntry.DataSource.Remove(sourceTreeEntry.IconNode);
+
                         targetTreeEntry.IconNode.Children.Add(sourceTreeEntry.IconNode);
 
                         //if (sourceTreeEntry.Node.Children.Count != 0)
@@ -671,7 +681,12 @@ namespace Editor.Controller
 
                     if (sourceSceneEntry.ID != targetSceneEntry.ID)
                     {
-                        GetParent(newTreeEntry).IconNode.Children.Remove(newTreeEntry.IconNode);
+                        var parent = GetParent(newTreeEntry);
+                        if (parent != null)
+                            parent.IconNode.Children.Remove(newTreeEntry.IconNode);
+                        else
+                            sourceSceneEntry.DataSource.Remove(newTreeEntry.IconNode);
+
                         targetSceneEntry.DataSource.Add(newTreeEntry.IconNode);
 
                         //if (newTreeEntry.Node.Children.Count != 0)
@@ -685,7 +700,12 @@ namespace Editor.Controller
 
                     if (sourceSceneEntry.ID != targetSceneEntry.ID)
                     {
-                        GetParent(sourceTreeEntry).IconNode.Children.Remove(sourceTreeEntry.IconNode);
+                        var parent = GetParent(sourceTreeEntry);
+                        if (parent != null)
+                            parent.IconNode.Children.Remove(sourceTreeEntry.IconNode);
+                        else
+                            sourceSceneEntry.DataSource.Remove(sourceTreeEntry.IconNode);
+
                         targetSceneEntry.DataSource.Add(sourceTreeEntry.IconNode);
 
                         //if (sourceTreeEntry.Node.Children.Count != 0)
