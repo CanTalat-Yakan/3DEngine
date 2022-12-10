@@ -7,13 +7,13 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Shapes;
 using Microsoft.UI.Xaml;
 using Microsoft.UI;
-using Windows.Foundation;
+using System.Numerics;
 using System;
+using Windows.Foundation;
 using ColorPicker = CommunityToolkit.WinUI.UI.Controls.ColorPicker;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
 using Expander = Microsoft.UI.Xaml.Controls.Expander;
-using System.Numerics;
 
 namespace Editor.Controller
 {

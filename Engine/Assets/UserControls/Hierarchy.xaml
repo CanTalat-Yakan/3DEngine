@@ -7,12 +7,39 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:controller="using:Editor.Controller"
     mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="FolderTemplate" x:DataType="controller:TreeViewIconNode">
+            <TreeViewItem AutomationProperties.Name="{x:Bind Name}" ItemsSource="{x:Bind Children}" IsExpanded="True">
+                <StackPanel Orientation="Horizontal">
+                    <SymbolIcon Symbol="Folder"/>
+                    <TextBlock Margin="0,0,10,0"/>
+                    <TextBlock Text="{x:Bind Name}" />
+                </StackPanel>
+            </TreeViewItem>
+        </DataTemplate>
+
+        <DataTemplate x:Key="FileTemplate" x:DataType="controller:TreeViewIconNode">
+            <TreeViewItem AutomationProperties.Name="{x:Bind Name}">
+                <StackPanel Orientation="Horizontal">
+                    <SymbolIcon Symbol="Page"/>
+                    <TextBlock Margin="0,0,10,0"/>
+                    <TextBlock Text="{x:Bind Name}"/>
+                </StackPanel>
+            </TreeViewItem>
+        </DataTemplate>
+
+        <controller:TreeViewIconNodeTemplateSelector x:Key="TreeViewIconNodeTemplateSelector" FolderTemplate="{StaticResource FolderTemplate}" FileTemplate="{StaticResource FileTemplate}" />
+    </UserControl.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <ScrollViewer Padding="4,0,4,0">
             <StackPanel x:Name="x_StackPanel_Hierarchy" Orientation="Vertical">
-                <Grid Padding="15"/>                
+                <TreeView x:Name="x_TreeView_IconNode" ItemTemplateSelector="{StaticResource TreeViewIconNodeTemplateSelector}"/>
+
+                <Grid Padding="15"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>

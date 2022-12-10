@@ -19,6 +19,7 @@ namespace Editor.UserControls
                 MainController.Instance.LayoutControl.ViewPort.Loaded += (s, e) =>
                 {
                     _hierarchyControl = new HierarchyController(this, x_StackPanel_Hierarchy);
+                    x_TreeView_IconNode.ItemsSource = _hierarchyControl.DataSource;
                 };
         }
     }

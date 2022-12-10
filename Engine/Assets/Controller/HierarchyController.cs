@@ -11,6 +11,8 @@ using Windows.ApplicationModel.DataTransfer;
 using System.Text.RegularExpressions;
 using System.Linq;
 using Engine.ECS;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace Editor.Controller
 {
@@ -21,6 +23,7 @@ namespace Editor.Controller
         public string Name;
 
         public TreeViewNode Node;
+        public TreeViewIconNode IconNode;
 
         public override string ToString()
         {
@@ -47,6 +50,8 @@ namespace Editor.Controller
         public SceneEntry SceneEntry;
         public List<SceneEntry> SubsceneEntries;
 
+        public ObservableCollection<TreeViewIconNode> DataSource;
+
         private Hierarchy _hierarchy;
         private StackPanel _stackPanel;
 
@@ -56,6 +61,8 @@ namespace Editor.Controller
         {
             _hierarchy = hierarchy;
             _stackPanel = stackPanel;
+
+            DataSource = new();
 
             SceneEntry = new SceneEntry() { ID = SceneManager.Scene.ID, Name = SceneManager.Scene.Name, Hierarchy = new List<TreeEntry>() };
             SubsceneEntries = new List<SceneEntry>();
@@ -142,9 +149,13 @@ namespace Editor.Controller
         {
             var treeEntry = new TreeEntry() { Name = entity.Name, ID = entity.ID };
             treeEntry.Node = new TreeViewNode() { Content = treeEntry, IsExpanded = true };
+            treeEntry.IconNode = new TreeViewIconNode() { Name = treeEntry.ToString(), IsExpanded = true };
+
             treeEntry.IDparent = entity.Parent != null ? entity.Parent.ID : null;
 
             sceneEntry.Hierarchy.Add(treeEntry);
+
+            DataSource.Add(treeEntry.IconNode);
 
             TreeEntry parent;
             if ((parent = GetParent(treeEntry)) is null)
@@ -183,6 +194,63 @@ namespace Editor.Controller
 
             PropertiesController.Clear();
             PropertiesController.Set(new Properties(entity));
+        }
+    }
+
+    public class TreeViewIconNode : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public enum TreeViewIconNodeType { Folder, File };
+        public string Name { get; set; }
+        public TreeViewIconNodeType Type { get; set; }
+
+        private ObservableCollection<TreeViewIconNode> _children;
+        public ObservableCollection<TreeViewIconNode> Children
+        {
+            get
+            {
+                if (_children == null)
+                {
+                    _children = new ObservableCollection<TreeViewIconNode>();
+                }
+                return _children;
+            }
+            set
+            {
+                _children = value;
+            }
+        }
+
+        private bool _isExpanded;
+        public bool IsExpanded
+        {
+            get { return _isExpanded; }
+            set
+            {
+                if (_isExpanded != value)
+                {
+                    _isExpanded = value;
+                    NotifyPropertyChanged("IsExpanded");
+                }
+            }
+        }
+
+        private void NotifyPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    class TreeViewIconNodeTemplateSelector : DataTemplateSelector
+    {
+        public DataTemplate FolderTemplate { get; set; }
+        public DataTemplate FileTemplate { get; set; }
+
+        protected override DataTemplate SelectTemplateCore(object item)
+        {
+            var treeViewIconNode = (TreeViewIconNode)item;
+            return treeViewIconNode.Type == TreeViewIconNode.TreeViewIconNodeType.Folder ? FolderTemplate : FileTemplate;
         }
     }
 
