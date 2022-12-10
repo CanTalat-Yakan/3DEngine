@@ -20,8 +20,8 @@
     <Content Remove="Assets\Engine\Utilities\BaseSystem.cs" />
     <Content Remove="Assets\Engine\Utilities\Component.cs" />
     <Content Remove="Assets\Engine\Utilities\SceneManagear.cs" />
-    <Content Remove="Assets\Frames\Documentation.xaml" />
-    <Content Remove="Assets\Frames\Documentation.xaml.cs" />
+    <Content Remove="Assets\ModelView\Frames\Documentation.xaml" />
+    <Content Remove="Assets\ModelView\Frames\Documentation.xaml.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Assets\Engine\Resources\Models\Cube.obj" />
@@ -37,15 +37,14 @@
     <None Remove="Assets\Engine\Resources\Templates\Scenes.txt" />
     <None Remove="Assets\Engine\Resources\Templates\Scripts.txt" />
     <None Remove="Assets\Engine\Resources\Templates\Shaders.txt" />
-    <None Remove="Assets\Frames\Documentation.xaml" />
-    <None Remove="Assets\Frames\Home.xaml" />
-    <None Remove="Assets\Frames\Main.xaml" />
-    <None Remove="Assets\Frames\Settings.xaml" />
+    <None Remove="Assets\ModelView\Frames\Documentation.xaml" />
+    <None Remove="Assets\ModelView\Frames\Home.xaml" />
+    <None Remove="Assets\ModelView\Frames\Main.xaml" />
+    <None Remove="Assets\ModelView\Frames\Settings.xaml" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Aspose.3D" Version="22.11.0" />
-    <PackageReference Include="Aspose.Zip" Version="22.11.0" />
     <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
     <PackageReference Include="BenchmarkDotNet" Version="0.13.2" />
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
@@ -53,7 +52,6 @@
     <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.0.4" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.221116.1" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
-    <PackageReference Include="PhysX.Net-x64" Version="0.5.1" />
     <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
     <PackageReference Include="Vortice.D3DCompiler" Version="2.1.41" />
     <PackageReference Include="Vortice.Direct2D1" Version="2.1.41" />
@@ -71,19 +69,17 @@
     <PackageReference Include="Vortice.WinUI" Version="2.1.41" />
     <PackageReference Include="Vortice.XAudio2" Version="2.1.41" />
     <PackageReference Include="Vortice.XInput" Version="2.1.41" />
-    <PackageReference Include="WinUIEx" Version="1.8.0" />
+    <PackageReference Include="WinUIEx" Version="2.0.0" />
     <Manifest Include="$(ApplicationManifest)" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="Assets\Frames\Documentation.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
 
   <ItemGroup>
     <Page Update="Frame\Settings.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Assets\ModelView\" />
   </ItemGroup>
 </Project>
