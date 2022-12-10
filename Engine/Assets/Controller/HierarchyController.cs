@@ -620,6 +620,23 @@ namespace Editor.Controller
             SceneManager.Scene.EntitytManager.Destroy(GetEntity(treeEntry.ID));
         }
 
+        public void MoveIconNode(TreeEntry sourceTreeEntry, SceneEntry sourceSceneEntry, TreeEntry targetTreeEntry, SceneEntry targetSceneEntry)
+        {
+            var parent = GetParent(sourceTreeEntry);
+            if (parent != null)
+                parent.IconNode.Children.Remove(sourceTreeEntry.IconNode);
+            else
+                sourceSceneEntry.DataSource.Remove(sourceTreeEntry.IconNode);
+
+            if (targetSceneEntry != null)
+                targetSceneEntry.DataSource.Add(sourceTreeEntry.IconNode);
+            else if (targetTreeEntry != null)
+                targetTreeEntry.IconNode.Children.Add(sourceTreeEntry.IconNode);
+
+            if (sourceTreeEntry.IconNode.Children.Count != 0)
+                SetNewSceneEntryRecurisivally(sourceSceneEntry, targetSceneEntry, sourceTreeEntry.IconNode.Children.ToArray());
+        }
+
         public void PasteEntity(Guid sourceGuid, Guid targetGuid, DataPackageOperation requestedOperation)
         {
             GetEntries(out TreeEntry sourceTreeEntry, out SceneEntry sourceSceneEntry, sourceGuid);
@@ -629,43 +646,19 @@ namespace Editor.Controller
             GetEntity(out Entity targetEntity, targetGuid, targetSceneEntry);
 
             if (sourceEntity != null)
-                if (requestedOperation == DataPackageOperation.Copy)
-                {
-                    var newEntity = SceneManager.GetFromID(sourceSceneEntry.ID).EntitytManager.Duplicate(sourceEntity, targetEntity);
-                    var newTreeEntry = GetTreeEntry(newEntity.ID, sourceSceneEntry);
-
-                    if (sourceSceneEntry.ID != targetSceneEntry.ID)
-                    {
-                        var parent = GetParent(newTreeEntry);
-                        if (parent != null)
-                            parent.IconNode.Children.Remove(newTreeEntry.IconNode);
-                        else
-                            sourceSceneEntry.DataSource.Remove(newTreeEntry.IconNode);
-
-                        targetTreeEntry.IconNode.Children.Add(newTreeEntry.IconNode);
-
-                        //if (newTreeEntry.Node.Children.Count != 0)
-                        //    SetNewSceneEntryRecurisivally(sourceSceneEntry, targetSceneEntry, newTreeEntry.Node.Children.ToArray());
-                    }
-                }
-                else if (requestedOperation == DataPackageOperation.Move)
+                if (requestedOperation == DataPackageOperation.Move)
                 {
                     sourceTreeEntry.IDparent = targetTreeEntry.ID;
                     sourceEntity.Parent = targetEntity;
 
-                    if (sourceSceneEntry.ID != targetSceneEntry.ID)
-                    {
-                        var parent = GetParent(sourceTreeEntry);
-                        if (parent != null)
-                            parent.IconNode.Children.Remove(sourceTreeEntry.IconNode);
-                        else
-                            sourceSceneEntry.DataSource.Remove(sourceTreeEntry.IconNode);
+                    MoveIconNode(sourceTreeEntry, sourceSceneEntry, targetTreeEntry, null);
+                }
+                else if (requestedOperation == DataPackageOperation.Copy)
+                {
+                    var newEntity = SceneManager.GetFromID(sourceSceneEntry.ID).EntitytManager.Duplicate(sourceEntity, targetEntity);
+                    var newTreeEntry = GetTreeEntry(newEntity.ID, sourceSceneEntry);
 
-                        targetTreeEntry.IconNode.Children.Add(sourceTreeEntry.IconNode);
-
-                        //if (sourceTreeEntry.Node.Children.Count != 0)
-                        //    SetNewSceneEntryRecurisivally(sourceSceneEntry, targetSceneEntry, sourceTreeEntry.Node.Children.ToArray());
-                    }
+                    MoveIconNode(newTreeEntry, sourceSceneEntry, targetTreeEntry, null);
                 }
         }
 
@@ -673,44 +666,21 @@ namespace Editor.Controller
         {
             GetEntries(out TreeEntry sourceTreeEntry, out SceneEntry sourceSceneEntry, sourceGuid);
             GetEntity(out Entity sourceEntity, sourceGuid, sourceSceneEntry);
+
             if (sourceEntity != null)
-                if (requestedOperation == DataPackageOperation.Copy)
-                {
-                    var newEntity = SceneManager.GetFromID(sourceSceneEntry.ID).EntitytManager.Duplicate(sourceEntity);
-                    var newTreeEntry = GetTreeEntry(newEntity.ID, sourceSceneEntry);
-
-                    if (sourceSceneEntry.ID != targetSceneEntry.ID)
-                    {
-                        var parent = GetParent(newTreeEntry);
-                        if (parent != null)
-                            parent.IconNode.Children.Remove(newTreeEntry.IconNode);
-                        else
-                            sourceSceneEntry.DataSource.Remove(newTreeEntry.IconNode);
-
-                        targetSceneEntry.DataSource.Add(newTreeEntry.IconNode);
-
-                        //if (newTreeEntry.Node.Children.Count != 0)
-                        //    SetNewSceneEntryRecurisivally(sourceSceneEntry, targetSceneEntry, newTreeEntry.Node.Children.ToArray());
-                    }
-                }
-                else if (requestedOperation == DataPackageOperation.Move)
+                if (requestedOperation == DataPackageOperation.Move)
                 {
                     sourceTreeEntry.IDparent = null;
                     sourceEntity.Parent = null;
 
-                    if (sourceSceneEntry.ID != targetSceneEntry.ID)
-                    {
-                        var parent = GetParent(sourceTreeEntry);
-                        if (parent != null)
-                            parent.IconNode.Children.Remove(sourceTreeEntry.IconNode);
-                        else
-                            sourceSceneEntry.DataSource.Remove(sourceTreeEntry.IconNode);
+                    MoveIconNode(sourceTreeEntry, sourceSceneEntry, null, targetSceneEntry);
+                }
+                else if (requestedOperation == DataPackageOperation.Copy)
+                {
+                    var newEntity = SceneManager.GetFromID(sourceSceneEntry.ID).EntitytManager.Duplicate(sourceEntity);
+                    var newTreeEntry = GetTreeEntry(newEntity.ID, sourceSceneEntry);
 
-                        targetSceneEntry.DataSource.Add(sourceTreeEntry.IconNode);
-
-                        //if (sourceTreeEntry.Node.Children.Count != 0)
-                        //    SetNewSceneEntryRecurisivally(sourceSceneEntry, targetSceneEntry, sourceTreeEntry.Node.Children.ToArray());
-                    }
+                    MoveIconNode(newTreeEntry, sourceSceneEntry, null, targetSceneEntry);
                 }
         }
 
