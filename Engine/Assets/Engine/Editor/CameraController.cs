@@ -6,7 +6,7 @@ using Engine.Utilities;
 
 namespace Engine.Editor
 {
-    internal class CameraController : Component
+    internal class CameraController : EditorComponent
     {
         public static float s_MovementSpeed = 2;
 
@@ -20,7 +20,7 @@ namespace Engine.Editor
 
         public CameraController()
         {
-            ScriptSystem.Register(this);
+            EditorScriptSystem.Register(this);
 
             _input = Input.Instance;
         }

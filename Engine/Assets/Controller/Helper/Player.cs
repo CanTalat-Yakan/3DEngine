@@ -7,9 +7,9 @@ namespace Editor.Controller
 {
     internal enum EPlayMode
     {
-        NONE,
-        PLAYING,
-        PAUSED
+        None,
+        Playing,
+        Paused
     }
 
     internal class Player
@@ -33,7 +33,7 @@ namespace Editor.Controller
 
         public void Play()
         {
-            if (PlayMode == EPlayMode.NONE)
+            if (PlayMode == EPlayMode.None)
                 if (_output._clearPlay.IsChecked.Value)
                     _output.ClearOutput();
 
@@ -47,7 +47,7 @@ namespace Editor.Controller
 
         public void Pause()
         {
-            PlayMode = _pause.IsChecked.Value ? EPlayMode.PAUSED : EPlayMode.PLAYING;
+            PlayMode = _pause.IsChecked.Value ? EPlayMode.Paused : EPlayMode.Playing;
 
             _forward.IsEnabled = _pause.IsChecked.Value;
             Main.Instance.LayoutControl.ViewPort._viewPortControl.GridMain.BorderBrush = new SolidColorBrush(_pause.IsChecked.Value ? Colors.Orange : Colors.GreenYellow);
@@ -57,7 +57,7 @@ namespace Editor.Controller
 
         public void Forward()
         {
-            if (PlayMode != EPlayMode.PAUSED)
+            if (PlayMode != EPlayMode.Paused)
                 return;
 
             Output.Log("Stepped Forward");
@@ -74,7 +74,7 @@ namespace Editor.Controller
 
         private void SetStatusAppBarButtons(bool b)
         {
-            PlayMode = b ? EPlayMode.PLAYING : EPlayMode.NONE;
+            PlayMode = b ? EPlayMode.Playing : EPlayMode.None;
 
             _pause.IsEnabled = b;
             _pause.IsChecked = false;

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Editor.Controller;
 using Engine.Components;
 
 namespace Engine.ECS
@@ -49,4 +50,5 @@ namespace Engine.ECS
     class TransformSystem : BaseSystem<Transform> { }
     class MeshSystem : BaseSystem<Mesh> { }
     class ScriptSystem : BaseSystem<Component> { }
+    class EditorScriptSystem : BaseSystem<EditorComponent> { }
 }

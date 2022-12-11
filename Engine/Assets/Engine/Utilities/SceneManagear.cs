@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
 using Engine.ECS;
+using Editor.Controller;
 
 namespace Engine.Utilities
 {
@@ -53,7 +54,10 @@ namespace Engine.Utilities
             TransformSystem.Awake();
             CameraSystem.Awake();
             MeshSystem.Awake();
-            ScriptSystem.Awake();
+            EditorScriptSystem.Awake();
+
+            if (Main.Instance.ControlPlayer.PlayMode == EPlayMode.Playing)
+                ScriptSystem.Awake();
         }
 
         public void Start()
@@ -61,7 +65,10 @@ namespace Engine.Utilities
             TransformSystem.Start();
             CameraSystem.Start();
             MeshSystem.Start();
-            ScriptSystem.Start();
+            EditorScriptSystem.Start();
+
+            if (Main.Instance.ControlPlayer.PlayMode == EPlayMode.Playing)
+                ScriptSystem.Start();
         }
 
         public void Update()
@@ -69,7 +76,10 @@ namespace Engine.Utilities
             TransformSystem.Update();
             CameraSystem.Update();
             MeshSystem.Update();
-            ScriptSystem.Update();
+            EditorScriptSystem.Update();
+
+            if (Main.Instance.ControlPlayer.PlayMode == EPlayMode.Playing)
+                ScriptSystem.Update();
         }
 
         public void LateUpdate()
@@ -77,12 +87,16 @@ namespace Engine.Utilities
             TransformSystem.LateUpdate();
             CameraSystem.LateUpdate();
             MeshSystem.LateUpdate();
-            ScriptSystem.LateUpdate();
+            EditorScriptSystem.LateUpdate();
+
+            if (Main.Instance.ControlPlayer.PlayMode == EPlayMode.Playing)
+                ScriptSystem.LateUpdate();
         }
 
         public void Render()
         {
             MeshSystem.Render();
+            EditorScriptSystem.Render();
         }
 
         public string Profile()

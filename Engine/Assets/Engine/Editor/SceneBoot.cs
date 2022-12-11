@@ -9,7 +9,7 @@ using Engine.Utilities;
 namespace Engine.Editor
 {
     //[Generator]
-    internal class SceneBoot : Component
+    internal class SceneBoot : EditorComponent
     {
         public Entity Camera;
 
@@ -18,7 +18,7 @@ namespace Engine.Editor
         private Entity _subParent;
         private Entity _special;
 
-        public SceneBoot() { ScriptSystem.Register(this); }
+        public SceneBoot() { EditorScriptSystem.Register(this); }
 
         public override void Awake()
         {
@@ -37,6 +37,7 @@ namespace Engine.Editor
             _special = SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Special);
             _special.Transform.Scale *= 0.1f;
             _special.Transform.Position.Y += 0.5f;
+            _special.AddComponent(new PlayerMovement());
 
             Entity parent = SceneManager.Scene.EntitytManager.CreateEntity(null, "Content");
 
@@ -78,4 +79,26 @@ namespace Engine.Editor
         }
     }
 
+    internal class PlayerMovement : Component
+    {
+        public PlayerMovement() { ScriptSystem.Register(this); }
+
+        public override void Update()
+        {
+            Vector3 targetDirection = Movement();
+            if (!Single.IsNaN(targetDirection.X))
+                if (!Single.IsNaN(targetDirection.Y))
+                    if (!Single.IsNaN(targetDirection.Z))
+                        Entity.Transform.Position += targetDirection;
+        }
+
+        internal Vector3 Movement()
+        {
+            Vector3 dest =
+                Input.Instance.GetAxis().X * Entity.Transform.Right * (float)Time.s_Delta +
+                Input.Instance.GetAxis().Y * Entity.Transform.Forward * (float)Time.s_Delta;
+
+            return Vector3.Normalize(dest);
+        }
+    }
 }

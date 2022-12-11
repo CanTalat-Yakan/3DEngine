@@ -14,4 +14,6 @@
 
         public virtual void Render() { }
     }
+
+    internal class EditorComponent : Component { }
 }

@@ -41,13 +41,13 @@ namespace Editor.ModelView
 
         private void Tick(object sender, object e)
         {
-            if (Controller.Main.Instance.ControlPlayer.PlayMode == Controller.EPlayMode.PLAYING)
+            if (Controller.Main.Instance.ControlPlayer.PlayMode == Controller.EPlayMode.Playing)
                 Update();
         }
 
         private void TickSec(object sender, object e)
         {
-            if (Controller.Main.Instance.ControlPlayer.PlayMode == Controller.EPlayMode.PLAYING)
+            if (Controller.Main.Instance.ControlPlayer.PlayMode == Controller.EPlayMode.Playing)
                 UpdateSec();
         }
 
