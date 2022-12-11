@@ -4,7 +4,7 @@ namespace Engine.ECS
 {
     internal class Component : ICloneable
     {
-        public Entity Entity;
+        internal Entity Entity;
 
         public Component() => Register();
 

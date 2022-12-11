@@ -5,18 +5,20 @@ namespace Engine.Utilities
 {
     internal class Time
     {
-        public static double s_Time, s_Delta;
-        public static Stopwatch s_Watch = new();
-
         public string Profile = "";
+
+        public static double Delta { get => s_delta; set => s_delta = value; }
+        private static double s_time, s_delta;
+
+        private static Stopwatch s_watch = new();
 
         private int _fps, _tmpFPS;
         private DateTime _now = DateTime.Now;
 
         public void Update()
         {
-            s_Delta = s_Watch.ElapsedMilliseconds * 0.001;
-            s_Time += s_Delta;
+            s_delta = s_watch.ElapsedMilliseconds * 0.001;
+            s_time += s_delta;
             ++_tmpFPS;
 
             if (_now.Second != DateTime.Now.Second)
@@ -25,10 +27,10 @@ namespace Engine.Utilities
                 _tmpFPS = 0;
                 _now = DateTime.Now;
 
-                Profile = s_Watch.ElapsedMilliseconds.ToString() + " ms" + "\n" + _fps.ToString() + " FPS";
+                Profile = s_watch.ElapsedMilliseconds.ToString() + " ms" + "\n" + _fps.ToString() + " FPS";
             }
 
-            s_Watch.Restart();
+            s_watch.Restart();
         }
     }
 }

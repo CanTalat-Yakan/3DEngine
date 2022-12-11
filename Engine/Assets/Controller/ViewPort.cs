@@ -26,8 +26,8 @@ namespace Editor.Controller
             {
                 CreateButton(CreateIcon(Symbol.Video),
                     StackInGridVertical(
-                            CreateSlider((float)Camera.s_FieldOfView, 40, 110, (s, e) => { Camera.s_FieldOfView = e.NewValue; }).WrapInGridVertical("Field Of View"),
-                            CreateNumberInput(CameraController.s_MovementSpeed, 1, 100, (s, e) => { CameraController.s_MovementSpeed = (float)e.NewValue; }).WrapInGridVertical("Movement Speed"))),
+                            CreateSlider((float)Camera.FieldOfView, 40, 110, (s, e) => { Camera.FieldOfView= e.NewValue; }).WrapInGridVertical("Field Of View"),
+                            CreateNumberInput(CameraController.MovementSpeed, 1, 100, (s, e) => { CameraController.MovementSpeed = (float)e.NewValue; }).WrapInGridVertical("Movement Speed"))),
                 CreateAppBarSeperator(),
                 CreateComboBox(new[] { "Perspective", "Orthogonal" }),
                 CreateComboBox(new[] { "Lit", "Unlit", "Wireframe", "Shaded Wireframe" }),
@@ -42,8 +42,8 @@ namespace Editor.Controller
                 CreateToggleButton(CreateIcon("\xEA80"), true),
                 CreateToggleButton(CreateIcon("\xE81E"), true),
                 CreateAppBarSeperator(),
-                CreateButtonWithValue(CreateIcon("\xE80A"), 10, CreateNumberInput(10, 1, 100, (s, e) => { CameraController.s_MovementSpeed = (float)e.NewValue; }).WrapInGridVertical("Grid Snap")),
-                CreateButtonWithValue(CreateIcon(Symbol.Rotate), 15, CreateNumberInput(15, 1, 90, (s, e) => { CameraController.s_MovementSpeed = (float)e.NewValue; }).WrapInGridVertical("Rotation Snap")),
+                CreateButtonWithValue(CreateIcon("\xE80A"), 10, CreateNumberInput(10, 1, 100, (s, e) => { CameraController.MovementSpeed = (float)e.NewValue; }).WrapInGridVertical("Grid Snap")),
+                CreateButtonWithValue(CreateIcon(Symbol.Rotate), 15, CreateNumberInput(15, 1, 90, (s, e) => { CameraController.MovementSpeed = (float)e.NewValue; }).WrapInGridVertical("Rotation Snap")),
                 CreateAppBarSeperator(),
                 CreateToggleButton(CreateIcon(Symbol.Globe), true),
             };

@@ -77,7 +77,7 @@ namespace Engine
             ImGui.SetCurrentContext(imGuiContext);
             var io = ImGui.GetIO();
 
-            io.DeltaTime = (float)Time.s_Delta;
+            io.DeltaTime = (float)Time.Delta;
 
             ImGui.NewFrame();
             ImGui.Render();

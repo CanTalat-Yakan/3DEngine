@@ -8,9 +8,10 @@ namespace Engine.Editor
 {
     internal class CameraController : EditorComponent
     {
-        public static float s_MovementSpeed = 2;
-
         public string Profile { get => Entity.Transform.ToString(); }
+
+        public static float MovementSpeed { get => s_movementSpeed; set => s_movementSpeed = value; }
+        private static float s_movementSpeed = 2;
 
         private Input _input;
 
@@ -41,8 +42,8 @@ namespace Engine.Editor
 
             ScrollMovement();
 
-            Entity.Transform.Position += _direction * (float)Time.s_Delta * s_MovementSpeed;
-            Entity.Transform.EulerAngles -= _rotation * (float)Time.s_Delta * _rotationSpeed;
+            Entity.Transform.Position += _direction * (float)Time.Delta * s_movementSpeed;
+            Entity.Transform.EulerAngles -= _rotation * (float)Time.Delta * _rotationSpeed;
 
             Entity.Transform.EulerAngles.X = Math.Clamp(Entity.Transform.EulerAngles.X, -89, 89);
 
@@ -54,9 +55,9 @@ namespace Engine.Editor
         {
             if (_input.GetButton(EMouseButton.IsRightButtonPressed)
                 || _input.GetButton(EMouseButton.IsRightButtonPressed))
-                s_MovementSpeed += _input.GetMouseWheel();
+                s_movementSpeed += _input.GetMouseWheel();
 
-            s_MovementSpeed = Math.Clamp(s_MovementSpeed, 0.1f, 10);
+            s_movementSpeed = Math.Clamp(s_movementSpeed, 0.1f, 10);
         }
 
         private void CameraMovement(int _horizontalFactor = 1, int _verticalFactor = 1) =>
@@ -66,7 +67,7 @@ namespace Engine.Editor
             _direction = Entity.Transform.Forward * _input.GetAxis().Y + Entity.Transform.Right * _input.GetAxis().X;
 
         private void ScreenMovement() =>
-            _direction -=   Entity.Transform.Right * _input.GetMouseAxis().X * (float)Time.s_Delta + Entity.Transform.LocalUp * _input.GetMouseAxis().Y * (float)Time.s_Delta;
+            _direction -=   Entity.Transform.Right * _input.GetMouseAxis().X * (float)Time.Delta + Entity.Transform.LocalUp * _input.GetMouseAxis().Y * (float)Time.Delta;
 
         private void ScrollMovement()
         {

@@ -11,13 +11,13 @@ namespace Engine.Components
     {
         public Material Material;
 
-        public ID3D11Buffer VertexBuffer;
-        public ID3D11Buffer IndexBuffer;
+        private ID3D11Buffer VertexBuffer;
+        private ID3D11Buffer IndexBuffer;
 
-        public int VertexCount;
-        public int VertexStride;
-        public int IndexCount;
-        public int IndexStride;
+        internal int VertexCount;
+        internal int VertexStride;
+        internal int IndexCount;
+        internal int IndexStride;
 
         private Renderer _d3d;
 

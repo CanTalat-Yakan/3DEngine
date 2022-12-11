@@ -93,8 +93,8 @@ namespace Engine.Editor
         internal Vector3 Movement()
         {
             Vector3 dest =
-                Input.Instance.GetAxis().X * Entity.Transform.Right * (float)Time.s_Delta +
-                Input.Instance.GetAxis().Y * Entity.Transform.Forward * (float)Time.s_Delta;
+                Input.Instance.GetAxis().X * Entity.Transform.Right * (float)Time.Delta +
+                Input.Instance.GetAxis().Y * Entity.Transform.Forward * (float)Time.Delta;
 
             return Vector3.Normalize(dest);
         }

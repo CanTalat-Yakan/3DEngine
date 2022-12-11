@@ -28,7 +28,7 @@ namespace Engine.Editor
             var io = ImGuiNET.ImGui.GetIO();
             io.DisplaySize = _d3d.SwapChainPanel.ActualSize;
             io.DisplayFramebufferScale = Vector2.One;
-            io.DeltaTime = (float)Time.s_Watch.Elapsed.TotalSeconds;
+            io.DeltaTime = (float)Time.Delta;
             ImGuiNET.ImGui.StyleColorsDark();
             RecreateFontDeviceTexture();
         }
@@ -44,7 +44,7 @@ namespace Engine.Editor
 
         public void Draw()
         {
-            ImGuiNET.ImGui.GetIO().DeltaTime = (float)Time.s_Watch.Elapsed.TotalSeconds;
+            ImGuiNET.ImGui.GetIO().DeltaTime = (float)Time.Delta;
             ImGuiNET.ImGui.NewFrame();
             ImGuiNET.ImGui.Begin("Test");
 
