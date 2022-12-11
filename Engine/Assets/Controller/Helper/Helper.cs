@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Text;
+using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -14,7 +15,6 @@ using ColorPicker = CommunityToolkit.WinUI.UI.Controls.ColorPicker;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
 using Expander = Microsoft.UI.Xaml.Controls.Expander;
-using Microsoft.UI.Xaml.Data;
 
 namespace Editor.Controller
 {
@@ -45,6 +45,7 @@ namespace Editor.Controller
 
             return grid;
         }
+
         internal virtual ComboBox CreateComboBox(params string[] items)
         {
             ComboBox comboBox = new() { Height = 33, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
@@ -138,7 +139,8 @@ namespace Editor.Controller
             return textBlock;
         }
 
-        internal virtual Grid CreateNumberInput(float f = 0, float min = float.MinValue, float max = float.MaxValue, TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs> onValueChanged = null)
+        internal virtual Grid CreateNumberInput(float f = 0, float min = float.MinValue, float max = float.MaxValue,
+            TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs> onValueChanged = null)
         {
             NumberBox numInput = new() { Value = f, Minimum = min, Maximum = max, SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline, MaxWidth = 200 };
             numInput.ValueChanged += onValueChanged;
@@ -146,7 +148,8 @@ namespace Editor.Controller
             return StackInGrid(numInput);
         }
 
-        internal virtual UIElement CreateSlider(float f = 0, float min = float.MinValue, float max = float.MaxValue, RangeBaseValueChangedEventHandler onValueChanged = null)
+        internal virtual UIElement CreateSlider(float f = 0, float min = float.MinValue, float max = float.MaxValue,
+            RangeBaseValueChangedEventHandler onValueChanged = null)
         {
             Slider numInput = new() { Value = f, Minimum = min, Maximum = max, Width = 200, Margin = new(0, 0, 0, -5.5) };
             numInput.ValueChanged += onValueChanged;
@@ -194,20 +197,21 @@ namespace Editor.Controller
             return StackInGrid(rectangleR, numInput, rectangleG, num2Input, rectangleB, num3Input);
         }
 
-        internal virtual Grid CreateVec3InputTransform(Vector3 v = new Vector3(), params TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs>[] e)
+        internal virtual Grid CreateVec3InputTransform(Vector3 v = new Vector3(), 
+            params TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs>[] e)
         {
             Rectangle rectangleR = new() { Fill = new SolidColorBrush(Colors.IndianRed), RadiusX = 2, RadiusY = 2, Width = 4 };
-            NumberBox numInput = new() { Value = MathF.Round(v.X, 4), Margin = new(0, 0, 4, 0), Width = 64 };
+            NumberBox numInput = new() { Value = Math.Round(v.X, 4), Margin = new(0, 0, 4, 0), Width = 64 };
             if (e[0] != null)
                 numInput.ValueChanged += e[0];
 
             Rectangle rectangleG = new() { Fill = new SolidColorBrush(Colors.SeaGreen), RadiusX = 2, RadiusY = 2, Width = 4 };
-            NumberBox num2Input = new() { Value = MathF.Round(v.Y, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
+            NumberBox num2Input = new() { Value = Math.Round(v.Y, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
             if (e[1] != null)
                 num2Input.ValueChanged += e[1];
 
             Rectangle rectangleB = new() { Fill = new SolidColorBrush(Colors.DodgerBlue), RadiusX = 2, RadiusY = 2, Width = 4 };
-            NumberBox num3Input = new() { Value = MathF.Round(v.Z, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
+            NumberBox num3Input = new() { Value = Math.Round(v.Z, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
             if (e[2] != null)
                 num3Input.ValueChanged += e[2];
 
@@ -233,7 +237,8 @@ namespace Editor.Controller
             return StackInGrid(comboBox);
         }
 
-        internal virtual Grid CreateEvent(string s = "Event", RoutedEventHandler e = null)
+        internal virtual Grid CreateEvent(string s = "Event", 
+            RoutedEventHandler e = null)
         {
             Button button = new() { Content = s };
             button.Click += e;
@@ -273,7 +278,8 @@ namespace Editor.Controller
             return grid;
         }
 
-        internal virtual Grid CreateButton(string s, TappedEventHandler tapped)
+        internal virtual Grid CreateButton(string s, 
+            TappedEventHandler tapped)
         {
             Grid grid = new();
 
