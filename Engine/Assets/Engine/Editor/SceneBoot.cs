@@ -58,13 +58,6 @@ namespace Engine.Editor
         {
             SceneManager.Scene.EntitytManager.Sky.Transform.Position = Camera.Transform.Position;
 
-            if (Input.Instance.GetKey(Windows.System.VirtualKey.F, EInputState.DOWN))
-                _special.Transform.Position += _special.Transform.Forward;
-            if (Input.Instance.GetKey(Windows.System.VirtualKey.G, EInputState.DOWN))
-                _special.Transform.Position += _special.Transform.Right;
-            if (Input.Instance.GetKey(Windows.System.VirtualKey.V, EInputState.DOWN))
-                Camera.Transform.Position += Camera.Transform.Right;
-
             if (Input.Instance.GetKey(Windows.System.VirtualKey.C, EInputState.DOWN))
             {
                 Output.Log("Spawned 10 Cubes");
@@ -81,11 +74,14 @@ namespace Engine.Editor
 
     internal class PlayerMovement : Component
     {
+        public float MovementSpeed = 5;
+
         public override void Register() => ScriptSystem.Register(this);
-        
+
         public override void Update()
         {
             Vector3 targetDirection = Movement();
+
             if (!IsNaN(targetDirection))
                 Entity.Transform.Position += targetDirection;
         }
@@ -93,10 +89,10 @@ namespace Engine.Editor
         internal Vector3 Movement()
         {
             Vector3 dest =
-                Input.Instance.GetAxis().X * Entity.Transform.Right * (float)Time.Delta +
-                Input.Instance.GetAxis().Y * Entity.Transform.Forward * (float)Time.Delta;
+                Input.Instance.GetAxis().X * Entity.Transform.Right +
+                Input.Instance.GetAxis().Y * Entity.Transform.Forward;
 
-            return Vector3.Normalize(dest);
+            return Vector3.Normalize(dest) * MovementSpeed * (float)Time.Delta;
         }
 
         bool IsNaN(Vector3 vec)

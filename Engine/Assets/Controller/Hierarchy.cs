@@ -379,7 +379,7 @@ namespace Editor.Controller
 
         private MenuFlyout AppendDynamicMenuFlyoutSubItems(MenuFlyout menuFlyout)
         {
-            MenuFlyoutItem[] objects = new[] {
+            MenuFlyoutItem[] mesh = new[] {
                 new MenuFlyoutItem() { Text = "Plane"},
                 new MenuFlyoutItem() { Text = "Cube"},
                 new MenuFlyoutItem() { Text = "Sphere"},
@@ -387,22 +387,23 @@ namespace Editor.Controller
                 new MenuFlyoutItem() { Text = "Capsule"},
                 new MenuFlyoutItem() { Text = "Quad"},
             };
-            MenuFlyoutSubItem objectSubItem = new() { Text = "Objects" };
-            foreach (var item in objects)
+            MenuFlyoutSubItem objectSubItem = new() { Text = "Mesh" };
+            foreach (var item in mesh)
                 objectSubItem.Items.Add(item);
 
-            MenuFlyoutItem[] Lights = new[] {
+            MenuFlyoutItem[] lights = new[] {
                 new MenuFlyoutItem() { Text = "Directional Light"},
                 new MenuFlyoutItem() { Text = "Point Light"},
                 new MenuFlyoutItem() { Text = "Spot Light"},
             };
             MenuFlyoutSubItem lightSubItem = new() { Text = "Light" };
-            foreach (var item in Lights)
+            foreach (var item in lights)
                 lightSubItem.Items.Add(item);
 
             menuFlyout.Items.Add(new MenuFlyoutSeparator());
             menuFlyout.Items.Add(objectSubItem);
             menuFlyout.Items.Add(lightSubItem);
+            menuFlyout.Items.Add(new MenuFlyoutItem() { Text = "Camera" });
 
             return menuFlyout;
         }
