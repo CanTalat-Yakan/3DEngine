@@ -108,20 +108,21 @@ namespace Editor.Controller
             _stackPanel.Children.Add(transform.StackInGrid().WrapInExpander("Transform"));
             _stackPanel.Children.Add(CreateButton("Add Component", null));
 
-            var components = entity.GetComponents();
-            for (int i = 1; i < components.Length; i++)
-            {
-                var propertyInfo = components.GetType().GetProperties(
-                    BindingFlags.Public | 
-                    BindingFlags.NonPublic | 
-                    BindingFlags.Instance);
+            foreach (var component in entity.GetComponents())
+                if (component != entity.Transform)
+                {
+                    var fieldInfos = component.GetType().GetFields(
+                        //BindingFlags.NonPublic |
+                        BindingFlags.Static |
+                        BindingFlags.Public |
+                        BindingFlags.Instance);
 
-                List<Grid> propertiesCollection = new();
-                foreach (var property in propertyInfo)
-                    propertiesCollection.Add(CreateNumberInput().WrapInField(property.Name));
+                    List<Grid> propertiesCollection = new();
+                    foreach (var field in fieldInfos)
+                        propertiesCollection.Add(CreateNumberInput().WrapInFieldEqual(field.Name));
 
-                _stackPanel.Children.Add(propertiesCollection.ToArray().StackInGrid().WrapInExpanderWithToggleButton(components[i].ToString().Split('.').Last()));
-            }
+                    _stackPanel.Children.Add(propertiesCollection.ToArray().StackInGrid().WrapInExpanderWithToggleButton(component.ToString().Split('.').Last()));
+                }
 
             _stackPanel.Children.Add(collection.StackInGrid().WrapInExpanderWithToggleButton("Expander"));
         }
