@@ -18,12 +18,10 @@ namespace Engine.Editor
         private Vector3 _direction;
         private Vector3 _rotation;
 
-        public CameraController()
-        {
-            EditorScriptSystem.Register(this);
+        public override void Register() => EditorScriptSystem.Register(this);
 
-            _input = Input.Instance;
-        }
+        public CameraController() => _input = Input.Instance;
+        
 
         public override void Update()
         {

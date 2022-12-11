@@ -24,8 +24,8 @@ namespace Engine.Components
         public Vector3 EulerAngles = Vector3.Zero;
         public Vector3 Scale = Vector3.One;
 
-        public Transform() => TransformSystem.Register(this);
-
+        public override void Register() => TransformSystem.Register(this);
+        
         public override void Update()
         {
             if (Entity.Parent != null)

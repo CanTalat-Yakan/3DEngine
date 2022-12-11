@@ -29,7 +29,7 @@ namespace Engine.ECS
 
         public Entity Parent;
 
-        public Transform Transform { get => GetComponent<Transform>(); }
+        public Transform Transform { get => _transform; }
 
         public string Name;
         public bool IsEnabled;
@@ -38,8 +38,9 @@ namespace Engine.ECS
         public ELayers Layer;
 
         private List<Component> _components = new();
+        private Transform _transform;
 
-        public Entity() => AddComponent(new Transform());
+        public Entity() => AddComponent(_transform = new Transform());
 
         public void AddComponent(Component component)
         {
@@ -74,9 +75,30 @@ namespace Engine.ECS
 
         public Entity Clone()
         {
-            var newEntity = (Entity)MemberwiseClone();
-            newEntity.ID = Guid.NewGuid();
-            // clone all components
+            //var newEntity = (Entity)MemberwiseClone();
+            //newEntity.ID = Guid.NewGuid();
+
+            var newEntity = new Entity()
+            {
+                ID = Guid.NewGuid(),
+                Name = Name,
+                IsEnabled = IsEnabled,
+                IsStatic = IsStatic,
+                Layer = Layer,
+                Tag = Tag,
+            };
+
+            newEntity.Transform.Position = Transform.Position;
+            newEntity.Transform.Rotation = Transform.Rotation;
+            newEntity.Transform.Scale = Transform.Scale;
+
+            for (int i = 1; i < _components.Count; i++)
+            {
+                var newComponent = _components[i].Clone();
+                newComponent.Register();
+                newEntity.AddComponent(newComponent);
+
+            }
 
             return newEntity;
         }

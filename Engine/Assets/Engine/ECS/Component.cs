@@ -1,8 +1,14 @@
-﻿namespace Engine.ECS
+﻿using System;
+
+namespace Engine.ECS
 {
-    internal class Component
+    internal class Component : ICloneable
     {
         public Entity Entity;
+
+        public Component() => Register();
+
+        public virtual void Register() { }
 
         public virtual void Awake() { }
 
@@ -13,6 +19,10 @@
         public virtual void LateUpdate() { }
 
         public virtual void Render() { }
+
+        object ICloneable.Clone() { return Clone(); }
+
+        public Component Clone() { return (Component)MemberwiseClone(); }
     }
 
     internal class EditorComponent : Component { }

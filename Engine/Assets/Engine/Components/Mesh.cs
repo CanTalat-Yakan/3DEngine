@@ -21,10 +21,10 @@ namespace Engine.Components
 
         private Renderer _d3d;
 
+        public override void Register() => MeshSystem.Register(this);
+
         public Mesh(MeshInfo _obj)
         {
-            MeshSystem.Register(this);
-
             #region //Get Instance of DirectX
             _d3d = Renderer.Instance;
             #endregion

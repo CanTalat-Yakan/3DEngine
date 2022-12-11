@@ -18,7 +18,7 @@ namespace Engine.Editor
         private Entity _subParent;
         private Entity _special;
 
-        public SceneBoot() { EditorScriptSystem.Register(this); }
+        public override void Register() => EditorScriptSystem.Register(this);
 
         public override void Awake()
         {
@@ -81,8 +81,8 @@ namespace Engine.Editor
 
     internal class PlayerMovement : Component
     {
-        public PlayerMovement() { ScriptSystem.Register(this); }
-
+        public override void Register() => ScriptSystem.Register(this);
+        
         public override void Update()
         {
             Vector3 targetDirection = Movement();

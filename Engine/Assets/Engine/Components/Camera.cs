@@ -20,10 +20,10 @@ namespace Engine.Components
         private Renderer _d3d;
         private ID3D11Buffer _view;
 
+        public override void Register() => CameraSystem.Register(this);
+
         public Camera()
         {
-            CameraSystem.Register(this);
-
             #region //Get Instances
             _d3d = Renderer.Instance;
             #endregion
