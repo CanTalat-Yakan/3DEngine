@@ -3,6 +3,7 @@ using System;
 using Vortice.Mathematics;
 using Engine.Data;
 using Engine.ECS;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Engine.Components
 {
@@ -27,10 +28,11 @@ namespace Engine.Components
 
         public override void Update()
         {
-            if (this.Entity.Parent != null)
-                Parent = this.Entity.Parent.Transform;
+            if (Entity.Parent != null)
+                Parent = Entity.Parent.Transform;
 
             //EulerAngles = Rotation.ToEuler();
+            Rotation = Quaternion.CreateFromYawPitchRoll(EulerAngles.X, EulerAngles.Y, EulerAngles.Z);
 
             Forward = Vector3.Normalize(new(
                 MathF.Sin(MathHelper.ToRadians(EulerAngles.Y)) * MathF.Cos(MathHelper.ToRadians(EulerAngles.X)),
@@ -40,25 +42,25 @@ namespace Engine.Components
             Right = Vector3.Normalize(Vector3.Cross(Forward, Vector3.UnitY));
             LocalUp = Vector3.Normalize(Vector3.Cross(Right, Forward));
 
-            this.Rotation = Quaternion.CreateFromYawPitchRoll(EulerAngles.X, EulerAngles.Y, EulerAngles.Z);
-
-            Matrix4x4 translationMatrix = Matrix4x4.CreateTranslation(Position);
-            Matrix4x4 rotationMatrix = Matrix4x4.CreateFromQuaternion(Rotation);
-            Matrix4x4 scaleMatrix = Matrix4x4.CreateScale(Scale);
-
-            WorldMatrix = Matrix4x4.Transpose(scaleMatrix * rotationMatrix * translationMatrix);
-            if (Parent != null && Parent != this)
-                WorldMatrix = CalculateWorldMatrix(WorldMatrix, Parent);
+            WorldMatrix = CalculateWorldMatrix(Position, Rotation, Scale, Parent);
         }
 
-        Matrix4x4 CalculateWorldMatrix(Matrix4x4 localPosition, Transform parent)
+        Matrix4x4 CalculateWorldMatrix(Vector3 position, Quaternion rotation, Vector3 scale, Transform parent)
         {
-            localPosition = Matrix4x4.Multiply(localPosition, parent.WorldMatrix);
+            while (parent != null)
+            {
+                position += parent.Position;
+                rotation += parent.Rotation;
+                scale *= parent.Scale;
 
-            if (parent.Parent != null && Parent != this)
-                localPosition = CalculateWorldMatrix(localPosition, parent.Parent);
+                parent = parent.Parent;
+            }
 
-            return localPosition;
+            Matrix4x4 translationMatrix = Matrix4x4.CreateTranslation(position);
+            Matrix4x4 rotationMatrix = Matrix4x4.CreateFromQuaternion(rotation);
+            Matrix4x4 scaleMatrix = Matrix4x4.CreateScale(scale);
+
+            return Matrix4x4.Transpose(scaleMatrix * rotationMatrix * translationMatrix);
         }
 
         public override string ToString()
