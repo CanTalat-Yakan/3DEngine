@@ -86,10 +86,8 @@ namespace Engine.Editor
         public override void Update()
         {
             Vector3 targetDirection = Movement();
-            if (!Single.IsNaN(targetDirection.X))
-                if (!Single.IsNaN(targetDirection.Y))
-                    if (!Single.IsNaN(targetDirection.Z))
-                        Entity.Transform.Position += targetDirection;
+            if (!IsNaN(targetDirection))
+                Entity.Transform.Position += targetDirection;
         }
 
         internal Vector3 Movement()
@@ -99,6 +97,16 @@ namespace Engine.Editor
                 Input.Instance.GetAxis().Y * Entity.Transform.Forward * (float)Time.s_Delta;
 
             return Vector3.Normalize(dest);
+        }
+
+        bool IsNaN(Vector3 vec)
+        {
+            if (!Single.IsNaN(vec.X))
+                if (!Single.IsNaN(vec.Y))
+                    if (!Single.IsNaN(vec.Z))
+                        return false;
+
+            return true;
         }
     }
 }
