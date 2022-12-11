@@ -4,9 +4,11 @@ using Engine.Components;
 using Editor.Controller;
 using Engine.ECS;
 using Engine.Utilities;
+using Microsoft.CodeAnalysis;
 
 namespace Engine.Editor
 {
+    [Generator]
     internal class SceneBoot : Component
     {
         public Entity Camera;
