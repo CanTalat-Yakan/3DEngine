@@ -187,13 +187,13 @@ namespace Editor.Controller
         internal virtual Grid CreateVec3InputTransform(Vector3 v = new())
         {
             Rectangle rectangleR = new() { Fill = new SolidColorBrush(Colors.IndianRed), RadiusX = 2, RadiusY = 2, Width = 4 };
-            NumberBox numInput = new() { Value = MathF.Round(v.X, 4), Margin = new(0, 0, 4, 0), Width = 64 };
+            NumberBox numInput = new() { Value = Math.Round(v.X, 4), Margin = new(0, 0, 4, 0), Width = 64 };
 
             Rectangle rectangleG = new() { Fill = new SolidColorBrush(Colors.SeaGreen), RadiusX = 2, RadiusY = 2, Width = 4 };
-            NumberBox num2Input = new() { Value = MathF.Round(v.Y, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
+            NumberBox num2Input = new() { Value = Math.Round(v.Y, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
 
             Rectangle rectangleB = new() { Fill = new SolidColorBrush(Colors.DodgerBlue), RadiusX = 2, RadiusY = 2, Width = 4 };
-            NumberBox num3Input = new() { Value = MathF.Round(v.Z, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
+            NumberBox num3Input = new() { Value = Math.Round(v.Z, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
 
             return StackInGrid(rectangleR, numInput, rectangleG, num2Input, rectangleB, num3Input);
         }

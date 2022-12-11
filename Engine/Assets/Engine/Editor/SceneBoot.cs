@@ -101,9 +101,9 @@ namespace Engine.Editor
 
         bool IsNaN(Vector3 vec)
         {
-            if (!Single.IsNaN(vec.X))
-                if (!Single.IsNaN(vec.Y))
-                    if (!Single.IsNaN(vec.Z))
+            if (!float.IsNaN(vec.X))
+                if (!float.IsNaN(vec.Y))
+                    if (!float.IsNaN(vec.Z))
                         return false;
 
             return true;
