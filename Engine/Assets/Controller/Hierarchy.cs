@@ -152,7 +152,7 @@ namespace Editor.Controller
 
             return null;
         }
-        
+
         public void GetEntries(out TreeEntry treeEntry, out SceneEntry sceneEntry, Guid guid)
         {
             treeEntry = null;
@@ -281,7 +281,7 @@ namespace Editor.Controller
             items[3].Click += (s, e) => ContentDialogRename(_itemInvoked);
             items[4].Click += (s, e) => ContentDialogDelete(_itemInvoked);
 
-            items[5].Click += (s, e) => SceneManager.Scene.EntitytManager.CreateEntity(GetEntity(GetParent(_itemInvoked).IconNode.TreeEntry));
+            items[5].Click += (s, e) => SceneManager.Scene.EntitytManager.CreateEntity(GetEntity(GetParent(_itemInvoked)));
             items[6].Click += (s, e) => SceneManager.Scene.EntitytManager.CreateEntity(GetEntity(_itemInvoked));
 
             MenuFlyout menuFlyout = new();
@@ -524,7 +524,13 @@ namespace Editor.Controller
             return null;
         }
 
-        public Entity GetEntity(TreeEntry entry, SceneEntry sceneEntry = null) { return GetEntity(entry.ID, sceneEntry); }
+        public Entity GetEntity(TreeEntry entry, SceneEntry sceneEntry = null)
+        {
+            if (entry is null)
+                return null;
+
+            return GetEntity(entry.ID, sceneEntry);
+        }
 
         public void GetEntity(out Entity entity, TreeEntry entry, SceneEntry sceneEntry = null) => entity = GetEntity(entry.ID, sceneEntry);
 
