@@ -232,8 +232,8 @@ namespace Editor.Controller
             treeEntry.IDparent = entity.Parent != null ? entity.Parent.ID : null;
 
             var components = entity.GetComponents();
-            treeEntry.IconNode.Camera = components.OfType<Camera>().Any() ? Visibility.Visible : Visibility.Collapsed;
-            treeEntry.IconNode.Mesh = components.OfType<Mesh>().Any() ? Visibility.Visible : Visibility.Collapsed;
+            treeEntry.IconNode.Camera = components.OfType<Camera>().Any();
+            treeEntry.IconNode.Mesh = components.OfType<Mesh>().Any();
             treeEntry.IconNode.ScriptsCount = components.Length;
 
             sceneEntry.Hierarchy.Add(treeEntry);

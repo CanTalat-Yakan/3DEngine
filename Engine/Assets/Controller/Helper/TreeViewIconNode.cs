@@ -11,22 +11,22 @@ namespace Editor.Controller
 
         public TreeEntry TreeEntry { get; set; }
 
-        public Visibility Camera;
-        public Visibility Mesh;
+        public bool Camera;
+        public bool Mesh;
 
-        public Visibility Folder { get => Children.Count > 0 ? Visibility.Visible : Visibility.Collapsed; }
+        public bool Folder { get => Children.Count > 0; }
 
         public int ScriptsCount;
-        public Visibility Scripts
+        public bool Scripts
         {
             get
             {
                 int i = 1;
 
-                if (Camera == Visibility.Visible) i++;
-                if (Mesh == Visibility.Visible) i++;
+                if (Camera) i++;
+                if (Mesh) i++;
 
-                return ScriptsCount > i ? Visibility.Visible : Visibility.Collapsed;
+                return ScriptsCount > i;
             }
         }
 

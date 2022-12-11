@@ -11,35 +11,45 @@
     mc:Ignorable="d">
 
     <UserControl.Resources>
+        <controller:BooleanToVisibilityConverter x:Key="BoolConverter"/>
+
         <DataTemplate x:Key="x_IconNodeTemplate" x:DataType="controller:TreeViewIconNode">
-                <TreeViewItem AutomationProperties.Name="{x:Bind Name}" ItemsSource="{x:Bind Children}" IsExpanded="{x:Bind IsExpanded}">
-                    <Grid HorizontalAlignment="Stretch" Opacity="{x:Bind Opacity}">
+            <TreeViewItem AutomationProperties.Name="{x:Bind Name}" ItemsSource="{x:Bind Children}" IsExpanded="{x:Bind IsExpanded}">
+                <Grid HorizontalAlignment="Stretch" 
+                      Opacity="{x:Bind Opacity}">
+                    <StackPanel Orientation="Horizontal">
                         <StackPanel Orientation="Horizontal">
-                            <StackPanel Orientation="Horizontal">
-                                <SymbolIcon Symbol="Folder" Visibility="{x:Bind Folder}" Margin="0,0,10,0"/>
+                            <SymbolIcon Symbol="Folder" Margin="0,0,10,0" 
+                                        Visibility="{x:Bind Folder, Converter={StaticResource BoolConverter}}"/>
 
-                                <TextBlock Text="{x:Bind Name}" Margin="0,0,10,0"/>
-                            </StackPanel>
+                            <TextBlock Margin="0,0,10,0" 
+                                       Text="{x:Bind Name}"/>
                         </StackPanel>
+                    </StackPanel>
 
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <SymbolIcon Symbol="Video" Visibility="{x:Bind Camera}" Margin="0,0,10,0"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <SymbolIcon Symbol="Video" Margin="0,0,10,0" 
+                                    Visibility="{x:Bind Camera, Converter={StaticResource BoolConverter}}"/>
 
-                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xF158;" Visibility="{x:Bind Mesh}" Margin="0,0,10,0"/>
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xF158;" Margin="0,0,10,0" 
+                                  Visibility="{x:Bind Mesh, Converter={StaticResource BoolConverter}}"/>
 
-                            <SymbolIcon Symbol="Document" Visibility="{x:Bind Scripts}" Margin="0,0,10,0"/>
-                        </StackPanel>
-                    </Grid>
-                </TreeViewItem>
+                        <SymbolIcon Symbol="Document" Margin="0,0,10,0" 
+                                    Visibility="{x:Bind Scripts, Converter={StaticResource BoolConverter}}"/>
+                    </StackPanel>
+                </Grid>
+            </TreeViewItem>
         </DataTemplate>
 
-        <controller:TreeViewIconNodeTemplateSelector x:Key="x_TreeViewIconNodeTemplateSelector" IconNodeTemplate="{StaticResource x_IconNodeTemplate}"/>
+        <controller:TreeViewIconNodeTemplateSelector x:Key="x_TreeViewIconNodeTemplateSelector" 
+                                                     IconNodeTemplate="{StaticResource x_IconNodeTemplate}"/>
     </UserControl.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <ScrollViewer Padding="4,0,4,0">
             <StackPanel x:Name="x_StackPanel_Hierarchy" Orientation="Vertical">
-                <TreeView x:Name="x_TreeView_IconNode" ItemTemplateSelector="{StaticResource x_TreeViewIconNodeTemplateSelector}"/>
+                <TreeView x:Name="x_TreeView_IconNode" 
+                          ItemTemplateSelector="{StaticResource x_TreeViewIconNodeTemplateSelector}"/>
 
                 <Grid Padding="15"/>
             </StackPanel>
