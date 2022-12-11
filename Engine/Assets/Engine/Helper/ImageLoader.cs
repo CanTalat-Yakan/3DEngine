@@ -7,7 +7,6 @@ using Vortice.DXGI;
 using Vortice.Mathematics;
 using Vortice.WIC;
 
-
 namespace Engine.Helper
 {
     internal class ImageLoader
@@ -17,7 +16,7 @@ namespace Engine.Helper
             string assetsPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources\");
             string textureFile = Path.Combine(assetsPath, fileName);
 
-            using var wicFactory = new IWICImagingFactory();
+            using IWICImagingFactory wicFactory = new();
             using IWICBitmapDecoder decoder = wicFactory.CreateDecoderFromFileName(textureFile);
             using IWICBitmapFrameDecode frame = decoder.GetFrame(0);
 
@@ -50,7 +49,6 @@ namespace Engine.Helper
                 else
                 {
                     foreach (KeyValuePair<Guid, Guid> item in s_WICConvert)
-                    {
                         if (item.Key == pixelFormat)
                         {
                             convertGUID = item.Value;
@@ -60,17 +58,14 @@ namespace Engine.Helper
                             bpp = WICBitsPerPixel(wicFactory, convertGUID);
                             break;
                         }
-                    }
                 }
 
                 if (format == Format.Unknown)
-                {
                     throw new InvalidOperationException("WICTextureLoader does not support all DXGI formats");
                     //Debug.WriteLine("ERROR: WICTextureLoader does not support all DXGI formats (WIC GUID {%8.8lX-%4.4X-%4.4X-%2.2X%2.2X-%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X}). Consider using DirectXTex.\n",
                     //    pixelFormat.Data1, pixelFormat.Data2, pixelFormat.Data3,
                     //    pixelFormat.Data4[0], pixelFormat.Data4[1], pixelFormat.Data4[2], pixelFormat.Data4[3],
                     //    pixelFormat.Data4[4], pixelFormat.Data4[5], pixelFormat.Data4[6], pixelFormat.Data4[7]);
-                }
             }
             else
             {
@@ -118,10 +113,8 @@ namespace Engine.Helper
 
             // Load image data
             if (convertGUID == pixelFormat && size.Width == width && size.Height == height)
-            {
                 // No format conversion or resize needed
                 frame.CopyPixels(rowPitch, pixels);
-            }
             else if (size.Width != width || size.Height != height)
             {
                 // Resize
@@ -131,19 +124,15 @@ namespace Engine.Helper
                 Guid pixelFormatScaler = scaler.PixelFormat;
 
                 if (convertGUID == pixelFormatScaler)
-                {
                     // No format conversion needed
                     scaler.CopyPixels(rowPitch, pixels);
-                }
                 else
                 {
                     using IWICFormatConverter converter = wicFactory.CreateFormatConverter();
 
                     bool canConvert = converter.CanConvert(pixelFormatScaler, convertGUID);
                     if (!canConvert)
-                    {
                         return null;
-                    }
 
                     converter.Initialize(scaler, convertGUID, BitmapDitherType.ErrorDiffusion, null, 0, BitmapPaletteType.MedianCut);
                     converter.CopyPixels(rowPitch, pixels);
@@ -156,9 +145,7 @@ namespace Engine.Helper
 
                 bool canConvert = converter.CanConvert(pixelFormat, convertGUID);
                 if (!canConvert)
-                {
                     return null;
-                }
 
                 converter.Initialize(frame, convertGUID, BitmapDitherType.ErrorDiffusion, null, 0, BitmapPaletteType.MedianCut);
                 converter.CopyPixels(rowPitch, pixels);
@@ -254,9 +241,7 @@ namespace Engine.Helper
         internal static Format ToDXGIFormat(Guid guid)
         {
             if (s_WICFormats.TryGetValue(guid, out Format format))
-            {
                 return format;
-            }
 
             return Format.Unknown;
         }

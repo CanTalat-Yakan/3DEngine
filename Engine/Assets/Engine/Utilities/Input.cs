@@ -27,11 +27,11 @@ namespace Engine.Utilities
     {
         public static Input Instance { get; private set; }
 
-        private Dictionary<VirtualKey, bool[]> _virtualKeyDic = new Dictionary<VirtualKey, bool[]>();
-        private List<VirtualKey> _bufferKeys = new List<VirtualKey>();
+        private Dictionary<VirtualKey, bool[]> _virtualKeyDic = new();
+        private List<VirtualKey> _bufferKeys = new();
 
-        private Dictionary<EMouseButton, bool[]> _pointerPointDic = new Dictionary<EMouseButton, bool[]>();
-        private List<EMouseButton> _bufferPoints = new List<EMouseButton>();
+        private Dictionary<EMouseButton, bool[]> _pointerPointDic = new();
+        private List<EMouseButton> _bufferPoints = new();
 
         private PointerPoint _pointer;
         private int _mouseWheelDelta;
@@ -39,7 +39,7 @@ namespace Engine.Utilities
         private Vector2 _axis = Vector2.Zero;
         private Vector2 _mouseAxis = Vector2.Zero;
 
-        private Point _pointerPosition = new Point(), tmpPoint = new Point();
+        private Point _pointerPosition = new(), tmpPoint = new();
 
         public Input()
         {

@@ -37,7 +37,7 @@ namespace Engine.ECS
         public ETags Tag;
         public ELayers Layer;
 
-        private List<Component> _components = new List<Component>();
+        private List<Component> _components = new();
 
         public Entity() => AddComponent(new Transform());
 

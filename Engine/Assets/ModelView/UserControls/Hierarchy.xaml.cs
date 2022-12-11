@@ -15,7 +15,7 @@ namespace Editor.ModelView
 
             Controller.Main.Instance.Content.Loaded += (s, e) =>
                 Controller.Main.Instance.LayoutControl.ViewPort.Loaded += (s, e) =>
-                    _hierarchyControl = new Controller.Hierarchy(this, x_StackPanel_Hierarchy);
+                    _hierarchyControl = new(this, x_StackPanel_Hierarchy);
         }
     }
 }

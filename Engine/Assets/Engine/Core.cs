@@ -38,7 +38,7 @@ namespace Engine
 
             Output.Log("Engine Initialized...");
 
-            ImGui.GetIO().DisplaySize = new Vector2((float)swapChainPanel.ActualWidth, (float)swapChainPanel.ActualHeight);
+            ImGui.GetIO().DisplaySize = new((float)swapChainPanel.ActualWidth, (float)swapChainPanel.ActualHeight);
 
             SceneManager.Awake();
             SceneManager.Start();

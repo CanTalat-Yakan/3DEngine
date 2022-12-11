@@ -11,17 +11,17 @@ namespace Engine.Utilities
 
         public SceneManager(Scene scene = null)
         {
-            Scene = scene != null ? scene : new Scene() { ID = new Guid(), Name = "Core", IsEnabled = true, EntitytManager = new EntityManager() };
+            Scene = scene != null ? scene : new() { ID = Guid.NewGuid(), Name = "Core", IsEnabled = true, EntitytManager = new() };
             Subscenes = new List<Scene>();
         }
 
-        public static Scene AddSubscene(Guid guid = new Guid(), string name = "Subscene", bool enable = true)
+        public static Scene AddSubscene(Guid guid = new(), string name = "Subscene", bool enable = true)
         {
             if (guid.Equals(Guid.Empty))
                 guid = Guid.NewGuid();
 
             Scene scene;
-            Subscenes.Add(scene = new Scene() { ID = guid, Name = name, IsEnabled = enable, EntitytManager = new EntityManager() });
+            Subscenes.Add(scene = new() { ID = guid, Name = name, IsEnabled = enable, EntitytManager = new() });
 
             return scene;
         }

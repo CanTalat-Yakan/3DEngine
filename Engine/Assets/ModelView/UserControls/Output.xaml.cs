@@ -19,7 +19,7 @@ namespace Editor.ModelView
 
             ChangeColorWithTheme = x_Grid_Main;
 
-            _outputControl = new Controller.Output(
+            _outputControl = new(
                 x_Stackpanel_Output,
                 x_ScrollViewer_Output,
                 x_AppBarToggleButton_Output_Collapse,
@@ -29,11 +29,11 @@ namespace Editor.ModelView
                 x_AppBarToggleButton_Debug_ErrorPause,
                 x_AppBarToggleButton_Debug_ClearPlay);
 
-            DispatcherTimer dispatcher = new DispatcherTimer();
+            DispatcherTimer dispatcher = new();
             dispatcher.Interval = TimeSpan.FromMilliseconds(42);
             dispatcher.Tick += Tick;
             //dispatcher.Start();
-            DispatcherTimer dispatcherSec = new DispatcherTimer();
+            DispatcherTimer dispatcherSec = new();
             dispatcherSec.Interval = TimeSpan.FromSeconds(1);
             dispatcherSec.Tick += TickSec;
             dispatcherSec.Start();

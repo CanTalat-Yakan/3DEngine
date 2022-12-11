@@ -29,8 +29,8 @@ namespace Editor.Controller
                             CreateSlider((float)Camera.s_FieldOfView, 40, 110, (s, e) => { Camera.s_FieldOfView = e.NewValue; }).WrapInGridVertical("Field Of View"),
                             CreateNumberInput(CameraController.s_MovementSpeed, 1, 100, (s, e) => { CameraController.s_MovementSpeed = (float)e.NewValue; }).WrapInGridVertical("Movement Speed"))),
                 CreateAppBarSeperator(),
-                CreateComboBox(new string[] { "Perspective", "Orthogonal" }),
-                CreateComboBox(new string[] { "Lit", "Unlit", "Wireframe", "Shaded Wireframe" }),
+                CreateComboBox(new[] { "Perspective", "Orthogonal" }),
+                CreateComboBox(new[] { "Lit", "Unlit", "Wireframe", "Shaded Wireframe" }),
             };
 
             GridMain.Children.Add(WrapInStackPanelDockTopLeft(topLeft));

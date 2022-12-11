@@ -4,11 +4,11 @@ using Engine.Components;
 using Editor.Controller;
 using Engine.ECS;
 using Engine.Utilities;
-using Microsoft.CodeAnalysis;
+//using Microsoft.CodeAnalysis;
 
 namespace Engine.Editor
 {
-    [Generator]
+    //[Generator]
     internal class SceneBoot : Component
     {
         public Entity Camera;
@@ -24,8 +24,8 @@ namespace Engine.Editor
         {
             Camera = SceneManager.Scene.EntitytManager.CreateEntity(null, "Camera");
             Camera.Tag = ETags.MainCamera;
-            Camera.Transform.Position = new Vector3(3, 4, 5);
-            Camera.Transform.EulerAngles = new Vector3(35, -150, 0);
+            Camera.Transform.Position = new(3, 4, 5);
+            Camera.Transform.EulerAngles = new(35, -150, 0);
             Camera.AddComponent(new Camera());
             Camera.AddComponent(new CameraController());
 
@@ -40,12 +40,12 @@ namespace Engine.Editor
 
             Entity parent = SceneManager.Scene.EntitytManager.CreateEntity(null, "Content");
 
-            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Sphere, parent).Transform.Position = new Vector3(0, 0, 1);
-            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Sphere, parent).Transform.Position = new Vector3(0, 0, -3);
-            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Sphere, parent).Transform.Position = new Vector3(0, 2.5f, 0);
-            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Sphere, parent).Transform.Position = new Vector3(0, -4, 0);
-            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Sphere, parent).Transform.Position = new Vector3(2, 0, 0);
-            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Sphere, parent).Transform.Position = new Vector3(-1, 1, 0);
+            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Sphere, parent).Transform.Position = new(0, 0, 1);
+            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Sphere, parent).Transform.Position = new(0, 0, -3);
+            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Sphere, parent).Transform.Position = new(0, 2.5f, 0);
+            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Sphere, parent).Transform.Position = new(0, -4, 0);
+            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Sphere, parent).Transform.Position = new(2, 0, 0);
+            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Sphere, parent).Transform.Position = new(-1, 1, 0);
 
             _subParent = SceneManager.Scene.EntitytManager.CreateEntity(null, "Cubes");
             _subParent.Parent = parent;
@@ -71,8 +71,8 @@ namespace Engine.Editor
                 for (int i = 0; i < 10; i++)
                 {
                     var newCube = SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Cube, _subParent);
-                    newCube.Transform.EulerAngles = new Vector3(new Random().Next(1, 360), new Random().Next(1, 360), new Random().Next(1, 360));
-                    newCube.Transform.Scale = new Vector3(new Random().Next(1, 3), new Random().Next(1, 3), new Random().Next(1, 3));
+                    newCube.Transform.EulerAngles = new(new Random().Next(1, 360), new Random().Next(1, 360), new Random().Next(1, 360));
+                    newCube.Transform.Scale = new(new Random().Next(1, 3), new Random().Next(1, 3), new Random().Next(1, 3));
                 }
             }
         }

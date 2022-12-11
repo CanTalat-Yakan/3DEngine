@@ -68,19 +68,19 @@ namespace Editor.Controller
         public void PopulateFilesCategories()
         {
             CreateCatergoryTiles(
-                new Category() { Name = "Scenes", Glyph = "\xEA86", FileTypes = new string[] { ".usd", ".usda", ".usdc", ".usdz" }, Creatable = true },
-                new Category() { Name = "Scripts", Symbol = Symbol.Document, FileTypes = new string[] { ".cs" }, Creatable = true },
-                new Category() { Name = "Prefabs", Glyph = "\xE734", FileTypes = new string[] { ".prefab" } },
-                new Category() { Name = "Models", Glyph = "\xF158", FileTypes = new string[] { ".fbx", ".obj", ".blend", ".3ds", ".dae" } },
-                new Category() { Name = "Animations", Glyph = "\xE805", FileTypes = new string[] { ".fbx", ".dae" } },
-                new Category() { Name = "Materials", Glyph = "\xF156", FileTypes = new string[] { ".mat" }, Creatable = true },
-                new Category() { Name = "Textures", Symbol = Symbol.Pictures, FileTypes = new string[] { ".png", ".jpg", ".jpeg", ".tiff", ".tga", ".psd", ".bmp", }, Thumbnail = true },
-                new Category() { Name = "Audios", Symbol = Symbol.Audio, FileTypes = new string[] { ".m4a", ".mp3", ".wav", ".ogg" } },
-                new Category() { Name = "Videos", Symbol = Symbol.Video, FileTypes = new string[] { ".m4v", ".mp4", ".mov", ".avi" }, Thumbnail = false },
-                new Category() { Name = "Fonts", Symbol = Symbol.Font, FileTypes = new string[] { ".ttf", ".otf" } },
-                new Category() { Name = "Shaders", Glyph = "\xE706", FileTypes = new string[] { ".hlsl" }, Creatable = true },
-                new Category() { Name = "Documents", Symbol = Symbol.Document, FileTypes = new string[] { ".txt", ".pdf", ".doc", ".docx" }, Creatable = true },
-                new Category() { Name = "Packages", Glyph = "\xE7B8", FileTypes = new string[] { ".zip", ".7zip", ".rar" } });
+                new() { Name = "Scenes", Glyph = "\xEA86", FileTypes = new string[] { ".usd", ".usda", ".usdc", ".usdz" }, Creatable = true },
+                new() { Name = "Scripts", Symbol = Symbol.Document, FileTypes = new string[] { ".cs" }, Creatable = true },
+                new() { Name = "Prefabs", Glyph = "\xE734", FileTypes = new string[] { ".prefab" } },
+                new() { Name = "Models", Glyph = "\xF158", FileTypes = new string[] { ".fbx", ".obj", ".blend", ".3ds", ".dae" } },
+                new() { Name = "Animations", Glyph = "\xE805", FileTypes = new string[] { ".fbx", ".dae" } },
+                new() { Name = "Materials", Glyph = "\xF156", FileTypes = new string[] { ".mat" }, Creatable = true },
+                new() { Name = "Textures", Symbol = Symbol.Pictures, FileTypes = new string[] { ".png", ".jpg", ".jpeg", ".tiff", ".tga", ".psd", ".bmp", }, Thumbnail = true },
+                new() { Name = "Audios", Symbol = Symbol.Audio, FileTypes = new string[] { ".m4a", ".mp3", ".wav", ".ogg" } },
+                new() { Name = "Videos", Symbol = Symbol.Video, FileTypes = new string[] { ".m4v", ".mp4", ".mov", ".avi" }, Thumbnail = false },
+                new() { Name = "Fonts", Symbol = Symbol.Font, FileTypes = new string[] { ".ttf", ".otf" } },
+                new() { Name = "Shaders", Glyph = "\xE706", FileTypes = new string[] { ".hlsl" }, Creatable = true },
+                new() { Name = "Documents", Symbol = Symbol.Document, FileTypes = new string[] { ".txt", ".pdf", ".doc", ".docx" }, Creatable = true },
+                new() { Name = "Packages", Glyph = "\xE7B8", FileTypes = new string[] { ".zip", ".7zip", ".rar" } });
         }
 
         public async void SelectFilesAsync()
@@ -303,7 +303,7 @@ namespace Editor.Controller
             {
                 Grid icon = CreateIcon(_currentCategory.Value);
 
-                Image image = new Image() { Width = 145, Height = 90 };
+                Image image = new() { Width = 145, Height = 90 };
 
                 if (_currentCategory.Value.Thumbnail)
                 {
@@ -318,7 +318,7 @@ namespace Editor.Controller
 
         private Grid CategoryTile(Category category, Grid icon)
         {
-            Grid grid = new Grid() { Padding = new Thickness(-1), CornerRadius = new CornerRadius(10) };
+            Grid grid = new() { Padding = new(-1), CornerRadius = new(10) };
             grid.Background = new SolidColorBrush(new Color()
             {
                 A = 255,
@@ -327,11 +327,11 @@ namespace Editor.Controller
                 G = (byte)new Random().Next(32, 96)
             });
 
-            Button button = new Button()
+            Button button = new()
             {
                 Width = 145,
                 Height = 90,
-                Padding = new Thickness(10),
+                Padding = new(10),
                 HorizontalContentAlignment = HorizontalAlignment.Stretch,
                 VerticalContentAlignment = VerticalAlignment.Stretch,
                 DataContext = category,
@@ -343,10 +343,10 @@ namespace Editor.Controller
                 Refresh();
             };
 
-            Grid grid2 = new Grid() { HorizontalAlignment = HorizontalAlignment.Stretch };
+            Grid grid2 = new() { HorizontalAlignment = HorizontalAlignment.Stretch };
 
-            Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24, HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top };
-            TextBlock label = new TextBlock() { Text = category.Name, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Bottom };
+            Viewbox viewbox = new() { MaxHeight = 24, MaxWidth = 24, HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top };
+            TextBlock label = new() { Text = category.Name, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Bottom };
 
             viewbox.Child = icon;
             grid2.Children.Add(viewbox);
@@ -363,7 +363,7 @@ namespace Editor.Controller
 
         private Grid FolderTile(string path, Grid icon)
         {
-            Grid grid = new Grid() { Padding = new Thickness(-1), CornerRadius = new CornerRadius(10) };
+            Grid grid = new() { Padding = new(-1), CornerRadius = new(10) };
             grid.Background = new SolidColorBrush(new Color()
             {
                 A = 255,
@@ -372,21 +372,21 @@ namespace Editor.Controller
                 G = (byte)new Random().Next(32, 96)
             });
 
-            Button button = new Button()
+            Button button = new()
             {
                 Width = 145,
                 Height = 75,
-                Padding = new Thickness(10),
+                Padding = new (10),
                 HorizontalContentAlignment = HorizontalAlignment.Stretch,
                 VerticalContentAlignment = VerticalAlignment.Stretch,
             };
             button.ContextFlyout = CreateDefaultMenuFlyout(path);
             button.Click += (s, e) => GoIntoDirectoryAndRefresh(path);
 
-            Grid grid2 = new Grid() { HorizontalAlignment = HorizontalAlignment.Stretch };
+            Grid grid2 = new() { HorizontalAlignment = HorizontalAlignment.Stretch };
 
-            Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24, HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top };
-            TextBlock label = new TextBlock()
+            Viewbox viewbox = new() { MaxHeight = 24, MaxWidth = 24, HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top };
+            TextBlock label = new()
             {
                 Text = Path.GetFileName(path),
                 FontSize = 12,
@@ -408,21 +408,21 @@ namespace Editor.Controller
         {
             image.Opacity = 0.5f;
 
-            Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, -30) };
-            Grid grid2 = new Grid() { Padding = new Thickness(10) };
-            Grid grid3 = new Grid();
+            Grid grid = new() { Margin = new(0, 0, 0, -30) };
+            Grid grid2 = new() { Padding = new(10) };
+            Grid grid3 = new();
 
-            Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24, HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top };
-            TextBlock fileType = new TextBlock() { Text = Path.GetExtension(path), HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Bottom };
+            Viewbox viewbox = new() { MaxHeight = 24, MaxWidth = 24, HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top };
+            TextBlock fileType = new() { Text = Path.GetExtension(path), HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Bottom };
 
-            StackPanel stack = new StackPanel() { Spacing = 5 };
+            StackPanel stack = new() { Spacing = 5 };
 
-            Button button = new Button()
+            Button button = new()
             {
                 Width = 143,
                 Height = 73,
-                Padding = new Thickness(0),
-                CornerRadius = new CornerRadius(10),
+                Padding = new(0),
+                CornerRadius = new(10),
                 HorizontalContentAlignment = HorizontalAlignment.Stretch,
                 VerticalContentAlignment = VerticalAlignment.Stretch,
             };
@@ -438,7 +438,7 @@ namespace Editor.Controller
                     Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
             };
 
-            TextBlock label = new TextBlock()
+            TextBlock label = new()
             {
                 Text = Path.GetFileNameWithoutExtension(path),
                 FontSize = 12,
@@ -467,13 +467,13 @@ namespace Editor.Controller
 
             GridMain.ContextFlyout = CreateRootMenuFlyout(path);
 
-            Grid grid = new Grid();
+            Grid grid = new();
 
-            Button button = new Button()
+            Button button = new()
             {
                 Width = 67,
                 Height = 73,
-                CornerRadius = new CornerRadius(10),
+                CornerRadius = new(10),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
             };
@@ -482,7 +482,7 @@ namespace Editor.Controller
                 GoUpDirectoryAndRefresh();
             };
 
-            Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
+            Viewbox viewbox = new() { MaxHeight = 24, MaxWidth = 24 };
 
             viewbox.Child = icon;
             button.Content = viewbox;
@@ -493,13 +493,13 @@ namespace Editor.Controller
 
         private Grid AddTile(Grid icon)
         {
-            Grid grid = new Grid();
+            Grid grid = new();
 
-            Button button = new Button()
+            Button button = new()
             {
                 Width = 66,
                 Height = 73,
-                CornerRadius = new CornerRadius(10),
+                CornerRadius = new(10),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
             };
@@ -511,7 +511,7 @@ namespace Editor.Controller
                     ContentDialogCreateNewFolderAndRefreshAsync();
             };
 
-            Viewbox viewbox = new Viewbox() { MaxHeight = 24, MaxWidth = 24 };
+            Viewbox viewbox = new() { MaxHeight = 24, MaxWidth = 24 };
 
             viewbox.Child = icon;
             button.Content = viewbox;
@@ -522,7 +522,7 @@ namespace Editor.Controller
 
         private async void ContentDialogCreateNewFileOrFolderAndRefreshAsync(string path = "")
         {
-            var dialog = new ContentDialog()
+            ContentDialog dialog = new()
             {
                 XamlRoot = _files.XamlRoot,
                 Title = "Create a new file system entry",
@@ -544,7 +544,7 @@ namespace Editor.Controller
         {
             TextBox fileName;
 
-            var dialog = new ContentDialog()
+            ContentDialog dialog = new()
             {
                 XamlRoot = _files.XamlRoot,
                 Title = "Create a new " + RemoveLastChar(_currentCategory.Value.Name),
@@ -608,7 +608,7 @@ namespace Editor.Controller
         {
             TextBox fileName;
 
-            var dialog = new ContentDialog()
+            ContentDialog dialog = new()
             {
                 XamlRoot = _files.XamlRoot,
                 Title = "Create a new folder",
@@ -669,7 +669,7 @@ namespace Editor.Controller
         {
             TextBox fileName;
 
-            var dialog = new ContentDialog()
+            ContentDialog dialog = new()
             {
                 XamlRoot = _files.XamlRoot,
                 Title = "Rename",
@@ -717,7 +717,7 @@ namespace Editor.Controller
 
         private async void ContentDialogDelete(string path)
         {
-            var dialog = new ContentDialog()
+            ContentDialog dialog = new()
             {
                 XamlRoot = _files.XamlRoot,
                 Title = "Delete " + Path.GetFileName(path),
@@ -1023,7 +1023,7 @@ namespace Editor.Controller
 
         private Grid CreateIcon(Category _category)
         {
-            Grid grid = new Grid();
+            Grid grid = new();
 
             dynamic icon;
 
@@ -1039,7 +1039,7 @@ namespace Editor.Controller
 
         private Grid CreateIcon(string glyph)
         {
-            Grid grid = new Grid();
+            Grid grid = new();
 
             FontIcon icon = new FontIcon() { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = glyph };
 
@@ -1050,9 +1050,9 @@ namespace Editor.Controller
 
         private Grid CreateIcon(Symbol symbol)
         {
-            Grid grid = new Grid();
+            Grid grid = new();
 
-            SymbolIcon symbolIcon = new SymbolIcon() { Symbol = symbol };
+            SymbolIcon symbolIcon = new() { Symbol = symbol };
 
             grid.Children.Add(symbolIcon);
 
@@ -1063,7 +1063,7 @@ namespace Editor.Controller
         {
             using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
             {
-                BitmapImage bitmapImage = new BitmapImage() { DecodePixelWidth = (int)image.Width, DecodePixelHeight = (int)image.Height };
+                BitmapImage bitmapImage = new() { DecodePixelWidth = (int)image.Width, DecodePixelHeight = (int)image.Height };
 
                 await bitmapImage.SetSourceAsync(fileStream);
 

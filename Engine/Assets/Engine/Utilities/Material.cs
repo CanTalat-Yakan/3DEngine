@@ -30,7 +30,7 @@ namespace Engine.Utilities
             #endregion
 
             #region //Create InputLayout
-            var inputElements = new InputElementDescription[] {
+            InputElementDescription[] inputElements = new[] {
                 new InputElementDescription("POSITION", 0, Format.R32G32B32_Float, 0, 0),
                 new InputElementDescription("TEXCOORD", 0, Format.R32G32_Float, InputElementDescription.AppendAligned, 0),
                 new InputElementDescription("NORMAL", 0, Format.R32G32B32_Float, InputElementDescription.AppendAligned, 0)};
@@ -58,9 +58,9 @@ namespace Engine.Utilities
             #endregion
 
             #region //Create ConstantBuffers for Model
-            SPerModelConstantBuffer cbModel = new SPerModelConstantBuffer();
+            SPerModelConstantBuffer cbModel = new();
 
-            BufferDescription bufferDescription = new BufferDescription
+            BufferDescription bufferDescription = new()
             {
                 BindFlags = BindFlags.ConstantBuffer,
                 CPUAccessFlags = CpuAccessFlags.Write,
@@ -74,7 +74,7 @@ namespace Engine.Utilities
             var texture = ImageLoader.LoadTexture(_d3d.Device, imageFileName);
             _resourceView = _d3d.Device.CreateShaderResourceView(texture);
 
-            SamplerDescription samplerStateDescription = new SamplerDescription
+            SamplerDescription samplerStateDescription = new()
             {
                 Filter = Filter.MinMagMipLinear,
                 AddressU = TextureAddressMode.Clamp,

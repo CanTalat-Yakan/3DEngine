@@ -60,7 +60,7 @@ namespace Editor.Controller
             Viewbox viewbox = new() { Width = 16, Height = 16 };
             viewbox.Child = icon;
 
-            ToggleButton button = new() { IsChecked = isChecked, Padding = new Thickness(7) };
+            ToggleButton button = new() { IsChecked = isChecked, Padding = new(7) };
             button.Content = viewbox;
 
             return button;
@@ -98,7 +98,7 @@ namespace Editor.Controller
 
         internal virtual UIElement CreateSeperator()
         {
-            NavigationViewItemSeparator seperator = new NavigationViewItemSeparator() { Margin = new Thickness(10) };
+            NavigationViewItemSeparator seperator = new() { Margin = new(10) };
 
             return seperator;
         }
@@ -112,7 +112,7 @@ namespace Editor.Controller
 
         internal virtual UIElement CreateTextEqual(string placeholder = "Example")
         {
-            TextBlock textInput = new TextBlock() { Text = placeholder, MaxWidth = 200 };
+            TextBlock textInput = new() { Text = placeholder, MaxWidth = 200 };
 
             return textInput;
         }
@@ -148,10 +148,10 @@ namespace Editor.Controller
 
         internal virtual UIElement CreateSlider(float f = 0, float min = float.MinValue, float max = float.MaxValue, RangeBaseValueChangedEventHandler onValueChanged = null)
         {
-            Slider numInput = new() { Value = f, Minimum = min, Maximum = max, Width = 200, Margin = new Thickness(0, 0, 0, -5.5) };
+            Slider numInput = new() { Value = f, Minimum = min, Maximum = max, Width = 200, Margin = new(0, 0, 0, -5.5) };
             numInput.ValueChanged += onValueChanged;
 
-            TextBlock numPreview = new() { Padding = new Thickness(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
+            TextBlock numPreview = new() { Padding = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
 
             return StackInGrid(numInput, numPreview);
         }
@@ -165,49 +165,49 @@ namespace Editor.Controller
 
         internal virtual Grid CreateVec2Input(Vector2 v = new Vector2())
         {
-            NumberBox numInput = new() { Value = v.X, Margin = new Thickness(0, 0, 4, 0), MaxWidth = 98 };
-            NumberBox num2Input = new() { Value = v.Y, Margin = new Thickness(0, 0, 4, 0), MaxWidth = 98 };
+            NumberBox numInput = new() { Value = v.X, Margin = new(0, 0, 4, 0), MaxWidth = 98 };
+            NumberBox num2Input = new() { Value = v.Y, Margin = new(0, 0, 4, 0), MaxWidth = 98 };
 
             return StackInGrid(numInput, num2Input);
         }
 
         internal virtual Grid CreateVec3Input(Vector3 v = new Vector3())
         {
-            NumberBox numInput = new() { Value = v.X, Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
-            NumberBox num2Input = new() { Value = v.Y, Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
-            NumberBox num3Input = new() { Value = v.Z, Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
+            NumberBox numInput = new() { Value = v.X, Margin = new(0, 0, 4, 0), MaxWidth = 64 };
+            NumberBox num2Input = new() { Value = v.Y, Margin = new(0, 0, 4, 0), MaxWidth = 64 };
+            NumberBox num3Input = new() { Value = v.Z, Margin = new(0, 0, 4, 0), MaxWidth = 64 };
 
             return StackInGrid(numInput, num2Input, num3Input);
         }
 
         internal virtual Grid CreateVec3InputTransform(Vector3 v = new Vector3())
         {
-            Rectangle rectangleR = new Rectangle() { Fill = new SolidColorBrush(Colors.IndianRed), RadiusX = 2, RadiusY = 2, Width = 4 };
-            NumberBox numInput = new NumberBox() { Value = MathF.Round(v.X, 4), Margin = new Thickness(0, 0, 4, 0), Width = 64 };
+            Rectangle rectangleR = new() { Fill = new SolidColorBrush(Colors.IndianRed), RadiusX = 2, RadiusY = 2, Width = 4 };
+            NumberBox numInput = new() { Value = MathF.Round(v.X, 4), Margin = new(0, 0, 4, 0), Width = 64 };
 
-            Rectangle rectangleG = new Rectangle() { Fill = new SolidColorBrush(Colors.SeaGreen), RadiusX = 2, RadiusY = 2, Width = 4 };
-            NumberBox num2Input = new NumberBox() { Value = MathF.Round(v.Y, 4), Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
+            Rectangle rectangleG = new() { Fill = new SolidColorBrush(Colors.SeaGreen), RadiusX = 2, RadiusY = 2, Width = 4 };
+            NumberBox num2Input = new() { Value = MathF.Round(v.Y, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
 
-            Rectangle rectangleB = new Rectangle() { Fill = new SolidColorBrush(Colors.DodgerBlue), RadiusX = 2, RadiusY = 2, Width = 4 };
-            NumberBox num3Input = new NumberBox() { Value = MathF.Round(v.Z, 4), Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
+            Rectangle rectangleB = new() { Fill = new SolidColorBrush(Colors.DodgerBlue), RadiusX = 2, RadiusY = 2, Width = 4 };
+            NumberBox num3Input = new() { Value = MathF.Round(v.Z, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
 
             return StackInGrid(rectangleR, numInput, rectangleG, num2Input, rectangleB, num3Input);
         }
 
         internal virtual Grid CreateVec3InputTransform(Vector3 v = new Vector3(), params TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs>[] e)
         {
-            Rectangle rectangleR = new Rectangle() { Fill = new SolidColorBrush(Colors.IndianRed), RadiusX = 2, RadiusY = 2, Width = 4 };
-            NumberBox numInput = new NumberBox() { Value = MathF.Round(v.X, 4), Margin = new Thickness(0, 0, 4, 0), Width = 64 };
+            Rectangle rectangleR = new() { Fill = new SolidColorBrush(Colors.IndianRed), RadiusX = 2, RadiusY = 2, Width = 4 };
+            NumberBox numInput = new() { Value = MathF.Round(v.X, 4), Margin = new(0, 0, 4, 0), Width = 64 };
             if (e[0] != null)
                 numInput.ValueChanged += e[0];
 
-            Rectangle rectangleG = new Rectangle() { Fill = new SolidColorBrush(Colors.SeaGreen), RadiusX = 2, RadiusY = 2, Width = 4 };
-            NumberBox num2Input = new NumberBox() { Value = MathF.Round(v.Y, 4), Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
+            Rectangle rectangleG = new() { Fill = new SolidColorBrush(Colors.SeaGreen), RadiusX = 2, RadiusY = 2, Width = 4 };
+            NumberBox num2Input = new() { Value = MathF.Round(v.Y, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
             if (e[1] != null)
                 num2Input.ValueChanged += e[1];
 
-            Rectangle rectangleB = new Rectangle() { Fill = new SolidColorBrush(Colors.DodgerBlue), RadiusX = 2, RadiusY = 2, Width = 4 };
-            NumberBox num3Input = new NumberBox() { Value = MathF.Round(v.Z, 4), Margin = new Thickness(0, 0, 4, 0), MaxWidth = 64 };
+            Rectangle rectangleB = new() { Fill = new SolidColorBrush(Colors.DodgerBlue), RadiusX = 2, RadiusY = 2, Width = 4 };
+            NumberBox num3Input = new() { Value = MathF.Round(v.Z, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
             if (e[2] != null)
                 num3Input.ValueChanged += e[2];
 
@@ -216,14 +216,14 @@ namespace Editor.Controller
 
         internal virtual Grid CreateBool(bool b = false)
         {
-            CheckBox check = new() { IsChecked = b, Margin = new Thickness(0, 0, 0, -5.5) };
+            CheckBox check = new() { IsChecked = b, Margin = new(0, 0, 0, -5.5) };
 
             return StackInGrid(check);
         }
 
         internal virtual Grid CreateEnum(params string[] items)
         {
-            ComboBox comboBox = new ComboBox() { FontSize = 13.5f, HorizontalAlignment = HorizontalAlignment.Stretch };
+            ComboBox comboBox = new() { FontSize = 13.5f, HorizontalAlignment = HorizontalAlignment.Stretch };
 
             foreach (var item in items)
                 comboBox.Items.Add(item);
@@ -235,7 +235,7 @@ namespace Editor.Controller
 
         internal virtual Grid CreateEvent(string s = "Event", RoutedEventHandler e = null)
         {
-            Button button = new Button() { Content = s };
+            Button button = new() { Content = s };
             button.Click += e;
 
             return StackInGrid(button);
@@ -247,7 +247,7 @@ namespace Editor.Controller
             col.R = r; col.G = g; col.B = b; col.A = a;
             ColorPickerButton colbutton = new() { SelectedColor = col };
 
-            var stylee = new Style { TargetType = typeof(ColorPicker) };
+            Style stylee = new() { TargetType = typeof(ColorPicker) };
             stylee.Setters.Add(new Setter(ColorPicker.ColorSpectrumShapeProperty, ColorSpectrumShape.Ring));
             stylee.Setters.Add(new Setter(ColorPicker.IsAlphaEnabledProperty, true));
             stylee.Setters.Add(new Setter(ColorPicker.IsHexInputVisibleProperty, true));
@@ -259,7 +259,7 @@ namespace Editor.Controller
         internal virtual Grid CreateHeader(string s = "Header")
         {
             Grid grid = new();
-            TextBlock header = new() { Text = s, FontSize = 18, FontWeight = FontWeights.Bold, Margin = new Thickness(0, 20, 0, 0) };
+            TextBlock header = new() { Text = s, FontSize = 18, FontWeight = FontWeights.Bold, Margin = new(0, 20, 0, 0) };
 
             grid.Children.Add(header);
 
@@ -277,7 +277,7 @@ namespace Editor.Controller
         {
             Grid grid = new();
 
-            Button button = new() { Content = s, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(10) };
+            Button button = new() { Content = s, HorizontalAlignment = HorizontalAlignment.Center, Margin = new(10) };
             button.Tapped += tapped;
 
             grid.Children.Add(button);
@@ -287,9 +287,9 @@ namespace Editor.Controller
 
         internal virtual Grid CreateTreeView(out TreeView tree, DataTemplateSelector templateSelector = null)
         {
-            Grid grid = new Grid();
+            Grid grid = new();
 
-            tree = new TreeView() { ItemTemplateSelector = templateSelector, SelectionMode = TreeViewSelectionMode.Single, HorizontalAlignment = HorizontalAlignment.Stretch };
+            tree = new() { ItemTemplateSelector = templateSelector, SelectionMode = TreeViewSelectionMode.Single, HorizontalAlignment = HorizontalAlignment.Stretch };
 
             grid.Children.Add(tree);
 
@@ -338,9 +338,9 @@ namespace Editor.Controller
 
     internal static class ExtensionMethods
     {
-        public static float Remap(this float _value, float _oldMin, float _oldMax, float _newMin, float _newMax)
+        public static float Remap(this float value, float sourceMin, float sourceMax, float targetMin, float targetMax)
         {
-            return (_value - _oldMin) / (_oldMax - _oldMin) * (_newMax - _newMin) + _newMin;
+            return (value - sourceMin) / (sourceMax - sourceMin) * (targetMax - targetMin) + targetMin;
         }
 
         public static Grid WrapInGrid(this UIElement content)
@@ -393,9 +393,9 @@ namespace Editor.Controller
 
         public static Grid WrapInFieldEqual(this UIElement content, string text)
         {
-            Grid grid = new Grid();
-            StackPanel stack = new StackPanel() { Orientation = Orientation.Horizontal };
-            TextBlock header = new TextBlock() { Text = text, Width = 160, VerticalAlignment = VerticalAlignment.Bottom };
+            Grid grid = new();
+            StackPanel stack = new() { Orientation = Orientation.Horizontal };
+            TextBlock header = new() { Text = text, Width = 160, VerticalAlignment = VerticalAlignment.Bottom };
 
             stack.Children.Add(header);
             stack.Children.Add(content);
@@ -420,11 +420,11 @@ namespace Editor.Controller
 
         public static Grid WrapInExpander(this Grid content, string text)
         {
-            Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, 2) };
-            Expander expander = new Expander()
+            Grid grid = new() { Margin = new(0, 0, 0, 2) };
+            Expander expander = new()
             {
                 Header = text,
-                Padding = new Thickness(15),
+                Padding = new(15),
                 ExpandDirection = ExpandDirection.Down,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 HorizontalContentAlignment = HorizontalAlignment.Stretch
@@ -439,10 +439,10 @@ namespace Editor.Controller
 
         public static Grid WrapInExpanderWithToggleButton(this Grid content, string text)
         {
-            Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, 2) };
-            Expander expander = new Expander()
+            Grid grid = new() { Margin = new(0, 0, 0, 2) };
+            Expander expander = new()
             {
-                Padding = new Thickness(15),
+                Padding = new(15),
                 ExpandDirection = ExpandDirection.Down,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 HorizontalContentAlignment = HorizontalAlignment.Stretch
@@ -457,15 +457,15 @@ namespace Editor.Controller
 
         public static Grid WrapInExpanderWithEditableHeader(this Grid content, string text)
         {
-            Grid grid = new Grid() { Margin = new Thickness(0, 0, 0, 2) };
-            Expander expander = new Expander()
+            Grid grid = new() { Margin = new(0, 0, 0, 2) };
+            Expander expander = new()
             {
-                Padding = new Thickness(15),
+                Padding = new(15),
                 ExpandDirection = ExpandDirection.Down,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 HorizontalContentAlignment = HorizontalAlignment.Stretch
             };
-            expander.Header = new TextBox() { Text = text, Margin = new Thickness(0) };
+            expander.Header = new TextBox() { Text = text, Margin = new(0) };
             expander.Content = content;
 
             grid.Children.Add(expander);
@@ -480,10 +480,7 @@ namespace Editor.Controller
             return content;
         }
 
-        public static async void CreateDialogAsync(this ContentDialog contentDialog)
-        {
-            var result = await contentDialog.ShowAsync();
-        }
+        public static async void CreateDialogAsync(this ContentDialog contentDialog) => await contentDialog.ShowAsync();
     }
 
     internal sealed class BooleanToVisibilityConverter : IValueConverter
@@ -493,9 +490,9 @@ namespace Editor.Controller
             bool bValue = false;
             if (value is bool)
                 bValue = (bool)value;
-            else if (value is Nullable<bool>)
+            else if (value is bool?)
             {
-                Nullable<bool> tmp = (Nullable<bool>)value;
+                bool? tmp = (bool?)value;
                 bValue = tmp.HasValue ? tmp.Value : false;
             }
             return (bValue) ? Visibility.Visible : Visibility.Collapsed;
@@ -524,12 +521,12 @@ namespace Editor.Controller
             bool bValue = false;
             if (value is bool)
                 bValue = (bool)value;
-            else if (value is Nullable<bool>)
+            else if (value is bool?)
             {
-                Nullable<bool> tmp = (Nullable<bool>)value;
+                bool? tmp = (bool?)value;
                 bValue = tmp.HasValue ? tmp.Value : false;
             }
-            return (bValue) ? _initialValue : new GridLength(0);
+            return (bValue) ? _initialValue : new(0);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)

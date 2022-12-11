@@ -37,12 +37,12 @@ namespace Editor.Controller
 
         private void CreateEmptyMessage()
         {
-            Grid grid = new Grid() { Margin = new Thickness(0, 20, 0, 0) };
+            Grid grid = new() { Margin = new(0, 20, 0, 0) };
 
-            StackPanel stack = new StackPanel() { HorizontalAlignment = HorizontalAlignment.Center };
+            StackPanel stack = new() { HorizontalAlignment = HorizontalAlignment.Center };
 
-            TextBlock textBlock = new TextBlock() { Text = "Select a file or an entity", Opacity = 0.5f, HorizontalAlignment = HorizontalAlignment.Center };
-            TextBlock textBlock2 = new TextBlock() { Text = "to view its properties.", Opacity = 0.5f, HorizontalAlignment = HorizontalAlignment.Center };
+            TextBlock textBlock = new() { Text = "Select a file or an entity", Opacity = 0.5f, HorizontalAlignment = HorizontalAlignment.Center };
+            TextBlock textBlock2 = new() { Text = "to view its properties.", Opacity = 0.5f, HorizontalAlignment = HorizontalAlignment.Center };
 
             stack.Children.Add(textBlock);
             stack.Children.Add(textBlock2);
@@ -54,7 +54,7 @@ namespace Editor.Controller
 
         private void CreateEntityProperties(Entity entity)
         {
-            var properties = new Grid[]
+            Grid[] properties = new[]
             {
                 CreateBool(true).WrapInField("Is Acitve"),
                 CreateBool().WrapInField("Is Static"),
@@ -62,7 +62,7 @@ namespace Editor.Controller
                 CreateEnum(Enum.GetNames(typeof(ELayers))).WrapInField("Layer")
             };
 
-            var transform = new Grid[]
+            Grid[] transform = new[]
             {
                 CreateVec3InputTransform(
                     entity.Transform.Position,
@@ -81,7 +81,7 @@ namespace Editor.Controller
                     (s, e) => entity.Transform.Scale.Z = (float)e.NewValue).WrapInField("Scale"),
             };
 
-            var collection = new Grid[]
+            Grid[] collection = new[]
             {
                 CreateColorButton().WrapInField("Color"),
                 CreateNumberInput().WrapInField("Float"),
@@ -112,9 +112,9 @@ namespace Editor.Controller
         {
             Main.Instance.LayoutControl.Hierarchy._hierarchyControl.DeselectTreeViewNodes();
 
-            FileInfo fileInfo = new FileInfo(path);
+            FileInfo fileInfo = new(path);
 
-            var properties = new Grid[]
+            Grid[] properties = new[]
             {
                 CreateText(Path.GetFileNameWithoutExtension(path)).WrapInFieldEqual("File name:"),
                 CreateText(Path.GetExtension(path)).WrapInFieldEqual("File type:"),
@@ -143,7 +143,7 @@ namespace Editor.Controller
                     string[] lines = await File.ReadAllLinesAsync(path);
                     string joinedLines = string.Join("\n", lines);
 
-                    Grid[] preview = new Grid[] { CreateTextFullWithOpacity(joinedLines).WrapInGrid() };
+                    Grid[] preview = new[] { CreateTextFullWithOpacity(joinedLines).WrapInGrid() };
 
                     _stackPanel.Children.Add(preview.StackInGrid().WrapInExpander("Preview"));
                 }
@@ -154,10 +154,10 @@ namespace Editor.Controller
     {
         private Grid CreateTextureSlot()
         {
-            Grid container = new Grid() { Width = 48, Height = 48 };
-            Image img = new Image() { Stretch = Stretch.UniformToFill };
-            Button button = new Button() { HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch };
-            TextBlock path = new TextBlock() { Text = "None", Margin = new Thickness(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
+            Grid container = new() { Width = 48, Height = 48 };
+            Image img = new() { Stretch = Stretch.UniformToFill };
+            Button button = new() { HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch };
+            TextBlock path = new() { Text = "None", Margin = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
 
             container.Children.Add(img);
             container.Children.Add(button);
@@ -167,15 +167,15 @@ namespace Editor.Controller
 
         private Grid CreateReferenceSlot()
         {
-            Button button = new Button() { Content = "..." };
-            TextBlock reference = new TextBlock() { Text = "None (type)", Margin = new Thickness(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
+            Button button = new() { Content = "..." };
+            TextBlock reference = new() { Text = "None (type)", Margin = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
 
             return StackInGrid(button, reference);
         }
 
         private async void SelectImageAsync(Image image, TextBlock path)
         {
-            var picker = new FileOpenPicker()
+            FileOpenPicker picker = new()
             {
                 ViewMode = PickerViewMode.Thumbnail,
                 SuggestedStartLocation = PickerLocationId.PicturesLibrary,
@@ -193,17 +193,18 @@ namespace Editor.Controller
             {
                 using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
                 {
-                    BitmapImage bitmapImage = new BitmapImage() { DecodePixelHeight = 48, DecodePixelWidth = 48 };
+                    BitmapImage bitmapImage = new() { DecodePixelHeight = 48, DecodePixelWidth = 48 };
                     await bitmapImage.SetSourceAsync(fileStream);
                     image.Source = bitmapImage;
                 }
+
                 path.Text = file.Name;
             }
         }
 
         private async void SelectFileAsync(TextBlock path)
         {
-            var picker = new FileOpenPicker()
+            FileOpenPicker picker = new()
             {
                 ViewMode = PickerViewMode.Thumbnail,
                 SuggestedStartLocation = PickerLocationId.Desktop,
@@ -218,9 +219,7 @@ namespace Editor.Controller
             StorageFile file = await picker.PickSingleFileAsync();
 
             if (file != null)
-            {
                 path.Text = file.Name;
-            }
         }
 
     }

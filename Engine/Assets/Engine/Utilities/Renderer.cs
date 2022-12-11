@@ -41,14 +41,14 @@ namespace Engine.Utilities
             #endregion
 
             #region //Create Buffer Description for swapChain description
-            var swapChainDescription = new SwapChainDescription1()
+            SwapChainDescription1 swapChainDescription = new()
             {
                 AlphaMode = AlphaMode.Ignore,
                 BufferCount = 2,
                 Format = Format.R8G8B8A8_UNorm,
                 Height = (int)SwapChainPanel.RenderSize.Height,
                 Width = (int)SwapChainPanel.RenderSize.Width,
-                SampleDescription = new SampleDescription(1, 0),
+                SampleDescription = new(1, 0),
                 Scaling = Scaling.Stretch,
                 Stereo = false,
                 SwapEffect = SwapEffect.FlipSequential,
@@ -87,7 +87,7 @@ namespace Engine.Utilities
             #endregion
 
             #region //Create depth stencil view
-            _depthStencilTextureDescription = new Texture2DDescription
+            _depthStencilTextureDescription = new()
             {
                 Format = Format.D32_Float,
                 ArraySize = 1,
@@ -103,7 +103,7 @@ namespace Engine.Utilities
             using (_depthStencilTexture = Device.CreateTexture2D(_depthStencilTextureDescription))
                 _depthStencilView = Device.CreateDepthStencilView(_depthStencilTexture);
 
-            DepthStencilDescription desc = new DepthStencilDescription()
+            DepthStencilDescription desc = new()
             {
                 DepthEnable = true,
                 DepthFunc = ComparisonFunction.Less,
@@ -119,8 +119,8 @@ namespace Engine.Utilities
             #endregion
 
             #region //Create Blend State
-            var blendStateDesc = new BlendDescription();
-            var renTarDesc = new RenderTargetBlendDescription()
+            BlendDescription blendStateDesc = new();
+            RenderTargetBlendDescription renTarDesc = new()
             {
                 IsBlendEnabled = true,
                 SourceBlend = Blend.SourceAlpha,
@@ -179,7 +179,7 @@ namespace Engine.Utilities
 
         public void SetSolid()
         {
-            var rasterizerDesc = new RasterizerDescription()
+            RasterizerDescription rasterizerDesc = new()
             {
                 FillMode = FillMode.Solid,
                 CullMode = CullMode.Back,
@@ -190,7 +190,7 @@ namespace Engine.Utilities
 
         public void SetWireframe()
         {
-            var rasterizerDescWireframe = new RasterizerDescription()
+            RasterizerDescription rasterizerDescWireframe = new()
             {
                 FillMode = FillMode.Wireframe,
                 CullMode = CullMode.None,

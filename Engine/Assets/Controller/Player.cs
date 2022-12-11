@@ -38,7 +38,7 @@ namespace Editor.Controller
                     _output.ClearOutput();
 
             Main.Instance.LayoutControl.ViewPort._viewPortControl.GridMain.BorderBrush = new SolidColorBrush(Colors.GreenYellow);
-            Main.Instance.LayoutControl.ViewPort._viewPortControl.GridMain.BorderThickness = new Thickness(_play.IsChecked.Value ? 2 : 0);
+            Main.Instance.LayoutControl.ViewPort._viewPortControl.GridMain.BorderThickness = new(_play.IsChecked.Value ? 2 : 0);
 
             SetStatusAppBarButtons(_play.IsChecked.Value);
 
@@ -59,8 +59,6 @@ namespace Editor.Controller
         {
             if (PlayMode != EPlayMode.PAUSED)
                 return;
-
-            Output.Log("Stepped Forward..");
 
             Output.Log("Stepped Forward");
         }

@@ -65,19 +65,19 @@ namespace Engine.Utilities
 
         public EntityManager()
         {
-            _materialDefault = new Material(SHADER_SIMPLELIT, IMAGE_DEFAULT);
-            _materialReflection = new Material(SHADER_LIT, IMAGE_SKY);
-            _materialSky = new Material(SHADER_UNLIT, IMAGE_SKY);
-            _materialSkyLight = new Material(SHADER_UNLIT, IMAGE_SKY_LIGHT);
+            _materialDefault = new(SHADER_SIMPLELIT, IMAGE_DEFAULT);
+            _materialReflection = new(SHADER_LIT, IMAGE_SKY);
+            _materialSky = new(SHADER_UNLIT, IMAGE_SKY);
+            _materialSkyLight = new(SHADER_UNLIT, IMAGE_SKY_LIGHT);
         }
 
         public T[] FindComponent<T>() where T : Component
         {
             List<T> components = new();
             foreach (var entity in EntityList)
-            foreach (var component in entity.GetComponents<T>())
-                if (component.GetType().Equals(typeof(T)))
-                    components.Add((T)component);
+                foreach (var component in entity.GetComponents<T>())
+                    if (component.GetType().Equals(typeof(T)))
+                        components.Add(component);
 
             return components.ToArray();
         }
@@ -94,7 +94,7 @@ namespace Engine.Utilities
 
         public Entity CreateEntity(Entity parent = null, string name = "New Entity")
         {
-            Entity newEntity = new Entity()
+            Entity newEntity = new()
             {
                 Name = name,
                 Parent = parent
@@ -107,7 +107,7 @@ namespace Engine.Utilities
 
         public Entity CreatePrimitive(EPrimitiveTypes type, Entity parent = null)
         {
-            Entity newEntity = new Entity();
+            Entity newEntity = new();
             newEntity.Parent = parent;
 
             switch (type)
@@ -143,7 +143,7 @@ namespace Engine.Utilities
 
         public void CreateSky()
         {
-            Sky = new Entity() { Name = "Sky" };
+            Sky = new() { Name = "Sky" };
             Sky.AddComponent(new Mesh(ModelLoader.LoadFilePro(OBJ_SPHERE)));
             Sky.GetComponent<Mesh>().Material = _materialSky;
 
@@ -153,8 +153,9 @@ namespace Engine.Utilities
         public Entity GetFromID(Guid id)
         {
             foreach (var entity in EntityList)
-                if (entity.ID == id)
-                    return entity;
+                if (entity != null)
+                    if (entity.ID == id)
+                        return entity;
 
             return null;
         }

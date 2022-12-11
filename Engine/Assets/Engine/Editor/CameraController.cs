@@ -48,8 +48,8 @@ namespace Engine.Editor
 
             Entity.Transform.EulerAngles.X = Math.Clamp(Entity.Transform.EulerAngles.X, -89, 89);
 
-            _rotation = new Vector3();
-            _direction = new Vector3();
+            _rotation = new();
+            _direction = new();
         }
 
         private void MovementSpeedCalc()
@@ -62,7 +62,7 @@ namespace Engine.Editor
         }
 
         private void CameraMovement(int _horizontalFactor = 1, int _verticalFactor = 1) =>
-            _rotation = new Vector3(_input.GetMouseAxis().Y, _input.GetMouseAxis().X, 0);
+            _rotation = new(_input.GetMouseAxis().Y, _input.GetMouseAxis().X, 0);
 
         private void TransformMovement() =>
             _direction = Entity.Transform.Forward * _input.GetAxis().Y + Entity.Transform.Right * _input.GetAxis().X;

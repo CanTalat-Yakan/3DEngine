@@ -17,7 +17,7 @@ namespace Editor.ModelView
         {
             this.InitializeComponent();
 
-            _propertiesControl = new Controller.Properties(x_StackPanel_Properties, content);
+            _propertiesControl = new(x_StackPanel_Properties, content);
         }
 
         private void FirePropertyChanged([CallerMemberName] string memberName = null) => EventPropertyChanged?.Invoke(this, new PropertyChangedEventArgs(memberName));

@@ -6,7 +6,7 @@ namespace Engine.Utilities
     internal class Time
     {
         public static double s_Time, s_Delta;
-        public static Stopwatch s_Watch = new Stopwatch();
+        public static Stopwatch s_Watch = new();
 
         public string Profile = "";
 

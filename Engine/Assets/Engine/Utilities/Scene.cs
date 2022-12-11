@@ -8,7 +8,7 @@ namespace Engine.Utilities
     {
         public Guid ID = Guid.NewGuid();
 
-        public EntityManager EntitytManager = new EntityManager();
+        public EntityManager EntitytManager = new();
 
         public string Name = "Scene";
         public bool IsEnabled = true;

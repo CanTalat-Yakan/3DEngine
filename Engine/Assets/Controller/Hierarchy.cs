@@ -47,8 +47,8 @@ namespace Editor.Controller
             _hierarchy = hierarchy;
             _stackPanel = stackPanel;
 
-            SceneEntry = new SceneEntry() { ID = SceneManager.Scene.ID, Name = SceneManager.Scene.Name, Hierarchy = new List<TreeEntry>(), DataSource = new() };
-            SubsceneEntries = new List<SceneEntry>();
+            SceneEntry = new() { ID = SceneManager.Scene.ID, Name = SceneManager.Scene.Name, Hierarchy = new(), DataSource = new() };
+            SubsceneEntries = new();
 
             CreateDefaultHierarchy();
         }
@@ -214,7 +214,7 @@ namespace Editor.Controller
 
         private Grid[] CreateSubsceneHierarchy(out SceneEntry subsceneEntry, string name = "Subscene", bool enable = true)
         {
-            subsceneEntry = new SceneEntry() { ID = Guid.NewGuid(), Name = name, Hierarchy = new List<TreeEntry>(), DataSource = new() };
+            subsceneEntry = new SceneEntry() { ID = Guid.NewGuid(), Name = name, Hierarchy = new(), DataSource = new() };
 
             var subScene = SceneManager.AddSubscene(subsceneEntry.ID, name, enable);
             var subsceneGrid = CreateSceneHierarchy(subsceneEntry, subScene);
@@ -226,8 +226,8 @@ namespace Editor.Controller
 
         private TreeEntry AddTreeEntry(SceneEntry sceneEntry, Entity entity)
         {
-            var treeEntry = new TreeEntry() { Name = entity.Name, ID = entity.ID };
-            treeEntry.IconNode = new TreeViewIconNode() { Name = treeEntry.Name, TreeEntry = treeEntry, IsExpanded = false };
+            TreeEntry treeEntry = new() { Name = entity.Name, ID = entity.ID };
+            treeEntry.IconNode = new() { Name = treeEntry.Name, TreeEntry = treeEntry, IsExpanded = false };
             treeEntry.IconNode.IsActive = true;
             treeEntry.IDparent = entity.Parent != null ? entity.Parent.ID : null;
 
@@ -382,7 +382,7 @@ namespace Editor.Controller
                 new MenuFlyoutItem() { Text = "Capsule"},
                 new MenuFlyoutItem() { Text = "Quad"},
             };
-            var objectSubItem = new MenuFlyoutSubItem() { Text = "Objects" };
+            MenuFlyoutSubItem objectSubItem = new() { Text = "Objects" };
             foreach (var item in objects)
                 objectSubItem.Items.Add(item);
 
@@ -391,7 +391,7 @@ namespace Editor.Controller
                 new MenuFlyoutItem() { Text = "Point Light"},
                 new MenuFlyoutItem() { Text = "Spot Light"},
             };
-            var lightSubItem = new MenuFlyoutSubItem() { Text = "Light" };
+            MenuFlyoutSubItem lightSubItem = new() { Text = "Light" };
             foreach (var item in Lights)
                 lightSubItem.Items.Add(item);
 
@@ -406,7 +406,7 @@ namespace Editor.Controller
         {
             TextBox subsceneName;
 
-            var dialog = new ContentDialog()
+            ContentDialog dialog = new()
             {
                 XamlRoot = _hierarchy.XamlRoot,
                 Title = "Create new Subscene",
@@ -448,7 +448,7 @@ namespace Editor.Controller
         {
             TextBox fileName;
 
-            var dialog = new ContentDialog()
+            ContentDialog dialog = new()
             {
                 XamlRoot = _hierarchy.XamlRoot,
                 Title = "Rename",
@@ -486,7 +486,7 @@ namespace Editor.Controller
 
         private async void ContentDialogDelete(TreeEntry treeEntry)
         {
-            var dialog = new ContentDialog()
+            ContentDialog dialog = new()
             {
                 XamlRoot = _hierarchy.XamlRoot,
                 Title = "Delete " + treeEntry.Name,

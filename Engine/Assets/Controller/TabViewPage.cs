@@ -20,12 +20,12 @@ namespace Editor.Controller
 
         public TabViewPage(params TabViewItemDataTemplate[] icollection)
         {
-            TabView = new TabView()
+            TabView = new()
             {
                 TabWidthMode = TabViewWidthMode.SizeToContent,
                 CloseButtonOverlayMode = TabViewCloseButtonOverlayMode.Auto,
                 IsAddTabButtonVisible = true,
-                Padding = new Thickness(8, 8, 8, 0)
+                Padding = new(8, 8, 8, 0)
             };
             TabView.AddTabButtonClick += TabView_AddButtonClick;
             //m_TabView.TabCloseRequested += TabView_TabCloseRequested;
@@ -50,7 +50,7 @@ namespace Editor.Controller
 
         private void TabView_AddButtonClick(TabView sender, object args)
         {
-            var item = new TabViewItemDataTemplate() { Header = "New Tab", Content = new Page(), Symbol = Symbol.View };
+            TabViewItemDataTemplate item = new() { Header = "New Tab", Content = new Page(), Symbol = Symbol.View };
             TabView.TabItems.Add(CreateNewTab(item));
         }
 
@@ -61,7 +61,7 @@ namespace Editor.Controller
 
         private TabViewItem CreateNewTab(TabViewItemDataTemplate i)
         {
-            TabViewItem newItem = new TabViewItem
+            TabViewItem newItem = new()
             {
                 Header = i.Header + "⠀⠀⠀⠀⠀⠀⠀⠀",
                 Content = i.Content,

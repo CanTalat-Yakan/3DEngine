@@ -20,7 +20,7 @@ namespace Editor
 
             ExtendsContentIntoTitleBar = true; // enable custom titlebar
 
-            _themeControl = new Controller.Theme(this, x_Page_Main);
+            _themeControl = new(this, x_Page_Main);
 
             _main = new(this);
         }

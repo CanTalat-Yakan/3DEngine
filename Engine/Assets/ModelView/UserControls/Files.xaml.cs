@@ -21,7 +21,7 @@ namespace Editor.ModelView
 
             ChangeColorWithTheme = x_Grid_Main;
 
-            _filesControl = new Controller.Files(this, x_Grid_Main, x_WrapPanel_Files, x_BreadcrumBar_Files);
+            _filesControl = new(this, x_Grid_Main, x_WrapPanel_Files, x_BreadcrumBar_Files);
         }
 
         private void AppBarButton_Click_AddFiles(object sender, RoutedEventArgs e) => _filesControl.SelectFilesAsync();

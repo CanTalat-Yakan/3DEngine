@@ -9,7 +9,7 @@ namespace Editor.Controller
 {
     internal class GridDataTemeplate
     {
-        public GridLength Length = new GridLength(1, GridUnitType.Star);
+        public GridLength Length = new(1, GridUnitType.Star);
         public double MinWidth = 1;
         public double MinHeight = 40;
         public UIElement Content;
@@ -40,25 +40,25 @@ namespace Editor.Controller
             Output = output;
             Files = files;
 
-            PropertiesRoot = new Grid();
+            PropertiesRoot = new();
             PropertiesRoot.Children.Add(Properties);
 
-            TabsRoot = new Grid();
+            TabsRoot = new();
         }
 
         public void CreateLayout()
         {
             var tabView = WrapInTabView(TabsRoot,
-                new TabViewItemDataTemplate() { Content = Files, Header = "Files", Symbol = Symbol.Document },
-                new TabViewItemDataTemplate() { Content = Output, Header = "Output", Symbol = Symbol.Message });
+                new() { Content = Files, Header = "Files", Symbol = Symbol.Document },
+                new() { Content = Output, Header = "Output", Symbol = Symbol.Message });
 
             var content = PairVertical(
-                new GridDataTemeplate() { Content = WrapGrid(ViewPort), MinHeight = 0 },
-                new GridDataTemeplate() { Content = tabView, MinHeight = 0, Length = new GridLength(235, GridUnitType.Pixel) });
+                new() { Content = WrapGrid(ViewPort), MinHeight = 0 },
+                new() { Content = tabView, MinHeight = 0, Length = new(235, GridUnitType.Pixel) });
 
             var pane = PairVertical(
-                new GridDataTemeplate() { Content = WrapGrid(Hierarchy), MinHeight = 0 },
-                new GridDataTemeplate() { Content = WrapGrid(PropertiesRoot), MinHeight = 0, Length = new GridLength(1, GridUnitType.Star) });
+                new() { Content = WrapGrid(Hierarchy), MinHeight = 0 },
+                new() { Content = WrapGrid(PropertiesRoot), MinHeight = 0, Length = new(1, GridUnitType.Star) });
 
             Content.Children.Add(WrapSplitView(content, pane));
         }
@@ -69,15 +69,15 @@ namespace Editor.Controller
         private Grid PairVertical(GridDataTemeplate top, GridDataTemeplate bottom)
         {
             RowDefinition bottomRowDefinition;
-            Grid grid = new Grid() { };
-            grid.RowDefinitions.Add(new RowDefinition() { Height = top.Length, MinHeight = top.MinHeight });
-            grid.RowDefinitions.Add(bottomRowDefinition = new RowDefinition() { Height = bottom.Length, MinHeight = bottom.MinHeight });
+            Grid grid = new() { };
+            grid.RowDefinitions.Add(new() { Height = top.Length, MinHeight = top.MinHeight });
+            grid.RowDefinitions.Add(bottomRowDefinition = new() { Height = bottom.Length, MinHeight = bottom.MinHeight });
 
-            GridSplitter splitV = new GridSplitter() { VerticalAlignment = VerticalAlignment.Top, CursorBehavior = GridSplitter.SplitterCursorBehavior.ChangeOnGripperHover };
+            GridSplitter splitV = new() { VerticalAlignment = VerticalAlignment.Top, CursorBehavior = GridSplitter.SplitterCursorBehavior.ChangeOnGripperHover };
 
-            ((Grid)bottom.Content).Margin = new Thickness(0, 16, 0, 0);
-            ((Grid)top.Content).Padding = new Thickness(0, 16, 0, 0);
-            grid.Padding = new Thickness(0, -16, 0, 0);
+            ((Grid)bottom.Content).Margin = new(0, 16, 0, 0);
+            ((Grid)top.Content).Padding = new(0, 16, 0, 0);
+            grid.Padding = new(0, -16, 0, 0);
 
             grid.Children.Add(top.Content);
             grid.Children.Add(bottom.Content);
@@ -85,18 +85,18 @@ namespace Editor.Controller
             Grid.SetRow(splitV, 1);
             grid.Children.Add(splitV);
 
-            BindingOperations.SetBinding(bottomRowDefinition, RowDefinition.HeightProperty, new Binding() { ElementName = "x_AppBarToggleButton_Status_OpenPane", Path = new PropertyPath("IsChecked"), Converter = new BooleanToRowHeightConverter(bottom.Length) });
+            BindingOperations.SetBinding(bottomRowDefinition, RowDefinition.HeightProperty, new Binding() { ElementName = "x_AppBarToggleButton_Status_OpenPane", Path = new("IsChecked"), Converter = new BooleanToRowHeightConverter(bottom.Length) });
 
             return grid;
         }
 
         private Grid PairHorizontal(GridDataTemeplate left, GridDataTemeplate right)
         {
-            Grid grid = new Grid() { ColumnSpacing = 16 };
-            grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = left.Length, MinWidth = left.MinWidth });
-            grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = right.Length, MinWidth = right.MinWidth });
+            Grid grid = new() { ColumnSpacing = 16 };
+            grid.ColumnDefinitions.Add(new() { Width = left.Length, MinWidth = left.MinWidth });
+            grid.ColumnDefinitions.Add(new() { Width = right.Length, MinWidth = right.MinWidth });
 
-            GridSplitter splitH = new GridSplitter()
+            GridSplitter splitH = new()
             {
                 HorizontalAlignment = HorizontalAlignment.Right,
                 Margin = new Thickness(0, 0, -16, 0),
@@ -116,23 +116,23 @@ namespace Editor.Controller
 
         private Grid PairHorizontal(GridDataTemeplate left, GridDataTemeplate center, GridDataTemeplate right)
         {
-            Grid grid = new Grid() { ColumnSpacing = 16 };
-            grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = left.Length, MinWidth = left.MinWidth });
-            grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = center.Length, MinWidth = center.MinWidth });
-            grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = right.Length, MinWidth = right.MinWidth });
+            Grid grid = new() { ColumnSpacing = 16 };
+            grid.ColumnDefinitions.Add(new() { Width = left.Length, MinWidth = left.MinWidth });
+            grid.ColumnDefinitions.Add(new() { Width = center.Length, MinWidth = center.MinWidth });
+            grid.ColumnDefinitions.Add(new() { Width = right.Length, MinWidth = right.MinWidth });
 
-            GridSplitter splitH = new GridSplitter()
+            GridSplitter splitH = new()
             {
                 HorizontalAlignment = HorizontalAlignment.Right,
-                Margin = new Thickness(0, 0, -16, 0),
+                Margin = new(0, 0, -16, 0),
                 Opacity = 0.5f,
                 CursorBehavior = GridSplitter.SplitterCursorBehavior.ChangeOnGripperHover,
                 ResizeBehavior = GridSplitter.GridResizeBehavior.CurrentAndNext,
             };
-            GridSplitter splitH2 = new GridSplitter()
+            GridSplitter splitH2 = new()
             {
                 HorizontalAlignment = HorizontalAlignment.Right,
-                Margin = new Thickness(0, 0, -16, 0),
+                Margin = new(0, 0, -16, 0),
                 Opacity = 0.5f,
                 CursorBehavior = GridSplitter.SplitterCursorBehavior.ChangeOnGripperHover,
                 ResizeBehavior = GridSplitter.GridResizeBehavior.PreviousAndNext,
@@ -155,7 +155,7 @@ namespace Editor.Controller
         {
             root.Background = Application.Current.Resources["ApplicationPageBackgroundThemeBrush"] as SolidColorBrush;
 
-            TabViewPage tabViewPage = new TabViewPage(i);
+            TabViewPage tabViewPage = new(i);
             root.Children.Add(tabViewPage.TabView);
 
             //BindingOperations.SetBinding(root, Grid.VisibilityProperty, new Binding() { ElementName = "x_AppBarToggleButton_Status_OpenPane", Path = new PropertyPath("IsChecked"), Converter = new BooleanToVisibilityConverter() });
@@ -165,10 +165,10 @@ namespace Editor.Controller
 
         private Grid WrapSplitView(Grid content, Grid pane)
         {
-            Grid grid = new Grid();
-            SplitView split = new SplitView() { OpenPaneLength = 333, IsPaneOpen = true, DisplayMode = SplitViewDisplayMode.Inline, PanePlacement = SplitViewPanePlacement.Right, Pane = pane, Content = content };
+            Grid grid = new();
+            SplitView split = new() { OpenPaneLength = 333, IsPaneOpen = true, DisplayMode = SplitViewDisplayMode.Inline, PanePlacement = SplitViewPanePlacement.Right, Pane = pane, Content = content };
 
-            BindingOperations.SetBinding(split, SplitView.IsPaneOpenProperty, new Binding() { ElementName = "x_AppBarToggleButton_Status_OpenPane", Path = new PropertyPath("IsChecked") });
+            BindingOperations.SetBinding(split, SplitView.IsPaneOpenProperty, new Binding() { ElementName = "x_AppBarToggleButton_Status_OpenPane", Path = new("IsChecked") });
 
             grid.Children.Add(split);
 
@@ -177,7 +177,7 @@ namespace Editor.Controller
 
         private Grid WrapGrid(UIElement content)
         {
-            Grid grid = new Grid();
+            Grid grid = new();
             grid.Children.Add(content);
 
             return grid;

@@ -66,7 +66,7 @@ namespace Engine.Components
             // T(v*p), because HLSL calculates matrix mul in collumn-major and system.numerics returns row-major
             var viewProjection = Matrix4x4.Transpose(view * projection);
 
-            ViewConstants = new SViewConstantsBuffer() { ViewProjection = viewProjection, CameraPisiton = Entity.Transform.Position };
+            ViewConstants = new() { ViewProjection = viewProjection, CameraPisiton = Entity.Transform.Position };
             #endregion
 
             unsafe

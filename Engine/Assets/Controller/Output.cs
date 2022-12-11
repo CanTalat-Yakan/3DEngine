@@ -33,7 +33,7 @@ namespace Editor.Controller
 
     internal class Output
     {
-        private static Dictionary<SMessageInfo, List<DateTime>> s_messageCollection = new Dictionary<SMessageInfo, List<DateTime>>();
+        private static Dictionary<SMessageInfo, List<DateTime>> s_messageCollection = new();
 
         private static TextBlock s_status;
         private static Viewbox s_statusIcon;
@@ -64,14 +64,14 @@ namespace Editor.Controller
 
         public static void Log(string m, EMessageType t = EMessageType.MESSAGE, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null)
         {
-            SMessageInfo message = new SMessageInfo() { Script = s, Method = c, Line = l, Message = m, Type = t };
+            SMessageInfo message = new() { Script = s, Method = c, Line = l, Message = m, Type = t };
 
             if (s_pauseError.IsChecked.Value)
                 if (t == EMessageType.ERROR)
                     Main.Instance.ControlPlayer.Pause();
 
             if (!s_messageCollection.ContainsKey(message))
-                s_messageCollection.Add(message, new List<DateTime>() { DateTime.Now });
+                s_messageCollection.Add(message, new() { DateTime.Now });
             else
                 s_messageCollection[message].Add(DateTime.Now);
 
@@ -82,7 +82,7 @@ namespace Editor.Controller
 
         public static void IterateOutputMessages()
         {
-            Dictionary<DateTime, SMessageInfo> dic = new Dictionary<DateTime, SMessageInfo>();
+            Dictionary<DateTime, SMessageInfo> dic = new();
             s_stack.Children.Clear();
 
             int numMessages = 0;
@@ -208,8 +208,8 @@ namespace Editor.Controller
         private static UIElement CreateMessage(DateTime d, SMessageInfo m, int? i)
         {
             //Content of the message
-            StackPanel stack = new StackPanel() { Orientation = Orientation.Horizontal, Spacing = 10, Margin = new Thickness(10, 0, 0, 0), Padding = new Thickness(5) };
-            Viewbox viewbox = new Viewbox() { Width = 14, Height = 14 };
+            StackPanel stack = new() { Orientation = Orientation.Horizontal, Spacing = 10, Margin = new(10, 0, 0, 0), Padding = new(5) };
+            Viewbox viewbox = new() { Width = 14, Height = 14 };
             if (m.Type == EMessageType.WARNING)
                 viewbox.Child = new FontIcon() { Glyph = "\uE7BA" };
             else if (m.Type == EMessageType.MESSAGE)
@@ -221,18 +221,18 @@ namespace Editor.Controller
             stack.Children.Add(new TextBlock() { Text = m.Message });
 
             //The flyout when clicked on the message
-            StackPanel stackFlyout = new StackPanel() { Orientation = Orientation.Vertical };
+            StackPanel stackFlyout = new() { Orientation = Orientation.Vertical };
             stackFlyout.Children.Add(new TextBlock() { Text = m.GetInfo() + "\n" });
             stackFlyout.Children.Add(new MarkdownTextBlock() { Text = m.Message, Padding = new Thickness(2) });
             stackFlyout.Children.Add(new HyperlinkButton() { Content = Path.GetRelativePath(Directory.GetCurrentDirectory(), m.Script) + ":" + m.Line, Foreground = new SolidColorBrush(Colors.CadetBlue) });
             Flyout flyout = new Flyout() { OverlayInputPassThroughElement = stack, Content = stackFlyout };
 
             //Create main grid that gets returned
-            Grid grid = new Grid() { HorizontalAlignment = HorizontalAlignment.Stretch };
+            Grid grid = new() { HorizontalAlignment = HorizontalAlignment.Stretch };
             grid.Children.Add(stack);
             //If there is a count the number gets shown on the right
             if (i != null)
-                grid.Children.Add(new TextBlock() { Margin = new Thickness(0, 0, 10, 0), Padding = new Thickness(5), MinWidth = 25, HorizontalAlignment = HorizontalAlignment.Right, Text = i.ToString() });
+                grid.Children.Add(new TextBlock() { Margin = new(0, 0, 10, 0), Padding = new(5), MinWidth = 25, HorizontalAlignment = HorizontalAlignment.Right, Text = i.ToString() });
             //Set flyout to button that stretches along the grid
             grid.Children.Add(new Button()
             {

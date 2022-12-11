@@ -10,7 +10,7 @@ namespace Engine.Components
     {
         public Transform Parent;
 
-        public SPerModelConstantBuffer ConstantsBuffer { get => new SPerModelConstantBuffer() { ModelView = WorldMatrix }; }
+        public SPerModelConstantBuffer ConstantsBuffer { get => new() { ModelView = WorldMatrix }; }
 
         public Vector3 Forward { get; private set; }
         public Vector3 Right { get; private set; }
@@ -32,7 +32,7 @@ namespace Engine.Components
 
             //EulerAngles = Rotation.ToEuler();
 
-            Forward = Vector3.Normalize(new Vector3(
+            Forward = Vector3.Normalize(new(
                 MathF.Sin(MathHelper.ToRadians(EulerAngles.Y)) * MathF.Cos(MathHelper.ToRadians(EulerAngles.X)),
                 MathF.Sin(MathHelper.ToRadians(-EulerAngles.X)),
                 MathF.Cos(MathHelper.ToRadians(EulerAngles.X)) * MathF.Cos(MathHelper.ToRadians(EulerAngles.Y))));

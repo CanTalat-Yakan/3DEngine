@@ -11,7 +11,7 @@ namespace Engine.Helper
         {
             string assetsPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources\");
             string modelFile = Path.Combine(assetsPath, fileName);
-            
+
             //// initialize Scene class object
             //Scene scene = new Scene();
             //// initialize an object
@@ -31,17 +31,17 @@ namespace Engine.Helper
             //// Configure the look up paths to allow importer to find external dependencies.
             //loadObjOpts.LookupPaths = new List<string>(new string[] { modelFile });
 
-            var con = new Assimp.AssimpContext();
-            var file = con.ImportFile(modelFile);
+            Assimp.AssimpContext con = new();
+            Assimp.Scene file = con.ImportFile(modelFile);
 
-            MeshInfo obj = new MeshInfo();
+            MeshInfo obj = new();
 
-            obj.Vertices = new List<Vertex>();
-            obj.Indices = new List<ushort>();
+            obj.Vertices = new();
+            obj.Indices = new();
             foreach (var mesh in file.Meshes)
             {
                 for (int i = 0; i < mesh.VertexCount; i++)
-                    obj.Vertices.Add(new Vertex(
+                    obj.Vertices.Add(new(
                     mesh.Vertices[i].X,
                     mesh.Vertices[i].Y,
                     mesh.Vertices[i].Z,
@@ -53,14 +53,14 @@ namespace Engine.Helper
 
                 foreach (var face in mesh.Faces)
                 {
-                    var rangeIndices = new ushort[] {
+                    ushort[] rangeIndices = new[] {
                         (ushort)(face.Indices[0]),
                         (ushort)(face.Indices[2]),
                         (ushort)(face.Indices[1])};
                     obj.Indices.AddRange(rangeIndices);
                     if (face.IndexCount == 4)
                     {
-                        rangeIndices = new ushort[] {
+                        rangeIndices = new[] {
                         (ushort)(face.Indices[0]),
                         (ushort)(face.Indices[3]),
                         (ushort)(face.Indices[2])};

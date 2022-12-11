@@ -1,20 +1,18 @@
-﻿// based on https://github.com/ocornut/imgui/blob/master/examples/imgui_impl_dx11.cpp
-// copied from https://github.com/YaakovDavis/VorticeImGui/blob/master/VorticeImGui/Framework/ImGuiRenderer.cs
-
-using System;
+﻿using ImGuiNET;
 using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
-using Vortice.DXGI;
-using Vortice.Direct3D;
-using Vortice.Direct3D11;
+using System;
 using Vortice.D3DCompiler;
+using Vortice.Direct3D11;
+using Vortice.Direct3D;
+using Vortice.DXGI;
 using Vortice.Mathematics;
-using ImGuiNET;
 using ImDrawIdx = System.UInt16;
 using Engine.Utilities;
-using Engine.Components;
-using System.IO;
-using Engine.Data;
+
+// based on https://github.com/ocornut/imgui/blob/master/examples/imgui_impl_dx11.cpp
+// copied from https://github.com/YaakovDavis/VorticeImGui/blob/master/VorticeImGui/Framework/ImGuiRenderer.cs
 
 namespace Engine.Editor
 {
@@ -39,7 +37,7 @@ namespace Engine.Editor
         ID3D11DepthStencilState depthStencilState;
         int vertexBufferSize = 5000, indexBufferSize = 10000;
 
-        Dictionary<IntPtr, ID3D11ShaderResourceView> textureResources = new Dictionary<IntPtr, ID3D11ShaderResourceView>();
+        Dictionary<IntPtr, ID3D11ShaderResourceView> textureResources = new();
 
         private static readonly string SHADER_IMGUI = @"Shader\ImGui.hlsl";
 
@@ -70,7 +68,7 @@ namespace Engine.Editor
                 vertexBuffer?.Release();
 
                 vertexBufferSize = data.TotalVtxCount + 5000;
-                BufferDescription desc = new BufferDescription
+                BufferDescription desc = new()
                 {
                     Usage = ResourceUsage.Dynamic,
                     ByteWidth = vertexBufferSize * sizeof(ImDrawVert),
@@ -85,7 +83,7 @@ namespace Engine.Editor
                 indexBuffer?.Release();
 
                 indexBufferSize = data.TotalIdxCount + 10000;
-                BufferDescription desc = new BufferDescription
+                BufferDescription desc = new()
                 {
                     Usage = ResourceUsage.Dynamic,
                     ByteWidth = indexBufferSize * sizeof(ImDrawIdx),
@@ -149,9 +147,7 @@ namespace Engine.Editor
                 {
                     var cmd = cmdList.CmdBuffer[i];
                     if (cmd.UserCallback != IntPtr.Zero)
-                    {
                         throw new NotImplementedException("user callbacks not implemented");
-                    }
                     else
                     {
                         var rect = new Rect((int)(cmd.ClipRect.X - clip_off.X), (int)(cmd.ClipRect.Y - clip_off.Y), (int)(cmd.ClipRect.Z - clip_off.X), (int)(cmd.ClipRect.W - clip_off.Y));
@@ -217,7 +213,7 @@ namespace Engine.Editor
             int width, height;
             io.Fonts.GetTexDataAsRGBA32(out pixels, out width, out height);
 
-            var texDesc = new Texture2DDescription
+            Texture2DDescription texDesc = new()
             {
                 Width = width,
                 Height = height,
@@ -230,7 +226,7 @@ namespace Engine.Editor
                 CPUAccessFlags = CpuAccessFlags.None
             };
 
-            var subResource = new SubresourceData
+            SubresourceData subResource = new()
             {
                 DataPointer = (IntPtr)pixels,
                 RowPitch = texDesc.Width * 4,
@@ -239,7 +235,7 @@ namespace Engine.Editor
 
             var texture = device.CreateTexture2D(texDesc, new[] { subResource });
 
-            var resViewDesc = new ShaderResourceViewDescription
+            ShaderResourceViewDescription resViewDesc = new()
             {
                 Format = Format.R8G8B8A8_UNorm,
                 ViewDimension = ShaderResourceViewDimension.Texture2D,
@@ -250,7 +246,7 @@ namespace Engine.Editor
 
             io.Fonts.TexID = RegisterTexture(fontTextureView);
 
-            var samplerDesc = new SamplerDescription
+            SamplerDescription samplerDesc = new()
             {
                 Filter = Filter.MinMagMipLinear,
                 AddressU = TextureAddressMode.Wrap,
@@ -290,7 +286,7 @@ namespace Engine.Editor
 
             inputLayout = device.CreateInputLayout(inputElements, vertexShaderByteCode.Span);
 
-            var constBufferDesc = new BufferDescription
+            BufferDescription constBufferDesc = new()
             {
                 ByteWidth = VertexConstantBufferSize,
                 Usage = ResourceUsage.Dynamic,
@@ -306,12 +302,12 @@ namespace Engine.Editor
 
             pixelShader = device.CreatePixelShader(pixelShaderByteCode.Span);
 
-            var blendDesc = new BlendDescription
+            BlendDescription blendDesc = new()
             {
                 AlphaToCoverageEnable = false
             };
 
-            blendDesc.RenderTarget[0] = new RenderTargetBlendDescription
+            blendDesc.RenderTarget[0] = new()
             {
                 IsBlendEnabled = true,
                 SourceBlend = Blend.SourceAlpha,
@@ -325,7 +321,7 @@ namespace Engine.Editor
 
             blendState = device.CreateBlendState(blendDesc);
 
-            var rasterDesc = new RasterizerDescription
+            RasterizerDescription rasterDesc = new()
             {
                 FillMode = FillMode.Solid,
                 CullMode = CullMode.None,
@@ -335,8 +331,8 @@ namespace Engine.Editor
 
             rasterizerState = device.CreateRasterizerState(rasterDesc);
 
-            var stencilOpDesc = new DepthStencilOperationDescription(StencilOperation.Keep, StencilOperation.Keep, StencilOperation.Keep, ComparisonFunction.Always);
-            var depthDesc = new DepthStencilDescription
+            DepthStencilOperationDescription stencilOpDesc = new(StencilOperation.Keep, StencilOperation.Keep, StencilOperation.Keep, ComparisonFunction.Always);
+            DepthStencilDescription depthDesc = new()
             {
                 DepthEnable = false,
                 DepthWriteMask = DepthWriteMask.All,
