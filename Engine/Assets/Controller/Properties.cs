@@ -15,6 +15,7 @@ using Path = System.IO.Path;
 using Microsoft.VisualBasic;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 
 namespace Editor.Controller
 {
@@ -119,7 +120,7 @@ namespace Editor.Controller
                 foreach (var property in propertyInfo)
                     propertiesCollection.Add(CreateNumberInput().WrapInField(property.Name));
 
-                _stackPanel.Children.Add(propertiesCollection.ToArray().StackInGrid().WrapInExpanderWithToggleButton(components[i].ToString()));
+                _stackPanel.Children.Add(propertiesCollection.ToArray().StackInGrid().WrapInExpanderWithToggleButton(components[i].ToString().Split('.').Last()));
             }
 
             _stackPanel.Children.Add(collection.StackInGrid().WrapInExpanderWithToggleButton("Expander"));
