@@ -147,7 +147,7 @@ namespace Engine.Utilities
             Sky.AddComponent(new Mesh(ModelLoader.LoadFilePro(OBJ_SPHERE)));
             Sky.GetComponent<Mesh>().Material = _materialSky;
 
-            Sky.Transform.Scale = new Vector3(-1000, -1000, -1000);
+            Sky.Transform.Scale = new Vector3(-1000, 1000, 1000);
         }
 
         public Entity GetFromID(Guid id)
