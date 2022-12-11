@@ -39,6 +39,8 @@ namespace Editor.Controller
 
             Main.Instance.LayoutControl.ViewPort._viewPortControl.GridMain.BorderBrush = new SolidColorBrush(Colors.GreenYellow);
             Main.Instance.LayoutControl.ViewPort._viewPortControl.GridMain.BorderThickness = new(_play.IsChecked.Value ? 2 : 0);
+            Main.Instance.LayoutControl.ViewPort._viewPortControl.GridMain.Padding = new(_play.IsChecked.Value ? -2 : 0);
+            Main.Instance.LayoutControl.ViewPort._viewPortControl.GridMain.Margin = new(_play.IsChecked.Value ? 2 : 0);
 
             SetStatusAppBarButtons(_play.IsChecked.Value);
 

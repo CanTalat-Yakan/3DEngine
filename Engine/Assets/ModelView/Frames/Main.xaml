@@ -19,7 +19,9 @@
             <CommandBar>
                 <CommandBar.PrimaryCommands>
                     <AppBarToggleButton Name="x_AppBarToggleButton_Status_Play" Icon="Play" Label="Play" Click="AppBarToggleButton_Status_Play_Click"/>
+
                     <AppBarToggleButton x:Name="x_AppBarToggleButton_Status_Pause" Icon="Pause" Label="Pause" IsEnabled="False" Click="AppBarToggleButton_Status_Pause_Click"/>
+
                     <AppBarButton x:Name="x_AppBarButton_Status_Forward" Icon="Forward" Label="Forward" IsEnabled="False" Click="AppBarButton_Status_Forward_Click"/>
                 </CommandBar.PrimaryCommands>
 
@@ -29,6 +31,7 @@
                             <KeyboardAccelerator Key="Tab" Modifiers="Control" />
                         </AppBarToggleButton.KeyboardAccelerators>
                     </AppBarToggleButton>
+
                     <AppBarToggleButton Label="Toggle Theme" Click="AppBarToggleButton_Status_Light">
                         <AppBarToggleButton.KeyboardAccelerators>
                             <KeyboardAccelerator Key="T" Modifiers="Control" />
@@ -39,6 +42,7 @@
                 <CommandBar.Content>
                     <StackPanel Orientation="Horizontal" Padding="12,0,0,0">
                         <Viewbox x:Name="x_TextBlock_StatusIcon_Content" MaxHeight="16" MaxWidth="16"/>
+
                         <TextBlock x:Name="x_TextBlock_Status_Content" Text="" Margin="12,14"/>
                     </StackPanel>
                 </CommandBar.Content>
