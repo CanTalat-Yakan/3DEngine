@@ -166,7 +166,7 @@ namespace Editor.Controller
             return StackInGrid(textInput);
         }
 
-        internal virtual Grid CreateVec2Input(Vector2 v = new Vector2())
+        internal virtual Grid CreateVec2Input(Vector2 v = new())
         {
             NumberBox numInput = new() { Value = v.X, Margin = new(0, 0, 4, 0), MaxWidth = 98 };
             NumberBox num2Input = new() { Value = v.Y, Margin = new(0, 0, 4, 0), MaxWidth = 98 };
@@ -174,7 +174,7 @@ namespace Editor.Controller
             return StackInGrid(numInput, num2Input);
         }
 
-        internal virtual Grid CreateVec3Input(Vector3 v = new Vector3())
+        internal virtual Grid CreateVec3Input(Vector3 v = new())
         {
             NumberBox numInput = new() { Value = v.X, Margin = new(0, 0, 4, 0), MaxWidth = 64 };
             NumberBox num2Input = new() { Value = v.Y, Margin = new(0, 0, 4, 0), MaxWidth = 64 };
@@ -183,7 +183,7 @@ namespace Editor.Controller
             return StackInGrid(numInput, num2Input, num3Input);
         }
 
-        internal virtual Grid CreateVec3InputTransform(Vector3 v = new Vector3())
+        internal virtual Grid CreateVec3InputTransform(Vector3 v = new())
         {
             Rectangle rectangleR = new() { Fill = new SolidColorBrush(Colors.IndianRed), RadiusX = 2, RadiusY = 2, Width = 4 };
             NumberBox numInput = new() { Value = MathF.Round(v.X, 4), Margin = new(0, 0, 4, 0), Width = 64 };
@@ -197,7 +197,7 @@ namespace Editor.Controller
             return StackInGrid(rectangleR, numInput, rectangleG, num2Input, rectangleB, num3Input);
         }
 
-        internal virtual Grid CreateVec3InputTransform(Vector3 v = new Vector3(), 
+        internal virtual Grid CreateVec3InputTransform(Vector3 v = new(), 
             params TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs>[] e)
         {
             Rectangle rectangleR = new() { Fill = new SolidColorBrush(Colors.IndianRed), RadiusX = 2, RadiusY = 2, Width = 4 };
