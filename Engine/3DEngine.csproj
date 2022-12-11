@@ -14,6 +14,7 @@
     <Content Remove="Assets\Controller\Files.cs" />
     <Content Remove="Assets\Controller\Helper.cs" />
     <Content Remove="Assets\Controller\Theme.cs" />
+    <Content Remove="Assets\Controller\TreeViewIconNode.cs" />
     <Content Remove="Assets\Controller\ViewPort.cs" />
     <Content Remove="Assets\Engine\Editor\ImGuiRenderer.cs" />
     <Content Remove="Assets\Engine\Editor\SceneBoot.cs" />

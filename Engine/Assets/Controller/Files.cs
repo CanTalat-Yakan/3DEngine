@@ -519,6 +519,7 @@ namespace Editor.Controller
 
             return grid;
         }
+
         private async void ContentDialogCreateNewFileOrFolderAndRefreshAsync(string path = "")
         {
             var dialog = new ContentDialog()

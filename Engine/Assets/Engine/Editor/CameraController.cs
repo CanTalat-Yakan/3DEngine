@@ -29,11 +29,11 @@ namespace Engine.Editor
         {
             MovementSpeedCalc();
 
-            if (_input.GetButton(EMouseButton.ISMIDDLEBUTTONSPRESSED))
+            if (_input.GetButton(EMouseButton.IsMiddleButtonPressed))
                 if (_input.SetPointerInBounds())
                     ScreenMovement();
 
-            if (_input.GetButton(EMouseButton.ISRIGHTBUTTONPRESSED))
+            if (_input.GetButton(EMouseButton.IsRightButtonPressed))
                 if (_input.SetPointerInBounds())
                 {
                     TransformMovement();
@@ -54,8 +54,8 @@ namespace Engine.Editor
 
         private void MovementSpeedCalc()
         {
-            if (_input.GetButton(EMouseButton.ISRIGHTBUTTONPRESSED)
-                || _input.GetButton(EMouseButton.ISRIGHTBUTTONPRESSED))
+            if (_input.GetButton(EMouseButton.IsRightButtonPressed)
+                || _input.GetButton(EMouseButton.IsRightButtonPressed))
                 s_MovementSpeed += _input.GetMouseWheel();
 
             s_MovementSpeed = Math.Clamp(s_MovementSpeed, 0.1f, 10);
@@ -72,9 +72,9 @@ namespace Engine.Editor
 
         private void ScrollMovement()
         {
-            if (!_input.GetButton(EMouseButton.ISRIGHTBUTTONPRESSED)
-                && !_input.GetButton(EMouseButton.ISMIDDLEBUTTONSPRESSED)
-                && !_input.GetButton(EMouseButton.ISRIGHTBUTTONPRESSED))
+            if (!_input.GetButton(EMouseButton.IsRightButtonPressed)
+                && !_input.GetButton(EMouseButton.IsMiddleButtonPressed)
+                && !_input.GetButton(EMouseButton.IsRightButtonPressed))
                 _direction += 5 * Entity.Transform.Forward * _input.GetMouseWheel();
         }
 

@@ -32,23 +32,23 @@ namespace Engine.Editor
 
         public override void Start()
         {
-            _special = SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.SPECIAL);
+            _special = SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Special);
             _special.Transform.Scale *= 0.1f;
             _special.Transform.Position.Y += 0.5f;
 
             Entity parent = SceneManager.Scene.EntitytManager.CreateEntity(null, "Content");
 
-            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(0, 0, 1);
-            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(0, 0, -3);
-            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(0, 2.5f, 0);
-            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(0, -4, 0);
-            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(2, 0, 0);
-            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.SPHERE, parent).Transform.Position = new Vector3(-1, 1, 0);
+            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Sphere, parent).Transform.Position = new Vector3(0, 0, 1);
+            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Sphere, parent).Transform.Position = new Vector3(0, 0, -3);
+            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Sphere, parent).Transform.Position = new Vector3(0, 2.5f, 0);
+            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Sphere, parent).Transform.Position = new Vector3(0, -4, 0);
+            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Sphere, parent).Transform.Position = new Vector3(2, 0, 0);
+            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Sphere, parent).Transform.Position = new Vector3(-1, 1, 0);
 
             _subParent = SceneManager.Scene.EntitytManager.CreateEntity(null, "Cubes");
             _subParent.Parent = parent;
 
-            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.CUBE, _subParent);
+            SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Cube, _subParent);
         }
 
         public override void Update()
@@ -68,7 +68,7 @@ namespace Engine.Editor
 
                 for (int i = 0; i < 10; i++)
                 {
-                    var newCube = SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.CUBE, _subParent);
+                    var newCube = SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Cube, _subParent);
                     newCube.Transform.EulerAngles = new Vector3(new Random().Next(1, 360), new Random().Next(1, 360), new Random().Next(1, 360));
                     newCube.Transform.Scale = new Vector3(new Random().Next(1, 3), new Random().Next(1, 3), new Random().Next(1, 3));
                 }

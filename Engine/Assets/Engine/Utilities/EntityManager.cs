@@ -9,12 +9,12 @@ namespace Engine.Utilities
 {
     internal enum EPrimitiveTypes
     {
-        CUBE,
-        SPHERE,
-        PLANE,
-        CYLINDER,
-        CAPSULE,
-        SPECIAL
+        Cube,
+        Sphere,
+        Plane,
+        Cylinder,
+        Capsule,
+        Special
     }
 
     internal class EventList<T> : List<T>
@@ -112,23 +112,23 @@ namespace Engine.Utilities
 
             switch (type)
             {
-                case EPrimitiveTypes.SPECIAL:
+                case EPrimitiveTypes.Special:
                     newEntity.Name = "special";
                     newEntity.AddComponent(new Mesh(ModelLoader.LoadFilePro(OBJ_SPECIAL)));
                     break;
-                case EPrimitiveTypes.CUBE:
+                case EPrimitiveTypes.Cube:
                     newEntity.Name = "Cube";
                     newEntity.AddComponent(new Mesh(ModelLoader.LoadFilePro(OBJ_CUBE)));
                     break;
-                case EPrimitiveTypes.SPHERE:
+                case EPrimitiveTypes.Sphere:
                     newEntity.Name = "Sphere";
                     newEntity.AddComponent(new Mesh(ModelLoader.LoadFilePro(OBJ_SPHERE)));
                     break;
-                case EPrimitiveTypes.PLANE:
+                case EPrimitiveTypes.Plane:
                     break;
-                case EPrimitiveTypes.CYLINDER:
+                case EPrimitiveTypes.Cylinder:
                     break;
-                case EPrimitiveTypes.CAPSULE:
+                case EPrimitiveTypes.Capsule:
                     break;
                 default:
                     break;

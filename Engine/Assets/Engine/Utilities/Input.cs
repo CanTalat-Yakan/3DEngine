@@ -11,9 +11,9 @@ namespace Engine.Utilities
 {
     internal enum EMouseButton
     {
-        ISLEFTBUTTONPRESSED,
-        ISRIGHTBUTTONPRESSED,
-        ISMIDDLEBUTTONSPRESSED
+        IsLeftButtonPressed,
+        IsRightButtonPressed,
+        IsMiddleButtonPressed
     }
 
     internal enum EInputState 
@@ -180,13 +180,13 @@ namespace Engine.Utilities
                 newBool[(int)EInputState.UP] = false;
 
                 if (_pointer.Properties.IsLeftButtonPressed)
-                    SetPointerDic(EMouseButton.ISLEFTBUTTONPRESSED, newBool);
+                    SetPointerDic(EMouseButton.IsLeftButtonPressed, newBool);
 
                 if (_pointer.Properties.IsMiddleButtonPressed)
-                    SetPointerDic(EMouseButton.ISMIDDLEBUTTONSPRESSED, newBool);
+                    SetPointerDic(EMouseButton.IsMiddleButtonPressed, newBool);
 
                 if (_pointer.Properties.IsRightButtonPressed)
-                    SetPointerDic(EMouseButton.ISRIGHTBUTTONPRESSED, newBool);
+                    SetPointerDic(EMouseButton.IsRightButtonPressed, newBool);
             }
 
             e.Handled = true;
@@ -204,13 +204,13 @@ namespace Engine.Utilities
                 newBool[(int)EInputState.UP] = true;
 
                 if (!_pointer.Properties.IsLeftButtonPressed)
-                    SetPointerDic(EMouseButton.ISLEFTBUTTONPRESSED, newBool);
+                    SetPointerDic(EMouseButton.IsLeftButtonPressed, newBool);
 
                 if (!_pointer.Properties.IsMiddleButtonPressed)
-                    SetPointerDic(EMouseButton.ISMIDDLEBUTTONSPRESSED, newBool);
+                    SetPointerDic(EMouseButton.IsMiddleButtonPressed, newBool);
 
                 if (!_pointer.Properties.IsRightButtonPressed)
-                    SetPointerDic(EMouseButton.ISRIGHTBUTTONPRESSED, newBool);
+                    SetPointerDic(EMouseButton.IsRightButtonPressed, newBool);
             }
             e.Handled = true;
         }

@@ -31,9 +31,9 @@ namespace Engine.ECS
 
         public Transform Transform { get => GetComponent<Transform>(); }
 
-        public string Name = "Entity";
-        public bool IsEnabled = true;
-        public bool IsStatic = false;
+        public string Name;
+        public bool IsEnabled;
+        public bool IsStatic;
         public ETags Tag;
         public ELayers Layer;
 
@@ -68,15 +68,9 @@ namespace Engine.ECS
             return components.ToArray();
         }
 
-        public Component[] GetComponents()
-        {
-            return _components.ToArray();
-        }
+        public Component[] GetComponents() { return _components.ToArray(); }
 
-        object ICloneable.Clone()
-        {
-            return Clone();
-        }
+        object ICloneable.Clone() { return Clone(); }
 
         public Entity Clone()
         {

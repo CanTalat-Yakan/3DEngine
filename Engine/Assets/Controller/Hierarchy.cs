@@ -3,7 +3,6 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Linq;
 using System;
@@ -31,11 +30,6 @@ namespace Editor.Controller
         public TreeView TreeView;
         public List<TreeEntry> Hierarchy;
         public ObservableCollection<TreeViewIconNode> DataSource;
-
-        public override string ToString()
-        {
-            return Name;
-        }
     }
 
     internal partial class Hierarchy
@@ -59,12 +53,128 @@ namespace Editor.Controller
             CreateDefaultHierarchy();
         }
 
+        public void SetProperties(TreeView treeView)
+        {
+            if (treeView.SelectedNode is null)
+                return;
+
+            var selectedNode = treeView.SelectedNode;
+
+            DeselectTreeViewNodes();
+            treeView.SelectedNode = selectedNode;
+
+            var treeViewIconNode = (TreeViewIconNode)selectedNode.Content;
+            var entity = GetEntity(treeViewIconNode.TreeEntry);
+
+            Properties.Clear();
+            Properties.Set(new ModelView.Properties(entity));
+        }
+
         private void CreateDefaultHierarchy()
         {
             _stackPanel.Children.Add(CreateSceneHierarchy(SceneEntry).StackInGrid().WrapInExpander("Scene").AddContentFlyout(CreateRootMenuFlyout()));
             _stackPanel.Children.Add(CreateSeperator());
             _stackPanel.Children.Add(CreateButton("Add Subscene", (s, e) => ContentDialogCreateNewSubscene()));
             _stackPanel.Children.Add(CreateSubsceneHierarchy(out SceneEntry subSceneEntry).StackInGrid().WrapInExpanderWithToggleButton("Subscene").AddContentFlyout(CreateSubRootMenuFlyout(subSceneEntry)));
+        }
+
+        public void PopulateTree(SceneEntry sceneEntry)
+        {
+            Scene scene = SceneManager.GetFromID(sceneEntry.ID);
+
+            scene.EntitytManager.EntityList.OnAddEvent += (s, e) => AddTreeEntry(sceneEntry, (Entity)e);
+            scene.EntitytManager.EntityList.OnRemoveEvent += (s, e) => RemoveTreeEntry(sceneEntry, (Entity)e);
+
+            foreach (var entity in scene.EntitytManager.EntityList)
+                AddTreeEntry(sceneEntry, entity);
+        }
+
+        public void DeselectTreeViewNodes()
+        {
+            SceneEntry.TreeView.SelectedNode = null;
+
+            foreach (var subsceneTreeView in SubsceneEntries)
+                subsceneTreeView.TreeView.SelectedNode = null;
+        }
+
+        public TreeEntry GetParent(TreeEntry treeEntry)
+        {
+            if (treeEntry.IDparent != null)
+                foreach (var item in SceneEntry.Hierarchy)
+                    if (item.ID == treeEntry.IDparent.Value)
+                        return item;
+
+            return null;
+        }
+
+        public TreeEntry[] GetChildren(TreeEntry treeEntry)
+        {
+            List<TreeEntry> list = new List<TreeEntry>();
+            foreach (var item in SceneEntry.Hierarchy)
+                if (item.IDparent != null)
+                    if (item.IDparent.Value == treeEntry.ID)
+                        list.Add(item);
+
+            return list.ToArray();
+        }
+
+        public TreeEntry GetTreeEntry(Guid guid, SceneEntry sceneEntry = null)
+        {
+            if (sceneEntry != null)
+                foreach (var entry in sceneEntry.Hierarchy)
+                    if (entry.ID == guid)
+                        return entry;
+
+            foreach (var entry in SceneEntry.Hierarchy)
+                if (entry.ID == guid)
+                    return entry;
+
+            if (SubsceneEntries != null)
+                foreach (var subSceneEntry in SubsceneEntries)
+                    foreach (var treeEntry in subSceneEntry.Hierarchy)
+                        if (treeEntry.ID == guid)
+                            return treeEntry;
+
+            return null;
+        }
+
+        public SceneEntry GetSceneEntry(TreeEntry treeEntry)
+        {
+            foreach (var entry in SceneEntry.Hierarchy)
+                if (entry.ID == treeEntry.ID)
+                    return SceneEntry;
+
+            if (SubsceneEntries != null)
+                foreach (var subSceneEntry in SubsceneEntries)
+                    foreach (var entry in subSceneEntry.Hierarchy)
+                        if (entry.ID == treeEntry.ID)
+                            return subSceneEntry;
+
+            return null;
+        }
+        
+        public void GetEntries(out TreeEntry treeEntry, out SceneEntry sceneEntry, Guid guid)
+        {
+            treeEntry = null;
+            sceneEntry = null;
+
+            foreach (var entry in SceneEntry.Hierarchy)
+                if (entry.ID == guid)
+                {
+                    treeEntry = entry;
+                    sceneEntry = SceneEntry;
+                }
+
+            if (SubsceneEntries != null)
+                foreach (var subSceneEntry in SubsceneEntries)
+                    foreach (var entry in subSceneEntry.Hierarchy)
+                        if (entry.ID == guid)
+                        {
+                            treeEntry = entry;
+                            sceneEntry = subSceneEntry;
+
+                            return;
+                        }
         }
 
         private void GetInvokedItemAndSetContextFlyout(object sender, PointerRoutedEventArgs e)
@@ -114,25 +224,6 @@ namespace Editor.Controller
             return subsceneGrid;
         }
 
-        public void DeselectTreeViewNodes()
-        {
-            SceneEntry.TreeView.SelectedNode = null;
-
-            foreach (var subsceneTreeView in SubsceneEntries)
-                subsceneTreeView.TreeView.SelectedNode = null;
-        }
-
-        public void PopulateTree(SceneEntry sceneEntry)
-        {
-            Scene scene = SceneManager.GetFromID(sceneEntry.ID);
-
-            scene.EntitytManager.EntityList.OnAddEvent += (s, e) => AddTreeEntry(sceneEntry, (Entity)e);
-            scene.EntitytManager.EntityList.OnRemoveEvent += (s, e) => RemoveTreeEntry(sceneEntry, (Entity)e);
-
-            foreach (var entity in scene.EntitytManager.EntityList)
-                AddTreeEntry(sceneEntry, entity);
-        }
-
         private TreeEntry AddTreeEntry(SceneEntry sceneEntry, Entity entity)
         {
             var treeEntry = new TreeEntry() { Name = entity.Name, ID = entity.ID };
@@ -167,227 +258,6 @@ namespace Editor.Controller
                 parent.IconNode.Children.Remove(treeEntry.IconNode);
 
             sceneEntry.Hierarchy.Remove(treeEntry);
-        }
-
-        public void SetProperties(TreeView treeView)
-        {
-            if (treeView.SelectedNode is null)
-                return;
-
-            var selectedNode = treeView.SelectedNode;
-
-            DeselectTreeViewNodes();
-            treeView.SelectedNode = selectedNode;
-
-            var treeViewIconNode = (TreeViewIconNode)selectedNode.Content;
-            var entity = GetEntity(treeViewIconNode.TreeEntry);
-
-            Properties.Clear();
-            Properties.Set(new ModelView.Properties(entity));
-        }
-    }
-
-    internal class TreeViewIconNode : INotifyPropertyChanged
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public TreeEntry TreeEntry { get; set; }
-
-        public Visibility Camera;
-        public Visibility Mesh;
-
-        public Visibility Folder { get => Children.Count > 0 ? Visibility.Visible : Visibility.Collapsed; }
-
-        public int ScriptsCount;
-        public Visibility Scripts
-        {
-            get
-            {
-                int i = 1;
-
-                if (Camera == Visibility.Visible) i++;
-                if (Mesh == Visibility.Visible) i++;
-
-                return ScriptsCount > i ? Visibility.Visible : Visibility.Collapsed;
-            }
-        }
-
-        public string Name { get; set; }
-        public bool IsActive { get; set; }
-        public float Opacity { get => IsActive ? 1 : 0.5f; }
-
-
-        private ObservableCollection<TreeViewIconNode> _children;
-        public ObservableCollection<TreeViewIconNode> Children
-        {
-            get
-            {
-                if (_children == null)
-                    _children = new ObservableCollection<TreeViewIconNode>();
-
-                return _children;
-            }
-            set { _children = value; }
-        }
-
-        private bool _isExpanded;
-        public bool IsExpanded
-        {
-            get { return _isExpanded; }
-            set
-            {
-                if (_isExpanded != value)
-                {
-                    _isExpanded = value;
-                    NotifyPropertyChanged("IsExpanded");
-                }
-            }
-        }
-
-        private void NotifyPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    class TreeViewIconNodeTemplateSelector : DataTemplateSelector
-    {
-        public DataTemplate IconNodeTemplate { get; set; }
-
-        protected override DataTemplate SelectTemplateCore(object item) { return IconNodeTemplate; }
-    }
-
-    internal partial class Hierarchy : Controller.Helper
-    {
-        public TreeEntry GetParent(TreeEntry treeEntry)
-        {
-            if (treeEntry.IDparent != null)
-                foreach (var item in SceneEntry.Hierarchy)
-                    if (item.ID == treeEntry.IDparent.Value)
-                        return item;
-
-            return null;
-        }
-
-        public TreeEntry[] GetChildren(TreeEntry treeEntry)
-        {
-            List<TreeEntry> list = new List<TreeEntry>();
-            foreach (var item in SceneEntry.Hierarchy)
-                if (item.IDparent != null)
-                    if (item.IDparent.Value == treeEntry.ID)
-                        list.Add(item);
-
-            return list.ToArray();
-        }
-
-        public void GetEntries(out TreeEntry treeEntry, out SceneEntry sceneEntry, Guid guid)
-        {
-            treeEntry = null;
-            sceneEntry = null;
-
-            foreach (var entry in SceneEntry.Hierarchy)
-                if (entry.ID == guid)
-                {
-                    treeEntry = entry;
-                    sceneEntry = SceneEntry;
-                }
-
-            if (SubsceneEntries != null)
-                foreach (var subSceneEntry in SubsceneEntries)
-                    foreach (var entry in subSceneEntry.Hierarchy)
-                        if (entry.ID == guid)
-                        {
-                            treeEntry = entry;
-                            sceneEntry = subSceneEntry;
-
-                            return;
-                        }
-        }
-
-        public TreeEntry GetTreeEntry(Guid guid, SceneEntry sceneEntry = null)
-        {
-            if (sceneEntry != null)
-                foreach (var entry in sceneEntry.Hierarchy)
-                    if (entry.ID == guid)
-                        return entry;
-
-            foreach (var entry in SceneEntry.Hierarchy)
-                if (entry.ID == guid)
-                    return entry;
-
-            if (SubsceneEntries != null)
-                foreach (var subSceneEntry in SubsceneEntries)
-                    foreach (var treeEntry in subSceneEntry.Hierarchy)
-                        if (treeEntry.ID == guid)
-                            return treeEntry;
-
-            return null;
-        }
-
-        public SceneEntry GetSceneEntry(TreeEntry treeEntry)
-        {
-            foreach (var entry in SceneEntry.Hierarchy)
-                if (entry.ID == treeEntry.ID)
-                    return SceneEntry;
-
-            if (SubsceneEntries != null)
-                foreach (var subSceneEntry in SubsceneEntries)
-                    foreach (var entry in subSceneEntry.Hierarchy)
-                        if (entry.ID == treeEntry.ID)
-                            return subSceneEntry;
-
-            return null;
-        }
-
-        public Entity GetEntity(Guid guid, SceneEntry sceneEntry = null)
-        {
-            if (sceneEntry != null)
-                foreach (var entity in SceneManager.GetFromID(sceneEntry.ID).EntitytManager.EntityList)
-                    if (entity.ID == guid)
-                        return entity;
-
-            foreach (var entity in SceneManager.Scene.EntitytManager.EntityList)
-                if (entity.ID == guid)
-                    return entity;
-
-            foreach (var subscene in SceneManager.Subscenes)
-                foreach (var entity in subscene.EntitytManager.EntityList)
-                    if (entity.ID == guid)
-                        return entity;
-
-            return null;
-        }
-
-        public Entity GetEntity(TreeEntry entry, SceneEntry sceneEntry = null) { return GetEntity(entry.ID, sceneEntry); }
-
-        public void GetEntity(out Entity entity, TreeEntry entry, SceneEntry sceneEntry = null) => entity = GetEntity(entry.ID, sceneEntry);
-
-        public void GetEntity(out Entity entity, Guid guid, SceneEntry sceneEntry = null) => entity = GetEntity(guid, sceneEntry);
-
-        public void SetNewParentTreeEntry(TreeViewIconNode newParent, params TreeViewIconNode[] treeViewIconNodes)
-        {
-            if (newParent is null)
-                return;
-
-            foreach (var node in treeViewIconNodes)
-            {
-                (newParent.TreeEntry).IDparent = (node.TreeEntry).ID;
-                GetEntity(node.TreeEntry).Parent = GetEntity(newParent.TreeEntry);
-            }
-        }
-
-        public void SetNewSceneEntryRecurisivally(SceneEntry sourceSceneEntry, SceneEntry targetSceneEntry, params TreeViewIconNode[] treeViewIconNodes)
-        {
-            foreach (var node in treeViewIconNodes)
-            {
-                TreeEntry treeEntry = node.TreeEntry;
-
-                if (treeEntry.IconNode.Children.Count != 0)
-                    SetNewSceneEntryRecurisivally(sourceSceneEntry, targetSceneEntry, treeEntry.IconNode.Children.ToArray());
-
-                Scene sourceScene = SceneManager.GetFromID(sourceSceneEntry.ID);
-                Scene targetScene = SceneManager.GetFromID(targetSceneEntry.ID);
-
-                sourceScene.EntitytManager.EntityList.Remove(sourceScene.EntitytManager.GetFromID(treeEntry.ID), false);
-                targetScene.EntitytManager.EntityList.Add(targetScene.EntitytManager.GetFromID(treeEntry.ID), false);
-            }
         }
 
         private MenuFlyout CreateDefaultMenuFlyout()
@@ -630,6 +500,63 @@ namespace Editor.Controller
             if (result == ContentDialogResult.Primary)
                 GetSceneEntry(treeEntry);
             SceneManager.Scene.EntitytManager.Destroy(GetEntity(treeEntry.ID));
+        }
+    }
+
+    internal partial class Hierarchy : Controller.Helper
+    {
+        public Entity GetEntity(Guid guid, SceneEntry sceneEntry = null)
+        {
+            if (sceneEntry != null)
+                foreach (var entity in SceneManager.GetFromID(sceneEntry.ID).EntitytManager.EntityList)
+                    if (entity.ID == guid)
+                        return entity;
+
+            foreach (var entity in SceneManager.Scene.EntitytManager.EntityList)
+                if (entity.ID == guid)
+                    return entity;
+
+            foreach (var subscene in SceneManager.Subscenes)
+                foreach (var entity in subscene.EntitytManager.EntityList)
+                    if (entity.ID == guid)
+                        return entity;
+
+            return null;
+        }
+
+        public Entity GetEntity(TreeEntry entry, SceneEntry sceneEntry = null) { return GetEntity(entry.ID, sceneEntry); }
+
+        public void GetEntity(out Entity entity, TreeEntry entry, SceneEntry sceneEntry = null) => entity = GetEntity(entry.ID, sceneEntry);
+
+        public void GetEntity(out Entity entity, Guid guid, SceneEntry sceneEntry = null) => entity = GetEntity(guid, sceneEntry);
+
+        public void SetNewParentTreeEntry(TreeViewIconNode newParent, params TreeViewIconNode[] treeViewIconNodes)
+        {
+            if (newParent is null)
+                return;
+
+            foreach (var node in treeViewIconNodes)
+            {
+                (newParent.TreeEntry).IDparent = (node.TreeEntry).ID;
+                GetEntity(node.TreeEntry).Parent = GetEntity(newParent.TreeEntry);
+            }
+        }
+
+        public void SetNewSceneEntryRecurisivally(SceneEntry sourceSceneEntry, SceneEntry targetSceneEntry, params TreeViewIconNode[] treeViewIconNodes)
+        {
+            foreach (var node in treeViewIconNodes)
+            {
+                TreeEntry treeEntry = node.TreeEntry;
+
+                if (treeEntry.IconNode.Children.Count != 0)
+                    SetNewSceneEntryRecurisivally(sourceSceneEntry, targetSceneEntry, treeEntry.IconNode.Children.ToArray());
+
+                Scene sourceScene = SceneManager.GetFromID(sourceSceneEntry.ID);
+                Scene targetScene = SceneManager.GetFromID(targetSceneEntry.ID);
+
+                sourceScene.EntitytManager.EntityList.Remove(sourceScene.EntitytManager.GetFromID(treeEntry.ID), false);
+                targetScene.EntitytManager.EntityList.Add(targetScene.EntitytManager.GetFromID(treeEntry.ID), false);
+            }
         }
 
         public void MoveIconNode(TreeEntry sourceTreeEntry, SceneEntry sourceSceneEntry, TreeEntry targetTreeEntry, SceneEntry targetSceneEntry)
