@@ -389,7 +389,7 @@ namespace Editor.Controller
         {
             Grid grid = new();
             StackPanel stack = new() { Orientation = Orientation.Horizontal };
-            TextBlock header = new() { Text = text, Width = 80, VerticalAlignment = VerticalAlignment.Bottom };
+            TextBlock header = new() { Text = text, Width = 80, TextWrapping = TextWrapping.Wrap, VerticalAlignment = VerticalAlignment.Bottom };
 
             stack.Children.Add(header);
             stack.Children.Add(content);
@@ -403,7 +403,7 @@ namespace Editor.Controller
         {
             Grid grid = new();
             StackPanel stack = new() { Orientation = Orientation.Horizontal };
-            TextBlock header = new() { Text = text, Width = 160, VerticalAlignment = VerticalAlignment.Bottom };
+            TextBlock header = new() { Text = text, Width = 160, TextWrapping = TextWrapping.Wrap, VerticalAlignment = VerticalAlignment.Bottom };
 
             stack.Children.Add(header);
             stack.Children.Add(content);
@@ -416,7 +416,7 @@ namespace Editor.Controller
         {
             Grid grid = new();
             StackPanel stack = new() { Orientation = Orientation.Vertical, Spacing = 10, HorizontalAlignment = HorizontalAlignment.Stretch };
-            TextBlock header = new() { Text = text, VerticalAlignment = VerticalAlignment.Bottom };
+            TextBlock header = new() { Text = text, TextWrapping = TextWrapping.Wrap, VerticalAlignment = VerticalAlignment.Bottom };
 
             stack.Children.Add(header);
             stack.Children.Add(content);

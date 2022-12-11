@@ -12,6 +12,9 @@ using Windows.Storage.Streams;
 using Windows.Storage;
 using Engine.ECS;
 using Path = System.IO.Path;
+using Microsoft.VisualBasic;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace Editor.Controller
 {
@@ -103,7 +106,18 @@ namespace Editor.Controller
 
             var components = entity.GetComponents();
             for (int i = 1; i < components.Length; i++)
-                _stackPanel.Children.Add(new Grid().WrapInExpanderWithToggleButton(components[i].ToString()));
+            {
+                var propertyInfo = components.GetType().GetProperties(
+                    BindingFlags.Public | 
+                    BindingFlags.NonPublic | 
+                    BindingFlags.Instance);
+
+                List<Grid> propertiesCollection = new();
+                foreach (var property in propertyInfo)
+                    propertiesCollection.Add(CreateNumberInput().WrapInField(property.Name));
+
+                _stackPanel.Children.Add(propertiesCollection.ToArray().StackInGrid().WrapInExpanderWithToggleButton(components[i].ToString()));
+            }
 
             _stackPanel.Children.Add(collection.StackInGrid().WrapInExpanderWithToggleButton("Expander"));
         }
