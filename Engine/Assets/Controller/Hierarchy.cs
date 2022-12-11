@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using System;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.System;
 using Engine.Components;
 using Engine.ECS;
 using Engine.Utilities;
@@ -273,13 +274,17 @@ namespace Editor.Controller
                 new MenuFlyoutItem() { Text = "Create Entity" },
                 new MenuFlyoutItem() { Text = "Create Child Entity" },
             };
-
             items[0].Click += (s, e) => CopyToClipboard(_itemInvoked.ID, DataPackageOperation.Move);
+            items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Modifiers = VirtualKeyModifiers.Control, Key = VirtualKey.X });
             items[1].Click += (s, e) => CopyToClipboard(_itemInvoked.ID, DataPackageOperation.Copy);
+            items[1].KeyboardAccelerators.Add(new KeyboardAccelerator() { Modifiers = VirtualKeyModifiers.Control, Key = VirtualKey.C });
             items[2].Click += (s, e) => PasteEntityFromClipboard(_itemInvoked.ID);
+            items[2].KeyboardAccelerators.Add(new KeyboardAccelerator() { Modifiers = VirtualKeyModifiers.Control, Key = VirtualKey.V });
 
             items[3].Click += (s, e) => ContentDialogRename(_itemInvoked);
+            items[3].KeyboardAccelerators.Add(new KeyboardAccelerator() { Modifiers = VirtualKeyModifiers.Control, Key = VirtualKey.F2 });
             items[4].Click += (s, e) => ContentDialogDelete(_itemInvoked);
+            items[3].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.Delete });
 
             items[5].Click += (s, e) => SceneManager.Scene.EntitytManager.CreateEntity(GetEntity(GetParent(_itemInvoked)));
             items[6].Click += (s, e) => SceneManager.Scene.EntitytManager.CreateEntity(GetEntity(_itemInvoked));
