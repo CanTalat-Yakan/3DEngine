@@ -42,22 +42,22 @@ namespace Engine.Components
             Right = Vector3.Normalize(Vector3.Cross(Forward, Vector3.UnitY));
             LocalUp = Vector3.Normalize(Vector3.Cross(Right, Forward));
 
-            WorldMatrix = CalculateWorldMatrix(Position, Rotation, Scale, Parent);
+            WorldMatrix = CalculateWorldMatrix(Position, EulerAngles, Scale, Parent);
         }
 
-        Matrix4x4 CalculateWorldMatrix(Vector3 position, Quaternion rotation, Vector3 scale, Transform parent)
+        Matrix4x4 CalculateWorldMatrix(Vector3 position, Vector3 rotation, Vector3 scale, Transform parent)
         {
             while (parent != null)
             {
                 position += parent.Position;
-                rotation += parent.Rotation;
+                rotation += parent.EulerAngles;
                 scale *= parent.Scale;
 
                 parent = parent.Parent;
             }
 
             Matrix4x4 translationMatrix = Matrix4x4.CreateTranslation(position);
-            Matrix4x4 rotationMatrix = Matrix4x4.CreateFromQuaternion(rotation);
+            Matrix4x4 rotationMatrix = Matrix4x4.CreateFromYawPitchRoll(rotation.X, rotation.Y, rotation.Z); //.CreateFromQuaternion(rotation);
             Matrix4x4 scaleMatrix = Matrix4x4.CreateScale(scale);
 
             return Matrix4x4.Transpose(scaleMatrix * rotationMatrix * translationMatrix);
