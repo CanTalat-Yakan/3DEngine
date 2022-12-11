@@ -148,11 +148,12 @@ namespace Editor.Controller
             return StackInGrid(numInput);
         }
 
-        internal virtual UIElement CreateSlider(float f = 0, float min = float.MinValue, float max = float.MaxValue,
+        internal virtual UIElement CreateSlider(float f = 0, float min = 0, float max = 100,
             RangeBaseValueChangedEventHandler onValueChanged = null)
         {
             Slider numInput = new() { Value = f, Minimum = min, Maximum = max, Width = 200, Margin = new(0, 0, 0, -5.5) };
-            numInput.ValueChanged += onValueChanged;
+            if (onValueChanged != null)
+                numInput.ValueChanged += onValueChanged;
 
             TextBlock numPreview = new() { Padding = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
 
@@ -197,7 +198,7 @@ namespace Editor.Controller
             return StackInGrid(rectangleR, numInput, rectangleG, num2Input, rectangleB, num3Input);
         }
 
-        internal virtual Grid CreateVec3InputTransform(Vector3 v = new(), 
+        internal virtual Grid CreateVec3InputTransform(Vector3 v = new(),
             params TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs>[] e)
         {
             Rectangle rectangleR = new() { Fill = new SolidColorBrush(Colors.IndianRed), RadiusX = 2, RadiusY = 2, Width = 4 };
@@ -237,7 +238,7 @@ namespace Editor.Controller
             return StackInGrid(comboBox);
         }
 
-        internal virtual Grid CreateEvent(string s = "Event", 
+        internal virtual Grid CreateEvent(string s = "Event",
             RoutedEventHandler e = null)
         {
             Button button = new() { Content = s };
@@ -278,7 +279,7 @@ namespace Editor.Controller
             return grid;
         }
 
-        internal virtual Grid CreateButton(string s, 
+        internal virtual Grid CreateButton(string s,
             TappedEventHandler tapped)
         {
             Grid grid = new();
@@ -291,7 +292,8 @@ namespace Editor.Controller
             return grid;
         }
 
-        internal virtual Grid CreateTreeView(out TreeView tree, DataTemplateSelector templateSelector = null)
+        internal virtual Grid CreateTreeView(out TreeView tree,
+            DataTemplateSelector templateSelector = null)
         {
             Grid grid = new();
 
