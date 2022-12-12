@@ -47,8 +47,8 @@ In order to compile, make sure **no spaces** are present in the solution path ot
 Also, you need to install **Visual Studio 2022** with the following components:
 
 - [x] [Windows 11 SDK (10.0.22621.0)](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk)
-- [x] [.NET 7.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
 - [x] [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)
+- [x] [.NET 7.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
 
 # Preview
 ![3D Engine](https://drive.google.com/uc?export=view&id=170eLySL90SpNPX44mh-mmovyXwpWQZVj)
