@@ -1,9 +1,11 @@
-﻿using System.Numerics;
+﻿using System.Drawing;
+using System.Numerics;
 using System;
 using Engine.Components;
 using Editor.Controller;
 using Engine.ECS;
 using Engine.Utilities;
+using Texture = Vortice.Direct3D11.Texture2DArrayShaderResourceView;
 //using Microsoft.CodeAnalysis;
 
 namespace Engine.Editor
@@ -38,6 +40,7 @@ namespace Engine.Editor
             _special.Transform.Scale *= 0.1f;
             _special.Transform.Position.Y += 0.5f;
             _special.AddComponent(new PlayerMovement());
+            _special.AddComponent(new Test());
 
             Entity parent = SceneManager.Scene.EntitytManager.CreateEntity(null, "Content");
 
@@ -83,14 +86,14 @@ namespace Engine.Editor
             Vector3 targetDirection = Movement();
 
             if (!IsNaN(targetDirection))
-                Entity.Transform.Position += targetDirection;
+                entity.Transform.Position += targetDirection;
         }
 
         internal Vector3 Movement()
         {
             Vector3 dest =
-                Input.Instance.GetAxis().X * Entity.Transform.Right +
-                Input.Instance.GetAxis().Y * Entity.Transform.Forward;
+                Input.Instance.GetAxis().X * entity.Transform.Right +
+                Input.Instance.GetAxis().Y * entity.Transform.Forward;
 
             return Vector3.Normalize(dest) * MovementSpeed * (float)Time.Delta;
         }
@@ -104,5 +107,29 @@ namespace Engine.Editor
 
             return true;
         }
+    }
+
+    internal class Test : Component
+    {
+        [Show]
+        private string _visibleString = "this is a private field";
+        [Hide]
+        private string HiddenString = "this is a public field";
+        public Color Color;
+        public string String = "";
+        public int Int;
+        public float Float;
+        public Vector2 Vector2;
+        public Vector3 Vector3;
+        [Slider(1, 10)]
+        public float Slider;
+        public bool Bool;
+        public Texture Texture;
+        public Entity Entity;
+        [Spacer]
+        [Header("Header")]
+        public event EventHandler Event;
+
+        public override void Register() => ScriptSystem.Register(this);
     }
 }
