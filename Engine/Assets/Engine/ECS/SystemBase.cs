@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
-using Editor.Controller;
 using Engine.Components;
 
 namespace Engine.ECS
 {
-    internal class BaseSystem<T> where T : Component
+    internal class SystemBase<T> where T : Component
     {
         protected static List<T> s_components = new();
 
@@ -46,9 +45,9 @@ namespace Engine.ECS
         }
     }
 
-    class CameraSystem : BaseSystem<Camera> { }
-    class TransformSystem : BaseSystem<Transform> { }
-    class MeshSystem : BaseSystem<Mesh> { }
-    class ScriptSystem : BaseSystem<Component> { }
-    class EditorScriptSystem : BaseSystem<EditorComponent> { }
+    class CameraSystem : SystemBase<Camera> { }
+    class TransformSystem : SystemBase<Transform> { }
+    class MeshSystem : SystemBase<Mesh> { }
+    class ScriptSystem : SystemBase<Component> { }
+    class EditorScriptSystem : SystemBase<EditorComponent> { }
 }
