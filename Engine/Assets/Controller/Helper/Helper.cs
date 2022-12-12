@@ -335,7 +335,7 @@ namespace Editor.Controller
             Grid container = new() { Width = 48, Height = 48 };
             Image img = new() { Stretch = Stretch.UniformToFill };
             Button button = new() { HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch };
-            TextBlock path = new() { Text = s, TextWrapping = TextWrapping.WrapWholeWords, Margin = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
+            TextBlock path = new() { Text = s, TextWrapping = TextWrapping.WrapWholeWords, MaxWidth = 200, Margin = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
 
             container.Children.Add(img);
             container.Children.Add(button);
@@ -346,7 +346,7 @@ namespace Editor.Controller
         internal virtual Grid CreateReferenceSlot(string s = "None", string type = "type")
         {
             Button button = new() { Content = "..." };
-            TextBlock reference = new() { Text = s + $" ({type})", TextWrapping = TextWrapping.WrapWholeWords, Margin = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
+            TextBlock reference = new() { Text = s + $" ({type})", TextWrapping = TextWrapping.WrapWholeWords, MaxWidth = 200, Margin = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
 
             return StackInGrid(button, reference);
         }
