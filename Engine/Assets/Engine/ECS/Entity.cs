@@ -45,7 +45,7 @@ namespace Engine.ECS
         public void AddComponent(Component component)
         {
             _components.Add(component);
-            component.Entity = this;
+            component.entity = this;
         }
 
         public void RemoveComponent(Component component) => _components.Remove(component);

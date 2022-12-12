@@ -52,7 +52,7 @@ namespace Engine.Components
 
         public override void Render()
         {
-            Material.Set(Entity.Transform.ConstantsBuffer);
+            Material.Set(entity.Transform.ConstantsBuffer);
 
             _d3d.Draw(
                 VertexBuffer, VertexStride,

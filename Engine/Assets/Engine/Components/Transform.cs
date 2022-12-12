@@ -28,8 +28,8 @@ namespace Engine.Components
         
         public override void Update()
         {
-            if (Entity.Parent != null)
-                Parent = Entity.Parent.Transform;
+            if (entity.Parent != null)
+                Parent = entity.Parent.Transform;
 
             //EulerAngles = Rotation.ToEuler();
             Rotation = Quaternion.CreateFromYawPitchRoll(EulerAngles.X, EulerAngles.Y, EulerAngles.Z);
