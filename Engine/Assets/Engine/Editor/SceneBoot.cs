@@ -121,7 +121,7 @@ namespace Engine.Editor
         public float Float;
         public Vector2 Vector2;
         public Vector3 Vector3;
-        [Slider(1, 10)]
+        [Slider(1, 100)]
         public float Slider;
         public bool Bool;
         public Texture Texture;

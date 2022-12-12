@@ -172,7 +172,7 @@ namespace Editor.Controller
         {
             List<Grid> grid = new();
 
-            var type = value != null ? value.GetType() : fieldInfo.FieldType;
+            var type = fieldInfo.FieldType;
             var attributes = fieldInfo.GetCustomAttributes(true);
 
             if (attributes.OfType<HideAttribute>().Any())
@@ -191,7 +191,7 @@ namespace Editor.Controller
             // Int
             else if (type == typeof(int))
                 if (attributes.OfType<SliderAttribute>().Any())
-                    grid.Add(CreateSlider((int)value, (int)attributes.OfType<SliderAttribute>().First().CustomMin, (int)(int)attributes.OfType<SliderAttribute>().First().CustomMax).WrapInGrid());
+                    grid.Add(CreateSlider((int)value, (int)attributes.OfType<SliderAttribute>().First().CustomMin, (int)attributes.OfType<SliderAttribute>().First().CustomMax).WrapInGrid());
                 else
                     grid.Add(CreateNumberInput((int)value));
 
