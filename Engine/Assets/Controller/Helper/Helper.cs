@@ -152,7 +152,7 @@ namespace Editor.Controller
             return StackInGrid(numInput);
         }
 
-        internal virtual UIElement CreateSlider(float f = 0, float min = 0, float max = 100,
+        internal virtual UIElement CreateSlider(double f = 0, double min = 0, double max = 100,
             RangeBaseValueChangedEventHandler onValueChanged = null)
         {
             Slider numInput = new() { Value = f, Minimum = min, Maximum = max, Width = 200, Margin = new(0, 0, 0, -5.5) };
