@@ -1,21 +1,23 @@
 ﻿using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml;
 using System.Diagnostics;
+using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
+using System.Linq;
+using System.Reflection;
 using System;
 using Vortice.Mathematics;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.Storage;
-using Engine.ECS;
+using Image = Microsoft.UI.Xaml.Controls.Image;
 using Path = System.IO.Path;
-using Microsoft.VisualBasic;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Linq;
+using Texture = Vortice.Direct3D11.Texture2DArrayShaderResourceView;
+using Engine.ECS;
+using Engine.Editor;
+using Engine.Utilities;
 
 namespace Editor.Controller
 {
@@ -111,17 +113,28 @@ namespace Editor.Controller
             foreach (var component in entity.GetComponents())
                 if (component != entity.Transform)
                 {
-                    var fieldInfos = component.GetType().GetFields(
-                        //BindingFlags.NonPublic |
-                        BindingFlags.Static |
-                        BindingFlags.Public |
-                        BindingFlags.Instance);
+                    var nonPublicFieldInfos = component.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+                    var fieldInfos = component.GetType().GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
 
-                    List<Grid> propertiesCollection = new();
-                    foreach (var field in fieldInfos)
-                        propertiesCollection.Add(CreateNumberInput().WrapInFieldEqual(field.Name));
+                    var nonPublicEventsInfos = component.GetType().GetEvents(BindingFlags.NonPublic);
+                    var eventsInfos = component.GetType().GetEvents(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
 
-                    _stackPanel.Children.Add(propertiesCollection.ToArray().StackInGrid().WrapInExpanderWithToggleButton(component.ToString().Split('.').Last()));
+                    Grid tmp;
+                    List<Grid> fieldsCollection = new();
+                    foreach (var info in fieldInfos)
+                        if ((tmp = CreateFromFieldInfo(info.GetValue(component), info, nonPublicFieldInfos)) != null)
+                            fieldsCollection.Add(tmp);
+
+                    List<Grid> eventsCollection = new();
+                    foreach (var info in eventsInfos)
+                        if ((tmp = CreateFromEventInfo(info, nonPublicEventsInfos)) != null)
+                            eventsCollection.Add(tmp);
+
+                    List<Grid> scriptsCollection = new List<Grid>();
+                    scriptsCollection.AddRange(fieldsCollection.ToArray());
+                    scriptsCollection.AddRange(eventsCollection.ToArray());
+
+                    _stackPanel.Children.Add(scriptsCollection.ToArray().StackInGrid().WrapInExpanderWithToggleButton(component.ToString().SplitLast('_').SplitLast('.')));
                 }
 
             _stackPanel.Children.Add(collection.StackInGrid().WrapInExpanderWithToggleButton("Expander"));
@@ -171,25 +184,124 @@ namespace Editor.Controller
 
     internal partial class Properties : Controller.Helper
     {
-        private Grid CreateTextureSlot()
+        public Grid CreateFromFieldInfo(object value, FieldInfo fieldInfo, FieldInfo[] nonPublic)
         {
-            Grid container = new() { Width = 48, Height = 48 };
-            Image img = new() { Stretch = Stretch.UniformToFill };
-            Button button = new() { HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch };
-            TextBlock path = new() { Text = "None", Margin = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
+            List<Grid> grid = new();
 
-            container.Children.Add(img);
-            container.Children.Add(button);
+            var type = value != null ? value.GetType() : fieldInfo.FieldType;
+            var attributes = fieldInfo.GetCustomAttributes(true);
 
-            return StackInGrid(container, path);
+            if (!attributes.OfType<ShowAttribute>().Any())
+                foreach (var info in nonPublic)
+                    if (fieldInfo.Equals(info))
+                        return null;
+
+            #region // GetFieldType and process Value
+            // Color
+            if (type == typeof(Color))
+                grid.Add(CreateColorButton(((Color)value).R, ((Color)value).G, ((Color)value).B, ((Color)value).A));
+
+            // Int
+            else if (type == typeof(int))
+                if (attributes.OfType<SliderAttribute>().Any())
+                    grid.Add(CreateSlider((int)value, (int)attributes.OfType<SliderAttribute>().First().CustomMin, (int)(int)attributes.OfType<SliderAttribute>().First().CustomMax).WrapInGrid());
+                else
+                    grid.Add(CreateNumberInput((int)value));
+
+            // Float
+            else if (type == typeof(float))
+                if (attributes.OfType<SliderAttribute>().Any())
+                    grid.Add(CreateSlider((float)value, (float)attributes.OfType<SliderAttribute>().First().CustomMin, (float)attributes.OfType<SliderAttribute>().First().CustomMax).WrapInGrid());
+                else
+                    grid.Add(CreateNumberInput((float)value));
+
+            // String
+            else if (type == typeof(string))
+                grid.Add(CreateTextInput((string)value));
+
+            // Vector 2
+            else if (type == typeof(Vector2))
+                grid.Add(CreateVec2Input((Vector2)value));
+
+            // Vector 3
+            else if (type == typeof(Vector3))
+                grid.Add(CreateVec3Input((Vector3)value));
+
+            // Bool
+            else if (type == typeof(bool))
+                grid.Add(CreateBool((bool)value).WrapInGrid());
+
+            // Material
+            else if (type == typeof(Material))
+                grid.Add(CreateTextureSlot(((Material)value).ToString().FormatFieldsName()));
+
+            // Texture
+            else if (type == typeof(Texture))
+                grid.Add(CreateTextureSlot(((Texture)value).ToString().FormatFieldsName()));
+
+            // Entity
+            else if (type == typeof(Entity))
+                if (value is null)
+                    grid.Add(CreateReferenceSlot("None", type.ToString().FormatFieldsName()));
+                else
+                    grid.Add(CreateReferenceSlot(((Entity)value).Name, type.ToString().FormatFieldsName()));
+
+            // Component
+            else if (type == typeof(Component))
+                if (value is null)
+                    grid.Add(CreateReferenceSlot("None", type.ToString().FormatFieldsName()));
+                else
+                    grid.Add(CreateReferenceSlot(((Component)value).ToString().FormatFieldsName(), type.ToString().FormatFieldsName()));
+
+            // Event
+            else if (type == typeof(EventHandler))
+                if (value is null)
+                    grid.Add(CreateReferenceSlot("None", type.ToString().FormatFieldsName()));
+                else
+                    grid.Add(CreateReferenceSlot(((EventHandler)value).ToString().SplitLast('.'), type.ToString().FormatFieldsName()));
+
+            // Default
+            else
+                grid.Add(CreateReferenceSlot("None", type.ToString().FormatFieldsName()));
+            #endregion
+
+            return (new Grid[]
+            {
+                ProcessAttributes(attributes).StackInGrid(),
+                grid.ToArray().StackInGrid().WrapInField(fieldInfo.Name)
+            }).StackInGrid(0);
         }
 
-        private Grid CreateReferenceSlot()
+        public Grid CreateFromEventInfo(EventInfo eventInfo, EventInfo[] nonPublic)
         {
-            Button button = new() { Content = "..." };
-            TextBlock reference = new() { Text = "None (type)", Margin = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
+            var attributes = eventInfo.GetCustomAttributes(true);
 
-            return StackInGrid(button, reference);
+            if (!attributes.OfType<ShowAttribute>().Any())
+                foreach (var info in nonPublic)
+                    if (eventInfo.Equals(info))
+                        return null;
+
+            return (new Grid[]
+            {
+                ProcessAttributes(attributes).StackInGrid(),
+                CreateEvent(eventInfo.Name, (s, e) => eventInfo.GetRaiseMethod()).WrapInField(eventInfo.Name)
+            }).StackInGrid(0);
+        }
+
+        public Grid[] ProcessAttributes(object[] attributes)
+        {
+            List<Grid> grid = new();
+
+            foreach (var attribute in attributes)
+            {
+                if (attribute.GetType().Equals(typeof(HeaderAttribute)))
+                    grid.Add(CreateHeader((string)((HeaderAttribute)attribute).CustomHeader));
+
+                if (attribute.GetType().Equals(typeof(SpacerAttribute)))
+                    grid.Add(CreateSpacer());
+            }
+
+            return grid.ToArray();
         }
 
         private async void SelectImageAsync(Image image, TextBlock path)

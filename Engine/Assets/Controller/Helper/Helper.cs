@@ -5,16 +5,20 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Shapes;
 using Microsoft.UI.Xaml;
 using Microsoft.UI;
+using System.Linq;
 using System.Numerics;
+using System.Text;
 using System;
 using Windows.Foundation;
 using ColorPicker = CommunityToolkit.WinUI.UI.Controls.ColorPicker;
-using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
 using Expander = Microsoft.UI.Xaml.Controls.Expander;
+using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
+using Rectangle = Microsoft.UI.Xaml.Shapes.Rectangle;
+using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
+using Image = Microsoft.UI.Xaml.Controls.Image;
 
 namespace Editor.Controller
 {
@@ -326,6 +330,28 @@ namespace Editor.Controller
             return grid;
         }
 
+        internal virtual Grid CreateTextureSlot(string s = "None")
+        {
+            Grid container = new() { Width = 48, Height = 48 };
+            Image img = new() { Stretch = Stretch.UniformToFill };
+            Button button = new() { HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch };
+            TextBlock path = new() { Text = s, Margin = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
+
+            container.Children.Add(img);
+            container.Children.Add(button);
+
+            return StackInGrid(container, path);
+        }
+
+        internal virtual Grid CreateReferenceSlot(string s = "None", string type = "type")
+        {
+            Button button = new() { Content = "..." };
+            TextBlock reference = new() { Text = s + $" ({type})", TextWrapping = TextWrapping.WrapWholeWords, Margin = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
+
+            return StackInGrid(button, reference);
+        }
+
+
         internal static string SizeSuffix(Int64 value, int decimalPlaces = 1)
         {
             string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
@@ -359,10 +385,10 @@ namespace Editor.Controller
             return grid;
         }
 
-        public static Grid StackInGrid(this UIElement[] content)
+        public static Grid StackInGrid(this UIElement[] content, float spacing = 5)
         {
             Grid grid = new() { HorizontalAlignment = HorizontalAlignment.Stretch };
-            StackPanel stack = new() { Spacing = 5, Orientation = Orientation.Vertical, FlowDirection = FlowDirection.LeftToRight };
+            StackPanel stack = new() { Spacing = spacing, Orientation = Orientation.Vertical, FlowDirection = FlowDirection.LeftToRight };
 
             foreach (var item in content)
                 stack.Children.Add(item);
@@ -372,10 +398,10 @@ namespace Editor.Controller
             return grid;
         }
 
-        public static Grid StackInGrid(this Grid[] content)
+        public static Grid StackInGrid(this Grid[] content, float spacing = 5)
         {
             Grid grid = new() { HorizontalAlignment = HorizontalAlignment.Stretch };
-            StackPanel stack = new() { Spacing = 5, Orientation = Orientation.Vertical, FlowDirection = FlowDirection.LeftToRight };
+            StackPanel stack = new() { Spacing = spacing, Orientation = Orientation.Vertical, FlowDirection = FlowDirection.LeftToRight };
 
             foreach (var item in content)
                 stack.Children.Add(item);
@@ -389,7 +415,7 @@ namespace Editor.Controller
         {
             Grid grid = new();
             StackPanel stack = new() { Orientation = Orientation.Horizontal };
-            TextBlock header = new() { Text = text, Width = 80, TextWrapping = TextWrapping.Wrap, VerticalAlignment = VerticalAlignment.Bottom };
+            TextBlock header = new() { Text = text.FormatFieldsName(), Width = 80, TextWrapping = TextWrapping.WrapWholeWords, VerticalAlignment = VerticalAlignment.Bottom };
 
             stack.Children.Add(header);
             stack.Children.Add(content);
@@ -403,7 +429,7 @@ namespace Editor.Controller
         {
             Grid grid = new();
             StackPanel stack = new() { Orientation = Orientation.Horizontal };
-            TextBlock header = new() { Text = text, Width = 160, TextWrapping = TextWrapping.Wrap, VerticalAlignment = VerticalAlignment.Bottom };
+            TextBlock header = new() { Text = text.FormatFieldsName(), Width = 160, TextWrapping = TextWrapping.WrapWholeWords, VerticalAlignment = VerticalAlignment.Bottom };
 
             stack.Children.Add(header);
             stack.Children.Add(content);
@@ -489,6 +515,41 @@ namespace Editor.Controller
         }
 
         public static async void CreateDialogAsync(this ContentDialog contentDialog) => await contentDialog.ShowAsync();
+
+        public static string AddSpacesToSentence(this string text, bool preserveAcronyms = true)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return string.Empty;
+            StringBuilder newText = new StringBuilder(text.Length * 2);
+            newText.Append(text[0]);
+            for (int i = 1; i < text.Length; i++)
+            {
+                if (char.IsUpper(text[i]) || char.IsDigit(text[i]))
+                    if (!char.IsDigit(text[i - 1]))
+                        if ((text[i - 1] != ' ' && !char.IsUpper(text[i - 1])) ||
+                        (preserveAcronyms && char.IsUpper(text[i - 1]) &&
+                         i < text.Length - 1 && !char.IsUpper(text[i + 1])))
+                        newText.Append(' ');
+                newText.Append(text[i]);
+            }
+
+            return newText.ToString();
+        }
+
+        public static string SplitLast(this string text, char seperator)
+        {
+            return text.Split(seperator).Last();
+        }
+
+        public static string FirstCharToUpper(this string input) 
+        {
+            return string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1));
+        }
+
+        public static string FormatFieldsName(this string text)
+        {
+            return text.SplitLast('_').SplitLast('.').FirstCharToUpper().AddSpacesToSentence();
+        }
     }
 
     internal sealed class BooleanToVisibilityConverter : IValueConverter
