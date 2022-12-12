@@ -13,6 +13,7 @@ using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.Storage;
 using Image = Microsoft.UI.Xaml.Controls.Image;
+using Color = System.Drawing.Color;
 using Path = System.IO.Path;
 using Texture = Vortice.Direct3D11.Texture2DArrayShaderResourceView;
 using Engine.ECS;
@@ -90,21 +91,6 @@ namespace Editor.Controller
                     (s, e) => entity.Transform.Scale.Z = (float)e.NewValue).WrapInField("Scale"),
             };
 
-            Grid[] collection = new[]
-            {
-                CreateColorButton().WrapInField("Color"),
-                CreateNumberInput().WrapInField("Float"),
-                CreateTextInput().WrapInField("String"),
-                CreateVec2Input().WrapInField("Vector 2"),
-                CreateVec3Input().WrapInField("Vector 3"),
-                CreateSlider().WrapInField("Slider"),
-                CreateBool().WrapInField("Bool"),
-                CreateTextureSlot().WrapInField("Texture"),
-                CreateReferenceSlot().WrapInField("Reference"),
-                CreateHeader(),
-                CreateEvent().WrapInField("Event").WrapInExpander("Expander")
-            };
-
             _stackPanel.Children.Add(properties.StackInGrid().WrapInExpanderWithEditableHeader(entity.Name));
             _stackPanel.Children.Add(CreateSeperator());
             _stackPanel.Children.Add(transform.StackInGrid().WrapInExpander("Transform"));
@@ -114,7 +100,7 @@ namespace Editor.Controller
                 if (component != entity.Transform)
                 {
                     var nonPublicFieldInfos = component.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-                    var fieldInfos = component.GetType().GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
+                    var fieldInfos = component.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
 
                     var nonPublicEventsInfos = component.GetType().GetEvents(BindingFlags.NonPublic);
                     var eventsInfos = component.GetType().GetEvents(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
@@ -136,8 +122,6 @@ namespace Editor.Controller
 
                     _stackPanel.Children.Add(scriptsCollection.ToArray().StackInGrid().WrapInExpanderWithToggleButton(component.ToString().SplitLast('_').SplitLast('.')));
                 }
-
-            _stackPanel.Children.Add(collection.StackInGrid().WrapInExpanderWithToggleButton("Expander"));
         }
 
         private async void CreateFilePreviewer(string path)
@@ -190,6 +174,9 @@ namespace Editor.Controller
 
             var type = value != null ? value.GetType() : fieldInfo.FieldType;
             var attributes = fieldInfo.GetCustomAttributes(true);
+
+            if (attributes.OfType<HideAttribute>().Any())
+                return null;
 
             if (!attributes.OfType<ShowAttribute>().Any())
                 foreach (var info in nonPublic)
