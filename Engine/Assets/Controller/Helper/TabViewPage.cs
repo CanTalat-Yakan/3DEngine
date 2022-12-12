@@ -18,7 +18,7 @@ namespace Editor.Controller
     {
         public TabView TabView;
 
-        public TabViewPage(params TabViewItemDataTemplate[] icollection)
+        public TabViewPage(params TabViewItemDataTemplate[] tabViewDataTemplate)
         {
             TabView = new()
             {
@@ -30,8 +30,8 @@ namespace Editor.Controller
             TabView.AddTabButtonClick += TabView_AddButtonClick;
             //m_TabView.TabCloseRequested += TabView_TabCloseRequested;
 
-            foreach (var item in icollection)
-                TabView.TabItems.Add(CreateNewTab(item));
+            foreach (var dataTemplate in tabViewDataTemplate)
+                TabView.TabItems.Add(CreateNewTab(dataTemplate));
         }
 
         public async void TabViewWindowingButton_Click(object sender, RoutedEventArgs e)
