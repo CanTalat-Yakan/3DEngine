@@ -335,7 +335,7 @@ namespace Editor.Controller
             Grid container = new() { Width = 48, Height = 48 };
             Image img = new() { Stretch = Stretch.UniformToFill };
             Button button = new() { HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch };
-            TextBlock path = new() { Text = s, Margin = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
+            TextBlock path = new() { Text = s, TextWrapping = TextWrapping.WrapWholeWords, Margin = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
 
             container.Children.Add(img);
             container.Children.Add(button);
@@ -350,7 +350,6 @@ namespace Editor.Controller
 
             return StackInGrid(button, reference);
         }
-
 
         internal static string SizeSuffix(Int64 value, int decimalPlaces = 1)
         {

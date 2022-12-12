@@ -112,9 +112,9 @@ namespace Engine.Editor
     internal class Test : Component
     {
         [Show]
-        private string _visibleString = "this is a private field";
+        private string _visibleString = "This field is private!";
         [Hide]
-        private string HiddenString = "this is a public field";
+        public string HiddenString = "This field is public!";
         public Color Color;
         public string String = "";
         public int Int;
