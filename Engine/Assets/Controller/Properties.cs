@@ -13,6 +13,7 @@ using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.Storage;
 using Image = Microsoft.UI.Xaml.Controls.Image;
+using Color = System.Drawing.Color;
 using Path = System.IO.Path;
 using Texture = Vortice.Direct3D11.Texture2DArrayShaderResourceView;
 using Engine.ECS;
