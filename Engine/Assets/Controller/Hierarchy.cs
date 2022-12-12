@@ -359,7 +359,7 @@ namespace Editor.Controller
             //items[3].Click += (s, e) => ContentDialogRename(path);
             //items[4].Click += (s, e) => ContentDialogDelete(path);
 
-            items[5].Click += (s, e) => SceneManager.Scene.EntitytManager.CreateEntity();
+            items[5].Click += (s, e) => SceneManager.GetFromID(sceneEntry.ID).EntitytManager.CreateEntity();
 
             MenuFlyout menuFlyout = new();
             foreach (var item in items)
