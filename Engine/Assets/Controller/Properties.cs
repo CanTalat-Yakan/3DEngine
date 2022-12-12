@@ -105,16 +105,17 @@ namespace Editor.Controller
                     var nonPublicEventsInfos = component.GetType().GetEvents(BindingFlags.NonPublic);
                     var eventsInfos = component.GetType().GetEvents(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
 
-                    Grid tmp;
+                    Grid newFieldGrid;
+
                     List<Grid> fieldsCollection = new();
                     foreach (var info in fieldInfos)
-                        if ((tmp = CreateFromFieldInfo(info.GetValue(component), info, nonPublicFieldInfos)) != null)
-                            fieldsCollection.Add(tmp);
+                        if ((newFieldGrid = CreateFromFieldInfo(info.GetValue(component), info, nonPublicFieldInfos)) != null)
+                            fieldsCollection.Add(newFieldGrid);
 
                     List<Grid> eventsCollection = new();
                     foreach (var info in eventsInfos)
-                        if ((tmp = CreateFromEventInfo(info, nonPublicEventsInfos)) != null)
-                            eventsCollection.Add(tmp);
+                        if ((newFieldGrid = CreateFromEventInfo(info, nonPublicEventsInfos)) != null)
+                            eventsCollection.Add(newFieldGrid);
 
                     List<Grid> scriptsCollection = new List<Grid>();
                     scriptsCollection.AddRange(fieldsCollection.ToArray());
