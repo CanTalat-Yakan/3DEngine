@@ -34,7 +34,7 @@ namespace Engine.Components
 
         public override void Awake()
         {
-            if (Entity.Tag == ETags.MainCamera)
+            if (entity.Tag == ETags.MainCamera)
                 Main = this;
         }
 
@@ -44,8 +44,8 @@ namespace Engine.Components
         {
             #region //Set ViewConstantBuffer
             var view = Matrix4x4.CreateLookAt(
-                Entity.Transform.Position,
-                Entity.Transform.Position + Entity.Transform.Forward,
+                entity.Transform.Position,
+                entity.Transform.Position + entity.Transform.Forward,
                 Vector3.UnitY);
 
             var aspect = (float)(_d3d.SwapChainPanel.ActualWidth / _d3d.SwapChainPanel.ActualHeight);
@@ -67,7 +67,7 @@ namespace Engine.Components
             // T(v*p), because HLSL calculates matrix mul in collumn-major and system.numerics returns row-major
             var viewProjection = Matrix4x4.Transpose(view * projection);
 
-            ViewConstants = new() { ViewProjection = viewProjection, CameraPisiton = Entity.Transform.Position };
+            ViewConstants = new() { ViewProjection = viewProjection, CameraPisiton = entity.Transform.Position };
             #endregion
 
             unsafe
