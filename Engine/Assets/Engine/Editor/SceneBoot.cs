@@ -61,7 +61,7 @@ namespace Engine.Editor
         {
             SceneManager.Scene.EntitytManager.Sky.Transform.Position = Camera.Transform.Position;
 
-            if (Input.Instance.GetKey(Windows.System.VirtualKey.C, EInputState.DOWN))
+            if (Input.Instance.GetKey(Windows.System.VirtualKey.C, EInputState.Down))
             {
                 Output.Log("Spawned 10 Cubes");
 

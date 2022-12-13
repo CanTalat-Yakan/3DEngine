@@ -18,9 +18,9 @@ namespace Engine.Utilities
 
     internal enum EInputState 
     { 
-        DOWN, 
-        PRESSED, 
-        UP 
+        Down, 
+        Pressed, 
+        Up 
     }
 
     internal class Input
@@ -85,13 +85,13 @@ namespace Engine.Utilities
         {
             foreach (var item in _bufferKeys)
             {
-                _virtualKeyDic[item][(int)EInputState.DOWN] = false;
-                _virtualKeyDic[item][(int)EInputState.UP] = false;
+                _virtualKeyDic[item][(int)EInputState.Down] = false;
+                _virtualKeyDic[item][(int)EInputState.Up] = false;
             }
             foreach (var item in _bufferPoints)
             {
-                _pointerPointDic[item][(int)EInputState.DOWN] = false;
-                _pointerPointDic[item][(int)EInputState.UP] = false;
+                _pointerPointDic[item][(int)EInputState.Down] = false;
+                _pointerPointDic[item][(int)EInputState.Up] = false;
             }
 
             _bufferKeys.Clear();
@@ -120,7 +120,7 @@ namespace Engine.Utilities
             _bufferPoints.Add(input);
         }
 
-        public bool GetKey(VirtualKey key, EInputState state = EInputState.PRESSED)
+        public bool GetKey(VirtualKey key, EInputState state = EInputState.Pressed)
         {
             if (_virtualKeyDic.ContainsKey(key))
                 return _virtualKeyDic[key][(int)state];
@@ -128,7 +128,7 @@ namespace Engine.Utilities
             return false;
         }
 
-        public bool GetButton(EMouseButton button, EInputState state = EInputState.PRESSED)
+        public bool GetButton(EMouseButton button, EInputState state = EInputState.Pressed)
         {
             if (_pointerPointDic.ContainsKey(button))
                 return _pointerPointDic[button][(int)state];
@@ -147,9 +147,9 @@ namespace Engine.Utilities
         public void KeyDown(object sender, KeyRoutedEventArgs e)
         {
             var newBool = new bool[3];
-            newBool[(int)EInputState.DOWN] = true;
-            newBool[(int)EInputState.PRESSED] = true;
-            newBool[(int)EInputState.UP] = false;
+            newBool[(int)EInputState.Down] = true;
+            newBool[(int)EInputState.Pressed] = true;
+            newBool[(int)EInputState.Up] = false;
 
             SetKeyDic(e.Key, newBool);
 
@@ -159,9 +159,9 @@ namespace Engine.Utilities
         public void KeyUp(object sender, KeyRoutedEventArgs e) //CoreWindow sender, KeyEventArgs e)
         {
             var newBool = new bool[3];
-            newBool[(int)EInputState.DOWN] = false;
-            newBool[(int)EInputState.PRESSED] = false;
-            newBool[(int)EInputState.UP] = true;
+            newBool[(int)EInputState.Down] = false;
+            newBool[(int)EInputState.Pressed] = false;
+            newBool[(int)EInputState.Up] = true;
 
             SetKeyDic(e.Key, newBool);
 
@@ -175,9 +175,9 @@ namespace Engine.Utilities
                 _pointer = e.GetCurrentPoint(null);
 
                 var newBool = new bool[3];
-                newBool[(int)EInputState.DOWN] = true;
-                newBool[(int)EInputState.PRESSED] = true;
-                newBool[(int)EInputState.UP] = false;
+                newBool[(int)EInputState.Down] = true;
+                newBool[(int)EInputState.Pressed] = true;
+                newBool[(int)EInputState.Up] = false;
 
                 if (_pointer.Properties.IsLeftButtonPressed)
                     SetPointerDic(EMouseButton.IsLeftButtonPressed, newBool);
@@ -199,9 +199,9 @@ namespace Engine.Utilities
                 _pointer = e.GetCurrentPoint(null);
 
                 var newBool = new bool[3];
-                newBool[(int)EInputState.DOWN] = false;
-                newBool[(int)EInputState.PRESSED] = false;
-                newBool[(int)EInputState.UP] = true;
+                newBool[(int)EInputState.Down] = false;
+                newBool[(int)EInputState.Pressed] = false;
+                newBool[(int)EInputState.Up] = true;
 
                 if (!_pointer.Properties.IsLeftButtonPressed)
                     SetPointerDic(EMouseButton.IsLeftButtonPressed, newBool);

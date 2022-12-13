@@ -68,9 +68,9 @@ namespace Editor.ModelView
 
             Controller.Output.Log(i.ToString());
             if (i < 5)
-                Controller.Output.Log("Error Example!", Controller.EMessageType.ERROR);
+                Controller.Output.Log("Error Example!", Controller.EMessageType.Error);
             else if (i < 10 && i > 5)
-                Controller.Output.Log("A Warning.", Controller.EMessageType.WARNING);
+                Controller.Output.Log("A Warning.", Controller.EMessageType.Warning);
             else if (i < 15)
                 Controller.Output.Log("This is a Message");
             else if (i > 15)

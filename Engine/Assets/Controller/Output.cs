@@ -15,9 +15,9 @@ namespace Editor.Controller
 {
     internal enum EMessageType
     {
-        MESSAGE,
-        WARNING,
-        ERROR
+        Message,
+        Warning,
+        Error
     }
 
     internal struct SMessageInfo
@@ -62,12 +62,12 @@ namespace Editor.Controller
             s_statusIcon = Main.Instance.StatusIcon;
         }
 
-        public static void Log(string m, EMessageType t = EMessageType.MESSAGE, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null)
+        public static void Log(string m, EMessageType t = EMessageType.Message, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null)
         {
             SMessageInfo message = new() { Script = s, Method = c, Line = l, Message = m, Type = t };
 
             if (s_pauseError.IsChecked.Value)
-                if (t == EMessageType.ERROR)
+                if (t == EMessageType.Error)
                     Main.Instance.ControlPlayer.Pause();
 
             if (!s_messageCollection.ContainsKey(message))
@@ -92,13 +92,13 @@ namespace Editor.Controller
             {
                 switch (kv.Key.Type)
                 {
-                    case EMessageType.MESSAGE:
+                    case EMessageType.Message:
                         numMessages += kv.Value.Count;
                         break;
-                    case EMessageType.WARNING:
+                    case EMessageType.Warning:
                         numWarnings += kv.Value.Count;
                         break;
-                    case EMessageType.ERROR:
+                    case EMessageType.Error:
                         numErrors += kv.Value.Count;
                         break;
                     default:
@@ -121,15 +121,15 @@ namespace Editor.Controller
                 {
                     switch (kv.Value.Type)
                     {
-                        case EMessageType.MESSAGE:
+                        case EMessageType.Message:
                             if (!s_filterMessages.IsChecked.Value)
                                 continue;
                             break;
-                        case EMessageType.WARNING:
+                        case EMessageType.Warning:
                             if (!s_filterWarnings.IsChecked.Value)
                                 continue;
                             break;
-                        case EMessageType.ERROR:
+                        case EMessageType.Error:
                             if (!s_filterErrors.IsChecked.Value)
                                 continue;
                             break;
@@ -152,15 +152,15 @@ namespace Editor.Controller
                 {
                     switch (kv.Value.Type)
                     {
-                        case EMessageType.MESSAGE:
+                        case EMessageType.Message:
                             if (!s_filterMessages.IsChecked.Value)
                                 continue;
                             break;
-                        case EMessageType.WARNING:
+                        case EMessageType.Warning:
                             if (!s_filterWarnings.IsChecked.Value)
                                 continue;
                             break;
-                        case EMessageType.ERROR:
+                        case EMessageType.Error:
                             if (!s_filterErrors.IsChecked.Value)
                                 continue;
                             break;
@@ -189,11 +189,11 @@ namespace Editor.Controller
         {
             s_status.Text = m.Message;
 
-            if (m.Type == EMessageType.WARNING)
+            if (m.Type == EMessageType.Warning)
                 s_statusIcon.Child = new FontIcon() { Glyph = "\uE7BA" };
-            else if (m.Type == EMessageType.MESSAGE)
+            else if (m.Type == EMessageType.Message)
                 s_statusIcon.Child = new SymbolIcon() { Symbol = Symbol.Message };
-            else if (m.Type == EMessageType.ERROR)
+            else if (m.Type == EMessageType.Error)
                 s_statusIcon.Child = new SymbolIcon() { Symbol = Symbol.ReportHacked };
         }
 
@@ -210,11 +210,11 @@ namespace Editor.Controller
             //Content of the message
             StackPanel stack = new() { Orientation = Orientation.Horizontal, Spacing = 10, Margin = new(10, 0, 0, 0), Padding = new(5) };
             Viewbox viewbox = new() { Width = 14, Height = 14 };
-            if (m.Type == EMessageType.WARNING)
+            if (m.Type == EMessageType.Warning)
                 viewbox.Child = new FontIcon() { Glyph = "\uE7BA" };
-            else if (m.Type == EMessageType.MESSAGE)
+            else if (m.Type == EMessageType.Message)
                 viewbox.Child = new SymbolIcon() { Symbol = Symbol.Message };
-            else if (m.Type == EMessageType.ERROR)
+            else if (m.Type == EMessageType.Error)
                 viewbox.Child = new SymbolIcon() { Symbol = Symbol.ReportHacked };
             stack.Children.Add(viewbox);
             stack.Children.Add(new TextBlock() { Text = "[" + d.TimeOfDay.ToString("hh\\:mm\\:ss").ToString() + "]" });
@@ -240,11 +240,11 @@ namespace Editor.Controller
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
                 Background = new SolidColorBrush(
-                    m.Type == EMessageType.MESSAGE ?
+                    m.Type == EMessageType.Message ?
                         s_stack.Children.Count() % 2 == 0 ?
                             Colors.Transparent :
                             Windows.UI.Color.FromArgb(50, 10, 10, 10) :
-                        m.Type == EMessageType.ERROR ?
+                        m.Type == EMessageType.Error ?
                             Windows.UI.Color.FromArgb(88, 255, 0, 0) :
                             Windows.UI.Color.FromArgb(88, 255, 255, 0))
             });
