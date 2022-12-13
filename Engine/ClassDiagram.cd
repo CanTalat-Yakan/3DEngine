@@ -159,28 +159,28 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Components.Camera" Collapsed="true">
-    <Position X="6.75" Y="16" Width="1.5" />
+    <Position X="6.75" Y="15.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAQAAAAAAAIAgCAAABAAADACAABAAAAEA=</HashCode>
       <FileName>Assets\Engine\Components\Camera.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Components.Mesh" Collapsed="true">
-    <Position X="8.5" Y="16" Width="1.5" />
+    <Position X="8.5" Y="15.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AEAAAAAAAAAAAAgEAAAAEAkAAQABAAAAABAAAAAAEAA=</HashCode>
       <FileName>Assets\Engine\Components\Mesh.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Components.Transform" Collapsed="true">
-    <Position X="5" Y="16" Width="1.5" />
+    <Position X="5" Y="15.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAASAMCkAQIAQAAAAAABAAAAAACAAQAAAAI=</HashCode>
       <FileName>Assets\Engine\Components\Transform.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.ECS.Component" Collapsed="true">
-    <Position X="4" Y="12.5" Width="1.5" />
+    <Position X="4" Y="12.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAABAAACAAAAAIAAAAIAAAAAABAAAAABAAAAAAAFA=</HashCode>
       <FileName>Assets\Engine\ECS\Component.cs</FileName>
@@ -188,14 +188,14 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Engine.ECS.EditorComponent" Collapsed="true">
-    <Position X="3" Y="14.75" Width="1.5" />
+    <Position X="2.75" Y="14" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\ECS\Component.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.ECS.Entity" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="2.25" Y="12.5" Width="1.5" />
+    <Position X="2.25" Y="12.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAooAAIAQEARAQoAAAAAAAEAAAAAAAAABA=</HashCode>
       <FileName>Assets\Engine\ECS\Entity.cs</FileName>
@@ -203,84 +203,84 @@
     <Lollipop Position="0.1" />
   </Class>
   <Class Name="Engine.ECS.SystemBase&lt;T&gt;" Collapsed="true">
-    <Position X="5.75" Y="12.5" Width="1.5" />
+    <Position X="5.75" Y="12.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAACAAAAAAAAAAIgAAAAABAAAAABAAAAAAAEA=</HashCode>
       <FileName>Assets\Engine\ECS\SystemBase.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.ECS.CameraSystem" Collapsed="true">
-    <Position X="6.75" Y="13.25" Width="1.75" />
+    <Position X="6.75" Y="13" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\ECS\SystemBase.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.ECS.TransformSystem" Collapsed="true">
-    <Position X="6.75" Y="13.5" Width="1.75" />
+    <Position X="6.75" Y="13.25" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\ECS\SystemBase.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.ECS.MeshSystem" Collapsed="true">
-    <Position X="6.75" Y="13.75" Width="1.75" />
+    <Position X="6.75" Y="13.5" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\ECS\SystemBase.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.ECS.ScriptSystem" Collapsed="true">
-    <Position X="6.75" Y="14" Width="1.75" />
+    <Position X="6.75" Y="13.75" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\ECS\SystemBase.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.ECS.EditorScriptSystem" Collapsed="true">
-    <Position X="6.75" Y="14.25" Width="1.75" />
+    <Position X="6.75" Y="14" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\ECS\SystemBase.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Editor.SliderAttribute" Collapsed="true">
-    <Position X="0.5" Y="13.75" Width="1.5" />
+    <Position X="0.5" Y="13" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAACAAAAAAIAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Editor\Attributes.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Editor.HeaderAttribute" Collapsed="true">
-    <Position X="0.5" Y="14" Width="1.5" />
+    <Position X="0.5" Y="13.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Editor\Attributes.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Editor.SpacerAttribute" Collapsed="true">
-    <Position X="0.5" Y="14.25" Width="1.5" />
+    <Position X="0.5" Y="13.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Editor\Attributes.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Editor.ShowAttribute" Collapsed="true">
-    <Position X="0.5" Y="14.5" Width="1.5" />
+    <Position X="0.5" Y="13.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Editor\Attributes.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Editor.HideAttribute" Collapsed="true">
-    <Position X="0.5" Y="14.75" Width="1.5" />
+    <Position X="0.5" Y="14" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Editor\Attributes.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Editor.CameraController" Collapsed="true">
-    <Position X="1.25" Y="16" Width="1.5" />
+    <Position X="1.25" Y="15.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAIABAAUIAAkAAAAgEgBAAAAARAIAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Editor\CameraController.cs</FileName>
@@ -301,49 +301,49 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Editor.SceneBoot" Collapsed="true">
-    <Position X="3" Y="16" Width="1.5" />
+    <Position X="3" Y="15.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQCAAAAACAAAAAAAAAIAAAAAAgBIAAAAAAAAAAAAEA=</HashCode>
       <FileName>Assets\Engine\Editor\SceneBoot.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Editor.PlayerMovement" Collapsed="true">
-    <Position X="4" Y="17.5" Width="1.5" />
+    <Position X="4" Y="18.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAAAAAABAAAAAAAAAgBAAAIAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Editor\SceneBoot.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Editor.Test" Collapsed="true">
-    <Position X="4" Y="17.75" Width="1.5" />
+    <Position X="4" Y="18.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>EAAAAAAAAIABAAAgQEAAAAAAAgABAAAAAIIAgAAgBCA=</HashCode>
       <FileName>Assets\Engine\Editor\SceneBoot.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Helper.ImageLoader" Collapsed="true">
-    <Position X="6.75" Y="18.25" Width="1.5" />
+    <Position X="7" Y="17.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAEAAAAAAAAggAAAAAQAAAAAAAAAAAAAEAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Helper\ImageLoader.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Helper.ModelLoader" Collapsed="true">
-    <Position X="2.25" Y="11.25" Width="1.5" />
+    <Position X="2.5" Y="11" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Helper\ModelLoader.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Utilities.EventList&lt;T&gt;" Collapsed="true">
-    <Position X="4" Y="11" Width="1.5" />
+    <Position X="4" Y="10.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAIAAgAAAEAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Utilities\EntityManager.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Utilities.EntityManager" Collapsed="true">
-    <Position X="4" Y="11.25" Width="1.5" />
+    <Position X="4" Y="11" Width="1.5" />
     <TypeIdentifier>
       <HashCode>oAAAAAAAQUAAAAEAACMAAABAQABQaQAAEAAAgBAAEBA=</HashCode>
       <FileName>Assets\Engine\Utilities\EntityManager.cs</FileName>
@@ -357,7 +357,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Utilities.Material" Collapsed="true">
-    <Position X="8.5" Y="18.25" Width="1.5" />
+    <Position X="8.5" Y="17.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>QAUAAAAAAABABAAAAgAAAAgAAAAAAFAAAAAIAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Utilities\Material.cs</FileName>
@@ -502,42 +502,42 @@
     </TypeIdentifier>
   </Struct>
   <Struct Name="Engine.Data.SViewConstantsBuffer" Collapsed="true">
-    <Position X="6.75" Y="16.75" Width="1.5" />
+    <Position X="6.75" Y="16" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAgAAAAAAAAAgAAAAAAAAAAAAAAAAAACAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Data\ConstantBuffer.cs</FileName>
     </TypeIdentifier>
   </Struct>
   <Struct Name="Engine.Data.SPerModelConstantBuffer" Collapsed="true">
-    <Position X="8.5" Y="17.25" Width="2.5" />
+    <Position X="8.5" Y="16.5" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Data\ConstantBuffer.cs</FileName>
     </TypeIdentifier>
   </Struct>
   <Struct Name="Engine.Data.SDirectionalLightConstantBuffer" Collapsed="true">
-    <Position X="8.5" Y="19" Width="2.5" />
+    <Position X="8.5" Y="18.25" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAgAAAiAAAAAIAAAAAAAAAAAAAEAAAAg=</HashCode>
       <FileName>Assets\Engine\Data\ConstantBuffer.cs</FileName>
     </TypeIdentifier>
   </Struct>
   <Struct Name="Engine.Data.SPointLightConstantBuffer" Collapsed="true">
-    <Position X="8.5" Y="19.25" Width="2.5" />
+    <Position X="8.5" Y="18.5" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AAAIAAAAAAAAAgAgAgAAAAAIAAAAAAAAAAAAAAAAAAg=</HashCode>
       <FileName>Assets\Engine\Data\ConstantBuffer.cs</FileName>
     </TypeIdentifier>
   </Struct>
   <Struct Name="Engine.Data.MeshInfo" Collapsed="true">
-    <Position X="8.5" Y="16.25" Width="1.5" />
+    <Position X="8.5" Y="15.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Data\MeshInfo.cs</FileName>
     </TypeIdentifier>
   </Struct>
   <Struct Name="Engine.Data.Vertex" Collapsed="true">
-    <Position X="8.5" Y="16.5" Width="1.5" />
+    <Position X="8.5" Y="15.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAIAAAAAAACIAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Data\Vertex.cs</FileName>
@@ -558,21 +558,21 @@
     </TypeIdentifier>
   </Enum>
   <Enum Name="Engine.ECS.ETags" Collapsed="true">
-    <Position X="2.25" Y="12.75" Width="1.5" />
+    <Position X="2.25" Y="12.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAABAAAAAAAAAAAAAABAAAAAAAABAAARAAAAg=</HashCode>
       <FileName>Assets\Engine\ECS\Entity.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="Engine.ECS.ELayers" Collapsed="true">
-    <Position X="2.25" Y="13" Width="1.5" />
+    <Position X="2.25" Y="12.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAEAAAAAAAAAAAAAAQAIAAAAAAgAAAAAAAAAAAAEAA=</HashCode>
       <FileName>Assets\Engine\ECS\Entity.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="Engine.Utilities.EPrimitiveTypes" Collapsed="true">
-    <Position X="4" Y="11.5" Width="1.5" />
+    <Position X="4" Y="11.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAACAgAAAAAAAAIAQAAAAAAAAAAAAAAAYAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Utilities\EntityManager.cs</FileName>
