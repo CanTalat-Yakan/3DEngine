@@ -207,7 +207,7 @@
       <HashCode>AAAAAAAAAAAooAAIAQEARAQoAAAAAAAEAAAAAAAAABA=</HashCode>
       <FileName>Assets\Engine\ECS\Entity.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
+    <Lollipop Orientation="Bottom" Position="0.1" />
   </Class>
   <Class Name="Engine.ECS.SystemBase&lt;T&gt;" Collapsed="true">
     <Position X="17" Y="12.75" Width="1.5" />
@@ -383,7 +383,7 @@
       <HashCode>AAAAgACAAACAgAAIAAEAAAQAAAAAAAAIABAAAAAAABA=</HashCode>
       <FileName>Assets\Engine\Utilities\Scene.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="Engine.Utilities.SceneManager" Collapsed="true">
     <Position X="15.25" Y="10" Width="1.5" />
@@ -560,7 +560,7 @@
   <Enum Name="Editor.Controller.EMessageType" Collapsed="true">
     <Position X="6.5" Y="7.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAABAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAgAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAABAAAAAAAAAAAAAAIAAAAAA=</HashCode>
       <FileName>Assets\Controller\Output.cs</FileName>
     </TypeIdentifier>
   </Enum>
@@ -595,7 +595,7 @@
   <Enum Name="Engine.Utilities.EInputState" Collapsed="true">
     <Position X="11.75" Y="9.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAEAAAAAAAAAAAAAAAAAAICAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAI=</HashCode>
       <FileName>Assets\Engine\Utilities\Input.cs</FileName>
     </TypeIdentifier>
   </Enum>
