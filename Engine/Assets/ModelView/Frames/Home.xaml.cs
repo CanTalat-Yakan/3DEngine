@@ -8,9 +8,13 @@ namespace Editor.ModelView
 {
     public sealed partial class Home : Frame
     {
-        public Home()
+        private Controller.Home _homeControl;
+
+        public Home(MainWindow mainWindow, NavigationView navigationView)
         {
             this.InitializeComponent();
+
+            _homeControl = new(this, x_StackPanel_Projects, navigationView);
         }
 
         private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) { Controller.Main.Instance.MainWindow._themeControl.SetRequstedTheme(); }

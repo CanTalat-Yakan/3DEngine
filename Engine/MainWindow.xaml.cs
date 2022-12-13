@@ -21,8 +21,6 @@ namespace Editor
             ExtendsContentIntoTitleBar = true; // enable custom titlebar
 
             _themeControl = new(this, x_Page_Main);
-
-            _main = new(this);
         }
 
         private void AppBarButton_Help_Click(object sender, RoutedEventArgs e) => _ = Launcher.LaunchUriAsync(new System.Uri(@"https://3DEngine.wiki/"));
@@ -39,7 +37,7 @@ namespace Editor
                 switch (args.SelectedItemContainer.Tag)
                 {
                     case "home":
-                        x_Frame_Content.Content = new ModelView.Home();
+                        x_Frame_Content.Content = new ModelView.Home(this, x_NavigationView_Main);
                         x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
                         break;
                     case "documentation":
@@ -47,6 +45,7 @@ namespace Editor
                         x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
                         break;
                     case "engine":
+                        _main = new(this);
                         x_Frame_Content.Content = _main;
                         x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftCompact;
 

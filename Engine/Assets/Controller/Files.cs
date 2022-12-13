@@ -30,8 +30,7 @@ namespace Editor.Controller
 
     internal partial class Files
     {
-        public string RootPath { get; private set; }
-        public string CurrentProjectTitle { get; private set; }
+        public string ProjectPath { get; private set; }
 
         public WrapPanel Wrap;
 
@@ -54,13 +53,7 @@ namespace Editor.Controller
 
             _files = files;
 
-            var documentsDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-
-            RootPath = Path.Combine(documentsDir, "3DEngine");
-            CurrentProjectTitle = "New Project";
-
-            if (!string.IsNullOrEmpty(CurrentProjectTitle))
-                RootPath = Path.Combine(RootPath, CurrentProjectTitle);
+            ProjectPath = Home.ProjectPath;
 
             PopulateFilesCategories();
         }
@@ -113,7 +106,7 @@ namespace Editor.Controller
                         foreach (var type in category.FileTypes)
                             if (type == file.FileType)
                             {
-                                string targetPath = Path.Combine(RootPath, category.Name);
+                                string targetPath = Path.Combine(ProjectPath, category.Name);
                                 targetPath = Path.Combine(targetPath, file.Name);
 
                                 File.Copy(file.Path, targetPath, true);
@@ -135,7 +128,7 @@ namespace Editor.Controller
                 foreach (var type in category.FileTypes)
                     if (type == file.FileType)
                     {
-                        string targetPath = Path.Combine(RootPath, category.Name);
+                        string targetPath = Path.Combine(ProjectPath, category.Name);
                         if (_currentCategory != null)
                             if (_currentCategory.Value.Name == category.Name)
                                 if (!string.IsNullOrEmpty(_currentSubPath))
@@ -167,7 +160,7 @@ namespace Editor.Controller
         private void GoIntoDirectoryAndRefresh(string path)
         {
             _currentSubPath = Path.GetRelativePath(
-                Path.Combine(RootPath, _currentCategory.Value.Name),
+                Path.Combine(ProjectPath, _currentCategory.Value.Name),
                 path);
 
             Refresh();
@@ -175,11 +168,11 @@ namespace Editor.Controller
 
         public void OpenFolder()
         {
-            var path = RootPath;
+            var path = ProjectPath;
 
             if (_currentCategory != null)
             {
-                path = Path.Combine(RootPath, _currentCategory.Value.Name);
+                path = Path.Combine(ProjectPath, _currentCategory.Value.Name);
 
                 if (!string.IsNullOrEmpty(_currentSubPath))
                     path = Path.Combine(path, _currentSubPath);
@@ -207,7 +200,7 @@ namespace Editor.Controller
             string categoryPath;
 
             foreach (var category in Categories)
-                if (!Directory.Exists(categoryPath = Path.Combine(RootPath, category.Name)))
+                if (!Directory.Exists(categoryPath = Path.Combine(ProjectPath, category.Name)))
                     Directory.CreateDirectory(categoryPath);
         }
 
@@ -218,7 +211,7 @@ namespace Editor.Controller
             if (_currentCategory is null)
                 return;
 
-            var targetPath = Path.Combine(RootPath, _currentCategory.Value.Name);
+            var targetPath = Path.Combine(ProjectPath, _currentCategory.Value.Name);
             if (!string.IsNullOrEmpty(_currentSubPath))
                 targetPath = Path.Combine(targetPath, _currentSubPath);
 
@@ -231,7 +224,7 @@ namespace Editor.Controller
                             {
                                 File.Move(
                                     path,
-                                    IncrementFileIfExists(Path.Combine(RootPath, category2.Name, Path.GetFileName(path))));
+                                    IncrementFileIfExists(Path.Combine(ProjectPath, category2.Name, Path.GetFileName(path))));
 
                                 if (_currentCategory != null)
                                     if (_currentCategory.Value.Equals(_currentCategory.Value) || category2.Equals(_currentCategory.Value))
@@ -266,7 +259,7 @@ namespace Editor.Controller
 
             Wrap.Children.Add(AddTile(CreateIcon(Symbol.Add)));
 
-            string currentPath = Path.Combine(RootPath, _currentCategory.Value.Name);
+            string currentPath = Path.Combine(ProjectPath, _currentCategory.Value.Name);
 
             if (!string.IsNullOrEmpty(_currentSubPath))
             {
@@ -280,11 +273,11 @@ namespace Editor.Controller
 
                     if (string.IsNullOrEmpty(_currentSubPath))
                     {
-                        currentPath = Path.Combine(RootPath, _currentCategory.Value.Name);
+                        currentPath = Path.Combine(ProjectPath, _currentCategory.Value.Name);
                         break;
                     }
 
-                    currentPath = Path.Combine(RootPath, _currentCategory.Value.Name, _currentSubPath);
+                    currentPath = Path.Combine(ProjectPath, _currentCategory.Value.Name, _currentSubPath);
                 }
             }
 
@@ -461,7 +454,7 @@ namespace Editor.Controller
 
         private Grid BackTile(Grid icon)
         {
-            var path = Path.Combine(RootPath, _currentCategory.Value.Name);
+            var path = Path.Combine(ProjectPath, _currentCategory.Value.Name);
             if (!string.IsNullOrEmpty(_currentSubPath))
                 path = Path.Combine(path, _currentSubPath);
 
@@ -577,10 +570,10 @@ namespace Editor.Controller
                 var pathProvided = string.IsNullOrEmpty(path);
                 if (pathProvided)
                 {
-                    path = Path.Combine(RootPath, _currentCategory.Value.Name);
+                    path = Path.Combine(ProjectPath, _currentCategory.Value.Name);
 
                     if (_currentSubPath != null)
-                        path = Path.Combine(RootPath, _currentCategory.Value.Name, _currentSubPath);
+                        path = Path.Combine(ProjectPath, _currentCategory.Value.Name, _currentSubPath);
                 }
 
                 if (string.IsNullOrEmpty(fileName.Text))
@@ -641,10 +634,10 @@ namespace Editor.Controller
                 var pathProvided = string.IsNullOrEmpty(path);
                 if (pathProvided)
                 {
-                    path = Path.Combine(RootPath, _currentCategory.Value.Name);
+                    path = Path.Combine(ProjectPath, _currentCategory.Value.Name);
 
                     if (_currentSubPath != null)
-                        path = Path.Combine(RootPath, _currentCategory.Value.Name, _currentSubPath);
+                        path = Path.Combine(ProjectPath, _currentCategory.Value.Name, _currentSubPath);
                 }
 
                 if (string.IsNullOrEmpty(fileName.Text))
@@ -818,8 +811,8 @@ namespace Editor.Controller
             if (dataPackageView.Contains(StandardDataFormats.Text))
             {
                 var sourcePath = await dataPackageView.GetTextAsync();
-                var sourcePathCatagory = Path.GetRelativePath(RootPath, sourcePath).Split("\\").First();
-                var targetPathCatagory = Path.GetRelativePath(RootPath, path).Split("\\").First();
+                var sourcePathCatagory = Path.GetRelativePath(ProjectPath, sourcePath).Split("\\").First();
+                var targetPathCatagory = Path.GetRelativePath(ProjectPath, path).Split("\\").First();
 
                 if (sourcePathCatagory == targetPathCatagory)
                     if (string.IsNullOrEmpty(Path.GetExtension(sourcePath)))
@@ -923,7 +916,7 @@ namespace Editor.Controller
         private MenuFlyout CreateDefaultMenuFlyout(string path, bool hasExtension = false)
         {
             MenuFlyoutItem[] items = new[] {
-                new MenuFlyoutItem() { Text = "Create File System Entry", Icon = new SymbolIcon(Symbol.NewFolder) },
+                new MenuFlyoutItem() { Text = "Create file system entry", Icon = new SymbolIcon(Symbol.NewFolder) },
                 //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Open file", Icon = new SymbolIcon(Symbol.OpenFile) },
                 new MenuFlyoutItem() { Text = "Open folder location", Icon = new FontIcon(){ Glyph = "\xEC50", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
@@ -961,8 +954,8 @@ namespace Editor.Controller
             {
                 menuFlyout.Items.Add(item);
 
-                if (item.Text == "Create File System Entry"
-                    || item.Text == "Open folder Location"
+                if (item.Text == "Create file system entry"
+                    || item.Text == "Open folder location"
                     || item.Text == "Paste"
                     || item.Text == "Delete")
                     menuFlyout.Items.Add(new MenuFlyoutSeparator());
@@ -974,9 +967,9 @@ namespace Editor.Controller
         private MenuFlyout CreateRootMenuFlyout(string path)
         {
             MenuFlyoutItem[] items = new[] {
-                new MenuFlyoutItem() { Text = "Create File System Entry", Icon = new SymbolIcon(Symbol.NewFolder) },
+                new MenuFlyoutItem() { Text = "Create file system entry", Icon = new SymbolIcon(Symbol.NewFolder) },
                 //new MenuFlyoutSeparator(),
-                new MenuFlyoutItem() { Text = "Open folder Location", Icon = new FontIcon(){ Glyph = "\xEC50", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
+                new MenuFlyoutItem() { Text = "Open folder location", Icon = new FontIcon(){ Glyph = "\xEC50", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
                 //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Cut", Icon = new SymbolIcon(Symbol.Cut) },
                 new MenuFlyoutItem() { Text = "Copy", Icon = new SymbolIcon(Symbol.Copy) },
@@ -1011,8 +1004,8 @@ namespace Editor.Controller
 
                 menuFlyout.Items.Add(item);
 
-                if (item.Text == "Create File System Entry"
-                    || item.Text == "Open folder Location"
+                if (item.Text == "Create file system entry"
+                    || item.Text == "Open folder location"
                     || item.Text == "Paste"
                     || item.Text == "Delete")
                     menuFlyout.Items.Add(new MenuFlyoutSeparator());

@@ -29,15 +29,9 @@
                 <NavigationViewItemSeparator/>
 
                 <NavigationViewItemHeader Content="Engine"/>
-
-                <NavigationViewItem Tag="engine" Content="New Project">
-                    <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74C;"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
             </NavigationView.MenuItems>
 
-            <NavigationView.PaneFooter>
+         <NavigationView.PaneFooter>
                 <StackPanel Orientation="Horizontal" Spacing="5">
                     <AppBarButton Content="Help" Icon="Help" Height="50" Width="44" Margin="2" Click="AppBarButton_Help_Click"/>
                     <TextBlock Text="Help" VerticalAlignment="Center"/>
