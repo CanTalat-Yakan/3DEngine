@@ -49,11 +49,29 @@
                 </Grid>
 
                 <StackPanel Spacing="20" Orientation="Horizontal">
-                    <Button Content="Gettings Started" FontWeight="Medium"/>
+                    <HyperlinkButton NavigateUri="https://3DEngine.wiki">
+                        <StackPanel Spacing="10" Orientation="Horizontal">
+                            <TextBlock Text="Gettings Started" FontWeight="Medium"/>
 
-                    <Button Content="GitHub Repo" FontWeight="Medium"/>
+                            <SymbolIcon Symbol="Link"/>
+                        </StackPanel>
+                    </HyperlinkButton>
 
-                    <Button Content="Documentation" FontWeight="Medium"/>
+                    <HyperlinkButton NavigateUri="https://github.com/CanTalat-Yakan/3DEngine">
+                        <StackPanel Spacing="10" Orientation="Horizontal">
+                            <TextBlock Text="GitHub Repo" FontWeight="Medium"/>
+
+                            <SymbolIcon Symbol="Link"/>
+                        </StackPanel>
+                    </HyperlinkButton>
+
+                    <HyperlinkButton NavigateUri="https://engine3d.gitbook.io/documentation/">
+                        <StackPanel Spacing="10" Orientation="Horizontal">
+                            <TextBlock Text="Documentation" FontWeight="Medium"/>
+
+                            <SymbolIcon Symbol="Link"/>
+                        </StackPanel>
+                    </HyperlinkButton>
                 </StackPanel>
 
                 <Grid/>

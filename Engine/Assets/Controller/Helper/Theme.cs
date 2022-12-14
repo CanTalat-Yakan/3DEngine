@@ -10,6 +10,8 @@ namespace Editor.Controller
 {
     internal class Theme
     {
+        public static Theme Instance { get; private set; }
+
         private WindowsSystemDispatcherQueueHelper _wsdqHelper;
         private MicaController _micaController;
         private SystemBackdropConfiguration _configurationSource;
@@ -20,6 +22,8 @@ namespace Editor.Controller
         {
             _mainWindow = mainWindow;
             _page = page;
+
+            Instance = this;
 
             if (MicaController.IsSupported())
             {
@@ -45,25 +49,42 @@ namespace Editor.Controller
             }
         }
 
-        public void SetRequstedTheme()
+        public void SetRequstedTheme(ElementTheme? requestedTheme = null)
         {
-            _page.RequestedTheme = _page.RequestedTheme == ElementTheme.Light ? ElementTheme.Dark : ElementTheme.Light;
-            _configurationSource.Theme = _configurationSource.Theme == SystemBackdropTheme.Light ? SystemBackdropTheme.Dark : SystemBackdropTheme.Light;
+            if (requestedTheme is null)
+            {
+                _page.RequestedTheme = _page.RequestedTheme == ElementTheme.Light ? ElementTheme.Dark : ElementTheme.Light;
+                _configurationSource.Theme = _configurationSource.Theme == SystemBackdropTheme.Light ? SystemBackdropTheme.Dark : SystemBackdropTheme.Light;
+            }
+            else
+            {
+                _page.RequestedTheme = requestedTheme.Value;
 
-            Main.Instance.LayoutControl.TabsRoot.Background =
-                _page.RequestedTheme == ElementTheme.Light
-                    ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 243, 243, 243))
-                    : Application.Current.Resources["ApplicationPageBackgroundThemeBrush"] as SolidColorBrush;
+                if (requestedTheme.Value == ElementTheme.Light)
+                    _configurationSource.Theme = SystemBackdropTheme.Light;
+                if (requestedTheme.Value == ElementTheme.Dark)
+                    _configurationSource.Theme = SystemBackdropTheme.Dark;
+                if (requestedTheme.Value == ElementTheme.Default)
+                    _configurationSource.Theme = SystemBackdropTheme.Default;
+            }
 
-            Main.Instance.LayoutControl.Output.ChangeColorWithTheme.Background =
-                _page.RequestedTheme == ElementTheme.Light
-                    ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 249, 249, 249))
-                    : new SolidColorBrush(Windows.UI.Color.FromArgb(255, 40, 40, 40));
+            if (Main.Instance != null)
+            {
+                Main.Instance.LayoutControl.TabsRoot.Background =
+                    _page.RequestedTheme == ElementTheme.Light
+                        ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 243, 243, 243))
+                        : Application.Current.Resources["ApplicationPageBackgroundThemeBrush"] as SolidColorBrush;
 
-            Main.Instance.LayoutControl.Files.ChangeColorWithTheme.Background =
-                _page.RequestedTheme == ElementTheme.Light
-                    ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 249, 249, 249))
-                    : new SolidColorBrush(Windows.UI.Color.FromArgb(255, 40, 40, 40));
+                Main.Instance.LayoutControl.Output.ChangeColorWithTheme.Background =
+                    _page.RequestedTheme == ElementTheme.Light
+                        ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 249, 249, 249))
+                        : new SolidColorBrush(Windows.UI.Color.FromArgb(255, 40, 40, 40));
+
+                Main.Instance.LayoutControl.Files.ChangeColorWithTheme.Background =
+                    _page.RequestedTheme == ElementTheme.Light
+                        ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 249, 249, 249))
+                        : new SolidColorBrush(Windows.UI.Color.FromArgb(255, 40, 40, 40));
+            }
 
             if (Engine.Core.Instance != null)
                 SceneManager.Scene.EntitytManager.SetTheme(_page.RequestedTheme == ElementTheme.Light);

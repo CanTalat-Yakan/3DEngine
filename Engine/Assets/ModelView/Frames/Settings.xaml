@@ -20,8 +20,10 @@
                     <Expander.Header>
                         <StackPanel Padding="15" Spacing="20" Orientation="Horizontal">
                             <SymbolIcon Symbol="Globe"/>
+
                             <StackPanel>
                                 <TextBlock Text="Project Settings"/>
+
                                 <TextBlock Text="Window, C# Project Generation, Shader Compilation" FontSize="12"/>
                             </StackPanel>
                         </StackPanel>
@@ -32,8 +34,10 @@
                     <Expander.Header>
                         <StackPanel Padding="15" Spacing="20" Orientation="Horizontal">
                             <SymbolIcon Symbol="AllApps"/>
+
                             <StackPanel>
                                 <TextBlock Text="Editor"/>
+
                                 <TextBlock Text="Name, Window, Player, Graphics API" FontSize="12"/>
                             </StackPanel>
                         </StackPanel>
@@ -44,8 +48,10 @@
                     <Expander.Header>
                         <StackPanel Padding="15" Spacing="20" Orientation="Horizontal">
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEDA2;"/>
+
                             <StackPanel>
                                 <TextBlock Text="Storage"/>
+
                                 <TextBlock Text="Storage Space, Drives, Configuration Rules" FontSize="12"/>
                             </StackPanel>
                         </StackPanel>
@@ -56,8 +62,10 @@
                     <Expander.Header>
                         <StackPanel Padding="15" Spacing="20" Orientation="Horizontal">
                             <SymbolIcon Symbol="Play"/>
+
                             <StackPanel>
                                 <TextBlock Text="Player"/>
+
                                 <TextBlock Text="Name, Resolution, Splash, Other Settings" FontSize="12"/>
                             </StackPanel>
                         </StackPanel>
@@ -71,9 +79,11 @@
                 <TextBlock FontSize="20" FontWeight="SemiBold" Text="Theme Mode"/>
 
                 <RadioButtons>
-                    <RadioButton Content="Light"/>
-                    <RadioButton Content="Dark" IsChecked="True"/>
-                    <RadioButton Content="Use system setting"/>
+                    <RadioButton Content="Light" Click="RadioButton_Click_Light"/>
+
+                    <RadioButton Content="Dark" IsChecked="True" Click="RadioButton_Click_Dark"/>
+
+                    <RadioButton Content="Use system setting" Click="RadioButton_Click_Default"/>
                 </RadioButtons>
             </StackPanel>
 
@@ -100,11 +110,11 @@
             <StackPanel Spacing="10">
                 <TextBlock FontSize="20" FontWeight="SemiBold" Text="About"/>
 
-                <TextBlock Text="Source code: "/>
+                <HyperlinkButton Content="Source code" NavigateUri="https://github.com/CanTalat-Yakan/3DEngine"/>
 
-                <TextBlock Text="Website: "/>
+                <HyperlinkButton Content="Documentation" NavigateUri="https://engine3d.gitbook.io/documentation/"/>
 
-                <TextBlock Text="Documentation: "/>
+                <HyperlinkButton Content="Website" NavigateUri="https://3DEngine.wiki"/>
             </StackPanel>
 
             <Grid/>
@@ -112,9 +122,12 @@
             <StackPanel Spacing="10">
                 <TextBlock FontSize="20" FontWeight="SemiBold" Text="Found a bug? Want a new feature?"/>
 
-                <TextBlock Text="If you have found a bug within the 3D Engine, please file an issue on GitHub:"/>
+                <StackPanel Spacing="10">
+                    <TextBlock Text="If you have found a bug within the 3D Engine or you would like a new feature requested, please file an issue on GitHub:"/>
 
-                <TextBlock Text="If you would like a new feature request it on GitHub:"/>
+                    <HyperlinkButton Content="GitHub - Issue" NavigateUri="https://github.com/CanTalat-Yakan/3DEngine/issues"/>
+                </StackPanel>
+
             </StackPanel>
 
             <Grid/>
@@ -122,15 +135,17 @@
             <StackPanel Spacing="10">
                 <TextBlock FontSize="20" FontWeight="SemiBold" Text="Dependencies and References"/>
 
-                <TextBlock Text="Vortice.Windows"/>
+                <HyperlinkButton Content="Windows App SDK" NavigateUri="https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/"/>
 
-                <TextBlock Text="Windows App SDK"/>
+                <HyperlinkButton Content="WinUI 3" NavigateUri="https://learn.microsoft.com/en-us/windows/apps/winui/winui3/"/>
 
-                <TextBlock Text="WinUI 3"/>
+                <HyperlinkButton Content="Vortice.Windows" NavigateUri="https://github.com/amerkoleci/Vortice.Windows"/>
 
-                <TextBlock Text="Universal Scene Description"/>
+                <HyperlinkButton Content="Direct3D 11" NavigateUri="https://learn.microsoft.com/en-us/windows/win32/direct3d11/atoc-dx-graphics-direct3d-11"/>
 
-                <TextBlock Text="Aspose.3D"/>
+                <HyperlinkButton Content="Universal Scene Description" NavigateUri="https://developer.nvidia.com/usd"/>
+
+                <HyperlinkButton Content="Aspose 3D" NavigateUri="Aspose.3D"/>
             </StackPanel>
 
             <Grid/>
@@ -143,7 +158,7 @@
 
                 <Grid/>
 
-                <TextBlock Text="MIT License"/>
+                <HyperlinkButton Content="MIT License" NavigateUri="https://github.com/CanTalat-Yakan/3DEngine/blob/master/LICENSE"/>
 
                 <TextBlock Text="Copyright (c) 2022 CanTalat-Yakan"/>
             </StackPanel>

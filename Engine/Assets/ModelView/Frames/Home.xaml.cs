@@ -17,6 +17,6 @@ namespace Editor.ModelView
             _homeControl = new(this, x_StackPanel_Projects, navigationView);
         }
 
-        private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) { Controller.Main.Instance.MainWindow._themeControl.SetRequstedTheme(); }
+        private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) { Controller.Theme.Instance.SetRequstedTheme(); }
     }
 }
