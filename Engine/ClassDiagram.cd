@@ -8,7 +8,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Editor.Controller.ExtensionMethods" Collapsed="true">
-    <Position X="6.5" Y="0.5" Width="1.75" />
+    <Position X="6.75" Y="0.5" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAECAAAAAAAAIgEAAAQgQkAAEAAgAIAEAAAAAAAA=</HashCode>
       <FileName>Assets\Controller\Helper\Helper.cs</FileName>
@@ -20,7 +20,7 @@
       <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Controller\Helper\Helper.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
+    <Lollipop Orientation="Left" Position="0.1" Collapsed="true" />
   </Class>
   <Class Name="Editor.Controller.BooleanToRowHeightConverter" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="12.5" Y="6" Width="2.5" />
@@ -28,24 +28,24 @@
       <HashCode>AAAAAAAAAAAAQAAAAIAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Controller\Helper\Helper.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Orientation="Bottom" Position="0.1" Collapsed="true" />
+    <Lollipop Orientation="Left" Position="0.1" Collapsed="true" />
   </Class>
   <Class Name="Editor.Controller.GridDataTemeplate" Collapsed="true">
-    <Position X="4.75" Y="5.5" Width="1.5" />
+    <Position X="4.75" Y="5.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAEgAAAAAAAAAAAABAAAAAAAAAAAAQAAAAAAA=</HashCode>
       <FileName>Assets\Controller\Helper\Layout.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Editor.Controller.Layout" Collapsed="true">
-    <Position X="4.75" Y="5.75" Width="1.5" />
+    <Position X="4.75" Y="5.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>BAAAACAAAgAAAgAAAAAIAIQAgAAEAAIAAAAgAAgCAIA=</HashCode>
       <FileName>Assets\Controller\Helper\Layout.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Editor.Controller.Player" Collapsed="true">
-    <Position X="3.75" Y="3.25" Width="1.5" />
+    <Position X="6.5" Y="5.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AEAgAAAAAEAAAIgAAAAAAAAAABAAJAAAgAAAAAACAAI=</HashCode>
       <FileName>Assets\Controller\Helper\Player.cs</FileName>
@@ -66,14 +66,14 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Editor.Controller.Theme" Collapsed="true">
-    <Position X="7.25" Y="3.25" Width="1.5" />
+    <Position X="5.75" Y="2.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AACAAAAAAAAAAAAAAAATAAAACAAAIACAAAAAAAAAAAA=</HashCode>
+      <HashCode>AACAAAAAAAAAAAAAAAATAAAACAAAIACAQAAAAAAAAAA=</HashCode>
       <FileName>Assets\Controller\Helper\Theme.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Editor.Controller.WindowsSystemDispatcherQueueHelper" Collapsed="true">
-    <Position X="3.25" Y="0.5" Width="3" />
+    <Position X="3.5" Y="0.5" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAABBAA=</HashCode>
       <FileName>Assets\Controller\Helper\Theme.cs</FileName>
@@ -85,7 +85,7 @@
       <HashCode>AAASEQAAAAABAIIAEAAEAAQAgAAAAAAAAQAABAAABAA=</HashCode>
       <FileName>Assets\Controller\Helper\TreeViewIconNode.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
+    <Lollipop Orientation="Left" Position="0.1" Collapsed="true" />
   </Class>
   <Class Name="Editor.Controller.TreeViewIconNodeTemplateSelector" Collapsed="true">
     <Position X="12.5" Y="8" Width="2.75" />
@@ -97,7 +97,7 @@
   <Class Name="Editor.Controller.Files" Collapsed="true">
     <Position X="3" Y="8" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>C6AgACIAAAhCMUBkAAJAAAEACAwBMmCIEQDQCQAgEoY=</HashCode>
+      <HashCode>C6AgACIAAAhCMUBkAAJAAAEACAwBMkCIEQDSCQAgEIY=</HashCode>
       <FileName>Assets\Controller\Files.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -123,7 +123,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Editor.Controller.Main" Collapsed="true">
-    <Position X="5.5" Y="3.25" Width="1.5" />
+    <Position X="5.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAEAgIEAAAAAAEEAAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
       <FileName>Assets\Controller\Main.cs</FileName>
@@ -400,7 +400,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Editor.ModelView.Documentation" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="8.25" Y="4.5" Width="1.5" />
+    <Position X="9.25" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\ModelView\Frames\Documentation.xaml.cs</FileName>
@@ -408,15 +408,15 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.ModelView.Home" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="3" Y="4.5" Width="1.5" />
+    <Position X="4" Y="3.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAIIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\ModelView\Frames\Home.xaml.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.ModelView.Main" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="4.75" Y="4.5" Width="1.5" />
+    <Position X="5.75" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAIAAAACAAAAQAAAAAAAAAAAAAAAAAQIAACAAAAAAA=</HashCode>
       <FileName>Assets\ModelView\Frames\Main.xaml.cs</FileName>
@@ -424,9 +424,9 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.ModelView.Settings" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="6.5" Y="4.5" Width="1.5" />
+    <Position X="7.5" Y="3.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAEA=</HashCode>
       <FileName>Assets\ModelView\Frames\Settings.xaml.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
@@ -472,20 +472,27 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.App" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="5.5" Y="1.25" Width="1.5" />
+    <Position X="5.75" Y="1.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIQAAACAAAAAA=</HashCode>
       <FileName>App.xaml.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
+    <Lollipop Orientation="Left" Position="0.1" Collapsed="true" />
   </Class>
   <Class Name="Editor.MainWindow" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="5.5" Y="2.25" Width="1.5" />
+    <Position X="5.75" Y="2.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAEAAEAAAAAAAAAAAAAgAAAAAAAAAACAAAAAAA=</HashCode>
       <FileName>MainWindow.xaml.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
+    <Lollipop Orientation="Left" Position="0.1" Collapsed="true" />
+  </Class>
+  <Class Name="Editor.Controller.Home" Collapsed="true">
+    <Position X="4" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CYAAAAAAAAgCIIAAEABAIAIAAAQAAAAAAADCAAAAAgo=</HashCode>
+      <FileName>Assets\Controller\Home.cs</FileName>
+    </TypeIdentifier>
   </Class>
   <Struct Name="Editor.Controller.Category" Collapsed="true">
     <Position X="3" Y="8.25" Width="1.5" />
@@ -544,7 +551,7 @@
     </TypeIdentifier>
   </Struct>
   <Enum Name="Editor.Controller.EPlayMode" Collapsed="true">
-    <Position X="3.75" Y="3.5" Width="1.5" />
+    <Position X="6.5" Y="5.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAgAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAEAAAA=</HashCode>
       <FileName>Assets\Controller\Helper\Player.cs</FileName>
