@@ -9,8 +9,7 @@
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d">
 
-
-    <controls:DockPanel MinWidth="820">
+    <controls:DockPanel>
         <!--STATUS -->
         <Grid controls:DockPanel.Dock="Bottom">
             <CommandBar>
@@ -37,50 +36,52 @@
 
         <!--MAIN-->
         <Grid x:Name="x_Grid_Main" HorizontalAlignment="Stretch">
-            <StackPanel Spacing="20" Padding="50">
-                <Grid HorizontalAlignment="Stretch" CornerRadius="5">
-                    <Image Height="250" Stretch="UniformToFill" Source="/Assets/Engine/Resources/Textures/BG.png" />
+            <ScrollViewer>
+                <StackPanel Spacing="20" Padding="50">
+                    <Grid HorizontalAlignment="Stretch" CornerRadius="5">
+                        <Image Height="250" Stretch="UniformToFill" Source="/Assets/Engine/Resources/Textures/BG.png" />
 
-                    <StackPanel Padding="50">
-                        <TextBlock FontSize="28" FontWeight="SemiBold" Foreground="Black" Text="3D Engine"/>
+                        <StackPanel Padding="50">
+                            <TextBlock FontSize="28" FontWeight="SemiBold" Foreground="Black" Text="3D Engine"/>
 
-                        <TextBlock FontSize="20" FontWeight="SemiBold" Foreground="Black" Text=".Net 7  C# 11  WinUI 3  "/>
+                            <TextBlock FontSize="20" FontWeight="SemiBold" Foreground="Black" Text=".Net 7  C# 11  WinUI 3  "/>
+                        </StackPanel>
+                    </Grid>
+
+                    <StackPanel Spacing="20" Orientation="Horizontal">
+                        <HyperlinkButton NavigateUri="https://3DEngine.wiki">
+                            <StackPanel Spacing="10" Orientation="Horizontal">
+                                <TextBlock Text="Gettings Started" FontWeight="Medium"/>
+
+                                <SymbolIcon Symbol="Link"/>
+                            </StackPanel>
+                        </HyperlinkButton>
+
+                        <HyperlinkButton NavigateUri="https://github.com/CanTalat-Yakan/3DEngine">
+                            <StackPanel Spacing="10" Orientation="Horizontal">
+                                <TextBlock Text="GitHub Repo" FontWeight="Medium"/>
+
+                                <SymbolIcon Symbol="Link"/>
+                            </StackPanel>
+                        </HyperlinkButton>
+
+                        <HyperlinkButton NavigateUri="https://engine3d.gitbook.io/documentation/">
+                            <StackPanel Spacing="10" Orientation="Horizontal">
+                                <TextBlock Text="Documentation" FontWeight="Medium"/>
+
+                                <SymbolIcon Symbol="Link"/>
+                            </StackPanel>
+                        </HyperlinkButton>
                     </StackPanel>
-                </Grid>
 
-                <StackPanel Spacing="20" Orientation="Horizontal">
-                    <HyperlinkButton NavigateUri="https://3DEngine.wiki">
-                        <StackPanel Spacing="10" Orientation="Horizontal">
-                            <TextBlock Text="Gettings Started" FontWeight="Medium"/>
+                    <Grid/>
 
-                            <SymbolIcon Symbol="Link"/>
-                        </StackPanel>
-                    </HyperlinkButton>
+                    <TextBlock FontSize="20" FontWeight="SemiBold" Text="Projects"/>
 
-                    <HyperlinkButton NavigateUri="https://github.com/CanTalat-Yakan/3DEngine">
-                        <StackPanel Spacing="10" Orientation="Horizontal">
-                            <TextBlock Text="GitHub Repo" FontWeight="Medium"/>
-
-                            <SymbolIcon Symbol="Link"/>
-                        </StackPanel>
-                    </HyperlinkButton>
-
-                    <HyperlinkButton NavigateUri="https://engine3d.gitbook.io/documentation/">
-                        <StackPanel Spacing="10" Orientation="Horizontal">
-                            <TextBlock Text="Documentation" FontWeight="Medium"/>
-
-                            <SymbolIcon Symbol="Link"/>
-                        </StackPanel>
-                    </HyperlinkButton>
+                    <controls:WrapPanel x:Name="x_StackPanel_Projects" HorizontalSpacing="10" VerticalSpacing="10" Orientation="Horizontal"/>
+                    <Grid/>
                 </StackPanel>
-
-                <Grid/>
-
-                <TextBlock FontSize="20" FontWeight="SemiBold" Text="Projects"/>
-
-                <controls:WrapPanel x:Name="x_StackPanel_Projects" HorizontalSpacing="10" VerticalSpacing="10" Orientation="Horizontal"/>
-                <Grid/>
-            </StackPanel>
+            </ScrollViewer>
         </Grid>
     </controls:DockPanel>
 

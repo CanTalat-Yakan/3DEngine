@@ -13,7 +13,7 @@
         <ResourceDictionary Source="ms-appx:///Microsoft.UI.Xaml/DensityStyles/Compact.xaml" />
     </Frame.Resources>
 
-    <controls:DockPanel MinWidth="820" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <controls:DockPanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <!--STATUS -->
         <Grid controls:DockPanel.Dock="Bottom">
             <CommandBar>
