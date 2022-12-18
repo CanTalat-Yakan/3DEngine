@@ -42,7 +42,7 @@ namespace Editor
                         break;
                     case "documentation":
                         x_Frame_Content.Content = new ModelView.Documentation();
-                        x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
+                        x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftCompact;
                         break;
                     case "engine":
                         _main = new(this);
