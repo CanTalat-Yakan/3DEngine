@@ -322,7 +322,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Helper.ImageLoader" Collapsed="true">
-    <Position X="7" Y="16.75" Width="1.5" />
+    <Position X="7" Y="17.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAEAAAAAAAAggAAAAAQAAAAAAAAAAAAAEAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Helper\ImageLoader.cs</FileName>
@@ -357,7 +357,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Utilities.Material" Collapsed="true">
-    <Position X="8.5" Y="16.75" Width="1.5" />
+    <Position X="8.5" Y="17.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>QAUAAAAAAABABAAAAgAAAAgAAAAAAFAAAAAIAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Utilities\Material.cs</FileName>
@@ -405,6 +405,7 @@
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\ModelView\Frames\Documentation.xaml.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.ModelView.Home" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="4" Y="3.5" Width="1.5" />
@@ -412,6 +413,7 @@
       <HashCode>AAIIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\ModelView\Frames\Home.xaml.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.ModelView.Main" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="5.75" Y="3.5" Width="1.5" />
@@ -419,6 +421,7 @@
       <HashCode>AAAIAAAACAAAAQAAAAAAAAAAAAAAAAAQIAACAAAAAAA=</HashCode>
       <FileName>Assets\ModelView\Frames\Main.xaml.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.ModelView.Settings" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="7.5" Y="3.5" Width="1.5" />
@@ -426,6 +429,7 @@
       <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAEA=</HashCode>
       <FileName>Assets\ModelView\Frames\Settings.xaml.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.ModelView.Files" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="3" Y="6.75" Width="1.5" />
@@ -433,6 +437,7 @@
       <HashCode>AAAAAAEQAAAEEAABAAAAAAAgAAAAAAAAAAAAAAAAJAQ=</HashCode>
       <FileName>Assets\ModelView\UserControls\Files.xaml.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.ModelView.Hierarchy" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="8.25" Y="6.75" Width="1.5" />
@@ -440,6 +445,7 @@
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\ModelView\UserControls\Hierarchy.xaml.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.ModelView.Output" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="1.25" Y="6.75" Width="1.5" />
@@ -447,6 +453,7 @@
       <HashCode>AAQQAAAgAAAgQQBAgAAAAAEAAAAAAEAAAAAACAAAQAQ=</HashCode>
       <FileName>Assets\ModelView\UserControls\Output.xaml.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.ModelView.Properties" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="6.5" Y="6.75" Width="1.5" />
@@ -454,6 +461,7 @@
       <HashCode>AAAAAABAAAgAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAA=</HashCode>
       <FileName>Assets\ModelView\UserControls\Properties.xaml.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.ModelView.ViewPort" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="4.75" Y="6.75" Width="1.5" />
@@ -461,6 +469,7 @@
       <HashCode>AAAAAAQAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAIAA=</HashCode>
       <FileName>Assets\ModelView\UserControls\ViewPort.xaml.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.App" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="5.75" Y="1.25" Width="1.5" />
@@ -468,6 +477,7 @@
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIQAAACAAAAAA=</HashCode>
       <FileName>App.xaml.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.MainWindow" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="5.75" Y="2.5" Width="1.5" />
@@ -475,6 +485,7 @@
       <HashCode>AAAAAAAEAAEAAAAAAAAAAAAAgAAAAAAAAAACAAAAAAA=</HashCode>
       <FileName>MainWindow.xaml.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.Controller.Home" Collapsed="true">
     <Position X="4" Y="4.5" Width="1.5" />
@@ -498,42 +509,42 @@
     </TypeIdentifier>
   </Struct>
   <Struct Name="Engine.Data.SViewConstantsBuffer" Collapsed="true">
-    <Position X="6.75" Y="16" Width="1.5" />
+    <Position X="6.75" Y="16.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAgAAAAAAAAAgAAAAAAAAAAAAAAAAAACAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Data\ConstantBuffer.cs</FileName>
     </TypeIdentifier>
   </Struct>
   <Struct Name="Engine.Data.SPerModelConstantBuffer" Collapsed="true">
-    <Position X="8.5" Y="15.5" Width="1.5" />
+    <Position X="8.5" Y="16.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Data\ConstantBuffer.cs</FileName>
     </TypeIdentifier>
   </Struct>
   <Struct Name="Engine.Data.SDirectionalLightConstantBuffer" Collapsed="true">
-    <Position X="8.5" Y="18.25" Width="1.5" />
+    <Position X="10.25" Y="18.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAgAAAiAAAAAIAAAAAAAAAAAAAEAAAAg=</HashCode>
       <FileName>Assets\Engine\Data\ConstantBuffer.cs</FileName>
     </TypeIdentifier>
   </Struct>
   <Struct Name="Engine.Data.SPointLightConstantBuffer" Collapsed="true">
-    <Position X="8.5" Y="18.5" Width="1.5" />
+    <Position X="10.25" Y="18.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAIAAAAAAAAAgAgAgAAAAAIAAAAAAAAAAAAAAAAAAg=</HashCode>
       <FileName>Assets\Engine\Data\ConstantBuffer.cs</FileName>
     </TypeIdentifier>
   </Struct>
   <Struct Name="Engine.Data.MeshInfo" Collapsed="true">
-    <Position X="8.5" Y="15.75" Width="1.5" />
+    <Position X="8.5" Y="15.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Data\MeshInfo.cs</FileName>
     </TypeIdentifier>
   </Struct>
   <Struct Name="Engine.Data.Vertex" Collapsed="true">
-    <Position X="8.5" Y="16" Width="1.5" />
+    <Position X="8.5" Y="15.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAIAAAAAAACIAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Data\Vertex.cs</FileName>
