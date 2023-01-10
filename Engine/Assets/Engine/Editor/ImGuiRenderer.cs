@@ -7,7 +7,7 @@ using Vortice.D3DCompiler;
 using Vortice.Direct3D11;
 using Vortice.Direct3D;
 using Vortice.DXGI;
-using Vortice.Mathematics;
+using Windows.Foundation;
 using ImDrawIdx = System.UInt16;
 using Engine.Utilities;
 

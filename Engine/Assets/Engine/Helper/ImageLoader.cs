@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System;
 using Vortice.Direct3D11;
 using Vortice.DXGI;
-using Vortice.Mathematics;
 using Vortice.WIC;
 
 namespace Engine.Helper
@@ -20,7 +20,7 @@ namespace Engine.Helper
             using IWICBitmapDecoder decoder = wicFactory.CreateDecoderFromFileName(textureFile);
             using IWICBitmapFrameDecode frame = decoder.GetFrame(0);
 
-            SizeI size = frame.Size;
+            Size size = frame.Size;
 
             // Determine format
             Guid pixelFormat = frame.PixelFormat;
