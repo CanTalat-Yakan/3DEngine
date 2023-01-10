@@ -477,7 +477,7 @@
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIQAAACAAAAAA=</HashCode>
       <FileName>App.xaml.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
+    <Lollipop Orientation="Left" Position="0.1" Collapsed="true" />
   </Class>
   <Class Name="Editor.MainWindow" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="5.75" Y="2.5" Width="1.5" />
@@ -485,7 +485,7 @@
       <HashCode>AAAAAAAEAAEAAAAAAAAAAAAAgAAAAAAAAAACAAAAAAA=</HashCode>
       <FileName>MainWindow.xaml.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
+    <Lollipop Orientation="Left" Position="0.1" Collapsed="true" />
   </Class>
   <Class Name="Editor.Controller.Home" Collapsed="true">
     <Position X="4" Y="4.5" Width="1.5" />
