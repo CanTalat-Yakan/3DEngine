@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 using SharpGen.Runtime;
+using System.Drawing;
 using System;
 using Vortice.Direct3D11;
 using Vortice.Direct3D;
@@ -213,7 +214,7 @@ namespace Engine.Utilities
 
         public void OnSwapChainPanelSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            var newSize = new SizeI((int)e.NewSize.Width, (int)e.NewSize.Height);
+            var newSize = new Size((int)e.NewSize.Width, (int)e.NewSize.Height);
 
             _renderTargetView.Dispose();
             _renderTargetTexture.Dispose();

@@ -10,6 +10,25 @@ cbuffer PerModelConstantBuffer : register(b1)
     matrix ModelView;
 };
 
+//// Directional light structure
+//struct DirectionalLight
+//{
+//    float3 direction;
+//};
+
+//// Point light structure
+//struct PointLight
+//{
+//    float3 position;
+//    float3 direction;
+//};
+
+//cbuffer LightingConstantBuffer : register(b2)
+//{
+//    DirectionalLight directionalLight;
+//    PointLight pointLights[];
+//};
+
 struct appdata
 {
     float3 vertex : POSITION;
@@ -26,6 +45,195 @@ struct VS_OUTPUT
     float2 uv : TEXCOORD;
     float3 normal : NORMAL;
 };
+
+
+
+
+
+
+
+
+
+
+
+
+//// GGX microfacet distribution function
+//float GGX(float3 normal, float3 halfway, float roughness)
+//{
+//    float alpha = roughness * roughness;
+//    float NdotH = saturate(dot(normal, halfway));
+//    float denom = NdotH * NdotH * (alpha - 1.0f) + 1.0f;
+//    return alpha / (denom * denom);
+//}
+
+//// Schlick fresnel function
+//float SchlickFresnel(float fresnel, float NdotH)
+//{
+//    return fresnel + (1.0f - fresnel) * pow(1.0f - NdotH, 5.0f);
+//}
+
+//// Helper functions for the Cook-Torrance diffuse lighting model and the 
+//float3 CookTorranceDiffuse(float3 normal, float3 lightDir, float3 albedo)
+//{
+//    // Calculate the diffuse lighting contribution
+//    float NdotL = saturate(dot(normal, lightDir));
+//    return albedo * NdotL;
+//}
+
+//// GGX microfacet specular lighting model
+//float3 GGXMicrofacetSpecular(float3 normal, float3 lightDir, float3 cameraDir, float roughness, float fresnel)
+//{
+//    // Calculate the halfway vector
+//    float3 halfway = normalize(lightDir + cameraDir);
+
+//    // Calculate the specular lighting contribution
+//    float NdotH = saturate(dot(normal, halfway));
+//    float G = GGX(normal, halfway, roughness);
+//    float F = SchlickFresnel(fresnel, NdotH);
+//    return G * F / (4.0f * dot(normal, lightDir) * dot(normal, cameraDir));
+//}
+
+//// Sample reflection in the reflection map
+//float3 SampleReflectionMap(float3 reflectionVector, float2 texCoord)
+//{
+//    // Calculate the texture coordinates to use for the reflection
+//    float2 reflectionTexCoord = reflectionVector.xy * 0.5f + 0.5f;
+
+//    // Sample the texture using the reflection texture coordinates
+//    return tex2D(gReflectionMapSampler, reflectionTexCoord).rgb;
+//}
+
+//// Input and output structures for the vertex and pixel shaders
+//struct PBRVertexInput
+//{
+//    float3 position : POSITION;
+//    float3 normal : NORMAL;
+//    float2 texCoord : TEXCOORD;
+//};
+
+//struct PBRVertexOutput
+//{
+//    float4 position : SV_POSITION;
+//    float3 normal : NORMAL;
+//    float2 texCoord : TEXCOORD;
+//};
+
+//struct PBRPixelInput
+//{
+//    float3 position : SV_POSITION;
+//    float3 normal : NORMAL;
+//    float2 texCoord : TEXCOORD;
+//};
+
+//struct PBRPixelOutput
+//{
+//    float4 color : SV_TARGET;
+//};
+
+//// Vertex shader
+//PBRVertexOutput PBRVertexShader(PBRVertexInput input)
+//{
+//    PBRVertexOutput output;
+
+//    // Transform the position and normal from model space to clip space
+//    output.position = mul(gWorldViewProj, float4(input.position, 1.0f));
+//    output.normal = mul(gWorld, input.normal);
+
+//    // Pass through the texture coordinates
+//    output.texCoord = input.texCoord;
+
+//    return output;
+//}
+
+//// Pixel shader
+//PBRPixelOutput PBRPixelShader(PBRPixelInput input)
+//{
+//    PBRPixelOutput output;
+
+//    // Initialize the final color to black
+//    output.color = float4(0.0f, 0.0f, 0.0f, 1.0f);
+
+//    // Calculate the diffuse and specular lighting contributions for the directional light
+//    float3 diffuse = CookTorranceDiffuse(input.normal, directionalLight.direction, gAlbedo);
+//    float3 specular = GGXMicrofacetSpecular(input.normal, directionalLight.direction, gCameraDirection, gRoughness, gFresnel);
+
+//    // Add the diffuse and specular lighting contributions for the directional light to the final color
+//    output.color += float4(diffuse + specular, 1.0f);
+
+//    // Loop over all of the point lights in the scene
+//    for (int i = 0; i < pointLights.Length; i++)
+//    {
+//        // Calculate the diffuse lighting contribution for this point light
+//        diffuse = CookTorranceDiffuse(input.normal, pointLights[i].direction, gAlbedo);
+
+//        // Calculate the specular lighting contribution for this point light
+//        specular = GGXMicrofacetSpecular(input.normal, pointLights[i].direction, gCameraDirection, gRoughness, gFresnel);
+
+//        // Add the diffuse and specular lighting contributions for this point light to the final color
+//        output.color += float4(diffuse + specular, 1.0f);
+//    }
+
+//    return output;
+//}
+
+//// Pixel shader
+//PBRPixelOutput PBRPixelShader(PBRPixelInput input)
+//{
+//    PBRPixelOutput output;
+
+//    // Initialize the final color to black
+//    output.color = float4(0.0f, 0.0f, 0.0f, 1.0f);
+
+//    // Calculate the reflection vector
+//    float3 reflectionVector = reflect(gCameraDirection, input.normal);
+
+//    // Calculate the lighting contribution from the reflection
+//    float3 reflection = SampleReflectionMap(reflectionVector, input.texCoord);
+
+//    // Add the reflection contribution to the final color
+//    output.color += float4(reflection, 1.0f);
+
+//    // Calculate the diffuse and specular lighting contributions for the directional light
+//    float3 diffuse = CookTorranceDiffuse(input.normal, directionalLight.direction, gAlbedo);
+//    float3 specular = GGXMicrofacetSpecular(input.normal, directionalLight.direction, gCameraDirection, gRoughness, gFresnel);
+
+//    // Add the diffuse and specular lighting contributions for the directional light to the final color
+//    output.color += float4(diffuse + specular, 1.0f);
+
+//    // Loop over all of the point lights in the scene
+//    for (int i = 0; i < pointLights.Length; i++)
+//    {
+//        // Calculate the diffuse lighting contribution for this point light
+//        diffuse = CookTorranceDiffuse(input.normal, pointLights[i].direction, gAlbedo);
+
+//        // Calculate the specular lighting contribution for this point light
+//        specular = GGXMicrofacetSpecular(input.normal, pointLights[i].direction, gCameraDirection, gRoughness, gFresnel);
+
+//        // Add the diffuse and specular lighting contributions for this point light to the final color
+//        output.color += float4(diffuse + specular, 1.0f);
+//    }
+
+//    return output;
+//}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 float PI = 3.14159265359;
 
