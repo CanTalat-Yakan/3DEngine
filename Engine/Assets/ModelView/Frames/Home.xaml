@@ -14,6 +14,11 @@
         <Grid controls:DockPanel.Dock="Bottom">
             <CommandBar>
                 <CommandBar.PrimaryCommands>
+                    <AppBarButton Label="Show in Explorer" Click="AppBarButton_Click_OpenFolder">
+                        <AppBarButton.Icon>
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEC50;"/>
+                        </AppBarButton.Icon>
+                    </AppBarButton>
                 </CommandBar.PrimaryCommands>
 
                 <CommandBar.SecondaryCommands>

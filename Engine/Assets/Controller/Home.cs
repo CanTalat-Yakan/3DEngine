@@ -32,6 +32,12 @@ namespace Editor.Controller
             PopulateProjectTiles();
         }
 
+        public void OpenFolder()
+        {
+            if (Directory.Exists(RootPath))
+                Process.Start(new ProcessStartInfo { FileName = RootPath, UseShellExecute = true });
+        }
+
         public void PopulateProjectTiles()
         {
             _wrap.Children.Clear();

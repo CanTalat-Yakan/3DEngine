@@ -1,5 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System.Diagnostics;
+using System.IO;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -17,6 +19,10 @@ namespace Editor.ModelView
             _homeControl = new(this, x_StackPanel_Projects, navigationView);
         }
 
-        private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) { Controller.Theme.Instance.SetRequstedTheme(); }
+        private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) => 
+            Controller.Theme.Instance.SetRequstedTheme();
+    
+        private void AppBarButton_Click_OpenFolder(object sender, RoutedEventArgs e) =>
+            _homeControl.OpenFolder();
     }
 }

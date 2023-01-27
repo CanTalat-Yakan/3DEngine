@@ -40,7 +40,7 @@
   <Class Name="Editor.Controller.Layout" Collapsed="true">
     <Position X="4.75" Y="5.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>BAAAACAAAgAAAgAAAACIAIQAgAAEAAIAAAQgAggCAIA=</HashCode>
+      <HashCode>BAAAACAAAAAAAgAAAACIAIQAwAAEBAIAAAQgAggCAIA=</HashCode>
       <FileName>Assets\Controller\Helper\Layout.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -410,7 +410,7 @@
   <Class Name="Editor.ModelView.Home" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="4" Y="3.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAIIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAIIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAA=</HashCode>
       <FileName>Assets\ModelView\Frames\Home.xaml.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
@@ -442,7 +442,7 @@
   <Class Name="Editor.ModelView.Hierarchy" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="8.25" Y="6.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAIAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAQAAAAAAAAAAAAAAAAQAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\ModelView\UserControls\Hierarchy.xaml.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
@@ -458,7 +458,7 @@
   <Class Name="Editor.ModelView.Properties" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="6.5" Y="6.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAABAAAgAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAABAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\ModelView\UserControls\Properties.xaml.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
