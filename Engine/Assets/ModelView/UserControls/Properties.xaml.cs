@@ -9,8 +9,6 @@ namespace Editor.ModelView
 {
     public sealed partial class Properties : UserControl
     {
-        public event PropertyChangedEventHandler EventPropertyChanged;
-
         internal Controller.Properties _propertiesControl;
 
         public Properties(object content = null)
@@ -20,6 +18,7 @@ namespace Editor.ModelView
             _propertiesControl = new(x_StackPanel_Properties, content);
         }
 
-        private void FirePropertyChanged([CallerMemberName] string memberName = null) => EventPropertyChanged?.Invoke(this, new PropertyChangedEventArgs(memberName));
+        private void AppBarToggleButton_SwitchLayout_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) =>
+            Controller.Main.Instance.LayoutControl.SwitchPaneLayout();
     }
 }

@@ -51,7 +51,13 @@
                 <TreeView x:Name="x_TreeView_IconNode" 
                           ItemTemplateSelector="{StaticResource x_TreeViewIconNodeTemplateSelector}"/>
 
-                <Grid Padding="15"/>
+                <CommandBar HorizontalAlignment="Left">
+                    <CommandBar.SecondaryCommands>
+                        <AppBarToggleButton x:Name="x_AppBarToggleButton_SwitchLayout" IsChecked="False" Label="Two Collumn Layout" Icon="TwoPage"
+                                    Click="AppBarToggleButton_SwitchLayout_Click">
+                        </AppBarToggleButton>
+                    </CommandBar.SecondaryCommands>
+                </CommandBar>
             </StackPanel>
         </ScrollViewer>
     </Grid>

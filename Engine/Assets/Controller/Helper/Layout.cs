@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
+using System.Collections.Generic;
 
 namespace Editor.Controller
 {
@@ -16,7 +17,11 @@ namespace Editor.Controller
 
     internal partial class Layout
     {
-        public Grid Content;
+        public Grid MainContent;
+        public Grid ContentRoot;
+        public Grid PaneRoot;
+        public SplitView SplitView;
+
         public ModelView.ViewPort ViewPort;
         public ModelView.Hierarchy Hierarchy;
         public ModelView.Properties Properties;
@@ -25,14 +30,17 @@ namespace Editor.Controller
         public ModelView.Files Files;
         public Grid TabsRoot;
 
-        public Layout(Grid content, 
-            ModelView.ViewPort viewPort, 
-            ModelView.Hierarchy hierarchy, 
-            ModelView.Properties properties, 
-            ModelView.Output output, 
+        public bool OneCollumnPaneLayout = true;
+        public List<Grid> GridsToClear = new List<Grid>();
+
+        public Layout(Grid content,
+            ModelView.ViewPort viewPort,
+            ModelView.Hierarchy hierarchy,
+            ModelView.Properties properties,
+            ModelView.Output output,
             ModelView.Files files)
         {
-            Content = content;
+            MainContent = content;
             ViewPort = viewPort;
             Hierarchy = hierarchy;
             Properties = properties;
@@ -51,21 +59,46 @@ namespace Editor.Controller
                 new() { Content = Files, Header = "Files", Symbol = Symbol.Document },
                 new() { Content = Output, Header = "Output", Symbol = Symbol.Message });
 
-            var content = PairVertical(
+            ContentRoot = new();
+            ContentRoot.Children.Add(PairVertical(
                 new() { Content = WrapGrid(ViewPort), MinHeight = 0 },
-                new() { Content = tabView, MinHeight = 0, Length = new(235, GridUnitType.Pixel) });
+                new() { Content = tabView, MinHeight = 0, Length = new(235, GridUnitType.Pixel) }));
 
-            var pane = PairVertical(
-                new() { Content = WrapGrid(Hierarchy), MinHeight = 0 },
-                new() { Content = WrapGrid(PropertiesRoot), MinHeight = 0, Length = new(1, GridUnitType.Star) });
+            PaneRoot = new();
+            PaneRoot.Children.Add(PairVertical(
+                new() { Content = WrapGrid(Hierarchy, GridsToClear), MinHeight = 0 },
+                new() { Content = WrapGrid(PropertiesRoot, GridsToClear), MinHeight = 0, Length = new(1, GridUnitType.Star) }));
 
-            Content.Children.Add(WrapSplitView(content, pane));
+            MainContent.Children.Add(WrapSplitView(ContentRoot, PaneRoot));
+        }
+
+        public void SwitchPaneLayout()
+        {
+            OneCollumnPaneLayout = !OneCollumnPaneLayout;
+
+            foreach (var grid in GridsToClear)
+                grid.Children.Clear();
+
+            PaneRoot.Children.Clear();
+
+            if (OneCollumnPaneLayout)
+                PaneRoot.Children.Add(PairVertical(
+                    new() { Content = WrapGrid(Hierarchy, GridsToClear), MinHeight = 0 },
+                    new() { Content = WrapGrid(PropertiesRoot, GridsToClear), MinHeight = 0, Length = new(1, GridUnitType.Star) }));
+            else
+                PaneRoot.Children.Add(PairHorizontal(
+                    new() { Content = WrapGrid(Hierarchy, GridsToClear), MinWidth = 0 },
+                    new() { Content = WrapGrid(PropertiesRoot, GridsToClear), MinWidth = 0, Length = new(1, GridUnitType.Star) },
+                    false));
+
+            SplitView.OpenPaneLength = OneCollumnPaneLayout ? 333 : 666;
+
         }
     }
 
     internal partial class Layout
     {
-        private Grid PairVertical(GridDataTemeplate top, GridDataTemeplate bottom)
+        private Grid PairVertical(GridDataTemeplate top, GridDataTemeplate bottom, bool gridSplitter = true)
         {
             RowDefinition bottomRowDefinition;
             Grid grid = new() { };
@@ -82,16 +115,17 @@ namespace Editor.Controller
             grid.Children.Add(bottom.Content);
             Grid.SetRow((FrameworkElement)bottom.Content, 1);
             Grid.SetRow(splitV, 1);
-            grid.Children.Add(splitV);
+            if (gridSplitter)
+                grid.Children.Add(splitV);
 
             BindingOperations.SetBinding(bottomRowDefinition, RowDefinition.HeightProperty, new Binding() { ElementName = "x_AppBarToggleButton_Status_OpenPane", Path = new("IsChecked"), Converter = new BooleanToRowHeightConverter(bottom.Length) });
 
             return grid;
         }
 
-        private Grid PairHorizontal(GridDataTemeplate left, GridDataTemeplate right)
+        private Grid PairHorizontal(GridDataTemeplate left, GridDataTemeplate right, bool gridSplitter = true)
         {
-            Grid grid = new() { ColumnSpacing = 16 };
+            Grid grid = new() { ColumnSpacing = gridSplitter ? 16 : 0 };
             grid.ColumnDefinitions.Add(new() { Width = left.Length, MinWidth = left.MinWidth });
             grid.ColumnDefinitions.Add(new() { Width = right.Length, MinWidth = right.MinWidth });
 
@@ -107,13 +141,15 @@ namespace Editor.Controller
             grid.Children.Add(left.Content);
             grid.Children.Add(right.Content);
             Grid.SetColumn((FrameworkElement)right.Content, 1);
-            grid.Children.Add(splitH);
-
+            if (gridSplitter)
+                grid.Children.Add(splitH);
+            else
+                grid.Children.Add(new AppBarSeparator() { HorizontalAlignment = HorizontalAlignment.Right, Margin = new(0, 0, -2, 0) });
 
             return grid;
         }
 
-        private Grid PairHorizontal(GridDataTemeplate left, GridDataTemeplate center, GridDataTemeplate right)
+        private Grid PairHorizontal(GridDataTemeplate left, GridDataTemeplate center, GridDataTemeplate right, bool gridSplitter = true)
         {
             Grid grid = new() { ColumnSpacing = 16 };
             grid.ColumnDefinitions.Add(new() { Width = left.Length, MinWidth = left.MinWidth });
@@ -143,9 +179,10 @@ namespace Editor.Controller
             Grid.SetColumn((FrameworkElement)center.Content, 1);
             grid.Children.Add(right.Content);
             Grid.SetColumn((FrameworkElement)right.Content, 2);
-            grid.Children.Add(splitH);
-            grid.Children.Add(splitH2);
-
+            if (gridSplitter)
+                grid.Children.Add(splitH);
+            if (gridSplitter)
+                grid.Children.Add(splitH2);
 
             return grid;
         }
@@ -165,19 +202,23 @@ namespace Editor.Controller
         private Grid WrapSplitView(Grid content, Grid pane)
         {
             Grid grid = new();
-            SplitView split = new() { OpenPaneLength = 333, IsPaneOpen = true, DisplayMode = SplitViewDisplayMode.Inline, PanePlacement = SplitViewPanePlacement.Right, Pane = pane, Content = content };
+            SplitView = new() { OpenPaneLength = 333, IsPaneOpen = true, DisplayMode = SplitViewDisplayMode.Inline, PanePlacement = SplitViewPanePlacement.Right, Pane = pane, Content = content };
 
-            BindingOperations.SetBinding(split, SplitView.IsPaneOpenProperty, new Binding() { ElementName = "x_AppBarToggleButton_Status_OpenPane", Path = new("IsChecked") });
+            BindingOperations.SetBinding(SplitView, SplitView.IsPaneOpenProperty, new Binding() { ElementName = "x_AppBarToggleButton_Status_OpenPane", Path = new("IsChecked") });
 
-            grid.Children.Add(split);
+            grid.Children.Add(SplitView);
 
             return grid;
         }
 
-        private Grid WrapGrid(UIElement content)
+        private Grid WrapGrid(UIElement content, List<Grid> list = null)
         {
+
             Grid grid = new();
             grid.Children.Add(content);
+
+            if (list != null)
+                list.Add(grid);
 
             return grid;
         }

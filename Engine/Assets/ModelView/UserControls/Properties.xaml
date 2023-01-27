@@ -11,7 +11,17 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <ScrollViewer Padding="4,0,4,0">
-                <StackPanel x:Name="x_StackPanel_Properties" Padding="0,4,0,0"/>
+            <StackPanel Orientation="Vertical">
+                <CommandBar HorizontalAlignment="Left">
+                    <CommandBar.SecondaryCommands>
+                        <AppBarToggleButton x:Name="x_AppBarToggleButton_SwitchLayout" IsChecked="False" Label="Two Collumn Layout" Icon="TwoPage"
+                                    Click="AppBarToggleButton_SwitchLayout_Click">
+                        </AppBarToggleButton>
+                    </CommandBar.SecondaryCommands>
+                </CommandBar>
+
+                <StackPanel x:Name="x_StackPanel_Properties"/>
+            </StackPanel>
         </ScrollViewer>
     </Grid>
 </UserControl>

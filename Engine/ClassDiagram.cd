@@ -40,7 +40,7 @@
   <Class Name="Editor.Controller.Layout" Collapsed="true">
     <Position X="4.75" Y="5.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>BAAAACAAAgAAAgAAAAAIAIQAgAAEAAIAAAAgAAgCAIA=</HashCode>
+      <HashCode>BAAAACAAAgAAAgAAAACIAIQAgAAEAAIAAAQgAggCAIA=</HashCode>
       <FileName>Assets\Controller\Helper\Layout.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -442,7 +442,7 @@
   <Class Name="Editor.ModelView.Hierarchy" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="8.25" Y="6.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAIAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\ModelView\UserControls\Hierarchy.xaml.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />

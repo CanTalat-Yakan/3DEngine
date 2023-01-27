@@ -17,5 +17,8 @@ namespace Editor.ModelView
                 Controller.Main.Instance.LayoutControl.ViewPort.Loaded += (s, e) =>
                     _hierarchyControl = new(this, x_StackPanel_Hierarchy);
         }
+
+        private void AppBarToggleButton_SwitchLayout_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) =>
+            Controller.Main.Instance.LayoutControl.SwitchPaneLayout();
     }
 }
