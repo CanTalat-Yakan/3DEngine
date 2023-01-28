@@ -330,12 +330,12 @@ namespace Editor.Controller
             return grid;
         }
 
-        internal virtual Grid CreateTextureSlot(string s = "None")
+        internal virtual Grid CreateTextureSlot(string s = "None", string type = "type")
         {
             Grid container = new() { Width = 48, Height = 48 };
             Image img = new() { Stretch = Stretch.UniformToFill };
             Button button = new() { HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch };
-            TextBlock path = new() { Text = s, TextWrapping = TextWrapping.WrapWholeWords, MaxWidth = 200, Margin = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
+            TextBlock path = new() { Text = s + $" ({type})", TextWrapping = TextWrapping.WrapWholeWords, MaxWidth = 200, Margin = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
 
             container.Children.Add(img);
             container.Children.Add(button);

@@ -221,11 +221,11 @@ namespace Editor.Controller
 
             // Material
             else if (type == typeof(Material))
-                grid.Add(CreateTextureSlot(((Material)value).ToString().FormatFieldsName()));
+                grid.Add(CreateTextureSlot("None", "Material"));
 
             // Texture
             else if (type == typeof(Texture))
-                grid.Add(CreateTextureSlot(((Texture)value).ToString().FormatFieldsName()));
+                grid.Add(CreateTextureSlot("None", "Texture"));
 
             // Entity
             else if (type == typeof(Entity))
