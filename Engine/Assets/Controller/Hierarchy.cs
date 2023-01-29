@@ -11,6 +11,8 @@ using Windows.System;
 using Engine.Components;
 using Engine.ECS;
 using Engine.Utilities;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using System.Text.Json.Nodes;
 
 namespace Editor.Controller
 {
@@ -443,10 +445,10 @@ namespace Editor.Controller
                     }
 
                 _stackPanel.Children.Add(
-                    CreateSubsceneHierarchy(out SceneEntry subSceneEntry, subsceneName.Text).
+                    CreateSubsceneHierarchy(out SceneEntry subsceneEntry, subsceneName.Text).
                     StackInGrid().
-                    WrapInExpanderWithToggleButton(subsceneName.Text).
-                    AddContentFlyout(CreateSubRootMenuFlyout(subSceneEntry)));
+                    WrapInExpanderWithToggleButton(subsceneName.Text, (s, r) => SceneManager.GetFromID(subsceneEntry.ID).IsEnabled = (s as ToggleButton).IsChecked.Value).
+                    AddContentFlyout(CreateSubRootMenuFlyout(subsceneEntry)));
             }
         }
 
@@ -554,14 +556,20 @@ namespace Editor.Controller
             }
         }
 
-        public void SetNewSceneEntryRecurisivally(SceneEntry sourceSceneEntry, SceneEntry targetSceneEntry, params TreeViewIconNode[] treeViewIconNodes)
+        public void SetNewSceneEntryRecurisivally(SceneEntry sourceSceneEntry, SceneEntry targetSceneEntry, TreeEntry sourceTreeEntry)
         {
+            List<TreeViewIconNode> treeViewIconNodes = new();
+            treeViewIconNodes.Add(sourceTreeEntry.IconNode);
+
+            if (sourceTreeEntry.IconNode.Children.Count != 0)
+                treeViewIconNodes.AddRange(sourceTreeEntry.IconNode.Children.ToArray());
+
             foreach (var node in treeViewIconNodes)
             {
                 TreeEntry treeEntry = node.TreeEntry;
 
                 if (treeEntry.IconNode.Children.Count != 0)
-                    SetNewSceneEntryRecurisivally(sourceSceneEntry, targetSceneEntry, treeEntry.IconNode.Children.ToArray());
+                    SetNewSceneEntryRecurisivally(sourceSceneEntry, targetSceneEntry, treeEntry);
 
                 Scene sourceScene = SceneManager.GetFromID(sourceSceneEntry.ID);
                 Scene targetScene = SceneManager.GetFromID(targetSceneEntry.ID);
@@ -584,8 +592,7 @@ namespace Editor.Controller
             else if (targetTreeEntry != null)
                 targetTreeEntry.IconNode.Children.Add(sourceTreeEntry.IconNode);
 
-            if (sourceTreeEntry.IconNode.Children.Count != 0)
-                SetNewSceneEntryRecurisivally(sourceSceneEntry, targetSceneEntry, sourceTreeEntry.IconNode.Children.ToArray());
+            //SetNewSceneEntryRecurisivally(sourceSceneEntry, targetSceneEntry, sourceTreeEntry);
         }
 
         public void PasteEntity(Guid sourceGuid, Guid targetGuid, DataPackageOperation requestedOperation)

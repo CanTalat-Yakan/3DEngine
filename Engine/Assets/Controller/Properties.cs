@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml;
 using System.Diagnostics;
@@ -19,10 +20,6 @@ using Texture = Vortice.Direct3D11.Texture2DArrayShaderResourceView;
 using Engine.ECS;
 using Engine.Editor;
 using Engine.Utilities;
-using Microsoft.UI.Xaml.Input;
-using Windows.ApplicationModel.DataTransfer;
-using Windows.System;
-using Microsoft.UI.Xaml.Controls.Primitives;
 
 namespace Editor.Controller
 {
@@ -67,8 +64,8 @@ namespace Editor.Controller
         {
             Grid[] properties = new[]
             {
-                CreateBool(true).WrapInField("Is Acitve"),
-                CreateBool().WrapInField("Is Static"),
+                CreateBool(true, (s, r) => entity.IsEnabled = (s as CheckBox).IsChecked.Value).WrapInField("Is Enabled"),
+                CreateBool(false, (s, r) => entity.IsStatic = (s as CheckBox).IsChecked.Value).WrapInField("Is Static"),
                 CreateEnum(Enum.GetNames(typeof(ETags))).WrapInField("Tag"),
                 CreateEnum(Enum.GetNames(typeof(ELayers))).WrapInField("Layer")
             };
@@ -106,7 +103,7 @@ namespace Editor.Controller
                     var nonPublicFieldInfos = component.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
                     var fieldInfos = component.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
 
-                    var nonPublicEventsInfos = component.GetType().GetEvents(BindingFlags.NonPublic);
+                    var nonPublicEventsInfos = component.GetType().GetEvents(BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
                     var eventsInfos = component.GetType().GetEvents(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
 
                     Grid newFieldGrid;

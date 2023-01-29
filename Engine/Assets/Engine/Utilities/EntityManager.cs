@@ -144,10 +144,12 @@ namespace Engine.Utilities
         public void CreateSky()
         {
             Sky = new() { Name = "Sky" };
+            Sky.Transform.Scale = new Vector3(-1000, 1000, 1000);
+
             Sky.AddComponent(new Mesh(ModelLoader.LoadFilePro(OBJ_SPHERE)));
             Sky.GetComponent<Mesh>().Material = _materialSky;
 
-            Sky.Transform.Scale = new Vector3(-1000, 1000, 1000);
+            EntityList.Add(Sky);
         }
 
         public Entity GetFromID(Guid id)

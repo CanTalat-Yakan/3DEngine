@@ -3,7 +3,6 @@ using System;
 using Vortice.Mathematics;
 using Engine.Data;
 using Engine.ECS;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Engine.Components
 {
@@ -24,7 +23,9 @@ namespace Engine.Components
         public Vector3 EulerAngles = Vector3.Zero;
         public Vector3 Scale = Vector3.One;
 
-        public override void Register() => 
+        internal bool _activeInHierarchy = true;
+
+        public override void Register() =>
             TransformSystem.Register(this);
 
         public override void Update()
@@ -48,11 +49,16 @@ namespace Engine.Components
 
         Matrix4x4 CalculateWorldMatrix(Vector3 position, Vector3 rotation, Vector3 scale, Transform parent)
         {
+            _activeInHierarchy = true;
+
             while (parent != null)
             {
                 position += parent.Position;
                 rotation += parent.EulerAngles;
                 scale *= parent.Scale;
+
+                //if (!parent._entity.IsEnabled)
+                //    _activeInHierarchy = false;
 
                 parent = parent.Parent;
             }

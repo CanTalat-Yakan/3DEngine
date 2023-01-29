@@ -6,11 +6,9 @@ using Editor.Controller;
 using Engine.ECS;
 using Engine.Utilities;
 using Texture = Vortice.Direct3D11.Texture2DArrayShaderResourceView;
-//using Microsoft.CodeAnalysis;
 
 namespace Engine.Editor
 {
-    //[Generator]
     internal class SceneBoot : EditorComponent
     {
         public Entity Camera;

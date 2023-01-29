@@ -115,5 +115,17 @@ namespace Engine.Utilities
 
             return null;
         }
+
+        public static Scene GetFromEntityID(Guid guid)
+        {
+            if (Scene.EntitytManager.GetFromID(guid) != null)
+                return Scene;
+
+            foreach (var subscene in Subscenes)
+                if (subscene.EntitytManager.GetFromID(guid) != null)
+                    return subscene;
+
+            return null;
+        }
     }
 }

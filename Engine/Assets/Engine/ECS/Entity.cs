@@ -2,6 +2,7 @@
 using System;
 using Engine.Components;
 using System.Reflection;
+using Engine.Utilities;
 
 namespace Engine.ECS
 {
@@ -30,18 +31,22 @@ namespace Engine.ECS
 
         public Entity Parent;
 
-        public Transform Transform { get => _transform; }
-
         public string Name;
         public bool IsEnabled;
         public bool IsStatic;
         public ETags Tag;
         public ELayers Layer;
 
-        private List<Component> _components = new();
+        public Scene Scene { get => _scene is null ? _scene = SceneManager.GetFromEntityID(ID) : _scene; }
+        private Scene _scene;
+
+        public Transform Transform { get => _transform; }
         private Transform _transform;
 
-        public Entity() => AddComponent(_transform = new Transform());
+        private List<Component> _components = new();
+
+        public Entity() => 
+            AddComponent(_transform = new Transform());
 
         public void AddComponent(Component component)
         {
@@ -102,7 +107,7 @@ namespace Engine.ECS
             for (int i = 1; i < _components.Count; i++)
             {
                 var newComponent = _components[i].Clone();
-                newComponent.GetType().GetConstructor(Type.EmptyTypes).Invoke(newComponent, null);
+                newComponent.Register();
                 newEntity.AddComponent(newComponent);
             }
 

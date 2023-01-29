@@ -223,9 +223,11 @@ namespace Editor.Controller
             return StackInGrid(rectangleR, numInput, rectangleG, num2Input, rectangleB, num3Input);
         }
 
-        internal virtual Grid CreateBool(bool b = false)
+        internal virtual Grid CreateBool(bool b = false, RoutedEventHandler OnChecked = null)
         {
             CheckBox check = new() { IsChecked = b, Margin = new(0, 0, 0, -5.5) };
+            if (OnChecked != null)
+                check.Checked += OnChecked;
 
             return StackInGrid(check);
         }

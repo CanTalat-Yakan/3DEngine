@@ -17,7 +17,7 @@ namespace Engine.ECS
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                if (component._active)
+                if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
                     component.Awake();
         }
 
@@ -25,7 +25,7 @@ namespace Engine.ECS
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                if (component._active)
+                if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
                     component.Start();
         }
 
@@ -33,7 +33,7 @@ namespace Engine.ECS
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                if (component._active)
+                if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
                     component.Update();
         }
 
@@ -41,7 +41,7 @@ namespace Engine.ECS
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                if (component._active)
+                if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
                     component.LateUpdate();
         }
 
@@ -49,7 +49,7 @@ namespace Engine.ECS
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                if (component._active)
+                if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
                     component.Render();
         }
 
