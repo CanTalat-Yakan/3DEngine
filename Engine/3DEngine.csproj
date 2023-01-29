@@ -22,7 +22,7 @@
     <Content Remove="Assets\Engine\Editor\SceneBoot.cs" />
     <Content Remove="Assets\Engine\Utilities\BaseSystem.cs" />
     <Content Remove="Assets\Engine\Utilities\Component.cs" />
-    <Content Remove="Assets\Engine\Utilities\SceneManagear.cs" />
+    <Content Remove="Assets\Engine\Utilities\SceneManager.cs" />
     <Content Remove="Assets\ModelView\Frames\Documentation.xaml" />
     <Content Remove="Assets\ModelView\Frames\Documentation.xaml.cs" />
   </ItemGroup>
