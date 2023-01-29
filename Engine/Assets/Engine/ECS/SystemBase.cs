@@ -17,35 +17,40 @@ namespace Engine.ECS
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                component.Awake();
+                if (component._active)
+                    component.Awake();
         }
 
         public static void Start()
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                component.Start();
+                if (component._active)
+                    component.Start();
         }
 
         public static void Update()
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                component.Update();
+                if (component._active)
+                    component.Update();
         }
 
         public static void LateUpdate()
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                component.LateUpdate();
+                if (component._active)
+                    component.LateUpdate();
         }
 
         public static void Render()
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                component.Render();
+                if (component._active)
+                    component.Render();
         }
 
         public static void Destroy(T component)

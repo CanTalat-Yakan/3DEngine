@@ -22,6 +22,7 @@ using Engine.Utilities;
 using Microsoft.UI.Xaml.Input;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
+using Microsoft.UI.Xaml.Controls.Primitives;
 
 namespace Editor.Controller
 {
@@ -125,7 +126,13 @@ namespace Editor.Controller
                     scriptsCollection.AddRange(eventsCollection.ToArray());
 
                     UIElement tmp;
-                    _stackPanel.Children.Add(tmp = scriptsCollection.ToArray().StackInGrid().WrapInExpanderWithToggleButton(component.ToString().FormatString()).AddContentFlyout(CreateDefaultMenuFlyout(entity, component)));
+                    _stackPanel.Children.Add(tmp = 
+                        scriptsCollection.ToArray().StackInGrid()
+                        .WrapInExpanderWithToggleButton(
+                            component.ToString().FormatString(),
+                            (s, r) => component._active = (s as ToggleButton).IsChecked.Value)
+                        .AddContentFlyout(CreateDefaultMenuFlyout(entity, component)));
+
                     component._eventOnDestroy += (s, e) => _stackPanel.Children.Remove(tmp);
                 }
         }

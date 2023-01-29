@@ -5,6 +5,7 @@ namespace Engine.ECS
     internal class Component : ICloneable
     {
         internal Entity _entity;
+        internal bool _active;
 
         internal event EventHandler _eventOnDestroy;
 

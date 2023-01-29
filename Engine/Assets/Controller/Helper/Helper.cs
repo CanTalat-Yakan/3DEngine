@@ -470,7 +470,7 @@ namespace Editor.Controller
             return grid;
         }
 
-        public static Grid WrapInExpanderWithToggleButton(this Grid content, string text)
+        public static Grid WrapInExpanderWithToggleButton(this Grid content, string text, RoutedEventHandler onClick = null)
         {
             Grid grid = new() { Margin = new(0, 0, 0, 2) };
             Expander expander = new()
@@ -480,7 +480,11 @@ namespace Editor.Controller
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 HorizontalContentAlignment = HorizontalAlignment.Stretch
             };
-            expander.Header = new ToggleButton() { Content = text, IsChecked = true };
+            ToggleButton toggleButton = new() { Content = text, IsChecked = true };
+            if (onClick != null)
+                toggleButton.Click += onClick;
+
+            expander.Header = toggleButton;
             expander.Content = content;
 
             grid.Children.Add(expander);
@@ -528,7 +532,7 @@ namespace Editor.Controller
                         if ((text[i - 1] != ' ' && !char.IsUpper(text[i - 1])) ||
                         (preserveAcronyms && char.IsUpper(text[i - 1]) &&
                          i < text.Length - 1 && !char.IsUpper(text[i + 1])))
-                        newText.Append(' ');
+                            newText.Append(' ');
                 newText.Append(text[i]);
             }
 
@@ -540,7 +544,7 @@ namespace Editor.Controller
             return text.Split(seperator).Last();
         }
 
-        public static string FirstCharToUpper(this string input) 
+        public static string FirstCharToUpper(this string input)
         {
             return string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1));
         }
