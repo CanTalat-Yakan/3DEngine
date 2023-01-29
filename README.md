@@ -23,14 +23,6 @@ Plus, **create beautiful, modern apps for Windows 11 that are backwards compatib
 
 This library supports netstandard3.1 and net7.0 using modern .NET API, see [CHANGELOG](https://github.com/amerkoleci/Vortice.Windows/blob/main/CHANGELOG.md) for list of changes between commits.
 
-# Universal Scene Description (USD) 
-
-[Universal Scene Description](https://developer.nvidia.com/usd) is an efficient, scalable system for
-authoring, reading, and streaming time-sampled scene description for
-interchange between graphics applications.
-
-For more details, please visit the web site [here](http://openusd.org).
-
 # Entity Component System (ECS)
 
 The Entity Component System is an architectural pattern often used in video game development. It facilitates code reusability by separating the data from the behavior. In addition, ECS obeys the "composition over inheritance principle," providing improved flexibility and helping developers identify entities in a game's scene where all the objects are classified as entities. One reason ECS is faster than a game object component system is that you put all the data you need together in the same place in memory. Doing so avoids the performance overhead of having to search around to find it.
