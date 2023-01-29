@@ -13,39 +13,35 @@ namespace Engine.Components
     {
         public static Camera Main { get; private set; }
 
-        public SViewConstantsBuffer ViewConstants;
-
         public static double FieldOfView { get => s_fieldOfView; set => s_fieldOfView = value; }
         private static double s_fieldOfView = 90;
 
-        private Renderer _d3d;
+        private Renderer _d3d { get => Renderer.Instance; }
+
         private ID3D11Buffer _view;
+        private SViewConstantsBuffer _viewConstants;
 
-        public override void Register() => CameraSystem.Register(this);
+        public override void Register() =>
+            CameraSystem.Register(this);
 
-        public Camera()
-        {
-            #region //Get Instances
-            _d3d = Renderer.Instance;
-            #endregion
-
+        public Camera() =>
             _view = _d3d.Device.CreateConstantBuffer<SViewConstantsBuffer>();
-        }
 
         public override void Awake()
         {
-            if (entity.Tag == ETags.MainCamera)
+            if (_entity.Tag == ETags.MainCamera)
                 Main = this;
         }
 
-        public override void LateUpdate() => RecreateViewConstants();
+        public override void LateUpdate() => 
+            RecreateViewConstants();
 
         public void RecreateViewConstants()
         {
             #region //Set ViewConstantBuffer
             var view = Matrix4x4.CreateLookAt(
-                entity.Transform.Position,
-                entity.Transform.Position + entity.Transform.Forward,
+                _entity.Transform.Position,
+                _entity.Transform.Position + _entity.Transform.Forward,
                 Vector3.UnitY);
 
             var aspect = (float)(_d3d.SwapChainPanel.ActualWidth / _d3d.SwapChainPanel.ActualHeight);
@@ -67,17 +63,18 @@ namespace Engine.Components
             // T(v*p), because HLSL calculates matrix mul in collumn-major and system.numerics returns row-major
             var viewProjection = Matrix4x4.Transpose(view * projection);
 
-            ViewConstants = new() { ViewProjection = viewProjection, CameraPisiton = entity.Transform.Position };
+            _viewConstants = new() { ViewProjection = viewProjection, CameraPisiton = _entity.Transform.Position };
             #endregion
 
+            #region //Update constant buffer data
             unsafe
             {
-                // Update constant buffer data
                 MappedSubresource mappedResource = _d3d.DeviceContext.Map(this._view, MapMode.WriteDiscard);
-                Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref ViewConstants);
+                Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref _viewConstants);
                 _d3d.DeviceContext.Unmap(this._view, 0);
             }
             _d3d.DeviceContext.VSSetConstantBuffer(0, this._view);
+            #endregion
         }
     }
 }

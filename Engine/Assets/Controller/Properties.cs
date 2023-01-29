@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml;
 using System.Diagnostics;
@@ -63,8 +64,8 @@ namespace Editor.Controller
         {
             Grid[] properties = new[]
             {
-                CreateBool(true).WrapInField("Is Acitve"),
-                CreateBool().WrapInField("Is Static"),
+                CreateBool(true, (s, r) => entity.IsEnabled = (s as CheckBox).IsChecked.Value).WrapInField("Is Enabled"),
+                CreateBool(false, (s, r) => entity.IsStatic = (s as CheckBox).IsChecked.Value).WrapInField("Is Static"),
                 CreateEnum(Enum.GetNames(typeof(ETags))).WrapInField("Tag"),
                 CreateEnum(Enum.GetNames(typeof(ELayers))).WrapInField("Layer")
             };
@@ -102,7 +103,7 @@ namespace Editor.Controller
                     var nonPublicFieldInfos = component.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
                     var fieldInfos = component.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
 
-                    var nonPublicEventsInfos = component.GetType().GetEvents(BindingFlags.NonPublic);
+                    var nonPublicEventsInfos = component.GetType().GetEvents(BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
                     var eventsInfos = component.GetType().GetEvents(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
 
                     Grid newFieldGrid;
@@ -121,7 +122,15 @@ namespace Editor.Controller
                     scriptsCollection.AddRange(fieldsCollection.ToArray());
                     scriptsCollection.AddRange(eventsCollection.ToArray());
 
-                    _stackPanel.Children.Add(scriptsCollection.ToArray().StackInGrid().WrapInExpanderWithToggleButton(component.ToString().SplitLast('_').SplitLast('.')));
+                    UIElement tmp;
+                    _stackPanel.Children.Add(tmp = 
+                        scriptsCollection.ToArray().StackInGrid()
+                        .WrapInExpanderWithToggleButton(
+                            component.ToString().FormatString(),
+                            (s, r) => component._active = (s as ToggleButton).IsChecked.Value)
+                        .AddContentFlyout(CreateDefaultMenuFlyout(entity, component)));
+
+                    component._eventOnDestroy += (s, e) => _stackPanel.Children.Remove(tmp);
                 }
         }
 
@@ -164,6 +173,20 @@ namespace Editor.Controller
 
                     _stackPanel.Children.Add(preview.StackInGrid().WrapInExpander("Preview"));
                 }
+        }
+
+        private MenuFlyout CreateDefaultMenuFlyout(Entity entity, Component component)
+        {
+            MenuFlyoutItem[] items = new[] {
+                new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
+            };
+            items[0].Click += (s, e) => entity.RemoveComponent(component);
+
+            MenuFlyout menuFlyout = new();
+            foreach (var item in items)
+                menuFlyout.Items.Add(item);
+
+            return menuFlyout;
         }
     }
 
@@ -230,27 +253,27 @@ namespace Editor.Controller
             // Entity
             else if (type == typeof(Entity))
                 if (value is null)
-                    grid.Add(CreateReferenceSlot("None", type.ToString().FormatFieldsName()));
+                    grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
                 else
-                    grid.Add(CreateReferenceSlot(((Entity)value).Name, type.ToString().FormatFieldsName()));
+                    grid.Add(CreateReferenceSlot(((Entity)value).Name, type.ToString().FormatString()));
 
             // Component
             else if (type == typeof(Component))
                 if (value is null)
-                    grid.Add(CreateReferenceSlot("None", type.ToString().FormatFieldsName()));
+                    grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
                 else
-                    grid.Add(CreateReferenceSlot(((Component)value).ToString().FormatFieldsName(), type.ToString().FormatFieldsName()));
+                    grid.Add(CreateReferenceSlot(((Component)value).ToString().FormatString(), type.ToString().FormatString()));
 
             // Event
             else if (type == typeof(EventHandler))
                 if (value is null)
-                    grid.Add(CreateReferenceSlot("None", type.ToString().FormatFieldsName()));
+                    grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
                 else
-                    grid.Add(CreateReferenceSlot(((EventHandler)value).ToString().SplitLast('.'), type.ToString().FormatFieldsName()));
+                    grid.Add(CreateReferenceSlot(((EventHandler)value).ToString().SplitLast('.'), type.ToString().FormatString()));
 
             // Default
             else
-                grid.Add(CreateReferenceSlot("None", type.ToString().FormatFieldsName()));
+                grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
             #endregion
 
             return (new Grid[]

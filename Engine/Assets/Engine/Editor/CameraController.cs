@@ -8,21 +8,19 @@ namespace Engine.Editor
 {
     internal class CameraController : EditorComponent
     {
-        public string Profile { get => entity.Transform.ToString(); }
+        public string Profile { get => _entity.Transform.ToString(); }
 
         public static float MovementSpeed { get => s_movementSpeed; set => s_movementSpeed = value; }
         private static float s_movementSpeed = 2;
 
-        private Input _input;
+        private Input _input { get => Input.Instance; }
 
         private float _rotationSpeed = 5;
         private Vector3 _direction;
         private Vector3 _rotation;
 
-        public override void Register() => EditorScriptSystem.Register(this);
-
-        public CameraController() => _input = Input.Instance;
-        
+        public override void Register() => 
+            EditorScriptSystem.Register(this);
 
         public override void Update()
         {
@@ -42,10 +40,10 @@ namespace Engine.Editor
 
             ScrollMovement();
 
-            entity.Transform.Position += _direction * (float)Time.Delta * s_movementSpeed;
-            entity.Transform.EulerAngles -= _rotation * (float)Time.Delta * _rotationSpeed;
+            _entity.Transform.Position += _direction * (float)Time.Delta * s_movementSpeed;
+            _entity.Transform.EulerAngles -= _rotation * (float)Time.Delta * _rotationSpeed;
 
-            entity.Transform.EulerAngles.X = Math.Clamp(entity.Transform.EulerAngles.X, -89, 89);
+            _entity.Transform.EulerAngles.X = Math.Clamp(_entity.Transform.EulerAngles.X, -89, 89);
 
             _rotation = new();
             _direction = new();
@@ -64,17 +62,17 @@ namespace Engine.Editor
             _rotation = new(_input.GetMouseAxis().Y, _input.GetMouseAxis().X, 0);
 
         private void TransformMovement() =>
-            _direction = entity.Transform.Forward * _input.GetAxis().Y + entity.Transform.Right * _input.GetAxis().X;
+            _direction = _entity.Transform.Forward * _input.GetAxis().Y + _entity.Transform.Right * _input.GetAxis().X;
 
         private void ScreenMovement() =>
-            _direction -=   entity.Transform.Right * _input.GetMouseAxis().X * (float)Time.Delta + entity.Transform.LocalUp * _input.GetMouseAxis().Y * (float)Time.Delta;
+            _direction -= _entity.Transform.Right * _input.GetMouseAxis().X * (float)Time.Delta + _entity.Transform.LocalUp * _input.GetMouseAxis().Y * (float)Time.Delta;
 
         private void ScrollMovement()
         {
             if (!_input.GetButton(EMouseButton.IsRightButtonPressed)
                 && !_input.GetButton(EMouseButton.IsMiddleButtonPressed)
                 && !_input.GetButton(EMouseButton.IsRightButtonPressed))
-                _direction += 5 * entity.Transform.Forward * _input.GetMouseWheel();
+                _direction += 5 * _entity.Transform.Forward * _input.GetMouseWheel();
         }
 
         private void HeightTransformMovement()
@@ -89,7 +87,7 @@ namespace Engine.Editor
             if (_input.GetKey(VirtualKey.Q) && _input.GetKey(VirtualKey.S)) input = -1;
 
             if (_input.GetKey(VirtualKey.W) || _input.GetKey(VirtualKey.S))
-                _direction += input * entity.Transform.LocalUp;
+                _direction += input * _entity.Transform.LocalUp;
             else
                 _direction += input * Vector3.UnitY;
         }

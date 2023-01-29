@@ -223,9 +223,11 @@ namespace Editor.Controller
             return StackInGrid(rectangleR, numInput, rectangleG, num2Input, rectangleB, num3Input);
         }
 
-        internal virtual Grid CreateBool(bool b = false)
+        internal virtual Grid CreateBool(bool b = false, RoutedEventHandler OnChecked = null)
         {
             CheckBox check = new() { IsChecked = b, Margin = new(0, 0, 0, -5.5) };
+            if (OnChecked != null)
+                check.Checked += OnChecked;
 
             return StackInGrid(check);
         }
@@ -414,7 +416,7 @@ namespace Editor.Controller
         {
             Grid grid = new();
             StackPanel stack = new() { Orientation = Orientation.Horizontal };
-            TextBlock header = new() { Text = text.FormatFieldsName(), Width = 80, TextWrapping = TextWrapping.WrapWholeWords, VerticalAlignment = VerticalAlignment.Bottom };
+            TextBlock header = new() { Text = text.FormatString(), Width = 80, TextWrapping = TextWrapping.WrapWholeWords, VerticalAlignment = VerticalAlignment.Bottom };
 
             stack.Children.Add(header);
             stack.Children.Add(content);
@@ -428,7 +430,7 @@ namespace Editor.Controller
         {
             Grid grid = new();
             StackPanel stack = new() { Orientation = Orientation.Horizontal };
-            TextBlock header = new() { Text = text.FormatFieldsName(), Width = 160, TextWrapping = TextWrapping.WrapWholeWords, VerticalAlignment = VerticalAlignment.Bottom };
+            TextBlock header = new() { Text = text.FormatString(), Width = 160, TextWrapping = TextWrapping.WrapWholeWords, VerticalAlignment = VerticalAlignment.Bottom };
 
             stack.Children.Add(header);
             stack.Children.Add(content);
@@ -470,7 +472,7 @@ namespace Editor.Controller
             return grid;
         }
 
-        public static Grid WrapInExpanderWithToggleButton(this Grid content, string text)
+        public static Grid WrapInExpanderWithToggleButton(this Grid content, string text, RoutedEventHandler onClick = null)
         {
             Grid grid = new() { Margin = new(0, 0, 0, 2) };
             Expander expander = new()
@@ -480,7 +482,11 @@ namespace Editor.Controller
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 HorizontalContentAlignment = HorizontalAlignment.Stretch
             };
-            expander.Header = new ToggleButton() { Content = text, IsChecked = true };
+            ToggleButton toggleButton = new() { Content = text, IsChecked = true };
+            if (onClick != null)
+                toggleButton.Click += onClick;
+
+            expander.Header = toggleButton;
             expander.Content = content;
 
             grid.Children.Add(expander);
@@ -528,7 +534,7 @@ namespace Editor.Controller
                         if ((text[i - 1] != ' ' && !char.IsUpper(text[i - 1])) ||
                         (preserveAcronyms && char.IsUpper(text[i - 1]) &&
                          i < text.Length - 1 && !char.IsUpper(text[i + 1])))
-                        newText.Append(' ');
+                            newText.Append(' ');
                 newText.Append(text[i]);
             }
 
@@ -540,12 +546,12 @@ namespace Editor.Controller
             return text.Split(seperator).Last();
         }
 
-        public static string FirstCharToUpper(this string input) 
+        public static string FirstCharToUpper(this string input)
         {
             return string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1));
         }
 
-        public static string FormatFieldsName(this string text)
+        public static string FormatString(this string text)
         {
             return text.SplitLast('_').SplitLast('.').FirstCharToUpper().AddSpacesToSentence();
         }

@@ -7,41 +7,56 @@ namespace Engine.ECS
     {
         protected static List<T> s_components = new();
 
-        public static void Register(T component) => s_components.Add(component);
+        public static void Register(T component)
+        {
+            s_components.Add(component);
+            component._eventOnDestroy += (s, e) => Destroy(component);
+        }
 
         public static void Awake()
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                component.Awake();
+                if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
+                    component.Awake();
         }
 
         public static void Start()
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                component.Start();
+                if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
+                    component.Start();
         }
 
         public static void Update()
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                component.Update();
+                if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
+                    component.Update();
         }
 
         public static void LateUpdate()
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                component.LateUpdate();
+                if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
+                    component.LateUpdate();
         }
 
         public static void Render()
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                component.Render();
+                if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
+                    component.Render();
+        }
+
+        public static void Destroy(T component)
+        {
+            s_components.Remove(component);
+            component.Destroy();
         }
     }
 

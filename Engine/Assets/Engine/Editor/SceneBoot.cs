@@ -6,11 +6,9 @@ using Editor.Controller;
 using Engine.ECS;
 using Engine.Utilities;
 using Texture = Vortice.Direct3D11.Texture2DArrayShaderResourceView;
-//using Microsoft.CodeAnalysis;
 
 namespace Engine.Editor
 {
-    //[Generator]
     internal class SceneBoot : EditorComponent
     {
         public Entity Camera;
@@ -20,7 +18,8 @@ namespace Engine.Editor
         private Entity _subParent;
         private Entity _special;
 
-        public override void Register() => EditorScriptSystem.Register(this);
+        public override void Register() => 
+            EditorScriptSystem.Register(this);
 
         public override void Awake()
         {
@@ -79,21 +78,22 @@ namespace Engine.Editor
     {
         public float MovementSpeed = 5;
 
-        public override void Register() => ScriptSystem.Register(this);
+        public override void Register() => 
+            ScriptSystem.Register(this);
 
         public override void Update()
         {
             Vector3 targetDirection = Movement();
 
             if (!IsNaN(targetDirection))
-                entity.Transform.Position += targetDirection;
+                _entity.Transform.Position += targetDirection;
         }
 
         internal Vector3 Movement()
         {
             Vector3 dest =
-                Input.Instance.GetAxis().X * entity.Transform.Right +
-                Input.Instance.GetAxis().Y * entity.Transform.Forward;
+                Input.Instance.GetAxis().X * _entity.Transform.Right +
+                Input.Instance.GetAxis().Y * _entity.Transform.Forward;
 
             return Vector3.Normalize(dest) * MovementSpeed * (float)Time.Delta;
         }
@@ -130,6 +130,7 @@ namespace Engine.Editor
         [Header("Header")]
         public event EventHandler Event;
 
-        public override void Register() => ScriptSystem.Register(this);
+        public override void Register() => 
+            ScriptSystem.Register(this);
     }
 }

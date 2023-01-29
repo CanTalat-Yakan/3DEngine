@@ -33,10 +33,10 @@ namespace Engine.Utilities
             int vertexCount = 0;
             int indexCount = 0;
 
-            foreach (var entoty in EntitytManager.EntityList)
+            foreach (var entity in EntitytManager.EntityList)
             {
-                var mesh = entoty.GetComponent<Mesh>();
-                if (entoty.IsEnabled && mesh != null)
+                var mesh = entity.GetComponent<Mesh>();
+                if (entity.IsEnabled && mesh != null)
                 {
                     vertexCount += mesh.VertexCount;
                     indexCount += mesh.IndexCount;
