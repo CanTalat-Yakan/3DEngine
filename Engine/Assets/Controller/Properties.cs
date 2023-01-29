@@ -19,6 +19,9 @@ using Texture = Vortice.Direct3D11.Texture2DArrayShaderResourceView;
 using Engine.ECS;
 using Engine.Editor;
 using Engine.Utilities;
+using Microsoft.UI.Xaml.Input;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.System;
 
 namespace Editor.Controller
 {
@@ -121,7 +124,9 @@ namespace Editor.Controller
                     scriptsCollection.AddRange(fieldsCollection.ToArray());
                     scriptsCollection.AddRange(eventsCollection.ToArray());
 
-                    _stackPanel.Children.Add(scriptsCollection.ToArray().StackInGrid().WrapInExpanderWithToggleButton(component.ToString().SplitLast('_').SplitLast('.')));
+                    UIElement tmp;
+                    _stackPanel.Children.Add(tmp = scriptsCollection.ToArray().StackInGrid().WrapInExpanderWithToggleButton(component.ToString().FormatString()).AddContentFlyout(CreateDefaultMenuFlyout(entity, component)));
+                    component._eventOnDestroy += (s, e) => _stackPanel.Children.Remove(tmp);
                 }
         }
 
@@ -164,6 +169,20 @@ namespace Editor.Controller
 
                     _stackPanel.Children.Add(preview.StackInGrid().WrapInExpander("Preview"));
                 }
+        }
+
+        private MenuFlyout CreateDefaultMenuFlyout(Entity entity, Component component)
+        {
+            MenuFlyoutItem[] items = new[] {
+                new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
+            };
+            items[0].Click += (s, e) => entity.RemoveComponent(component);
+
+            MenuFlyout menuFlyout = new();
+            foreach (var item in items)
+                menuFlyout.Items.Add(item);
+
+            return menuFlyout;
         }
     }
 
@@ -230,27 +249,27 @@ namespace Editor.Controller
             // Entity
             else if (type == typeof(Entity))
                 if (value is null)
-                    grid.Add(CreateReferenceSlot("None", type.ToString().FormatFieldsName()));
+                    grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
                 else
-                    grid.Add(CreateReferenceSlot(((Entity)value).Name, type.ToString().FormatFieldsName()));
+                    grid.Add(CreateReferenceSlot(((Entity)value).Name, type.ToString().FormatString()));
 
             // Component
             else if (type == typeof(Component))
                 if (value is null)
-                    grid.Add(CreateReferenceSlot("None", type.ToString().FormatFieldsName()));
+                    grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
                 else
-                    grid.Add(CreateReferenceSlot(((Component)value).ToString().FormatFieldsName(), type.ToString().FormatFieldsName()));
+                    grid.Add(CreateReferenceSlot(((Component)value).ToString().FormatString(), type.ToString().FormatString()));
 
             // Event
             else if (type == typeof(EventHandler))
                 if (value is null)
-                    grid.Add(CreateReferenceSlot("None", type.ToString().FormatFieldsName()));
+                    grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
                 else
-                    grid.Add(CreateReferenceSlot(((EventHandler)value).ToString().SplitLast('.'), type.ToString().FormatFieldsName()));
+                    grid.Add(CreateReferenceSlot(((EventHandler)value).ToString().SplitLast('.'), type.ToString().FormatString()));
 
             // Default
             else
-                grid.Add(CreateReferenceSlot("None", type.ToString().FormatFieldsName()));
+                grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
             #endregion
 
             return (new Grid[]

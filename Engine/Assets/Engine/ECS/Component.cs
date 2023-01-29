@@ -4,9 +4,12 @@ namespace Engine.ECS
 {
     internal class Component : ICloneable
     {
-        internal Entity entity;
+        internal Entity _entity;
 
-        public Component() => Register();
+        internal event EventHandler _eventOnDestroy;
+
+        public Component() =>
+            Register();
 
         public virtual void Register() { }
 
@@ -19,6 +22,11 @@ namespace Engine.ECS
         public virtual void LateUpdate() { }
 
         public virtual void Render() { }
+
+        public virtual void Destroy() { }
+
+        public void InvokeOnDestroy() =>
+            _eventOnDestroy(this, null);
 
         object ICloneable.Clone() { return Clone(); }
 

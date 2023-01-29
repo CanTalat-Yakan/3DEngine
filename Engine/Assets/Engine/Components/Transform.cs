@@ -24,12 +24,13 @@ namespace Engine.Components
         public Vector3 EulerAngles = Vector3.Zero;
         public Vector3 Scale = Vector3.One;
 
-        public override void Register() => TransformSystem.Register(this);
-        
+        public override void Register() => 
+            TransformSystem.Register(this);
+
         public override void Update()
         {
-            if (entity.Parent != null)
-                Parent = entity.Parent.Transform;
+            if (_entity.Parent != null)
+                Parent = _entity.Parent.Transform;
 
             //EulerAngles = Rotation.ToEuler();
             Rotation = Quaternion.CreateFromYawPitchRoll(EulerAngles.X, EulerAngles.Y, EulerAngles.Z);

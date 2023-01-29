@@ -11,7 +11,7 @@ namespace Engine.Utilities
 {
     internal class Material
     {
-        private Renderer _d3d;
+        private Renderer _d3d { get => Renderer.Instance; }
 
         private ID3D11VertexShader _vertexShader;
         private ID3D11PixelShader _pixelShader;
@@ -25,10 +25,6 @@ namespace Engine.Utilities
 
         public Material(string shaderFileName, string imageFileName, bool includeGeometryShader = false)
         {
-            #region //Get Instances
-            _d3d = Renderer.Instance;
-            #endregion
-
             #region //Create InputLayout
             InputElementDescription[] inputElements = new[] {
                 new InputElementDescription("POSITION", 0, Format.R32G32B32_Float, 0, 0),

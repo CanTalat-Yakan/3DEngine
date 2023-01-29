@@ -7,7 +7,11 @@ namespace Engine.ECS
     {
         protected static List<T> s_components = new();
 
-        public static void Register(T component) => s_components.Add(component);
+        public static void Register(T component)
+        {
+            s_components.Add(component);
+            component._eventOnDestroy += (s, e) => Destroy(component);
+        }
 
         public static void Awake()
         {
@@ -42,6 +46,12 @@ namespace Engine.ECS
             var components = s_components.ToArray();
             foreach (T component in components)
                 component.Render();
+        }
+
+        public static void Destroy(T component)
+        {
+            s_components.Remove(component);
+            component.Destroy();
         }
     }
 

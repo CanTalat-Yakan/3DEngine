@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
 using Engine.Components;
+using System.Reflection;
 
 namespace Engine.ECS
 {
@@ -45,10 +46,15 @@ namespace Engine.ECS
         public void AddComponent(Component component)
         {
             _components.Add(component);
-            component.entity = this;
+            component._entity = this;
         }
 
-        public void RemoveComponent(Component component) => _components.Remove(component);
+        public void RemoveComponent(Component component)
+        {
+            _components.Remove(component);
+
+            component.InvokeOnDestroy();
+        }
 
         public T GetComponent<T>() where T : Component
         {
@@ -95,9 +101,8 @@ namespace Engine.ECS
             for (int i = 1; i < _components.Count; i++)
             {
                 var newComponent = _components[i].Clone();
-                newComponent.Register();
+                newComponent.GetType().GetConstructor(Type.EmptyTypes).Invoke(newComponent, null);
                 newEntity.AddComponent(newComponent);
-
             }
 
             return newEntity;

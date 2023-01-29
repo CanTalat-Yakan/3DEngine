@@ -10,17 +10,14 @@ namespace Engine.Editor
 {
     internal class ImGuiEditor
     {
-        private Renderer _d3d;
+        private Renderer _d3d { get => Renderer.Instance; }
+
         private InputLayoutDescription _inputLayoutDescription;
         private ID3D11Texture2D _fontTexture;
         private Mesh _imguiMesh;
 
         public ImGuiEditor()
         {
-            #region //Create Instance
-            _d3d = Renderer.Instance;
-            #endregion
-
             var con = ImGuiNET.ImGui.CreateContext();
             ImGuiNET.ImGui.SetCurrentContext(con);
             var fonts = ImGuiNET.ImGui.GetIO().Fonts;

@@ -414,7 +414,7 @@ namespace Editor.Controller
         {
             Grid grid = new();
             StackPanel stack = new() { Orientation = Orientation.Horizontal };
-            TextBlock header = new() { Text = text.FormatFieldsName(), Width = 80, TextWrapping = TextWrapping.WrapWholeWords, VerticalAlignment = VerticalAlignment.Bottom };
+            TextBlock header = new() { Text = text.FormatString(), Width = 80, TextWrapping = TextWrapping.WrapWholeWords, VerticalAlignment = VerticalAlignment.Bottom };
 
             stack.Children.Add(header);
             stack.Children.Add(content);
@@ -428,7 +428,7 @@ namespace Editor.Controller
         {
             Grid grid = new();
             StackPanel stack = new() { Orientation = Orientation.Horizontal };
-            TextBlock header = new() { Text = text.FormatFieldsName(), Width = 160, TextWrapping = TextWrapping.WrapWholeWords, VerticalAlignment = VerticalAlignment.Bottom };
+            TextBlock header = new() { Text = text.FormatString(), Width = 160, TextWrapping = TextWrapping.WrapWholeWords, VerticalAlignment = VerticalAlignment.Bottom };
 
             stack.Children.Add(header);
             stack.Children.Add(content);
@@ -545,7 +545,7 @@ namespace Editor.Controller
             return string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1));
         }
 
-        public static string FormatFieldsName(this string text)
+        public static string FormatString(this string text)
         {
             return text.SplitLast('_').SplitLast('.').FirstCharToUpper().AddSpacesToSentence();
         }

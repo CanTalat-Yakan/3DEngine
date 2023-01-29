@@ -11,24 +11,21 @@ namespace Engine.Components
     {
         public Material Material;
 
-        private ID3D11Buffer VertexBuffer;
-        private ID3D11Buffer IndexBuffer;
-
         internal int VertexCount;
         internal int VertexStride;
         internal int IndexCount;
         internal int IndexStride;
 
-        private Renderer _d3d;
+        private Renderer _d3d { get => Renderer.Instance; }
 
-        public override void Register() => MeshSystem.Register(this);
+        private ID3D11Buffer VertexBuffer;
+        private ID3D11Buffer IndexBuffer;
+
+        public override void Register() =>
+            MeshSystem.Register(this);
 
         public Mesh(MeshInfo _obj)
         {
-            #region //Get Instance of DirectX
-            _d3d = Renderer.Instance;
-            #endregion
-
             #region //Set Variables
             VertexCount = _obj.Vertices.Count();
             VertexStride = Unsafe.SizeOf<Vertex>();
@@ -52,7 +49,7 @@ namespace Engine.Components
 
         public override void Render()
         {
-            Material.Set(entity.Transform.ConstantsBuffer);
+            Material.Set(_entity.Transform.ConstantsBuffer);
 
             _d3d.Draw(
                 VertexBuffer, VertexStride,
