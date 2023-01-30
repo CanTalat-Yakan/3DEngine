@@ -32,8 +32,8 @@ namespace Engine.ECS
         public Entity Parent;
 
         public string Name;
-        public bool IsEnabled;
-        public bool IsStatic;
+        public bool IsEnabled = true;
+        public bool IsStatic = false;
         public ETags Tag;
         public ELayers Layer;
 
@@ -42,6 +42,9 @@ namespace Engine.ECS
 
         public Transform Transform { get => _transform; }
         private Transform _transform;
+
+        public bool ActiveInHierarchy { get => Parent != null ? _activeInHierarchy &= Parent.IsEnabled : IsEnabled; }
+        private bool _activeInHierarchy = true;
 
         private List<Component> _components = new();
 
@@ -59,7 +62,7 @@ namespace Engine.ECS
         {
             _components.Remove(component);
 
-            component.InvokeOnDestroy();
+            component.InvokeEventOnDestroy();
         }
 
         public T GetComponent<T>() where T : Component
@@ -107,7 +110,7 @@ namespace Engine.ECS
             for (int i = 1; i < _components.Count; i++)
             {
                 var newComponent = _components[i].Clone();
-                newComponent.Register();
+                newComponent.OnRegister();
                 newEntity.AddComponent(newComponent);
             }
 

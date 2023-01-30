@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Engine.Components;
 
 namespace Engine.ECS
@@ -17,46 +18,51 @@ namespace Engine.ECS
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
-                    component.Awake();
+                if (CheckActive(component))
+                    component.OnAwake();
         }
 
         public static void Start()
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
-                    component.Start();
+                if (CheckActive(component))
+                    component.OnStart();
         }
 
         public static void Update()
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
-                    component.Update();
+                if (CheckActive(component))
+                    component.OnUpdate();
         }
 
         public static void LateUpdate()
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
-                    component.LateUpdate();
+                if (CheckActive(component))
+                    component.OnLateUpdate();
         }
 
         public static void Render()
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
-                    component.Render();
+                if (CheckActive(component))
+                    component.OnRender();
         }
 
         public static void Destroy(T component)
         {
             s_components.Remove(component);
-            component.Destroy();
+            component.OnDestroy();
+        }
+
+        private static bool CheckActive(T component)
+        {
+            return component._active && component._entity.IsEnabled && component._entity.ActiveInHierarchy && component._entity.Scene.IsEnabled;
         }
     }
 

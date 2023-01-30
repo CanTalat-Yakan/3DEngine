@@ -18,7 +18,7 @@ namespace Editor.ModelView
             _propertiesControl = new(x_StackPanel_Properties, content);
         }
 
-        private void AppBarToggleButton_SwitchLayout_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) =>
+        private void AppBarButton_SwitchLayout_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) =>
             Controller.Main.Instance.LayoutControl.SwitchPaneLayout();
     }
 }

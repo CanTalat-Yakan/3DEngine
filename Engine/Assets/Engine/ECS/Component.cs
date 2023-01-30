@@ -10,23 +10,23 @@ namespace Engine.ECS
         internal event EventHandler _eventOnDestroy;
 
         public Component() =>
-            Register();
+            OnRegister();
 
-        public virtual void Register() { }
+        public virtual void OnRegister() { }
 
-        public virtual void Awake() { }
+        public virtual void OnAwake() { }
 
-        public virtual void Start() { }
+        public virtual void OnStart() { }
 
-        public virtual void Update() { }
+        public virtual void OnUpdate() { }
 
-        public virtual void LateUpdate() { }
+        public virtual void OnLateUpdate() { }
 
-        public virtual void Render() { }
+        public virtual void OnRender() { }
 
-        public virtual void Destroy() { }
+        public virtual void OnDestroy() { }
 
-        public void InvokeOnDestroy() =>
+        public void InvokeEventOnDestroy() =>
             _eventOnDestroy(this, null);
 
         object ICloneable.Clone() { return Clone(); }

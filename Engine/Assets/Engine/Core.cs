@@ -1,9 +1,8 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using ImGuiNET;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using Editor.Controller;
-using ImGuiNET;
-using System.Numerics;
 using System;
+using Editor.Controller;
 using Engine.Editor;
 using Engine.Utilities;
 

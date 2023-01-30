@@ -64,7 +64,7 @@ namespace Editor.Controller
         {
             Grid[] properties = new[]
             {
-                CreateBool(true, (s, r) => entity.IsEnabled = (s as CheckBox).IsChecked.Value).WrapInField("Is Enabled"),
+                //CreateBool(true, (s, r) => {entity.IsEnabled = (s as CheckBox).IsChecked.Value;Output.Log(entity.IsEnabled.ToString()); }).WrapInField("Is Enabled"),
                 CreateBool(false, (s, r) => entity.IsStatic = (s as CheckBox).IsChecked.Value).WrapInField("Is Static"),
                 CreateEnum(Enum.GetNames(typeof(ETags))).WrapInField("Tag"),
                 CreateEnum(Enum.GetNames(typeof(ELayers))).WrapInField("Layer")
@@ -82,9 +82,6 @@ namespace Editor.Controller
                     (s, e) =>  entity.Transform.EulerAngles.X = (float)e.NewValue,
                     (s, e) =>  entity.Transform.EulerAngles.Y = (float)e.NewValue,
                     (s, e) =>  entity.Transform.EulerAngles.Z = (float) e.NewValue).WrapInField("Rotation"),
-                    //(s, e) =>  entity.Transform.Rotation = Quaternion.Add(entity.Transform.Rotation, Quaternion.CreateFromAxisAngle(Vector3.UnitX, (float)e.NewValue)),
-                    //(s, e) =>  entity.Transform.Rotation = Quaternion.Add(entity.Transform.Rotation, Quaternion.CreateFromAxisAngle(Vector3.UnitY, (float)e.NewValue)),
-                    //(s, e) =>  entity.Transform.Rotation = Quaternion.Add(entity.Transform.Rotation, Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)e.NewValue))).WrapInField("Rotation"),
                 CreateVec3InputTransform(
                     entity.Transform.Scale,
                     (s, e) => entity.Transform.Scale.X = (float)e.NewValue,
@@ -92,7 +89,7 @@ namespace Editor.Controller
                     (s, e) => entity.Transform.Scale.Z = (float)e.NewValue).WrapInField("Scale"),
             };
 
-            _stackPanel.Children.Add(properties.StackInGrid().WrapInExpanderWithEditableHeader(entity.Name));
+            _stackPanel.Children.Add(properties.StackInGrid().WrapInExpanderWithEditableHeaderAndCheckBox(entity.Name, true, (s, r) => entity.Name = (s as TextBox).Text, (s, r) => entity.IsEnabled = (s as CheckBox).IsChecked.Value));
             _stackPanel.Children.Add(CreateSeperator());
             _stackPanel.Children.Add(transform.StackInGrid().WrapInExpander("Transform"));
             _stackPanel.Children.Add(CreateButton("Add Component", null));

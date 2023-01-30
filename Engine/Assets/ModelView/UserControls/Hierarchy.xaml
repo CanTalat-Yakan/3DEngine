@@ -53,9 +53,9 @@
 
                 <CommandBar HorizontalAlignment="Left">
                     <CommandBar.SecondaryCommands>
-                        <AppBarToggleButton x:Name="x_AppBarToggleButton_SwitchLayout" IsChecked="False" Label="Two Collumn Layout" Icon="TwoPage"
-                                    Click="AppBarToggleButton_SwitchLayout_Click">
-                        </AppBarToggleButton>
+                        <AppBarButton x:Name="x_AppBarButton_SwitchLayout" Label="Switch Layout" Icon="TwoPage"
+                                    Click="AppBarButton_SwitchLayout_Click">
+                        </AppBarButton>
                     </CommandBar.SecondaryCommands>
                 </CommandBar>
             </StackPanel>
