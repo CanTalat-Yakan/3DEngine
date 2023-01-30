@@ -604,6 +604,8 @@ namespace Editor.Controller
             GetEntries(out TreeEntry targetTreeEntry, out SceneEntry targetSceneEntry, targetEntityGuid);
             GetEntity(out Entity targetEntity, targetEntityGuid, targetSceneEntry);
 
+            GetScenes(out Scene sourceScene, out Scene targetScene, sourceSceneEntry, targetSceneEntry);
+
             if (sourceEntity != null)
                 if (requestedOperation == DataPackageOperation.Move)
                 {
@@ -611,6 +613,7 @@ namespace Editor.Controller
                     sourceEntity.Parent = targetEntity;
 
                     MigrateIconNode(sourceTreeEntry, sourceSceneEntry, targetTreeEntry, null);
+                    MigrateEntityRecurisivally(sourceScene, targetScene, sourceTreeEntry);
                 }
                 else if (requestedOperation == DataPackageOperation.Copy)
                 {
@@ -618,6 +621,7 @@ namespace Editor.Controller
                     var newTreeEntry = GetTreeEntry(newEntity.ID, sourceSceneEntry);
 
                     MigrateIconNode(newTreeEntry, sourceSceneEntry, targetTreeEntry, null);
+                    MigrateEntityRecurisivally(sourceScene, targetScene, sourceTreeEntry);
                 }
         }
 
@@ -668,14 +672,15 @@ namespace Editor.Controller
 
         public void MigrateEntityRecurisivally(Scene sourceScene, Scene targetScene, params TreeEntry[] treeEntries)
         {
-            foreach (var treeEntry in treeEntries)
-            {
-                if (treeEntry.IconNode.Children.Count != 0)
-                    MigrateEntityRecurisivally(sourceScene, targetScene, treeEntry.IconNode.Children.Select(node => node.TreeEntry).ToArray());
+            if (sourceScene != targetScene)
+                foreach (var treeEntry in treeEntries)
+                {
+                    if (treeEntry.IconNode.Children.Count != 0)
+                        MigrateEntityRecurisivally(sourceScene, targetScene, treeEntry.IconNode.Children.Select(node => node.TreeEntry).ToArray());
 
-                sourceScene.EntitytManager.EntityList.Remove(sourceScene.EntitytManager.GetFromID(treeEntry.ID), false);
-                targetScene.EntitytManager.EntityList.Add(targetScene.EntitytManager.GetFromID(treeEntry.ID), false);
-            }
+                    sourceScene.EntitytManager.EntityList.Remove(sourceScene.EntitytManager.GetFromID(treeEntry.ID), false);
+                    targetScene.EntitytManager.EntityList.Add(targetScene.EntitytManager.GetFromID(treeEntry.ID), false);
+                }
         }
     }
 }
