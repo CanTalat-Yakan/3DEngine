@@ -18,7 +18,7 @@ namespace Editor.ModelView
                     _hierarchyControl = new(this, x_StackPanel_Hierarchy);
         }
 
-        private void AppBarToggleButton_SwitchLayout_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) =>
+        private void AppBarButton_SwitchLayout_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) =>
             Controller.Main.Instance.LayoutControl.SwitchPaneLayout();
     }
 }
