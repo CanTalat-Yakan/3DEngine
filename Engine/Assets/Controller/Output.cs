@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 using System;
 using Windows.Storage;
 using Windows.System;
+using System.Diagnostics;
 
 namespace Editor.Controller
 {
@@ -224,7 +225,9 @@ namespace Editor.Controller
             StackPanel stackFlyout = new() { Orientation = Orientation.Vertical };
             stackFlyout.Children.Add(new TextBlock() { Text = m.GetInfo() + "\n" });
             stackFlyout.Children.Add(new MarkdownTextBlock() { Text = m.Message, Padding = new Thickness(2) });
-            stackFlyout.Children.Add(new HyperlinkButton() { Content = Path.GetRelativePath(Directory.GetCurrentDirectory(), m.Script) + ":" + m.Line, Foreground = new SolidColorBrush(Colors.CadetBlue) });
+            HyperlinkButton hyperlinkButton = new() { Content = Path.GetRelativePath(Directory.GetCurrentDirectory(), m.Script) + ":" + m.Line, Foreground = new SolidColorBrush(Colors.CadetBlue) };
+            hyperlinkButton.Click += (s, e) => Process.Start(new ProcessStartInfo { FileName = Path.GetRelativePath(Directory.GetCurrentDirectory(), m.Script), UseShellExecute = true });
+            stackFlyout.Children.Add(hyperlinkButton);
             Flyout flyout = new Flyout() { OverlayInputPassThroughElement = stack, Content = stackFlyout };
 
             //Create main grid that gets returned
