@@ -610,14 +610,14 @@ namespace Editor.Controller
                     sourceTreeEntry.IDparent = targetTreeEntry.ID;
                     sourceEntity.Parent = targetEntity;
 
-                    MoveIconNode(sourceTreeEntry, sourceSceneEntry, targetTreeEntry, null);
+                    MigrateIconNode(sourceTreeEntry, sourceSceneEntry, targetTreeEntry, null);
                 }
                 else if (requestedOperation == DataPackageOperation.Copy)
                 {
                     var newEntity = SceneManager.GetFromID(sourceSceneEntry.ID).EntitytManager.Duplicate(sourceEntity, targetEntity);
                     var newTreeEntry = GetTreeEntry(newEntity.ID, sourceSceneEntry);
 
-                    MoveIconNode(newTreeEntry, sourceSceneEntry, targetTreeEntry, null);
+                    MigrateIconNode(newTreeEntry, sourceSceneEntry, targetTreeEntry, null);
                 }
         }
 
@@ -633,8 +633,8 @@ namespace Editor.Controller
                     sourceTreeEntry.IDparent = null;
                     sourceEntity.Parent = null;
 
-                    MoveIconNode(sourceTreeEntry, sourceSceneEntry, null, targetSceneEntry);
-                    MoveEntityRecurisivally(sourceScene, targetScene, sourceTreeEntry);
+                    MigrateIconNode(sourceTreeEntry, sourceSceneEntry, null, targetSceneEntry);
+                    MigrateEntityRecurisivally(sourceScene, targetScene, sourceTreeEntry);
                 }
                 else if (requestedOperation == DataPackageOperation.Copy)
                 {
@@ -647,12 +647,12 @@ namespace Editor.Controller
                         PasteEntity(childEntity.ID, newEntity.ID, DataPackageOperation.Copy);
                     }
 
-                    MoveIconNode(newTreeEntry, sourceSceneEntry, null, targetSceneEntry);
-                    MoveEntityRecurisivally(sourceScene, targetScene, sourceTreeEntry);
+                    MigrateIconNode(newTreeEntry, sourceSceneEntry, null, targetSceneEntry);
+                    MigrateEntityRecurisivally(sourceScene, targetScene, sourceTreeEntry);
                 }
         }
 
-        public void MoveIconNode(TreeEntry sourceTreeEntry, SceneEntry sourceSceneEntry, TreeEntry targetTreeEntry, SceneEntry targetSceneEntry)
+        public void MigrateIconNode(TreeEntry sourceTreeEntry, SceneEntry sourceSceneEntry, TreeEntry targetTreeEntry, SceneEntry targetSceneEntry)
         {
             var parent = GetParent(sourceTreeEntry);
             if (parent != null)
@@ -666,12 +666,12 @@ namespace Editor.Controller
                 targetSceneEntry.DataSource.Add(sourceTreeEntry.IconNode);
         }
 
-        public void MoveEntityRecurisivally(Scene sourceScene, Scene targetScene, params TreeEntry[] treeEntries)
+        public void MigrateEntityRecurisivally(Scene sourceScene, Scene targetScene, params TreeEntry[] treeEntries)
         {
             foreach (var treeEntry in treeEntries)
             {
                 if (treeEntry.IconNode.Children.Count != 0)
-                    MoveEntityRecurisivally(sourceScene, targetScene, treeEntry.IconNode.Children.Select(node => node.TreeEntry).ToArray());
+                    MigrateEntityRecurisivally(sourceScene, targetScene, treeEntry.IconNode.Children.Select(node => node.TreeEntry).ToArray());
 
                 sourceScene.EntitytManager.EntityList.Remove(sourceScene.EntitytManager.GetFromID(treeEntry.ID), false);
                 targetScene.EntitytManager.EntityList.Add(targetScene.EntitytManager.GetFromID(treeEntry.ID), false);
