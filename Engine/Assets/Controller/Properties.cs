@@ -64,7 +64,7 @@ namespace Editor.Controller
         {
             Grid[] properties = new[]
             {
-                CreateBool(true, (s, r) => entity.IsEnabled = (s as CheckBox).IsChecked.Value).WrapInField("Is Enabled"),
+                CreateBool(true, (s, r) => {entity.IsEnabled = (s as CheckBox).IsChecked.Value;Output.Log(entity.IsEnabled.ToString()); }).WrapInField("Is Enabled"),
                 CreateBool(false, (s, r) => entity.IsStatic = (s as CheckBox).IsChecked.Value).WrapInField("Is Static"),
                 CreateEnum(Enum.GetNames(typeof(ETags))).WrapInField("Tag"),
                 CreateEnum(Enum.GetNames(typeof(ELayers))).WrapInField("Layer")

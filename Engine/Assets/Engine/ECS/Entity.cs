@@ -32,8 +32,8 @@ namespace Engine.ECS
         public Entity Parent;
 
         public string Name;
-        public bool IsEnabled;
-        public bool IsStatic;
+        public bool IsEnabled = true;
+        public bool IsStatic = false;
         public ETags Tag;
         public ELayers Layer;
 

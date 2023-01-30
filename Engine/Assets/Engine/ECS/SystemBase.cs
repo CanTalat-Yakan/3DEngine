@@ -17,7 +17,7 @@ namespace Engine.ECS
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
+                if (component._active && component._entity.IsEnabled && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
                     component.OnAwake();
         }
 
@@ -25,7 +25,7 @@ namespace Engine.ECS
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
+                if (component._active && component._entity.IsEnabled && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
                     component.OnStart();
         }
 
@@ -33,7 +33,7 @@ namespace Engine.ECS
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
+                if (component._active && component._entity.IsEnabled && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
                     component.OnUpdate();
         }
 
@@ -41,7 +41,7 @@ namespace Engine.ECS
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
+                if (component._active && component._entity.IsEnabled && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
                     component.OnLateUpdate();
         }
 
@@ -49,7 +49,7 @@ namespace Engine.ECS
         {
             var components = s_components.ToArray();
             foreach (T component in components)
-                if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
+                if (component._active && component._entity.IsEnabled && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
                     component.OnRender();
         }
 
