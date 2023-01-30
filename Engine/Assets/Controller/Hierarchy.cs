@@ -578,7 +578,7 @@ namespace Editor.Controller
                 targetScene.EntitytManager.EntityList.Add(targetScene.EntitytManager.GetFromID(treeEntry.ID), false);
             }
         }
-
+        
         public void MoveIconNode(TreeEntry sourceTreeEntry, SceneEntry sourceSceneEntry, TreeEntry targetTreeEntry, SceneEntry targetSceneEntry)
         {
             var parent = GetParent(sourceTreeEntry);

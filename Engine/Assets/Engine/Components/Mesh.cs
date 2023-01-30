@@ -21,7 +21,7 @@ namespace Engine.Components
         private ID3D11Buffer VertexBuffer;
         private ID3D11Buffer IndexBuffer;
 
-        public override void Register() =>
+        public override void OnRegister() =>
             MeshSystem.Register(this);
 
         public Mesh(MeshInfo _obj)
@@ -47,7 +47,7 @@ namespace Engine.Components
             #endregion
         }
 
-        public override void Render()
+        public override void OnRender()
         {
             Material.Set(_entity.Transform.ConstantsBuffer);
 

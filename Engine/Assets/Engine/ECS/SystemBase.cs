@@ -18,7 +18,7 @@ namespace Engine.ECS
             var components = s_components.ToArray();
             foreach (T component in components)
                 if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
-                    component.Awake();
+                    component.OnAwake();
         }
 
         public static void Start()
@@ -26,7 +26,7 @@ namespace Engine.ECS
             var components = s_components.ToArray();
             foreach (T component in components)
                 if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
-                    component.Start();
+                    component.OnStart();
         }
 
         public static void Update()
@@ -34,7 +34,7 @@ namespace Engine.ECS
             var components = s_components.ToArray();
             foreach (T component in components)
                 if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
-                    component.Update();
+                    component.OnUpdate();
         }
 
         public static void LateUpdate()
@@ -42,7 +42,7 @@ namespace Engine.ECS
             var components = s_components.ToArray();
             foreach (T component in components)
                 if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
-                    component.LateUpdate();
+                    component.OnLateUpdate();
         }
 
         public static void Render()
@@ -50,13 +50,13 @@ namespace Engine.ECS
             var components = s_components.ToArray();
             foreach (T component in components)
                 if (component._active && component._entity.Scene.IsEnabled && component._entity.Transform._activeInHierarchy)
-                    component.Render();
+                    component.OnRender();
         }
 
         public static void Destroy(T component)
         {
             s_components.Remove(component);
-            component.Destroy();
+            component.OnDestroy();
         }
     }
 

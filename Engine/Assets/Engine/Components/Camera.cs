@@ -21,19 +21,19 @@ namespace Engine.Components
         private ID3D11Buffer _view;
         private SViewConstantsBuffer _viewConstants;
 
-        public override void Register() =>
+        public override void OnRegister() =>
             CameraSystem.Register(this);
 
         public Camera() =>
             _view = _d3d.Device.CreateConstantBuffer<SViewConstantsBuffer>();
 
-        public override void Awake()
+        public override void OnAwake()
         {
             if (_entity.Tag == ETags.MainCamera)
                 Main = this;
         }
 
-        public override void LateUpdate() => 
+        public override void OnLateUpdate() => 
             RecreateViewConstants();
 
         public void RecreateViewConstants()

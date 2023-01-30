@@ -25,10 +25,10 @@ namespace Engine.Components
 
         internal bool _activeInHierarchy = true;
 
-        public override void Register() =>
+        public override void OnRegister() =>
             TransformSystem.Register(this);
 
-        public override void Update()
+        public override void OnUpdate()
         {
             if (_entity.Parent != null)
                 Parent = _entity.Parent.Transform;

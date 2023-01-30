@@ -18,10 +18,10 @@ namespace Engine.Editor
         private Entity _subParent;
         private Entity _special;
 
-        public override void Register() => 
+        public override void OnRegister() => 
             EditorScriptSystem.Register(this);
 
-        public override void Awake()
+        public override void OnAwake()
         {
             Camera = SceneManager.Scene.EntitytManager.CreateEntity(null, "Camera");
             Camera.Tag = ETags.MainCamera;
@@ -33,7 +33,7 @@ namespace Engine.Editor
             SceneManager.Scene.EntitytManager.CreateSky();
         }
 
-        public override void Start()
+        public override void OnStart()
         {
             _special = SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Special);
             _special.Transform.Scale *= 0.1f;
@@ -56,7 +56,7 @@ namespace Engine.Editor
             SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Cube, _subParent);
         }
 
-        public override void Update()
+        public override void OnUpdate()
         {
             SceneManager.Scene.EntitytManager.Sky.Transform.Position = Camera.Transform.Position;
 
@@ -78,10 +78,10 @@ namespace Engine.Editor
     {
         public float MovementSpeed = 5;
 
-        public override void Register() => 
+        public override void OnRegister() => 
             ScriptSystem.Register(this);
 
-        public override void Update()
+        public override void OnUpdate()
         {
             Vector3 targetDirection = Movement();
 
@@ -130,7 +130,7 @@ namespace Engine.Editor
         [Header("Header")]
         public event EventHandler Event;
 
-        public override void Register() => 
+        public override void OnRegister() => 
             ScriptSystem.Register(this);
     }
 }

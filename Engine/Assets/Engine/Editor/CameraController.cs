@@ -19,10 +19,10 @@ namespace Engine.Editor
         private Vector3 _direction;
         private Vector3 _rotation;
 
-        public override void Register() => 
+        public override void OnRegister() => 
             EditorScriptSystem.Register(this);
 
-        public override void Update()
+        public override void OnUpdate()
         {
             MovementSpeedCalc();
 

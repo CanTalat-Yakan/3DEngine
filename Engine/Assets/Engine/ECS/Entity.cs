@@ -59,7 +59,7 @@ namespace Engine.ECS
         {
             _components.Remove(component);
 
-            component.InvokeOnDestroy();
+            component.InvokeEventOnDestroy();
         }
 
         public T GetComponent<T>() where T : Component
@@ -107,7 +107,7 @@ namespace Engine.ECS
             for (int i = 1; i < _components.Count; i++)
             {
                 var newComponent = _components[i].Clone();
-                newComponent.Register();
+                newComponent.OnRegister();
                 newEntity.AddComponent(newComponent);
             }
 
