@@ -496,7 +496,7 @@ namespace Editor.Controller
 
         public static Grid WrapInExpanderWithEditableHeader(this Grid content, string text)
         {
-            Grid grid = new() { Margin = new(0, 0, 0, 2) };
+            Grid grid = new();
             Expander expander = new()
             {
                 Padding = new(15),
@@ -505,6 +505,34 @@ namespace Editor.Controller
                 HorizontalContentAlignment = HorizontalAlignment.Stretch
             };
             expander.Header = new TextBox() { Text = text, Margin = new(0) };
+            expander.Content = content;
+
+            grid.Children.Add(expander);
+
+            return grid;
+        }
+
+        public static Grid WrapInExpanderWithEditableHeaderAndCheckBox(this Grid content, string text, bool isChecked = true, TextChangedEventHandler onTextChanged = null, RoutedEventHandler onClick = null)
+        {
+            Grid grid = new();
+            Expander expander = new()
+            {
+                Padding = new(15),
+                ExpandDirection = ExpandDirection.Down,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                HorizontalContentAlignment = HorizontalAlignment.Stretch
+            };
+
+            Grid grid2 = new();
+            CheckBox checkBox = new() { Content = "", IsChecked = isChecked };
+            TextBox textBox = new() { Text = text, Margin = new(25, 0, 0, 0), Height = 23 };
+            checkBox.Click += onClick;
+            textBox.TextChanged += onTextChanged;
+
+            grid2.Children.Add(checkBox);
+            grid2.Children.Add(textBox);
+
+            expander.Header = grid2;
             expander.Content = content;
 
             grid.Children.Add(expander);

@@ -64,7 +64,7 @@ namespace Editor.Controller
         {
             Grid[] properties = new[]
             {
-                CreateBool(true, (s, r) => {entity.IsEnabled = (s as CheckBox).IsChecked.Value;Output.Log(entity.IsEnabled.ToString()); }).WrapInField("Is Enabled"),
+                //CreateBool(true, (s, r) => {entity.IsEnabled = (s as CheckBox).IsChecked.Value;Output.Log(entity.IsEnabled.ToString()); }).WrapInField("Is Enabled"),
                 CreateBool(false, (s, r) => entity.IsStatic = (s as CheckBox).IsChecked.Value).WrapInField("Is Static"),
                 CreateEnum(Enum.GetNames(typeof(ETags))).WrapInField("Tag"),
                 CreateEnum(Enum.GetNames(typeof(ELayers))).WrapInField("Layer")
@@ -92,7 +92,7 @@ namespace Editor.Controller
                     (s, e) => entity.Transform.Scale.Z = (float)e.NewValue).WrapInField("Scale"),
             };
 
-            _stackPanel.Children.Add(properties.StackInGrid().WrapInExpanderWithEditableHeader(entity.Name));
+            _stackPanel.Children.Add(properties.StackInGrid().WrapInExpanderWithEditableHeaderAndCheckBox(entity.Name, true, (s, r) => entity.Name = (s as TextBox).Text, (s, r) => entity.IsEnabled = (s as CheckBox).IsChecked.Value));
             _stackPanel.Children.Add(CreateSeperator());
             _stackPanel.Children.Add(transform.StackInGrid().WrapInExpander("Transform"));
             _stackPanel.Children.Add(CreateButton("Add Component", null));
