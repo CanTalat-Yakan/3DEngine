@@ -24,8 +24,6 @@ namespace Engine.Components
         public Vector3 EulerAngles = Vector3.Zero;
         public Vector3 Scale = Vector3.One;
 
-        internal bool _activeInHierarchy = true;
-
         public override void OnRegister() =>
             TransformSystem.Register(this);
 
