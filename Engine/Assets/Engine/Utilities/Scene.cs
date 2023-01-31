@@ -38,8 +38,8 @@ namespace Engine.Utilities
                 var mesh = entity.GetComponent<Mesh>();
                 if (entity.IsEnabled && mesh != null)
                 {
-                    vertexCount += mesh.VertexCount;
-                    indexCount += mesh.IndexCount;
+                    vertexCount += mesh._vertexCount;
+                    indexCount += mesh._indexCount;
                 }
             }
 

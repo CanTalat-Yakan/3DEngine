@@ -9,42 +9,27 @@ namespace Engine.Components
 {
     internal class Mesh : Component
     {
+        public MeshInfo MeshInfo;
         public Material Material;
 
-        internal int VertexCount;
-        internal int VertexStride;
-        internal int IndexCount;
-        internal int IndexStride;
+        internal ID3D11Buffer _vertexBuffer;
+        internal ID3D11Buffer _indexBuffer;
+
+        internal int _vertexCount { get => MeshInfo.Vertices.Count; }
+        internal int _vertexStride { get => Unsafe.SizeOf<Vertex>(); }
+        internal int _indexCount { get => MeshInfo.Indices.Count; }
+        internal int _indexStride { get => Unsafe.SizeOf<int>(); }
 
         private Renderer _d3d { get => Renderer.Instance; }
-
-        private ID3D11Buffer VertexBuffer;
-        private ID3D11Buffer IndexBuffer;
 
         public override void OnRegister() =>
             MeshSystem.Register(this);
 
-        public Mesh(MeshInfo _obj)
+        public Mesh(MeshInfo _info)
         {
-            #region //Set Variables
-            VertexCount = _obj.Vertices.Count();
-            VertexStride = Unsafe.SizeOf<Vertex>();
+            MeshInfo = _info;
 
-            IndexCount = _obj.Indices.Count();
-            IndexStride = Unsafe.SizeOf<int>();
-            #endregion
-
-            #region //Create VertexBuffer
-            VertexBuffer = _d3d.Device.CreateBuffer(
-                _obj.Vertices.ToArray(),
-                BindFlags.VertexBuffer);
-            #endregion
-
-            #region //Create IndexBuffer
-            IndexBuffer = _d3d.Device.CreateBuffer(
-                _obj.Indices.ToArray(),
-                BindFlags.IndexBuffer);
-            #endregion
+            CreateBuffer();
         }
 
         public override void OnRender()
@@ -52,8 +37,23 @@ namespace Engine.Components
             Material.Set(_entity.Transform.ConstantsBuffer);
 
             _d3d.Draw(
-                VertexBuffer, VertexStride,
-                IndexBuffer, IndexCount);
+                _vertexBuffer, _vertexStride,
+                _indexBuffer, _indexCount);
+        }
+
+        internal void CreateBuffer()
+        {
+            #region //Create VertexBuffer
+            _vertexBuffer = _d3d.Device.CreateBuffer(
+                MeshInfo.Vertices.ToArray(),
+                BindFlags.VertexBuffer);
+            #endregion
+
+            #region //Create IndexBuffer
+            _indexBuffer = _d3d.Device.CreateBuffer(
+                MeshInfo.Indices.ToArray(),
+                BindFlags.IndexBuffer);
+            #endregion
         }
     }
 }
