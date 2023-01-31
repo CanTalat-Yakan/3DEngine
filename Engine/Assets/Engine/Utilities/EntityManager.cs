@@ -18,7 +18,7 @@ namespace Engine.Utilities
         Icosphere,
         Cylinder,
         //Capsule,
-        Cone,
+        //Cone,
         Torus,
         Tree,
         Suzanne,
