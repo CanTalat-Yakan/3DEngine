@@ -54,16 +54,16 @@ namespace Engine.Helper
                 foreach (var face in mesh.Faces)
                 {
                     ushort[] rangeIndices = new[] {
-                        (ushort)(face.Indices[0]),
-                        (ushort)(face.Indices[2]),
-                        (ushort)(face.Indices[1])};
+                        (ushort)face.Indices[0],
+                        (ushort)face.Indices[2],
+                        (ushort)face.Indices[1]};
                     obj.Indices.AddRange(rangeIndices);
                     if (face.IndexCount == 4)
                     {
                         rangeIndices = new[] {
-                        (ushort)(face.Indices[0]),
-                        (ushort)(face.Indices[3]),
-                        (ushort)(face.Indices[2])};
+                        (ushort)face.Indices[0],
+                        (ushort)face.Indices[3],
+                        (ushort)face.Indices[2]};
                         obj.Indices.AddRange(rangeIndices);
                     }
                 }
