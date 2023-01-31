@@ -55,6 +55,9 @@
                     <CommandBar.SecondaryCommands>
                         <AppBarButton x:Name="x_AppBarButton_SwitchLayout" Label="Switch Layout" Icon="TwoPage"
                                     Click="AppBarButton_SwitchLayout_Click">
+                            <AppBarButton.KeyboardAccelerators>
+                                <KeyboardAccelerator Key="S" Modifiers="Control"/>
+                            </AppBarButton.KeyboardAccelerators>
                         </AppBarButton>
                     </CommandBar.SecondaryCommands>
                 </CommandBar>
