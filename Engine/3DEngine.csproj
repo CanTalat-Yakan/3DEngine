@@ -86,4 +86,37 @@
   <ItemGroup>
     <Folder Include="Assets\ModelView\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Assets\Engine\Resources\Models\Primitives\Cone.obj">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Models\Primitives\Cube.obj">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Models\Primitives\Cylinder.obj">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Models\Primitives\Plane.obj">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Models\Primitives\Quad.obj">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Models\Primitives\Sphere.obj">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Models\Primitives\Sphere_Lowpoly.obj">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Models\Primitives\Suzanne.obj">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Models\Primitives\Torus.obj">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Models\Primitives\Tree_Lowpoly.obj">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

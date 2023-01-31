@@ -4,17 +4,25 @@ using System;
 using Engine.Components;
 using Engine.ECS;
 using Engine.Helper;
+using Editor.Controller;
+using System.IO;
 
 namespace Engine.Utilities
 {
     internal enum EPrimitiveTypes
     {
+        Plane,
+        Quad,
         Cube,
         Sphere,
-        Plane,
+        Icosphere,
         Cylinder,
-        Capsule,
-        Special
+        //Capsule,
+        Cone,
+        Torus,
+        Tree,
+        Suzanne,
+        Duck,
     }
 
     internal class EventList<T> : List<T>
@@ -59,9 +67,7 @@ namespace Engine.Utilities
         private static readonly string IMAGE_SKY = @"Textures\SkyGradient.png";
         private static readonly string IMAGE_SKY_LIGHT = @"Textures\SkyGradient_Light.png";
 
-        private static readonly string OBJ_SPECIAL = @"Models\Lowpoly_tree_sample.obj";
-        private static readonly string OBJ_CUBE = @"Models\Cube.obj";
-        private static readonly string OBJ_SPHERE = @"Models\Sphere.obj";
+        private static readonly string PATH_PRIMITIVES = @"Models\Primitives";
 
         public EntityManager()
         {
@@ -108,32 +114,10 @@ namespace Engine.Utilities
         public Entity CreatePrimitive(EPrimitiveTypes type, Entity parent = null)
         {
             Entity newEntity = new();
+            newEntity.Name = type.ToString().FormatString();
             newEntity.Parent = parent;
-
-            switch (type)
-            {
-                case EPrimitiveTypes.Special:
-                    newEntity.Name = "special";
-                    newEntity.AddComponent(new Mesh(ModelLoader.LoadFilePro(OBJ_SPECIAL)));
-                    break;
-                case EPrimitiveTypes.Cube:
-                    newEntity.Name = "Cube";
-                    newEntity.AddComponent(new Mesh(ModelLoader.LoadFilePro(OBJ_CUBE)));
-                    break;
-                case EPrimitiveTypes.Sphere:
-                    newEntity.Name = "Sphere";
-                    newEntity.AddComponent(new Mesh(ModelLoader.LoadFilePro(OBJ_SPHERE)));
-                    break;
-                case EPrimitiveTypes.Plane:
-                    break;
-                case EPrimitiveTypes.Cylinder:
-                    break;
-                case EPrimitiveTypes.Capsule:
-                    break;
-                default:
-                    break;
-            }
-
+            
+            newEntity.AddComponent(new Mesh(ModelLoader.LoadFilePro(Path.Combine(PATH_PRIMITIVES, type.ToString()) + ".obj")));
             newEntity.GetComponent<Mesh>().Material = _materialDefault;
 
             EntityList.Add(newEntity);
@@ -146,7 +130,7 @@ namespace Engine.Utilities
             Sky = new() { Name = "Sky" };
             Sky.Transform.Scale = new Vector3(-1000, 1000, 1000);
 
-            Sky.AddComponent(new Mesh(ModelLoader.LoadFilePro(OBJ_SPHERE)));
+            Sky.AddComponent(new Mesh(ModelLoader.LoadFilePro(Path.Combine(PATH_PRIMITIVES, EPrimitiveTypes.Sphere.ToString()) + ".obj")));
             Sky.GetComponent<Mesh>().Material = _materialSky;
 
             EntityList.Add(Sky);

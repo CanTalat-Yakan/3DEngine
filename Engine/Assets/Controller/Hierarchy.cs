@@ -374,37 +374,24 @@ namespace Editor.Controller
                     menuFlyout.Items.Add(new MenuFlyoutSeparator());
             }
 
-            menuFlyout = AppendDynamicMenuFlyoutSubItems(menuFlyout);
+            menuFlyout = AppendDynamicMenuFlyoutSubItems(menuFlyout, sceneEntry);
 
             return menuFlyout;
         }
 
-        private MenuFlyout AppendDynamicMenuFlyoutSubItems(MenuFlyout menuFlyout)
+        private MenuFlyout AppendDynamicMenuFlyoutSubItems(MenuFlyout menuFlyout, SceneEntry sceneEntry = null)
         {
-            MenuFlyoutItem[] mesh = new[] {
-                new MenuFlyoutItem() { Text = "Plane"},
-                new MenuFlyoutItem() { Text = "Cube"},
-                new MenuFlyoutItem() { Text = "Sphere"},
-                new MenuFlyoutItem() { Text = "Cylinder"},
-                new MenuFlyoutItem() { Text = "Capsule"},
-                new MenuFlyoutItem() { Text = "Quad"},
-            };
             MenuFlyoutSubItem objectSubItem = new() { Text = "Mesh" };
-            foreach (var item in mesh)
+            foreach (var type in Enum.GetNames(typeof(EPrimitiveTypes)))
+            {
+                MenuFlyoutItem item = new() { Text = type.ToString().FormatString() };
+                item.Click += (s, e) => SceneManager.Scene.EntitytManager.CreatePrimitive((EPrimitiveTypes)Enum.Parse(typeof(EPrimitiveTypes), type));
+                
                 objectSubItem.Items.Add(item);
-
-            MenuFlyoutItem[] lights = new[] {
-                new MenuFlyoutItem() { Text = "Directional Light"},
-                new MenuFlyoutItem() { Text = "Point Light"},
-                new MenuFlyoutItem() { Text = "Spot Light"},
-            };
-            MenuFlyoutSubItem lightSubItem = new() { Text = "Light" };
-            foreach (var item in lights)
-                lightSubItem.Items.Add(item);
+            }
 
             menuFlyout.Items.Add(new MenuFlyoutSeparator());
             menuFlyout.Items.Add(objectSubItem);
-            menuFlyout.Items.Add(lightSubItem);
             menuFlyout.Items.Add(new MenuFlyoutItem() { Text = "Camera" });
 
             return menuFlyout;
