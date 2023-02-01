@@ -13,12 +13,12 @@ namespace Engine.Utilities
 
         public string Name = "Scene"; 
 
+        private bool _isEnabled = true;
         public bool IsEnabled
         {
             get { return _isEnabled; }
             set { SetProperty(ref _isEnabled, value); }
         }
-        private bool _isEnabled = true;
 
         private string _profile;
 

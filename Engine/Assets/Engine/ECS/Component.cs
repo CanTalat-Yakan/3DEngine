@@ -7,12 +7,12 @@ namespace Engine.ECS
     {
         internal Entity _entity; 
         
+        private bool _isActive;
         public bool IsActive
         {
             get { return _isActive; }
             set { SetProperty(ref _isActive, value); }
         }
-        private bool _isActive;
 
         internal event EventHandler _eventOnDestroy;
 

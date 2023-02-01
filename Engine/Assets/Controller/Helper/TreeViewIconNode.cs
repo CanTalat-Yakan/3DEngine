@@ -34,7 +34,6 @@ namespace Editor.Controller
         public bool IsActive { get; set; }
         public float Opacity { get => IsActive ? 1 : 0.5f; }
 
-
         private ObservableCollection<TreeViewIconNode> _children;
         public ObservableCollection<TreeViewIconNode> Children
         {

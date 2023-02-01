@@ -655,8 +655,7 @@ namespace Editor.Controller
                 foreach (var treeEntry in treeEntries)
                 {
                     if (treeEntry.IconNode.Children.Count != 0)
-                        MigrateEntityRecurisivally(sourceScene, targetScene, treeEntry.IconNode.Children.Select(node => node.TreeEntry).ToArray());
-
+                        MigrateEntityRecurisivally(sourceScene, targetScene, treeEntry.IconNode.Children.Select(TreeViewIconNode => TreeViewIconNode.TreeEntry).ToArray());
 
                     targetScene.EntitytManager.EntityList.Add(sourceScene.EntitytManager.GetFromID(treeEntry.ID), false);
                     sourceScene.EntitytManager.EntityList.Remove(sourceScene.EntitytManager.GetFromID(treeEntry.ID), false);

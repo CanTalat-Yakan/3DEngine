@@ -37,14 +37,14 @@ namespace Engine.ECS
         public ETags Tag;
         public ELayers Layer;
 
-        public Scene Scene { get => _scene is null ? _scene = SceneManager.GetFromEntityID(ID) : _scene; set => _scene = null; }
         private Scene _scene;
+        public Scene Scene { get => _scene is null ? _scene = SceneManager.GetFromEntityID(ID) : _scene; set => _scene = null; }
 
-        public Transform Transform { get => _transform; }
         private Transform _transform;
+        public Transform Transform { get => _transform; }
 
-        public bool ActiveInHierarchy { get => Parent != null ? _activeInHierarchy &= Parent.IsEnabled : IsEnabled; }
         private bool _activeInHierarchy = true;
+        public bool ActiveInHierarchy { get => Parent != null ? _activeInHierarchy &= Parent.IsEnabled : IsEnabled; }
 
         private List<Component> _components = new();
 
