@@ -348,14 +348,7 @@ namespace Editor.Controller
                 //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Create Entity" },
             };
-
-            //items[0].Click += (s, e) => OpenFolder(path);
-            //items[1].Click += (s, e) => OpenFolder(path);
-
             items[2].Click += (s, e) => PasteEntityFromClipboard(sceneEntry);
-
-            //items[3].Click += (s, e) => ContentDialogRename(path);
-            //items[4].Click += (s, e) => ContentDialogDelete(path);
 
             items[5].Click += (s, e) => SceneManager.GetFromID(sceneEntry.ID).EntitytManager.CreateEntity();
 
@@ -432,11 +425,9 @@ namespace Editor.Controller
 
                 subsceneName.Text = subsceneName.Text.IncrementNameIfExists(SceneManager.Subscenes.ToArray().Select(Scene => Scene.Name).ToArray());
 
-                _stackPanel.Children.Add(
-                    CreateSubsceneHierarchy(out SceneEntry subsceneEntry, subsceneName.Text).
-                    StackInGrid().
-                    WrapInExpanderWithToggleButton(subsceneName.Text, SceneManager.GetFromID(subsceneEntry.ID), "IsEnabled").
-                    AddContentFlyout(CreateSubRootMenuFlyout(subsceneEntry)));
+                _stackPanel.Children.Add(CreateSubsceneHierarchy(out SceneEntry subsceneEntry, subsceneName.Text)
+                    .StackInGrid().WrapInExpanderWithToggleButton(subsceneName.Text, SceneManager.GetFromID(subsceneEntry.ID), "IsEnabled")
+                    .AddContentFlyout(CreateSubRootMenuFlyout(subsceneEntry)));
             }
         }
 
@@ -666,8 +657,11 @@ namespace Editor.Controller
                     if (treeEntry.IconNode.Children.Count != 0)
                         MigrateEntityRecurisivally(sourceScene, targetScene, treeEntry.IconNode.Children.Select(node => node.TreeEntry).ToArray());
 
+
+                    targetScene.EntitytManager.EntityList.Add(sourceScene.EntitytManager.GetFromID(treeEntry.ID), false);
                     sourceScene.EntitytManager.EntityList.Remove(sourceScene.EntitytManager.GetFromID(treeEntry.ID), false);
-                    targetScene.EntitytManager.EntityList.Add(targetScene.EntitytManager.GetFromID(treeEntry.ID), false);
+
+                    targetScene.EntitytManager.GetFromID(treeEntry.ID).Scene = null;
                 }
         }
     }

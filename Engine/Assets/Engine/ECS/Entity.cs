@@ -37,7 +37,7 @@ namespace Engine.ECS
         public ETags Tag;
         public ELayers Layer;
 
-        public Scene Scene { get => _scene is null ? _scene = SceneManager.GetFromEntityID(ID) : _scene; }
+        public Scene Scene { get => _scene is null ? _scene = SceneManager.GetFromEntityID(ID) : _scene; set => _scene = null; }
         private Scene _scene;
 
         public Transform Transform { get => _transform; }
@@ -61,7 +61,6 @@ namespace Engine.ECS
         public void RemoveComponent(Component component)
         {
             _components.Remove(component);
-
             component.InvokeEventOnDestroy();
         }
 
