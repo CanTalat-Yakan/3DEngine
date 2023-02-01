@@ -12,6 +12,8 @@
     <controls:DockPanel>
         <!--STATUS -->
         <Grid controls:DockPanel.Dock="Bottom">
+            <MenuFlyoutSeparator VerticalAlignment="Top" Margin="0, -1, 0, 0"/>
+
             <CommandBar>
                 <CommandBar.PrimaryCommands>
                     <AppBarButton Label="Show in Explorer" Click="AppBarButton_Click_OpenFolder">

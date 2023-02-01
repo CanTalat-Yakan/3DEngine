@@ -16,6 +16,8 @@
     <controls:DockPanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <!--STATUS -->
         <Grid controls:DockPanel.Dock="Bottom">
+            <MenuFlyoutSeparator VerticalAlignment="Top" Margin="0, -1, 0, 0"/>
+
             <CommandBar>
                 <CommandBar.PrimaryCommands>
                     <AppBarToggleButton Name="x_AppBarToggleButton_Status_Play" Icon="Play" Label="Play" Click="AppBarToggleButton_Status_Play_Click"/>
