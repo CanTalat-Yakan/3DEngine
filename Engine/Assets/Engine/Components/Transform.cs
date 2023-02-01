@@ -47,15 +47,14 @@ namespace Engine.Components
 
         Matrix4x4 CalculateWorldMatrix(Vector3 position, Quaternion rotation, Vector3 scale, Transform parent)
         {
-            Matrix4x4 parentWorldMatrix = Matrix4x4.Identity;
-            if (parent != null)
-                parentWorldMatrix = parent.WorldMatrix;
+            if(parent is null)
+                parent = new Transform();
 
-            Matrix4x4 translationMatrix = Matrix4x4.CreateTranslation(position);
-            Matrix4x4 rotationMatrix = Matrix4x4.CreateFromQuaternion(rotation);
-            Matrix4x4 scaleMatrix = Matrix4x4.CreateScale(scale);
+            Matrix4x4 translationMatrix = Matrix4x4.CreateTranslation(position + parent.Position);
+            Matrix4x4 rotationMatrix = Matrix4x4.CreateFromQuaternion(rotation * parent.Rotation);
+            Matrix4x4 scaleMatrix = Matrix4x4.CreateScale(scale * parent.Scale);
 
-            return Matrix4x4.Transpose(scaleMatrix * rotationMatrix * translationMatrix * parentWorldMatrix);
+            return Matrix4x4.Transpose(scaleMatrix * rotationMatrix * translationMatrix);
         }
 
         public override string ToString()
