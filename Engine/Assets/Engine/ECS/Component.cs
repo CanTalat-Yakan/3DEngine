@@ -5,8 +5,8 @@ namespace Engine.ECS
 {
     internal class Component : BindableBase, ICloneable
     {
-        internal Entity _entity; 
-        
+        internal Entity _entity;
+
         private bool _isActive;
         public bool IsActive
         {
