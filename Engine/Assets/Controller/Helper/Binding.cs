@@ -14,11 +14,12 @@ namespace Editor.Controller
                 Path = new PropertyPath(sourcePropertyPath),
                 Mode = mode
             };
+
             BindingOperations.SetBinding(target, targetProperty, binding);
         }
     }
 
-    public class BindableBase : INotifyPropertyChanged
+    internal class BindableBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -29,13 +30,12 @@ namespace Editor.Controller
 
             storage = value;
             RaisePropertyChanged(propertyName);
+
             return true;
         }
 
-        protected void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
-        {
+        protected void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 
 }

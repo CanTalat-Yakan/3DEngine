@@ -32,6 +32,7 @@ namespace Editor.Controller
         public TreeView TreeView;
         public List<TreeEntry> Hierarchy;
         public ObservableCollection<TreeViewIconNode> DataSource;
+        public Grid Content;
     }
 
     internal partial class Hierarchy
@@ -78,7 +79,7 @@ namespace Editor.Controller
             _stackPanel.Children.Add(CreateSeperator());
             _stackPanel.Children.Add(CreateButton("Add Subscene", (s, e) => ContentDialogCreateNewSubscene()));
             _stackPanel.Children.Add(CreateSubsceneHierarchy(out SceneEntry subSceneEntry)
-                .StackInGrid().WrapInExpanderWithToggleButton("Subscene", SceneManager.GetFromID(subSceneEntry.ID), "IsEnabled")
+                .StackInGrid().WrapInExpanderWithToggleButton(ref subSceneEntry.Content, "Subscene", SceneManager.GetFromID(subSceneEntry.ID), "IsEnabled", "Name")
                 .AddContentFlyout(CreateSubRootMenuFlyout(subSceneEntry)));
         }
 
@@ -284,9 +285,9 @@ namespace Editor.Controller
             items[2].Click += (s, e) => PasteEntityFromClipboard(_itemInvoked.ID);
             items[2].KeyboardAccelerators.Add(new KeyboardAccelerator() { Modifiers = VirtualKeyModifiers.Control, Key = VirtualKey.V });
 
-            items[3].Click += (s, e) => ContentDialogRename(_itemInvoked);
+            items[3].Click += (s, e) => ContentDialogRenameTreeEntry(_itemInvoked);
             items[3].KeyboardAccelerators.Add(new KeyboardAccelerator() { Modifiers = VirtualKeyModifiers.Control, Key = VirtualKey.F2 });
-            items[4].Click += (s, e) => ContentDialogDelete(_itemInvoked);
+            items[4].Click += (s, e) => ContentDialogDeleteTreeEntry(_itemInvoked);
             items[4].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.Delete });
 
             items[5].Click += (s, e) => SceneManager.Scene.EntitytManager.CreateEntity(GetEntity(GetParent(_itemInvoked)));
@@ -345,6 +346,9 @@ namespace Editor.Controller
                 //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Paste", Icon = new SymbolIcon(Symbol.Paste) },
                 //new MenuFlyoutSeparator(),
+                new MenuFlyoutItem() { Text = "Rename", Icon = new SymbolIcon(Symbol.Rename) },
+                new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
+                //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Unload" },
                 new MenuFlyoutItem() { Text = "Load" },
                 //new MenuFlyoutSeparator(),
@@ -352,7 +356,10 @@ namespace Editor.Controller
             };
             items[2].Click += (s, e) => PasteEntityFromClipboard(sceneEntry);
 
-            items[5].Click += (s, e) => SceneManager.GetFromID(sceneEntry.ID).EntitytManager.CreateEntity();
+            items[3].Click += (s, e) => ContentDialogRenameSubscene(sceneEntry);
+            items[4].Click += (s, e) => ContentDialogDeleteSubscene(sceneEntry);
+
+            items[7].Click += (s, e) => SceneManager.GetFromID(sceneEntry.ID).EntitytManager.CreateEntity();
 
             MenuFlyout menuFlyout = new();
             foreach (var item in items)
@@ -361,6 +368,7 @@ namespace Editor.Controller
 
                 if (item.Text == "Show in Files"
                     || item.Text == "Paste"
+                    || item.Text == "Delete"
                     || item.Text == "Load")
                     menuFlyout.Items.Add(new MenuFlyoutSeparator());
             }
@@ -428,12 +436,53 @@ namespace Editor.Controller
                 subsceneName.Text = subsceneName.Text.IncrementNameIfExists(SceneManager.Subscenes.ToArray().Select(Scene => Scene.Name).ToArray());
 
                 _stackPanel.Children.Add(CreateSubsceneHierarchy(out SceneEntry subsceneEntry, subsceneName.Text)
-                    .StackInGrid().WrapInExpanderWithToggleButton(subsceneName.Text, SceneManager.GetFromID(subsceneEntry.ID), "IsEnabled")
+                    .StackInGrid().WrapInExpanderWithToggleButton(ref subsceneEntry.Content, subsceneName.Text, SceneManager.GetFromID(subsceneEntry.ID), "IsEnabled", "Name")
                     .AddContentFlyout(CreateSubRootMenuFlyout(subsceneEntry)));
             }
         }
 
-        private async void ContentDialogRename(TreeEntry treeEntry)
+        private async void ContentDialogRenameSubscene(SceneEntry sceneEntry)
+        {
+            TextBox fileName;
+
+            ContentDialog dialog = new()
+            {
+                XamlRoot = _hierarchy.XamlRoot,
+                Title = "Rename",
+                PrimaryButtonText = "Rename",
+                CloseButtonText = "Cancel",
+                DefaultButton = ContentDialogButton.Primary,
+                Content = fileName = new TextBox() { Text = sceneEntry.Name },
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                // \w is equivalent of [0 - 9a - zA - Z_]."
+                if (!string.IsNullOrEmpty(fileName.Text))
+                    if (!Regex.Match(fileName.Text, @"^[\w\-.]+$").Success)
+                    {
+                        new ContentDialog()
+                        {
+                            XamlRoot = _hierarchy.XamlRoot,
+                            Title = "An entity can't contain any of the following characters",
+                            CloseButtonText = "Close",
+                            DefaultButton = ContentDialogButton.Close,
+                            Content = new TextBlock() { Text = "\\ / : * ? \" < > |" },
+                        }.CreateDialogAsync();
+
+                        return;
+                    }
+
+                Scene scene = SceneManager.GetFromID(sceneEntry.ID);
+
+                scene.Name = fileName.Text;
+                sceneEntry.Name = fileName.Text;
+            }
+        }
+
+        private async void ContentDialogRenameTreeEntry(TreeEntry treeEntry)
         {
             TextBox fileName;
 
@@ -473,7 +522,35 @@ namespace Editor.Controller
             }
         }
 
-        private async void ContentDialogDelete(TreeEntry treeEntry)
+        private async void ContentDialogDeleteSubscene(SceneEntry sceneEntry)
+        {
+            ContentDialog dialog = new()
+            {
+                XamlRoot = _hierarchy.XamlRoot,
+                Title = "Delete " + sceneEntry.Name,
+                PrimaryButtonText = "Delete",
+                CloseButtonText = "Cancel",
+                DefaultButton = ContentDialogButton.Close,
+            };
+
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                sceneEntry.DataSource.Clear();
+                sceneEntry.Hierarchy.Clear();
+                sceneEntry.Content.Children.Clear();
+                _stackPanel.Children.Remove(sceneEntry.Content);
+
+                Scene scene = SceneManager.GetFromID(sceneEntry.ID);
+
+                foreach (var entity in scene.EntitytManager.EntityList)
+                    scene.EntitytManager.Destroy(entity);
+
+                SceneManager.Subscenes.Remove(scene);
+            }
+        }
+
+        private async void ContentDialogDeleteTreeEntry(TreeEntry treeEntry)
         {
             ContentDialog dialog = new()
             {

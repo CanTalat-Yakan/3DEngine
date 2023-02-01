@@ -472,7 +472,7 @@ namespace Editor.Controller
             return grid;
         }
 
-        public static Grid WrapInExpanderWithToggleButton(this Grid content, string text, object source, string sourcePropertyPath)
+        public static Grid WrapInExpanderWithToggleButton(this Grid content, ref Grid reference, string text, object source, string isCheckedPropertyPath, string contentPropertyPath)
         {
             Grid grid = new() { Margin = new(0, 0, 0, 2) };
             Expander expander = new()
@@ -483,12 +483,17 @@ namespace Editor.Controller
                 HorizontalContentAlignment = HorizontalAlignment.Stretch
             };
             ToggleButton toggleButton = new() { Content = text, IsChecked = true };
-            BindingHelper.SetBinding(toggleButton, ToggleButton.IsCheckedProperty, source, sourcePropertyPath, BindingMode.TwoWay);
+            if (isCheckedPropertyPath != null)
+                BindingHelper.SetBinding(toggleButton, ToggleButton.IsCheckedProperty, source, isCheckedPropertyPath, BindingMode.TwoWay);
+            if (contentPropertyPath != null)
+                BindingHelper.SetBinding(toggleButton, ToggleButton.ContentProperty, source, contentPropertyPath, BindingMode.TwoWay);
 
             expander.Header = toggleButton;
             expander.Content = content;
 
             grid.Children.Add(expander);
+
+            reference = grid;
 
             return grid;
         }

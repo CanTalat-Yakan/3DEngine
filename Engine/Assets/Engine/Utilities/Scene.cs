@@ -11,7 +11,13 @@ namespace Engine.Utilities
 
         public EntityManager EntitytManager = new();
 
-        public string Name = "Scene"; 
+
+        private string _name = "Scene";
+        public string Name
+        {
+            get { return _name; }
+            set { SetProperty(ref _name , value); }
+        }
 
         private bool _isEnabled = true;
         public bool IsEnabled

@@ -120,11 +120,9 @@ namespace Editor.Controller
                     scriptsCollection.AddRange(eventsCollection.ToArray());
 
                     UIElement tmp;
-                    _stackPanel.Children.Add(tmp = 
-                        scriptsCollection.ToArray().StackInGrid()
-                        .WrapInExpanderWithToggleButton(
-                            component.ToString().FormatString(),
-                            component, "IsActive")
+                    Grid content = new();
+                    _stackPanel.Children.Add(tmp = scriptsCollection.ToArray()
+                        .StackInGrid().WrapInExpanderWithToggleButton(ref content, component.ToString().FormatString(), component, "IsActive", null)
                         .AddContentFlyout(CreateDefaultMenuFlyout(entity, component)));
 
                     component._eventOnDestroy += (s, e) => _stackPanel.Children.Remove(tmp);
