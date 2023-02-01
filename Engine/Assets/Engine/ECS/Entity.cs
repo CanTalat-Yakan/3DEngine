@@ -55,7 +55,7 @@ namespace Engine.ECS
         {
             _components.Add(component);
             component._entity = this;
-            component._active = true;
+            component.IsActive = true;
         }
 
         public void RemoveComponent(Component component)

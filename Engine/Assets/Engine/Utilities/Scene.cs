@@ -1,21 +1,29 @@
 ﻿using System.Linq;
 using System;
+using Editor.Controller;
 using Engine.Components;
 
 namespace Engine.Utilities
 {
-    internal class Scene : ICloneable
+    internal class Scene : BindableBase, ICloneable
     {
         public Guid ID = Guid.NewGuid();
 
         public EntityManager EntitytManager = new();
 
-        public string Name = "Scene";
-        public bool IsEnabled = true;
+        public string Name = "Scene"; 
+
+        public bool IsEnabled
+        {
+            get { return _isEnabled; }
+            set { SetProperty(ref _isEnabled, value); }
+        }
+        private bool _isEnabled = true;
 
         private string _profile;
 
         object ICloneable.Clone() { return Clone(); }
+
         public Scene Clone()
         {
             var newScene = (Scene)this.MemberwiseClone();

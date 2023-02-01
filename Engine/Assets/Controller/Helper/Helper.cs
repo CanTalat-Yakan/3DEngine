@@ -472,7 +472,7 @@ namespace Editor.Controller
             return grid;
         }
 
-        public static Grid WrapInExpanderWithToggleButton(this Grid content, string text, RoutedEventHandler onClick = null)
+        public static Grid WrapInExpanderWithToggleButton(this Grid content, string text, object source, string sourcePropertyPath)
         {
             Grid grid = new() { Margin = new(0, 0, 0, 2) };
             Expander expander = new()
@@ -483,8 +483,7 @@ namespace Editor.Controller
                 HorizontalContentAlignment = HorizontalAlignment.Stretch
             };
             ToggleButton toggleButton = new() { Content = text, IsChecked = true };
-            if (onClick != null)
-                toggleButton.Click += onClick;
+            BindingHelper.SetBinding(toggleButton, ToggleButton.IsCheckedProperty, source, sourcePropertyPath, BindingMode.TwoWay);
 
             expander.Header = toggleButton;
             expander.Content = content;
@@ -582,6 +581,20 @@ namespace Editor.Controller
         public static string FormatString(this string text)
         {
             return text.SplitLast('_').SplitLast('.').FirstCharToUpper().AddSpacesToSentence();
+        }
+
+        public static string IncrementNameIfExists(this string name, string[] list)
+        {
+            var i = 0;
+
+            foreach (var s in list)
+                if (s == name || s.Contains(name + " ("))
+                    i++;
+
+            if (i > 0)
+                name += " (" + (i + 1).ToString() + ")";
+
+            return name;
         }
     }
 

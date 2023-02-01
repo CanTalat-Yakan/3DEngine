@@ -76,6 +76,9 @@ namespace Engine.Editor
 
             if (!IsNaN(targetDirection))
                 _entity.Transform.Position += targetDirection;
+
+            if (Input.Instance.GetKey(Windows.System.VirtualKey.F, EInputState.Down))
+                _entity.GetComponent<Mesh>().IsActive = !_entity.GetComponent<Mesh>().IsActive;
         }
 
         internal Vector3 Movement()

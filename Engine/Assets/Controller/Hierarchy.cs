@@ -1,5 +1,4 @@
 ﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using System.Collections.Generic;
@@ -78,8 +77,7 @@ namespace Editor.Controller
             _stackPanel.Children.Add(CreateSeperator());
             _stackPanel.Children.Add(CreateButton("Add Subscene", (s, e) => ContentDialogCreateNewSubscene()));
             _stackPanel.Children.Add(CreateSubsceneHierarchy(out SceneEntry subSceneEntry)
-                .StackInGrid().WrapInExpanderWithToggleButton(
-                    "Subscene", (s, r) => SceneManager.GetFromID(subSceneEntry.ID).IsEnabled = (s as ToggleButton).IsChecked.Value)
+                .StackInGrid().WrapInExpanderWithToggleButton("Subscene", SceneManager.GetFromID(subSceneEntry.ID), "IsEnabled")
                 .AddContentFlyout(CreateSubRootMenuFlyout(subSceneEntry)));
         }
 
@@ -318,10 +316,6 @@ namespace Editor.Controller
                 //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Create Entity" },
             };
-
-            //items[0].Click += (s, e) => OpenFolder(path);
-            //items[1].Click += (s, e) => OpenFolder(path);
-
             items[2].Click += (s, e) => PasteEntityFromClipboard(SceneEntry);
 
             items[3].Click += (s, e) => SceneManager.Scene.EntitytManager.CreateEntity();
@@ -436,10 +430,12 @@ namespace Editor.Controller
                         return;
                     }
 
+                subsceneName.Text = subsceneName.Text.IncrementNameIfExists(SceneManager.Subscenes.ToArray().Select(Scene => Scene.Name).ToArray());
+
                 _stackPanel.Children.Add(
                     CreateSubsceneHierarchy(out SceneEntry subsceneEntry, subsceneName.Text).
                     StackInGrid().
-                    WrapInExpanderWithToggleButton(subsceneName.Text, (s, r) => SceneManager.GetFromID(subsceneEntry.ID).IsEnabled = (s as ToggleButton).IsChecked.Value).
+                    WrapInExpanderWithToggleButton(subsceneName.Text, SceneManager.GetFromID(subsceneEntry.ID), "IsEnabled").
                     AddContentFlyout(CreateSubRootMenuFlyout(subsceneEntry)));
             }
         }

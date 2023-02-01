@@ -124,7 +124,7 @@ namespace Editor.Controller
                         scriptsCollection.ToArray().StackInGrid()
                         .WrapInExpanderWithToggleButton(
                             component.ToString().FormatString(),
-                            (s, r) => component._active = (s as ToggleButton).IsChecked.Value)
+                            component, "IsActive")
                         .AddContentFlyout(CreateDefaultMenuFlyout(entity, component)));
 
                     component._eventOnDestroy += (s, e) => _stackPanel.Children.Remove(tmp);

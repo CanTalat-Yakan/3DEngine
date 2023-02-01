@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using Editor.Controller;
 using Engine.Components;
 
 namespace Engine.ECS
@@ -62,7 +62,7 @@ namespace Engine.ECS
 
         private static bool CheckActive(T component)
         {
-            return component._active && component._entity.IsEnabled && component._entity.ActiveInHierarchy && component._entity.Scene.IsEnabled;
+            return component.IsActive && component._entity.IsEnabled && component._entity.ActiveInHierarchy && component._entity.Scene.IsEnabled;
         }
     }
 
