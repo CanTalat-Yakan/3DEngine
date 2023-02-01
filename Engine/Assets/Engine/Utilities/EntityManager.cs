@@ -55,7 +55,6 @@ namespace Engine.Utilities
         public Entity Sky;
 
         private Material _materialDefault;
-        private Material _materialReflection;
         private Material _materialSky;
         private Material _materialSkyLight;
 
@@ -72,7 +71,6 @@ namespace Engine.Utilities
         public EntityManager()
         {
             _materialDefault = new(SHADER_SIMPLELIT, IMAGE_DEFAULT);
-            _materialReflection = new(SHADER_LIT, IMAGE_SKY);
             _materialSky = new(SHADER_UNLIT, IMAGE_SKY);
             _materialSkyLight = new(SHADER_UNLIT, IMAGE_SKY_LIGHT);
         }
@@ -116,7 +114,7 @@ namespace Engine.Utilities
             Entity newEntity = new();
             newEntity.Name = type.ToString().FormatString();
             newEntity.Parent = parent;
-            
+
             newEntity.AddComponent(new Mesh(ModelLoader.LoadFilePro(Path.Combine(PATH_PRIMITIVES, type.ToString()) + ".obj")));
             newEntity.GetComponent<Mesh>().Material = _materialDefault;
 
@@ -146,8 +144,12 @@ namespace Engine.Utilities
             return null;
         }
 
-        public void SetTheme(bool light) => Sky.GetComponent<Mesh>().Material = light ? _materialSkyLight : _materialSky;
+        public void Destroy(Entity entity)
+        {
+            entity.RemoveComponents();
+            EntityList.Remove(entity);
+        }
 
-        public void Destroy(Entity sourceEntity) => EntityList.Remove(sourceEntity);
+        public void SetTheme(bool light) => Sky.GetComponent<Mesh>().Material = light ? _materialSkyLight : _materialSky;
     }
 }

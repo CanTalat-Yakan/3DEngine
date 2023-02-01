@@ -48,7 +48,7 @@ namespace Engine.ECS
 
         private List<Component> _components = new();
 
-        public Entity() => 
+        public Entity() =>
             AddComponent(_transform = new Transform());
 
         public void AddComponent(Component component)
@@ -64,9 +64,17 @@ namespace Engine.ECS
             component.InvokeEventOnDestroy();
         }
 
+        public void RemoveComponents()
+        {
+            foreach (var component in _components)
+                component.InvokeEventOnDestroy();
+
+            _components.Clear();
+        }
+
         public T GetComponent<T>() where T : Component
         {
-            foreach (Component component in _components)
+            foreach (var component in _components)
                 if (component.GetType().Equals(typeof(T)))
                     return (T)component;
 
@@ -76,7 +84,7 @@ namespace Engine.ECS
         public T[] GetComponents<T>() where T : Component
         {
             List<T> components = new();
-            foreach (Component component in _components)
+            foreach (var component in _components)
                 if (component.GetType().Equals(typeof(T)))
                     components.Add((T)component);
 

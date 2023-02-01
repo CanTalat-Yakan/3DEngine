@@ -11,6 +11,7 @@ using Windows.System;
 using Engine.Components;
 using Engine.ECS;
 using Engine.Utilities;
+using Windows.System.RemoteSystems;
 
 namespace Editor.Controller
 {
@@ -286,7 +287,7 @@ namespace Editor.Controller
             items[3].Click += (s, e) => ContentDialogRename(_itemInvoked);
             items[3].KeyboardAccelerators.Add(new KeyboardAccelerator() { Modifiers = VirtualKeyModifiers.Control, Key = VirtualKey.F2 });
             items[4].Click += (s, e) => ContentDialogDelete(_itemInvoked);
-            items[3].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.Delete });
+            items[4].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.Delete });
 
             items[5].Click += (s, e) => SceneManager.Scene.EntitytManager.CreateEntity(GetEntity(GetParent(_itemInvoked)));
             items[6].Click += (s, e) => SceneManager.Scene.EntitytManager.CreateEntity(GetEntity(_itemInvoked));
@@ -317,6 +318,7 @@ namespace Editor.Controller
                 new MenuFlyoutItem() { Text = "Create Entity" },
             };
             items[2].Click += (s, e) => PasteEntityFromClipboard(SceneEntry);
+            items[2].KeyboardAccelerators.Add(new KeyboardAccelerator() { Modifiers = VirtualKeyModifiers.Control, Key = VirtualKey.V });
 
             items[3].Click += (s, e) => SceneManager.Scene.EntitytManager.CreateEntity();
 
@@ -483,10 +485,21 @@ namespace Editor.Controller
             };
 
             var result = await dialog.ShowAsync();
-
             if (result == ContentDialogResult.Primary)
-                GetSceneEntry(treeEntry);
-            SceneManager.Scene.EntitytManager.Destroy(GetEntity(treeEntry.ID));
+            {
+                SceneEntry sceneEntry = GetSceneEntry(treeEntry);
+                Scene scene = SceneManager.GetFromID(sceneEntry.ID);
+
+                scene.EntitytManager.Destroy(GetEntity(treeEntry.ID));
+
+                foreach (var iconNode in treeEntry.IconNode.Children)
+                {
+                    scene.EntitytManager.Destroy(GetEntity(iconNode.TreeEntry.ID));
+                    sceneEntry.DataSource.Remove(iconNode);
+                }
+
+                sceneEntry.DataSource.Remove(treeEntry.IconNode);
+            }
         }
     }
 
