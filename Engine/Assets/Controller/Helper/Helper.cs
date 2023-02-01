@@ -591,12 +591,13 @@ namespace Editor.Controller
         public static string IncrementNameIfExists(this string name, string[] list)
         {
             var i = 0;
+            bool nameWithoutIncrement = list.Contains(name);
 
             foreach (var s in list)
                 if (s == name || s.Contains(name + " ("))
                     i++;
 
-            if (i > 0)
+            if (i > 0 && nameWithoutIncrement)
                 name += " (" + (i + 1).ToString() + ")";
 
             return name;
