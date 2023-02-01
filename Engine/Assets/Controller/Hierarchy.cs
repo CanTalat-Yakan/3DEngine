@@ -374,7 +374,7 @@ namespace Editor.Controller
             foreach (var type in Enum.GetNames(typeof(EPrimitiveTypes)))
             {
                 MenuFlyoutItem item = new() { Text = type.ToString().FormatString() };
-                if (SceneEntry != null)
+                if (sceneEntry != null)
                     item.Click += (s, e) => SceneManager.GetFromID(sceneEntry.ID).EntitytManager.CreatePrimitive((EPrimitiveTypes)Enum.Parse(typeof(EPrimitiveTypes), type));
                 else
                     item.Click += (s, e) => SceneManager.Scene.EntitytManager.CreatePrimitive((EPrimitiveTypes)Enum.Parse(typeof(EPrimitiveTypes), type));
@@ -660,7 +660,7 @@ namespace Editor.Controller
                     targetScene.EntitytManager.EntityList.Add(sourceScene.EntitytManager.GetFromID(treeEntry.ID), false);
                     sourceScene.EntitytManager.EntityList.Remove(sourceScene.EntitytManager.GetFromID(treeEntry.ID), false);
 
-                    targetScene.EntitytManager.GetFromID(treeEntry.ID).Scene = null;
+                    targetScene.EntitytManager.GetFromID(treeEntry.ID).Scene = targetScene;
                 }
         }
     }
