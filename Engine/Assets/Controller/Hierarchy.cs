@@ -1,4 +1,5 @@
 ﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using System.Collections.Generic;
@@ -11,8 +12,6 @@ using Windows.System;
 using Engine.Components;
 using Engine.ECS;
 using Engine.Utilities;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using System.Text.Json.Nodes;
 
 namespace Editor.Controller
 {
@@ -78,7 +77,10 @@ namespace Editor.Controller
             _stackPanel.Children.Add(CreateSceneHierarchy(SceneEntry).StackInGrid().WrapInExpander("Scene").AddContentFlyout(CreateRootMenuFlyout()));
             _stackPanel.Children.Add(CreateSeperator());
             _stackPanel.Children.Add(CreateButton("Add Subscene", (s, e) => ContentDialogCreateNewSubscene()));
-            _stackPanel.Children.Add(CreateSubsceneHierarchy(out SceneEntry subSceneEntry).StackInGrid().WrapInExpanderWithToggleButton("Subscene").AddContentFlyout(CreateSubRootMenuFlyout(subSceneEntry)));
+            _stackPanel.Children.Add(CreateSubsceneHierarchy(out SceneEntry subSceneEntry)
+                .StackInGrid().WrapInExpanderWithToggleButton(
+                    "Subscene", (s, r) => SceneManager.GetFromID(subSceneEntry.ID).IsEnabled = (s as ToggleButton).IsChecked.Value)
+                .AddContentFlyout(CreateSubRootMenuFlyout(subSceneEntry)));
         }
 
         public void PopulateTree(SceneEntry sceneEntry)
@@ -385,8 +387,11 @@ namespace Editor.Controller
             foreach (var type in Enum.GetNames(typeof(EPrimitiveTypes)))
             {
                 MenuFlyoutItem item = new() { Text = type.ToString().FormatString() };
-                item.Click += (s, e) => SceneManager.Scene.EntitytManager.CreatePrimitive((EPrimitiveTypes)Enum.Parse(typeof(EPrimitiveTypes), type));
-                
+                if (SceneEntry != null)
+                    item.Click += (s, e) => SceneManager.GetFromID(sceneEntry.ID).EntitytManager.CreatePrimitive((EPrimitiveTypes)Enum.Parse(typeof(EPrimitiveTypes), type));
+                else
+                    item.Click += (s, e) => SceneManager.Scene.EntitytManager.CreatePrimitive((EPrimitiveTypes)Enum.Parse(typeof(EPrimitiveTypes), type));
+
                 objectSubItem.Items.Add(item);
             }
 
