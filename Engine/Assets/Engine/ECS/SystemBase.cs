@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Editor.Controller;
+using System.Linq;
 using Engine.Components;
 
 namespace Engine.ECS
@@ -13,6 +13,9 @@ namespace Engine.ECS
             s_components.Add(component);
             component._eventOnDestroy += (s, e) => Destroy(component);
         }
+
+        public static void Sort() =>
+            s_components = s_components.OrderBy(Component => Component.Order).ToList();
 
         public static void Awake()
         {
@@ -62,7 +65,7 @@ namespace Engine.ECS
 
         private static bool CheckActive(T component)
         {
-            return component.IsActive && component._entity.IsEnabled && component._entity.ActiveInHierarchy && component._entity.Scene.IsEnabled;
+            return component.IsEnabled && component.Entity.IsEnabled && component.Entity.ActiveInHierarchy && component.Entity.Scene.IsEnabled;
         }
     }
 
