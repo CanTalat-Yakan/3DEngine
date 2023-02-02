@@ -28,64 +28,12 @@ namespace Editor.ModelView
                 x_AppBarToggleButton_Filter_Errors,
                 x_AppBarToggleButton_Debug_ErrorPause,
                 x_AppBarToggleButton_Debug_ClearPlay);
-
-            DispatcherTimer dispatcher = new();
-            dispatcher.Interval = TimeSpan.FromMilliseconds(42);
-            dispatcher.Tick += Tick;
-            //dispatcher.Start();
-            DispatcherTimer dispatcherSec = new();
-            dispatcherSec.Interval = TimeSpan.FromSeconds(1);
-            dispatcherSec.Tick += TickSec;
-            dispatcherSec.Start();
-        }
-
-        private void Tick(object sender, object e)
-        {
-            if (Controller.Main.Instance.ControlPlayer.PlayMode == Controller.EPlayMode.Playing)
-                Update();
-        }
-
-        private void TickSec(object sender, object e)
-        {
-            if (Controller.Main.Instance.ControlPlayer.PlayMode == Controller.EPlayMode.Playing)
-                UpdateSec();
-        }
-
-        private void Update()
-        {
-            Controller.Output.Log("Updated Frame..");
-        }
-
-        private void UpdateSec()
-        {
-            ExampleSkriptDebugTest();
-        }
-
-        private void ExampleSkriptDebugTest()
-        {
-            Random rnd = new Random();
-            int i = rnd.Next(0, 24);
-
-            Controller.Output.Log(i.ToString());
-            if (i < 5)
-                Controller.Output.Log("Error Example!", Controller.EMessageType.Error);
-            else if (i < 10 && i > 5)
-                Controller.Output.Log("A Warning.", Controller.EMessageType.Warning);
-            else if (i < 15)
-                Controller.Output.Log("This is a Message");
-            else if (i > 15)
-                Test();
-        }
-
-        private void Test()
-        {
-            Controller.Output.Log("Test");
         }
 
         private void AppBarButton_Output_Clear(object sender, RoutedEventArgs e) => _outputControl.ClearOutput();
 
         private void AppBarToggleButton_Output_Collapse_Click(object sender, RoutedEventArgs e) => Controller.Output.IterateOutputMessages();
-        
+
         private void AppBarToggleButton_Filter_Click(object sender, RoutedEventArgs e) => Controller.Output.IterateOutputMessages();
 
         private void AppBarToggleButton_Debug_ErrorPause_Click(object sender, RoutedEventArgs e) { }
