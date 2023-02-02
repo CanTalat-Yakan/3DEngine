@@ -5,16 +5,16 @@ using Microsoft.UI;
 
 namespace Editor.Controller
 {
-    internal enum EPlayMode
+    internal enum EPlaymode
     {
         None,
         Playing,
-        Paused
+        Paused,
     }
 
     internal class Player
     {
-        public EPlayMode PlayMode;
+        public EPlaymode Playmode;
 
         private AppBarToggleButton _play;
         private AppBarToggleButton _pause;
@@ -33,7 +33,7 @@ namespace Editor.Controller
 
         public void Play()
         {
-            if (PlayMode == EPlayMode.None)
+            if (Playmode == EPlaymode.None)
                 if (_output._clearPlay.IsChecked.Value)
                     _output.ClearOutput();
 
@@ -49,7 +49,7 @@ namespace Editor.Controller
 
         public void Pause()
         {
-            PlayMode = _pause.IsChecked.Value ? EPlayMode.Paused : EPlayMode.Playing;
+            Playmode = _pause.IsChecked.Value ? EPlaymode.Paused : EPlaymode.Playing;
 
             _forward.IsEnabled = _pause.IsChecked.Value;
             Main.Instance.LayoutControl.ViewPort._viewPortControl.GridMain.BorderBrush = new SolidColorBrush(_pause.IsChecked.Value ? Colors.Orange : Colors.GreenYellow);
@@ -59,7 +59,7 @@ namespace Editor.Controller
 
         public void Forward()
         {
-            if (PlayMode != EPlayMode.Paused)
+            if (Playmode != EPlaymode.Paused)
                 return;
 
             Output.Log("Stepped Forward");
@@ -76,7 +76,7 @@ namespace Editor.Controller
 
         private void SetStatusAppBarButtons(bool b)
         {
-            PlayMode = b ? EPlayMode.Playing : EPlayMode.None;
+            Playmode = b ? EPlaymode.Playing : EPlaymode.None;
 
             _pause.IsEnabled = b;
             _pause.IsChecked = false;

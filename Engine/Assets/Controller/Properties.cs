@@ -78,7 +78,7 @@ namespace Editor.Controller
                     (s, e) => entity.Transform.Position.Y = (float)e.NewValue,
                     (s, e) => entity.Transform.Position.Z = (float)e.NewValue).WrapInField("Position"),
                 CreateVec3InputTransform(
-                    entity.Transform.Rotation.ToEuler(),
+                    entity.Transform.Rotation.ToEuler().ToDegrees(),
                     (s, e) =>  entity.Transform.EulerAngles.X = (float)e.NewValue,
                     (s, e) =>  entity.Transform.EulerAngles.Y = (float)e.NewValue,
                     (s, e) =>  entity.Transform.EulerAngles.Z = (float) e.NewValue).WrapInField("Rotation"),
@@ -122,7 +122,7 @@ namespace Editor.Controller
                     UIElement tmp;
                     Grid content = new();
                     _stackPanel.Children.Add(tmp = scriptsCollection.ToArray()
-                        .StackInGrid().WrapInExpanderWithToggleButton(ref content, component.ToString().FormatString(), component, "IsActive", null)
+                        .StackInGrid().WrapInExpanderWithToggleButton(ref content, component.ToString().FormatString(), component, "IsEnabled", null)
                         .AddContentFlyout(CreateDefaultMenuFlyout(entity, component)));
 
                     component._eventOnDestroy += (s, e) => _stackPanel.Children.Remove(tmp);
@@ -282,6 +282,9 @@ namespace Editor.Controller
         {
             var attributes = eventInfo.GetCustomAttributes(true);
 
+            if (attributes.OfType<HideAttribute>().Any())
+                return null;
+
             if (!attributes.OfType<ShowAttribute>().Any())
                 foreach (var info in nonPublic)
                     if (eventInfo.Equals(info))
@@ -358,6 +361,5 @@ namespace Editor.Controller
             if (file != null)
                 path.Text = file.Name;
         }
-
     }
 }

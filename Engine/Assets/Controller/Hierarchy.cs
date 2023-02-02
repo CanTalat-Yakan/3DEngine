@@ -11,6 +11,7 @@ using Windows.System;
 using Engine.Components;
 using Engine.ECS;
 using Engine.Utilities;
+using Engine.Editor;
 
 namespace Editor.Controller
 {
@@ -230,7 +231,7 @@ namespace Editor.Controller
 
         private TreeEntry AddTreeEntry(SceneEntry sceneEntry, Entity entity)
         {
-            if (entity.CompareTag("SceneBoot", "SceneCamera", "SceneSky"))
+            if (entity.CompareTag(Enum.GetNames(typeof(EEditorTags))))
                 return null;
 
             TreeEntry treeEntry = new() { Name = entity.Name, ID = entity.ID };
@@ -543,12 +544,7 @@ namespace Editor.Controller
                 sceneEntry.Content.Children.Clear();
                 _stackPanel.Children.Remove(sceneEntry.Content);
 
-                Scene scene = SceneManager.GetFromID(sceneEntry.ID);
-
-                foreach (var entity in scene.EntitytManager.EntityList)
-                    scene.EntitytManager.Destroy(entity);
-
-                SceneManager.Subscenes.Remove(scene);
+                SceneManager.RemoveSubscene(sceneEntry.ID);
             }
         }
 

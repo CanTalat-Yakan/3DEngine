@@ -5,6 +5,7 @@ using System;
 using Editor.Controller;
 using Engine.Editor;
 using Engine.Utilities;
+using Engine.ECS;
 
 namespace Engine
 {
@@ -18,21 +19,23 @@ namespace Engine
         public Renderer Renderer;
         public ImGuiRenderer ImGuiRenderer;
 
-        IntPtr imGuiContext;
+        private IntPtr _imGuiContext;
+
+        private EPlaymode _playmode = EPlaymode.None;
 
         public Core(SwapChainPanel swapChainPanel, TextBlock profile)
         {
             if (Instance is null)
                 Instance = this;
 
-            imGuiContext = ImGui.CreateContext();
-            ImGui.SetCurrentContext(imGuiContext);
+            _imGuiContext = ImGui.CreateContext();
+            ImGui.SetCurrentContext(_imGuiContext);
 
             Renderer = new(swapChainPanel);
             Input = new();
             Time = new();
             SceneManager = new(new Scene());
-            SceneManager.Scene.EntitytManager.CreateEntity(null, "Boot", "SceneBoot").AddComponent(new SceneBoot());
+            SceneManager.Scene.EntitytManager.CreateEntity(null, "Boot", EEditorTags.SceneBoot.ToString()).AddComponent(new SceneBoot());
             ImGuiRenderer = new();
 
             Output.Log("Engine Initialized...");
@@ -47,6 +50,12 @@ namespace Engine
                 Renderer.Clear();
 
                 Input.Update();
+
+                if (CheckIfPlaymodeStarted())
+                {
+                    SceneManager.Awake();
+                    SceneManager.Start();
+                }
 
                 SceneManager.Update();
                 SceneManager.LateUpdate();
@@ -73,13 +82,23 @@ namespace Engine
 
         public virtual void UpdateImGui()
         {
-            ImGui.SetCurrentContext(imGuiContext);
+            ImGui.SetCurrentContext(_imGuiContext);
             var io = ImGui.GetIO();
 
             io.DeltaTime = (float)Time.Delta;
 
             ImGui.NewFrame();
             ImGui.Render();
+        }
+
+        private bool CheckIfPlaymodeStarted()
+        {
+            if (Main.Instance.ControlPlayer.Playmode == EPlaymode.Playing)
+                if (_playmode != Main.Instance.ControlPlayer.Playmode)
+                    return true;
+
+            _playmode = Main.Instance.ControlPlayer.Playmode;
+            return false;
         }
     }
 }

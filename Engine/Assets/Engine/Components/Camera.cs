@@ -6,6 +6,7 @@ using Vortice.Mathematics;
 using Engine.Data;
 using Engine.ECS;
 using Engine.Utilities;
+using Editor.Controller;
 
 namespace Engine.Components
 {
@@ -13,7 +14,7 @@ namespace Engine.Components
     {
         public static Camera Main { get; private set; }
 
-        public double FieldOfView = 90;
+        public float FieldOfView = 90;
 
         private Renderer _d3d { get => Renderer.Instance; }
 
@@ -28,19 +29,19 @@ namespace Engine.Components
 
         public override void OnAwake()
         {
-            if (_entity.Tag == ETags.MainCamera.ToString())
+            if (Entity.Tag == ETags.MainCamera.ToString())
                 Main = this;
         }
 
-        public override void OnLateUpdate() => 
+        public override void OnRender() =>
             RecreateViewConstants();
 
         public void RecreateViewConstants()
         {
             #region //Set ViewConstantBuffer
             var view = Matrix4x4.CreateLookAt(
-                _entity.Transform.Position,
-                _entity.Transform.Position + _entity.Transform.Forward,
+                Entity.Transform.WorldPosition,
+                Entity.Transform.WorldPosition + Entity.Transform.Forward,
                 Vector3.UnitY);
 
             var aspect = (float)(_d3d.SwapChainPanel.ActualWidth / _d3d.SwapChainPanel.ActualHeight);
@@ -62,7 +63,7 @@ namespace Engine.Components
             // T(v*p), because HLSL calculates matrix mul in collumn-major and system.numerics returns row-major
             var viewProjection = Matrix4x4.Transpose(view * projection);
 
-            _viewConstants = new() { ViewProjection = viewProjection, CameraPositon = _entity.Transform.Position };
+            _viewConstants = new() { ViewProjection = viewProjection, CameraPositon = Entity.Transform.Position };
             #endregion
 
             #region //Update constant buffer data

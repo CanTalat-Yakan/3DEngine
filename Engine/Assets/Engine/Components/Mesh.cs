@@ -35,7 +35,7 @@ namespace Engine.Components
 
         public override void OnRender()
         {
-            Material.Set(_entity.Transform.ConstantsBuffer);
+            Material.Set(Entity.Transform.ConstantsBuffer);
 
             _d3d.Draw(
                 _vertexBuffer, _vertexStride,
