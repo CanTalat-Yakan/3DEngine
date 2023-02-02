@@ -61,6 +61,7 @@ namespace Engine.Utilities
         private static readonly string SHADER_LIT = @"Shader\Lit.hlsl";
         private static readonly string SHADER_SIMPLELIT = @"Shader\SimpleLit.hlsl";
         private static readonly string SHADER_UNLIT = @"Shader\Unlit.hlsl";
+        private static readonly string SHADER_SKY = @"Shader\Sky.hlsl";
 
         private static readonly string IMAGE_DEFAULT = @"Textures\dark.png";
         private static readonly string IMAGE_SKY = @"Textures\SkyGradient.png";
@@ -73,17 +74,6 @@ namespace Engine.Utilities
             _materialDefault = new(SHADER_SIMPLELIT, IMAGE_DEFAULT);
             _materialSky = new(SHADER_UNLIT, IMAGE_SKY);
             _materialSkyLight = new(SHADER_UNLIT, IMAGE_SKY_LIGHT);
-        }
-
-        public T[] FindComponent<T>() where T : Component
-        {
-            List<T> components = new();
-            foreach (var entity in EntityList)
-                foreach (var component in entity.GetComponents<T>())
-                    if (component.GetType().Equals(typeof(T)))
-                        components.Add(component);
-
-            return components.ToArray();
         }
 
         public Entity Duplicate(Entity refEntity, Entity parent = null)
@@ -110,9 +100,14 @@ namespace Engine.Utilities
             return newEntity;
         }
 
-        public Entity CreatePrimitive(EPrimitiveTypes type, Entity parent = null)
+        public Entity CreatePrimitive(EPrimitiveTypes type = EPrimitiveTypes.Cube, Entity parent = null)
         {
-            Entity newEntity = new();
+            Entity newEntity = new()
+            {
+                Name = type.ToString().FormatString(),
+                Parent = parent,
+            };
+
             newEntity.Name = type.ToString().FormatString();
             newEntity.Parent = parent;
 
@@ -124,9 +119,29 @@ namespace Engine.Utilities
             return newEntity;
         }
 
+        public Entity CreateCamera(string name = "Camera", string tag = "Untagged", Entity parent = null)
+        {
+            Entity newEntity = new()
+            {
+                Name = name,
+                Parent = parent,
+                Tag = tag,
+            };
+
+            newEntity.AddComponent(new Camera());
+
+            EntityList.Add(newEntity);
+
+            return newEntity;
+        }
+
         public void CreateSky()
         {
-            Sky = new() { Name = "Sky", Tag = "SceneSky"};
+            Sky = new()
+            {
+                Name = "Sky",
+                Tag = EEditorTags.SceneSky.ToString(),
+            };
             Sky.Transform.Scale = new Vector3(-1000, 1000, 1000);
 
             Sky.AddComponent(new Mesh(ModelLoader.LoadFilePro(Path.Combine(PATH_PRIMITIVES, EPrimitiveTypes.Sphere.ToString()) + ".obj")));
@@ -134,6 +149,9 @@ namespace Engine.Utilities
 
             EntityList.Add(Sky);
         }
+
+        public void SetTheme(bool light) => 
+            Sky.GetComponent<Mesh>().Material = light ? _materialSkyLight : _materialSky;
 
         public Entity GetFromID(Guid id)
         {
@@ -160,7 +178,5 @@ namespace Engine.Utilities
             entity.RemoveComponents();
             EntityList.Remove(entity);
         }
-
-        public void SetTheme(bool light) => Sky.GetComponent<Mesh>().Material = light ? _materialSkyLight : _materialSky;
     }
 }
