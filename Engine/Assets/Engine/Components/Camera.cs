@@ -13,8 +13,7 @@ namespace Engine.Components
     {
         public static Camera Main { get; private set; }
 
-        public static double FieldOfView { get => s_fieldOfView; set => s_fieldOfView = value; }
-        private static double s_fieldOfView = 90;
+        public double FieldOfView = 90;
 
         private Renderer _d3d { get => Renderer.Instance; }
 
@@ -29,7 +28,7 @@ namespace Engine.Components
 
         public override void OnAwake()
         {
-            if (_entity.Tag == ETags.MainCamera)
+            if (_entity.Tag == ETags.MainCamera.ToString())
                 Main = this;
         }
 
@@ -47,7 +46,7 @@ namespace Engine.Components
             var aspect = (float)(_d3d.SwapChainPanel.ActualWidth / _d3d.SwapChainPanel.ActualHeight);
             var dAspect = aspect < 1 ? 1 * aspect : 1 / aspect;
 
-            var radAngle = MathHelper.ToRadians((float)s_fieldOfView);
+            var radAngle = MathHelper.ToRadians((float)FieldOfView);
             var radHFOV = 2 * MathF.Atan(MathF.Tan(radAngle * 0.5f) * dAspect);
             var hFOV = MathHelper.ToDegrees(radHFOV);
 

@@ -22,8 +22,7 @@ namespace Engine.Editor
 
         public override void OnAwake()
         {
-            Camera = SceneManager.Scene.EntitytManager.CreateEntity(null, "Camera");
-            Camera.Tag = ETags.MainCamera;
+            Camera = SceneManager.Scene.EntitytManager.CreateEntity(null, "Camera", "SceneCamera");
             Camera.Transform.Position = new(3, 4, 5);
             Camera.Transform.EulerAngles = new(35, -150, 0);
             Camera.AddComponent(new Camera());

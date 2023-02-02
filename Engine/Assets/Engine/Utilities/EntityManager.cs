@@ -96,12 +96,13 @@ namespace Engine.Utilities
             return clonedEntity;
         }
 
-        public Entity CreateEntity(Entity parent = null, string name = "New Entity")
+        public Entity CreateEntity(Entity parent = null, string name = "New Entity", string tag = "Untagged")
         {
             Entity newEntity = new()
             {
                 Name = name,
-                Parent = parent
+                Parent = parent,
+                Tag = tag,
             };
 
             EntityList.Add(newEntity);
@@ -125,7 +126,7 @@ namespace Engine.Utilities
 
         public void CreateSky()
         {
-            Sky = new() { Name = "Sky" };
+            Sky = new() { Name = "Sky", Tag = "SceneSky"};
             Sky.Transform.Scale = new Vector3(-1000, 1000, 1000);
 
             Sky.AddComponent(new Mesh(ModelLoader.LoadFilePro(Path.Combine(PATH_PRIMITIVES, EPrimitiveTypes.Sphere.ToString()) + ".obj")));
@@ -139,6 +140,16 @@ namespace Engine.Utilities
             foreach (var entity in EntityList)
                 if (entity != null)
                     if (entity.ID == id)
+                        return entity;
+
+            return null;
+        }
+
+        public Entity GetFromTag(string tag)
+        {
+            foreach (var entity in EntityList)
+                if (entity != null)
+                    if (entity.Tag.ToString() == tag)
                         return entity;
 
             return null;

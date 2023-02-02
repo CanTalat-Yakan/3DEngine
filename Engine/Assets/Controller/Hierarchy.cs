@@ -11,7 +11,6 @@ using Windows.System;
 using Engine.Components;
 using Engine.ECS;
 using Engine.Utilities;
-using Windows.System.RemoteSystems;
 
 namespace Editor.Controller
 {
@@ -231,6 +230,9 @@ namespace Editor.Controller
 
         private TreeEntry AddTreeEntry(SceneEntry sceneEntry, Entity entity)
         {
+            if (entity.CompareTag("SceneBoot", "SceneCamera", "SceneSky"))
+                return null;
+
             TreeEntry treeEntry = new() { Name = entity.Name, ID = entity.ID };
             treeEntry.IconNode = new() { Name = treeEntry.Name, TreeEntry = treeEntry, IsExpanded = false };
             treeEntry.IconNode.IsActive = true;
@@ -584,24 +586,21 @@ namespace Editor.Controller
     {
         public Entity GetEntity(Guid guid, SceneEntry sceneEntry = null)
         {
+            Entity entity;
+
             if (sceneEntry != null)
-                foreach (var entity in SceneManager.GetFromID(sceneEntry.ID).EntitytManager.EntityList)
-                    if (entity != null)
-                        if (entity.ID == guid)
-                            return entity;
+                entity = SceneManager.GetFromID(sceneEntry.ID).EntitytManager.GetFromID(guid);
+            else
+            {
+                entity = SceneManager.Scene.EntitytManager.GetFromID(guid);
 
-            foreach (var entity in SceneManager.Scene.EntitytManager.EntityList)
-                if (entity != null)
-                    if (entity.ID == guid)
-                        return entity;
+                if (entity is null)
+                    foreach (var subscene in SceneManager.Subscenes)
+                        if (entity is null)
+                            entity = subscene.EntitytManager.GetFromID(guid);
+            }
 
-            foreach (var subscene in SceneManager.Subscenes)
-                foreach (var entity in subscene.EntitytManager.EntityList)
-                    if (entity != null)
-                        if (entity.ID == guid)
-                            return entity;
-
-            return null;
+            return entity;
         }
 
         public Entity GetEntity(TreeEntry entry, SceneEntry sceneEntry = null)

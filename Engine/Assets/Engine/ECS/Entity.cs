@@ -13,7 +13,7 @@ namespace Engine.ECS
         Respawn,
         Player,
         Finish,
-        GameController
+        GameController,
     }
 
     internal enum ELayers
@@ -34,8 +34,8 @@ namespace Engine.ECS
         public string Name;
         public bool IsEnabled = true;
         public bool IsStatic = false;
-        public ETags Tag;
-        public ELayers Layer;
+        public string Tag;
+        public string Layer;
 
         private Scene _scene;
         public Scene Scene { get => _scene is null ? _scene = SceneManager.GetFromEntityID(ID) : _scene; set => _scene = null; }
@@ -89,6 +89,15 @@ namespace Engine.ECS
                     components.Add((T)component);
 
             return components.ToArray();
+        }
+
+        public bool CompareTag(params string[] tags)
+        {
+            foreach (var tag in tags)
+                if (Tag == tag)
+                    return true;
+
+            return false;
         }
 
         public Component[] GetComponents() { return _components.ToArray(); }

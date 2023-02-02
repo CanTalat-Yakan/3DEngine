@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml;
 using Engine.Components;
 using Engine.Editor;
+using Engine.Utilities;
 
 namespace Editor.Controller
 {
@@ -26,7 +27,8 @@ namespace Editor.Controller
             {
                 CreateButton(CreateIcon(Symbol.Video),
                     StackInGridVertical(
-                            CreateSlider((float)Camera.FieldOfView, 40, 110, (s, e) => { Camera.FieldOfView= e.NewValue; }).WrapInGridVertical("Field Of View"),
+                            CreateSlider(90, 40, 110, 
+                            (s, e) => { SceneManager.Scene.EntitytManager.GetFromTag("SceneCamera").GetComponent<Camera>().FieldOfView= e.NewValue; }).WrapInGridVertical("Field Of View"),
                             CreateNumberInput(CameraController.MovementSpeed, 1, 100, (s, e) => { CameraController.MovementSpeed = (float)e.NewValue; }).WrapInGridVertical("Movement Speed"))),
                 CreateAppBarSeperator(),
                 CreateComboBox(new[] { "Perspective", "Orthogonal" }),

@@ -11,7 +11,6 @@ namespace Engine.Utilities
 
         public EntityManager EntitytManager = new();
 
-
         private string _name = "Scene";
         public string Name
         {

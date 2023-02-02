@@ -32,7 +32,7 @@ namespace Engine
             Input = new();
             Time = new();
             SceneManager = new(new Scene());
-            SceneManager.Scene.EntitytManager.CreateEntity(null, "Boot").AddComponent(new SceneBoot());
+            SceneManager.Scene.EntitytManager.CreateEntity(null, "Boot", "SceneBoot").AddComponent(new SceneBoot());
             ImGuiRenderer = new();
 
             Output.Log("Engine Initialized...");
