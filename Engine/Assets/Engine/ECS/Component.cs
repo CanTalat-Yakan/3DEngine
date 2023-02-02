@@ -1,17 +1,21 @@
 ﻿using Editor.Controller;
+using Engine.Editor;
 using System;
 
 namespace Engine.ECS
 {
     internal class Component : BindableBase, ICloneable
     {
-        internal Entity _entity;
+        [Hide]
+        public Entity Entity;
+        [Hide]
+        public byte Order = 1;
 
-        private bool _isActive;
-        public bool IsActive
+        private bool _isEnabled;
+        public bool IsEnabled
         {
-            get { return _isActive; }
-            set { SetProperty(ref _isActive, value); }
+            get { return _isEnabled; }
+            set { SetProperty(ref _isEnabled, value); }
         }
 
         internal event EventHandler _eventOnDestroy;
