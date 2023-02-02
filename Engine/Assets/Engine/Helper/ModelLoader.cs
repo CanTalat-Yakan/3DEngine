@@ -6,18 +6,15 @@ namespace Engine.Helper
 {
     internal class ModelLoader
     {
-        public static MeshInfo LoadFilePro(string fileName)
+        public static MeshInfo LoadFilePro(string filePath)
         {
-            string assetsPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources\");
-            string modelFile = Path.Combine(assetsPath, fileName);
+            string resourcesPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources\");
+            string modelFilePath = Path.Combine(resourcesPath, filePath);
 
             Assimp.AssimpContext con = new();
-            Assimp.Scene file = con.ImportFile(modelFile);
+            Assimp.Scene file = con.ImportFile(modelFilePath);
 
-            MeshInfo obj = new();
-
-            obj.Vertices = new();
-            obj.Indices = new();
+            MeshInfo obj = new() { Vertices = new(), Indices = new() };
             foreach (var mesh in file.Meshes)
             {
                 for (int i = 0; i < mesh.VertexCount; i++)
@@ -45,7 +42,7 @@ namespace Engine.Helper
                             (ushort)face.Indices[2]});
                 }
             }
-
+            
             return obj;
         }
     }

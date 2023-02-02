@@ -11,13 +11,13 @@ namespace Engine.Helper
 {
     internal class ImageLoader
     {
-        public static ID3D11Texture2D LoadTexture(ID3D11Device device, string fileName)
+        public static ID3D11Texture2D LoadTexture(ID3D11Device device, string filePath)
         {
-            string assetsPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources\");
-            string textureFile = Path.Combine(assetsPath, fileName);
+            string resourcesPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources\");
+            string textureFilePath = Path.Combine(resourcesPath, filePath);
 
             using IWICImagingFactory wicFactory = new();
-            using IWICBitmapDecoder decoder = wicFactory.CreateDecoderFromFileName(textureFile);
+            using IWICBitmapDecoder decoder = wicFactory.CreateDecoderFromFileName(textureFilePath);
             using IWICBitmapFrameDecode frame = decoder.GetFrame(0);
 
             Size size = frame.Size;
