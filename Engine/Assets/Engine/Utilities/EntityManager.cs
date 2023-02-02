@@ -72,8 +72,8 @@ namespace Engine.Utilities
         public EntityManager()
         {
             _materialDefault = new(SHADER_SIMPLELIT, IMAGE_DEFAULT);
-            _materialSky = new(SHADER_UNLIT, IMAGE_SKY);
-            _materialSkyLight = new(SHADER_UNLIT, IMAGE_SKY_LIGHT);
+            _materialSky = new(SHADER_SKY, IMAGE_SKY);
+            _materialSkyLight = new(SHADER_SKY, IMAGE_SKY_LIGHT);
         }
 
         public Entity Duplicate(Entity refEntity, Entity parent = null)

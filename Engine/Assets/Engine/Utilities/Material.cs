@@ -106,10 +106,10 @@ namespace Engine.Utilities
             _d3d.DeviceContext.PSSetSampler(0, _sampler);
         }
 
-        protected static ReadOnlyMemory<byte> CompileBytecode(string shaderName, string entryPoint, string profile)
+        protected static ReadOnlyMemory<byte> CompileBytecode(string shaderPath, string entryPoint, string profile)
         {
-            string assetsPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources\");
-            string fileName = Path.Combine(assetsPath, shaderName);
+            string resourcesPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources\");
+            string fileNamePath = Path.Combine(resourcesPath, shaderPath);
             //string shaderSource = File.ReadAllText(Path.Combine(assetsPath, shaderName));
 
             ShaderFlags shaderFlags = ShaderFlags.EnableStrictness;
@@ -120,7 +120,7 @@ namespace Engine.Utilities
             shaderFlags |= ShaderFlags.OptimizationLevel3;
 #endif
 
-            return Compiler.CompileFromFile(fileName, entryPoint, profile, shaderFlags);
+            return Compiler.CompileFromFile(fileNamePath, entryPoint, profile, shaderFlags);
         }
     }
 }
