@@ -602,6 +602,19 @@ namespace Editor.Controller
 
             return name;
         }
+
+        public static Vector3 ToDegrees(this Vector3 vector3)
+        {
+            return new (
+                Vortice.Mathematics.MathHelper.ToDegrees(vector3.X),
+                Vortice.Mathematics.MathHelper.ToDegrees(vector3.Y),
+                Vortice.Mathematics.MathHelper.ToDegrees(vector3.Z));
+        }
+
+        public static bool IsNaN(this Vector3 vector3)
+        {
+            return float.IsNaN(vector3.X) || float.IsNaN(vector3.Y) || float.IsNaN(vector3.Z);
+        }
     }
 
     internal sealed class BooleanToVisibilityConverter : IValueConverter
