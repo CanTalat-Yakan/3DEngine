@@ -4,14 +4,15 @@ using Vortice.Mathematics;
 using Engine.Data;
 using Engine.ECS;
 using Aspose.ThreeD;
+using Vortice.Direct2D1.Effects;
 
 namespace Engine.Components
 {
     internal class Transform : Component
     {
-        public Transform Parent;
-
         public SPerModelConstantBuffer ConstantsBuffer { get => new() { ModelView = WorldMatrix }; }
+
+        public Transform Parent;
 
         public Vector3 Forward { get; private set; }
         public Vector3 Right { get; private set; }
@@ -19,9 +20,15 @@ namespace Engine.Components
 
         public Matrix4x4 WorldMatrix = Matrix4x4.Identity;
         public Matrix4x4 NormalMatrix = Matrix4x4.Identity;
+
+        public Vector3 WorldPosition { get => Parent is null ? Position : Position + Parent.WorldPosition; }
         public Vector3 Position = Vector3.Zero;
+
+        public Quaternion WorldRotation { get => Parent is null ? Rotation : Rotation * Parent.WorldRotation; }
         public Quaternion Rotation = Quaternion.Identity;
         public Vector3 EulerAngles = Vector3.Zero;
+
+        public Vector3 WorldScale { get => Parent is null ? Scale : Scale * Parent.WorldScale; }
         public Vector3 Scale = Vector3.One;
 
         public override void OnRegister() =>
@@ -29,8 +36,8 @@ namespace Engine.Components
 
         public override void OnUpdate()
         {
-            if (_entity.Parent != null)
-                Parent = _entity.Parent.Transform;
+            if (Entity.Parent != null)
+                Parent = Entity.Parent.Transform;
 
             Rotation = Quaternion.CreateFromYawPitchRoll(MathHelper.ToRadians(EulerAngles.X), MathHelper.ToRadians(EulerAngles.Y), MathHelper.ToRadians(EulerAngles.Z));
 
@@ -42,7 +49,11 @@ namespace Engine.Components
             Right = Vector3.Normalize(Vector3.Cross(Forward, Vector3.UnitY));
             LocalUp = Vector3.Normalize(Vector3.Cross(Right, Forward));
 
-            WorldMatrix = CalculateWorldMatrix(Position, Rotation, Scale, Parent);
+            Matrix4x4 translationMatrix = Matrix4x4.CreateTranslation(WorldPosition);
+            Matrix4x4 rotationMatrix = Matrix4x4.CreateFromQuaternion(WorldRotation);
+            Matrix4x4 scaleMatrix = Matrix4x4.CreateScale(WorldScale);
+
+            WorldMatrix = Matrix4x4.Transpose(scaleMatrix * rotationMatrix * translationMatrix);
         }
 
         Matrix4x4 CalculateWorldMatrix(Vector3 position, Quaternion rotation, Vector3 scale, Transform parent)
