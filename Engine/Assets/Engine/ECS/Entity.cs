@@ -6,6 +6,13 @@ using Engine.Utilities;
 
 namespace Engine.ECS
 {
+    internal enum EEditorTags
+    {
+        SceneBoot,
+        SceneCamera,
+        SceneSky,
+    }
+
     internal enum ETags
     {
         Untagged,
@@ -54,8 +61,8 @@ namespace Engine.ECS
         public void AddComponent(Component component)
         {
             _components.Add(component);
-            component._entity = this;
-            component.IsActive = true;
+            component.Entity = this;
+            component.IsEnabled = true;
         }
 
         public void RemoveComponent(Component component)
