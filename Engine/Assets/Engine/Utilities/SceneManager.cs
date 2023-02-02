@@ -27,12 +27,6 @@ namespace Engine.Utilities
             return scene;
         }
 
-        public static void LoadScene(Scene scene)
-        {
-            Scene = scene;
-            Subscenes = new List<Scene>();
-        }
-
         public static void LoadSubscene(Scene subscene)
         {
             subscene.Load();
@@ -44,59 +38,60 @@ namespace Engine.Utilities
             subscene.Unload();
         }
 
-        public static void RemoveScene(Guid guid)
+        public static void RemoveSubscene(Guid guid)
         {
-            Subscenes.Remove(GetFromID(guid));
+            Scene scene = GetFromID(guid);
+
+            foreach (var entity in scene.EntitytManager.EntityList)
+                scene.EntitytManager.Destroy(entity);
+
+            Subscenes.Remove(scene);
         }
 
         public void Awake()
         {
-            TransformSystem.Awake();
-            CameraSystem.Awake();
-            MeshSystem.Awake();
-            EditorScriptSystem.Awake();
+            if (Main.Instance.ControlPlayer.Playmode == EPlaymode.None)
+                EditorScriptSystem.Awake();
 
-            if (Main.Instance.ControlPlayer.PlayMode == EPlayMode.Playing)
+            if (Main.Instance.ControlPlayer.Playmode == EPlaymode.Playing)
                 ScriptSystem.Awake();
         }
 
         public void Start()
         {
-            TransformSystem.Start();
-            CameraSystem.Start();
-            MeshSystem.Start();
-            EditorScriptSystem.Start();
+            if (Main.Instance.ControlPlayer.Playmode == EPlaymode.None)
+                EditorScriptSystem.Start();
 
-            if (Main.Instance.ControlPlayer.PlayMode == EPlayMode.Playing)
+            if (Main.Instance.ControlPlayer.Playmode == EPlaymode.Playing)
                 ScriptSystem.Start();
         }
 
         public void Update()
         {
             TransformSystem.Update();
-            CameraSystem.Update();
-            MeshSystem.Update();
-            EditorScriptSystem.Update();
 
-            if (Main.Instance.ControlPlayer.PlayMode == EPlayMode.Playing)
+            if (Main.Instance.ControlPlayer.Playmode == EPlaymode.None)
+                EditorScriptSystem.Update();
+
+            if (Main.Instance.ControlPlayer.Playmode == EPlaymode.Playing)
                 ScriptSystem.Update();
         }
 
         public void LateUpdate()
         {
-            TransformSystem.LateUpdate();
-            CameraSystem.LateUpdate();
-            MeshSystem.LateUpdate();
-            EditorScriptSystem.LateUpdate();
+            if (Main.Instance.ControlPlayer.Playmode == EPlaymode.None)
+                EditorScriptSystem.LateUpdate();
 
-            if (Main.Instance.ControlPlayer.PlayMode == EPlayMode.Playing)
+            if (Main.Instance.ControlPlayer.Playmode == EPlaymode.Playing)
                 ScriptSystem.LateUpdate();
         }
 
         public void Render()
         {
+            TransformSystem.Update();
+            CameraSystem.Sort();
+            CameraSystem.Render();
             MeshSystem.Render();
-            EditorScriptSystem.Render();
         }
 
         public string Profile()
