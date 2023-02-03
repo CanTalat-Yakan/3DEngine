@@ -19,40 +19,35 @@ namespace Engine.ECS
 
         public static void Awake()
         {
-            var components = s_components.ToArray();
-            foreach (T component in components)
+            foreach (T component in s_components.ToArray())
                 if (CheckActive(component))
                     component.OnAwake();
         }
 
         public static void Start()
         {
-            var components = s_components.ToArray();
-            foreach (T component in components)
+            foreach (T component in s_components.ToArray())
                 if (CheckActive(component))
                     component.OnStart();
         }
 
         public static void Update()
         {
-            var components = s_components.ToArray();
-            foreach (T component in components)
+            foreach (T component in s_components.ToArray())
                 if (CheckActive(component))
                     component.OnUpdate();
         }
 
         public static void LateUpdate()
         {
-            var components = s_components.ToArray();
-            foreach (T component in components)
+            foreach (T component in s_components.ToArray())
                 if (CheckActive(component))
                     component.OnLateUpdate();
         }
 
         public static void Render()
         {
-            var components = s_components.ToArray();
-            foreach (T component in components)
+            foreach (T component in s_components.ToArray())
                 if (CheckActive(component))
                     component.OnRender();
         }
