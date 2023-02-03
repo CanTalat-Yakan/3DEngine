@@ -51,7 +51,7 @@ namespace Engine.ECS
         public Transform Transform { get => _transform; }
 
         private bool _activeInHierarchy = true;
-        public bool ActiveInHierarchy { get => Parent != null ? _activeInHierarchy &= Parent.IsEnabled : IsEnabled; }
+        public bool ActiveInHierarchy { get => Parent is null ? IsEnabled : _activeInHierarchy &= Parent.ActiveInHierarchy && Parent.IsEnabled; }
 
         private List<Component> _components = new();
 
