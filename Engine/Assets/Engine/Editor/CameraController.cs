@@ -15,8 +15,6 @@ namespace Engine.Editor
         private static float s_movementSpeed = 2;
         public static float MovementSpeed { get => s_movementSpeed; set => s_movementSpeed = value; }
 
-        private Input _input { get => Input.Instance; }
-
         private float _rotationSpeed = 5;
         private Vector3 _direction;
         private Vector3 _rotation;
@@ -28,12 +26,12 @@ namespace Engine.Editor
         {
             MovementSpeedCalc();
 
-            if (_input.GetButton(EMouseButton.IsMiddleButtonPressed))
-                if (_input.SetPointerInBounds())
+            if (Input.GetButton(EMouseButton.IsMiddleButtonPressed))
+                if (Input.SetPointerInBounds())
                     ScreenMovement();
 
-            if (_input.GetButton(EMouseButton.IsRightButtonPressed))
-                if (_input.SetPointerInBounds())
+            if (Input.GetButton(EMouseButton.IsRightButtonPressed))
+                if (Input.SetPointerInBounds())
                 {
                     TransformMovement();
                     CameraMovement();
@@ -53,42 +51,42 @@ namespace Engine.Editor
 
         private void MovementSpeedCalc()
         {
-            if (_input.GetButton(EMouseButton.IsRightButtonPressed)
-                || _input.GetButton(EMouseButton.IsRightButtonPressed))
-                s_movementSpeed += _input.GetMouseWheel();
+            if (Input.GetButton(EMouseButton.IsRightButtonPressed)
+                || Input.GetButton(EMouseButton.IsRightButtonPressed))
+                s_movementSpeed += Input.GetMouseWheel();
 
             s_movementSpeed = Math.Clamp(s_movementSpeed, 0.1f, 10);
         }
 
         private void CameraMovement(int _horizontalFactor = 1, int _verticalFactor = 1) =>
-            _rotation = new(_input.GetMouseAxis().Y, _input.GetMouseAxis().X, 0);
+            _rotation = new(Input.GetMouseAxis().Y, Input.GetMouseAxis().X, 0);
 
         private void TransformMovement() =>
-            _direction = Entity.Transform.Forward * _input.GetAxis().Y + Entity.Transform.Right * _input.GetAxis().X;
+            _direction = Entity.Transform.Forward * Input.GetAxis().Y + Entity.Transform.Right * Input.GetAxis().X;
 
         private void ScreenMovement() =>
-            _direction -= Entity.Transform.Right * _input.GetMouseAxis().X * (float)Time.Delta + Entity.Transform.LocalUp * _input.GetMouseAxis().Y * (float)Time.Delta;
+            _direction -= Entity.Transform.Right * Input.GetMouseAxis().X * (float)Time.Delta + Entity.Transform.LocalUp * Input.GetMouseAxis().Y * (float)Time.Delta;
 
         private void ScrollMovement()
         {
-            if (!_input.GetButton(EMouseButton.IsRightButtonPressed)
-                && !_input.GetButton(EMouseButton.IsMiddleButtonPressed)
-                && !_input.GetButton(EMouseButton.IsRightButtonPressed))
-                _direction += 5 * Entity.Transform.Forward * _input.GetMouseWheel();
+            if (!Input.GetButton(EMouseButton.IsRightButtonPressed)
+                && !Input.GetButton(EMouseButton.IsMiddleButtonPressed)
+                && !Input.GetButton(EMouseButton.IsRightButtonPressed))
+                _direction += 5 * Entity.Transform.Forward * Input.GetMouseWheel();
         }
 
         private void HeightTransformMovement()
         {
             float input = 0;
 
-            if (_input.GetKey(VirtualKey.E)) input = 1;
-            if (_input.GetKey(VirtualKey.Q)) input = -1;
-            if (_input.GetKey(VirtualKey.E) && _input.GetKey(VirtualKey.W)) input = 1;
-            if (_input.GetKey(VirtualKey.Q) && _input.GetKey(VirtualKey.W)) input = -1;
-            if (_input.GetKey(VirtualKey.E) && _input.GetKey(VirtualKey.S)) input = 1;
-            if (_input.GetKey(VirtualKey.Q) && _input.GetKey(VirtualKey.S)) input = -1;
-
-            if (_input.GetKey(VirtualKey.W) || _input.GetKey(VirtualKey.S))
+            if (Input.GetKey(VirtualKey.E)) input = 1;
+            if (Input.GetKey(VirtualKey.Q)) input = -1;
+            if (Input.GetKey(VirtualKey.E) && Input.GetKey(VirtualKey.W)) input = 1;
+            if (Input.GetKey(VirtualKey.Q) && Input.GetKey(VirtualKey.W)) input = -1;
+            if (Input.GetKey(VirtualKey.E) && Input.GetKey(VirtualKey.S)) input = 1;
+            if (Input.GetKey(VirtualKey.Q) && Input.GetKey(VirtualKey.S)) input = -1;
+            
+            if (Input.GetKey(VirtualKey.W) || Input.GetKey(VirtualKey.S))
                 _direction += input * Entity.Transform.LocalUp;
             else
                 _direction += input * Vector3.UnitY;

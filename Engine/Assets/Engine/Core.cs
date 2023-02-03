@@ -13,8 +13,6 @@ namespace Engine
     {
         public static Core Instance { get; private set; }
 
-        public Input Input;
-        public Time Time;
         public SceneManager SceneManager;
         public Renderer Renderer;
         public ImGuiRenderer ImGuiRenderer;
@@ -32,15 +30,13 @@ namespace Engine
             ImGui.SetCurrentContext(_imGuiContext);
 
             Renderer = new(swapChainPanel);
-            Input = new();
-            Time = new();
-            SceneManager = new(new Scene());
-            SceneManager.Scene.EntitytManager.CreateEntity(null, "Boot", EEditorTags.SceneBoot.ToString()).AddComponent(new SceneBoot());
+            SceneManager = new();
             ImGuiRenderer = new();
 
-            Output.Log("Engine Initialized...");
-
+            SceneManager.Scene.EntitytManager.CreateEntity(null, "Boot", EEditorTags.SceneBoot.ToString()).AddComponent(new SceneBoot());
             ImGui.GetIO().DisplaySize = new((float)swapChainPanel.ActualWidth, (float)swapChainPanel.ActualHeight);
+
+            Output.Log("Engine Initialized...");
 
             SceneManager.Awake();
             SceneManager.Start();
@@ -62,8 +58,6 @@ namespace Engine
 
                 Input.LateUpdate();
 
-                Time.Update();
-
                 Renderer.SetSolid();
                 SceneManager.Render();
                 Renderer.SetWireframe();
@@ -73,6 +67,8 @@ namespace Engine
                 ImGuiRenderer.Render(ImGui.GetDrawData());
 
                 Renderer.Present();
+
+                Time.Update();
 
                 profile.Text = Time.Profile;
                 profile.Text += "\n\n" + Renderer.Profile;

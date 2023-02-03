@@ -25,27 +25,19 @@ namespace Engine.Utilities
 
     internal class Input
     {
-        public static Input Instance { get; private set; }
+        private static Dictionary<VirtualKey, bool[]> _virtualKeyDic = new();
+        private static List<VirtualKey> _bufferKeys = new();
 
-        private Dictionary<VirtualKey, bool[]> _virtualKeyDic = new();
-        private List<VirtualKey> _bufferKeys = new();
+        private static Dictionary<EMouseButton, bool[]> _pointerPointDic = new();
+        private static List<EMouseButton> _bufferPoints = new();
 
-        private Dictionary<EMouseButton, bool[]> _pointerPointDic = new();
-        private List<EMouseButton> _bufferPoints = new();
+        private static PointerPoint _pointer;
+        private static int _mouseWheelDelta;
 
-        private PointerPoint _pointer;
-        private int _mouseWheelDelta;
+        private static Vector2 _axis = Vector2.Zero;
+        private static Vector2 _mouseAxis = Vector2.Zero;
 
-        private Vector2 _axis = Vector2.Zero;
-        private Vector2 _mouseAxis = Vector2.Zero;
-
-        private Point _pointerPosition = new(), tmpPoint = new();
-
-        public Input()
-        {
-            if (Instance is null)
-                Instance = this;
-        }
+        private static Point _pointerPosition = new(), tmpPoint = new();
 
 
         private void WinKeyDown(object sender, KeyRoutedEventArgs e)
@@ -64,7 +56,7 @@ namespace Engine.Utilities
         }
 
 
-        public void Update()
+        public static void Update()
         {
             if (_pointer != null)
             {
@@ -81,7 +73,7 @@ namespace Engine.Utilities
             if (GetKey(VirtualKey.D)) _axis.X = 1;
         }
 
-        public void LateUpdate()
+        public static void LateUpdate()
         {
             foreach (var item in _bufferKeys)
             {
@@ -100,7 +92,7 @@ namespace Engine.Utilities
             _mouseWheelDelta = 0;
         }
 
-        private void SetKeyDic(VirtualKey key, bool[] newBool)
+        private static void SetKeyDic(VirtualKey key, bool[] newBool)
         {
             if (!_virtualKeyDic.ContainsKey(key))
                 _virtualKeyDic.Add(key, newBool);
@@ -110,7 +102,7 @@ namespace Engine.Utilities
             _bufferKeys.Add(key);
         }
 
-        private void SetPointerDic(EMouseButton input, bool[] newBool)
+        private static void SetPointerDic(EMouseButton input, bool[] newBool)
         {
             if (!_pointerPointDic.ContainsKey(input))
                 _pointerPointDic.Add(input, newBool);
@@ -120,7 +112,7 @@ namespace Engine.Utilities
             _bufferPoints.Add(input);
         }
 
-        public bool GetKey(VirtualKey key, EInputState state = EInputState.Pressed)
+        public static bool GetKey(VirtualKey key, EInputState state = EInputState.Pressed)
         {
             if (_virtualKeyDic.ContainsKey(key))
                 return _virtualKeyDic[key][(int)state];
@@ -128,7 +120,7 @@ namespace Engine.Utilities
             return false;
         }
 
-        public bool GetButton(EMouseButton button, EInputState state = EInputState.Pressed)
+        public static bool GetButton(EMouseButton button, EInputState state = EInputState.Pressed)
         {
             if (_pointerPointDic.ContainsKey(button))
                 return _pointerPointDic[button][(int)state];
@@ -136,15 +128,15 @@ namespace Engine.Utilities
             return false;
         }
 
-        public Vector2 GetAxis() { return _axis; }
+        public static Vector2 GetAxis() { return _axis; }
 
-        public Vector2 GetMouseAxis() { return _mouseAxis; }
+        public static Vector2 GetMouseAxis() { return _mouseAxis; }
 
-        public Point GetMousePosition() { return _pointerPosition; }
+        public static Point GetMousePosition() { return _pointerPosition; }
 
-        public int GetMouseWheel() { return _mouseWheelDelta; }
+        public static int GetMouseWheel() { return _mouseWheelDelta; }
 
-        public void KeyDown(object sender, KeyRoutedEventArgs e)
+        public static void KeyDown(object sender, KeyRoutedEventArgs e)
         {
             var newBool = new bool[3];
             newBool[(int)EInputState.Down] = true;
@@ -156,7 +148,7 @@ namespace Engine.Utilities
             e.Handled = true;
         }
 
-        public void KeyUp(object sender, KeyRoutedEventArgs e) //CoreWindow sender, KeyEventArgs e)
+        public static void KeyUp(object sender, KeyRoutedEventArgs e) //CoreWindow sender, KeyEventArgs e)
         {
             var newBool = new bool[3];
             newBool[(int)EInputState.Down] = false;
@@ -168,7 +160,7 @@ namespace Engine.Utilities
             e.Handled = true;
         }
 
-        public void PointerPressed(object sender, PointerRoutedEventArgs e)
+        public static void PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             if (e.Pointer.PointerDeviceType == PointerDeviceType.Mouse)
             {
@@ -192,7 +184,7 @@ namespace Engine.Utilities
             e.Handled = true;
         }
 
-        public void PointerReleased(object sender, PointerRoutedEventArgs e)
+        public static void PointerReleased(object sender, PointerRoutedEventArgs e)
         {
             if (e.Pointer.PointerDeviceType == PointerDeviceType.Mouse)
             {
@@ -215,7 +207,7 @@ namespace Engine.Utilities
             e.Handled = true;
         }
 
-        public void PointerWheelChanged(object sender, PointerRoutedEventArgs e)
+        public static void PointerWheelChanged(object sender, PointerRoutedEventArgs e)
         {
             if (e.Pointer.PointerDeviceType == PointerDeviceType.Mouse)
             {
@@ -227,7 +219,7 @@ namespace Engine.Utilities
             e.Handled = true;
         }
 
-        public void PointerMoved(object sender, PointerRoutedEventArgs e)
+        public static void PointerMoved(object sender, PointerRoutedEventArgs e)
         {
             if (e.Pointer.PointerDeviceType == PointerDeviceType.Mouse)
             {
@@ -239,7 +231,7 @@ namespace Engine.Utilities
             e.Handled = true;
         }
 
-        public bool SetPointerInBounds()
+        public static bool SetPointerInBounds()
         {
             //if (m_pointer.Position.X <= 0)
             //{

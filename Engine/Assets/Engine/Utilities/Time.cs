@@ -5,17 +5,17 @@ namespace Engine.Utilities
 {
     internal class Time
     {
-        public string Profile = "";
+        public static string Profile = "";
 
         public static double Delta { get => s_delta; set => s_delta = value; }
         private static double s_time, s_delta;
 
         private static Stopwatch s_watch = new();
 
-        private int _fps, _tmpFPS;
-        private DateTime _now = DateTime.Now;
+        private static int _fps, _tmpFPS;
+        private static DateTime _now = DateTime.Now;
 
-        public void Update()
+        public static void Update()
         {
             s_delta = s_watch.ElapsedMilliseconds * 0.001;
             s_time += s_delta;

@@ -51,7 +51,7 @@ namespace Engine.Editor
         {
             SceneManager.Scene.EntitytManager.Sky.Transform.Position = Camera.Transform.Position;
 
-            if (Input.Instance.GetKey(Windows.System.VirtualKey.C, EInputState.Down))
+            if (Input.GetKey(Windows.System.VirtualKey.C, EInputState.Down))
             {
                 Output.Log("Spawned 10 Cubes");
 
@@ -63,8 +63,6 @@ namespace Engine.Editor
                     newCube.Transform.Scale = new(new Random().Next(1, 3), new Random().Next(1, 3), new Random().Next(1, 3));
                 }
             }
-
-            SceneCamera.IsEnabled = true;
         }
     }
 
@@ -98,16 +96,13 @@ namespace Engine.Editor
 
             if (!targetDirection.IsNaN())
                 Entity.Transform.Position += targetDirection;
-
-            if (Input.Instance.GetKey(Windows.System.VirtualKey.F, EInputState.Down))
-                Entity.GetComponent<Mesh>().IsEnabled = !Entity.GetComponent<Mesh>().IsEnabled;
         }
 
         internal Vector3 Movement()
         {
             Vector3 dest =
-                Input.Instance.GetAxis().X * Entity.Transform.Right +
-                Input.Instance.GetAxis().Y * Entity.Transform.Forward;
+                Input.GetAxis().X * Entity.Transform.Right +
+                Input.GetAxis().Y * Entity.Transform.Forward;
 
             return Vector3.Normalize(dest) * MovementSpeed * (float)Time.Delta;
         }
