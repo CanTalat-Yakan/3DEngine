@@ -31,6 +31,7 @@ namespace Engine.Utilities
 
         public Renderer(SwapChainPanel swapChainPanel)
         {
+
             #region //Create Instance
             if (Instance is null)
                 Instance = this;
@@ -41,7 +42,7 @@ namespace Engine.Utilities
             SwapChainPanel.SizeChanged += OnSwapChainPanelSizeChanged;
             #endregion
 
-            #region //Create Buffer Description for swapChain description
+            #region //Create device, device context & swap chain with result
             SwapChainDescription1 swapChainDescription = new()
             {
                 AlphaMode = AlphaMode.Ignore,
@@ -55,10 +56,8 @@ namespace Engine.Utilities
                 SwapEffect = SwapEffect.FlipSequential,
                 BufferUsage = Usage.RenderTargetOutput
             };
-            #endregion
 
-            #region //Create device, device context & swap chain
-            D3D11.D3D11CreateDevice(
+            var result = D3D11.D3D11CreateDevice(
                 null,
                 DriverType.Hardware,
                 DeviceCreationFlags.BgraSupport,
@@ -68,6 +67,9 @@ namespace Engine.Utilities
                     FeatureLevel.Level_11_0,
                 },
                 out var defaultDevice);
+
+            if (!result.Success)
+                throw new Exception("D3D11.D3D11CreateDevice()");
 
             Device = defaultDevice.QueryInterface<ID3D11Device2>();
             DeviceContext = Device.ImmediateContext2;
@@ -79,7 +81,10 @@ namespace Engine.Utilities
                 _swapChain = swapChain1.QueryInterface<IDXGISwapChain2>();
 
             using (var nativeObject = ComObject.As<Vortice.WinUI.ISwapChainPanelNative2>(this.SwapChainPanel))
-                nativeObject.SetSwapChain(_swapChain);
+                result = nativeObject.SetSwapChain(_swapChain);
+
+            if (!result.Success)
+                throw new Exception("nativeObject.SetSwapChain()");
             #endregion
 
             #region //Create render target view, get back buffer texture before
@@ -151,10 +156,10 @@ namespace Engine.Utilities
             Device.Dispose();
             DeviceContext.Dispose();
             _swapChain.Dispose();
-            _depthStencilView.Dispose();
-            _depthStencilTexture.Dispose();
-            _renderTargetView.Dispose();
             _renderTargetTexture.Dispose();
+            _renderTargetView.Dispose();
+            _depthStencilTexture.Dispose();
+            _depthStencilView.Dispose();
             _blendState.Dispose();
         }
 
@@ -214,7 +219,9 @@ namespace Engine.Utilities
 
         public void OnSwapChainPanelSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            var newSize = new Size((int)e.NewSize.Width, (int)e.NewSize.Height);
+            var newSize = new Size(
+                Math.Max(1, (int)e.NewSize.Width), 
+                Math.Max(1, (int)e.NewSize.Height));
 
             _renderTargetView.Dispose();
             _renderTargetTexture.Dispose();
@@ -225,19 +232,18 @@ namespace Engine.Utilities
 
             _swapChain.ResizeBuffers(
               _swapChain.Description.BufferCount,
-              Math.Max(1, (int)e.NewSize.Width),
-              Math.Max(1, (int)e.NewSize.Height),
+              newSize.Width,
+              newSize.Height,
               _swapChain.Description1.Format,
               _swapChain.Description1.Flags);
 
             _renderTargetTexture = _swapChain.GetBuffer<ID3D11Texture2D>(0);
             _renderTargetView = Device.CreateRenderTargetView(_renderTargetTexture);
 
-            _depthStencilTextureDescription.Width = Math.Max(1, (int)e.NewSize.Width);
-            _depthStencilTextureDescription.Height = Math.Max(1, (int)e.NewSize.Height);
+            _depthStencilTextureDescription.Width = newSize.Width;
+            _depthStencilTextureDescription.Height = newSize.Height;
             using (_depthStencilTexture = Device.CreateTexture2D(_depthStencilTextureDescription))
                 _depthStencilView = Device.CreateDepthStencilView(_depthStencilTexture);
-
 
             _swapChain.SourceSize = newSize;
 
