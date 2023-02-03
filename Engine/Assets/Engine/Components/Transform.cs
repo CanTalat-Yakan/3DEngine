@@ -3,7 +3,6 @@ using System;
 using Vortice.Mathematics;
 using Engine.Data;
 using Engine.ECS;
-using Aspose.ThreeD;
 
 namespace Engine.Components
 {
