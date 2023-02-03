@@ -23,12 +23,13 @@ namespace Editor
 
             var documentsDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             var rootPath = Path.Combine(documentsDir, "3DEngine");
+            var logFilePath = Path.Combine(rootPath, "Application.log");
 
-            // Set up listener
-            string logFilePath = Path.Combine(rootPath, "Application.log");
+            // Reset log
             if (File.Exists(logFilePath))
                 File.WriteAllText(logFilePath, String.Empty);
 
+            // Set up listener
             FileStream traceLog = new(logFilePath, FileMode.OpenOrCreate);
             TextWriterTraceListener listener = new(traceLog);
 
@@ -46,10 +47,13 @@ namespace Editor
 
                 // write call stack
                 foreach (StackFrame stackFrame in new StackTrace().GetFrames())
-                    Debug.WriteLine(stackFrame.ToString());
+                    Debug.Write(stackFrame.ToString());
+                    //Debug.WriteLine($"{stackFrame.GetFileName()}.{stackFrame.GetMethod()} (Line) {stackFrame.GetFileLineNumber()}");
 
                 // write exception
                 Debug.WriteLine("\n" +e.Exception + "\n\n");
+
+                Controller.Output.Log(e.Exception);
             };
         }
 
