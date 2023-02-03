@@ -13,6 +13,7 @@ namespace Editor
         internal Controller.Theme _themeControl;
 
         private ModelView.Main _main;
+        public ModelView.Main Main { get => _main != null ? _main : _main = new(this); }
 
         public MainWindow()
         {
@@ -45,15 +46,8 @@ namespace Editor
                         x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftCompact;
                         break;
                     case "engine":
-                        _main = new(this);
-                        x_Frame_Content.Content = _main;
+                        x_Frame_Content.Content = Main;
                         x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftCompact;
-
-                        //x_NavigationView_Main.SelectedItem = new Frames.Main();
-                        //x_NavigationView_Main.Content = x_Frame_Content;
-                        //x_Frame_Content.Content = new Frames.Main();
-
-                        //x_Frame_Content.Navigate(typeof(Frames.Main));
                         break;
                     default:
                         break;

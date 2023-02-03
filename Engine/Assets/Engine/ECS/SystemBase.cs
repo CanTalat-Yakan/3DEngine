@@ -65,7 +65,11 @@ namespace Engine.ECS
 
         private static bool CheckActive(T component)
         {
-            return component.IsEnabled && component.Entity.IsEnabled && component.Entity.ActiveInHierarchy && component.Entity.Scene.IsEnabled;
+            return
+                component.IsEnabled &&
+                component.Entity.IsEnabled &&
+                component.Entity.Scene.IsEnabled &&
+                component.Entity.ActiveInHierarchy; 
         }
     }
 
