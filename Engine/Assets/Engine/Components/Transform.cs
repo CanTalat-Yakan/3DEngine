@@ -4,7 +4,6 @@ using Vortice.Mathematics;
 using Engine.Data;
 using Engine.ECS;
 using Aspose.ThreeD;
-using Vortice.Direct2D1.Effects;
 
 namespace Engine.Components
 {

@@ -108,9 +108,6 @@ namespace Engine.Utilities
                 Parent = parent,
             };
 
-            newEntity.Name = type.ToString().FormatString();
-            newEntity.Parent = parent;
-
             newEntity.AddComponent(new Mesh(ModelLoader.LoadFilePro(Path.Combine(PATH_PRIMITIVES, type.ToString()) + ".obj")));
             newEntity.GetComponent<Mesh>().Material = _materialDefault;
 
