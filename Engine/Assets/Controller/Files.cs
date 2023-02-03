@@ -32,22 +32,20 @@ namespace Editor.Controller
     {
         public string ProjectPath { get; private set; }
 
+        public Grid Content;
+        public BreadcrumbBar Bar;
         public WrapPanel Wrap;
 
-        public BreadcrumbBar Bar;
-
-        public Grid GridMain;
+        private ModelView.Files _files;
 
         public Category[] Categories;
-
-        private ModelView.Files _files;
 
         private Category? _currentCategory;
         private string _currentSubPath;
 
         public Files(ModelView.Files files, Grid grid, WrapPanel wrap, BreadcrumbBar bar)
         {
-            GridMain = grid;
+            Content = grid;
             Wrap = wrap;
             Bar = bar;
 
@@ -348,7 +346,7 @@ namespace Editor.Controller
             grid.Children.Add(button);
 
             #region // MenuFlyout
-            GridMain.ContextFlyout = null;
+            Content.ContextFlyout = null;
             #endregion
 
             return grid;
@@ -458,7 +456,7 @@ namespace Editor.Controller
             if (!string.IsNullOrEmpty(_currentSubPath))
                 path = Path.Combine(path, _currentSubPath);
 
-            GridMain.ContextFlyout = CreateRootMenuFlyout(path);
+            Content.ContextFlyout = CreateRootMenuFlyout(path);
 
             Grid grid = new();
 
