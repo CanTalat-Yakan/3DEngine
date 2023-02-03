@@ -63,17 +63,8 @@ namespace Editor.Controller
             s_statusIcon = Main.Instance.StatusIcon;
         }
 
-        public static void Log(bool b, EMessageType t = EMessageType.Message, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null) =>
-            Log(b.ToString(), t, l, c, s);
-
-        public static void Log(int i, EMessageType t = EMessageType.Message, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null) =>
-             Log(i.ToString(), t, l, c, s);
-
-        public static void Log(float f, EMessageType t = EMessageType.Message, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null) =>
-            Log(f.ToString(), t, l, c, s);
-
-        public static void Log(double d, EMessageType t = EMessageType.Message, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null) =>
-            Log(d.ToString(), t, l, c, s);
+        public static void Log(object o, EMessageType t = EMessageType.Message, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null) =>
+            Log(o.ToString(), t, l, c, s);
 
         public static void Log(string m, EMessageType t = EMessageType.Message, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null)
         {
