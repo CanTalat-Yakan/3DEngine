@@ -13,13 +13,13 @@ using Vortice.Mathematics;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.Storage;
+using Engine.ECS;
+using Engine.Editor;
+using Engine.Utilities;
 using Image = Microsoft.UI.Xaml.Controls.Image;
 using Color = System.Drawing.Color;
 using Path = System.IO.Path;
 using Texture = Vortice.Direct3D11.Texture2DArrayShaderResourceView;
-using Engine.ECS;
-using Engine.Editor;
-using Engine.Utilities;
 
 namespace Editor.Controller
 {
@@ -64,7 +64,6 @@ namespace Editor.Controller
         {
             Grid[] properties = new[]
             {
-                //CreateBool(true, (s, r) => {entity.IsEnabled = (s as CheckBox).IsChecked.Value;Output.Log(entity.IsEnabled.ToString()); }).WrapInField("Is Enabled"),
                 CreateBool(false, (s, r) => entity.IsStatic = (s as CheckBox).IsChecked.Value).WrapInField("Is Static"),
                 CreateEnum(Enum.GetNames(typeof(ETags))).WrapInField("Tag"),
                 CreateEnum(Enum.GetNames(typeof(ELayers))).WrapInField("Layer")

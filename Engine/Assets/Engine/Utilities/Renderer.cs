@@ -31,7 +31,6 @@ namespace Engine.Utilities
 
         public Renderer(SwapChainPanel swapChainPanel)
         {
-
             #region //Create Instance
             if (Instance is null)
                 Instance = this;
@@ -174,13 +173,6 @@ namespace Engine.Utilities
         public void Present()
         {
             _swapChain.Present(0, PresentFlags.None);
-
-            //int syncInterval = 1;
-            //PresentFlags presentFlags = PresentFlags.None;
-            //syncInterval = 0;
-            //presentFlags = PresentFlags.AllowTearing;
-
-            //Result result = m_SwapChain.Present(syncInterval, presentFlags);
         }
 
         public void SetSolid()
