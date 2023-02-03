@@ -17,6 +17,8 @@ namespace Editor.ModelView
             Loaded += (s, e) => _engineCore = new Engine.Core(x_SwapChainPanel_ViewPort, _viewPortControl.Profile);
             Loaded += (s, e) => InitializeInput();
 
+            Unloaded += (s, e) => _engineCore.Renderer.Dispose();
+
             _viewPortControl = new Controller.ViewPort(this, x_Grid_Overlay);
         }
 
