@@ -1,4 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
+using System.Diagnostics;
+using System.IO;
+using System;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -17,6 +20,37 @@ namespace Editor
         public App()
         {
             this.InitializeComponent();
+
+            var documentsDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var rootPath = Path.Combine(documentsDir, "3DEngine");
+
+            // Set up listener
+            string logFilePath = Path.Combine(rootPath, "Application.log");
+            if (File.Exists(logFilePath))
+                File.WriteAllText(logFilePath, String.Empty);
+
+            FileStream traceLog = new(logFilePath, FileMode.OpenOrCreate);
+            TextWriterTraceListener listener = new(traceLog);
+
+            // Pass listener to trace
+            Trace.Listeners.Add(listener);
+            // Automatically write into file
+            Trace.AutoFlush = true;
+
+            this.UnhandledException += (s, e) =>
+            {
+                e.Handled = true;
+
+                // write date and time
+                Debug.WriteLine($"[{DateTime.Now}]");
+
+                // write call stack
+                foreach (StackFrame stackFrame in new StackTrace().GetFrames())
+                    Debug.WriteLine(stackFrame.ToString());
+
+                // write exception
+                Debug.WriteLine("\n" +e.Exception + "\n\n");
+            };
         }
 
         /// <summary>
@@ -30,7 +64,7 @@ namespace Editor
             window.Activate();
         }
 
-        private Window window; 
+        private Window window;
         public Window Window => window;
         //var window = (Application.Current as App)?.Window as MainWindow;
     }
