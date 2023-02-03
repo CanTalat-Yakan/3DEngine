@@ -9,7 +9,7 @@ namespace Engine.ECS
         [Hide]
         public Entity Entity;
         [Hide]
-        public byte Order = 1;
+        public byte Order = 0;
 
         private bool _isEnabled;
         public bool IsEnabled
