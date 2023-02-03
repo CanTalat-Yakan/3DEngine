@@ -11,7 +11,6 @@ using Windows.System;
 using Engine.Components;
 using Engine.ECS;
 using Engine.Utilities;
-using Engine.Editor;
 
 namespace Editor.Controller
 {
