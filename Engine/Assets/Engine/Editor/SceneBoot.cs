@@ -62,7 +62,10 @@ namespace Engine.Editor
                     newCube.Transform.EulerAngles = new(new Random().Next(1, 360), new Random().Next(1, 360), new Random().Next(1, 360));
                     newCube.Transform.Scale = new(new Random().Next(1, 3), new Random().Next(1, 3), new Random().Next(1, 3));
                 }
+
             }
+
+            SceneCamera.IsEnabled = true;
         }
     }
 
