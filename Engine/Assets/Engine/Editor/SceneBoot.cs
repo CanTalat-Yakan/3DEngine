@@ -36,12 +36,9 @@ namespace Engine.Editor
 
         public override void OnStart()
         {
-            var tree = SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Tree);
-            tree.Transform.Position.Y += 0.5f;
-            tree.AddComponent(new PlayerMovement());
-            tree.AddComponent(new Test());
-
-            Camera = SceneManager.Scene.EntitytManager.CreateCamera("Camera", ETags.MainCamera.ToString(), tree);
+            Camera = SceneManager.Scene.EntitytManager.CreateCamera("Camera", ETags.MainCamera.ToString());
+            Camera.AddComponent(new PlayerMovement());
+            Camera.AddComponent(new Test());
 
             Cubes = SceneManager.Scene.EntitytManager.CreateEntity(null, "Cubes");
             SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Cube, Cubes);
@@ -62,7 +59,6 @@ namespace Engine.Editor
                     newCube.Transform.EulerAngles = new(new Random().Next(1, 360), new Random().Next(1, 360), new Random().Next(1, 360));
                     newCube.Transform.Scale = new(new Random().Next(1, 3), new Random().Next(1, 3), new Random().Next(1, 3));
                 }
-
             }
 
             SceneCamera.IsEnabled = true;
