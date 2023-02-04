@@ -28,7 +28,7 @@ namespace Editor
                 var logFilePath = Path.Combine(rootPath, "Application.log");
 
                 // Create directory
-                if(Directory.Exists(rootPath))
+                if(!Directory.Exists(rootPath))
                     Directory.CreateDirectory(rootPath);
                 
                 // Create file 
