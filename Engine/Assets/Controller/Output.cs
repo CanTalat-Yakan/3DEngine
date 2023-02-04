@@ -70,6 +70,9 @@ namespace Editor.Controller
         {
             SMessageInfo message = new() { Script = s, Method = c, Line = l, Message = m, Type = t };
 
+            if (s_status is null)
+                return;
+
             if (s_pauseError.IsChecked.Value)
                 if (t == EMessageType.Error)
                     Main.Instance.ControlPlayer.Pause();
@@ -191,7 +194,7 @@ namespace Editor.Controller
 
         private static void SetStatus(SMessageInfo m)
         {
-            s_status.Text = m.Message;
+            s_status.Text = m.Message.Split("\n")[0];
 
             if (m.Type == EMessageType.Warning)
                 s_statusIcon.Child = new FontIcon() { Glyph = "\uE7BA" };
@@ -227,7 +230,7 @@ namespace Editor.Controller
             //The flyout when clicked on the message
             StackPanel stackFlyout = new() { Orientation = Orientation.Vertical };
             stackFlyout.Children.Add(new TextBlock() { Text = m.GetInfo() + "\n" });
-            stackFlyout.Children.Add(new MarkdownTextBlock() { Text = m.Message, Padding = new Thickness(2) });
+            stackFlyout.Children.Add(new MarkdownTextBlock() { Text = m.Message, TextWrapping = TextWrapping.WrapWholeWords, Padding = new Thickness(2) });
             HyperlinkButton hyperlinkButton = new() { Content = Path.GetRelativePath(Directory.GetCurrentDirectory(), m.Script) + ":" + m.Line, Foreground = new SolidColorBrush(Colors.CadetBlue) };
             hyperlinkButton.Click += (s, e) => Process.Start(new ProcessStartInfo { FileName = Path.GetRelativePath(Directory.GetCurrentDirectory(), m.Script), UseShellExecute = true });
             stackFlyout.Children.Add(hyperlinkButton);

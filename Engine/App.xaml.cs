@@ -48,12 +48,12 @@ namespace Editor
                 // write call stack
                 foreach (StackFrame stackFrame in new StackTrace().GetFrames())
                     Debug.Write(stackFrame.ToString());
-                    //Debug.WriteLine($"{stackFrame.GetFileName()}.{stackFrame.GetMethod()} (Line) {stackFrame.GetFileLineNumber()}");
 
                 // write exception
-                Debug.WriteLine("\n" +e.Exception + "\n\n");
+                Debug.WriteLine("\n" + e.Exception + "\n\n");
 
-                Controller.Output.Log(e.Exception, Controller.EMessageType.Error);
+                if (Controller.Main.Instance != null)
+                    Controller.Output.Log(e.Exception, Controller.EMessageType.Error);
             };
         }
 
