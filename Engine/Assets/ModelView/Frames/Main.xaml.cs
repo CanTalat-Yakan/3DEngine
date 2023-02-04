@@ -40,6 +40,5 @@ namespace Editor.ModelView
         private void AppBarButton_Status_Kill_Click(object sender, RoutedEventArgs e) => _mainControl.ControlPlayer.Kill();
 
         private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) { Controller.Theme.Instance.SetRequstedTheme(); }
-
     }
 }
