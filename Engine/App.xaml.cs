@@ -53,7 +53,7 @@ namespace Editor
                 // write exception
                 Debug.WriteLine("\n" +e.Exception + "\n\n");
 
-                Controller.Output.Log(e.Exception);
+                Controller.Output.Log(e.Exception, Controller.EMessageType.Error);
             };
         }
 
