@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using Vortice.Direct3D11;
+using Editor.Controller;
 using Engine.Data;
 using Engine.ECS;
 using Engine.Utilities;
@@ -40,6 +39,10 @@ namespace Engine.Components
             _d3d.Draw(
                 _vertexBuffer, _vertexStride,
                 _indexBuffer, _indexCount);
+
+            Profiler.Vertices += _vertexCount;
+            Profiler.Indices += _indexCount;
+            Profiler.DrawCalls++;
         }
 
         internal void CreateBuffer()

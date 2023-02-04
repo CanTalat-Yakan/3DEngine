@@ -2,6 +2,7 @@
 using System;
 using Engine.ECS;
 using Editor.Controller;
+using Engine.Components;
 
 namespace Engine.Utilities
 {
@@ -92,11 +93,6 @@ namespace Engine.Utilities
             CameraSystem.Sort();
             CameraSystem.Render();
             MeshSystem.Render();
-        }
-
-        public string Profile()
-        {
-            return Scene.Profile();
         }
 
         public static Scene GetFromID(Guid guid)

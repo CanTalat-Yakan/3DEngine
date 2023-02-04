@@ -25,8 +25,6 @@ namespace Engine.Utilities
             set { SetProperty(ref _isEnabled, value); }
         }
 
-        private string _profile;
-
         object ICloneable.Clone() { return Clone(); }
 
         public Scene Clone()
@@ -40,28 +38,5 @@ namespace Engine.Utilities
         public void Load() { }
 
         public void Unload() { }
-
-        public string Profile()
-        {
-            int vertexCount = 0;
-            int indexCount = 0;
-
-            foreach (var entity in EntitytManager.EntityList)
-            {
-                var mesh = entity.GetComponent<Mesh>();
-                if (entity.IsEnabled && mesh != null)
-                {
-                    vertexCount += mesh._vertexCount;
-                    indexCount += mesh._indexCount;
-                }
-            }
-
-            _profile = "Objects: " + EntitytManager.EntityList.Count().ToString();
-            _profile += "\n" + "Vertices: " + vertexCount;
-            _profile += "\n" + "Indices: " + indexCount;
-
-            return _profile;
-        }
-
     }
 }

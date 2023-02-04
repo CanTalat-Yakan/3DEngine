@@ -70,9 +70,7 @@ namespace Engine
 
                 Time.Update();
 
-                profile.Text = Time.Profile;
-                profile.Text += "\n\n" + Renderer.Profile;
-                profile.Text += "\n\n" + SceneManager.Profile();
+                profile.Text = Profiler.ToString();
             };
         }
 

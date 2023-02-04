@@ -7,14 +7,13 @@ using Vortice.Direct3D11;
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
+using Editor.Controller;
 
 namespace Engine.Utilities
 {
     internal class Renderer
     {
         public static Renderer Instance { get; private set; }
-
-        public string Profile;
 
         public ID3D11Device2 Device { get; private set; }
         public ID3D11DeviceContext DeviceContext { get; private set; }
@@ -168,6 +167,10 @@ namespace Engine.Utilities
             DeviceContext.ClearRenderTargetView(_renderTargetView, col);
             DeviceContext.ClearDepthStencilView(_depthStencilView, DepthStencilClearFlags.Depth, 1.0f, 0);
             DeviceContext.OMSetRenderTargets(_renderTargetView, _depthStencilView);
+
+            Profiler.Vertices = 0;
+            Profiler.Indices = 0;
+            Profiler.DrawCalls = 0;
         }
 
         public void Present()
@@ -219,8 +222,6 @@ namespace Engine.Utilities
             _renderTargetTexture.Dispose();
             _depthStencilView.Dispose();
             _depthStencilTexture.Dispose();
-
-            Profile = "Resolution: " + "\n" + ((int)e.NewSize.Width).ToString() + ":" + ((int)e.NewSize.Height).ToString();
 
             _swapChain.ResizeBuffers(
               _swapChain.Description.BufferCount,
