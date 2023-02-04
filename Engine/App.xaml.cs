@@ -21,35 +21,46 @@ namespace Editor
         {
             this.InitializeComponent();
 
-            var documentsDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var rootPath = Path.Combine(documentsDir, "3DEngine");
-            var logFilePath = Path.Combine(rootPath, "Application.log");
+            try
+            {
+                var documentsDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                var rootPath = Path.Combine(documentsDir, "3DEngine");
+                var logFilePath = Path.Combine(rootPath, "Application.log");
 
-            // Reset log
-            if (File.Exists(logFilePath))
+                // Create directory
+                if(Directory.Exists(rootPath))
+                    Directory.CreateDirectory(rootPath);
+                
+                // Create file 
+                if (!File.Exists(logFilePath))
+                    File.Create(logFilePath);
+
+                // Reset log
                 File.WriteAllText(logFilePath, String.Empty);
 
-            // Set up listener
-            FileStream traceLog = new(logFilePath, FileMode.OpenOrCreate);
-            TextWriterTraceListener listener = new(traceLog);
+                // Set up listener
+                FileStream traceLog = new(logFilePath, FileMode.Open);
+                TextWriterTraceListener listener = new(traceLog);
 
-            // Pass listener to trace
-            Trace.Listeners.Add(listener);
-            // Automatically write into file
-            Trace.AutoFlush = true;
+                // Pass listener to trace
+                Trace.Listeners.Add(listener);
+                // Automatically write into file
+                Trace.AutoFlush = true;
+            }
+            catch { }
 
             this.UnhandledException += (s, e) =>
             {
                 e.Handled = true;
 
-                // write date and time
+                // Write date and time
                 Debug.WriteLine($"[{DateTime.Now}]");
 
-                // write call stack
-                foreach (StackFrame stackFrame in new StackTrace().GetFrames())
+                // Write call stack
+                foreach (var stackFrame in new StackTrace().GetFrames())
                     Debug.Write(stackFrame.ToString());
 
-                // write exception
+                // Write exception
                 Debug.WriteLine("\n" + e.Exception + "\n\n");
 
                 if (Controller.Main.Instance != null)

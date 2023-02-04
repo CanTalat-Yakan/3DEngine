@@ -215,7 +215,7 @@ namespace Editor.Controller
         private static UIElement CreateMessage(DateTime d, SMessageInfo m, int? i)
         {
             //Content of the message
-            StackPanel stack = new() { Orientation = Orientation.Horizontal, Spacing = 10, Margin = new(10, 0, 0, 0), Padding = new(5) };
+            StackPanel stack = new() { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Top, Spacing = 10, Margin = new(10, 0, 0, 0), Padding = new(5) };
             Viewbox viewbox = new() { Width = 14, Height = 14 };
             if (m.Type == EMessageType.Warning)
                 viewbox.Child = new FontIcon() { Glyph = "\uE7BA" };
