@@ -1,3 +1,4 @@
+using Engine.Utilities;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -16,6 +17,18 @@ namespace Editor.ModelView
 
             _mainControl = new(mainWindow, x_Grid_Main, x_TextBlock_Status_Content, x_TextBlock_StatusIcon_Content);
             _mainControl.ControlPlayer = new(x_AppBarToggleButton_Status_Play, x_AppBarToggleButton_Status_Pause, x_AppBarButton_Status_Forward);
+
+            InitializeInput();
+        }
+
+        private void InitializeInput()
+        {
+            PointerPressed += Input.PointerPressed;
+            PointerWheelChanged += Input.PointerWheelChanged;
+            PointerReleased += Input.PointerReleased;
+            PointerMoved += Input.PointerMoved;
+            KeyDown += Input.KeyDown;
+            KeyUp += Input.KeyUp;
         }
 
         private void AppBarToggleButton_Status_Play_Click(object sender, RoutedEventArgs e) => _mainControl.ControlPlayer.Play();
