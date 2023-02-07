@@ -109,7 +109,7 @@ namespace Engine.Utilities
         protected static ReadOnlyMemory<byte> CompileBytecode(string shaderPath, string entryPoint, string profile)
         {
             string resourcesPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources\");
-            string fileNamePath = Path.Combine(resourcesPath, shaderPath);
+            string shaderFilePath = Path.Combine(resourcesPath, shaderPath);
             //string shaderSource = File.ReadAllText(Path.Combine(assetsPath, shaderName));
 
             ShaderFlags shaderFlags = ShaderFlags.EnableStrictness;
@@ -120,7 +120,7 @@ namespace Engine.Utilities
             shaderFlags |= ShaderFlags.OptimizationLevel3;
 #endif
 
-            return Compiler.CompileFromFile(fileNamePath, entryPoint, profile, shaderFlags);
+            return Compiler.CompileFromFile(shaderFilePath, entryPoint, profile, shaderFlags);
         }
     }
 }
