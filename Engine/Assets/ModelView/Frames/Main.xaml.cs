@@ -26,7 +26,6 @@ namespace Editor.ModelView
             PointerMoved += Input.PointerMoved;
             PointerReleased += Input.PointerReleased;
             KeyUp += Input.KeyUp;
-            KeyDown += Input.KeyDown;
         }
 
         private void AppBarToggleButton_Status_Play_Click(object sender, RoutedEventArgs e) => _mainControl.ControlPlayer.Play();
