@@ -9,34 +9,36 @@ namespace Editor.Controller
     internal partial class ViewPort
     {
         public TextBlock Profile;
-        public Grid GridMain;
+        public Grid MainContent;
 
         private ModelView.ViewPort _viewPort;
 
-        public ViewPort(ModelView.ViewPort viewPort, Grid grid)
+        public ViewPort(ModelView.ViewPort viewPort, Grid content)
         {
+            // Set the Viewport and Maincontent variable.
             _viewPort = viewPort;
-            GridMain = grid;
+            MainContent = content;
 
+            // Call the CreateViewPortSettings function to build the UI.
             CreateViewPortSettings();
         }
 
         private void CreateViewPortSettings()
         {
+            // Initialize an array of UI elements to be positioned in the top-left corner of the main content.
             UIElement[] topLeft = new[]
             {
                 CreateButton(CreateIcon(Symbol.Video),
                     StackInGridVertical(
-                            CreateSlider(90, 40, 110, 
+                            CreateSlider(90, 40, 110,
                             (s, e) => { SceneManager.Scene.EntitytManager.GetFromTag("SceneCamera").GetComponent<Camera>().FieldOfView= (float)e.NewValue; }).WrapInGridVertical("Field Of View"),
                             CreateNumberInput(CameraController.MovementSpeed, 1, 100, (s, e) => { CameraController.MovementSpeed = (float)e.NewValue; }).WrapInGridVertical("Movement Speed"))),
                 CreateAppBarSeperator(),
                 CreateComboBox(new[] { "Perspective", "Orthogonal" }),
                 CreateComboBox(new[] { "Lit", "Unlit", "Wireframe", "Shaded Wireframe" }),
             };
-
-            GridMain.Children.Add(WrapInStackPanelDockTopLeft(topLeft));
-
+            
+            // Initialize an array of UI elements to be positioned in the top-right corner of the main content.
             UIElement[] topRight = new[]
             {
                 CreateButton(CreateIcon("\xE946"), CreateTextFull(out Profile).WrapInGrid()),
@@ -50,7 +52,9 @@ namespace Editor.Controller
                 CreateToggleButton(CreateIcon(Symbol.Globe), true),
             };
 
-            GridMain.Children.Add(WrapInStackPanelDockTopRight(topRight));
+            // Add the top-left and top-right UI elements to the main content.
+            MainContent.Children.Add(WrapInStackPanelDockTopLeft(topLeft));
+            MainContent.Children.Add(WrapInStackPanelDockTopRight(topRight));
         }
     }
 

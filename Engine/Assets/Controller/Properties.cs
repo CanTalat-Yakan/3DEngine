@@ -39,9 +39,13 @@ namespace Editor.Controller
                 CreateFilePreviewer((string)content);
         }
 
-        public static void Clear() => Main.Instance.LayoutControl.PropertiesRoot.Children.Clear();
+        public static void Clear() =>
+            // Clear the children of the PropertiesRoot element in the LayoutControl.
+            Main.Instance.LayoutControl.PropertiesRoot.Children.Clear();
 
-        public static void Set(ModelView.Properties properties) => Main.Instance.LayoutControl.PropertiesRoot.Children.Add(properties);
+        public static void Set(ModelView.Properties properties) =>
+            // Set the children of the PropertiesRoot element in the LayoutControl.
+            Main.Instance.LayoutControl.PropertiesRoot.Children.Add(properties);
 
         private void CreateEmptyMessage()
         {
@@ -93,39 +97,49 @@ namespace Editor.Controller
             _stackPanel.Children.Add(transform.StackInGrid().WrapInExpander("Transform"));
             _stackPanel.Children.Add(CreateButton("Add Component", null));
 
+            // Iterate through all the components of the given entity.
             foreach (var component in entity.GetComponents())
+            {
+                // Skip the Transform component of the entity.
                 if (component != entity.Transform)
                 {
+                    // Get the non-public fields and events of the component.
                     var nonPublicFieldInfos = component.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
                     var fieldInfos = component.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
-
                     var nonPublicEventsInfos = component.GetType().GetEvents(BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
                     var eventsInfos = component.GetType().GetEvents(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
 
+                    // Initialize the collection of fields, events, and scripts.
                     Grid newFieldGrid;
-
                     List<Grid> fieldsCollection = new();
+                    List<Grid> eventsCollection = new();
+                    List<Grid> scriptsCollection = new();
+
+                    // Add fields to the fields collection.
                     foreach (var info in fieldInfos)
                         if ((newFieldGrid = CreateFromFieldInfo(info.GetValue(component), info, nonPublicFieldInfos)) != null)
                             fieldsCollection.Add(newFieldGrid);
 
-                    List<Grid> eventsCollection = new();
+                    // Add events to the events collection.
                     foreach (var info in eventsInfos)
                         if ((newFieldGrid = CreateFromEventInfo(info, nonPublicEventsInfos)) != null)
                             eventsCollection.Add(newFieldGrid);
 
-                    List<Grid> scriptsCollection = new List<Grid>();
-                    scriptsCollection.AddRange(fieldsCollection.ToArray());
-                    scriptsCollection.AddRange(eventsCollection.ToArray());
+                    // Add all the fields and events to the scripts collection.
+                    scriptsCollection.AddRange(fieldsCollection);
+                    scriptsCollection.AddRange(eventsCollection);
 
+                    // Initialize the content grid and stack panel.
                     UIElement tmp;
-                    Grid content = new();
+                    Grid content = new Grid();
                     _stackPanel.Children.Add(tmp = scriptsCollection.ToArray()
                         .StackInGrid().WrapInExpanderWithToggleButton(ref content, component.ToString().FormatString(), component, "IsEnabled", null)
                         .AddContentFlyout(CreateDefaultMenuFlyout(entity, component)));
 
+                    // Add an event handler to remove the current component from the stack panel when it's destroyed.
                     component._eventOnDestroy += (s, e) => _stackPanel.Children.Remove(tmp);
                 }
+            }
         }
 
         private async void CreateFilePreviewer(string path)
@@ -149,37 +163,52 @@ namespace Editor.Controller
             _stackPanel.Children.Add(CreateSeperator());
             _stackPanel.Children.Add(CreateButton("Open File", (s, e) =>
             {
+                // Check if the file exists at the specified path and start the process to open it.
                 if (File.Exists(path))
                     Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
             }));
 
+
+            // Check if the file at the given path exists.
             if (File.Exists(path))
+                // When the file extension is in a readable format, continue.
                 if (fileInfo.Extension == ".cs"
                     || fileInfo.Extension == ".txt"
                     || fileInfo.Extension == ".usd"
                     || fileInfo.Extension == ".mat"
                     || fileInfo.Extension == ".hlsl")
                 {
+                    // Read all the lines in the file asynchronously and store them in an array of strings.
                     string[] lines = await File.ReadAllLinesAsync(path);
+                    // Join all the lines in the array with a line break to create a single string.
                     string joinedLines = string.Join("\n", lines);
 
+                    // Create a Grid that contains a text element with the joined lines and wrap it in an array.
                     Grid[] preview = new[] { CreateTextFullWithOpacity(joinedLines).WrapInGrid() };
 
+                    // Add the preview to the stack panel, wrapped in an expander with a label "Preview".
                     _stackPanel.Children.Add(preview.StackInGrid().WrapInExpander("Preview"));
                 }
         }
 
         private MenuFlyout CreateDefaultMenuFlyout(Entity entity, Component component)
         {
+            // Create an array of MenuFlyoutItems.
             MenuFlyoutItem[] items = new[] {
                 new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
             };
+
+            // Add a click event to the first item in the items array.
+            // The event will remove the component from the entity when clicked.
             items[0].Click += (s, e) => entity.RemoveComponent(component);
 
+            // Create a new instance of MenuFlyout.
             MenuFlyout menuFlyout = new();
+            // Loop through each item in the items array and add it to the menuFlyout's Items collection.
             foreach (var item in items)
                 menuFlyout.Items.Add(item);
 
+            // Return the created menuFlyout.
             return menuFlyout;
         }
     }
@@ -188,18 +217,38 @@ namespace Editor.Controller
     {
         public Grid CreateFromFieldInfo(object value, FieldInfo fieldInfo, FieldInfo[] nonPublic)
         {
+            // Initialize a new List of Grid type.
             List<Grid> grid = new();
 
+            // Get the type of the current field.
             var type = fieldInfo.FieldType;
+            // Get any custom attributes applied to the field.
             var attributes = fieldInfo.GetCustomAttributes(true);
 
+            // Return null if the field has a HideAttribute applied.
             if (attributes.OfType<HideAttribute>().Any())
                 return null;
 
+            // Return null if the field doesn't have a ShowAttribute and is not a non-public field.
             if (!attributes.OfType<ShowAttribute>().Any())
                 foreach (var info in nonPublic)
                     if (fieldInfo.Equals(info))
                         return null;
+
+            #region Get Field Type and Process Value
+            // Color.
+            if (type == typeof(Color))
+                // Create a color button for the field value.
+                grid.Add(CreateColorButton(((Color)value).R, ((Color)value).G, ((Color)value).B, ((Color)value).A));
+
+            // Int.
+            else if (type == typeof(int))
+                // Check if the field has a SliderAttribute applied.
+                if (attributes.OfType<SliderAttribute>().Any())
+                // Create a slider for the field value with custom minimum and maximum values.
+                { }
+
+
 
             #region // GetFieldType and process Value
             // Color
@@ -272,8 +321,8 @@ namespace Editor.Controller
 
             return (new Grid[]
             {
-                ProcessAttributes(attributes).StackInGrid(),
-                grid.ToArray().StackInGrid().WrapInField(fieldInfo.Name)
+                    ProcessAttributes(attributes).StackInGrid(),
+                    grid.ToArray().StackInGrid().WrapInField(fieldInfo.Name)
             }).StackInGrid(0);
         }
 
