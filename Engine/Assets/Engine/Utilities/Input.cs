@@ -151,26 +151,34 @@ namespace Engine.Utilities
 
         public static void PointerPressed(object sender, PointerRoutedEventArgs e)
         {
+            // Check if the pointer is a mouse.
             if (e.Pointer.PointerDeviceType == PointerDeviceType.Mouse)
             {
+                // Store the current point of the mouse.
                 _pointer = e.GetCurrentPoint(null);
 
-                // Create an array of booleans to store the state of the virtual key.
+                // Create an array of booleans to store the state of the virtual mouse button.
                 var newBool = new bool[3];
 
-                // Set the "Down" and "Pressed" states to true for the virtual key.
+                // Set the "Down" and "Pressed" states to true for the virtual mouse button.
                 newBool[(int)EInputState.Down] = true;
                 newBool[(int)EInputState.Pressed] = true;
-                // Set the "Up" state to false for the virtual key.
+                // Set the "Up" state to false for the virtual mouse button.
                 newBool[(int)EInputState.Up] = false;
 
+                // Check if the left mouse button is pressed.
                 if (_pointer.Properties.IsLeftButtonPressed)
+                    // Update the dictionary for the left mouse button with the new state.
                     SetPointerDic(EMouseButton.IsLeftButtonPressed, newBool);
 
+                // Check if the middle mouse button is pressed.
                 if (_pointer.Properties.IsMiddleButtonPressed)
+                    // Update the dictionary for the middle mouse button with the new state.
                     SetPointerDic(EMouseButton.IsMiddleButtonPressed, newBool);
 
+                // Check if the right mouse button is pressed.
                 if (_pointer.Properties.IsRightButtonPressed)
+                    // Update the dictionary for the right mouse button with the new state.
                     SetPointerDic(EMouseButton.IsRightButtonPressed, newBool);
             }
 
@@ -182,24 +190,31 @@ namespace Engine.Utilities
         {
             if (e.Pointer.PointerDeviceType == PointerDeviceType.Mouse)
             {
+                // Store the current point of the mouse.
                 _pointer = e.GetCurrentPoint(null);
 
-                // Create an array of booleans to store the state of the virtual key.
+                // Create an array of booleans to store the state of the virtual mouse button.
                 var newBool = new bool[3];
 
-                // Set the "Down" and "Pressed" states to false for the virtual key.
+                // Set the "Down" and "Pressed" states to false for the virtual mouse button.
                 newBool[(int)EInputState.Down] = false;
                 newBool[(int)EInputState.Pressed] = false;
-                // Set the "Up" state to true for the virtual key.
+                // Set the "Up" state to true for the virtual mouse button.
                 newBool[(int)EInputState.Up] = true;
 
+                // Check if the left mouse button is not pressed.
                 if (!_pointer.Properties.IsLeftButtonPressed)
+                    // Update the dictionary for the left mouse button with the new state.
                     SetPointerDic(EMouseButton.IsLeftButtonPressed, newBool);
 
+                // Check if the middle mouse button is not pressed.
                 if (!_pointer.Properties.IsMiddleButtonPressed)
+                    // Update the dictionary for the middle mouse button with the new state.
                     SetPointerDic(EMouseButton.IsMiddleButtonPressed, newBool);
 
+                // Check if the right mouse button is not pressed.
                 if (!_pointer.Properties.IsRightButtonPressed)
+                    // Update the dictionary for the right mouse button with the new state.
                     SetPointerDic(EMouseButton.IsRightButtonPressed, newBool);
             }
 
@@ -209,10 +224,14 @@ namespace Engine.Utilities
 
         public static void PointerWheelChanged(object sender, PointerRoutedEventArgs e)
         {
+            // Check if the type of the pointer device that generated the event is a mouse.
             if (e.Pointer.PointerDeviceType == PointerDeviceType.Mouse)
             {
+                // Store the current point of the mouse.
                 _pointer = e.GetCurrentPoint(null);
 
+                // Get the mouse wheel delta from the event properties
+                // and store the clamped value between -1 and 1.
                 _mouseWheelDelta = Math.Clamp(_pointer.Properties.MouseWheelDelta, -1, 1);
             }
 
@@ -222,53 +241,18 @@ namespace Engine.Utilities
 
         public static void PointerMoved(object sender, PointerRoutedEventArgs e)
         {
+            // Check if the type of the pointer device that generated the event is a mouse.
             if (e.Pointer.PointerDeviceType == PointerDeviceType.Mouse)
             {
+                // Store the current point of the mouse.
                 _pointer = e.GetCurrentPoint(null);
 
+                // Get the mouse position from the event.
                 _pointerPosition = _pointer.Position;
             }
 
             // Mark the event as handled to prevent it from being processed further.
             e.Handled = true;
-        }
-
-        public static bool SetPointerInBounds()
-        {
-            //if (m_pointer.Position.X <= 0)
-            //{
-            //    m_tmpPoint = new Point(Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().VisibleBounds.Width, m_pointer.Position.Y + 42);
-            //    CoreWindow.GetForCurrentThread().PointerPosition = m_tmpPoint;
-            //    m_pointerPosition = m_tmpPoint;
-            //    m_mouseAxis = Vector2.Zero;
-            //    return false;
-            //}
-            //else if (m_pointer.Position.X >= Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().VisibleBounds.Width - 1)
-            //{
-            //    m_tmpPoint = new Point(0, m_pointer.Position.Y + 42);
-            //    CoreWindow.GetForCurrentThread().PointerPosition = m_tmpPoint;
-            //    m_pointerPosition = m_tmpPoint;
-            //    m_mouseAxis = Vector2.Zero;
-            //    return false;
-            //}
-            //else if (m_pointer.Position.Y <= 0)
-            //{
-            //    m_tmpPoint = new Point(m_pointer.Position.X, Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().VisibleBounds.Height + 42);
-            //    CoreWindow.GetForCurrentThread().PointerPosition = m_tmpPoint;
-            //    m_pointerPosition = m_tmpPoint;
-            //    m_mouseAxis = Vector2.Zero;
-            //    return false;
-            //}
-            //else if (m_pointer.Position.Y >= Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().VisibleBounds.Height - 1)
-            //{
-            //    m_tmpPoint = new Point(m_pointer.Position.X, 0);
-            //    CoreWindow.GetForCurrentThread().PointerPosition = m_tmpPoint;
-            //    m_pointerPosition = m_tmpPoint;
-            //    m_mouseAxis = Vector2.Zero;
-            //    return false;
-            //}
-
-            return true;
         }
 
         private static void SetKeyDic(VirtualKey key, bool[] newBool)

@@ -69,7 +69,7 @@ namespace Engine.Utilities
             if (Main.Instance.ControlPlayer.Playmode == EPlaymode.None)
                 EditorScriptSystem.Awake();
 
-            // If the playmode is set to Playing and is not stopped, call the Awake method on the ScriptSystem.
+            // If the playmode is set to Playing and is not paused, call the Awake method on the ScriptSystem.
             if (Main.Instance.ControlPlayer.Playmode == EPlaymode.Playing)
                 ScriptSystem.Awake();
         }
@@ -80,7 +80,7 @@ namespace Engine.Utilities
             if (Main.Instance.ControlPlayer.Playmode == EPlaymode.None)
                 EditorScriptSystem.Start();
 
-            // If the playmode is set to Playing and is not stopped, call the Start method on the ScriptSystem.
+            // If the playmode is set to Playing and is not paused, call the Start method on the ScriptSystem.
             if (Main.Instance.ControlPlayer.Playmode == EPlaymode.Playing)
                 ScriptSystem.Start();
         }
@@ -94,7 +94,7 @@ namespace Engine.Utilities
             if (Main.Instance.ControlPlayer.Playmode == EPlaymode.None)
                 EditorScriptSystem.Update();
 
-            // If the playmode is set to Playing and is not stopped, call the Update method on the ScriptSystem.
+            // If the playmode is set to Playing and is not paused, call the Update method on the ScriptSystem.
             if (Main.Instance.ControlPlayer.Playmode == EPlaymode.Playing)
                 ScriptSystem.Update();
         }
@@ -105,7 +105,7 @@ namespace Engine.Utilities
             if (Main.Instance.ControlPlayer.Playmode == EPlaymode.None)
                 EditorScriptSystem.LateUpdate();
 
-            // If the playmode is set to Playing and is not stopped, call the LateUpdate method on the ScriptSystem.
+            // If the playmode is set to Playing and is not paused, call the LateUpdate method on the ScriptSystem.
             if (Main.Instance.ControlPlayer.Playmode == EPlaymode.Playing)
                 ScriptSystem.LateUpdate();
         }
