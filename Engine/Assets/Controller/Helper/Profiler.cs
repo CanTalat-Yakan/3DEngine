@@ -25,7 +25,7 @@ namespace Editor.Controller
             profile += "\n";
             profile += "DrawCalls: " + DrawCalls + "\n";
             profile += "Vertices: " + Vertices + "\n";
-            profile += "Indices: " + Indices + "\n";
+            profile += "Indices: " + Indices;
 
             return profile;
         }
