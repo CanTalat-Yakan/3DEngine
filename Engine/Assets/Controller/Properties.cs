@@ -235,18 +235,18 @@ namespace Editor.Controller
                     if (fieldInfo.Equals(info))
                         return null;
 
-            #region Get Field Type and Process Value
-            // Color.
-            if (type == typeof(Color))
-                // Create a color button for the field value.
-                grid.Add(CreateColorButton(((Color)value).R, ((Color)value).G, ((Color)value).B, ((Color)value).A));
+            //#region Get Field Type and Process Value
+            //// Color.
+            //if (type == typeof(Color))
+            //    // Create a color button for the field value.
+            //    grid.Add(CreateColorButton(((Color)value).R, ((Color)value).G, ((Color)value).B, ((Color)value).A));
 
-            // Int.
-            else if (type == typeof(int))
-                // Check if the field has a SliderAttribute applied.
-                if (attributes.OfType<SliderAttribute>().Any())
-                // Create a slider for the field value with custom minimum and maximum values.
-                { }
+            //// Int.
+            //else if (type == typeof(int))
+            //    // Check if the field has a SliderAttribute applied.
+            //    if (attributes.OfType<SliderAttribute>().Any())
+            //    // Create a slider for the field value with custom minimum and maximum values.
+            //    { }
 
 
 

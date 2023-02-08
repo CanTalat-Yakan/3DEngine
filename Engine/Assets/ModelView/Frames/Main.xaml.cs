@@ -23,11 +23,8 @@ namespace Editor.ModelView
 
         private void InitializeInput()
         {
-            PointerPressed += Input.PointerPressed;
-            PointerWheelChanged += Input.PointerWheelChanged;
-            PointerReleased += Input.PointerReleased;
             PointerMoved += Input.PointerMoved;
-            KeyDown += Input.KeyDown;
+            PointerReleased += Input.PointerReleased;
             KeyUp += Input.KeyUp;
         }
 

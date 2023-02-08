@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using Engine.Utilities;
+using Microsoft.UI.Xaml.Controls;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -18,6 +19,15 @@ namespace Editor.ModelView
             Unloaded += (s, e) => _engineCore.Renderer.Dispose();
 
             _viewPortControl = new Controller.ViewPort(this, x_Grid_Overlay);
+
+            InitializeInput();
+        }
+
+        private void InitializeInput()
+        {
+            PointerPressed += Input.PointerPressed;
+            PointerWheelChanged += Input.PointerWheelChanged;
+            KeyDown += Input.KeyDown;
         }
     }
 }
