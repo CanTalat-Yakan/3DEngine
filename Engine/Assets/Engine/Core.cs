@@ -79,7 +79,7 @@ namespace Engine
                 // Renders the scene twice, once in solid mode and once in wireframe mode.
                 Renderer.SetRasterizerDesc();
                 SceneManager.Render();
-                Renderer.SetRasterizerDesc(FillMode.Wireframe);
+                Renderer.SetRasterizerDesc(false);
                 SceneManager.Render();
 
                 // Updates and renders the ImGui user interface.

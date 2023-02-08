@@ -233,13 +233,13 @@ namespace Engine.Utilities
             _swapChain.Present(0, PresentFlags.None);
         }
 
-        public void SetRasterizerDesc(FillMode fillMode = FillMode.Solid)
+        public void SetRasterizerDesc(bool solid = true)
         {
             // Create a rasterizer state with specified fill and cull modes.
             RasterizerDescription rasterizerDesc = new()
             {
-                FillMode = fillMode,
-                CullMode = CullMode.None,
+                FillMode = solid ? FillMode.Solid : FillMode.Wireframe,
+                CullMode = solid ? CullMode.Back : CullMode.None,
             };
 
             // Create a rasterizer state based on the description and set it as the current state in the device context.

@@ -162,9 +162,6 @@
     <Content Update="Assets\Engine\Resources\Shader\SimpleLit.hlsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="Assets\Engine\Resources\Shader\Sky.hlsl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Update="Assets\Engine\Resources\Shader\Unlit.hlsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

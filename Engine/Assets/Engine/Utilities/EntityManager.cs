@@ -68,7 +68,6 @@ namespace Engine.Utilities
         private static readonly string SHADER_LIT = @"Shader\Lit.hlsl";
         private static readonly string SHADER_SIMPLELIT = @"Shader\SimpleLit.hlsl";
         private static readonly string SHADER_UNLIT = @"Shader\Unlit.hlsl";
-        private static readonly string SHADER_SKY = @"Shader\Sky.hlsl";
 
         private static readonly string IMAGE_DEFAULT = @"Textures\dark.png";
         private static readonly string IMAGE_SKY = @"Textures\SkyGradient.png";

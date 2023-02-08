@@ -13,9 +13,12 @@ namespace Engine.Helper
     {
         public static ID3D11Texture2D LoadTexture(ID3D11Device device, string filePath)
         {
-            string resourcesPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources\");
+            // Combine the base directory and the relative path to the resources directory
+            string resourcesPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources");
+            // Define the full path to the texture file.
             string textureFilePath = Path.Combine(resourcesPath, filePath);
 
+            #region // Third-Party Solution
             using IWICImagingFactory wicFactory = new();
             using IWICBitmapDecoder decoder = wicFactory.CreateDecoderFromFileName(textureFilePath);
             using IWICBitmapFrameDecode frame = decoder.GetFrame(0);
@@ -236,23 +239,30 @@ namespace Engine.Helper
             { PixelFormat.Format64bppPRGBAHalf,        PixelFormat.Format64bppRGBAHalf }, // DXGI_FORMAT_R16G16B16A16_FLOAT
 
             // We don't support n-channel formats
+            #endregion
         };
 
         internal static Format ToDXGIFormat(Guid guid)
         {
+            // Get the format based on the guid.
             if (s_WICFormats.TryGetValue(guid, out Format format))
                 return format;
 
+            // If the guid is not found, return unknown format.
             return Format.Unknown;
         }
 
         internal static int WICBitsPerPixel(IWICImagingFactory factory, Guid targetGuid)
         {
+            // Get the component type of the specified target GUID using the WIC component factory
             using IWICComponentInfo info = factory.CreateComponentInfo(targetGuid);
+
+            // Check if the component type is a PixelFormat
             ComponentType type = info.ComponentType;
             if (type != ComponentType.PixelFormat)
                 return 0;
 
+            // If the component type is a PixelFormat, get the number of bits per pixel using the pixel format info interface
             using IWICPixelFormatInfo pixelFormatInfo = info.QueryInterface<IWICPixelFormatInfo>();
             return pixelFormatInfo.BitsPerPixel;
         }

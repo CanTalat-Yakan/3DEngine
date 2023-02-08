@@ -134,7 +134,7 @@ namespace Engine.Utilities
         {
             // Combine the base directory and the relative path to the resources directory
             string resourcesPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources\");
-            // Combine the resources path with the shader path
+            // Define the full path to the shader file.
             string shaderFilePath = Path.Combine(resourcesPath, shaderPath);
 
             // Shader flags to enable strictness and set optimization level or debug mode
