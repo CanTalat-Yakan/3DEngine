@@ -44,8 +44,6 @@ namespace Editor
 
             this.UnhandledException += (s, e) =>
             {
-                e.Handled = true;
-
                 // Write date and time
                 Debug.WriteLine($"[{DateTime.Now}]");
 
@@ -58,6 +56,9 @@ namespace Editor
 
                 if (Controller.Main.Instance != null)
                     Controller.Output.Log(e.Exception, Controller.EMessageType.Error);
+
+                // Mark the event as handled to prevent it from being processed further.
+                e.Handled = true;
             };
         }
 

@@ -16,10 +16,16 @@ namespace Engine.Utilities
 
         public static void Update()
         {
+            // Calculates the elapsed time by dividing the elapsed milliseconds by 1000.
             s_delta = s_watch.ElapsedMilliseconds * 0.001;
+
+            // Adds the elapsed time to the running total time.
             s_time += s_delta;
+
+            // Increases the temporary frame count by 1.
             ++_tmpFPS;
 
+            // Updates the fps value and resets the temporary frame count if a second has passed.
             if (_now.Second != DateTime.Now.Second)
             {
                 _fps = _tmpFPS;
@@ -27,6 +33,7 @@ namespace Engine.Utilities
                 _now = DateTime.Now;
             }
 
+            // Restarts the stopwatch to measure the time for the next frame.
             s_watch.Restart();
         }
     }

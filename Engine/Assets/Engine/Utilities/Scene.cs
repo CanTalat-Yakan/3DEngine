@@ -29,9 +29,13 @@ namespace Engine.Utilities
 
         public Scene Clone()
         {
+            // Copy the current scene object using MemberwiseClone method.
             var newScene = (Scene)this.MemberwiseClone();
+
+            // Assign a new Guid to the cloned scene object.
             newScene.ID = Guid.NewGuid();
 
+            // Return the cloned scene object.
             return newScene;
         }
 
