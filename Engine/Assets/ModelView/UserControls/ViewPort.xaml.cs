@@ -27,7 +27,6 @@ namespace Editor.ModelView
         {
             PointerPressed += Input.PointerPressed;
             PointerWheelChanged += Input.PointerWheelChanged;
-            KeyDown += Input.KeyDown;
         }
     }
 }

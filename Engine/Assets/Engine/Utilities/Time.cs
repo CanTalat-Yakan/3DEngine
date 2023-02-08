@@ -17,7 +17,7 @@ namespace Engine.Utilities
         public static void Update()
         {
             // Calculates the elapsed time by dividing the elapsed milliseconds by 1000.
-            s_delta = s_watch.ElapsedMilliseconds * 0.001;
+            s_delta = s_watch.Elapsed.TotalSeconds;
 
             // Adds the elapsed time to the running total time.
             s_time += s_delta;
