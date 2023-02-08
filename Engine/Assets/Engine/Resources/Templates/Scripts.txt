@@ -3,14 +3,18 @@ using System.Collections;
 
 public class {{FileName}} : Entity 
 {
+	// Initilizes the component in the ScriptSystem
+    public override void OnRegister() =>
+        ScriptSystem.Register(this);
+
 	// Use this for initialization
-	void Start () 
+	void OnStart() 
 	{
 		
 	}
 	
 	// Update is called once per frame
-	void Update () 
+	void OnUpdate() 
 	{
 		
 	}
