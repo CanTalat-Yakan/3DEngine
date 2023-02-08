@@ -38,6 +38,7 @@ namespace Engine.ECS
         public virtual void OnDestroy() { }
 
         public void InvokeEventOnDestroy() =>
+            // Invoke the Event when the Component is destroyed.
             _eventOnDestroy(this, null);
 
         object ICloneable.Clone() { return Clone(); }
