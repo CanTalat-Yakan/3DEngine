@@ -110,6 +110,7 @@ namespace Engine.Utilities
             _d3d.DeviceContext.PSSetShader(_pixelShader);
             _d3d.DeviceContext.GSSetShader(_geometryShader);
 
+            #region //Update constant buffer data
             // Update constant buffer data in the device context.
             unsafe
             {
@@ -121,6 +122,7 @@ namespace Engine.Utilities
                 _d3d.DeviceContext.Unmap(_model, 0);
 
             }
+            #endregion
 
             // Set the constant buffer in the vertex shader stage of the device context.
             _d3d.DeviceContext.VSSetConstantBuffer(1, _model);
