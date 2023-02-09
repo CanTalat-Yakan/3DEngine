@@ -35,6 +35,7 @@ namespace Editor.Controller
         public void OpenFolder()
         {
             if (Directory.Exists(RootPath))
+                // Start the process with the given root path.
                 Process.Start(new ProcessStartInfo { FileName = RootPath, UseShellExecute = true });
         }
 

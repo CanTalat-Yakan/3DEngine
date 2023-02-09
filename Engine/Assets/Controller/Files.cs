@@ -15,6 +15,7 @@ using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.Storage;
 using Windows.UI;
+using Vortice.Win32;
 
 namespace Editor.Controller
 {
@@ -149,7 +150,7 @@ namespace Editor.Controller
                                 if (!string.IsNullOrEmpty(_currentSubPath))
                                     targetPath = Path.Combine(targetPath, _currentSubPath);
 
-                        // Call the method "PasteFile" with the file path, target path, and the copy operation.
+                        // Copy the selected file into the targetPath with the copy operation.
                         PasteFile(file.Path, targetPath, DataPackageOperation.Copy);
                     }
 
@@ -235,112 +236,152 @@ namespace Editor.Controller
         {
             string categoryPath;
 
+            // Loop through the Categories list and check if the directory doesn't exist.
             foreach (var category in Categories)
                 if (!Directory.Exists(categoryPath = Path.Combine(ProjectPath, category.Name)))
+                    // If the directory doesn't exist, create it.
                     Directory.CreateDirectory(categoryPath);
         }
 
         public void ValidateCorrectFileTypes()
         {
+            // A flag to track if the file system has been modified.
             bool dirty = false;
 
+            // Return if the current category is null.
             if (_currentCategory is null)
                 return;
 
+            // Get the target path by combining the project path with the current category name and current subpath (if not empty).
             var targetPath = Path.Combine(ProjectPath, _currentCategory.Value.Name);
             if (!string.IsNullOrEmpty(_currentSubPath))
                 targetPath = Path.Combine(targetPath, _currentSubPath);
 
+            // Get a list of all files in the target path.
             var filePaths = Directory.EnumerateFiles(targetPath);
+
+            // Loop through each file in the target path.
             foreach (var path in filePaths)
                 if (!_currentCategory.Value.FileTypes.Contains(Path.GetExtension(path)))
+                    // If the current file type is not in the file types for the current category,
+                    // loop through all categories to find a match.
                     foreach (var category2 in Categories)
                         foreach (var fileTypes2 in category2.FileTypes)
                             if (Path.GetExtension(path) == fileTypes2)
                             {
+                                // If a match is found, move the file to the new category's folder.
                                 File.Move(
                                     path,
                                     IncrementFileIfExists(Path.Combine(ProjectPath, category2.Name, Path.GetFileName(path))));
 
+                                // If the current category or category2 matches the original current category, set dirty to true.
                                 if (_currentCategory != null)
                                     if (_currentCategory.Value.Equals(_currentCategory.Value) || category2.Equals(_currentCategory.Value))
                                         dirty = true;
                             }
 
+            // If dirty is true, call the CreateFileSystemEntryTilesAsync method.
             if (dirty)
                 CreateFileSystemEntryTilesAsync();
         }
 
         public void CreateCatergoryTiles(params Category[] categories)
         {
+            // Set the Categories property to the categories argument.
             Categories = categories;
 
+            // Clear all children in the Wrap StackLayout.
             Wrap.Children.Clear();
 
+            // Set the vertical spacing between children in the Wrap StackLayout.
             Wrap.VerticalSpacing = 10;
 
+            // Loop through each category in the Categories list.
             foreach (var category in Categories)
+                // Add a category tile and its associated icon to the Wrap StackLayout.
                 Wrap.Children.Add(CategoryTile(category, CreateIcon(category)));
 
+            // Call the SetBreadcrumbBar method.
             SetBreadcrumbBar();
         }
 
         public async void CreateFileSystemEntryTilesAsync()
         {
+            // Clear all children in the Wrap StackLayout.
             Wrap.Children.Clear();
 
+            // Set the vertical spacing between children in the Wrap StackLayout.
             Wrap.VerticalSpacing = 35;
 
+            // Add a file system entry tiles and its associated icon to the Wrap StackLayout.
             Wrap.Children.Add(BackTile(CreateIcon(Symbol.Back)));
-
             Wrap.Children.Add(AddTile(CreateIcon(Symbol.Add)));
 
+            // Combine the ProjectPath with the Name of the current category to get the currentPath.
             string currentPath = Path.Combine(ProjectPath, _currentCategory.Value.Name);
-
+            // If the current sub path is not empty.
             if (!string.IsNullOrEmpty(_currentSubPath))
             {
+                // Combine the currentPath with the current sub path.
                 currentPath = Path.Combine(currentPath, _currentSubPath);
 
-                // When a directoy is deleted and you refresh
-                // Go up a directoy and if it exists continue, if not just display category folder
+                // If the current path does not exist.
                 while (!Directory.Exists(currentPath))
                 {
+                    // Go up a directory in the current sub path.
                     _currentSubPath = GoUpDirectory(_currentSubPath);
 
+                    // If the current sub path is empty.
                     if (string.IsNullOrEmpty(_currentSubPath))
                     {
+                        // Set the current path to the ProjectPath combined with the current category Name.
                         currentPath = Path.Combine(ProjectPath, _currentCategory.Value.Name);
+
                         break;
                     }
 
+                    // Combine the ProjectPath with the Name of the current category and the current sub path.
                     currentPath = Path.Combine(ProjectPath, _currentCategory.Value.Name, _currentSubPath);
                 }
+
             }
 
+            // Enumerate the directories in the current path.
             var folderPaths = Directory.EnumerateDirectories(currentPath);
-
+            // Loop through each folder path.
             foreach (var path in folderPaths)
             {
+                // Create an icon for the folder.
                 Grid icon = CreateIcon(Symbol.Folder);
 
+                // Add the folder tile and its icon to the Wrap StackLayout.
                 Wrap.Children.Add(FolderTile(path, icon));
+
+
             }
 
+            // Enumerate the files in the current path.
             var filePaths = Directory.EnumerateFiles(currentPath);
-
+            // Loop through each file path.
             foreach (var path in filePaths)
             {
+                // Create an icon for the file using the current category.
                 Grid icon = CreateIcon(_currentCategory.Value);
 
+                // Create an image with a specified width and height.
                 Image image = new() { Width = 145, Height = 90 };
 
+                // If the current category has a thumbnail.
                 if (_currentCategory.Value.Thumbnail)
                 {
+                    // Get the file from the path.
                     var file = await StorageFile.GetFileFromPathAsync(path);
 
+                    // Call the PreviewfileToImageAsync method with the file and the image.
                     PreviewfileToImageAsync(file, image);
                 }
 
+                // Add the file tile, its icon, and image to the Wrap StackLayout.
                 Wrap.Children.Add(FileTile(path, icon, image));
             }
         }
@@ -462,6 +503,7 @@ namespace Editor.Controller
             button.DoubleTapped += (s, e) =>
             {
                 if (File.Exists(path))
+                    // Start the process with the given file path.
                     Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
             };
 
@@ -549,6 +591,7 @@ namespace Editor.Controller
 
         private async void ContentDialogCreateNewFileOrFolderAndRefreshAsync(string path = "")
         {
+            // Show a content dialog for creating a new file system entry.
             ContentDialog dialog = new()
             {
                 XamlRoot = _files.XamlRoot,
@@ -559,18 +602,23 @@ namespace Editor.Controller
                 DefaultButton = ContentDialogButton.Primary,
             };
 
+            // Store the result of the content dialog.
             var result = await dialog.ShowAsync();
 
+            // If the result is primary, run the ContentDialogCreateNewFileAsync method with the given path.
             if (result == ContentDialogResult.Primary)
                 ContentDialogCreateNewFileAsync(path);
+            // If the result is secondary, run the ContentDialogCreateNewFolderAndRefreshAsync method with the given path.
             else if (result == ContentDialogResult.Secondary)
                 ContentDialogCreateNewFolderAndRefreshAsync(path);
         }
 
         private async void ContentDialogCreateNewFileAsync(string path = "")
         {
+            // Declare fileName TextBox.
             TextBox fileName;
 
+            // Show a content dialog for creating a new file system entry.
             ContentDialog dialog = new()
             {
                 XamlRoot = _files.XamlRoot,
@@ -581,60 +629,80 @@ namespace Editor.Controller
                 Content = fileName = new TextBox() { PlaceholderText = "New " + RemoveLastChar(_currentCategory.Value.Name) },
             };
 
+            // Store the result of the content dialog.
             var result = await dialog.ShowAsync();
 
+            // Check if the result of the content dialog is Primary.
             if (result == ContentDialogResult.Primary)
             {
-                // \w is equivalent of [0 - 9a - zA - Z_]."
-                if (!string.IsNullOrEmpty(fileName.Text))
-                    if (!Regex.Match(fileName.Text, @"^[\w\-.]+$").Success)
+                // Check if the text in the fileName TextBox is not null or empty
+                // and if the text does not match the pattern of [0-9a-zA-Z_-.]+
+                if (!string.IsNullOrEmpty(fileName.Text)
+                    && !Regex.Match(fileName.Text, @"^[\w-.]+$").Success)
+                {
+                    // Show a content dialog with a message about the file's invalid characters.
+                    new ContentDialog()
                     {
-                        new ContentDialog()
-                        {
-                            XamlRoot = _files.XamlRoot,
-                            Title = "A file can't contain any of the following characters",
-                            CloseButtonText = "Close",
-                            DefaultButton = ContentDialogButton.Close,
-                            Content = new TextBlock() { Text = "\\ / : * ? \" < > |" },
-                        }.CreateDialogAsync();
+                        XamlRoot = _files.XamlRoot,
+                        Title = "A file can't contain any of the following characters",
+                        CloseButtonText = "Close",
+                        DefaultButton = ContentDialogButton.Close,
+                        Content = new TextBlock() { Text = "\\ / : * ? \" < > |" },
+                    }.CreateDialogAsync();
 
-                        return;
-                    }
+                    // Return if the file name is not valid.
+                    return;
+                }
 
+                // Check if path is provided.
                 var pathProvided = string.IsNullOrEmpty(path);
                 if (pathProvided)
                 {
+                    // Set the path to the category name.
                     path = Path.Combine(ProjectPath, _currentCategory.Value.Name);
 
+                    // Check if there is a current sub path.
                     if (_currentSubPath != null)
+                        // Set the path to the category name and the current sub path.
                         path = Path.Combine(ProjectPath, _currentCategory.Value.Name, _currentSubPath);
                 }
 
+                // Check if the fileName TextBox is null or empty and set the path to the category name, "New", and the file type.
                 if (string.IsNullOrEmpty(fileName.Text))
                     path = Path.Combine(path, "New " + RemoveLastChar(_currentCategory.Value.Name) + _currentCategory.Value.FileTypes[0]);
                 else if (char.IsDigit(fileName.Text[0]))
+                    // Set the path to prefix "_" when the file name starts with a digit.
                     path = Path.Combine(path, "_" + fileName.Text + _currentCategory.Value.FileTypes[0]);
                 else
+                    // Set the path to the file name and the file type.
                     path = Path.Combine(path, fileName.Text + _currentCategory.Value.FileTypes[0]);
 
+                // Increment the file name if it already exists.
                 path = IncrementFileIfExists(path);
 
+                // Write the file from the templates.
                 await WriteFileFromTemplatesAsync(path);
 
+                // Check if the path was provided, if yes, call the CreateFileSystemEntryTilesAsync method.
                 if (pathProvided)
                     CreateFileSystemEntryTilesAsync();
 
+                // Call the Refresh method.
                 Refresh();
 
+                // Clear the properties.
                 Properties.Clear();
+                // Set the properties to a new instance of ModelView.Properties with the specified path.
                 Properties.Set(new ModelView.Properties(path));
             }
         }
 
         private async void ContentDialogCreateNewFolderAndRefreshAsync(string path = "")
         {
-            TextBox fileName;
+            // Declare folderName TextBox.
+            TextBox folderName;
 
+            // Show a content dialog for creating a new folder.
             ContentDialog dialog = new()
             {
                 XamlRoot = _files.XamlRoot,
@@ -642,17 +710,21 @@ namespace Editor.Controller
                 PrimaryButtonText = "Save",
                 CloseButtonText = "Cancel",
                 DefaultButton = ContentDialogButton.Primary,
-                Content = fileName = new TextBox() { PlaceholderText = "New folder" },
+                Content = folderName = new TextBox() { PlaceholderText = "New folder" },
             };
 
+            // Store the result of the content dialog.
             var result = await dialog.ShowAsync();
 
+            // Check if the result of the content dialog is Primary.
             if (result == ContentDialogResult.Primary)
             {
-                // \w is equivalent of [0 - 9a - zA - Z_]."
-                if (!string.IsNullOrEmpty(fileName.Text))
-                    if (!Regex.Match(fileName.Text, @"^[\w\-.]+$").Success)
+                // Check if the text in the folderName TextBox is not null or empty
+                // and if the text does not match the pattern of [0-9a-zA-Z_-.]+
+                if (!string.IsNullOrEmpty(folderName.Text))
+                    if (!Regex.Match(folderName.Text, @"^[\w\-.]+$").Success)
                     {
+                        // Show a content dialog with a message about the file's invalid characters.
                         new ContentDialog()
                         {
                             XamlRoot = _files.XamlRoot,
@@ -662,40 +734,54 @@ namespace Editor.Controller
                             Content = new TextBlock() { Text = "\\ / : * ? \" < > |" },
                         }.CreateDialogAsync();
 
+                        // Return if the folder name is not valid.
                         return;
                     }
 
+                // Check if path is provided.
                 var pathProvided = string.IsNullOrEmpty(path);
                 if (pathProvided)
                 {
+                    // Set the path to the category name.
                     path = Path.Combine(ProjectPath, _currentCategory.Value.Name);
 
+                    // Check if there is a current sub path.
                     if (_currentSubPath != null)
+                        // Set the path to the category name and the current sub path.
                         path = Path.Combine(ProjectPath, _currentCategory.Value.Name, _currentSubPath);
                 }
 
-                if (string.IsNullOrEmpty(fileName.Text))
+                // Check if the folderName TextBox is null or empty and set the path to "New folder".
+                if (string.IsNullOrEmpty(folderName.Text))
                     path = Path.Combine(path, "New folder");
-                else if (char.IsDigit(fileName.Text[0]))
-                    path = Path.Combine(path, "_" + fileName.Text);
+                else if (char.IsDigit(folderName.Text[0]))
+                    // Set the path to prefix "_" whe the folder name starts with a digit.
+                    path = Path.Combine(path, "_" + folderName.Text);
                 else
-                    path = Path.Combine(path, fileName.Text);
+                    // Set the path to the folder name.
+                    path = Path.Combine(path, folderName.Text);
 
+                // Increment the folder name if it already exists.
                 path = IncrementFolderIfExists(path);
 
+                // Create a new directory with the specified path
                 Directory.CreateDirectory(path);
 
+                // Check if the path was provided, if yes, call the CreateFileSystemEntryTilesAsync method.
                 if (pathProvided)
                     CreateFileSystemEntryTilesAsync();
 
+                // Call the Refresh method.
                 Refresh();
             }
         }
 
         private async void ContentDialogRename(string path)
         {
+            // Declare fileName TextBox.
             TextBox fileName;
 
+            // Show a content dialog for creating a new file system entry.
             ContentDialog dialog = new()
             {
                 XamlRoot = _files.XamlRoot,
@@ -706,14 +792,18 @@ namespace Editor.Controller
                 Content = fileName = new TextBox() { Text = Path.GetFileNameWithoutExtension(path) },
             };
 
+            // Store the result of the content dialog.
             var result = await dialog.ShowAsync();
 
+            // Check if the result of the content dialog is Primary.
             if (result == ContentDialogResult.Primary)
             {
-                // \w is equivalent of [0 - 9a - zA - Z_]."
+                // Check if the text in the fileName TextBox is not null or empty
+                // and if the text does not match the pattern of [0-9a-zA-Z_-.]+
                 if (!string.IsNullOrEmpty(fileName.Text))
                     if (!Regex.Match(fileName.Text, @"^[\w\-.]+$").Success)
                     {
+                        // Show a content dialog with a message about the file's invalid characters.
                         new ContentDialog()
                         {
                             XamlRoot = _files.XamlRoot,
@@ -723,27 +813,35 @@ namespace Editor.Controller
                             Content = new TextBlock() { Text = "\\ / : * ? \" < > |" },
                         }.CreateDialogAsync();
 
+                        // Return if the file name is not valid.
                         return;
                     }
 
+                // Check if the file has an extension, meaning it is a folder.
                 if (string.IsNullOrEmpty(Path.GetExtension(path)))
+                    // Move the folder by directory.
                     Directory.Move(path, Path.Combine(GoUpDirectory(path), fileName.Text));
                 else
                 {
                     //await RenameInsideFile(path, fileName.Text);
 
+                    // If the file has an extension, move the file.
                     File.Move(path, Path.Combine(GoUpDirectory(path), fileName.Text) + Path.GetExtension(path));
                 }
 
+                // Refresh the file system entries.
                 CreateFileSystemEntryTilesAsync();
 
-                //PropertiesController.Clear();
-                //PropertiesController.Set(new Properties(path));
+                //// Clear the properties.
+                //Properties.Clear();
+                //// Set the properties to a new instance of ModelView.Properties with the specified path.
+                //Properties.Set(new ModelView.Properties(path));
             }
         }
 
         private async void ContentDialogDelete(string path)
         {
+            // Show a content dialog for creating a new file system entry.
             ContentDialog dialog = new()
             {
                 XamlRoot = _files.XamlRoot,
@@ -753,63 +851,90 @@ namespace Editor.Controller
                 DefaultButton = ContentDialogButton.Close,
             };
 
+            // Store the result of the content dialog.
             var result = await dialog.ShowAsync();
 
+            // Check if the result of the content dialog is Primary.
             if (result == ContentDialogResult.Primary)
             {
+                // Check if the file has an extension, meaning it is a folder.
                 if (string.IsNullOrEmpty(Path.GetExtension(path)))
+                    // Delete the folder by directory.
                     DeleteDirectory(path);
                 else
+                    // If the file has an extension, delete the file.
                     File.Delete(path);
 
+                // Refresh the file system entries.
                 CreateFileSystemEntryTilesAsync();
             }
         }
 
         private async Task WriteFileFromTemplatesAsync(string path)
         {
-            string templatePath = Path.Combine(AppContext.BaseDirectory, TEMPLATES, _currentCategory.Value.Name + ".txt");
-
+            // Create a file stream to write the new file.
             using (FileStream fs = File.Create(path))
+            {
+                // Get the path of the template file.
+                string templatePath = Path.Combine(AppContext.BaseDirectory, TEMPLATES, _currentCategory.Value.Name + ".txt");
+
+                // Check if the template file exists.
                 if (File.Exists(templatePath))
                 {
-                    // writing data in string
+                    // Read the contents of the template file.
                     string text = await File.ReadAllTextAsync(templatePath);
 
+                    // Get the name of the new file without the extension.
                     string fileName = Path.GetFileNameWithoutExtension(path);
 
+                    // Replace the placeholder {{FileName}} with the actual file name.
                     if (text.Contains("{{FileName}}"))
                         text = text.Replace("{{FileName}}", Regex.Replace(fileName, @"[\s+\(\)]", ""));
 
+                    // Convert the text to a byte array.
                     byte[] info = new UTF8Encoding(true).GetBytes(text);
 
+                    // Write the byte array to the file stream and finish it by closing the stream.
                     fs.Write(info, 0, info.Length);
                     fs.Close();
                 }
+            }
         }
 
         private void SetBreadcrumbBar()
         {
+            // Check if the current category is null and set the ItemsSource of the Bar to an empty string array.
             if (_currentCategory is null)
-                Bar.ItemsSource = new string[] { };
-            else
             {
-                var source = new string[] { "Assets", _currentCategory.Value.Name };
+                Bar.ItemsSource = new string[0];
 
-                Bar.ItemsSource = source;
-
-                if (!string.IsNullOrEmpty(_currentSubPath))
-                {
-                    var subPathSource = _currentSubPath.Split('\\');
-
-                    var newSource = new string[source.Length + subPathSource.Length];
-
-                    source.CopyTo(newSource, 0);
-                    subPathSource.CopyTo(newSource, source.Length);
-
-                    Bar.ItemsSource = newSource;
-                }
+                // Return if the file name is not valid.
+                return;
             }
+
+            // If the current category is not null, create a string array "source" with "Assets" and the name of the current category.
+            var source = new string[] { "Assets", _currentCategory.Value.Name };
+
+            // Check if the current sub path is not empty.
+            if (!string.IsNullOrEmpty(_currentSubPath))
+            {
+                // If the current sub path is not empty, split it by the backslash character and store it in "subPathSource".
+                var subPathSource = _currentSubPath.Split('\\');
+
+                // Create a new string array "newSource" with the length equal to the length of "source" and "subPathSource".
+                var newSource = new string[source.Length + subPathSource.Length];
+
+                // Copy the contents of "source" to "newSource".
+                source.CopyTo(newSource, 0);
+                // Copy the contents of "subPathSource" to "newSource".
+                subPathSource.CopyTo(newSource, source.Length);
+
+                // Set the ItemsSource of the Bar to "newSource".
+                Bar.ItemsSource = newSource;
+            }
+            else
+                // Set the ItemsSource of the Bar to the "source" array.
+                Bar.ItemsSource = source;
         }
     }
 
