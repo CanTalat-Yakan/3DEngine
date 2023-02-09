@@ -236,6 +236,15 @@ namespace Editor.Controller
             if (type == typeof(Color))
                 grid.Add(CreateColorButton(((Color)value).R, ((Color)value).G, ((Color)value).B, ((Color)value).A));
 
+            // Byte
+            else if (type == typeof(byte))
+                // If the field has the `SliderAttribute`, add a slider element.
+                if (attributes.OfType<SliderAttribute>().Any())
+                    grid.Add(CreateSlider((byte)value, (byte)attributes.OfType<SliderAttribute>().First().CustomMin, (byte)attributes.OfType<SliderAttribute>().First().CustomMax).WrapInGrid());
+                // If the field doesn't have the `SliderAttribute`, add a number input element.
+                else
+                    grid.Add(CreateNumberInput((byte)value));
+
             // Int
             else if (type == typeof(int))
                 // If the field has the `SliderAttribute`, add a slider element.

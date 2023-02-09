@@ -6,11 +6,6 @@ using Vortice.Mathematics;
 using Engine.Data;
 using Engine.ECS;
 using Engine.Utilities;
-using Editor.Controller;
-using BenchmarkDotNet.Columns;
-using Microsoft.UI.Xaml.Media;
-using System.Net.NetworkInformation;
-using Vortice.WIC;
 
 namespace Engine.Components
 {
@@ -19,6 +14,7 @@ namespace Engine.Components
         public static Camera Main { get; private set; }
 
         public float FieldOfView = 90;
+        public byte CameraOrder = 0;
 
         private Renderer _d3d { get => Renderer.Instance; }
 
@@ -40,12 +36,16 @@ namespace Engine.Components
                 Main = this;
         }
 
+        public override void OnUpdate() =>
+            // Override the Component Order with the local variable.
+            Order = CameraOrder;
+
         public override void OnRender() =>
             // Recreates the view constants data to be used by the Camera.
             RecreateViewConstants();
 
         public void RecreateViewConstants()
-        {
+        {            
             #region //Set ViewConstantBuffer
             // Calculate the view matrix to use for the camera.
             var view = Matrix4x4.CreateLookAt(
