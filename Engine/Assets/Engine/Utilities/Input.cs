@@ -52,12 +52,12 @@ namespace Engine.Utilities
             }
 
             // Reset axis vector.
-            _axis = new Vector2();
+            _axis = Vector2.Zero;
             // Update axis based on keyboard input.
-            if (GetKey(VirtualKey.W)) _axis.Y = 1;
-            if (GetKey(VirtualKey.S)) _axis.Y = -1;
-            if (GetKey(VirtualKey.A)) _axis.X = -1;
-            if (GetKey(VirtualKey.D)) _axis.X = 1;
+            if (GetKey(VirtualKey.W)) _axis.Y++;
+            if (GetKey(VirtualKey.S)) _axis.Y--;
+            if (GetKey(VirtualKey.A)) _axis.X--;
+            if (GetKey(VirtualKey.D)) _axis.X++;
         }
 
         public static void LateUpdate()
