@@ -1,5 +1,5 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/CanTalat-Yakan/3DEngine/blob/master/LICENSE) 
-# [3DEngine - Get it in Store app](https://www.microsoft.com/store/apps/9NFSX6JPV0PS)
+# [3DEngine - Get it in Store-App](https://www.microsoft.com/store/apps/9NFSX6JPV0PS)
 [3DEngine Wiki](https://3DEngine.Wiki) 
 
 # Windows App SDK
