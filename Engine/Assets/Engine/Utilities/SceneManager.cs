@@ -65,22 +65,26 @@ namespace Engine.Utilities
 
         public void Awake()
         {
-            // If the playmode is set to None and is not running, call the Awake method on the EditorScriptSystem.
+            // If the playmode is set to None and is not running,
+            // call the Awake method on the EditorScriptSystem.
             if (Main.Instance.ControlPlayer.Playmode == EPlaymode.None)
                 EditorScriptSystem.Awake();
 
-            // If the playmode is set to Playing and is not paused, call the Awake method on the ScriptSystem.
+            // If the playmode is set to Playing and is not paused,
+            // call the Awake method on the ScriptSystem.
             if (Main.Instance.ControlPlayer.Playmode == EPlaymode.Playing)
                 ScriptSystem.Awake();
         }
 
         public void Start()
         {
-            // If the playmode is set to None and is not running, call the Start method on the EditorScriptSystem.
+            // If the playmode is set to None and is not running,
+            // call the Start method on the EditorScriptSystem.
             if (Main.Instance.ControlPlayer.Playmode == EPlaymode.None)
                 EditorScriptSystem.Start();
 
-            // If the playmode is set to Playing and is not paused, call the Start method on the ScriptSystem.
+            // If the playmode is set to Playing and is not paused,
+            // call the Start method on the ScriptSystem.
             if (Main.Instance.ControlPlayer.Playmode == EPlaymode.Playing)
                 ScriptSystem.Start();
         }
@@ -90,22 +94,26 @@ namespace Engine.Utilities
             // Update the Transform system
             TransformSystem.Update();
 
-            // If the playmode is set to None and is not running, call the Update method on the EditorScriptSystem.
+            // If the playmode is set to None and is not running,
+            // call the Update method on the EditorScriptSystem.
             if (Main.Instance.ControlPlayer.Playmode == EPlaymode.None)
                 EditorScriptSystem.Update();
 
-            // If the playmode is set to Playing and is not paused, call the Update method on the ScriptSystem.
+            // If the playmode is set to Playing and is not paused,
+            // call the Update method on the ScriptSystem.
             if (Main.Instance.ControlPlayer.Playmode == EPlaymode.Playing)
                 ScriptSystem.Update();
         }
 
         public void LateUpdate()
         {
-            // If the playmode is set to None and is not running, call the LateUpdate method on the EditorScriptSystem.
+            // If the playmode is set to None and is not running,
+            // call the LateUpdate method on the EditorScriptSystem.
             if (Main.Instance.ControlPlayer.Playmode == EPlaymode.None)
                 EditorScriptSystem.LateUpdate();
 
-            // If the playmode is set to Playing and is not paused, call the LateUpdate method on the ScriptSystem.
+            // If the playmode is set to Playing and is not paused,
+            // call the LateUpdate method on the ScriptSystem.
             if (Main.Instance.ControlPlayer.Playmode == EPlaymode.Playing)
                 ScriptSystem.LateUpdate();
         }

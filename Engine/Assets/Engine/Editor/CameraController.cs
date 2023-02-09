@@ -32,7 +32,8 @@ namespace Engine.Editor
             if (Input.GetButton(EMouseButton.IsMiddleButtonPressed))
                 ScreenMovement();
 
-            // Check if the right mouse button is pressed. If so, call the TransformMovement, CameraMovement and HeightTransformMovement functions.
+            // Check if the right mouse button is pressed.
+            // If so, call the TransformMovement, CameraMovement and HeightTransformMovement functions.
             if (Input.GetButton(EMouseButton.IsRightButtonPressed))
             {
                 TransformMovement();
@@ -59,7 +60,8 @@ namespace Engine.Editor
 
         private void MovementSpeedCalc()
         {
-            // Check if either the right or middle mouse button is pressed. If so, update the movement speed based on the mouse wheel input.
+            // Check if either the right or middle mouse button is pressed.
+            // If so, update the movement speed based on the mouse wheel input.
             if (Input.GetButton(EMouseButton.IsRightButtonPressed)
                 || Input.GetButton(EMouseButton.IsRightButtonPressed))
                 s_movementSpeed += Input.GetMouseWheel();
@@ -73,7 +75,8 @@ namespace Engine.Editor
             _rotation = new(Input.GetMouseAxis().Y, Input.GetMouseAxis().X, 0);
 
         private void TransformMovement() =>
-            // Calculate the direction based on the forward and right vectors of the entity's transform and the X and Y axis inputs from the Input class.
+            // Calculate the direction based on the forward and right vectors of the entity's transform
+            // and the X and Y axis inputs from the Input class.
             _direction = Entity.Transform.Forward * Input.GetAxis().Y + Entity.Transform.Right * Input.GetAxis().X;
 
         private void ScreenMovement() =>

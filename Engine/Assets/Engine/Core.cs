@@ -66,7 +66,8 @@ namespace Engine
             // Clears the render target, discarding the contents and preparing it for the next frame.
             Renderer.Clear();
 
-            // Updates the input state, polling for any new events or changes in the state of the pointer or the keyboard.
+            // Updates the input state, polling for any new events
+            // or changes in the state of the pointer or the keyboard.
             Input.Update();
 
             // Invokes Awake and Start if playmode has started.
@@ -97,7 +98,8 @@ namespace Engine
             // Presents the final rendered image on the screen.
             Renderer.Present();
 
-            // Updates the time values, such as delta time and time scale, used in the game or application.
+            // Updates the time values, such as delta time and time scale,
+            // used in the game or application.
             Time.Update();
 
             // Updates the text of the profile with the profiling information.

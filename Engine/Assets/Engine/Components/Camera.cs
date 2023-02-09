@@ -96,8 +96,11 @@ namespace Engine.Components
             // Map the constant buffer and copy the camera's view-projection matrix and position into it.
             unsafe
             {
+                // Map the constant buffer to memory for write access.
                 MappedSubresource mappedResource = _d3d.DeviceContext.Map(this._view, MapMode.WriteDiscard);
+                // Copy the data from the constant buffer to the mapped resource.
                 Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref _viewConstants);
+                // Unmap the constant buffer from memory.
                 _d3d.DeviceContext.Unmap(this._view, 0);
             }
 

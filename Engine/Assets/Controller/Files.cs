@@ -45,19 +45,23 @@ namespace Editor.Controller
 
         public Files(ModelView.Files files, Grid grid, WrapPanel wrap, BreadcrumbBar bar)
         {
+            // Assign local variables.
             Content = grid;
             Wrap = wrap;
             Bar = bar;
 
             _files = files;
 
+            // Assign the ProjectPath value from static property in "Home".
             ProjectPath = Home.ProjectPath;
 
+            // Call the method to initialize and populate the files categories with a DataTemplate.
             PopulateFilesCategories();
         }
 
         public void PopulateFilesCategories()
         {
+            // Create a list of categories presented with attrubutes Name, Smybol or Glyph, FileType, Creatable and Thumbnail.
             CreateCatergoryTiles(
                 new() { Name = "Scenes", Glyph = "\xEA86", FileTypes = new string[] { ".usd", ".usda", ".usdc", ".usdz" }, Creatable = true },
                 new() { Name = "Scripts", Symbol = Symbol.Document, FileTypes = new string[] { ".cs" }, Creatable = true },
@@ -76,120 +80,154 @@ namespace Editor.Controller
 
         public async void SelectFilesAsync()
         {
+            // Validate the categories exist to make sure they are set up properly.
             ValidateCategoriesExist();
 
+            // Create a new instance of the FileOpenPicker.
             var picker = new FileOpenPicker()
             {
+                // Set the view mode to thumbnail view.
                 ViewMode = PickerViewMode.Thumbnail,
+                // Set the suggested start location to the desktop.
                 SuggestedStartLocation = PickerLocationId.Desktop,
             };
 
+            // If the current category is not null, add the file types of the category to the filter.
             if (_currentCategory != null)
                 foreach (var type in _currentCategory.Value.FileTypes)
                     picker.FileTypeFilter.Add(type);
             else
+                // Otherwise, add all file types to the filter.
                 picker.FileTypeFilter.Add("*");
 
             // Make sure to get the HWND from a Window object,
-            // pass a Window reference to GetWindowHandle.
+            // pass a Window reference to GetWindowHandle
+            // and initialize picker with handle.
             var hwnd = WinRT.Interop.WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
             WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
+            // Pick multiple files using the picker and store the result in "files".
             var files = await picker.PickMultipleFilesAsync();
 
+            // Loop through all the picked files.
             foreach (StorageFile file in files)
-            {
+                // If a file was picked, loop through all the categories and check if the file type matches.
                 if (file != null)
                     foreach (var category in Categories)
                         foreach (var type in category.FileTypes)
                             if (type == file.FileType)
                             {
+                                // Create the target path by combining the project path, category name, and file name.
                                 string targetPath = Path.Combine(ProjectPath, category.Name);
                                 targetPath = Path.Combine(targetPath, file.Name);
-
+                                // Copy the file to the target path and overwrite if it already exists. 
                                 File.Copy(file.Path, targetPath, true);
                             }
-            }
 
+            // Call the refresh method to update the category and file list.
             Refresh();
         }
 
         public void AddFileSystemEntry(StorageFile file)
         {
-            if (file is null)
+            // Check if the file is null or the file type is empty.
+            if (file is null || string.IsNullOrEmpty(file.FileType))
                 return;
 
-            if (string.IsNullOrEmpty(file.FileType))
-                return;
-
+            // Loop through all categories to find a match with the file type.
             foreach (var category in Categories)
                 foreach (var type in category.FileTypes)
+                    // Check if the file type matches the type in the current category.
                     if (type == file.FileType)
                     {
+                        // Create the target path by combining the project path and the name of the matching category.
                         string targetPath = Path.Combine(ProjectPath, category.Name);
+
+                        // If a currently in a subpath, check if its name matches the targetPath for the file.
                         if (_currentCategory != null)
                             if (_currentCategory.Value.Name == category.Name)
                                 if (!string.IsNullOrEmpty(_currentSubPath))
                                     targetPath = Path.Combine(targetPath, _currentSubPath);
 
+                        // Call the method "PasteFile" with the file path, target path, and the copy operation.
                         PasteFile(file.Path, targetPath, DataPackageOperation.Copy);
                     }
 
+            // Call the refresh method to update the category and file list.
             Refresh();
         }
 
         public void GoUpDirectoryAndRefresh()
         {
+            // Check if the current sub-path is not empty.
             if (!string.IsNullOrEmpty(_currentSubPath))
             {
+                // If the current sub-path is not empty, go up one directory level using the GoUpDirectory method.
                 _currentSubPath = GoUpDirectory(_currentSubPath);
 
+                // Call the refresh method to update the category and file list.
                 Refresh();
             }
             else
             {
+                // If the current sub-path is empty, set the current category and sub-path to null.
                 _currentCategory = null;
                 _currentSubPath = null;
 
+                // Create category tiles based on the Categories list.
                 CreateCatergoryTiles(Categories);
             }
         }
 
         private void GoIntoDirectoryAndRefresh(string path)
         {
+            // Set the current sub-directory path to the relative path of the given path
+            // with respect to the current category's directory in the project path.
             _currentSubPath = Path.GetRelativePath(
                 Path.Combine(ProjectPath, _currentCategory.Value.Name),
                 path);
 
+            // Call the refresh method to update the category and file list.
             Refresh();
         }
 
         public void OpenFolder()
         {
+            // Assign local variable to the ProjectPath.
             var path = ProjectPath;
 
+            // If the current category exists, combine it with the ProjectPath and set it as to the path.
             if (_currentCategory != null)
             {
+                // Create the full path to the current category folder.
                 path = Path.Combine(ProjectPath, _currentCategory.Value.Name);
 
+                // If there is a current sub-path, add it to the path.
                 if (!string.IsNullOrEmpty(_currentSubPath))
                     path = Path.Combine(path, _currentSubPath);
             }
 
+            // Check if the folder at the path exists.
             if (Directory.Exists(path))
+                // If the folder exists, start a process to open it in the default file explorer
+                // UseShellExecute is set to "true" to run the process with elevated privileges.
                 Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
         }
 
         public void Refresh()
         {
+            // Validate if the categories exist and their correct file types exist.
             ValidateCategoriesExist();
             ValidateCorrectFileTypes();
 
+            // If the current category is not set, create the category tiles.
             if (_currentCategory is null)
                 CreateCatergoryTiles(Categories);
+            // If currently inside category, create the file system entry tiles.
             else
                 CreateFileSystemEntryTilesAsync();
 
+            // Set the breadcrumb bar with the correct values.
             SetBreadcrumbBar();
         }
 

@@ -271,15 +271,15 @@ namespace Engine.Utilities
 
         private static void SetPointerDic(EMouseButton input, bool[] newBool)
         {
-            // Check if the current pointer point is already in the dictionary
+            // Check if the current pointer point is already in the dictionary.
             if (!_pointerPointDic.ContainsKey(input))
-                // If not, add the current pointer point to the dictionary
+                // If not, add the current pointer point to the dictionary.
                 _pointerPointDic.Add(input, newBool);
             else
-                // If yes, update the current pointer point in the dictionary
+                // If yes, update the current pointer point in the dictionary.
                 _pointerPointDic[input] = newBool;
 
-            // Add the current pointer point to the buffer list
+            // Add the current pointer point to the buffer list.
             _bufferPoints.Add(input);
         }
     }

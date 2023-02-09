@@ -97,7 +97,7 @@ namespace Engine.Utilities
                 MaxLOD = float.MaxValue,
             };
 
-            // Create the sampler state using the sampler state description
+            // Create the sampler state using the sampler state description.
             _sampler = _d3d.Device.CreateSamplerState(samplerStateDescription);
             #endregion
         }
@@ -111,7 +111,7 @@ namespace Engine.Utilities
             _d3d.DeviceContext.GSSetShader(_geometryShader);
 
             #region //Update constant buffer data
-            // Update constant buffer data in the device context.
+            // Map the constant buffer and copy the models's model-view matrix into it.
             unsafe
             {
                 // Map the constant buffer to memory for write access.
@@ -134,12 +134,12 @@ namespace Engine.Utilities
 
         protected static ReadOnlyMemory<byte> CompileBytecode(string shaderPath, string entryPoint, string profile)
         {
-            // Combine the base directory and the relative path to the resources directory
+            // Combine the base directory and the relative path to the resources directory.
             string resourcesPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources\");
             // Define the full path to the shader file.
             string shaderFilePath = Path.Combine(resourcesPath, shaderPath);
 
-            // Shader flags to enable strictness and set optimization level or debug mode
+            // Shader flags to enable strictness and set optimization level or debug mode.
             ShaderFlags shaderFlags = ShaderFlags.EnableStrictness;
 #if DEBUG
             shaderFlags |= ShaderFlags.Debug;
@@ -148,7 +148,7 @@ namespace Engine.Utilities
             shaderFlags |= ShaderFlags.OptimizationLevel3;
 #endif
 
-            // Compile the shader from the specified file using the specified entry point, profile, and flags
+            // Compile the shader from the specified file using the specified entry point, profile, and flags.
             return Compiler.CompileFromFile(shaderFilePath, entryPoint, profile, shaderFlags);
         }
     }

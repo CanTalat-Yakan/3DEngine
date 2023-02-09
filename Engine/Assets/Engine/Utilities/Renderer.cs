@@ -149,7 +149,8 @@ namespace Engine.Utilities
                 CullMode = CullMode.None,
             };
 
-            // Create a rasterizer state based on the description and set it as the current state in the device context:
+            // Create a rasterizer state based on the description
+            // and set it as the current state in the device context.
             DeviceContext.RSSetState(Device.CreateRasterizerState(rasterizerDesc));
             #endregion
 
@@ -179,7 +180,7 @@ namespace Engine.Utilities
             #endregion
 
             #region //Set ViewPort
-            // Set the viewport to match the size of the swap chain panel..
+            // Set the viewport to match the size of the swap chain panel.
             DeviceContext.RSSetViewport(
                 0, 0,
                 (int)SwapChainPanel.ActualWidth,
@@ -242,7 +243,8 @@ namespace Engine.Utilities
                 CullMode = solid ? CullMode.Back : CullMode.None,
             };
 
-            // Create a rasterizer state based on the description and set it as the current state in the device context.
+            // Create a rasterizer state based on the description
+            // and set it as the current state in the device context.
             DeviceContext.RSSetState(Device.CreateRasterizerState(rasterizerDesc));
         }
 
@@ -263,18 +265,19 @@ namespace Engine.Utilities
 
         public void OnSwapChainPanelSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            // Resize the buffers, depth stencil texture, render target texture and viewport when the size of the window changes
+            // Resize the buffers, depth stencil texture, render target texture and viewport
+            // when the size of the window changes.
             var newSize = new Size(
                 Math.Max(1, (int)e.NewSize.Width),
                 Math.Max(1, (int)e.NewSize.Height));
 
-            // Dispose the existing render target view, render target texture, depth stencil view, and depth stencil texture
+            // Dispose the existing render target view, render target texture, depth stencil view, and depth stencil texture.
             _renderTargetView.Dispose();
             _renderTargetTexture.Dispose();
             _depthStencilView.Dispose();
             _depthStencilTexture.Dispose();
 
-            // Resize the swap chain buffers to match the new window size
+            // Resize the swap chain buffers to match the new window size.
             _swapChain.ResizeBuffers(
                 _swapChain.Description.BufferCount,
                 newSize.Width,
@@ -282,20 +285,20 @@ namespace Engine.Utilities
                 _swapChain.Description1.Format,
                 _swapChain.Description1.Flags);
 
-            // Get the render target texture and create the render target view
+            // Get the render target texture and create the render target view.
             _renderTargetTexture = _swapChain.GetBuffer<ID3D11Texture2D>(0);
             _renderTargetView = Device.CreateRenderTargetView(_renderTargetTexture);
 
-            // Update the depth stencil texture description and create the depth stencil texture and view
+            // Update the depth stencil texture description and create the depth stencil texture and view.
             _depthStencilTextureDescription.Width = newSize.Width;
             _depthStencilTextureDescription.Height = newSize.Height;
             using (_depthStencilTexture = Device.CreateTexture2D(_depthStencilTextureDescription))
                 _depthStencilView = Device.CreateDepthStencilView(_depthStencilTexture);
 
-            // Update the size of the source in the swap chain
+            // Update the size of the source in the swap chain.
             _swapChain.SourceSize = newSize;
 
-            // Update the viewport to match the new window size
+            // Update the viewport to match the new window size.
             DeviceContext.RSSetViewport(
                 0, 0, 
                 (int)e.NewSize.Width, 
