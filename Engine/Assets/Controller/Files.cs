@@ -345,9 +345,7 @@ namespace Editor.Controller
             button.Content = grid2;
             grid.Children.Add(button);
 
-            #region // MenuFlyout
             Content.ContextFlyout = null;
-            #endregion
 
             return grid;
         }
@@ -367,7 +365,7 @@ namespace Editor.Controller
             {
                 Width = 145,
                 Height = 75,
-                Padding = new (10),
+                Padding = new(10),
                 HorizontalContentAlignment = HorizontalAlignment.Stretch,
                 VerticalContentAlignment = VerticalAlignment.Stretch,
             };
@@ -932,7 +930,7 @@ namespace Editor.Controller
             //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
             items[0].Click += (s, e) => ContentDialogCreateNewFileOrFolderAndRefreshAsync(path);
 
-            if(hasExtension)
+            if (hasExtension)
                 items[1].Click += (s, e) => OpenFile(path);
             else
                 items[1].Click += (s, e) => GoIntoDirectoryAndRefresh(path);
@@ -978,7 +976,7 @@ namespace Editor.Controller
                 //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Copy as Path", Icon = new SymbolIcon(Symbol.Copy) },
             };
-                        
+
             //items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.X, Modifiers = VirtualKeyModifiers.Control });
             items[0].Click += (s, e) => ContentDialogCreateNewFileOrFolderAndRefreshAsync(path);
 
