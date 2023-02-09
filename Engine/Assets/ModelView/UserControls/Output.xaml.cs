@@ -30,11 +30,14 @@ namespace Editor.ModelView
                 x_AppBarToggleButton_Debug_ClearPlay);
         }
 
-        private void AppBarButton_Output_Clear(object sender, RoutedEventArgs e) => _outputControl.ClearOutput();
+        private void AppBarButton_Output_Clear(object sender, RoutedEventArgs e) => 
+            _outputControl.ClearOutput();
 
-        private void AppBarToggleButton_Output_Collapse_Click(object sender, RoutedEventArgs e) => Controller.Output.IterateOutputMessages();
+        private void AppBarToggleButton_Output_Collapse_Click(object sender, RoutedEventArgs e) => 
+            Controller.Output.IterateOutputMessages();
 
-        private void AppBarToggleButton_Filter_Click(object sender, RoutedEventArgs e) => Controller.Output.IterateOutputMessages();
+        private void AppBarToggleButton_Filter_Click(object sender, RoutedEventArgs e) => 
+            Controller.Output.IterateOutputMessages();
 
         private void AppBarToggleButton_Debug_ErrorPause_Click(object sender, RoutedEventArgs e) { }
 

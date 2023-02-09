@@ -28,14 +28,19 @@ namespace Editor.ModelView
             KeyUp += Input.KeyUp;
         }
 
-        private void AppBarToggleButton_Status_Play_Click(object sender, RoutedEventArgs e) => _mainControl.ControlPlayer.Play();
+        private void AppBarToggleButton_Status_Play_Click(object sender, RoutedEventArgs e) => 
+            _mainControl.ControlPlayer.Play();
 
-        private void AppBarToggleButton_Status_Pause_Click(object sender, RoutedEventArgs e) => _mainControl.ControlPlayer.Pause();
+        private void AppBarToggleButton_Status_Pause_Click(object sender, RoutedEventArgs e) => 
+            _mainControl.ControlPlayer.Pause();
 
-        private void AppBarButton_Status_Forward_Click(object sender, RoutedEventArgs e) => _mainControl.ControlPlayer.Forward();
+        private void AppBarButton_Status_Forward_Click(object sender, RoutedEventArgs e) => 
+            _mainControl.ControlPlayer.Forward();
 
-        private void AppBarButton_Status_Kill_Click(object sender, RoutedEventArgs e) => _mainControl.ControlPlayer.Kill();
+        private void AppBarButton_Status_Kill_Click(object sender, RoutedEventArgs e) => 
+            _mainControl.ControlPlayer.Kill();
 
-        private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) { Controller.Theme.Instance.SetRequstedTheme(); }
+        private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) => 
+            Controller.Theme.Instance.SetRequstedTheme();
     }
 }

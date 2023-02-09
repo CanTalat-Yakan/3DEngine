@@ -13,10 +13,13 @@ namespace Editor.ModelView
             this.InitializeComponent();
         }
 
-        private void RadioButton_Click_Light(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) => Controller.Theme.Instance.SetRequstedTheme(ElementTheme.Light);
+        private void RadioButton_Click_Light(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) => 
+            Controller.Theme.Instance.SetRequstedTheme(ElementTheme.Light);
 
-        private void RadioButton_Click_Dark(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) => Controller.Theme.Instance.SetRequstedTheme(ElementTheme.Dark);
+        private void RadioButton_Click_Dark(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) => 
+            Controller.Theme.Instance.SetRequstedTheme(ElementTheme.Dark);
 
-        private void RadioButton_Click_Default(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) => Controller.Theme.Instance.SetRequstedTheme(ElementTheme.Default);
+        private void RadioButton_Click_Default(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) => 
+            Controller.Theme.Instance.SetRequstedTheme(ElementTheme.Default);
     }
 }
