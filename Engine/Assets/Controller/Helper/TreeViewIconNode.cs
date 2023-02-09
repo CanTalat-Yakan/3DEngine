@@ -26,6 +26,8 @@ namespace Editor.Controller
                 if (Camera) i++;
                 if (Mesh) i++;
 
+                // Check the result of "ScriptsCount" with i that considers Transform, Camera and Mesh,
+                // and return true when the Count is greater.
                 return ScriptsCount > i;
             }
         }
@@ -61,14 +63,18 @@ namespace Editor.Controller
             }
         }
 
-        private void NotifyPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        private void NotifyPropertyChanged(string propertyName) =>
+            // Raise the PropertyChanged event with the provided property name argument.
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     class TreeViewIconNodeTemplateSelector : DataTemplateSelector
     {
         public DataTemplate IconNodeTemplate { get; set; }
 
-        protected override DataTemplate SelectTemplateCore(object item) { return IconNodeTemplate; }
+        protected override DataTemplate SelectTemplateCore(object item)
+        {
+            return IconNodeTemplate;
+        }
     }
-
 }

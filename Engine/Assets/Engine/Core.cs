@@ -21,12 +21,16 @@ namespace Engine
         private IntPtr _imGuiContext;
 
         private EPlaymode _playmode = EPlaymode.None;
+        private TextBlock _profile;
 
         public Core(SwapChainPanel swapChainPanel, TextBlock profile)
         {
             // Initializes the singleton instance of the class, if it hasn't been already.
             if (Instance is null)
                 Instance = this;
+
+            // Assign local variable.
+            _profile = profile;
 
             // Creates a new ImGui context and sets it as the current context.
             _imGuiContext = ImGui.CreateContext();
@@ -53,49 +57,51 @@ namespace Engine
             // Adds an event handler for the CompositionTarget.Rendering event,
             // which is triggered when the composition system is rendering a frame.
             // The code inside the event handler will be executed each time the event is raised.
-            CompositionTarget.Rendering += (s, e) =>
-            {
-                // Clears the render target, discarding the contents and preparing it for the next frame.
-                Renderer.Clear();
-
-                // Updates the input state, polling for any new events or changes in the state of the pointer or the keyboard.
-                Input.Update();
-
-                // Invokes Awake and Start if playmode has started.
-                if (CheckIfPlaymodeStarted())
-                {
-                    SceneManager.Awake();
-                    SceneManager.Start();
-                }
-
-                // Invokes Update
-                SceneManager.Update();
-                // Invokes LateUpdate
-                SceneManager.LateUpdate();
-
-                // Finishes the state of input processing.
-                Input.LateUpdate();
-
-                // Renders the scene twice, once in solid mode and once in wireframe mode.
-                Renderer.SetRasterizerDesc();
-                SceneManager.Render();
-                Renderer.SetRasterizerDesc(false);
-                SceneManager.Render();
-
-                // Updates and renders the ImGui user interface.
-                UpdateImGui();
-                ImGuiRenderer.Render(ImGui.GetDrawData());
-
-                // Presents the final rendered image on the screen.
-                Renderer.Present();
-
-                // Updates the time values, such as delta time and time scale, used in the game or application.
-                Time.Update();
-
-                // Updates the text of the profile with the profiling information.
-                profile.Text = Profiler.ToString();
-            };
+            CompositionTarget.Rendering += (s, e) => Frame();
             #endregion
+        }
+
+        public void Frame()
+        {
+            // Clears the render target, discarding the contents and preparing it for the next frame.
+            Renderer.Clear();
+
+            // Updates the input state, polling for any new events or changes in the state of the pointer or the keyboard.
+            Input.Update();
+
+            // Invokes Awake and Start if playmode has started.
+            if (CheckIfPlaymodeStarted())
+            {
+                SceneManager.Awake();
+                SceneManager.Start();
+            }
+
+            // Invokes Update
+            SceneManager.Update();
+            // Invokes LateUpdate
+            SceneManager.LateUpdate();
+
+            // Finishes the state of input processing.
+            Input.LateUpdate();
+
+            // Renders the scene twice, once in solid mode and once in wireframe mode.
+            Renderer.SetRasterizerDesc();
+            SceneManager.Render();
+            Renderer.SetRasterizerDesc(false);
+            SceneManager.Render();
+
+            // Updates and renders the ImGui user interface.
+            UpdateImGui();
+            ImGuiRenderer.Render(ImGui.GetDrawData());
+
+            // Presents the final rendered image on the screen.
+            Renderer.Present();
+
+            // Updates the time values, such as delta time and time scale, used in the game or application.
+            Time.Update();
+
+            // Updates the text of the profile with the profiling information.
+            _profile.Text = Profiler.ToString();
         }
 
         public virtual void UpdateImGui()

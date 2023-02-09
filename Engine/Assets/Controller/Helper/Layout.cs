@@ -41,6 +41,7 @@ namespace Editor.Controller
             ModelView.Output output,
             ModelView.Files files)
         {
+            // Assign local variables.
             MainContent = content;
             ViewPort = viewPort;
             Hierarchy = hierarchy;
@@ -48,52 +49,65 @@ namespace Editor.Controller
             Output = output;
             Files = files;
 
+            // Initialize the PropertiesRoot property to a new instance.
             PropertiesRoot = new();
+            // Add the Properties property to the Children collection of the PropertiesRoot property.
             PropertiesRoot.Children.Add(Properties);
 
+            // Initialize the TabsRoot property to a new instance.
             TabsRoot = new();
         }
 
         public void CreateLayout()
         {
+            // Create a new instance of the tab view and pass it the TabsRoot and the contents of the Files and Output tabs.
             var tabView = WrapInTabView(TabsRoot,
                 new() { Content = Files, Header = "Files", Symbol = Symbol.Document },
                 new() { Content = Output, Header = "Output", Symbol = Symbol.Message });
 
+            // Create a new instance of the ContentRoot, and add the ViewPort wrapped in a grid and the tabView to it.
             ContentRoot = new();
             ContentRoot.Children.Add(PairVertical(
                 new() { Content = WrapGrid(ViewPort), MinHeight = 0 },
                 new() { Content = tabView, MinHeight = 0, Length = new(235, GridUnitType.Pixel) }));
 
+            // Create a new instance of the PaneRoot and add the Hierarchy and PropertiesRoot wrapped in grids to it.
             PaneRoot = new();
             PaneRoot.Children.Add(PairVertical(
                 new() { Content = WrapGrid(Hierarchy, GridsToClear), MinHeight = 0 },
                 new() { Content = WrapGrid(PropertiesRoot, GridsToClear), MinHeight = 0, Length = new(1, GridUnitType.Star) }, 
                 true, true));
 
+            // Add the ContentRoot and PaneRoot wrapped in a split view to the MainContent.
             MainContent.Children.Add(WrapSplitView(ContentRoot, PaneRoot));
         }
 
         public void SwitchPaneLayout()
         {
+            //Inverse bool variable OneCollumnPaneLayout that toggles between a one collumn and two collumn layout.
             OneCollumnPaneLayout = !OneCollumnPaneLayout;
 
+            //Loop through all grids in GridsToClear and clear their children
             foreach (var grid in GridsToClear)
                 grid.Children.Clear();
 
+            //Clear the children of PaneRoot
             PaneRoot.Children.Clear();
 
+            //Check if the layout is one collumn, if so add the Hierarchy and PropertiesRoot to PaneRoot vertically
             if (OneCollumnPaneLayout)
                 PaneRoot.Children.Add(PairVertical(
                     new() { Content = WrapGrid(Hierarchy, GridsToClear), MinHeight = 0 },
-                    new() { Content = WrapGrid(PropertiesRoot, GridsToClear), MinHeight = 0, Length = new(1, GridUnitType.Star) }, 
+                    new() { Content = WrapGrid(PropertiesRoot, GridsToClear), MinHeight = 0, Length = new(1, GridUnitType.Star) },
                     true, true));
+            //If not a one collumn layout, add the Hierarchy and PropertiesRoot to PaneRoot horizontally
             else
                 PaneRoot.Children.Add(PairHorizontal(
                     new() { Content = WrapGrid(Hierarchy, GridsToClear), MinWidth = 0 },
                     new() { Content = WrapGrid(PropertiesRoot, GridsToClear), MinWidth = 0, Length = new(1, GridUnitType.Star) },
                     false, true));
 
+            //Set the OpenPaneLength of the SplitView to be 333 pixels if OneCollumnPaneLayout is true, and 666 pixels otherwise.
             SplitView.OpenPaneLength = OneCollumnPaneLayout ? 333 : 666;
         }
     }

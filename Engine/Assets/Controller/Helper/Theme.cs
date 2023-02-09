@@ -20,10 +20,14 @@ namespace Editor.Controller
 
         public Theme(MainWindow mainWindow, Page page)
         {
+            // Initializes the singleton instance of the class, if it hasn't been already.
+            if (Instance is null)
+                Instance = this;
+
+            // Assign local variables.
             _mainWindow = mainWindow;
             _page = page;
 
-            Instance = this;
 
             if (MicaController.IsSupported())
             {
@@ -51,15 +55,20 @@ namespace Editor.Controller
 
         public void SetRequstedTheme(ElementTheme? requestedTheme = null)
         {
+            // Check if requested theme is not null.
             if (requestedTheme is null)
             {
+                // If it's null, set the page theme to opposite of its current theme.
                 _page.RequestedTheme = _page.RequestedTheme == ElementTheme.Light ? ElementTheme.Dark : ElementTheme.Light;
+                // Also set the configuration source theme to opposite of its current theme.
                 _configurationSource.Theme = _configurationSource.Theme == SystemBackdropTheme.Light ? SystemBackdropTheme.Dark : SystemBackdropTheme.Light;
             }
             else
             {
+                // If it's not null, set the page theme to the requested theme.
                 _page.RequestedTheme = requestedTheme.Value;
 
+                // Based on the requested theme, set the configuration source theme.
                 if (requestedTheme.Value == ElementTheme.Light)
                     _configurationSource.Theme = SystemBackdropTheme.Light;
                 if (requestedTheme.Value == ElementTheme.Dark)
@@ -68,8 +77,10 @@ namespace Editor.Controller
                     _configurationSource.Theme = SystemBackdropTheme.Default;
             }
 
+            // Check if the Main instance is not null.
             if (Main.Instance != null)
             {
+                // If it's not null, set the background color of tabs root and change the color with theme of output and files.
                 Main.Instance.LayoutControl.TabsRoot.Background =
                     _page.RequestedTheme == ElementTheme.Light
                         ? new SolidColorBrush(Windows.UI.Color.FromArgb(255, 243, 243, 243))
@@ -86,14 +97,15 @@ namespace Editor.Controller
                         : new SolidColorBrush(Windows.UI.Color.FromArgb(255, 40, 40, 40));
             }
 
+            // Check if the Engine.Core instance is not null.
             if (Engine.Core.Instance != null)
+                // If it's not null, set the theme for entity manager.
                 SceneManager.Scene.EntitytManager.SetTheme(_page.RequestedTheme == ElementTheme.Light);
         }
 
-        private void Window_Activated(object sender, WindowActivatedEventArgs args)
-        {
+        private void Window_Activated(object sender, WindowActivatedEventArgs args) =>
+            // Set the IsInputActive property of the ConfigurationSource to the opposite of the WindowActivationState.
             _configurationSource.IsInputActive = args.WindowActivationState != WindowActivationState.Deactivated;
-        }
 
         private void Window_Closed(object sender, WindowEventArgs args)
         {

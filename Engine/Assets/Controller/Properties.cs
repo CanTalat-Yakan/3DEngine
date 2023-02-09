@@ -1,6 +1,4 @@
-﻿using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media.Imaging;
+﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -10,13 +8,9 @@ using System.Linq;
 using System.Reflection;
 using System;
 using Vortice.Mathematics;
-using Windows.Storage.Pickers;
-using Windows.Storage.Streams;
-using Windows.Storage;
 using Engine.ECS;
 using Engine.Editor;
 using Engine.Utilities;
-using Image = Microsoft.UI.Xaml.Controls.Image;
 using Color = System.Drawing.Color;
 using Path = System.IO.Path;
 using Texture = Vortice.Direct3D11.Texture2DArrayShaderResourceView;
@@ -144,6 +138,7 @@ namespace Editor.Controller
 
         private async void CreateFilePreviewer(string path)
         {
+            // Deselect any highlighted Entity from the TreeViews.
             Main.Instance.LayoutControl.Hierarchy._hierarchyControl.DeselectTreeViewNodes();
 
             FileInfo fileInfo = new(path);
@@ -167,7 +162,6 @@ namespace Editor.Controller
                 if (File.Exists(path))
                     Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
             }));
-
 
             // Check if the file at the given path exists.
             if (File.Exists(path))
@@ -235,37 +229,28 @@ namespace Editor.Controller
                     if (fieldInfo.Equals(info))
                         return null;
 
-            //#region Get Field Type and Process Value
-            //// Color.
-            //if (type == typeof(Color))
-            //    // Create a color button for the field value.
-            //    grid.Add(CreateColorButton(((Color)value).R, ((Color)value).G, ((Color)value).B, ((Color)value).A));
+            #region // Process FieldType
+            // Check the type of the field and add the appropriate element to the `grid` list.
 
-            //// Int.
-            //else if (type == typeof(int))
-            //    // Check if the field has a SliderAttribute applied.
-            //    if (attributes.OfType<SliderAttribute>().Any())
-            //    // Create a slider for the field value with custom minimum and maximum values.
-            //    { }
-
-
-
-            #region // GetFieldType and process Value
             // Color
             if (type == typeof(Color))
                 grid.Add(CreateColorButton(((Color)value).R, ((Color)value).G, ((Color)value).B, ((Color)value).A));
 
             // Int
             else if (type == typeof(int))
+                // If the field has the `SliderAttribute`, add a slider element.
                 if (attributes.OfType<SliderAttribute>().Any())
                     grid.Add(CreateSlider((int)value, (int)attributes.OfType<SliderAttribute>().First().CustomMin, (int)attributes.OfType<SliderAttribute>().First().CustomMax).WrapInGrid());
+                // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
                     grid.Add(CreateNumberInput((int)value));
 
             // Float
             else if (type == typeof(float))
+                // If the field has the `SliderAttribute`, add a slider element.
                 if (attributes.OfType<SliderAttribute>().Any())
                     grid.Add(CreateSlider((float)value, (float)attributes.OfType<SliderAttribute>().First().CustomMin, (float)attributes.OfType<SliderAttribute>().First().CustomMax).WrapInGrid());
+                // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
                     grid.Add(CreateNumberInput((float)value));
 
@@ -295,119 +280,96 @@ namespace Editor.Controller
 
             // Entity
             else if (type == typeof(Entity))
+                // Check if value is null.
                 if (value is null)
+                    // Add empty reference slot.
                     grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
                 else
+                    // Add a reference slot with entity name.
                     grid.Add(CreateReferenceSlot(((Entity)value).Name, type.ToString().FormatString()));
 
-            // Component
+            // Component.
             else if (type == typeof(Component))
+                // Check if value is null.
                 if (value is null)
+                    // Add empty reference slot.
                     grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
                 else
+                    // Add a reference slot with component.
                     grid.Add(CreateReferenceSlot(((Component)value).ToString().FormatString(), type.ToString().FormatString()));
 
-            // Event
+            // Event.
             else if (type == typeof(EventHandler))
+                // Check if value is null.
                 if (value is null)
+                    // Add empty reference slot.
                     grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
                 else
+                    // Add a reference slot with event.
                     grid.Add(CreateReferenceSlot(((EventHandler)value).ToString().SplitLast('.'), type.ToString().FormatString()));
 
-            // Default
+            // Handle default type value.
             else
+                // Add empty reference slot.
                 grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
             #endregion
 
-            return (new Grid[]
-            {
+            // Return the final grid by stacking all the processed attributes, type grid and wrapping the field name.
+            return
+                (new Grid[] { 
+                    // Stack processed attributes in a grid.
                     ProcessAttributes(attributes).StackInGrid(),
-                    grid.ToArray().StackInGrid().WrapInField(fieldInfo.Name)
-            }).StackInGrid(0);
+                    // Stack field grid and wrap it with field name.
+                    grid.ToArray().StackInGrid().WrapInField(fieldInfo.Name)})
+                .StackInGrid(0);
         }
 
         public Grid CreateFromEventInfo(EventInfo eventInfo, EventInfo[] nonPublic)
         {
+            // Get any custom attributes applied to the field.
             var attributes = eventInfo.GetCustomAttributes(true);
 
+            // Return null if the field has a HideAttribute applied.
             if (attributes.OfType<HideAttribute>().Any())
                 return null;
 
+            // Return null if the field doesn't have a ShowAttribute and is not a non-public field.
             if (!attributes.OfType<ShowAttribute>().Any())
                 foreach (var info in nonPublic)
                     if (eventInfo.Equals(info))
                         return null;
 
-            return (new Grid[]
-            {
-                ProcessAttributes(attributes).StackInGrid(),
-                CreateEvent(eventInfo.Name, (s, e) => eventInfo.GetRaiseMethod()).WrapInField(eventInfo.Name)
-            }).StackInGrid(0);
+            // Create the grid that contains the event information and attributes.
+            return
+                (new Grid[] {
+                    // Stack processed attributes in a grid.
+                    ProcessAttributes(attributes).StackInGrid(),
+                    // Stack event grid and wrap it with field name.
+                    CreateEvent(eventInfo.Name, (s, e) => eventInfo.GetRaiseMethod()).WrapInField(eventInfo.Name)})
+                .StackInGrid(0);
         }
 
         public Grid[] ProcessAttributes(object[] attributes)
         {
-            List<Grid> grid = new();
+            // Create a list of grids
+            List<Grid> grid = new List<Grid>();
 
+            // Iterate through the attributes
             foreach (var attribute in attributes)
             {
+                // HeaderAttribute
                 if (attribute.GetType().Equals(typeof(HeaderAttribute)))
+                    // Create a header with the custom header value and add it to the grid
                     grid.Add(CreateHeader((string)((HeaderAttribute)attribute).CustomHeader));
 
+                // SpacerAttribute
                 if (attribute.GetType().Equals(typeof(SpacerAttribute)))
+                    // Create a spacer and add it to the grid
                     grid.Add(CreateSpacer());
             }
 
+            // Return the grid as an array
             return grid.ToArray();
-        }
-
-        private async void SelectImageAsync(Image image, TextBlock path)
-        {
-            FileOpenPicker picker = new()
-            {
-                ViewMode = PickerViewMode.Thumbnail,
-                SuggestedStartLocation = PickerLocationId.PicturesLibrary,
-                FileTypeFilter = { ".jpg", ".jpeg", ".png" }
-            };
-
-            // Make sure to get the HWND from a Window object,
-            // pass a Window reference to GetWindowHandle.
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-
-            StorageFile file = await picker.PickSingleFileAsync();
-
-            if (file != null)
-            {
-                using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
-                {
-                    BitmapImage bitmapImage = new() { DecodePixelHeight = 48, DecodePixelWidth = 48 };
-                    await bitmapImage.SetSourceAsync(fileStream);
-                    image.Source = bitmapImage;
-                }
-
-                path.Text = file.Name;
-            }
-        }
-
-        private async void SelectFileAsync(TextBlock path)
-        {
-            FileOpenPicker picker = new()
-            {
-                ViewMode = PickerViewMode.Thumbnail,
-                SuggestedStartLocation = PickerLocationId.Desktop,
-                FileTypeFilter = { "*" }
-            };
-
-            // Make sure to get the HWND from a Window object,
-            // pass a Window reference to GetWindowHandle.
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-
-            StorageFile file = await picker.PickSingleFileAsync();
-
-            if (file != null)
-                path.Text = file.Name;
         }
     }
 }

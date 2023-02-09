@@ -12,6 +12,7 @@ namespace Editor.Controller
     {
         public static void SetBinding(DependencyObject target, DependencyProperty targetProperty, object source, string sourcePropertyPath, BindingMode mode = BindingMode.OneWay)
         {
+            // Create a new instance of the Binding class and set its source, path, and mode properties.
             Binding binding = new Binding
             {
                 Source = source,
@@ -19,6 +20,7 @@ namespace Editor.Controller
                 Mode = mode
             };
 
+            // Apply the binding to the target property of the target object.
             BindingOperations.SetBinding(target, targetProperty, binding);
         }
     }
@@ -30,16 +32,21 @@ namespace Editor.Controller
 
         protected bool SetProperty<T>(ref T storage, T value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
         {
+            // Check if the new value to be set is equal to the current value of the property.
             if (Equals(storage, value))
                 return false;
 
+            // Set the new value for the property.
             storage = value;
+            // Raise the PropertyChanged event, notifying that the value of the property has changed.
             RaisePropertyChanged(propertyName);
 
+            // Return true to indicate that the value has been successfully changed.
             return true;
         }
 
         protected void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null) =>
+            // Raise the PropertyChanged event with the provided property name argument.
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
