@@ -52,6 +52,7 @@ namespace Editor.Controller
 
         public Output(StackPanel stack, ScrollViewer scroll, AppBarToggleButton collapse, AppBarToggleButton filterMessages, AppBarToggleButton filterWarnings, AppBarToggleButton filterErrors, AppBarToggleButton pauseError, AppBarToggleButton clearPlay)
         {
+            // Assign local variables
             s_stack = stack;
             s_scroll = scroll;
             s_collapse = collapse;

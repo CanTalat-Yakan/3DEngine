@@ -208,11 +208,8 @@ namespace Editor.Controller
                     path = Path.Combine(path, _currentSubPath);
             }
 
-            // Check if the folder at the path exists.
             if (Directory.Exists(path))
-                // If the folder exists, start a process to open it in the default file explorer
-                // UseShellExecute is set to "true" to run the process with elevated privileges.
-                Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
+                OpenFolder(path);
         }
 
         public void Refresh()
@@ -944,54 +941,75 @@ namespace Editor.Controller
 
         public void OnDragOver(DragEventArgs e)
         {
+            // Set the data package operation to copy.
             e.AcceptedOperation = DataPackageOperation.Copy;
 
+            // Set the UI for the drag and drop operation.
             if (e.DragUIOverride != null)
             {
+                // Display the text "Add file(s)" on the drag and drop UI.
                 e.DragUIOverride.Caption = "Add file(s)";
+                // Show the content of the files being dragged and dropped.
                 e.DragUIOverride.IsContentVisible = true;
             }
         }
 
         public async void OnDropAsync(DragEventArgs e)
         {
+            // check if data being dragged contains any storage items.
             if (e.DataView.Contains(StandardDataFormats.StorageItems))
             {
+                // get the storage items as a collection.
                 var items = await e.DataView.GetStorageItemsAsync();
+                // if there are items in the collection.
                 if (items.Count > 0)
+                    // loop through the items in the collection.
                     foreach (var file in items.OfType<StorageFile>())
+                        // add each file to the file system entry.
                         AddFileSystemEntry(file);
             }
         }
 
         public async void PasteFileSystemEntryFromClipboard(string path)
         {
+            // Get the contents of the clipboard.
             DataPackageView dataPackageView = Clipboard.GetContent();
+
+            // Check if the clipboard contains text data.
             if (dataPackageView.Contains(StandardDataFormats.Text))
             {
+                // Get the source path from the text in the clipboard.
                 var sourcePath = await dataPackageView.GetTextAsync();
+
+                // Get the first part of the source and target path.
                 var sourcePathCatagory = Path.GetRelativePath(ProjectPath, sourcePath).Split("\\").First();
                 var targetPathCatagory = Path.GetRelativePath(ProjectPath, path).Split("\\").First();
 
+                // Check if the source and target path belong to the same category.
                 if (sourcePathCatagory == targetPathCatagory)
+                    // Check if the source path is a folder or a file.
                     if (string.IsNullOrEmpty(Path.GetExtension(sourcePath)))
+                        // If it's a folder, call the PasteFolder method.
                         PasteFolder(sourcePath, GetDirectory(path), dataPackageView.RequestedOperation);
                     else
+                        // If it's a file, call the PasteFile method.
                         PasteFile(sourcePath, GetDirectory(path), dataPackageView.RequestedOperation);
-
-                Refresh();
             }
         }
 
         public void OpenFolder(string path)
         {
             if (Directory.Exists(path))
+                // If the path exists, start a process to open it in the default file explorer
+                // UseShellExecute is set to "true" to run the process with elevated privileges.
                 Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
         }
 
         public void OpenFile(string path)
         {
             if (File.Exists(path))
+                // If the path exists, start a process to open it in the default file explorer
+                // UseShellExecute is set to "true" to run the process with elevated privileges.
                 Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
         }
 

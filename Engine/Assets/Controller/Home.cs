@@ -35,7 +35,8 @@ namespace Editor.Controller
         public void OpenFolder()
         {
             if (Directory.Exists(RootPath))
-                // Start the process with the given root path.
+                // If the RootPath exists, start a process to open it in the default file explorer
+                // UseShellExecute is set to "true" to run the process with elevated privileges.
                 Process.Start(new ProcessStartInfo { FileName = RootPath, UseShellExecute = true });
         }
 
