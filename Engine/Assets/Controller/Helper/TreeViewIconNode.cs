@@ -72,9 +72,6 @@ namespace Editor.Controller
     {
         public DataTemplate IconNodeTemplate { get; set; }
 
-        protected override DataTemplate SelectTemplateCore(object item)
-        {
-            return IconNodeTemplate;
-        }
+        protected override DataTemplate SelectTemplateCore(object item) { return IconNodeTemplate; }
     }
 }
