@@ -382,10 +382,12 @@ namespace Editor.Controller
 
         private MenuFlyout AppendDynamicMenuFlyoutSubItems(MenuFlyout menuFlyout, SceneEntry sceneEntry = null)
         {
+            MenuFlyoutItem item;
+
             MenuFlyoutSubItem objectSubItem = new() { Text = "Mesh" };
             foreach (var type in Enum.GetNames(typeof(EPrimitiveTypes)))
             {
-                MenuFlyoutItem item = new() { Text = type.ToString().FormatString() };
+                item = new() { Text = type.ToString().FormatString() };
                 if (sceneEntry != null)
                     item.Click += (s, e) => SceneManager.GetFromID(sceneEntry.ID).EntitytManager.CreatePrimitive((EPrimitiveTypes)Enum.Parse(typeof(EPrimitiveTypes), type));
                 else
@@ -396,7 +398,11 @@ namespace Editor.Controller
 
             menuFlyout.Items.Add(new MenuFlyoutSeparator());
             menuFlyout.Items.Add(objectSubItem);
-            menuFlyout.Items.Add(new MenuFlyoutItem() { Text = "Camera" });
+            menuFlyout.Items.Add(item = new MenuFlyoutItem() { Text = "Camera" });
+            if (sceneEntry != null)
+                item.Click += (s, e) => SceneManager.GetFromID(sceneEntry.ID).EntitytManager.CreateCamera();
+            else
+                item.Click += (s, e) => SceneManager.Scene.EntitytManager.CreateCamera();
 
             return menuFlyout;
         }
