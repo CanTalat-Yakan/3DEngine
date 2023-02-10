@@ -554,7 +554,7 @@ namespace Editor.Controller
             button.Content = viewbox;
             grid.Children.Add(button);
 
-            return grid;
+            return grid.AddToolTip("Go back one directory");
         }
 
         private Grid AddTile(Grid icon)
@@ -583,7 +583,7 @@ namespace Editor.Controller
             button.Content = viewbox;
             grid.Children.Add(button);
 
-            return grid;
+            return grid.AddToolTip("Add a file or folder");
         }
 
         private async void ContentDialogCreateNewFileOrFolderAndRefreshAsync(string path = "")

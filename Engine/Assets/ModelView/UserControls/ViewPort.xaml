@@ -13,5 +13,8 @@
         <muxc:SwapChainPanel x:Name="x_SwapChainPanel_ViewPort" MinHeight="1" MinWidth="1"/>
 
         <Grid x:Name="x_Grid_Overlay"/>
+
+        <InfoBar IsOpen="True" Severity="Informational" Margin="30, 50" Title="To Fix:" 
+                 Message="When you start the playmode, you will have to click a button inside the viewport to register input." />
     </Grid>
 </UserControl>
