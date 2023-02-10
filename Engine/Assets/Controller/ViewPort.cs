@@ -9,7 +9,7 @@ namespace Editor.Controller
     internal partial class ViewPort
     {
         public TextBlock Profile;
-        public Grid MainContent;
+        public Grid Content;
 
         private ModelView.ViewPort _viewPort;
 
@@ -17,7 +17,7 @@ namespace Editor.Controller
         {
             // Set the Viewport and Maincontent variable.
             _viewPort = viewPort;
-            MainContent = content;
+            Content = content;
 
             // Call the CreateViewPortSettings function to build the UI.
             CreateViewPortSettings();
@@ -53,8 +53,8 @@ namespace Editor.Controller
             };
 
             // Add the top-left and top-right UI elements to the main content.
-            MainContent.Children.Add(WrapInStackPanelDockTopLeft(topLeft));
-            MainContent.Children.Add(WrapInStackPanelDockTopRight(topRight));
+            Content.Children.Add(WrapInStackPanelDockTopLeft(topLeft));
+            Content.Children.Add(WrapInStackPanelDockTopRight(topRight));
         }
     }
 

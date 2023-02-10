@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System;
 using Vortice.Mathematics;
+using Windows.Foundation;
 using Engine.ECS;
 using Engine.Editor;
 using Engine.Utilities;
@@ -86,10 +88,30 @@ namespace Editor.Controller
                     (s, e) => entity.Transform.Scale.Z = (float)e.NewValue).WrapInField("Scale"),
             };
 
-            _stackPanel.Children.Add(properties.StackInGrid().WrapInExpanderWithEditableHeaderAndCheckBox(entity.Name, true, (s, r) => entity.Name = (s as TextBox).Text, (s, r) => entity.IsEnabled = (s as CheckBox).IsChecked.Value));
+            _stackPanel.Children.Add(
+                properties.StackInGrid()
+                .WrapInExpanderWithEditableHeaderAndCheckBox(
+                    entity.Name,
+                    true,
+                    (s, r) => entity.Name = (s as TextBox).Text,
+                    (s, r) => entity.IsEnabled = (s as CheckBox).IsChecked.Value));
+
             _stackPanel.Children.Add(CreateSeperator());
-            _stackPanel.Children.Add(transform.StackInGrid().WrapInExpander("Transform"));
-            _stackPanel.Children.Add(CreateButton("Add Component", null));
+
+            _stackPanel.Children.Add(
+                transform.StackInGrid()
+                .WrapInExpander("Transform"));
+
+            _stackPanel.Children.Add(
+                CreateButtonWithAutoSuggesBoxWithComponentCollector(
+                    "Add Component",
+                    (s, e) =>
+                    {
+                        entity.AddComponent(Engine.Core.Instance.ComponentCollector.GetComponent(e.SelectedItem.ToString()));
+
+                        Properties.Clear();
+                        Properties.Set(new ModelView.Properties(entity));
+                    }));
 
             // Iterate through all the components of the given entity.
             foreach (var component in entity.GetComponents())
@@ -209,6 +231,40 @@ namespace Editor.Controller
 
     internal partial class Properties : Controller.Helper
     {
+        public Grid CreateButtonWithAutoSuggesBoxWithComponentCollector(string s,
+            TypedEventHandler<AutoSuggestBox, AutoSuggestBoxSuggestionChosenEventArgs> suggestionChosen)
+        {
+            Grid grid = new();
+
+            Button button = new() { Content = s, HorizontalAlignment = HorizontalAlignment.Center, Margin = new(10) };
+
+            AutoSuggestBox autoSuggestBox = new() { Width = 300 };
+            autoSuggestBox.ItemsSource = Engine.Core.Instance.ComponentCollector.Components.ConvertAll<string>(Type => Type.Name).ToArray();
+            autoSuggestBox.TextChanged += (s, e) =>
+            {
+                // Since selecting an item will also change the text,
+                // only listen to changes caused by user entering text.
+                if (e.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+                {
+                    string[] itemSource = Engine.Core.Instance.ComponentCollector.Components.ConvertAll<string>(Type => Type.Name).ToArray();
+                    List<string> suitableItems = new();
+
+                    foreach (var component in itemSource)
+                        if (component.ToLower().Contains(s.Text.ToLower()))
+                            suitableItems.Add(component);
+
+                    s.ItemsSource = suitableItems;
+                }
+            };
+            autoSuggestBox.SuggestionChosen += suggestionChosen;
+
+            button.Flyout = new Flyout() { Content = autoSuggestBox, Placement = FlyoutPlacementMode.Bottom };
+
+            grid.Children.Add(button);
+
+            return grid;
+        }
+
         public Grid CreateFromFieldInfo(object value, FieldInfo fieldInfo, FieldInfo[] nonPublic)
         {
             // Initialize a new List of Grid type.

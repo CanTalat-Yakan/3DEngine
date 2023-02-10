@@ -3,10 +3,10 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using System;
 using Editor.Controller;
+using Engine.Components;
+using Engine.ECS;
 using Engine.Editor;
 using Engine.Utilities;
-using Engine.ECS;
-using Vortice.Direct3D11;
 
 namespace Engine
 {
@@ -16,6 +16,7 @@ namespace Engine
 
         public SceneManager SceneManager;
         public Renderer Renderer;
+        public ComponentCollector ComponentCollector;
         public ImGuiRenderer ImGuiRenderer;
 
         private IntPtr _imGuiContext;
@@ -39,18 +40,25 @@ namespace Engine
             // Initializes the renderer, scene manager, and ImGui renderer.
             Renderer = new(swapChainPanel);
             SceneManager = new();
+            ComponentCollector = new();
             ImGuiRenderer = new();
 
             // Creates an entity with the "Boot" Editortag and adds a "SceneBoot" component to it.
             SceneManager.Scene.EntitytManager.CreateEntity(null, "Boot", EEditorTags.SceneBoot.ToString()).AddComponent(new SceneBoot());
             ImGui.GetIO().DisplaySize = new((float)swapChainPanel.ActualWidth, (float)swapChainPanel.ActualHeight);
 
+            // Add Components to the collector.
+            ComponentCollector.AddComponent(typeof(Camera));
+            ComponentCollector.AddComponent(typeof(Mesh));
+            ComponentCollector.AddComponent(typeof(PlayerMovement));
+            ComponentCollector.AddComponent(typeof(Test));
+
             Output.Log("Engine Initialized...");
 
 
-            // Invokes Awake
+            // Invokes Awake.
             SceneManager.Awake();
-            // Invokes Start
+            // Invokes Start.
             SceneManager.Start();
 
             #region // Render Pipeline Loop
@@ -77,9 +85,9 @@ namespace Engine
                 SceneManager.Start();
             }
 
-            // Invokes Update
+            // Invokes Update.
             SceneManager.Update();
-            // Invokes LateUpdate
+            // Invokes LateUpdate.
             SceneManager.LateUpdate();
 
             // Finishes the state of input processing.

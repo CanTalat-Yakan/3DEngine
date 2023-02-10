@@ -38,6 +38,7 @@
     <Content Remove="Assets\Controller\TreeViewIconNode.cs" />
     <Content Remove="Assets\Controller\ViewPort.cs" />
     <Content Remove="Assets\Engine\Editor\Attributes.cs" />
+    <Content Remove="Assets\Engine\Editor\ComponentCollector.cs" />
     <Content Remove="Assets\Engine\Editor\ImGuiRenderer.cs" />
     <Content Remove="Assets\Engine\Editor\SceneBoot.cs" />
     <Content Remove="Assets\Engine\Utilities\BaseSystem.cs" />

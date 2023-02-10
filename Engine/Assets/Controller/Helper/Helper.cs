@@ -605,7 +605,7 @@ namespace Editor.Controller
 
         public static Vector3 ToDegrees(this Vector3 vector3)
         {
-            return new (
+            return new(
                 Vortice.Mathematics.MathHelper.ToDegrees(vector3.X),
                 Vortice.Mathematics.MathHelper.ToDegrees(vector3.Y),
                 Vortice.Mathematics.MathHelper.ToDegrees(vector3.Z));

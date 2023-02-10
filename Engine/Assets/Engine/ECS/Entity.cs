@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System;
 using Engine.Components;
-using System.Reflection;
 using Engine.Utilities;
 
 namespace Engine.ECS
@@ -59,6 +58,18 @@ namespace Engine.ECS
             // Add the Transform component to the Entity when initialized.
             AddComponent(_transform = new Transform());
 
+        public void AddComponent(Type type)
+        {
+            var component = (Component)Activator.CreateInstance(type);
+
+            // Add the component to the Entity's component list.
+            _components.Add(component);
+            // Assign this Entity to the component's Entity.
+            component.Entity = this;
+            // Enable the component by default.
+            component.IsEnabled = true;
+        }
+        
         public void AddComponent(Component component)
         {
             // Add the component to the Entity's component list.
