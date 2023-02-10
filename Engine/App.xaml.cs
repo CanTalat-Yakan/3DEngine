@@ -47,12 +47,12 @@ namespace Editor
                 // Write date and time
                 Debug.WriteLine($"[{DateTime.Now}]");
 
-                // Write call stack
-                foreach (var stackFrame in new StackTrace().GetFrames())
-                    Debug.Write(stackFrame.ToString());
+                //// Write call stack
+                //foreach (var stackFrame in new StackTrace().GetFrames())
+                //    Debug.Write(stackFrame.ToString());
 
                 // Write exception
-                Debug.WriteLine("\n" + e.Exception + "\n\n");
+                Debug.WriteLine(e.Exception + "\n\n");
 
                 if (Controller.Main.Instance != null)
                     Controller.Output.Log(e.Exception, Controller.EMessageType.Error);
