@@ -2,15 +2,13 @@
 
 namespace Engine.Editor
 {
-    internal class SliderAttribute : Attribute
+    internal class ToolTipAttribute : Attribute
     {
-        public double CustomMin;
-        public double CustomMax;
+        public string ToolTip;
 
-        public SliderAttribute(double min, double max)
+        public ToolTipAttribute(string toolTip)
         {
-            CustomMin = min;
-            CustomMax = max;
+            ToolTip = toolTip;
         }
     }
 
@@ -24,9 +22,19 @@ namespace Engine.Editor
         }
     }
 
+    internal class SliderAttribute : Attribute
+    {
+        public double CustomMin;
+        public double CustomMax;
+
+        public SliderAttribute(double min, double max)
+        {
+            CustomMin = min;
+            CustomMax = max;
+        }
+    }
+
     internal class SpacerAttribute : Attribute { }
-
     internal class ShowAttribute : Attribute { }
-
     internal class HideAttribute : Attribute { }
 }

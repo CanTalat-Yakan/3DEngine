@@ -274,6 +274,8 @@ namespace Editor.Controller
             // Get any custom attributes applied to the field.
             var attributes = fieldInfo.GetCustomAttributes(true);
 
+
+            #region // Process Attributes
             // Return null if the field has a HideAttribute applied.
             if (attributes.OfType<HideAttribute>().Any())
                 return null;
@@ -283,6 +285,12 @@ namespace Editor.Controller
                 foreach (var info in nonPublic)
                     if (fieldInfo.Equals(info))
                         return null;
+
+            ToolTip toolTip = new();
+            // Create a ToolTip if the field has a ToolTipAttribute and is not a non-public field.
+            if (attributes.OfType<ToolTipAttribute>().Any())
+                toolTip.Content = (string)attributes.OfType<ToolTipAttribute>().First().ToolTip;
+            #endregion
 
             #region // Process FieldType
             // Check the type of the field and add the appropriate element to the `grid` list.
@@ -378,6 +386,7 @@ namespace Editor.Controller
                 grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
             #endregion
 
+
             // Return the final grid by stacking all the processed attributes, type grid and wrapping the field name.
             return
                 (new Grid[] { 
@@ -385,7 +394,7 @@ namespace Editor.Controller
                     ProcessAttributes(attributes).StackInGrid(),
                     // Stack field grid and wrap it with field name.
                     grid.ToArray().StackInGrid().WrapInField(fieldInfo.Name)})
-                .StackInGrid(0);
+                .StackInGrid(0, toolTip);
         }
 
         public Grid CreateFromEventInfo(EventInfo eventInfo, EventInfo[] nonPublic)

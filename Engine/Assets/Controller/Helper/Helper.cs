@@ -399,7 +399,7 @@ namespace Editor.Controller
             return grid;
         }
 
-        public static Grid StackInGrid(this Grid[] content, float spacing = 5)
+        public static Grid StackInGrid(this Grid[] content, float spacing = 5, ToolTip toolTip = null)
         {
             Grid grid = new() { HorizontalAlignment = HorizontalAlignment.Stretch };
             StackPanel stack = new() { Spacing = spacing, Orientation = Orientation.Vertical, FlowDirection = FlowDirection.LeftToRight };
@@ -408,8 +408,15 @@ namespace Editor.Controller
                 stack.Children.Add(item);
 
             grid.Children.Add(stack);
+            if (toolTip != null)
+                ToolTipService.SetToolTip(grid, toolTip);
 
             return grid;
+        }
+
+        public static Grid StackInGrid(this Grid[] content, ToolTip toolTip = null, float spacing = 5)
+        {
+            return StackInGrid(content, spacing, toolTip);
         }
 
         public static Grid WrapInField(this UIElement content, string text)

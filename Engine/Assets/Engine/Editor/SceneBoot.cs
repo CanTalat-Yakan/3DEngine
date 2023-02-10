@@ -142,6 +142,7 @@ namespace Engine.Editor
 
     internal class Test : Component
     {
+        [ToolTip("This is a ToolTip")]
         [Show]
         private string _visibleString = "This field is private!";
         [Hide]
