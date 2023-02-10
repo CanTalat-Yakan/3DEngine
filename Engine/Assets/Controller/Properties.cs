@@ -394,7 +394,7 @@ namespace Editor.Controller
                     ProcessAttributes(attributes).StackInGrid(),
                     // Stack field grid and wrap it with field name.
                     grid.ToArray().StackInGrid().WrapInField(fieldInfo.Name)})
-                .StackInGrid(0, toolTip);
+                .StackInGrid(0).AddToolTip(toolTip);
         }
 
         public Grid CreateFromEventInfo(EventInfo eventInfo, EventInfo[] nonPublic)
