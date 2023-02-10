@@ -554,7 +554,7 @@ namespace Editor.Controller
             button.Content = viewbox;
             grid.Children.Add(button);
 
-            return grid;
+            return grid.AddToolTip("Go back one directory");
         }
 
         private Grid AddTile(Grid icon)
