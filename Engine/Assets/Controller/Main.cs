@@ -7,7 +7,7 @@ namespace Editor.Controller
         public static Main Instance { get; private set; }
 
         public Layout LayoutControl;
-        public Player ControlPlayer;
+        public Player PlayerControl;
         public Grid Content;
         public TextBlock Status;
         public Viewbox StatusIcon;

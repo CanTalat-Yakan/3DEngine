@@ -119,11 +119,11 @@ namespace Engine
 
         private bool CheckIfPlaymodeStarted()
         {
-            if (Main.Instance.ControlPlayer.Playmode == EPlaymode.Playing)
-                if (_playmode != Main.Instance.ControlPlayer.Playmode)
+            if (Main.Instance.PlayerControl.Playmode == EPlaymode.Playing)
+                if (_playmode != Main.Instance.PlayerControl.Playmode)
                     return true;
 
-            _playmode = Main.Instance.ControlPlayer.Playmode;
+            _playmode = Main.Instance.PlayerControl.Playmode;
             return false;
         }
     }

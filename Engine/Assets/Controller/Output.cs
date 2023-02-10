@@ -91,7 +91,7 @@ namespace Editor.Controller
             if (s_pauseError.IsChecked.Value)
                 if (t == EMessageType.Error)
                     // Pause the Playmode with the message type error.
-                    Main.Instance.ControlPlayer.Pause();
+                    Main.Instance.PlayerControl.Pause();
 
             // Check if the message is not already in the message collection.
             if (!s_messageCollection.ContainsKey(message))

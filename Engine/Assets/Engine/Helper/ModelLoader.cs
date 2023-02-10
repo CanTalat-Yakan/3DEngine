@@ -6,7 +6,7 @@ namespace Engine.Helper
 {
     internal class ModelLoader
     {
-        public static MeshInfo LoadFilePro(string filePath)
+        public static MeshInfo LoadFile(string filePath)
         {
             // Combine the base directory and the relative path to the resources directory
             string resourcesPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources");

@@ -16,7 +16,7 @@ namespace Editor.ModelView
             this.InitializeComponent();
 
             _mainControl = new(mainWindow, x_Grid_Main, x_TextBlock_Status_Content, x_TextBlock_StatusIcon_Content);
-            _mainControl.ControlPlayer = new(x_AppBarToggleButton_Status_Play, x_AppBarToggleButton_Status_Pause, x_AppBarButton_Status_Forward);
+            _mainControl.PlayerControl = new(x_AppBarToggleButton_Status_Play, x_AppBarToggleButton_Status_Pause, x_AppBarButton_Status_Forward);
 
             InitializeInput();
         }
@@ -29,16 +29,16 @@ namespace Editor.ModelView
         }
 
         private void AppBarToggleButton_Status_Play_Click(object sender, RoutedEventArgs e) => 
-            _mainControl.ControlPlayer.Play();
+            _mainControl.PlayerControl.Play();
 
         private void AppBarToggleButton_Status_Pause_Click(object sender, RoutedEventArgs e) => 
-            _mainControl.ControlPlayer.Pause();
+            _mainControl.PlayerControl.Pause();
 
         private void AppBarButton_Status_Forward_Click(object sender, RoutedEventArgs e) => 
-            _mainControl.ControlPlayer.Forward();
+            _mainControl.PlayerControl.Forward();
 
         private void AppBarButton_Status_Kill_Click(object sender, RoutedEventArgs e) => 
-            _mainControl.ControlPlayer.Kill();
+            _mainControl.PlayerControl.Kill();
 
         private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) => 
             Controller.Theme.Instance.SetRequstedTheme();

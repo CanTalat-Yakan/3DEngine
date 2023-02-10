@@ -126,7 +126,7 @@ namespace Engine.Utilities
             };
 
             // Add a mesh component to the entity using the specified primitive type.
-            newEntity.AddComponent(new Mesh(ModelLoader.LoadFilePro(Path.Combine(PATH_PRIMITIVES, type.ToString()) + ".obj")));
+            newEntity.AddComponent(new Mesh(ModelLoader.LoadFile(Path.Combine(PATH_PRIMITIVES, type.ToString()) + ".obj")));
             // Set the material of the mesh component to the default material.
             newEntity.GetComponent<Mesh>().Material = _materialDefault;
 
@@ -169,7 +169,7 @@ namespace Engine.Utilities
             Sky.Transform.Scale = new Vector3(-1000, 1000, 1000);
 
             // Add Mesh component to Sky entity.
-            Sky.AddComponent(new Mesh(ModelLoader.LoadFilePro(Path.Combine(PATH_PRIMITIVES, EPrimitiveTypes.Sphere.ToString()) + ".obj")));
+            Sky.AddComponent(new Mesh(ModelLoader.LoadFile(Path.Combine(PATH_PRIMITIVES, EPrimitiveTypes.Sphere.ToString()) + ".obj")));
             // Set material of Sky's Mesh component.
             Sky.GetComponent<Mesh>().Material = _materialSky;
 
