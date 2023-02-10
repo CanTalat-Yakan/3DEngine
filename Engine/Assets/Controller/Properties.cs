@@ -238,8 +238,7 @@ namespace Editor.Controller
 
             Button button = new() { Content = s, HorizontalAlignment = HorizontalAlignment.Center, Margin = new(10) };
 
-            AutoSuggestBox autoSuggestBox = new() { Width = 300 };
-            autoSuggestBox.ItemsSource = Engine.Core.Instance.ComponentCollector.Components.ConvertAll<string>(Type => Type.Name).ToArray();
+            AutoSuggestBox autoSuggestBox = new() { Width = 200 };
             autoSuggestBox.TextChanged += (s, e) =>
             {
                 // Since selecting an item will also change the text,
@@ -258,7 +257,7 @@ namespace Editor.Controller
             };
             autoSuggestBox.SuggestionChosen += suggestionChosen;
 
-            button.Flyout = new Flyout() { Content = autoSuggestBox, Placement = FlyoutPlacementMode.Bottom };
+            button.Flyout = new Flyout() { Content = autoSuggestBox };
 
             grid.Children.Add(button);
 

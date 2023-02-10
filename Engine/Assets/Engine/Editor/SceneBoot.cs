@@ -156,7 +156,7 @@ namespace Engine.Editor
         public float Slider;
         public bool Bool;
         public Texture Texture;
-        public Entity Entity;
+        public Entity _Entity;
         [Spacer]
         [Header("Header")]
         public event EventHandler Event;
