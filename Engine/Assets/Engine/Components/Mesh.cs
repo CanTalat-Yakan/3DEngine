@@ -31,7 +31,7 @@ namespace Engine.Components
             //Assign the provided MeshInfo to the local MeshInfo variable.
             MeshInfo = _info;
 
-            //Call the CreateBuffer method to initialize the buffer.
+            //Call the CreateBuffer method to initialize the vertex and index buffer.
             CreateBuffer();
         }
 
