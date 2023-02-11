@@ -58,18 +58,12 @@ namespace Engine.ECS
             // Add the Transform component to the Entity when initialized.
             AddComponent(_transform = new Transform());
 
-        public void AddComponent(Type type)
-        {
-            var component = (Component)Activator.CreateInstance(type);
+        public void AddComponent<T>() where T : Component =>
+            AddComponent(Type.GetType(typeof(T).FullName));
 
-            // Add the component to the Entity's component list.
-            _components.Add(component);
-            // Assign this Entity to the component's Entity.
-            component.Entity = this;
-            // Enable the component by default.
-            component.IsEnabled = true;
-        }
-        
+        public void AddComponent(Type type) =>
+            AddComponent((Component)Activator.CreateInstance(type));
+
         public void AddComponent(Component component)
         {
             // Add the component to the Entity's component list.
@@ -151,11 +145,11 @@ namespace Engine.ECS
             var newEntity = new Entity()
             {
                 ID = Guid.NewGuid(), // Generate a new ID for the new Entity object.
-                Name = Name, 
-                IsEnabled = IsEnabled, 
-                IsStatic = IsStatic, 
-                Layer = Layer, 
-                Tag = Tag, 
+                Name = Name,
+                IsEnabled = IsEnabled,
+                IsStatic = IsStatic,
+                Layer = Layer,
+                Tag = Tag,
             };
 
             // Copy the original Entity object's Transform properties to the new Entity object.
@@ -167,15 +161,15 @@ namespace Engine.ECS
             for (int i = 1; i < _components.Count; i++)
             {
                 // Clone the Component.
-                var newComponent = _components[i].Clone(); 
+                var newComponent = _components[i].Clone();
                 // Call OnRegister method on the new Component.
-                newComponent.OnRegister(); 
+                newComponent.OnRegister();
                 // Add the new Component to the new Entity object.
-                newEntity.AddComponent(newComponent); 
+                newEntity.AddComponent(newComponent);
             }
 
             // Return the new Entity object.
-            return newEntity;  
+            return newEntity;
         }
     }
 }
