@@ -30,7 +30,7 @@ namespace Engine.Components
         public Vector3 Scale = Vector3.One;
 
         public override void OnRegister() =>
-            // Register the Component with the TransformSystem.
+            // Register the component with the TransformSystem.
             TransformSystem.Register(this);
 
         public override void OnUpdate()

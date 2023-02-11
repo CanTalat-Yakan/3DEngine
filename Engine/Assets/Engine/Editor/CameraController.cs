@@ -20,7 +20,7 @@ namespace Engine.Editor
         private Vector3 _rotation;
 
         public override void OnRegister() =>
-            // Register the Component with the EditorScriptSystem.
+            // Register the component with the EditorScriptSystem.
             EditorScriptSystem.Register(this);
 
         public override void OnUpdate()

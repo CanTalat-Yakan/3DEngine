@@ -18,7 +18,7 @@ namespace Engine.Editor
         public Entity Cubes;
 
         public override void OnRegister() =>
-            // Register the Component with the EditorScriptSystem.
+            // Register the component with the EditorScriptSystem.
             EditorScriptSystem.Register(this);
 
         public override void OnAwake()
@@ -93,7 +93,7 @@ namespace Engine.Editor
         public Camera SceneCamera;
 
         public override void OnRegister() =>
-            // Register the Component with the ScriptSystem.
+            // Register the component with the ScriptSystem.
             ScriptSystem.Register(this);
 
         public override void OnAwake() =>
@@ -114,7 +114,7 @@ namespace Engine.Editor
         public float MovementSpeed = 5;
 
         public override void OnRegister() =>
-            // Register the Component with the ScriptSystem.
+            // Register the component with the ScriptSystem.
             ScriptSystem.Register(this);
 
         public override void OnUpdate()
