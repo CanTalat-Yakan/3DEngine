@@ -16,18 +16,17 @@ namespace Editor.Controller
 
         public static string ToString()
         {
-            string profile = "";
-
-            profile += (int)(Delta * 1000) + " ms" + "\n";
-            profile += FPS + " FPS" + "\n";
-            profile += "\n";
-            profile += "Resolution: " + "\n" + SwapChainSizeWidth + ":" + SwapChainSizeHeight + "\n";
-            profile += "\n";
-            profile += "DrawCalls: " + DrawCalls + "\n";
-            profile += "Vertices: " + Vertices + "\n";
-            profile += "Indices: " + Indices;
-
-            return profile;
+            return $"""
+                {(int)(Delta * 1000)} ms
+                {FPS} FPS
+                
+                Resolution: 
+                {SwapChainSizeWidth + ":" + SwapChainSizeHeight}
+                
+                DrawCalls: {DrawCalls}
+                Vertices: {Vertices}
+                Indices: {Indices}
+                """;
         }
     }
 }
