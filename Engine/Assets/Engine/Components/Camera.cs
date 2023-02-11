@@ -19,7 +19,7 @@ namespace Engine.Components
         private Renderer _d3d { get => Renderer.Instance; }
 
         private ID3D11Buffer _view;
-        private SViewConstantsBuffer _viewConstants;
+        private SViewConstantBuffer _viewConstant;
 
         public override void OnRegister() =>
             // Register the component with the CameraSystem.
@@ -27,7 +27,7 @@ namespace Engine.Components
 
         public Camera() =>
             //Create View Constant Buffer when Camera is intialized.
-            _view = _d3d.Device.CreateConstantBuffer<SViewConstantsBuffer>();
+            _view = _d3d.Device.CreateConstantBuffer<SViewConstantBuffer>();
 
         public override void OnAwake()
         {
@@ -69,7 +69,7 @@ namespace Engine.Components
             var viewProjection = Matrix4x4.Transpose(view * projection);
 
             // Store the camera's view-projection matrix and position.
-            _viewConstants = new()
+            _viewConstant = new()
             {
                 ViewProjection = viewProjection,
                 CameraPositon = Entity.Transform.Position
@@ -99,7 +99,7 @@ namespace Engine.Components
                 // Map the constant buffer to memory for write access.
                 MappedSubresource mappedResource = _d3d.DeviceContext.Map(this._view, MapMode.WriteDiscard);
                 // Copy the data from the constant buffer to the mapped resource.
-                Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref _viewConstants);
+                Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref _viewConstant);
                 // Unmap the constant buffer from memory.
                 _d3d.DeviceContext.Unmap(this._view, 0);
             }

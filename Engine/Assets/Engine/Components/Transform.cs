@@ -8,7 +8,7 @@ namespace Engine.Components
 {
     internal class Transform : Component
     {
-        public SPerModelConstantBuffer ConstantsBuffer { get => new() { ModelView = WorldMatrix }; }
+        public SPerModelConstantBuffer ModelConstant;
 
         public Transform Parent;
 
@@ -60,17 +60,18 @@ namespace Engine.Components
             // Calculate the scale matrix based on the world scale.
             Matrix4x4 scaleMatrix = Matrix4x4.CreateScale(WorldScale);
 
-            // Calculate the world matrix as the transposed result of the combination of scale, rotation and translation matrices.
-            WorldMatrix = Matrix4x4.Transpose(scaleMatrix * rotationMatrix * translationMatrix);
+            // Calculate the world matrix as the transposed result of the combination of scale, rotation and translation matrices
+            // and set the ModelView matrix in the ModelConstant buffer to the world matrix.
+            ModelConstant.ModelView = WorldMatrix = Matrix4x4.Transpose(scaleMatrix * rotationMatrix * translationMatrix);
         }
 
         public override string ToString()
         {
-            string s = "";
-            s += Position.ToString() + "\n";
-            s += EulerAngles.ToString() + "\n";
-            s += Scale.ToString();
-            return s;
+            return $"""
+                {Position}
+                {EulerAngles}
+                {Scale}
+                """;
         }
     }
 }

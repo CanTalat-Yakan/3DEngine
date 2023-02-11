@@ -2,7 +2,7 @@
 
 namespace Engine.Data
 {
-    internal struct SViewConstantsBuffer
+    internal struct SViewConstantBuffer
     {
         public Matrix4x4 ViewProjection;
         public Vector3 CameraPositon;
