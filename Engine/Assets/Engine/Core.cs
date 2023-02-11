@@ -51,7 +51,7 @@ namespace Engine
             ComponentCollector.AddComponent(typeof(Camera));
             ComponentCollector.AddComponent(typeof(Mesh));
             ComponentCollector.AddComponent(typeof(PlayerMovement));
-            ComponentCollector.AddComponent(typeof(Test));
+            ComponentCollector.AddComponent(typeof(Example));
 
             Output.Log("Engine Initialized...");
 

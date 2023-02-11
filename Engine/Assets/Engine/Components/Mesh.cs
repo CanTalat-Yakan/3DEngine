@@ -23,7 +23,7 @@ namespace Engine.Components
         private Renderer _d3d { get => Renderer.Instance; }
 
         public override void OnRegister() =>
-            // Register the script with the MeshSystem.
+            // Register the Component with the MeshSystem.
             MeshSystem.Register(this);
 
         public Mesh(MeshInfo _info)

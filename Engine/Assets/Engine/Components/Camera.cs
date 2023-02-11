@@ -22,7 +22,7 @@ namespace Engine.Components
         private SViewConstantsBuffer _viewConstants;
 
         public override void OnRegister() =>
-            // Register the script with the CameraSystem.
+            // Register the Component with the CameraSystem.
             CameraSystem.Register(this);
 
         public Camera() =>

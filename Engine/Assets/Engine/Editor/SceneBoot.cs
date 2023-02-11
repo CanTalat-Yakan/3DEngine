@@ -18,7 +18,7 @@ namespace Engine.Editor
         public Entity Cubes;
 
         public override void OnRegister() =>
-            // Register the script with the EditorScriptSystem.
+            // Register the Component with the EditorScriptSystem.
             EditorScriptSystem.Register(this);
 
         public override void OnAwake()
@@ -47,7 +47,7 @@ namespace Engine.Editor
 
             // Add PlayerMovement and Test components to the camera entity.
             Camera.AddComponent(new PlayerMovement());
-            Camera.AddComponent(new Test());
+            Camera.AddComponent(new Example());
 
             // Create a parent entity for all cube entities with the name "Cubes".
             Cubes = SceneManager.Scene.EntitytManager.CreateEntity(null, "Cubes");
@@ -93,7 +93,7 @@ namespace Engine.Editor
         public Camera SceneCamera;
 
         public override void OnRegister() =>
-            // Register the script with the ScriptSystem.
+            // Register the Component with the ScriptSystem.
             ScriptSystem.Register(this);
 
         public override void OnAwake() =>
@@ -114,7 +114,7 @@ namespace Engine.Editor
         public float MovementSpeed = 5;
 
         public override void OnRegister() =>
-            // Register the script with the ScriptSystem.
+            // Register the Component with the ScriptSystem.
             ScriptSystem.Register(this);
 
         public override void OnUpdate()
@@ -140,13 +140,13 @@ namespace Engine.Editor
         }
     }
 
-    internal class Test : Component
+    internal class Example : Component
     {
         [ToolTip("This is a ToolTip")]
         [Show]
-        private string _visibleString = "This field is private!";
+        private string _visibleString = "This field is private";
         [Hide]
-        public string HiddenString = "This field is public!";
+        public string HiddenString = "This field is public";
         public Color Color;
         public string String = "";
         public int Int;
