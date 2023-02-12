@@ -5,7 +5,6 @@ using System.Numerics;
 using System;
 using Windows.Foundation;
 using Windows.System;
-using Windows.UI.Core;
 
 namespace Engine.Utilities
 {

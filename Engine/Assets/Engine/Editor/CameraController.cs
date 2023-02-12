@@ -10,7 +10,7 @@ namespace Engine.Editor
 {
     internal class CameraController : EditorComponent
     {
-        public string Profile { get => Entity.Transform.ToString(); }
+        public string Profile => Entity.Transform.ToString();
 
         private static float s_movementSpeed = 2;
         public static float MovementSpeed { get => s_movementSpeed; set => s_movementSpeed = value; }

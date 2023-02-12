@@ -11,7 +11,7 @@ namespace Engine.Utilities
 {
     internal class Material
     {
-        private Renderer _d3d { get => Renderer.Instance; }
+        private Renderer _d3d => Renderer.Instance;
 
         private ID3D11VertexShader _vertexShader;
         private ID3D11PixelShader _pixelShader;
