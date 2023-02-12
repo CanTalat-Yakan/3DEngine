@@ -7,6 +7,7 @@ using Engine.Components;
 using Engine.ECS;
 using Engine.Editor;
 using Engine.Utilities;
+using System.Linq;
 
 namespace Engine
 {
@@ -44,24 +45,26 @@ namespace Engine
             ImGuiRenderer = new();
 
             // Creates an entity with the "Boot" Editortag and adds a "SceneBoot" component to it.
-            SceneManager.Scene.EntitytManager.CreateEntity(null, "Boot", EEditorTags.SceneBoot.ToString()).AddComponent(new SceneBoot());
-            ImGui.GetIO().DisplaySize = new((float)swapChainPanel.ActualWidth, (float)swapChainPanel.ActualHeight);
+            SceneManager.Scene.EntitytManager
+                .CreateEntity(null, "Boot", EEditorTags.SceneBoot.ToString())
+                .AddComponent(new SceneBoot());
 
-            // Add Components to the collector.
-            ComponentCollector.AddComponent(typeof(Camera));
-            ComponentCollector.AddComponent(typeof(Mesh));
-            ComponentCollector.AddComponent(typeof(PlayerMovement));
-            ComponentCollector.AddComponent(typeof(Example));
+            // Set the displaySize with the actual size of the SwapChainPanel.
+            ImGui.GetIO().DisplaySize = new(
+                (float)swapChainPanel.ActualWidth,
+                (float)swapChainPanel.ActualHeight);
+
+            // Gather Components for the Editor's AddComponent function.
+            CollectComponents();
 
             Output.Log("Engine Initialized...");
 
-
+            #region // Render Pipeline Loop
             // Invokes Awake.
             SceneManager.Awake();
             // Invokes Start.
             SceneManager.Start();
 
-            #region // Render Pipeline Loop
             // Adds an event handler for the CompositionTarget.Rendering event,
             // which is triggered when the composition system is rendering a frame.
             // The code inside the event handler will be executed each time the event is raised.
@@ -112,6 +115,25 @@ namespace Engine
 
             // Updates the text of the profile with the profiling information.
             _profile.Text = Profiler.ToString();
+        }
+
+        public void CollectComponents()
+        {
+            // Collect all components in the Assembly.
+            var componentCollection = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(s => s.GetTypes())
+                .Where(p => typeof(Component).IsAssignableFrom(p) && !p.IsInterface);
+
+            // Remove editor components from the collection.
+            var EditorComponentCollection = componentCollection
+                .Where(p => typeof(EditorComponent).IsAssignableFrom(p) && !p.IsInterface);
+
+            var finalCollection = componentCollection.ToList();
+            //foreach (var editorComponent in EditorComponentCollection)
+            //    finalCollection.Remove(editorComponent);
+
+            // Add components to the collector.
+            ComponentCollector.AddComponents(finalCollection.ToArray());
         }
 
         public virtual void UpdateImGui()
