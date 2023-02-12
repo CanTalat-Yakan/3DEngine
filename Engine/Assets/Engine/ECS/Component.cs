@@ -4,7 +4,7 @@ using Engine.Editor;
 
 namespace Engine.ECS
 {
-    internal class Component : BindableBase, ICloneable
+    public class Component : BindableBase, ICloneable
     {
         [Hide]
         public Entity Entity;
@@ -48,7 +48,7 @@ namespace Engine.ECS
             (Component)MemberwiseClone();
     }
 
-    internal class EditorComponent : Component, IHide { }
+    public class EditorComponent : Component, IHide { }
 
-    internal interface IHide { }
+    public interface IHide { }
 }

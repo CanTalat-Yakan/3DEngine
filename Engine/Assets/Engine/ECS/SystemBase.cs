@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Engine.Components;
 
 namespace Engine.ECS
 {
-    internal class SystemBase<T> where T : Component
+    public class SystemBase<T> where T : Component
     {
         protected static List<T> s_components = new();
 
@@ -84,9 +84,9 @@ namespace Engine.ECS
             component.Entity.ActiveInHierarchy; 
     }
 
-    class CameraSystem : SystemBase<Camera> { }
-    class TransformSystem : SystemBase<Transform> { }
-    class MeshSystem : SystemBase<Mesh> { }
-    class ScriptSystem : SystemBase<Component> { }
-    class EditorScriptSystem : SystemBase<EditorComponent> { }
+    internal class CameraSystem : SystemBase<Camera> { }
+    internal class TransformSystem : SystemBase<Transform> { }
+    internal class MeshSystem : SystemBase<Mesh> { }
+    public class ScriptSystem : SystemBase<Component> { }
+    public class EditorScriptSystem : SystemBase<EditorComponent> { }
 }

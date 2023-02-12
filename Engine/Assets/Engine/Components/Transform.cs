@@ -7,7 +7,7 @@ using Engine.Helper;
 
 namespace Engine.Components
 {
-    internal class Transform : Component, IHide
+    public class Transform : Component, IHide
     {
         public Matrix4x4 WorldMatrix = Matrix4x4.Identity;
 
@@ -64,7 +64,7 @@ namespace Engine.Components
             WorldMatrix = Matrix4x4.Transpose(scaleMatrix * rotationMatrix * translationMatrix);
         }
 
-        public SPerModelConstantBuffer GetConstantBuffer()
+        internal SPerModelConstantBuffer GetConstantBuffer()
         {
             // Set the ModelView matrix in the ModelConstantBuffer to the WorldMatrix.
             _modelConstantBuffer.ModelView = WorldMatrix;

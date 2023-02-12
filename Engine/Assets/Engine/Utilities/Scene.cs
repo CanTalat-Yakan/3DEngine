@@ -3,7 +3,7 @@ using Editor.Controller;
 
 namespace Engine.Utilities
 {
-    internal class Scene : BindableBase, ICloneable
+    public class Scene : BindableBase, ICloneable
     {
         public Guid ID = Guid.NewGuid();
 

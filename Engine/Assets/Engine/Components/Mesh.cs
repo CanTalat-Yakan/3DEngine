@@ -7,7 +7,7 @@ using Engine.Utilities;
 
 namespace Engine.Components
 {
-    internal class Mesh : Component
+    public class Mesh : Component
     {
         public MeshInfo MeshInfo;
         public Material Material;

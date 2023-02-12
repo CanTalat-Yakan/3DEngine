@@ -2,7 +2,7 @@
 
 namespace Engine.Data
 {
-    internal struct MeshInfo
+    public struct MeshInfo
     {
         public List<Vertex> Vertices;
         public List<ushort> Indices;

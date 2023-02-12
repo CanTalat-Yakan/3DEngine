@@ -9,7 +9,7 @@ using Engine.Helper;
 
 namespace Engine.Utilities
 {
-    internal class Material
+    public class Material
     {
         private Renderer _d3d => Renderer.Instance;
 
@@ -103,7 +103,7 @@ namespace Engine.Utilities
             #endregion
         }
 
-        public void Set(SPerModelConstantBuffer constantBuffer)
+        internal void Set(SPerModelConstantBuffer constantBuffer)
         {
             // Set input layout, vertex shader, and pixel shader in the device context.
             _d3d.DeviceContext.IASetInputLayout(_inputLayout);

@@ -9,7 +9,7 @@ using Engine.Helper;
 
 namespace Engine.Utilities
 {
-    internal enum EPrimitiveTypes
+    public enum EPrimitiveTypes
     {
         Plane,
         Quad,
@@ -25,7 +25,7 @@ namespace Engine.Utilities
         Duck,
     }
 
-    internal class EventList<T> : List<T>
+    public class EventList<T> : List<T>
     {
         // Event that is raised when an item is added to the list.
         public event EventHandler<T> OnAdd;
@@ -56,7 +56,7 @@ namespace Engine.Utilities
         }
     }
 
-    internal class EntityManager
+    public class EntityManager
     {
         public EventList<Entity> EntityList = new();
         public Entity Sky;

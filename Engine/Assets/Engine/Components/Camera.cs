@@ -9,7 +9,7 @@ using Engine.Helper;
 
 namespace Engine.Components
 {
-    internal class Camera : Component
+    public class Camera : Component
     {
         public static Camera Main { get; private set; }
 
