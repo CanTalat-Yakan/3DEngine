@@ -48,12 +48,12 @@ namespace Engine
             CollectComponents();
 
             #region // ImGui
-            // Initializes the ImGui renderer.
-            ImGuiRenderer = new();
-
             // Creates a new ImGui context and sets it as the current context.
             _imGuiContext = ImGui.CreateContext();
             ImGui.SetCurrentContext(_imGuiContext);
+
+            // Initializes the ImGui renderer.
+            ImGuiRenderer = new();
 
             // Set the displaySize with the actual size of the SwapChainPanel.
             ImGui.GetIO().DisplaySize = new(
