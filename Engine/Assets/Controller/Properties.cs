@@ -16,6 +16,7 @@ using Engine.Utilities;
 using Color = System.Drawing.Color;
 using Path = System.IO.Path;
 using Texture = Vortice.Direct3D11.Texture2DArrayShaderResourceView;
+using Engine.Helper;
 
 namespace Editor.Controller
 {
@@ -71,21 +72,22 @@ namespace Editor.Controller
 
             Grid[] transform = new[]
             {
-                CreateVec3InputTransform(
-                    entity.Transform.Position,
-                    (s, e) => entity.Transform.Position.X = (float)e.NewValue,
-                    (s, e) => entity.Transform.Position.Y = (float)e.NewValue,
-                    (s, e) => entity.Transform.Position.Z = (float)e.NewValue).WrapInField("Position"),
-                CreateVec3InputTransform(
-                    entity.Transform.Rotation.ToEuler().ToDegrees(),
-                    (s, e) =>  entity.Transform.EulerAngles.X = (float)e.NewValue,
-                    (s, e) =>  entity.Transform.EulerAngles.Y = (float)e.NewValue,
-                    (s, e) =>  entity.Transform.EulerAngles.Z = (float) e.NewValue).WrapInField("Rotation"),
-                CreateVec3InputTransform(
-                    entity.Transform.Scale,
-                    (s, e) => entity.Transform.Scale.X = (float)e.NewValue,
-                    (s, e) => entity.Transform.Scale.Y = (float)e.NewValue,
-                    (s, e) => entity.Transform.Scale.Z = (float)e.NewValue).WrapInField("Scale"),
+                CreateVec3InputWithRGB(
+                    entity.Transform.LocalPosition,
+                    (s, e) => entity.Transform.LocalPosition.X = (float)e.NewValue,
+                    (s, e) => entity.Transform.LocalPosition.Y = (float)e.NewValue,
+                    (s, e) => entity.Transform.LocalPosition.Z = (float)e.NewValue)
+                .WrapInField("Position"),
+                CreateVec3InputWithRGBAndTransform(
+                    entity.Transform.EulerAngles,
+                    entity.Transform)
+                .WrapInField("Rotation"),
+                CreateVec3InputWithRGB(
+                    entity.Transform.LocalScale,
+                    (s, e) => entity.Transform.LocalScale.X = (float)e.NewValue,
+                    (s, e) => entity.Transform.LocalScale.Y = (float)e.NewValue,
+                    (s, e) => entity.Transform.LocalScale.Z = (float)e.NewValue)
+                .WrapInField("Scale"),
             };
 
             _stackPanel.Children.Add(
@@ -103,7 +105,7 @@ namespace Editor.Controller
                 .WrapInExpander("Transform"));
 
             _stackPanel.Children.Add(
-                CreateButtonWithAutoSuggesBoxWithComponentCollector(
+                CreateButtonWithAutoSuggesBoxAndComponentCollector(
                     "Add Component",
                     (s, e) =>
                     {
@@ -231,7 +233,7 @@ namespace Editor.Controller
 
     internal partial class Properties : Controller.Helper
     {
-        public Grid CreateButtonWithAutoSuggesBoxWithComponentCollector(string s,
+        public Grid CreateButtonWithAutoSuggesBoxAndComponentCollector(string s,
             TypedEventHandler<AutoSuggestBox, AutoSuggestBoxSuggestionChosenEventArgs> suggestionChosen)
         {
             Grid grid = new();
