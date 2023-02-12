@@ -112,7 +112,7 @@ namespace Engine
 
             // Updates the time values, such as delta time and time scale,
             // used in the game or application.
-            Timer.Update();
+            Time.Update();
 
             // Updates the text of the profile with the profiling information.
             _profile.Text = Profiler.GetString();
@@ -138,7 +138,7 @@ namespace Engine
             ImGui.SetCurrentContext(_imGuiContext);
             var io = ImGui.GetIO();
 
-            io.DeltaTime = (float)Timer.Delta;
+            io.DeltaTime = (float)Time.Delta;
 
             ImGui.NewFrame();
             ImGui.Render();

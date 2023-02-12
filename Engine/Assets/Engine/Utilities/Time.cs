@@ -3,13 +3,13 @@ using System;
 
 namespace Engine.Utilities
 {
-    internal class Timer
+    public class Time
     {
-        public static double Time => s_time; 
+        public static double Timer => s_timer; 
         public static double Delta => s_delta; 
         public static int FPS => s_fps; 
 
-        private static double s_time, s_delta;
+        private static double s_timer, s_delta;
         private static int s_fps, s_tmpFPS;
 
         private static Stopwatch s_watch = new();
@@ -21,7 +21,7 @@ namespace Engine.Utilities
             s_delta = s_watch.Elapsed.TotalSeconds;
 
             // Adds the elapsed time to the running total time.
-            s_time += s_delta;
+            s_timer += s_delta;
 
             // Increases the temporary frame count by 1.
             ++s_tmpFPS;

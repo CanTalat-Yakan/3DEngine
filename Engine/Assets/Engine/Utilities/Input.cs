@@ -8,21 +8,21 @@ using Windows.System;
 
 namespace Engine.Utilities
 {
-    internal enum EMouseButton
+    public enum EMouseButton
     {
         IsLeftButtonPressed,
         IsRightButtonPressed,
         IsMiddleButtonPressed
     }
 
-    internal enum EInputState
+    public enum EInputState
     {
         Down,
         Pressed,
         Up
     }
 
-    internal class Input
+    public class Input
     {
         private static Dictionary<VirtualKey, bool[]> _virtualKeyDic = new();
         private static List<VirtualKey> _bufferKeys = new();

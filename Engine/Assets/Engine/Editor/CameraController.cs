@@ -43,9 +43,9 @@ namespace Engine.Editor
             ScrollMovement();
 
             // Update the entity's position based on the calculated direction and movement speed.
-            Entity.Transform.LocalPosition += _direction * (float)Timer.Delta * s_movementSpeed;
+            Entity.Transform.LocalPosition += _direction * (float)Time.Delta * s_movementSpeed;
             // Update the entity's rotation based on the calculated rotation and rotation speed.
-            Entity.Transform.EulerAngles -= _rotation * (float)Timer.Delta * _rotationSpeed;
+            Entity.Transform.EulerAngles -= _rotation * (float)Time.Delta * _rotationSpeed;
 
             //// Limit the entity's vertical rotation between -89 and 89 degrees.
             //Entity.Transform.EulerAngles = Math.Clamp(Entity.Transform.EulerAngles.X, -89, 89);
@@ -79,7 +79,7 @@ namespace Engine.Editor
         private void ScreenMovement() =>
             // Update the direction by subtracting the right vector multiplied by the mouse X axis input,
             // and the local up vector multiplied by the mouse Y axis input, both scaled by the time delta.
-            _direction -= Entity.Transform.Right * Input.GetMouseAxis().X * (float)Timer.Delta + Entity.Transform.Up * Input.GetMouseAxis().Y * (float)Timer.Delta;
+            _direction -= Entity.Transform.Right * Input.GetMouseAxis().X * (float)Time.Delta + Entity.Transform.Up * Input.GetMouseAxis().Y * (float)Time.Delta;
 
         private void ScrollMovement()
         {

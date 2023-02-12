@@ -151,7 +151,7 @@ namespace Engine.Editor
                 Input.GetAxis().Y * Entity.Transform.Forward;
 
             // Return the normalized movement direction with a magnitude of MovementSpeed multiplied by the delta time.
-            _targetDirection = Vector3.Normalize(destination) * MovementSpeed * (float)Timer.Delta;
+            _targetDirection = Vector3.Normalize(destination) * MovementSpeed * (float)Time.Delta;
         }
 
         internal void Rotation()
@@ -165,7 +165,7 @@ namespace Engine.Editor
                 Input.GetMouseAxis().X);
 
             // Update the entity's rotation based on the calculated rotation and rotation speed.
-            _cameraRotataion -= rotation * (float)Timer.Delta * RotationSpeed;
+            _cameraRotataion -= rotation * (float)Time.Delta * RotationSpeed;
         }
     }
 

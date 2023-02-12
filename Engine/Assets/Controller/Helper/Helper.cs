@@ -627,9 +627,6 @@ namespace Editor.Controller
                 Vortice.Mathematics.MathHelper.ToRadians(vector.Y),
                 Vortice.Mathematics.MathHelper.ToRadians(vector.Z));
 
-        public static Vector3 SwitchXY(this Vector3 vector) =>
-            new(vector.Y, vector.X, vector.Z);
-
         public static bool IsNaN(this Vector3 vector3) =>
             float.IsNaN(vector3.X) || float.IsNaN(vector3.Y) || float.IsNaN(vector3.Z);
     }

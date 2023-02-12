@@ -2,9 +2,9 @@
 
 namespace Engine.Helper
 {
-    internal class Helper { }
+    public class Helper { }
 
-    internal static class ExtensionMethods
+    public static class ExtensionMethods
     {
         public static float ToDegrees(this float value) =>
             Vortice.Mathematics.MathHelper.ToDegrees(value);

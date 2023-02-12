@@ -4,8 +4,8 @@ namespace Editor.Controller
 {
     internal class Profiler
     {
-        public static int FPS => Timer.FPS;
-        public static double Delta => Timer.Delta;
+        public static int FPS => Time.FPS;
+        public static double Delta => Time.Delta;
 
         public static double SwapChainSizeWidth => Renderer.Instance.SwapChainPanel.ActualWidth;
         public static double SwapChainSizeHeight => Renderer.Instance.SwapChainPanel.ActualHeight;
