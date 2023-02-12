@@ -28,47 +28,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm64'">
     <DefineConstants>TRACE;DEBUG;NET;NET7_0;NETCOREAPP</DefineConstants>
   </PropertyGroup>
-  <ItemGroup>
-    <Content Remove="Assets\Controller\Files.cs" />
-    <Content Remove="Assets\Controller\Helper.cs" />
-    <Content Remove="Assets\Controller\Helper\Binding.cs" />
-    <Content Remove="Assets\Controller\Helper\Profiler.cs" />
-    <Content Remove="Assets\Controller\Helper\Serialization.cs" />
-    <Content Remove="Assets\Controller\Home.cs" />
-    <Content Remove="Assets\Controller\Theme.cs" />
-    <Content Remove="Assets\Controller\TreeViewIconNode.cs" />
-    <Content Remove="Assets\Controller\ViewPort.cs" />
-    <Content Remove="Assets\Engine\Editor\Attributes.cs" />
-    <Content Remove="Assets\Engine\Editor\ComponentCollector.cs" />
-    <Content Remove="Assets\Engine\Editor\ImGuiRenderer.cs" />
-    <Content Remove="Assets\Engine\Editor\SceneBoot.cs" />
-    <Content Remove="Assets\Engine\Helper\Helper.cs" />
-    <Content Remove="Assets\Engine\Utilities\BaseSystem.cs" />
-    <Content Remove="Assets\Engine\Utilities\Component.cs" />
-    <Content Remove="Assets\Engine\Utilities\SceneManager.cs" />
-    <Content Remove="Assets\ModelView\Frames\Documentation.xaml" />
-    <Content Remove="Assets\ModelView\Frames\Documentation.xaml.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Assets\Engine\Resources\Models\Cube.obj" />
-    <None Remove="Assets\Engine\Resources\Models\Cylinder.obj" />
-    <None Remove="Assets\Engine\Resources\Models\Duck.obj" />
-    <None Remove="Assets\Engine\Resources\Models\Lowpoly_tree_sample.obj" />
-    <None Remove="Assets\Engine\Resources\Models\SmallSphere.obj" />
-    <None Remove="Assets\Engine\Resources\Models\Sphere.obj" />
-    <None Remove="Assets\Engine\Resources\Models\sponza.obj" />
-    <None Remove="Assets\Engine\Resources\Shader\ImGui.hlsl" />
-    <None Remove="Assets\Engine\Resources\Shader\ShaderHelper.hlsl" />
-    <None Remove="Assets\Engine\Resources\Templates\Materials.txt" />
-    <None Remove="Assets\Engine\Resources\Templates\Scenes.txt" />
-    <None Remove="Assets\Engine\Resources\Templates\Scripts.txt" />
-    <None Remove="Assets\Engine\Resources\Templates\Shaders.txt" />
-    <None Remove="Assets\ModelView\Frames\Documentation.xaml" />
-    <None Remove="Assets\ModelView\Frames\Home.xaml" />
-    <None Remove="Assets\ModelView\Frames\Main.xaml" />
-    <None Remove="Assets\ModelView\Frames\Settings.xaml" />
-  </ItemGroup>
-
+	
   <ItemGroup>
     <PackageReference Include="Aspose.3D" Version="23.1.0" />
     <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
@@ -98,16 +58,6 @@
     <PackageReference Include="Vortice.XInput" Version="2.3.0" />
     <PackageReference Include="WinUIEx" Version="2.1.0" />
     <Manifest Include="$(ApplicationManifest)" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="Frame\Settings.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Assets\ModelView\" />
   </ItemGroup>
 
   <ItemGroup>
