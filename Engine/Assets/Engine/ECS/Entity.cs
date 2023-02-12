@@ -47,10 +47,10 @@ namespace Engine.ECS
         public Scene Scene { get => _scene is null ? _scene = SceneManager.GetFromEntityID(ID) : _scene; set => _scene = null; }
 
         private Transform _transform;
-        public Transform Transform { get => _transform; }
+        public Transform Transform => _transform;
 
         private bool _activeInHierarchy = true;
-        public bool ActiveInHierarchy { get => Parent is null ? IsEnabled : _activeInHierarchy &= Parent.ActiveInHierarchy && Parent.IsEnabled; }
+        public bool ActiveInHierarchy => Parent is null ? IsEnabled : _activeInHierarchy &= Parent.ActiveInHierarchy && Parent.IsEnabled;
 
         private List<Component> _components = new();
 

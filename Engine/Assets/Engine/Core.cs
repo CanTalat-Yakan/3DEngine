@@ -82,7 +82,7 @@ namespace Engine
             Input.Update();
 
             // Invokes Awake and Start if playmode has started.
-            if (CheckIfPlaymodeStarted())
+            if (CheckPlaymodeStarted())
             {
                 SceneManager.Awake();
                 SceneManager.Start();
@@ -143,7 +143,7 @@ namespace Engine
             ImGui.Render();
         }
 
-        private bool CheckIfPlaymodeStarted()
+        private bool CheckPlaymodeStarted()
         {
             if (Main.Instance.PlayerControl.Playmode == EPlaymode.Playing)
                 if (_playmode != Main.Instance.PlayerControl.Playmode)

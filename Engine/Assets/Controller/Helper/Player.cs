@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI;
+using FastSerialization;
 
 namespace Editor.Controller
 {
@@ -21,7 +22,7 @@ namespace Editor.Controller
         private TextBlock _status;
         private Output _output;
 
-        public Player(AppBarToggleButton play, AppBarToggleButton pause, AppBarButton forward)
+        public Player(AppBarToggleButton play, AppBarToggleButton pause, AppBarButton forward) 
         {
             _play = play;
             _pause = pause;

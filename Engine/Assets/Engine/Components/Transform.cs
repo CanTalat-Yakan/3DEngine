@@ -11,28 +11,28 @@ namespace Engine.Components
     {
         public Matrix4x4 WorldMatrix = Matrix4x4.Identity;
 
-        public Transform Parent { get => Entity.Parent is null ? null : Entity.Parent.Transform; }
+        public Transform Parent => Entity.Parent is null ? null : Entity.Parent.Transform;
 
-        public Vector3 Forward { get => Parent is null ? LocalForward : LocalForward + Parent.Forward; }
+        public Vector3 Forward => Parent is null ? LocalForward : LocalForward + Parent.Forward;
         public Vector3 LocalForward = Vector3.UnitZ;
 
-        public Vector3 Right { get => Parent is null ? LocalRight : LocalRight + Parent.Right; }
+        public Vector3 Right => Parent is null ? LocalRight : LocalRight + Parent.Right;
         public Vector3 LocalRight = Vector3.UnitX;
 
-        public Vector3 Up { get => Parent is null ? LocalUp : LocalUp + Parent.Up; }
+        public Vector3 Up => Parent is null ? LocalUp : LocalUp + Parent.Up;
         public Vector3 LocalUp = Vector3.UnitY;
 
-        public Vector3 Position { get => Parent is null ? LocalPosition : LocalPosition + Parent.Position; }
+        public Vector3 Position => Parent is null ? LocalPosition : LocalPosition + Parent.Position;
         public Vector3 LocalPosition = Vector3.Zero;
 
-        public Quaternion Rotation { get => Parent is null ? LocalRotation : LocalRotation * Parent.Rotation; }
+        public Quaternion Rotation => Parent is null ? LocalRotation : LocalRotation * Parent.Rotation;
         public Quaternion LocalRotation { get => _localRotation; set => SetQuaternion(value); }
         public Quaternion _localRotation = Quaternion.Identity;
 
         public Vector3 EulerAngles { get => _eulerAngles; set => SetEulerAngles(value); }
         private Vector3 _eulerAngles = Vector3.Zero;
 
-        public Vector3 Scale { get => Parent is null ? LocalScale : LocalScale * Parent.Scale; }
+        public Vector3 Scale => Parent is null ? LocalScale : LocalScale * Parent.Scale;
         public Vector3 LocalScale = Vector3.One;
 
         private SPerModelConstantBuffer _modelConstantBuffer;

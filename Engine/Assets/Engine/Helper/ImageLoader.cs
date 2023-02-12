@@ -18,7 +18,7 @@ namespace Engine.Helper
             // Define the full path to the texture file.
             string textureFilePath = Path.Combine(resourcesPath, filePath);
 
-            #region // Third-Party Solution
+            #region // Loading images using Vortice.WIC
             using IWICImagingFactory wicFactory = new();
             using IWICBitmapDecoder decoder = wicFactory.CreateDecoderFromFileName(textureFilePath);
             using IWICBitmapFrameDecode frame = decoder.GetFrame(0);

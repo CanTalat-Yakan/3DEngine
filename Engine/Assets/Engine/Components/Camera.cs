@@ -16,7 +16,7 @@ namespace Engine.Components
         public float FieldOfView = 90;
         public byte CameraOrder = 0;
 
-        private Renderer _d3d { get => Renderer.Instance; }
+        private Renderer _d3d => Renderer.Instance;
 
         private ID3D11Buffer _view;
         private SViewConstantBuffer _viewConstantBuffer;
