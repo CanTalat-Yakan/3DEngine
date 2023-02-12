@@ -33,6 +33,7 @@
     <Content Remove="Assets\Controller\Helper.cs" />
     <Content Remove="Assets\Controller\Helper\Binding.cs" />
     <Content Remove="Assets\Controller\Helper\Profiler.cs" />
+    <Content Remove="Assets\Controller\Helper\Serialization.cs" />
     <Content Remove="Assets\Controller\Home.cs" />
     <Content Remove="Assets\Controller\Theme.cs" />
     <Content Remove="Assets\Controller\TreeViewIconNode.cs" />
