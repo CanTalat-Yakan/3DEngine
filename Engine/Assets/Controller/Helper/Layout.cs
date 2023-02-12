@@ -4,7 +4,6 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
 using System.Collections.Generic;
-using System;
 
 namespace Editor.Controller
 {
@@ -32,7 +31,7 @@ namespace Editor.Controller
         public Grid TabsRoot;
 
         public bool OneCollumnPaneLayout = true;
-        public List<Grid> GridsToClear = new List<Grid>();
+        public List<Grid> GridsToClear = new();
 
         public Layout(Grid content,
             ModelView.ViewPort viewPort,

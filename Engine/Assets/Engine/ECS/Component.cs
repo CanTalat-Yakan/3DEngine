@@ -1,6 +1,6 @@
-﻿using Editor.Controller;
+﻿using System;
+using Editor.Controller;
 using Engine.Editor;
-using System;
 
 namespace Engine.ECS
 {
@@ -41,9 +41,11 @@ namespace Engine.ECS
             // Invoke the Event when the Component is destroyed.
             _eventOnDestroy(this, null);
 
-        object ICloneable.Clone() { return Clone(); }
+        object ICloneable.Clone() => 
+            Clone();
 
-        public Component Clone() { return (Component)MemberwiseClone(); }
+        public Component Clone() =>
+            (Component)MemberwiseClone();
     }
 
     internal class EditorComponent : Component, IHide { }

@@ -3,8 +3,9 @@ using System;
 
 namespace Engine.Utilities
 {
-    internal class Time
+    internal class Timer
     {
+        public static double Time => s_time; 
         public static double Delta => s_delta; 
         public static int FPS => s_fps; 
 

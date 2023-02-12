@@ -336,11 +336,11 @@
       <FileName>Assets\Engine\Utilities\SceneManager.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Engine.Utilities.Time" Collapsed="true">
+  <Class Name="Engine.Utilities.Timer" Collapsed="true">
     <Position X="8.25" Y="10" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>QAQAAAEAAAAAIAAFAAAAACAQAAAAQAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Assets\Engine\Utilities\Time.cs</FileName>
+      <HashCode>QAQAAAEAAAAAIAAFAAAAACAQAAAAQAAAAAAAAAAAAQA=</HashCode>
+      <FileName>Assets\Engine\Utilities\Timer.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Core" Collapsed="true">
@@ -497,7 +497,7 @@
   <Struct Name="Engine.Data.Vertex" Collapsed="true">
     <Position X="9.25" Y="16.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAIAAAAAAACIAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAgAAIAAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\Engine\Data\Vertex.cs</FileName>
     </TypeIdentifier>
   </Struct>

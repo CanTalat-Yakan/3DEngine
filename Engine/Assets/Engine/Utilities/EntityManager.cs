@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
 using System;
+using Editor.Controller;
 using Engine.Components;
 using Engine.ECS;
 using Engine.Helper;
-using Editor.Controller;
-using System.IO;
 
 namespace Engine.Utilities
 {
@@ -28,28 +28,28 @@ namespace Engine.Utilities
     internal class EventList<T> : List<T>
     {
         // Event that is raised when an item is added to the list.
-        public event EventHandler<T> OnAddEvent;
+        public event EventHandler<T> OnAdd;
 
         // Event that is raised when an item is removed from the list.
-        public event EventHandler<T> OnRemoveEvent;
+        public event EventHandler<T> OnRemove;
 
         public void Add(T item, bool invokeEvent = true)
         {
             // Adds an item to the list.
             base.Add(item);
 
-            if (OnAddEvent != null)
+            if (OnAdd != null)
                 if (invokeEvent)
                     // Raises the OnAddEvent event.
-                    OnAddEvent(this, item);
+                    OnAdd(this, item);
         }
 
         public void Remove(T item, bool invokeEvent = true)
         {
-            if (OnRemoveEvent != null)
+            if (OnRemove != null)
                 if (invokeEvent)
                     // Raises the OnRemoveEvent event.
-                    OnRemoveEvent(this, item);
+                    OnRemove(this, item);
 
             // Removes an item from the list.
             base.Remove(item);
@@ -58,7 +58,7 @@ namespace Engine.Utilities
 
     internal class EntityManager
     {
-        public EventList<Entity> EntityList = new EventList<Entity>();
+        public EventList<Entity> EntityList = new();
         public Entity Sky;
 
         private Material _materialDefault;

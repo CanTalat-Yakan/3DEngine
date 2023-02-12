@@ -76,15 +76,12 @@ namespace Engine.ECS
             component.OnDestroy();
         }
 
-        private static bool CheckActive(T component)
-        {
+        private static bool CheckActive(T component) =>
             // Check if the component is active.
-            return
-                component.IsEnabled &&
-                component.Entity.IsEnabled &&
-                component.Entity.Scene.IsEnabled &&
-                component.Entity.ActiveInHierarchy; 
-        }
+            component.IsEnabled &&
+            component.Entity.IsEnabled &&
+            component.Entity.Scene.IsEnabled &&
+            component.Entity.ActiveInHierarchy; 
     }
 
     class CameraSystem : SystemBase<Camera> { }

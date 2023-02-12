@@ -43,14 +43,14 @@ namespace Engine.ECS
         public string Tag;
         public string Layer;
 
-        private Scene _scene;
         public Scene Scene { get => _scene is null ? _scene = SceneManager.GetFromEntityID(ID) : _scene; set => _scene = null; }
+        private Scene _scene;
 
-        private Transform _transform;
         public Transform Transform => _transform;
+        private Transform _transform;
 
+        public bool ActiveInHierarchy => Parent is null ? IsEnabled : _activeInHierarchy = IsEnabled && (Parent.ActiveInHierarchy && Parent.IsEnabled);
         private bool _activeInHierarchy = true;
-        public bool ActiveInHierarchy => Parent is null ? IsEnabled : _activeInHierarchy &= Parent.ActiveInHierarchy && Parent.IsEnabled;
 
         private List<Component> _components = new();
 
@@ -132,9 +132,11 @@ namespace Engine.ECS
             return false;
         }
 
-        public Component[] GetComponents() { return _components.ToArray(); }
+        public Component[] GetComponents() =>
+            _components.ToArray();
 
-        object ICloneable.Clone() { return Clone(); }
+        object ICloneable.Clone() =>
+            Clone();
 
         public Entity Clone()
         {

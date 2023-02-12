@@ -10,7 +10,7 @@ namespace Engine.Editor
 {
     internal class ImGuiEditor
     {
-        private Renderer _d3d { get => Renderer.Instance; }
+        private Renderer _d3d => Renderer.Instance;
 
         private InputLayoutDescription _inputLayoutDescription;
         private ID3D11Texture2D _fontTexture;
@@ -25,7 +25,7 @@ namespace Engine.Editor
             var io = ImGuiNET.ImGui.GetIO();
             io.DisplaySize = _d3d.SwapChainPanel.ActualSize;
             io.DisplayFramebufferScale = Vector2.One;
-            io.DeltaTime = (float)Time.Delta;
+            io.DeltaTime = (float)Timer.Delta;
             ImGuiNET.ImGui.StyleColorsDark();
             RecreateFontDeviceTexture();
         }
@@ -41,7 +41,7 @@ namespace Engine.Editor
 
         public void Draw()
         {
-            ImGuiNET.ImGui.GetIO().DeltaTime = (float)Time.Delta;
+            ImGuiNET.ImGui.GetIO().DeltaTime = (float)Timer.Delta;
             ImGuiNET.ImGui.NewFrame();
             ImGuiNET.ImGui.Begin("Test");
 

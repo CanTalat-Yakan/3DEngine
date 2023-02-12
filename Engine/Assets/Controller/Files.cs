@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -15,7 +15,6 @@ using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.Storage;
 using Windows.UI;
-using Vortice.Win32;
 
 namespace Editor.Controller
 {
@@ -1305,7 +1304,8 @@ namespace Editor.Controller
                     : ""));
         }
 
-        private string RemoveLastChar(string s) { return s.Remove(s.Length - 1); }
+        private string RemoveLastChar(string s) =>
+            s.Remove(s.Length - 1);
 
         private void CopyToClipboard(string path, DataPackageOperation requestedOpertion)
         {

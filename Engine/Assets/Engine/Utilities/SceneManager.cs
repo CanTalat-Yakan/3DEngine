@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
-using Engine.ECS;
 using Editor.Controller;
-using Engine.Components;
+using Engine.ECS;
 
 namespace Engine.Utilities
 {

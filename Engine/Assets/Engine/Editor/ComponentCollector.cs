@@ -13,9 +13,7 @@ namespace Engine.Editor
         public void AddComponents(params Type[] components) =>
             Components.AddRange(components);
 
-        public Type GetComponent(string name)
-        {
-            return Components.Find(Type => Type.Name.ToString() == name);
-        }
+        public Type GetComponent(string name) =>
+            Components.Find(Type => Type.Name.ToString() == name);
     }
 }

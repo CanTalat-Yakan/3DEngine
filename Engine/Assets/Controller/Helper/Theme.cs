@@ -12,11 +12,12 @@ namespace Editor.Controller
     {
         public static Theme Instance { get; private set; }
 
+        private Page _page;
+        private MainWindow _mainWindow;
+
         private WindowsSystemDispatcherQueueHelper _wsdqHelper;
         private MicaController _micaController;
         private SystemBackdropConfiguration _configurationSource;
-        private Page _page;
-        private MainWindow _mainWindow;
 
         public Theme(MainWindow mainWindow, Page page)
         {
@@ -133,14 +134,16 @@ namespace Editor.Controller
         }
 
         [DllImport("CoreMessaging.dll")]
-        private static extern int CreateDispatcherQueueController([In] DispatcherQueueOptions options, [In, Out, MarshalAs(UnmanagedType.IUnknown)] ref object dispatcherQueueController);
+        private static extern int CreateDispatcherQueueController(
+            [In] DispatcherQueueOptions options, 
+            [In, Out, MarshalAs(UnmanagedType.IUnknown)] ref object dispatcherQueueController);
 
         private object _dispatcherQueueController = null;
 
         public void EnsureWindowsSystemDispatcherQueueController()
         {
             if (Windows.System.DispatcherQueue.GetForCurrentThread() != null)
-                // one already exists, so we'll just use it.
+                // One already exists, so we'll just use it.
                 return;
 
             if (_dispatcherQueueController == null)

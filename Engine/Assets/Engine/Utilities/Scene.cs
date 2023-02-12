@@ -1,7 +1,5 @@
-﻿using System.Linq;
-using System;
+﻿using System;
 using Editor.Controller;
-using Engine.Components;
 
 namespace Engine.Utilities
 {
@@ -25,7 +23,8 @@ namespace Engine.Utilities
             set { SetProperty(ref _isEnabled, value); }
         }
 
-        object ICloneable.Clone() { return Clone(); }
+        object ICloneable.Clone() => 
+            Clone(); 
 
         public Scene Clone()
         {

@@ -1,13 +1,12 @@
 ﻿using ImGuiNET;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using System.Linq;
 using System;
 using Editor.Controller;
-using Engine.Components;
 using Engine.ECS;
 using Engine.Editor;
 using Engine.Utilities;
-using System.Linq;
 
 namespace Engine
 {
@@ -60,9 +59,9 @@ namespace Engine
             Output.Log("Engine Initialized...");
 
             #region // Render Pipeline Loop
-            // Invokes Awake.
+            // Call Awake method for all scenens.
             SceneManager.Awake();
-            // Invokes Start.
+            // Call Start method for all scenens.
             SceneManager.Start();
 
             // Adds an event handler for the CompositionTarget.Rendering event,
@@ -84,13 +83,15 @@ namespace Engine
             // Invokes Awake and Start if playmode has started.
             if (CheckPlaymodeStarted())
             {
+                // Call Awake method for all scenens again.
                 SceneManager.Awake();
+                // Call Start method for all scenens again.
                 SceneManager.Start();
             }
 
-            // Invokes Update.
+            // Call Update method for all scenens.
             SceneManager.Update();
-            // Invokes LateUpdate.
+            // Call LateUpdate method for all scenens.
             SceneManager.LateUpdate();
 
             // Finishes the state of input processing.
@@ -111,10 +112,10 @@ namespace Engine
 
             // Updates the time values, such as delta time and time scale,
             // used in the game or application.
-            Time.Update();
+            Timer.Update();
 
             // Updates the text of the profile with the profiling information.
-            _profile.Text = Profiler.ToString();
+            _profile.Text = Profiler.GetString();
         }
 
         public void CollectComponents()
@@ -137,7 +138,7 @@ namespace Engine
             ImGui.SetCurrentContext(_imGuiContext);
             var io = ImGui.GetIO();
 
-            io.DeltaTime = (float)Time.Delta;
+            io.DeltaTime = (float)Timer.Delta;
 
             ImGui.NewFrame();
             ImGui.Render();

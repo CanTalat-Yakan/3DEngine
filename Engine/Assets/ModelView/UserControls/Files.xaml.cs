@@ -1,5 +1,5 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
 using System.Collections.Generic;
 using Windows.Storage;
 
@@ -12,8 +12,9 @@ namespace Editor.ModelView
     {
         public Grid ChangeColorWithTheme;
 
-        internal Controller.Files _filesControl;
         public List<StorageFile> DragDropFiles = new();
+
+        internal Controller.Files _filesControl;
 
         public Files()
         {

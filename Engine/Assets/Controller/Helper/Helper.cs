@@ -15,11 +15,10 @@ using Windows.Foundation;
 using ColorPicker = CommunityToolkit.WinUI.UI.Controls.ColorPicker;
 using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
 using Expander = Microsoft.UI.Xaml.Controls.Expander;
-using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
-using Rectangle = Microsoft.UI.Xaml.Shapes.Rectangle;
 using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
 using Image = Microsoft.UI.Xaml.Controls.Image;
-using Engine.ECS;
+using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
+using Rectangle = Microsoft.UI.Xaml.Shapes.Rectangle;
 
 namespace Editor.Controller
 {
@@ -95,54 +94,29 @@ namespace Editor.Controller
             return button;
         }
 
-        internal virtual UIElement CreateAppBarSeperator()
-        {
-            AppBarSeparator seperator = new();
+        internal virtual UIElement CreateAppBarSeperator() =>
+            new AppBarSeparator();
 
-            return seperator;
-        }
+        internal virtual UIElement CreateSeperator() =>
+            new NavigationViewItemSeparator() { Margin = new(10) };
 
-        internal virtual UIElement CreateSeperator()
-        {
-            NavigationViewItemSeparator seperator = new() { Margin = new(10) };
+        internal virtual UIElement CreateText(string placeholder = "Example") =>
+            new TextBlock() { Text = placeholder, MaxWidth = 200, TextWrapping = TextWrapping.Wrap };
 
-            return seperator;
-        }
+        internal virtual UIElement CreateTextEqual(string placeholder = "Example") =>
+            new TextBlock() { Text = placeholder, MaxWidth = 200 };
 
-        internal virtual UIElement CreateText(string placeholder = "Example")
-        {
-            TextBlock textInput = new() { Text = placeholder, MaxWidth = 200, TextWrapping = TextWrapping.Wrap };
-
-            return textInput;
-        }
-
-        internal virtual UIElement CreateTextEqual(string placeholder = "Example")
-        {
-            TextBlock textInput = new() { Text = placeholder, MaxWidth = 200 };
-
-            return textInput;
-        }
-
-        internal virtual UIElement CreateTextFull(out TextBlock textBlock)
-        {
+        internal virtual UIElement CreateTextFull(out TextBlock textBlock) =>
             textBlock = new();
 
-            return textBlock;
-        }
+        internal virtual UIElement CreateTextFull(string s = "String") =>
+            new TextBlock() { Text = s, TextWrapping = TextWrapping.Wrap };
 
-        internal virtual UIElement CreateTextFull(string s = "String")
-        {
-            TextBlock textBlock = new() { Text = s, TextWrapping = TextWrapping.Wrap };
+        internal virtual UIElement CreateTextFullWithOpacity(string s = "String") =>
+            new TextBlock() { Text = s, Opacity = 0.5f, TextWrapping = TextWrapping.Wrap };
 
-            return textBlock;
-        }
-
-        internal virtual UIElement CreateTextFullWithOpacity(string s = "String")
-        {
-            TextBlock textBlock = new() { Text = s, Opacity = 0.5f, TextWrapping = TextWrapping.Wrap };
-
-            return textBlock;
-        }
+        internal virtual Grid CreateTextInput(string placeholder = "Example") =>
+            StackInGrid(new TextBox() { Text = placeholder, MaxWidth = 200 });
 
         internal virtual Grid CreateNumberInput(float f = 0, float min = float.MinValue, float max = float.MaxValue,
             TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs> onValueChanged = null)
@@ -163,13 +137,6 @@ namespace Editor.Controller
             TextBlock numPreview = new() { Padding = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
 
             return StackInGrid(numInput, numPreview);
-        }
-
-        internal virtual Grid CreateTextInput(string placeholder = "Example")
-        {
-            TextBox textInput = new() { Text = placeholder, MaxWidth = 200 };
-
-            return StackInGrid(textInput);
         }
 
         internal virtual Grid CreateVec2Input(Vector2 v = new())
@@ -241,7 +208,7 @@ namespace Editor.Controller
 
             return StackInGrid(rectangleR, numInput, rectangleG, num2Input, rectangleB, num3Input);
         }
-        
+
         internal virtual Grid CreateBool(bool b = false, RoutedEventHandler OnClick = null)
         {
             CheckBox check = new() { IsChecked = b, Margin = new(0, 0, 0, -5.5) };
@@ -297,12 +264,8 @@ namespace Editor.Controller
             return grid;
         }
 
-        internal virtual Grid CreateSpacer()
-        {
-            Grid grid = new() { Height = 10 };
-
-            return grid;
-        }
+        internal virtual Grid CreateSpacer() =>
+            new Grid() { Height = 10 };
 
         internal virtual Grid CreateButton(string s,
             TappedEventHandler tapped)
@@ -392,10 +355,8 @@ namespace Editor.Controller
 
     internal static class ExtensionMethods
     {
-        public static float Remap(this float value, float sourceMin, float sourceMax, float targetMin, float targetMax)
-        {
-            return (value - sourceMin) / (sourceMax - sourceMin) * (targetMax - targetMin) + targetMin;
-        }
+        public static float Remap(this float value, float sourceMin, float sourceMax, float targetMin, float targetMax) =>
+            (value - sourceMin) / (sourceMax - sourceMin) * (targetMax - targetMin) + targetMin;
 
         public static UIElement AddToolTip(this UIElement content, ToolTip toolTip)
         {
@@ -404,7 +365,7 @@ namespace Editor.Controller
 
             return content;
         }
-        
+
         public static Grid AddToolTip(this Grid content, ToolTip toolTip)
         {
             if (toolTip != null)
@@ -412,7 +373,7 @@ namespace Editor.Controller
 
             return content;
         }
-        
+
         public static UIElement AddToolTip(this UIElement content, string tip)
         {
             ToolTip toolTip = new();
@@ -420,7 +381,7 @@ namespace Editor.Controller
 
             return AddToolTip(content, toolTip);
         }
-        
+
         public static Grid AddToolTip(this Grid content, string tip)
         {
             ToolTip toolTip = new();
@@ -606,7 +567,8 @@ namespace Editor.Controller
             return content;
         }
 
-        public static async void CreateDialogAsync(this ContentDialog contentDialog) => await contentDialog.ShowAsync();
+        public static async void CreateDialogAsync(this ContentDialog contentDialog) =>
+            await contentDialog.ShowAsync();
 
         public static string AddSpacesToSentence(this string text, bool preserveAcronyms = true)
         {
@@ -628,20 +590,14 @@ namespace Editor.Controller
             return newText.ToString();
         }
 
-        public static string SplitLast(this string text, char seperator)
-        {
-            return text.Split(seperator).Last();
-        }
+        public static string SplitLast(this string text, char seperator) =>
+            text.Split(seperator).Last();
 
-        public static string FirstCharToUpper(this string input)
-        {
-            return string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1));
-        }
+        public static string FirstCharToUpper(this string input) =>
+            string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1));
 
-        public static string FormatString(this string text)
-        {
-            return text.SplitLast('_').SplitLast('.').FirstCharToUpper().AddSpacesToSentence();
-        }
+        public static string FormatString(this string text) =>
+            text.SplitLast('_').SplitLast('.').FirstCharToUpper().AddSpacesToSentence();
 
         public static string IncrementNameIfExists(this string name, string[] list)
         {
@@ -658,31 +614,21 @@ namespace Editor.Controller
             return name;
         }
 
-        public static Vector3 ToDegrees(this Vector3 vector)
-        {
-            return new(
-                Vortice.Mathematics.MathHelper.ToDegrees(vector.X),
+        public static Vector3 ToDegrees(this Vector3 vector) =>
+            new(Vortice.Mathematics.MathHelper.ToDegrees(vector.X),
                 Vortice.Mathematics.MathHelper.ToDegrees(vector.Y),
                 Vortice.Mathematics.MathHelper.ToDegrees(vector.Z));
-        }
 
-        public static Vector3 ToRadians(this Vector3 vector)
-        {
-            return new(
-                Vortice.Mathematics.MathHelper.ToRadians(vector.X),
-                Vortice.Mathematics.MathHelper.ToRadians(vector.Y),
+        public static Vector3 ToRadians(this Vector3 vector) => 
+            new(Vortice.Mathematics.MathHelper.ToRadians(vector.X),
+                Vortice.Mathematics.MathHelper.ToRadians(vector.Y), 
                 Vortice.Mathematics.MathHelper.ToRadians(vector.Z));
-        }
-        
-        public static Vector3 SwitchXY(this Vector3 vector)
-        {
-            return new(vector.Y, vector.X, vector.Z);
-        }
 
-        public static bool IsNaN(this Vector3 vector3)
-        {
-            return float.IsNaN(vector3.X) || float.IsNaN(vector3.Y) || float.IsNaN(vector3.Z);
-        }
+        public static Vector3 SwitchXY(this Vector3 vector) =>
+            new(vector.Y, vector.X, vector.Z);
+
+        public static bool IsNaN(this Vector3 vector3) =>
+            float.IsNaN(vector3.X) || float.IsNaN(vector3.Y) || float.IsNaN(vector3.Z);
     }
 
     internal sealed class BooleanToVisibilityConverter : IValueConverter
@@ -713,10 +659,8 @@ namespace Editor.Controller
     {
         GridLength _initialValue;
 
-        public BooleanToRowHeightConverter(GridLength initialValue)
-        {
+        public BooleanToRowHeightConverter(GridLength initialValue) =>
             _initialValue = initialValue;
-        }
 
         public object Convert(object value, Type targetType, object parameter, string language)
         {

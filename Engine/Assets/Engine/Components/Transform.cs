@@ -96,13 +96,11 @@ namespace Engine.Components
             _eulerAngles = value.ToEuler();
         }
 
-        public override string ToString()
-        {
-            return $"""
-                {LocalPosition}
-                {EulerAngles}
-                {LocalScale}
-                """;
-        }
+        public override string ToString() => 
+            $"""
+            {LocalPosition}
+            {EulerAngles}
+            {LocalScale}
+            """;
     }
 }

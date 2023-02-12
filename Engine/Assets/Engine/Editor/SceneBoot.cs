@@ -1,12 +1,12 @@
 ﻿using System.Drawing;
 using System.Numerics;
+using System.Linq;
 using System;
 using Editor.Controller;
 using Engine.Components;
 using Engine.ECS;
 using Engine.Utilities;
 using Texture = Vortice.Direct3D11.Texture2DArrayShaderResourceView;
-using System.Linq;
 
 namespace Engine.Editor
 {
@@ -151,7 +151,7 @@ namespace Engine.Editor
                 Input.GetAxis().Y * Entity.Transform.Forward;
 
             // Return the normalized movement direction with a magnitude of MovementSpeed multiplied by the delta time.
-            _targetDirection = Vector3.Normalize(destination) * MovementSpeed * (float)Time.Delta;
+            _targetDirection = Vector3.Normalize(destination) * MovementSpeed * (float)Timer.Delta;
         }
 
         internal void Rotation()
@@ -165,7 +165,7 @@ namespace Engine.Editor
                 Input.GetMouseAxis().X);
 
             // Update the entity's rotation based on the calculated rotation and rotation speed.
-            _cameraRotataion -= rotation * (float)Time.Delta * RotationSpeed;
+            _cameraRotataion -= rotation * (float)Timer.Delta * RotationSpeed;
         }
     }
 

@@ -1,5 +1,4 @@
-﻿using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -8,7 +7,6 @@ using System.Numerics;
 using System.Linq;
 using System.Reflection;
 using System;
-using Vortice.Mathematics;
 using Windows.Foundation;
 using Engine.ECS;
 using Engine.Editor;
@@ -16,7 +14,6 @@ using Engine.Utilities;
 using Color = System.Drawing.Color;
 using Path = System.IO.Path;
 using Texture = Vortice.Direct3D11.Texture2DArrayShaderResourceView;
-using Engine.Helper;
 
 namespace Editor.Controller
 {
@@ -299,13 +296,23 @@ namespace Editor.Controller
 
             // Color
             if (type == typeof(Color))
-                grid.Add(CreateColorButton(((Color)value).R, ((Color)value).G, ((Color)value).B, ((Color)value).A));
+                grid.Add(
+                    CreateColorButton(
+                        ((Color)value).R, 
+                        ((Color)value).G, 
+                        ((Color)value).B, 
+                        ((Color)value).A));
 
             // Byte
             else if (type == typeof(byte))
                 // If the field has the `SliderAttribute`, add a slider element.
                 if (attributes.OfType<SliderAttribute>().Any())
-                    grid.Add(CreateSlider((byte)value, (byte)attributes.OfType<SliderAttribute>().First().CustomMin, (byte)attributes.OfType<SliderAttribute>().First().CustomMax).WrapInGrid());
+                    grid.Add(
+                        CreateSlider(
+                            (byte)value, 
+                            (byte)attributes.OfType<SliderAttribute>().First().CustomMin, 
+                            (byte)attributes.OfType<SliderAttribute>().First().CustomMax)
+                        .WrapInGrid());
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
                     grid.Add(CreateNumberInput((byte)value));
@@ -314,7 +321,12 @@ namespace Editor.Controller
             else if (type == typeof(int))
                 // If the field has the `SliderAttribute`, add a slider element.
                 if (attributes.OfType<SliderAttribute>().Any())
-                    grid.Add(CreateSlider((int)value, (int)attributes.OfType<SliderAttribute>().First().CustomMin, (int)attributes.OfType<SliderAttribute>().First().CustomMax).WrapInGrid());
+                    grid.Add(
+                        CreateSlider(
+                            (int)value, 
+                            (int)attributes.OfType<SliderAttribute>().First().CustomMin, 
+                            (int)attributes.OfType<SliderAttribute>().First().CustomMax)
+                        .WrapInGrid());
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
                     grid.Add(CreateNumberInput((int)value));
@@ -323,7 +335,12 @@ namespace Editor.Controller
             else if (type == typeof(float))
                 // If the field has the `SliderAttribute`, add a slider element.
                 if (attributes.OfType<SliderAttribute>().Any())
-                    grid.Add(CreateSlider((float)value, (float)attributes.OfType<SliderAttribute>().First().CustomMin, (float)attributes.OfType<SliderAttribute>().First().CustomMax).WrapInGrid());
+                    grid.Add(
+                        CreateSlider(
+                            (float)value, 
+                            (float)attributes.OfType<SliderAttribute>().First().CustomMin, 
+                            (float)attributes.OfType<SliderAttribute>().First().CustomMax)
+                        .WrapInGrid());
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
                     grid.Add(CreateNumberInput((float)value));

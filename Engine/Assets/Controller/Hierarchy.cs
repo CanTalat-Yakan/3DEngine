@@ -1,6 +1,6 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
@@ -86,8 +86,8 @@ namespace Editor.Controller
         {
             Scene scene = SceneManager.GetFromID(sceneEntry.ID);
 
-            scene.EntitytManager.EntityList.OnAddEvent += (s, e) => AddTreeEntry(sceneEntry, (Entity)e);
-            scene.EntitytManager.EntityList.OnRemoveEvent += (s, e) => RemoveTreeEntry(sceneEntry, (Entity)e);
+            scene.EntitytManager.EntityList.OnAdd += (s, e) => AddTreeEntry(sceneEntry, (Entity)e);
+            scene.EntitytManager.EntityList.OnRemove += (s, e) => RemoveTreeEntry(sceneEntry, (Entity)e);
 
             foreach (var entity in scene.EntitytManager.EntityList)
                 AddTreeEntry(sceneEntry, entity);
@@ -199,7 +199,8 @@ namespace Editor.Controller
 
         private Grid[] CreateSceneHierarchy(in SceneEntry sceneEntry, Scene scene = null)
         {
-            if (scene is null) scene = SceneManager.Scene;
+            if (scene is null) 
+                scene = SceneManager.Scene;
 
             var sceneGrid = new Grid[]
             {
@@ -612,9 +613,11 @@ namespace Editor.Controller
             return GetEntity(entry.ID, sceneEntry);
         }
 
-        public void GetEntity(out Entity entity, TreeEntry entry, SceneEntry sceneEntry = null) => entity = GetEntity(entry.ID, sceneEntry);
+        public void GetEntity(out Entity entity, TreeEntry entry, SceneEntry sceneEntry = null) => 
+            entity = GetEntity(entry.ID, sceneEntry);
 
-        public void GetEntity(out Entity entity, Guid guid, SceneEntry sceneEntry = null) => entity = GetEntity(guid, sceneEntry);
+        public void GetEntity(out Entity entity, Guid guid, SceneEntry sceneEntry = null) => 
+            entity = GetEntity(guid, sceneEntry);
 
         public void GetScenes(out Scene sourceScene, out Scene targetScene, SceneEntry sourceSceneEntry, SceneEntry targetSceneEntry)
         {

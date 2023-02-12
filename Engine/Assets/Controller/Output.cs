@@ -4,13 +4,11 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
 using Microsoft.UI;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System;
-using Windows.Storage;
-using Windows.System;
-using System.Diagnostics;
 
 namespace Editor.Controller
 {
@@ -29,7 +27,8 @@ namespace Editor.Controller
         public int Line;
         public string Message;
 
-        public string GetInfo() { return Script.Split("\\").Last() + $":{Line} ({Method})"; }
+        public string GetInfo() =>
+            Script.Split("\\").Last() + $":{Line} ({Method})";
     }
 
     internal class Output
@@ -67,8 +66,8 @@ namespace Editor.Controller
         }
 
         public static void Log(object o, EMessageType t = EMessageType.Message, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null) =>
-        // Logs a message, with a string representation of an object.
-        Log(o.ToString(), t, l, c, s);
+            // Logs a message, with a string representation of an object.
+            Log(o.ToString(), t, l, c, s);
 
         public static void Log(string m, EMessageType t = EMessageType.Message, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null)
         {
