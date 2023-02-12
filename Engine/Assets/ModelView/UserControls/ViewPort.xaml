@@ -10,11 +10,12 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <muxc:SwapChainPanel x:Name="x_SwapChainPanel_ViewPort" MinHeight="1" MinWidth="1"/>
+        <muxc:SwapChainPanel x:Name="x_SwapChainPanel_ViewPort"/>
 
         <Grid x:Name="x_Grid_Overlay"/>
 
-        <InfoBar IsOpen="True" Severity="Informational" Margin="30, 50" Title="To Fix:" 
-                 Message="When you start the playmode, you will have to click a button inside the viewport to register input." />
+        <InfoBar IsOpen="True" Severity="Informational" Width="600" Margin="30, 50" HorizontalAlignment="Left"
+                 Title="To Fix:" 
+                 Message="Register keyboard input by clicking a button within the Viewport." />
     </Grid>
 </UserControl>
