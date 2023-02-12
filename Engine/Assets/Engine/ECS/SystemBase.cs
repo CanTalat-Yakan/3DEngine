@@ -8,6 +8,8 @@ namespace Engine.ECS
     {
         protected static List<T> s_components = new();
 
+        public static T[] Components => s_components.ToArray();
+
         public static void Register(T component)
         {
             // Adds the given component to the static list of components.

@@ -9,6 +9,9 @@ namespace Engine.Editor
 
         public void AddComponent(Type component) =>
             Components.Add(component);
+        
+        public void AddComponents(params Type[] components) =>
+            Components.AddRange(components);
 
         public Type GetComponent(string name)
         {
