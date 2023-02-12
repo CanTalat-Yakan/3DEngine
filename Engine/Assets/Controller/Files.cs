@@ -30,7 +30,7 @@ namespace Editor.Controller
 
     internal partial class Files
     {
-        public string ProjectPath { get; private set; }
+        public string AssetsPath { get; private set; }
 
         public Grid Content;
         public BreadcrumbBar Bar;
@@ -53,10 +53,13 @@ namespace Editor.Controller
             _files = files;
 
             // Assign the ProjectPath value from static property in "Home".
-            ProjectPath = Home.ProjectPath;
+            AssetsPath = Path.Combine(Home.ProjectPath, "Assets");
 
             // Call the method to initialize and populate the files categories with a DataTemplate.
             PopulateFilesCategories();
+
+            // Call the refresh method to update the category and file list.
+            Refresh();
         }
 
         public void PopulateFilesCategories()
@@ -117,8 +120,8 @@ namespace Editor.Controller
                         foreach (var type in category.FileTypes)
                             if (type == file.FileType)
                             {
-                                // Create the target path by combining the project path, category name, and file name.
-                                string targetPath = Path.Combine(ProjectPath, category.Name);
+                                // Create the target path by combining the AssetsPath, category name, and file name.
+                                string targetPath = Path.Combine(AssetsPath, category.Name);
                                 targetPath = Path.Combine(targetPath, file.Name);
                                 // Copy the file to the target path and overwrite if it already exists. 
                                 File.Copy(file.Path, targetPath, true);
@@ -140,8 +143,8 @@ namespace Editor.Controller
                     // Check if the file type matches the type in the current category.
                     if (type == file.FileType)
                     {
-                        // Create the target path by combining the project path and the name of the matching category.
-                        string targetPath = Path.Combine(ProjectPath, category.Name);
+                        // Create the target path by combining the AssetsPath and the name of the matching category.
+                        string targetPath = Path.Combine(AssetsPath, category.Name);
 
                         // If a currently in a subpath, check if its name matches the targetPath for the file.
                         if (_currentCategory != null)
@@ -182,9 +185,9 @@ namespace Editor.Controller
         private void GoIntoDirectoryAndRefresh(string path)
         {
             // Set the current sub-directory path to the relative path of the given path
-            // with respect to the current category's directory in the project path.
+            // with respect to the current category's directory in the AssetsPath.
             _currentSubPath = Path.GetRelativePath(
-                Path.Combine(ProjectPath, _currentCategory.Value.Name),
+                Path.Combine(AssetsPath, _currentCategory.Value.Name),
                 path);
 
             // Call the refresh method to update the category and file list.
@@ -193,18 +196,22 @@ namespace Editor.Controller
 
         public void OpenFolder()
         {
-            // Assign local variable to the ProjectPath.
-            var path = ProjectPath;
+            // Assign local variable to the AssetsPath.
+            var path = AssetsPath;
 
-            // If the current category exists, combine it with the ProjectPath and set it as to the path.
+            // If the current category exists, combine it with the AssetsPath and set it as to the path.
             if (_currentCategory != null)
             {
                 // Create the full path to the current category folder.
-                path = Path.Combine(ProjectPath, _currentCategory.Value.Name);
+                path = Path.Combine(AssetsPath, _currentCategory.Value.Name);
 
                 // If there is a current sub-path, add it to the path.
                 if (!string.IsNullOrEmpty(_currentSubPath))
                     path = Path.Combine(path, _currentSubPath);
+            }
+            else
+            {
+
             }
 
             if (Directory.Exists(path))
@@ -234,7 +241,7 @@ namespace Editor.Controller
 
             // Loop through the Categories list and check if the directory doesn't exist.
             foreach (var category in Categories)
-                if (!Directory.Exists(categoryPath = Path.Combine(ProjectPath, category.Name)))
+                if (!Directory.Exists(categoryPath = Path.Combine(AssetsPath, category.Name)))
                     // If the directory doesn't exist, create it.
                     Directory.CreateDirectory(categoryPath);
         }
@@ -248,8 +255,8 @@ namespace Editor.Controller
             if (_currentCategory is null)
                 return;
 
-            // Get the target path by combining the project path with the current category name and current subpath (if not empty).
-            var targetPath = Path.Combine(ProjectPath, _currentCategory.Value.Name);
+            // Get the target path by combining the AssetsPath with the current category name and current subpath (if not empty).
+            var targetPath = Path.Combine(AssetsPath, _currentCategory.Value.Name);
             if (!string.IsNullOrEmpty(_currentSubPath))
                 targetPath = Path.Combine(targetPath, _currentSubPath);
 
@@ -268,7 +275,7 @@ namespace Editor.Controller
                                 // If a match is found, move the file to the new category's folder.
                                 File.Move(
                                     path,
-                                    IncrementFileIfExists(Path.Combine(ProjectPath, category2.Name, Path.GetFileName(path))));
+                                    IncrementFileIfExists(Path.Combine(AssetsPath, category2.Name, Path.GetFileName(path))));
 
                                 // If the current category or category2 matches the original current category, set dirty to true.
                                 if (_currentCategory != null)
@@ -314,7 +321,7 @@ namespace Editor.Controller
             Wrap.Children.Add(AddTile(CreateIcon(Symbol.Add)));
 
             // Combine the ProjectPath with the Name of the current category to get the currentPath.
-            string currentPath = Path.Combine(ProjectPath, _currentCategory.Value.Name);
+            string currentPath = Path.Combine(AssetsPath, _currentCategory.Value.Name);
             // If the current sub path is not empty.
             if (!string.IsNullOrEmpty(_currentSubPath))
             {
@@ -331,13 +338,13 @@ namespace Editor.Controller
                     if (string.IsNullOrEmpty(_currentSubPath))
                     {
                         // Set the current path to the ProjectPath combined with the current category Name.
-                        currentPath = Path.Combine(ProjectPath, _currentCategory.Value.Name);
+                        currentPath = Path.Combine(AssetsPath, _currentCategory.Value.Name);
 
                         break;
                     }
 
                     // Combine the ProjectPath with the Name of the current category and the current sub path.
-                    currentPath = Path.Combine(ProjectPath, _currentCategory.Value.Name, _currentSubPath);
+                    currentPath = Path.Combine(AssetsPath, _currentCategory.Value.Name, _currentSubPath);
                 }
 
             }
@@ -526,7 +533,7 @@ namespace Editor.Controller
 
         private Grid BackTile(Grid icon)
         {
-            var path = Path.Combine(ProjectPath, _currentCategory.Value.Name);
+            var path = Path.Combine(AssetsPath, _currentCategory.Value.Name);
             if (!string.IsNullOrEmpty(_currentSubPath))
                 path = Path.Combine(path, _currentSubPath);
 
@@ -655,12 +662,12 @@ namespace Editor.Controller
                 if (pathProvided)
                 {
                     // Set the path to the category name.
-                    path = Path.Combine(ProjectPath, _currentCategory.Value.Name);
+                    path = Path.Combine(AssetsPath, _currentCategory.Value.Name);
 
                     // Check if there is a current sub path.
                     if (_currentSubPath != null)
                         // Set the path to the category name and the current sub path.
-                        path = Path.Combine(ProjectPath, _currentCategory.Value.Name, _currentSubPath);
+                        path = Path.Combine(AssetsPath, _currentCategory.Value.Name, _currentSubPath);
                 }
 
                 // Check if the fileName TextBox is null or empty and set the path to the category name, "New", and the file type.
@@ -739,12 +746,12 @@ namespace Editor.Controller
                 if (pathProvided)
                 {
                     // Set the path to the category name.
-                    path = Path.Combine(ProjectPath, _currentCategory.Value.Name);
+                    path = Path.Combine(AssetsPath, _currentCategory.Value.Name);
 
                     // Check if there is a current sub path.
                     if (_currentSubPath != null)
                         // Set the path to the category name and the current sub path.
-                        path = Path.Combine(ProjectPath, _currentCategory.Value.Name, _currentSubPath);
+                        path = Path.Combine(AssetsPath, _currentCategory.Value.Name, _currentSubPath);
                 }
 
                 // Check if the folderName TextBox is null or empty and set the path to "New folder".
@@ -981,8 +988,8 @@ namespace Editor.Controller
                 var sourcePath = await dataPackageView.GetTextAsync();
 
                 // Get the first part of the source and target path.
-                var sourcePathCatagory = Path.GetRelativePath(ProjectPath, sourcePath).Split("\\").First();
-                var targetPathCatagory = Path.GetRelativePath(ProjectPath, path).Split("\\").First();
+                var sourcePathCatagory = Path.GetRelativePath(AssetsPath, sourcePath).Split("\\").First();
+                var targetPathCatagory = Path.GetRelativePath(AssetsPath, path).Split("\\").First();
 
                 // Check if the source and target path belong to the same category.
                 if (sourcePathCatagory == targetPathCatagory)
