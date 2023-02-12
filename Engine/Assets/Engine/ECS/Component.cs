@@ -46,5 +46,7 @@ namespace Engine.ECS
         public Component Clone() { return (Component)MemberwiseClone(); }
     }
 
-    internal class EditorComponent : Component { }
+    internal class EditorComponent : Component, IHide { }
+
+    internal interface IHide { }
 }

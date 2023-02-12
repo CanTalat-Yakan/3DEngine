@@ -91,7 +91,7 @@ namespace Engine.Editor
         }
     }
 
-    internal class DeactivateOnPlay : Component
+    internal class DeactivateOnPlay : Component, IHide
     {
         public Camera SceneCamera;
 

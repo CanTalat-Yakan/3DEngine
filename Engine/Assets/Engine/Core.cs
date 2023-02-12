@@ -119,21 +119,17 @@ namespace Engine
 
         public void CollectComponents()
         {
-            // Collect all components in the Assembly.
+            // Collect all components in the Assembly
+            // and ignore all components that have the IHide interface.
             var componentCollection = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
-                .Where(p => typeof(Component).IsAssignableFrom(p) && !p.IsInterface);
-
-            // Remove editor components from the collection.
-            var EditorComponentCollection = componentCollection
-                .Where(p => typeof(EditorComponent).IsAssignableFrom(p) && !p.IsInterface);
-
-            var finalCollection = componentCollection.ToList();
-            //foreach (var editorComponent in EditorComponentCollection)
-            //    finalCollection.Remove(editorComponent);
-
+                .Where(p => 
+                    (typeof(Component).IsAssignableFrom(p) && !p.Equals(typeof(Component)))
+                    && !(typeof(IHide).IsAssignableFrom(p) && !p.IsInterface))
+                .ToArray();
+            
             // Add components to the collector.
-            ComponentCollector.AddComponents(finalCollection.ToArray());
+            ComponentCollector.AddComponents(componentCollection.ToArray());
         }
 
         public virtual void UpdateImGui()

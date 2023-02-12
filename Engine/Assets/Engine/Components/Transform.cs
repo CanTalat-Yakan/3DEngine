@@ -7,7 +7,7 @@ using Engine.Helper;
 
 namespace Engine.Components
 {
-    internal class Transform : Component
+    internal class Transform : Component, IHide
     {
         public Matrix4x4 WorldMatrix = Matrix4x4.Identity;
 
