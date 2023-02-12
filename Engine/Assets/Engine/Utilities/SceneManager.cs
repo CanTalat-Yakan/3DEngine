@@ -65,6 +65,9 @@ namespace Engine.Utilities
 
         public void Awake()
         {
+            // Update the CameraSystem
+            CameraSystem.Awake();
+
             // If the playmode is set to None and is not running,
             // call the Awake method on the EditorScriptSystem.
             if (Main.Instance.PlayerControl.Playmode == EPlaymode.None)
@@ -91,8 +94,10 @@ namespace Engine.Utilities
 
         public void Update()
         {
-            // Update the Transform system
+            // Update the TransformSystem
             TransformSystem.Update();
+            // Update the CameraSystem
+            CameraSystem.Update();
 
             // If the playmode is set to None and is not running,
             // call the Update method on the EditorScriptSystem.
@@ -120,14 +125,14 @@ namespace Engine.Utilities
 
         public void Render()
         {
-            // Update the Transform system.
+            // Update the TransforSystem.
             TransformSystem.Update();
 
             // Sort and Render the Cameras.
             CameraSystem.Sort();
             CameraSystem.Render();
 
-            // Render the Mesh system.
+            // Render the MeshSystem.
             MeshSystem.Render();
         }
 

@@ -21,6 +21,7 @@ namespace Engine.Utilities
 
         private ID3D11ShaderResourceView _resourceView;
         private ID3D11SamplerState _sampler;
+
         private ID3D11Buffer _model;
 
         public Material(string shaderFileName, string imageFileName, bool includeGeometryShader = false)
