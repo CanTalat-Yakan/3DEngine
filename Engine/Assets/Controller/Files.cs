@@ -507,8 +507,16 @@ namespace Editor.Controller
             {
                 if ((Path.GetExtension(path) == ".cs")
                  || (Path.GetExtension(path) == ".hlsl"))
-                    // Opens the solution that contains the scripts and shader in the project's assetspath.
-                    OpenFile(Path.Combine(Home.ProjectPath, "Project.sln"));
+                {
+                    Process[] processes = Process.GetProcessesByName("devenv");
+
+                    if (processes.Length == 0)
+                        // Opens the solution that contains the scripts and shader in the project's assetspath.
+                        OpenFile(Path.Combine(Home.ProjectPath, "Project.sln"));
+                    else
+                        // Opens the file with the respective app.
+                        OpenFile(path);
+                }
                 else
                     // Opens the file with the respective app.
                     OpenFile(path);
