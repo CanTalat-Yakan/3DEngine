@@ -25,7 +25,7 @@ namespace Editor
         }
 
         private void AppBarButton_Help_Click(object sender, RoutedEventArgs e) => 
-            Launcher.LaunchUriAsync(new System.Uri(@"https://3DEngine.wiki/"));
+            _ = Launcher.LaunchUriAsync(new System.Uri(@"https://3DEngine.wiki/"));
 
         private void x_NavigationView_Main_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {

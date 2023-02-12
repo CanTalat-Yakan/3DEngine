@@ -5,8 +5,11 @@ using Microsoft.UI.Xaml;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Text;
+using System.Threading.Tasks;
 using System;
 using Windows.ApplicationModel.DataTransfer;
+using System.IO.Compression;
 
 namespace Editor.Controller
 {
@@ -14,6 +17,9 @@ namespace Editor.Controller
     {
         public static string RootPath { get; private set; }
         public static string ProjectPath { get; private set; }
+
+        public static readonly string TEMPLATES = @"Assets\Engine\Resources\Templates";
+
 
         private ModelView.Home _home;
         private WrapPanel _wrap;
@@ -155,6 +161,11 @@ namespace Editor.Controller
                 path = IncrementFolderIfExists(path);
 
                 Directory.CreateDirectory(path);
+                Directory.CreateDirectory(Path.Combine(path, "Assets"));
+
+                string zipPath = Path.Combine(AppContext.BaseDirectory, Home.TEMPLATES, "Project.zip");
+                if (File.Exists(zipPath))
+                    ZipFile.ExtractToDirectory(zipPath, path);
 
                 PopulateProjectTiles();
             }

@@ -58,6 +58,9 @@ namespace Editor.Controller
             // Call the method to initialize and populate the files categories with a DataTemplate.
             PopulateFilesCategories();
 
+            // Opens the Solution that contains the scripts and shader in the project's assetspath.
+            OpenFile(Path.Combine(Home.ProjectPath, "Project.sln"));
+
             // Call the refresh method to update the category and file list.
             Refresh();
         }
@@ -879,7 +882,7 @@ namespace Editor.Controller
             using (FileStream fs = File.Create(path))
             {
                 // Get the path of the template file.
-                string templatePath = Path.Combine(AppContext.BaseDirectory, TEMPLATES, _currentCategory.Value.Name + ".txt");
+                string templatePath = Path.Combine(AppContext.BaseDirectory, Home.TEMPLATES, _currentCategory.Value.Name + ".txt");
 
                 // Check if the template file exists.
                 if (File.Exists(templatePath))
@@ -943,8 +946,6 @@ namespace Editor.Controller
 
     internal partial class Files
     {
-        private static readonly string TEMPLATES = @"Assets\Engine\Resources\Templates";
-
         public void OnDragOver(DragEventArgs e)
         {
             // Set the data package operation to copy.

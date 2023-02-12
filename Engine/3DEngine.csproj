@@ -28,6 +28,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm64'">
     <DefineConstants>TRACE;DEBUG;NET;NET7_0;NETCOREAPP</DefineConstants>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Remove="Assets\Engine\Resources\Templates\Project.zip" />
+  </ItemGroup>
 	
   <ItemGroup>
     <PackageReference Include="Aspose.3D" Version="23.1.0" />
@@ -169,5 +172,11 @@
     <Content Update="Assets\Engine\Resources\Textures\UVMap.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Assets\Engine\Resources\Templates\Project.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
