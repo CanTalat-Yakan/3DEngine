@@ -166,7 +166,7 @@ namespace Engine.Utilities
                 Tag = EEditorTags.SceneSky.ToString(), // Set entity tag to SceneSky.
             };
             // Set scale of the Sky's transform.
-            Sky.Transform.Scale = new Vector3(-1000, 1000, 1000);
+            Sky.Transform.LocalScale = new Vector3(-1000, 1000, 1000);
 
             // Add Mesh component to Sky entity.
             Sky.AddComponent(new Mesh(ModelLoader.LoadFile(Path.Combine(PATH_PRIMITIVES, EPrimitiveTypes.Sphere.ToString()) + ".obj")));

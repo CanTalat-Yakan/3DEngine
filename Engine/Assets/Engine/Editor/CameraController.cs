@@ -37,7 +37,7 @@ namespace Engine.Editor
             if (Input.GetButton(EMouseButton.IsRightButtonPressed))
             {
                 TransformMovement();
-                CameraMovement();
+                CameraRotation();
                 HeightTransformMovement();
             }
 
@@ -45,17 +45,16 @@ namespace Engine.Editor
             ScrollMovement();
 
             // Update the entity's position based on the calculated direction and movement speed.
-            Entity.Transform.Position += _direction * (float)Time.Delta * s_movementSpeed;
+            Entity.Transform.LocalPosition += _direction * (float)Time.Delta * s_movementSpeed;
             // Update the entity's rotation based on the calculated rotation and rotation speed.
             Entity.Transform.EulerAngles -= _rotation * (float)Time.Delta * _rotationSpeed;
 
-            // Limit the entity's X rotation between -89 and 89 degrees.
-            Entity.Transform.EulerAngles.X = Math.Clamp(Entity.Transform.EulerAngles.X, -89, 89);
+            //// Limit the entity's vertical rotation between -89 and 89 degrees.
+            //Entity.Transform.EulerAngles = Math.Clamp(Entity.Transform.EulerAngles.X, -89, 89);
 
             // Reset the rotation and direction vector.
             _rotation = new();
             _direction = new();
-            ;
         }
 
         private void MovementSpeedCalc()
@@ -70,7 +69,7 @@ namespace Engine.Editor
             s_movementSpeed = Math.Clamp(s_movementSpeed, 0.1f, 10);
         }
 
-        private void CameraMovement(int _horizontalFactor = 1, int _verticalFactor = 1) =>
+        private void CameraRotation() =>
             // Create a new rotation based on the mouse X and Y axis inputs.
             _rotation = new(Input.GetMouseAxis().Y, Input.GetMouseAxis().X, 0);
 
@@ -82,7 +81,7 @@ namespace Engine.Editor
         private void ScreenMovement() =>
             // Update the direction by subtracting the right vector multiplied by the mouse X axis input,
             // and the local up vector multiplied by the mouse Y axis input, both scaled by the time delta.
-            _direction -= Entity.Transform.Right * Input.GetMouseAxis().X * (float)Time.Delta + Entity.Transform.LocalUp * Input.GetMouseAxis().Y * (float)Time.Delta;
+            _direction -= Entity.Transform.Right * Input.GetMouseAxis().X * (float)Time.Delta + Entity.Transform.Up * Input.GetMouseAxis().Y * (float)Time.Delta;
 
         private void ScrollMovement()
         {
@@ -114,7 +113,7 @@ namespace Engine.Editor
             // Check if either the W or S key is pressed and update the direction
             // based on the local up vector of the entity's transform and the input variable.
             if (Input.GetKey(VirtualKey.W) || Input.GetKey(VirtualKey.S))
-                _direction += input * Entity.Transform.LocalUp;
+                _direction += input * Entity.Transform.Up;
             // If neither the W or S key is pressed, update the direction
             // based on the global Y unit vector and the input variable.
             else

@@ -38,7 +38,7 @@ namespace Engine.Components
         public override void OnRender()
         {
             // Set the material's constant buffer to the entity's transform constant buffer.
-            Material.Set(Entity.Transform.ModelConstant);
+            Material.Set(Entity.Transform.GetConstantBuffer());
 
             // Draw the mesh using the Direct3D context.
             _d3d.Draw(

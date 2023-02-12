@@ -58,8 +58,8 @@ namespace Engine.ECS
             // Add the Transform component to the Entity when initialized.
             AddComponent(_transform = new Transform());
 
-        public void AddComponent<T>() where T : Component =>
-            AddComponent(Type.GetType(typeof(T).FullName));
+        public void AddComponent<T>() where T : Component, new() =>
+            AddComponent(new T());
 
         public void AddComponent(Type type) =>
             AddComponent((Component)Activator.CreateInstance(type));
@@ -153,9 +153,9 @@ namespace Engine.ECS
             };
 
             // Copy the original Entity object's Transform properties to the new Entity object.
-            newEntity.Transform.Position = Transform.Position;
-            newEntity.Transform.Rotation = Transform.Rotation;
-            newEntity.Transform.Scale = Transform.Scale;
+            newEntity.Transform.LocalPosition = Transform.LocalPosition;
+            newEntity.Transform.LocalRotation = Transform.LocalRotation;
+            newEntity.Transform.LocalScale = Transform.LocalScale;
 
             // Loop through the original Entity object's Components, clone each one and register it to the new Entity object.
             for (int i = 1; i < _components.Count; i++)

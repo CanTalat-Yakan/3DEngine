@@ -2,10 +2,10 @@
 using System.Runtime.CompilerServices;
 using System;
 using Vortice.Direct3D11;
-using Vortice.Mathematics;
 using Engine.Data;
 using Engine.ECS;
 using Engine.Utilities;
+using Engine.Helper;
 
 namespace Engine.Components
 {
@@ -19,7 +19,7 @@ namespace Engine.Components
         private Renderer _d3d { get => Renderer.Instance; }
 
         private ID3D11Buffer _view;
-        private SViewConstantBuffer _viewConstant;
+        private SViewConstantBuffer _viewConstantBuffer;
 
         public override void OnRegister() =>
             // Register the component with the CameraSystem.
@@ -49,8 +49,8 @@ namespace Engine.Components
             #region //Set ViewConstantBuffer
             // Calculate the view matrix to use for the camera.
             var view = Matrix4x4.CreateLookAt(
-                Entity.Transform.WorldPosition,
-                Entity.Transform.WorldPosition + Entity.Transform.Forward,
+                Entity.Transform.Position,
+                Entity.Transform.Position + Entity.Transform.Forward,
                 Vector3.UnitY);
 
             // Get the aspect ratio for the device's screen.
@@ -58,9 +58,9 @@ namespace Engine.Components
             var dAspect = aspect < 1 ? 1 * aspect : 1 / aspect;
 
             // Convert the field of view from degrees to radians.
-            var radAngle = MathHelper.ToRadians((float)FieldOfView);
+            var radAngle = FieldOfView.ToRadians();
             var radHFOV = 2 * MathF.Atan(MathF.Tan(radAngle * 0.5f) * dAspect);
-            var hFOV = MathHelper.ToDegrees(radHFOV);
+            var hFOV = radHFOV.ToDegrees();
 
             // Calculate the projection matrix for the camera.
             var projection = Matrix4x4.CreatePerspectiveFieldOfView(radHFOV, aspect, 0.1f, 1000);
@@ -69,10 +69,10 @@ namespace Engine.Components
             var viewProjection = Matrix4x4.Transpose(view * projection);
 
             // Store the camera's view-projection matrix and position.
-            _viewConstant = new()
+            _viewConstantBuffer = new()
             {
                 ViewProjection = viewProjection,
-                CameraPositon = Entity.Transform.Position
+                CameraPositon = Entity.Transform.Position,
             };
             #endregion
 
@@ -99,7 +99,7 @@ namespace Engine.Components
                 // Map the constant buffer to memory for write access.
                 MappedSubresource mappedResource = _d3d.DeviceContext.Map(this._view, MapMode.WriteDiscard);
                 // Copy the data from the constant buffer to the mapped resource.
-                Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref _viewConstant);
+                Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref _viewConstantBuffer);
                 // Unmap the constant buffer from memory.
                 _d3d.DeviceContext.Unmap(this._view, 0);
             }
