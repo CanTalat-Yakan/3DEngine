@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Numerics;
 using Engine.Components;
 using Engine.ECS;
+using Engine.Helper;
 using Engine.Utilities;
 
 public class {{FileName}} : Component 
 {
-	// Initilizes the component in the ScriptSystem.
+	// Register the component in the ScriptSystem.
     public override void OnRegister() =>
         ScriptSystem.Register(this);
 
