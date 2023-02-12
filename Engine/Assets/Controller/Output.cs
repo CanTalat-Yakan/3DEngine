@@ -12,7 +12,7 @@ using System;
 
 namespace Editor.Controller
 {
-    internal enum EMessageType
+    public enum EMessageType
     {
         Message,
         Warning,
@@ -31,7 +31,7 @@ namespace Editor.Controller
             Script.Split("\\").Last() + $":{Line} ({Method})";
     }
 
-    internal class Output
+    public class Output
     {
         private static Dictionary<SMessageInfo, List<DateTime>> s_messageCollection = new();
 

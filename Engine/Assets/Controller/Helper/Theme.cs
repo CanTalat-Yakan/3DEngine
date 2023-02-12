@@ -123,7 +123,7 @@ namespace Editor.Controller
         }
     }
 
-    public class WindowsSystemDispatcherQueueHelper
+    internal class WindowsSystemDispatcherQueueHelper
     {
         [StructLayout(LayoutKind.Sequential)]
         struct DispatcherQueueOptions

@@ -16,9 +16,10 @@ namespace Engine
 
         public SceneManager SceneManager;
         public Renderer Renderer;
-        public ComponentCollector ComponentCollector;
-        public ImGuiRenderer ImGuiRenderer;
 
+        public ComponentCollector ComponentCollector;
+
+        public ImGuiRenderer ImGuiRenderer;
         private IntPtr _imGuiContext;
 
         private EPlayMode _playmode = EPlayMode.None;
@@ -33,28 +34,32 @@ namespace Engine
             // Assign local variable.
             _profile = profile;
 
-            // Creates a new ImGui context and sets it as the current context.
-            _imGuiContext = ImGui.CreateContext();
-            ImGui.SetCurrentContext(_imGuiContext);
-
-            // Initializes the renderer, scene manager, and ImGui renderer.
+            // Initializes the renderer, scene manager, and the ComponentCollector.
             Renderer = new(swapChainPanel);
             SceneManager = new();
             ComponentCollector = new();
-            ImGuiRenderer = new();
 
             // Creates an entity with the "Boot" Editortag and adds a "SceneBoot" component to it.
             SceneManager.Scene.EntitytManager
                 .CreateEntity(null, "Boot", EEditorTags.SceneBoot.ToString())
                 .AddComponent(new SceneBoot());
 
+            // Gather Components for the Editor's AddComponent function.
+            CollectComponents();
+
+            #region // ImGui
+            // Initializes the ImGui renderer.
+            ImGuiRenderer = new();
+
+            // Creates a new ImGui context and sets it as the current context.
+            _imGuiContext = ImGui.CreateContext();
+            ImGui.SetCurrentContext(_imGuiContext);
+
             // Set the displaySize with the actual size of the SwapChainPanel.
             ImGui.GetIO().DisplaySize = new(
                 (float)swapChainPanel.ActualWidth,
                 (float)swapChainPanel.ActualHeight);
-
-            // Gather Components for the Editor's AddComponent function.
-            CollectComponents();
+            #endregion
 
             Output.Log("Engine Initialized...");
 

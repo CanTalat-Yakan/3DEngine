@@ -8,7 +8,7 @@ using Engine.Editor;
 
 namespace Editor.Controller
 {
-    public class BindingHelper
+    internal class BindingHelper
     {
         public static void SetBinding(DependencyObject target, DependencyProperty targetProperty, object source, string sourcePropertyPath, BindingMode mode = BindingMode.OneWay)
         {
@@ -25,7 +25,7 @@ namespace Editor.Controller
         }
     }
 
-    public class BindableBase : INotifyPropertyChanged
+    internal class BindableBase : INotifyPropertyChanged
     {
         [Hide]
         public event PropertyChangedEventHandler PropertyChanged;
@@ -51,7 +51,7 @@ namespace Editor.Controller
     }
 
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-    public class PropertyAttribute : Attribute
+    internal class PropertyAttribute : Attribute
     {
         public PropertyAttribute(string name)
         {
