@@ -16,7 +16,7 @@ using Engine.Utilities;
 
 namespace Engine.Editor
 {
-    unsafe public class ImGuiRenderer
+    unsafe internal class ImGuiRenderer
     {
         const int VertexConstantBufferSize = 16 * 4;
 

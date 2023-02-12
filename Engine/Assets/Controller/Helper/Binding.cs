@@ -25,7 +25,7 @@ namespace Editor.Controller
         }
     }
 
-    internal class BindableBase : INotifyPropertyChanged
+    public class BindableBase : INotifyPropertyChanged
     {
         [Hide]
         public event PropertyChangedEventHandler PropertyChanged;
