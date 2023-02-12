@@ -21,7 +21,7 @@ namespace Engine
 
         private IntPtr _imGuiContext;
 
-        private EPlaymode _playmode = EPlaymode.None;
+        private EPlayMode _playmode = EPlayMode.None;
         private TextBlock _profile;
 
         public Core(SwapChainPanel swapChainPanel, TextBlock profile)
@@ -146,11 +146,11 @@ namespace Engine
 
         private bool CheckPlaymodeStarted()
         {
-            if (Main.Instance.PlayerControl.Playmode == EPlaymode.Playing)
-                if (_playmode != Main.Instance.PlayerControl.Playmode)
+            if (Main.Instance.PlayerControl.PlayMode == EPlayMode.Playing)
+                if (_playmode != Main.Instance.PlayerControl.PlayMode)
                     return true;
 
-            _playmode = Main.Instance.PlayerControl.Playmode;
+            _playmode = Main.Instance.PlayerControl.PlayMode;
             return false;
         }
     }

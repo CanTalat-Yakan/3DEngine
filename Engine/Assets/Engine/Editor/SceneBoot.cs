@@ -106,7 +106,7 @@ namespace Engine.Editor
         public override void OnUpdate()
         {
             // Check if the playmode is set to "Playing" before deactivating the SceneCamera.
-            if (Main.Instance.PlayerControl.Playmode == EPlaymode.Playing)
+            if (Main.Instance.PlayerControl.PlayMode == EPlayMode.Playing)
                 // Deactivate the SceneCamera after OnUpdate is called from the ScriptSystem.
                 SceneCamera.IsEnabled = false;
         }

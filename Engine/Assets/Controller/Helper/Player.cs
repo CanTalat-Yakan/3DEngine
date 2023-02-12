@@ -4,7 +4,7 @@ using Microsoft.UI;
 
 namespace Editor.Controller
 {
-    internal enum EPlaymode
+    internal enum EPlayMode
     {
         None,
         Playing,
@@ -13,7 +13,7 @@ namespace Editor.Controller
 
     internal class Player
     {
-        public EPlaymode Playmode;
+        public EPlayMode PlayMode;
 
         private AppBarToggleButton _play;
         private AppBarToggleButton _pause;
@@ -33,7 +33,7 @@ namespace Editor.Controller
         public void Play()
         {
             // Check if the current playmode is None.
-            if (Playmode == EPlaymode.None)
+            if (PlayMode == EPlayMode.None)
                 // If the clear play option is checked, clear the output.
                 if (_output._clearPlay.IsChecked.Value)
                     _output.ClearOutput();
@@ -54,7 +54,7 @@ namespace Editor.Controller
         public void Pause()
         {
             // Set enum variable Playmode value based on the checked state of "_pause".
-            Playmode = _pause.IsChecked.Value ? EPlaymode.Paused : EPlaymode.Playing;
+            PlayMode = _pause.IsChecked.Value ? EPlayMode.Paused : EPlayMode.Playing;
             // Enable the "_forward" Button with the checked state of "_pause".
             _forward.IsEnabled = _pause.IsChecked.Value;
 
@@ -68,7 +68,7 @@ namespace Editor.Controller
         public void Forward()
         {
             // Check if the current playmode is not paused.
-            if (Playmode != EPlaymode.Paused)
+            if (PlayMode != EPlayMode.Paused)
                 return;
 
             // Advance the game by one frame.
@@ -93,7 +93,7 @@ namespace Editor.Controller
         private void SetStatusAppBarButtons(bool b)
         {
             // Update the play mode of the game instance.
-            Playmode = b ? EPlaymode.Playing : EPlaymode.None;
+            PlayMode = b ? EPlayMode.Playing : EPlayMode.None;
 
             // Enable/disable the pause button based on the play mode.
             _pause.IsEnabled = b;
