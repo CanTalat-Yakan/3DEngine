@@ -79,6 +79,14 @@
                                 <SymbolIcon Symbol="Link"/>
                             </StackPanel>
                         </HyperlinkButton>
+
+                        <HyperlinkButton NavigateUri="https://docs.google.com/forms/d/e/1FAIpQLSf6PbepYNPx7FZDTJ8hLyYYC6zGo2Qqz1nO2AkZx2jF99tNyg/viewform">
+                            <StackPanel Spacing="10" Orientation="Horizontal">
+                                <TextBlock Text="Feedback" FontWeight="Medium"/>
+
+                                <SymbolIcon Symbol="Link"/>
+                            </StackPanel>
+                        </HyperlinkButton>
                     </StackPanel>
 
                     <Grid/>
