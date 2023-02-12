@@ -58,9 +58,6 @@ namespace Editor.Controller
             // Call the method to initialize and populate the files categories with a DataTemplate.
             PopulateFilesCategories();
 
-            // Opens the Solution that contains the scripts and shader in the project's assetspath.
-            OpenFile(Path.Combine(Home.ProjectPath, "Project.sln"));
-
             // Call the refresh method to update the category and file list.
             Refresh();
         }
@@ -508,9 +505,13 @@ namespace Editor.Controller
             };
             button.DoubleTapped += (s, e) =>
             {
-                if (File.Exists(path))
-                    // Start the process with the given file path.
-                    Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
+                if ((Path.GetExtension(path) == ".cs")
+                 || (Path.GetExtension(path) == ".hlsl"))
+                    // Opens the solution that contains the scripts and shader in the project's assetspath.
+                    OpenFile(Path.Combine(Home.ProjectPath, "Project.sln"));
+                else
+                    // Opens the file with the respective app.
+                    OpenFile(path);
             };
 
             TextBlock label = new()
@@ -1015,7 +1016,7 @@ namespace Editor.Controller
         public void OpenFile(string path)
         {
             if (File.Exists(path))
-                // If the path exists, start a process to open it in the default file explorer
+                // If the path exists, start the process with the given file path.
                 // UseShellExecute is set to "true" to run the process with elevated privileges.
                 Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
         }
