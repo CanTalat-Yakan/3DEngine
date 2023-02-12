@@ -360,8 +360,10 @@ namespace Editor.Controller
 
         public static UIElement AddToolTip(this UIElement content, ToolTip toolTip)
         {
+
             if (toolTip != null)
-                ToolTipService.SetToolTip(content, toolTip);
+                if (!string.IsNullOrEmpty((string)toolTip.Content))
+                    ToolTipService.SetToolTip(content, toolTip);
 
             return content;
         }
@@ -369,7 +371,8 @@ namespace Editor.Controller
         public static Grid AddToolTip(this Grid content, ToolTip toolTip)
         {
             if (toolTip != null)
-                ToolTipService.SetToolTip(content, toolTip);
+                if (!string.IsNullOrEmpty((string)toolTip.Content))
+                    ToolTipService.SetToolTip(content, toolTip);
 
             return content;
         }
@@ -619,9 +622,9 @@ namespace Editor.Controller
                 Vortice.Mathematics.MathHelper.ToDegrees(vector.Y),
                 Vortice.Mathematics.MathHelper.ToDegrees(vector.Z));
 
-        public static Vector3 ToRadians(this Vector3 vector) => 
+        public static Vector3 ToRadians(this Vector3 vector) =>
             new(Vortice.Mathematics.MathHelper.ToRadians(vector.X),
-                Vortice.Mathematics.MathHelper.ToRadians(vector.Y), 
+                Vortice.Mathematics.MathHelper.ToRadians(vector.Y),
                 Vortice.Mathematics.MathHelper.ToRadians(vector.Z));
 
         public static Vector3 SwitchXY(this Vector3 vector) =>
