@@ -1,20 +1,22 @@
-﻿using Engine;
-using System.Collections;
+﻿using System.Collections.Generic;
+using Engine.Components;
+using Engine.ECS;
+using Engine.Utilities;
 
-public class {{FileName}} : Entity 
+public class {{FileName}} : Component 
 {
-	// Initilizes the component in the ScriptSystem
+	// Initilizes the component in the ScriptSystem.
     public override void OnRegister() =>
         ScriptSystem.Register(this);
 
-	// Use this for initialization
-	void OnStart() 
+	// Use this for initialization.
+	public override void OnStart() 
 	{
 		
 	}
 	
-	// Update is called once per frame
-	void OnUpdate() 
+	// Update is called once per frame.
+	public override void OnUpdate() 
 	{
 		
 	}
