@@ -41,6 +41,7 @@
     <Content Remove="Assets\Engine\Editor\ComponentCollector.cs" />
     <Content Remove="Assets\Engine\Editor\ImGuiRenderer.cs" />
     <Content Remove="Assets\Engine\Editor\SceneBoot.cs" />
+    <Content Remove="Assets\Engine\Helper\Helper.cs" />
     <Content Remove="Assets\Engine\Utilities\BaseSystem.cs" />
     <Content Remove="Assets\Engine\Utilities\Component.cs" />
     <Content Remove="Assets\Engine\Utilities\SceneManager.cs" />

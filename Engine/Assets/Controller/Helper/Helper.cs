@@ -19,6 +19,7 @@ using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 using Rectangle = Microsoft.UI.Xaml.Shapes.Rectangle;
 using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
 using Image = Microsoft.UI.Xaml.Controls.Image;
+using Engine.ECS;
 
 namespace Editor.Controller
 {
@@ -188,7 +189,7 @@ namespace Editor.Controller
             return StackInGrid(numInput, num2Input, num3Input);
         }
 
-        internal virtual Grid CreateVec3InputTransform(Vector3 v = new())
+        internal virtual Grid CreateVec3InputWithRGB(Vector3 v = new())
         {
             Rectangle rectangleR = new() { Fill = new SolidColorBrush(Colors.IndianRed), RadiusX = 2, RadiusY = 2, Width = 4 };
             NumberBox numInput = new() { Value = Math.Round(v.X, 4), Margin = new(0, 0, 4, 0), Width = 64 };
@@ -202,7 +203,7 @@ namespace Editor.Controller
             return StackInGrid(rectangleR, numInput, rectangleG, num2Input, rectangleB, num3Input);
         }
 
-        internal virtual Grid CreateVec3InputTransform(Vector3 v = new(),
+        internal virtual Grid CreateVec3InputWithRGB(Vector3 v = new(),
             params TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs>[] e)
         {
             Rectangle rectangleR = new() { Fill = new SolidColorBrush(Colors.IndianRed), RadiusX = 2, RadiusY = 2, Width = 4 };
@@ -223,6 +224,24 @@ namespace Editor.Controller
             return StackInGrid(rectangleR, numInput, rectangleG, num2Input, rectangleB, num3Input);
         }
 
+        internal virtual Grid CreateVec3InputWithRGBAndTransform(Vector3 v = new(), Engine.Components.Transform transform = null)
+        {
+            Rectangle rectangleR = new() { Fill = new SolidColorBrush(Colors.IndianRed), RadiusX = 2, RadiusY = 2, Width = 4 };
+            NumberBox numInput = new() { Value = Math.Round(v.X, 4), Margin = new(0, 0, 4, 0), Width = 64 };
+
+            Rectangle rectangleG = new() { Fill = new SolidColorBrush(Colors.SeaGreen), RadiusX = 2, RadiusY = 2, Width = 4 };
+            NumberBox num2Input = new() { Value = Math.Round(v.Y, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
+
+            Rectangle rectangleB = new() { Fill = new SolidColorBrush(Colors.DodgerBlue), RadiusX = 2, RadiusY = 2, Width = 4 };
+            NumberBox num3Input = new() { Value = Math.Round(v.Z, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
+
+            numInput.ValueChanged += (s, e) => { transform.EulerAngles = new Vector3((float)numInput.Value, (float)num2Input.Value, (float)num3Input.Value); };
+            num2Input.ValueChanged += (s, e) => { transform.EulerAngles = new Vector3((float)numInput.Value, (float)num2Input.Value, (float)num3Input.Value); };
+            num3Input.ValueChanged += (s, e) => { transform.EulerAngles = new Vector3((float)numInput.Value, (float)num2Input.Value, (float)num3Input.Value); };
+
+            return StackInGrid(rectangleR, numInput, rectangleG, num2Input, rectangleB, num3Input);
+        }
+        
         internal virtual Grid CreateBool(bool b = false, RoutedEventHandler OnClick = null)
         {
             CheckBox check = new() { IsChecked = b, Margin = new(0, 0, 0, -5.5) };
@@ -639,12 +658,25 @@ namespace Editor.Controller
             return name;
         }
 
-        public static Vector3 ToDegrees(this Vector3 vector3)
+        public static Vector3 ToDegrees(this Vector3 vector)
         {
             return new(
-                Vortice.Mathematics.MathHelper.ToDegrees(vector3.X),
-                Vortice.Mathematics.MathHelper.ToDegrees(vector3.Y),
-                Vortice.Mathematics.MathHelper.ToDegrees(vector3.Z));
+                Vortice.Mathematics.MathHelper.ToDegrees(vector.X),
+                Vortice.Mathematics.MathHelper.ToDegrees(vector.Y),
+                Vortice.Mathematics.MathHelper.ToDegrees(vector.Z));
+        }
+
+        public static Vector3 ToRadians(this Vector3 vector)
+        {
+            return new(
+                Vortice.Mathematics.MathHelper.ToRadians(vector.X),
+                Vortice.Mathematics.MathHelper.ToRadians(vector.Y),
+                Vortice.Mathematics.MathHelper.ToRadians(vector.Z));
+        }
+        
+        public static Vector3 SwitchXY(this Vector3 vector)
+        {
+            return new(vector.Y, vector.X, vector.Z);
         }
 
         public static bool IsNaN(this Vector3 vector3)
