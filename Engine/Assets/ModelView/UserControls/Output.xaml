@@ -18,11 +18,9 @@
             <AppBarSeparator/>
 
             <CommandBar.SecondaryCommands>
-                <AppBarToggleButton x:Name="x_AppBarToggleButton_Debug_ErrorPause" IsChecked="False" Label="Error Pause" Icon="Pause"
-                                    Click="AppBarToggleButton_Debug_ErrorPause_Click"/>
+                <AppBarToggleButton x:Name="x_AppBarToggleButton_Debug_ErrorPause" IsChecked="False" Label="Error Pause" Icon="Pause"/>
                 
-                <AppBarToggleButton x:Name="x_AppBarToggleButton_Debug_ClearPlay" IsChecked="true" Label="Clear Play" Icon="Clear"
-                                    Click="AppBarToggleButton_Debug_ClearPlay_Click"/>
+                <AppBarToggleButton x:Name="x_AppBarToggleButton_Debug_ClearPlay" IsChecked="true" Label="Clear Play" Icon="Clear"/>
                 
                 <AppBarSeparator />
                 

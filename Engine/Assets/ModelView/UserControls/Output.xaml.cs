@@ -37,8 +37,4 @@ public sealed partial class Output : UserControl
 
     private void AppBarToggleButton_Filter_Click(object sender, RoutedEventArgs e) =>
         Controller.Output.IterateOutputMessages();
-
-    private void AppBarToggleButton_Debug_ErrorPause_Click(object sender, RoutedEventArgs e) { }
-
-    private void AppBarToggleButton_Debug_ClearPlay_Click(object sender, RoutedEventArgs e) { }
 }
