@@ -3,24 +3,28 @@ using System.Numerics;
 using Editor.Controller;
 using Engine.Components;
 using Engine.ECS;
+using Engine.Editor;
 using Engine.Helper;
 using Engine.Utilities;
 
-public class {{FileName}} : Component 
+public class Test : Component
 {
-	// Register the component in the ScriptSystem.
+    [Show]
+    private string _text = "Hello World!";
+
+    // Register the component in the ScriptSystem.
     public override void OnRegister() =>
         ScriptSystem.Register(this);
 
-	// Use this for initialization.
-	public override void OnStart() 
-	{
-		
-	}
-	
-	// Update is called once per frame.
-	public override void OnUpdate() 
-	{
-		
-	}
+    // Use this for initialization.
+    public override void OnStart()
+    {
+        Output.Log(_text);
+    }
+
+    // Update is called once per frame.
+    public override void OnUpdate()
+    {
+
+    }
 }
