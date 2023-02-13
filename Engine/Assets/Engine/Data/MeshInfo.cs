@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 
-namespace Engine.Data
+namespace Engine.Data;
+
+public struct MeshInfo
 {
-    public struct MeshInfo
-    {
-        public List<Vertex> Vertices;
-        public List<ushort> Indices;
-    }
+    public List<Vertex> Vertices;
+    public List<ushort> Indices;
 }

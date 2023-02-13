@@ -1,21 +1,21 @@
 ﻿using Engine.Utilities;
 
-namespace Editor.Controller
+namespace Editor.Controller;
+
+internal class Profiler
 {
-    internal class Profiler
-    {
-        public static int FPS => Time.FPS;
-        public static double Delta => Time.Delta;
+    public static int FPS => Time.FPS;
+    public static double Delta => Time.Delta;
 
-        public static double SwapChainSizeWidth => Renderer.Instance.SwapChainPanel.ActualWidth;
-        public static double SwapChainSizeHeight => Renderer.Instance.SwapChainPanel.ActualHeight;
+    public static double SwapChainSizeWidth => Renderer.Instance.SwapChainPanel.ActualWidth;
+    public static double SwapChainSizeHeight => Renderer.Instance.SwapChainPanel.ActualHeight;
 
-        public static float DrawCalls { get; set; }
-        public static float Vertices { get; set; }
-        public static float Indices { get; set; }
+    public static float DrawCalls { get; set; }
+    public static float Vertices { get; set; }
+    public static float Indices { get; set; }
 
-        public static string GetString() =>
-            $"""
+    public static string GetString() =>
+        $"""
             {(int)(Delta * 1000)} ms
             {FPS} FPS
             
@@ -26,5 +26,4 @@ namespace Editor.Controller
             Vertices: {Vertices}
             Indices: {Indices}
             """;
-    }
 }

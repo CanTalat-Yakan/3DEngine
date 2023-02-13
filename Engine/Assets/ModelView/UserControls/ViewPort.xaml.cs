@@ -4,30 +4,29 @@ using Engine.Utilities;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Editor.ModelView
+namespace Editor.ModelView;
+
+public sealed partial class ViewPort : UserControl
 {
-    public sealed partial class ViewPort : UserControl
+    internal Engine.Core _engineCore;
+    internal Controller.ViewPort _viewPortControl;
+
+    public ViewPort()
     {
-        internal Engine.Core _engineCore;
-        internal Controller.ViewPort _viewPortControl;
+        this.InitializeComponent();
 
-        public ViewPort()
-        {
-            this.InitializeComponent();
+        Loaded += (s, e) => _engineCore = new Engine.Core(x_SwapChainPanel_ViewPort, _viewPortControl.Profile);
+        Unloaded += (s, e) => _engineCore.Renderer.Dispose();
 
-            Loaded += (s, e) => _engineCore = new Engine.Core(x_SwapChainPanel_ViewPort, _viewPortControl.Profile);
-            Unloaded += (s, e) => _engineCore.Renderer.Dispose();
+        _viewPortControl = new Controller.ViewPort(this, x_Grid_Overlay);
 
-            _viewPortControl = new Controller.ViewPort(this, x_Grid_Overlay);
+        InitializeInput();
+    }
 
-            InitializeInput();
-        }
-
-        private void InitializeInput()
-        {
-            PointerPressed += Input.PointerPressed;
-            PointerWheelChanged += Input.PointerWheelChanged;
-            KeyDown += Input.KeyDown;
-        }
+    private void InitializeInput()
+    {
+        PointerPressed += Input.PointerPressed;
+        PointerWheelChanged += Input.PointerWheelChanged;
+        KeyDown += Input.KeyDown;
     }
 }

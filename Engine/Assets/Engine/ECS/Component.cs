@@ -2,53 +2,52 @@
 using Editor.Controller;
 using Engine.Editor;
 
-namespace Engine.ECS
+namespace Engine.ECS;
+
+public class Component : BindableBase, ICloneable
 {
-    public class Component : BindableBase, ICloneable
+    [Hide]
+    public Entity Entity;
+    [Hide]
+    public byte Order = 0;
+
+    private bool _isEnabled;
+    public bool IsEnabled
     {
-        [Hide]
-        public Entity Entity;
-        [Hide]
-        public byte Order = 0;
-
-        private bool _isEnabled;
-        public bool IsEnabled
-        {
-            get { return _isEnabled; }
-            set { SetProperty(ref _isEnabled, value); }
-        }
-
-        internal event EventHandler _eventOnDestroy;
-
-        public Component() =>
-            OnRegister();
-
-        public virtual void OnRegister() { }
-
-        public virtual void OnAwake() { }
-
-        public virtual void OnStart() { }
-
-        public virtual void OnUpdate() { }
-
-        public virtual void OnLateUpdate() { }
-
-        public virtual void OnRender() { }
-
-        public virtual void OnDestroy() { }
-
-        public void InvokeEventOnDestroy() =>
-            // Invoke the Event when the Component is destroyed.
-            _eventOnDestroy(this, null);
-
-        object ICloneable.Clone() => 
-            Clone();
-
-        public Component Clone() =>
-            (Component)MemberwiseClone();
+        get { return _isEnabled; }
+        set { SetProperty(ref _isEnabled, value); }
     }
 
-    public class EditorComponent : Component, IHide { }
+    internal event EventHandler _eventOnDestroy;
 
-    public interface IHide { }
+    public Component() =>
+        OnRegister();
+
+    public virtual void OnRegister() { }
+
+    public virtual void OnAwake() { }
+
+    public virtual void OnStart() { }
+
+    public virtual void OnUpdate() { }
+
+    public virtual void OnLateUpdate() { }
+
+    public virtual void OnRender() { }
+
+    public virtual void OnDestroy() { }
+
+    public void InvokeEventOnDestroy() =>
+        // Invoke the Event when the Component is destroyed.
+        _eventOnDestroy(this, null);
+
+    object ICloneable.Clone() =>
+        Clone();
+
+    public Component Clone() =>
+        (Component)MemberwiseClone();
 }
+
+public class EditorComponent : Component, IHide { }
+
+public interface IHide { }

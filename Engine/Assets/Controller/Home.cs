@@ -3,254 +3,252 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
 using System.Diagnostics;
+using System.IO.Compression;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Text;
-using System.Threading.Tasks;
 using System;
 using Windows.ApplicationModel.DataTransfer;
-using System.IO.Compression;
 
-namespace Editor.Controller
+namespace Editor.Controller;
+
+internal class Home
 {
-    internal class Home
+    public static string RootPath { get; private set; }
+    public static string ProjectPath { get; private set; }
+
+    public static readonly string TEMPLATES = @"Assets\Engine\Resources\Templates";
+
+
+    private ModelView.Home _home;
+    private WrapPanel _wrap;
+    private NavigationView _navigationView;
+
+    public Home(ModelView.Home home, WrapPanel wrap, NavigationView navigationView)
     {
-        public static string RootPath { get; private set; }
-        public static string ProjectPath { get; private set; }
+        _home = home;
+        _wrap = wrap;
+        _navigationView = navigationView;
 
-        public static readonly string TEMPLATES = @"Assets\Engine\Resources\Templates";
+        var documentsDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
+        RootPath = Path.Combine(documentsDir, "3DEngine");
 
-        private ModelView.Home _home;
-        private WrapPanel _wrap;
-        private NavigationView _navigationView;
+        PopulateProjectTiles();
+    }
 
-        public Home(ModelView.Home home, WrapPanel wrap, NavigationView navigationView)
+    public void OpenFolder()
+    {
+        if (Directory.Exists(RootPath))
+            // If the RootPath exists, start a process to open it in the default file explorer
+            // UseShellExecute is set to "true" to run the process with elevated privileges.
+            Process.Start(new ProcessStartInfo { FileName = RootPath, UseShellExecute = true });
+    }
+
+    public void PopulateProjectTiles()
+    {
+        _wrap.Children.Clear();
+
+        _wrap.Children.Add(AddTile(CreateIcon(Symbol.Add)));
+
+        foreach (var projectPath in Directory.GetDirectories(RootPath))
+            _wrap.Children.Add(ProjectTile(projectPath, CreateIcon("\xE74C")));
+    }
+
+    private Grid AddTile(Grid icon)
+    {
+        Grid grid = new();
+
+        Button button = new()
         {
-            _home = home;
-            _wrap = wrap;
-            _navigationView = navigationView;
+            Width = 66,
+            Height = 73,
+            CornerRadius = new(10),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+        button.Click += (s, e) => ContentDialogCreateNewProjectAsync();
 
-            var documentsDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        Viewbox viewbox = new() { MaxHeight = 24, MaxWidth = 24 };
 
-            RootPath = Path.Combine(documentsDir, "3DEngine");
+        viewbox.Child = icon;
+        button.Content = viewbox;
+        grid.Children.Add(button);
+
+        return grid;
+    }
+
+    private Grid ProjectTile(string path, Grid icon)
+    {
+        Grid grid = new() { Padding = new(-1), CornerRadius = new(10) };
+
+        Button button = new()
+        {
+            Width = 245,
+            Height = 75,
+            Padding = new(10),
+            HorizontalContentAlignment = HorizontalAlignment.Stretch,
+            VerticalContentAlignment = VerticalAlignment.Stretch,
+        };
+        button.ContextFlyout = CreateDefaultMenuFlyout(path);
+        button.Click += (s, e) => OpenEngine(path);
+
+        Grid grid2 = new() { HorizontalAlignment = HorizontalAlignment.Stretch };
+
+        Viewbox viewbox = new() { MaxHeight = 24, MaxWidth = 24, HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top };
+        TextBlock label = new()
+        {
+            Text = Path.GetFileName(path),
+            FontSize = 12,
+            MaxWidth = 140,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Bottom
+        };
+
+        viewbox.Child = icon;
+        grid2.Children.Add(viewbox);
+        grid2.Children.Add(label);
+        button.Content = grid2;
+        grid.Children.Add(button);
+
+        return grid;
+    }
+
+    private async void ContentDialogCreateNewProjectAsync()
+    {
+        TextBox fileName;
+
+        ContentDialog dialog = new()
+        {
+            XamlRoot = _home.XamlRoot,
+            Title = "Create a new project",
+            PrimaryButtonText = "Save",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Primary,
+            Content = fileName = new TextBox() { PlaceholderText = "New Project" },
+        };
+
+        var result = await dialog.ShowAsync();
+
+        if (result == ContentDialogResult.Primary)
+        {
+            // \w is equivalent of [0 - 9a - zA - Z_]."
+            if (!string.IsNullOrEmpty(fileName.Text))
+                if (!Regex.Match(fileName.Text, @"^[\w\-.]+$").Success)
+                {
+                    new ContentDialog()
+                    {
+                        XamlRoot = _home.XamlRoot,
+                        Title = "A projectname can't contain any of the following characters",
+                        CloseButtonText = "Close",
+                        DefaultButton = ContentDialogButton.Close,
+                        Content = new TextBlock() { Text = "\\ / : * ? \" < > |" },
+                    }.CreateDialogAsync();
+
+                    return;
+                }
+
+            var path = RootPath;
+
+            if (string.IsNullOrEmpty(fileName.Text))
+                path = Path.Combine(path, "New Project");
+            else if (char.IsDigit(fileName.Text[0]))
+                path = Path.Combine(path, "_" + fileName.Text);
+            else
+                path = Path.Combine(path, fileName.Text);
+
+            path = IncrementFolderIfExists(path);
+
+            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(Path.Combine(path, "Assets"));
+
+            string zipPath = Path.Combine(AppContext.BaseDirectory, Home.TEMPLATES, "Project.zip");
+            if (File.Exists(zipPath))
+                ZipFile.ExtractToDirectory(zipPath, path);
 
             PopulateProjectTiles();
         }
+    }
 
-        public void OpenFolder()
+    private async void ContentDialogRename(string path)
+    {
+        TextBox projectName;
+
+        ContentDialog dialog = new()
         {
-            if (Directory.Exists(RootPath))
-                // If the RootPath exists, start a process to open it in the default file explorer
-                // UseShellExecute is set to "true" to run the process with elevated privileges.
-                Process.Start(new ProcessStartInfo { FileName = RootPath, UseShellExecute = true });
-        }
+            XamlRoot = _home.XamlRoot,
+            Title = "Rename",
+            PrimaryButtonText = "Rename",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Primary,
+            Content = projectName = new TextBox() { Text = Path.GetFileName(path) },
+        };
 
-        public void PopulateProjectTiles()
+        var result = await dialog.ShowAsync();
+
+        if (result == ContentDialogResult.Primary)
         {
-            _wrap.Children.Clear();
-
-            _wrap.Children.Add(AddTile(CreateIcon(Symbol.Add)));
-
-            foreach (var projectPath in Directory.GetDirectories(RootPath))
-                _wrap.Children.Add(ProjectTile(projectPath, CreateIcon("\xE74C")));
-        }
-
-        private Grid AddTile(Grid icon)
-        {
-            Grid grid = new();
-
-            Button button = new()
-            {
-                Width = 66,
-                Height = 73,
-                CornerRadius = new(10),
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
-            button.Click += (s, e) => ContentDialogCreateNewProjectAsync();
-
-            Viewbox viewbox = new() { MaxHeight = 24, MaxWidth = 24 };
-
-            viewbox.Child = icon;
-            button.Content = viewbox;
-            grid.Children.Add(button);
-
-            return grid;
-        }
-
-        private Grid ProjectTile(string path, Grid icon)
-        {
-            Grid grid = new() { Padding = new(-1), CornerRadius = new(10) };
-
-            Button button = new()
-            {
-                Width = 245,
-                Height = 75,
-                Padding = new(10),
-                HorizontalContentAlignment = HorizontalAlignment.Stretch,
-                VerticalContentAlignment = VerticalAlignment.Stretch,
-            };
-            button.ContextFlyout = CreateDefaultMenuFlyout(path);
-            button.Click += (s, e) => OpenEngine(path);
-
-            Grid grid2 = new() { HorizontalAlignment = HorizontalAlignment.Stretch };
-
-            Viewbox viewbox = new() { MaxHeight = 24, MaxWidth = 24, HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top };
-            TextBlock label = new()
-            {
-                Text = Path.GetFileName(path),
-                FontSize = 12,
-                MaxWidth = 140,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Bottom
-            };
-
-            viewbox.Child = icon;
-            grid2.Children.Add(viewbox);
-            grid2.Children.Add(label);
-            button.Content = grid2;
-            grid.Children.Add(button);
-
-            return grid;
-        }
-
-        private async void ContentDialogCreateNewProjectAsync()
-        {
-            TextBox fileName;
-
-            ContentDialog dialog = new()
-            {
-                XamlRoot = _home.XamlRoot,
-                Title = "Create a new project",
-                PrimaryButtonText = "Save",
-                CloseButtonText = "Cancel",
-                DefaultButton = ContentDialogButton.Primary,
-                Content = fileName = new TextBox() { PlaceholderText = "New Project" },
-            };
-
-            var result = await dialog.ShowAsync();
-
-            if (result == ContentDialogResult.Primary)
-            {
-                // \w is equivalent of [0 - 9a - zA - Z_]."
-                if (!string.IsNullOrEmpty(fileName.Text))
-                    if (!Regex.Match(fileName.Text, @"^[\w\-.]+$").Success)
+            // \w is equivalent of [0 - 9a - zA - Z_]."
+            if (!string.IsNullOrEmpty(projectName.Text))
+                if (!Regex.Match(projectName.Text, @"^[\w\-.]+$").Success)
+                {
+                    new ContentDialog()
                     {
-                        new ContentDialog()
-                        {
-                            XamlRoot = _home.XamlRoot,
-                            Title = "A projectname can't contain any of the following characters",
-                            CloseButtonText = "Close",
-                            DefaultButton = ContentDialogButton.Close,
-                            Content = new TextBlock() { Text = "\\ / : * ? \" < > |" },
-                        }.CreateDialogAsync();
+                        XamlRoot = _home.XamlRoot,
+                        Title = "A folder can't contain any of the following characters",
+                        CloseButtonText = "Close",
+                        DefaultButton = ContentDialogButton.Close,
+                        Content = new TextBlock() { Text = "\\ / : * ? \" < > |" },
+                    }.CreateDialogAsync();
 
-                        return;
-                    }
+                    return;
+                }
 
-                var path = RootPath;
 
-                if (string.IsNullOrEmpty(fileName.Text))
-                    path = Path.Combine(path, "New Project");
-                else if (char.IsDigit(fileName.Text[0]))
-                    path = Path.Combine(path, "_" + fileName.Text);
-                else
-                    path = Path.Combine(path, fileName.Text);
+            Directory.Move(path, Path.Combine(RootPath, projectName.Text));
 
-                path = IncrementFolderIfExists(path);
-
-                Directory.CreateDirectory(path);
-                Directory.CreateDirectory(Path.Combine(path, "Assets"));
-
-                string zipPath = Path.Combine(AppContext.BaseDirectory, Home.TEMPLATES, "Project.zip");
-                if (File.Exists(zipPath))
-                    ZipFile.ExtractToDirectory(zipPath, path);
-
-                PopulateProjectTiles();
-            }
+            PopulateProjectTiles();
         }
+    }
 
-        private async void ContentDialogRename(string path)
+    private async void ContentDialogDelete(string path)
+    {
+        ContentDialog dialog = new()
         {
-            TextBox projectName;
+            XamlRoot = _home.XamlRoot,
+            Title = "Delete " + Path.GetFileName(path),
+            PrimaryButtonText = "Delete",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Close,
+        };
 
-            ContentDialog dialog = new()
+        var result = await dialog.ShowAsync();
+
+        if (result == ContentDialogResult.Primary)
+        {
+            dialog = new()
             {
                 XamlRoot = _home.XamlRoot,
-                Title = "Rename",
-                PrimaryButtonText = "Rename",
-                CloseButtonText = "Cancel",
-                DefaultButton = ContentDialogButton.Primary,
-                Content = projectName = new TextBox() { Text = Path.GetFileName(path) },
-            };
-
-            var result = await dialog.ShowAsync();
-
-            if (result == ContentDialogResult.Primary)
-            {
-                // \w is equivalent of [0 - 9a - zA - Z_]."
-                if (!string.IsNullOrEmpty(projectName.Text))
-                    if (!Regex.Match(projectName.Text, @"^[\w\-.]+$").Success)
-                    {
-                        new ContentDialog()
-                        {
-                            XamlRoot = _home.XamlRoot,
-                            Title = "A folder can't contain any of the following characters",
-                            CloseButtonText = "Close",
-                            DefaultButton = ContentDialogButton.Close,
-                            Content = new TextBlock() { Text = "\\ / : * ? \" < > |" },
-                        }.CreateDialogAsync();
-
-                        return;
-                    }
-
-
-                Directory.Move(path, Path.Combine(RootPath, projectName.Text));
-
-                PopulateProjectTiles();
-            }
-        }
-
-        private async void ContentDialogDelete(string path)
-        {
-            ContentDialog dialog = new()
-            {
-                XamlRoot = _home.XamlRoot,
-                Title = "Delete " + Path.GetFileName(path),
+                Title = "Delete " + Path.GetFileName(path) + " permanently?",
                 PrimaryButtonText = "Delete",
                 CloseButtonText = "Cancel",
                 DefaultButton = ContentDialogButton.Close,
+                Content = new TextBlock() { Text = "If you delete this project, you won't be able to recover it. Do you want to delete it?", TextWrapping = TextWrapping.WrapWholeWords },
             };
 
-            var result = await dialog.ShowAsync();
+            result = await dialog.ShowAsync();
 
             if (result == ContentDialogResult.Primary)
             {
-                dialog = new()
-                {
-                    XamlRoot = _home.XamlRoot,
-                    Title = "Delete " + Path.GetFileName(path) + " permanently?",
-                    PrimaryButtonText = "Delete",
-                    CloseButtonText = "Cancel",
-                    DefaultButton = ContentDialogButton.Close,
-                    Content = new TextBlock() { Text = "If you delete this project, you won't be able to recover it. Do you want to delete it?", TextWrapping = TextWrapping.WrapWholeWords },
-                };
+                DeleteDirectory(path);
 
-                result = await dialog.ShowAsync();
-
-                if (result == ContentDialogResult.Primary)
-                {
-                    DeleteDirectory(path);
-
-                    PopulateProjectTiles();
-                }
+                PopulateProjectTiles();
             }
         }
+    }
 
-        private MenuFlyout CreateDefaultMenuFlyout(string path, bool hasExtension = false)
-        {
-            MenuFlyoutItem[] items = new[] {
+    private MenuFlyout CreateDefaultMenuFlyout(string path, bool hasExtension = false)
+    {
+        MenuFlyoutItem[] items = new[] {
                 new MenuFlyoutItem() { Text = "Open project", Icon = new SymbolIcon(Symbol.OpenFile) },
                 new MenuFlyoutItem() { Text = "Open folder location", Icon = new FontIcon(){ Glyph = "\xEC50", FontFamily = new FontFamily("Segoe MDL2 Assets") } },
                 //new MenuFlyoutSeparator(),
@@ -260,121 +258,120 @@ namespace Editor.Controller
                 new MenuFlyoutItem() { Text = "Copy as Path", Icon = new SymbolIcon(Symbol.Copy) },
             };
 
-            items[0].Click += (s, e) => OpenEngine(path);
-            items[1].Click += (s, e) => OpenFolder(path);
+        items[0].Click += (s, e) => OpenEngine(path);
+        items[1].Click += (s, e) => OpenFolder(path);
 
-            items[2].Click += (s, e) => ContentDialogRename(path);
-            items[3].Click += (s, e) => ContentDialogDelete(path);
+        items[2].Click += (s, e) => ContentDialogRename(path);
+        items[3].Click += (s, e) => ContentDialogDelete(path);
 
-            items[4].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.None);
+        items[4].Click += (s, e) => CopyToClipboard(path, DataPackageOperation.None);
 
-            MenuFlyout menuFlyout = new();
-            foreach (var item in items)
-            {
-                menuFlyout.Items.Add(item);
+        MenuFlyout menuFlyout = new();
+        foreach (var item in items)
+        {
+            menuFlyout.Items.Add(item);
 
-                if (item.Text == "Open folder location"
-                    || item.Text == "Delete")
-                    menuFlyout.Items.Add(new MenuFlyoutSeparator());
-            }
-
-            return menuFlyout;
+            if (item.Text == "Open folder location"
+                || item.Text == "Delete")
+                menuFlyout.Items.Add(new MenuFlyoutSeparator());
         }
 
-        public void OpenFolder(string path)
-        {
-            if (Directory.Exists(path))
-                Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
-        }
+        return menuFlyout;
+    }
 
-        private void OpenEngine(string path)
-        {
-            ProjectPath = path;
+    public void OpenFolder(string path)
+    {
+        if (Directory.Exists(path))
+            Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
+    }
 
-            NavigationViewItem menuItem = new();
-            menuItem.Tag = "engine";
-            menuItem.Name = Path.GetFileName(path);
-            menuItem.Content = Path.GetFileName(path);
-            menuItem.Icon = new FontIcon() { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\xE74C" };
+    private void OpenEngine(string path)
+    {
+        ProjectPath = path;
 
-            _navigationView.MenuItems.Add(menuItem);
+        NavigationViewItem menuItem = new();
+        menuItem.Tag = "engine";
+        menuItem.Name = Path.GetFileName(path);
+        menuItem.Content = Path.GetFileName(path);
+        menuItem.Icon = new FontIcon() { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\xE74C" };
 
-            //_navigationView.SelectedItem = menuItem;
-        }
+        _navigationView.MenuItems.Add(menuItem);
 
-        private Grid CreateIcon(string glyph)
-        {
-            Grid grid = new();
+        //_navigationView.SelectedItem = menuItem;
+    }
 
-            FontIcon icon = new FontIcon() { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = glyph };
+    private Grid CreateIcon(string glyph)
+    {
+        Grid grid = new();
 
-            grid.Children.Add(icon);
+        FontIcon icon = new FontIcon() { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = glyph };
 
-            return grid;
-        }
+        grid.Children.Add(icon);
 
-        private Grid CreateIcon(Symbol symbol)
-        {
-            Grid grid = new();
+        return grid;
+    }
 
-            SymbolIcon symbolIcon = new() { Symbol = symbol };
+    private Grid CreateIcon(Symbol symbol)
+    {
+        Grid grid = new();
 
-            grid.Children.Add(symbolIcon);
+        SymbolIcon symbolIcon = new() { Symbol = symbol };
 
-            return grid;
-        }
+        grid.Children.Add(symbolIcon);
 
-        public void DeleteDirectory(string path)
-        {
-            string[] files = Directory.GetFiles(path);
-            string[] dirs = Directory.GetDirectories(path);
+        return grid;
+    }
 
-            foreach (string file in files)
-                File.Delete(file);
+    public void DeleteDirectory(string path)
+    {
+        string[] files = Directory.GetFiles(path);
+        string[] dirs = Directory.GetDirectories(path);
 
-            foreach (string dir in dirs)
-                DeleteDirectory(dir);
+        foreach (string file in files)
+            File.Delete(file);
 
-            Directory.Delete(path, false);
+        foreach (string dir in dirs)
+            DeleteDirectory(dir);
 
-            foreach (var menuItem in _navigationView.MenuItems)
-                if (menuItem.GetType().Equals(typeof(NavigationViewItem)))
-                    if (((NavigationViewItem)menuItem).Name == Path.GetFileName(path))
-                    {
-                        _navigationView.MenuItems.Remove(menuItem);
+        Directory.Delete(path, false);
 
-                        break;
-                    }
-        }
+        foreach (var menuItem in _navigationView.MenuItems)
+            if (menuItem.GetType().Equals(typeof(NavigationViewItem)))
+                if (((NavigationViewItem)menuItem).Name == Path.GetFileName(path))
+                {
+                    _navigationView.MenuItems.Remove(menuItem);
 
-        private string IncrementFolderIfExists(string path)
-        {
-            var fileCount = 0;
+                    break;
+                }
+    }
 
-            while (Directory.Exists(
-                Path.Combine(
-                    RootPath,
-                    Path.GetFileName(path) +
-                        (fileCount > 0
-                        ? " (" + (fileCount + 1).ToString() + ")"
-                        : ""))))
-                fileCount++;
+    private string IncrementFolderIfExists(string path)
+    {
+        var fileCount = 0;
 
-            return Path.Combine(
+        while (Directory.Exists(
+            Path.Combine(
                 RootPath,
                 Path.GetFileName(path) +
                     (fileCount > 0
                     ? " (" + (fileCount + 1).ToString() + ")"
-                    : ""));
-        }
+                    : ""))))
+            fileCount++;
 
-        private void CopyToClipboard(string path, DataPackageOperation requestedOpertion)
-        {
-            DataPackage data = new();
-            data.SetText(path);
-            data.RequestedOperation = requestedOpertion;
+        return Path.Combine(
+            RootPath,
+            Path.GetFileName(path) +
+                (fileCount > 0
+                ? " (" + (fileCount + 1).ToString() + ")"
+                : ""));
+    }
 
-            Clipboard.SetContent(data);
-        }
+    private void CopyToClipboard(string path, DataPackageOperation requestedOpertion)
+    {
+        DataPackage data = new();
+        data.SetText(path);
+        data.RequestedOperation = requestedOpertion;
+
+        Clipboard.SetContent(data);
     }
 }

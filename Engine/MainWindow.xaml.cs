@@ -6,53 +6,52 @@ using WinUIEx;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Editor
+namespace Editor;
+
+public sealed partial class MainWindow : WindowEx
 {
-    public sealed partial class MainWindow : WindowEx
+    internal Controller.Theme _themeControl;
+
+    public ModelView.Main Main { get => _main != null ? _main : _main = new(this); }
+    private ModelView.Main _main;
+
+    public MainWindow()
     {
-        internal Controller.Theme _themeControl;
+        this.InitializeComponent();
 
-        public ModelView.Main Main { get => _main != null ? _main : _main = new(this); }
-        private ModelView.Main _main;
+        ExtendsContentIntoTitleBar = true; // enable custom titlebar
 
-        public MainWindow()
+        _themeControl = new(this, x_Page_Main);
+    }
+
+    private void AppBarButton_Help_Click(object sender, RoutedEventArgs e) =>
+        _ = Launcher.LaunchUriAsync(new System.Uri(@"https://3DEngine.wiki/"));
+
+    private void x_NavigationView_Main_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+    {
+        if (args.IsSettingsSelected == true)
         {
-            this.InitializeComponent();
-
-            ExtendsContentIntoTitleBar = true; // enable custom titlebar
-
-            _themeControl = new(this, x_Page_Main);
+            x_Frame_Content.Content = new ModelView.Settings();
+            x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
         }
 
-        private void AppBarButton_Help_Click(object sender, RoutedEventArgs e) => 
-            _ = Launcher.LaunchUriAsync(new System.Uri(@"https://3DEngine.wiki/"));
-
-        private void x_NavigationView_Main_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
-        {
-            if (args.IsSettingsSelected == true)
+        if (args.SelectedItemContainer != null)
+            switch (args.SelectedItemContainer.Tag)
             {
-                x_Frame_Content.Content = new ModelView.Settings();
-                x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
+                case "home":
+                    x_Frame_Content.Content = new ModelView.Home(this, x_NavigationView_Main);
+                    x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
+                    break;
+                case "documentation":
+                    x_Frame_Content.Content = new ModelView.Documentation();
+                    x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftCompact;
+                    break;
+                case "engine":
+                    x_Frame_Content.Content = Main;
+                    x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftCompact;
+                    break;
+                default:
+                    break;
             }
-
-            if (args.SelectedItemContainer != null)
-                switch (args.SelectedItemContainer.Tag)
-                {
-                    case "home":
-                        x_Frame_Content.Content = new ModelView.Home(this, x_NavigationView_Main);
-                        x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
-                        break;
-                    case "documentation":
-                        x_Frame_Content.Content = new ModelView.Documentation();
-                        x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftCompact;
-                        break;
-                    case "engine":
-                        x_Frame_Content.Content = Main;
-                        x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftCompact;
-                        break;
-                    default:
-                        break;
-                }
-        }
     }
 }

@@ -5,79 +5,78 @@ using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.ViewManagement;
 
-namespace Editor.Controller
+namespace Editor.Controller;
+
+internal class TabViewItemDataTemplate
 {
-    internal class TabViewItemDataTemplate
+    public string Header;
+    public object Content;
+    public Symbol Symbol;
+}
+
+internal class TabViewPage
+{
+    public TabView TabView;
+
+    public TabViewPage(params TabViewItemDataTemplate[] tabViewDataTemplate)
     {
-        public string Header;
-        public object Content;
-        public Symbol Symbol;
+        // Initialize the TabView control.
+        TabView = new TabView
+        {
+            TabWidthMode = TabViewWidthMode.SizeToContent,
+            CloseButtonOverlayMode = TabViewCloseButtonOverlayMode.Auto,
+            IsAddTabButtonVisible = true,
+            Padding = new Thickness(8, 8, 8, 0)
+        };
+        // Subscribe to the add tab button click event.
+        TabView.AddTabButtonClick += TabView_AddButtonClick;
+
+        // Iterate through the data templates and create new tabs for each.
+        foreach (var dataTemplate in tabViewDataTemplate)
+            TabView.TabItems.Add(CreateNewTab(dataTemplate));
     }
 
-    internal class TabViewPage
+    public async void TabViewWindowingButton_Click(object sender, RoutedEventArgs e)
     {
-        public TabView TabView;
+        // Create a new CoreApplicationView
+        CoreApplicationView newView = CoreApplication.CreateNewView();
+        int newViewId = 0;
 
-        public TabViewPage(params TabViewItemDataTemplate[] tabViewDataTemplate)
+        // Set the current window's content to a new Page and activate it.
+        await newView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
         {
-            // Initialize the TabView control.
-            TabView = new TabView
-            {
-                TabWidthMode = TabViewWidthMode.SizeToContent,
-                CloseButtonOverlayMode = TabViewCloseButtonOverlayMode.Auto,
-                IsAddTabButtonVisible = true,
-                Padding = new Thickness(8, 8, 8, 0)
-            };
-            // Subscribe to the add tab button click event.
-            TabView.AddTabButtonClick += TabView_AddButtonClick;
+            Window.Current.Content = new Page();
+            Window.Current.Activate();
 
-            // Iterate through the data templates and create new tabs for each.
-            foreach (var dataTemplate in tabViewDataTemplate)
-                TabView.TabItems.Add(CreateNewTab(dataTemplate));
-        }
+            // Get the Id of the newly created view.
+            newViewId = ApplicationView.GetForCurrentView().Id;
+        });
 
-        public async void TabViewWindowingButton_Click(object sender, RoutedEventArgs e)
+        // Try to show the new view as a standalone window.
+        bool viewShown = await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
+    }
+
+    private void TabView_AddButtonClick(TabView sender, object args)
+    {
+        // Create a new TabViewItemDataTemplate with the header "New Tab", content set to a new Page, and symbol set to Symbol.View.
+        TabViewItemDataTemplate item = new() { Header = "New Tab", Content = new Page(), Symbol = Symbol.View };
+
+        // Add a new tab to the TabView with the TabViewItemDataTemplate item.
+        TabView.TabItems.Add(CreateNewTab(item));
+    }
+
+    private TabViewItem CreateNewTab(TabViewItemDataTemplate i)
+    {
+        // Create a new TabViewItem and set its properties.
+        TabViewItem newItem = new()
         {
-            // Create a new CoreApplicationView
-            CoreApplicationView newView = CoreApplication.CreateNewView();
-            int newViewId = 0;
+            Header = i.Header + "⠀⠀⠀⠀⠀⠀⠀⠀", // Add spaces to the header text.
+            Content = i.Content,
+            IconSource = new SymbolIconSource() { Symbol = i.Symbol },
+            IsClosable = false // Disable the close button for this tab.
+        };
 
-            // Set the current window's content to a new Page and activate it.
-            await newView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                Window.Current.Content = new Page();
-                Window.Current.Activate();
-
-                // Get the Id of the newly created view.
-                newViewId = ApplicationView.GetForCurrentView().Id;
-            });
-
-            // Try to show the new view as a standalone window.
-            bool viewShown = await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
-        }
-
-        private void TabView_AddButtonClick(TabView sender, object args)
-        {
-            // Create a new TabViewItemDataTemplate with the header "New Tab", content set to a new Page, and symbol set to Symbol.View.
-            TabViewItemDataTemplate item = new() { Header = "New Tab", Content = new Page(), Symbol = Symbol.View };
-
-            // Add a new tab to the TabView with the TabViewItemDataTemplate item.
-            TabView.TabItems.Add(CreateNewTab(item));
-        }
-
-        private TabViewItem CreateNewTab(TabViewItemDataTemplate i)
-        {
-            // Create a new TabViewItem and set its properties.
-            TabViewItem newItem = new()
-            {
-                Header = i.Header + "⠀⠀⠀⠀⠀⠀⠀⠀", // Add spaces to the header text.
-                Content = i.Content, 
-                IconSource = new SymbolIconSource() { Symbol = i.Symbol }, 
-                IsClosable = false // Disable the close button for this tab.
-            };
-
-            // Return the new TabViewItem.
-            return newItem;
-        }
+        // Return the new TabViewItem.
+        return newItem;
     }
 }

@@ -3,13 +3,12 @@ using Microsoft.UI.Xaml.Controls;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Editor.ModelView
+namespace Editor.ModelView;
+
+public sealed partial class Documentation : Frame
 {
-    public sealed partial class Documentation : Frame
+    public Documentation()
     {
-        public Documentation()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
     }
 }
