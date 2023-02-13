@@ -30,7 +30,7 @@ internal struct Category
 
 internal partial class Files
 {
-    public string AssetsPath { get; private set; }
+    public static string AssetsPath { get; private set; }
 
     public Grid Content;
     public BreadcrumbBar Bar;

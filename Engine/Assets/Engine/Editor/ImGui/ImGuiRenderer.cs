@@ -55,6 +55,17 @@ unsafe internal class ImGuiRenderer
         CreateDeviceObjects();
     }
 
+    public void Update(IntPtr imGuiContext)
+    {
+        ImGui.SetCurrentContext(imGuiContext);
+        var io = ImGui.GetIO();
+
+        io.DeltaTime = (float)Time.Delta;
+
+        ImGui.NewFrame();
+        ImGui.Render();
+    }
+
     public void Render(ImDrawDataPtr data)
     {
         // Avoid rendering when minimized

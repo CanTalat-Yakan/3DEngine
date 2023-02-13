@@ -2,7 +2,7 @@
 
 namespace Engine.Editor;
 
-internal class ToolTipAttribute : Attribute
+public class ToolTipAttribute : Attribute
 {
     public string ToolTip;
 
@@ -12,7 +12,7 @@ internal class ToolTipAttribute : Attribute
     }
 }
 
-internal class HeaderAttribute : Attribute
+public class HeaderAttribute : Attribute
 {
     public string CustomHeader;
 
@@ -22,7 +22,7 @@ internal class HeaderAttribute : Attribute
     }
 }
 
-internal class SliderAttribute : Attribute
+public class SliderAttribute : Attribute
 {
     public double CustomMin;
     public double CustomMax;
@@ -34,6 +34,6 @@ internal class SliderAttribute : Attribute
     }
 }
 
-internal class SpacerAttribute : Attribute { }
-internal class ShowAttribute : Attribute { }
-internal class HideAttribute : Attribute { }
+public class SpacerAttribute : Attribute { }
+public class ShowAttribute : Attribute { }
+public class HideAttribute : Attribute { }

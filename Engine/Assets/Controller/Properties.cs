@@ -106,7 +106,7 @@ internal partial class Properties
                 "Add Component",
                 (s, e) =>
                 {
-                    entity.AddComponent(Engine.Core.Instance.ComponentCollector.GetComponent(e.SelectedItem.ToString()));
+                    entity.AddComponent(Engine.Core.Instance.RuntimeCompiler.ComponentCollector.GetComponent(e.SelectedItem.ToString()));
 
                     Properties.Clear();
                     Properties.Set(new ModelView.Properties(entity));
@@ -244,7 +244,7 @@ internal partial class Properties : Controller.Helper
             // only listen to changes caused by user entering text.
             if (e.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
-                string[] itemSource = Engine.Core.Instance.ComponentCollector.Components.ConvertAll<string>(Type => Type.Name).ToArray();
+                string[] itemSource = Engine.Core.Instance.RuntimeCompiler.ComponentCollector.Components.ConvertAll<string>(Type => Type.Name).ToArray();
                 List<string> suitableItems = new();
 
                 foreach (var component in itemSource)

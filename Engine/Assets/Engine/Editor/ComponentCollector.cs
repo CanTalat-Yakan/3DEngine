@@ -7,12 +7,6 @@ internal class ComponentCollector
 {
     public List<Type> Components = new();
 
-    public void AddComponent(Type component) =>
-        Components.Add(component);
-
-    public void AddComponents(params Type[] components) =>
-        Components.AddRange(components);
-
     public Type GetComponent(string name) =>
         Components.Find(Type => Type.Name.ToString() == name);
 }

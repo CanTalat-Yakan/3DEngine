@@ -30,6 +30,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="Assets\Engine\Resources\Templates\Project.zip" />
+    <Content Remove="Assets\Engine\Utilities\RuntimeCompiler.cs" />
   </ItemGroup>
 	
   <ItemGroup>
@@ -39,6 +40,7 @@
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
     <PackageReference Include="ImGui.NET" Version="1.89.3" />
     <PackageReference Include="Microsoft.CodeAnalysis" Version="4.4.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.4.0" />
     <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.0.4" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230118.102" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />

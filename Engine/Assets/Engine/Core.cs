@@ -1,7 +1,6 @@
 ﻿using ImGuiNET;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using System.Linq;
 using System;
 using Editor.Controller;
 using Engine.ECS;
@@ -16,13 +15,11 @@ internal class Core
 
     public SceneManager SceneManager;
     public Renderer Renderer;
-
-    public ComponentCollector ComponentCollector;
+    public RuntimeCompiler RuntimeCompiler;
 
     public ImGuiRenderer ImGuiRenderer;
     private IntPtr _imGuiContext;
 
-    private EPlayMode _playmode = EPlayMode.None;
     private TextBlock _profile;
 
     public Core(SwapChainPanel swapChainPanel, TextBlock profile)
@@ -34,10 +31,10 @@ internal class Core
         // Assign local variable.
         _profile = profile;
 
-        // Initializes the renderer, scene manager, and the ComponentCollector.
+        // Initializes the renderer, scene manager, and the runtimeCompiler.
         Renderer = new(swapChainPanel);
         SceneManager = new();
-        ComponentCollector = new();
+        RuntimeCompiler = new();
 
         // Creates an entity with the "Boot" Editortag and adds a "SceneBoot" component to it.
         SceneManager.Scene.EntitytManager
@@ -45,7 +42,7 @@ internal class Core
             .AddComponent(new SceneBoot());
 
         // Gather Components for the Editor's AddComponent function.
-        CollectComponents();
+        RuntimeCompiler.CompileProjectScripts();
 
         #region // ImGui
         // Creates a new ImGui context and sets it as the current context.
@@ -86,8 +83,11 @@ internal class Core
         Input.Update();
 
         // Invokes Awake and Start if playmode has started.
-        if (CheckPlaymodeStarted())
+        if (Main.Instance.PlayerControl.CheckPlaymodeStarted())
         {
+            // Gather Components for the Editor's AddComponent function.
+            RuntimeCompiler.CompileProjectScripts();
+
             // Call Awake method for all scenens again.
             SceneManager.Awake();
             // Call Start method for all scenens again.
@@ -109,7 +109,7 @@ internal class Core
         SceneManager.Render();
 
         // Updates and renders the ImGui user interface.
-        UpdateImGui();
+        ImGuiRenderer.Update(_imGuiContext);
         ImGuiRenderer.Render(ImGui.GetDrawData());
 
         // Presents the final rendered image on the screen.
@@ -121,41 +121,5 @@ internal class Core
 
         // Updates the text of the profile with the profiling information.
         _profile.Text = Profiler.GetString();
-    }
-
-    public void CollectComponents()
-    {
-        // Collect all components in the Assembly
-        // and ignore all components that have the IHide interface.
-        var componentCollection = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(s => s.GetTypes())
-            .Where(p =>
-                (typeof(Component).IsAssignableFrom(p) && !p.Equals(typeof(Component)))
-                && !(typeof(IHide).IsAssignableFrom(p) && !p.IsInterface))
-            .ToArray();
-
-        // Add components to the collector.
-        ComponentCollector.AddComponents(componentCollection.ToArray());
-    }
-
-    public virtual void UpdateImGui()
-    {
-        ImGui.SetCurrentContext(_imGuiContext);
-        var io = ImGui.GetIO();
-
-        io.DeltaTime = (float)Time.Delta;
-
-        ImGui.NewFrame();
-        ImGui.Render();
-    }
-
-    private bool CheckPlaymodeStarted()
-    {
-        if (Main.Instance.PlayerControl.PlayMode == EPlayMode.Playing)
-            if (_playmode != Main.Instance.PlayerControl.PlayMode)
-                return true;
-
-        _playmode = Main.Instance.PlayerControl.PlayMode;
-        return false;
     }
 }

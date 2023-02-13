@@ -21,6 +21,8 @@ internal class Player
     private TextBlock _status;
     private Output _output;
 
+    private EPlayMode _playmode = EPlayMode.None;
+
     public Player(AppBarToggleButton play, AppBarToggleButton pause, AppBarButton forward)
     {
         _play = play;
@@ -48,7 +50,7 @@ internal class Player
         SetStatusAppBarButtons(_play.IsChecked.Value);
 
         // Log the current status of the game.
-        Output.Log(_play.IsChecked.Value ? "Now Playing..." : "Stopped Gamemode");
+        Output.Log(_play.IsChecked.Value ? "Now Playing..." : "Stopped Playmode");
     }
 
     public void Pause()
@@ -62,7 +64,7 @@ internal class Player
         Main.Instance.LayoutControl.ViewPort._viewPortControl.Content.BorderBrush = new SolidColorBrush(_pause.IsChecked.Value ? Colors.Orange : Colors.GreenYellow);
 
         // Log the current status of the game.
-        Output.Log(_pause.IsChecked.Value ? "Paused Gamemode" : "Continued Gamemode");
+        Output.Log(_pause.IsChecked.Value ? "Paused Playmode" : "Continued Playmode");
     }
 
     public void Forward()
@@ -105,5 +107,18 @@ internal class Player
         // Update the label and icon of the play button based on the play mode.
         _play.Label = b ? "Stop" : "Play";
         _play.Icon = b ? new SymbolIcon(Symbol.Stop) : new SymbolIcon(Symbol.Play);
+    }
+
+    public bool CheckPlaymodeStarted()
+    {
+        bool b = false;
+
+        if (Main.Instance.PlayerControl.PlayMode == EPlayMode.Playing)
+            if (_playmode != Main.Instance.PlayerControl.PlayMode)
+                b = true;
+
+        _playmode = Main.Instance.PlayerControl.PlayMode;
+
+        return b;
     }
 }

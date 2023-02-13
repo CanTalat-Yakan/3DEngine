@@ -600,7 +600,7 @@ internal static class ExtensionMethods
         string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1));
 
     public static string FormatString(this string text) =>
-        text.SplitLast('_').SplitLast('.').FirstCharToUpper().AddSpacesToSentence();
+        text.SplitLast('_').SplitLast('.').SplitLast('+').FirstCharToUpper().AddSpacesToSentence();
 
     public static string IncrementNameIfExists(this string name, string[] list)
     {

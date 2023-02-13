@@ -232,12 +232,14 @@ public class Output
         // Content of the message.
         StackPanel stack = new() { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Top, Spacing = 10, Margin = new(10, 0, 0, 0), Padding = new(5) };
         Viewbox viewbox = new() { Width = 14, Height = 14 };
+
         if (m.Type == EMessageType.Warning)
             viewbox.Child = new FontIcon() { Glyph = "\uE7BA" };
         else if (m.Type == EMessageType.Message)
             viewbox.Child = new SymbolIcon() { Symbol = Symbol.Message };
         else if (m.Type == EMessageType.Error)
             viewbox.Child = new SymbolIcon() { Symbol = Symbol.ReportHacked };
+
         stack.Children.Add(viewbox);
         stack.Children.Add(new TextBlock() { Text = "[" + d.TimeOfDay.ToString("hh\\:mm\\:ss").ToString() + "]" });
         stack.Children.Add(new TextBlock() { Text = m.Message });
@@ -246,8 +248,14 @@ public class Output
         StackPanel stackFlyout = new() { Orientation = Orientation.Vertical };
         stackFlyout.Children.Add(new TextBlock() { Text = m.GetInfo() + "\n" });
         stackFlyout.Children.Add(new MarkdownTextBlock() { Text = m.Message, TextWrapping = TextWrapping.WrapWholeWords, Width = 400, Padding = new Thickness(2) });
-        HyperlinkButton hyperlinkButton = new() { Content = Path.GetRelativePath(Directory.GetCurrentDirectory(), m.Script) + ":" + m.Line, Foreground = new SolidColorBrush(Colors.CadetBlue) };
-        hyperlinkButton.Click += (s, e) => Process.Start(new ProcessStartInfo { FileName = Path.GetRelativePath(Directory.GetCurrentDirectory(), m.Script), UseShellExecute = true });
+
+        string filePath = "";
+        if (!string.IsNullOrEmpty(m.Script))
+            filePath = Path.GetRelativePath(Directory.GetCurrentDirectory(), m.Script);
+        HyperlinkButton hyperlinkButton = new() { Content = filePath + ":" + m.Line, Foreground = new SolidColorBrush(Colors.CadetBlue) };
+        if (File.Exists(filePath))
+            hyperlinkButton.Click += (s, e) => Process.Start(new ProcessStartInfo { FileName = filePath, UseShellExecute = true });
+
         stackFlyout.Children.Add(hyperlinkButton);
         Flyout flyout = new Flyout() { OverlayInputPassThroughElement = stack, Content = stackFlyout };
 
