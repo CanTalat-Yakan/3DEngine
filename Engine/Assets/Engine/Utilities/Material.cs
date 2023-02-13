@@ -121,7 +121,6 @@ public class Material
             Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref constantBuffer);
             // Unmap the constant buffer from memory.
             _d3d.DeviceContext.Unmap(_model, 0);
-
         }
         #endregion
 
