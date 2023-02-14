@@ -36,12 +36,12 @@ internal class Core
         SceneManager = new();
         RuntimeCompiler = new();
 
-        // Creates an entity with the "Boot" Editortag and adds a "SceneBoot" component to it.
+        // Creates an entity with the "Boot" editortag and adds a "SceneBoot" component to it.
         SceneManager.Scene.EntitytManager
             .CreateEntity(null, "Boot", EEditorTags.SceneBoot.ToString())
             .AddComponent(new SceneBoot());
 
-        // Gather Components for the Editor's AddComponent function.
+        // Compile all projec scripts and add components for the editor's "AddComponent" function.
         RuntimeCompiler.CompileProjectScripts();
 
         #region // ImGui

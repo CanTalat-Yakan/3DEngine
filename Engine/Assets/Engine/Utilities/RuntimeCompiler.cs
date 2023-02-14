@@ -86,7 +86,7 @@ namespace Engine.Utilities
                 }
             }
 
-            // Remove all compiled projectscript.
+            // Remove all compiled project script.
             foreach (var fullName in scriptsCollection.Keys.ToArray())
                 if (!validateScripts.Contains(fullName))
                 {
@@ -96,13 +96,14 @@ namespace Engine.Utilities
                     Output.Log("Removed file");
                 }
 
+            // Gather components for the editor's "AddComponent" function.
             CollectComponents();
         }
 
         public void CollectComponents()
         {
             // Collect all components in the Assembly
-            // and ignore all components that have the IHide interface.
+            // and ignore all components that have the "IHide" interface.
             var componentCollection = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
                 .Where(p =>
