@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
 using Microsoft.UI;
@@ -41,6 +42,8 @@ internal class Helper
     {
         Grid grid = new() { HorizontalAlignment = HorizontalAlignment.Stretch };
         StackPanel stack = new() { Orientation = Orientation.Vertical, FlowDirection = FlowDirection.LeftToRight };
+
+        stack.AddStackTransition();
 
         foreach (var item in content)
             stack.Children.Add(item);
@@ -391,6 +394,14 @@ internal static class ExtensionMethods
         toolTip.Content = tip;
 
         return AddToolTip(content, toolTip);
+    }
+
+    public static StackPanel AddStackTransition(this StackPanel stack)
+    {
+        var transition = new TransitionCollection { new EntranceThemeTransition() { IsStaggeringEnabled = true } };
+        stack.ChildrenTransitions = transition;
+
+        return stack;
     }
 
     public static Grid WrapInGrid(this UIElement content, ToolTip toolTip = null)
