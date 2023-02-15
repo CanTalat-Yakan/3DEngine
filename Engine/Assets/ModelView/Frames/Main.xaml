@@ -30,7 +30,7 @@
                 <CommandBar.SecondaryCommands>
                     <AppBarToggleButton x:Name="x_AppBarToggleButton_Status_OpenPane" Label="Open Pane" IsChecked="True">
                         <AppBarToggleButton.KeyboardAccelerators>
-                            <KeyboardAccelerator Key="Space" Modifiers="Control" />
+                            <KeyboardAccelerator Key="Tab" Modifiers="Control" />
                         </AppBarToggleButton.KeyboardAccelerators>
                     </AppBarToggleButton>
 

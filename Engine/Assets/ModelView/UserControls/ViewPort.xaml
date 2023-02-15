@@ -10,7 +10,7 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <muxc:SwapChainPanel x:Name="x_SwapChainPanel_ViewPort"/>
+        <muxc:SwapChainPanel x:Name="x_SwapChainPanel_ViewPort" MinWidth="1" MinHeight="1"/>
 
         <Grid x:Name="x_Grid_Overlay"/>
 

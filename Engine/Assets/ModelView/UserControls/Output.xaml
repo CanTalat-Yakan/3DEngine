@@ -27,7 +27,7 @@
                 <AppBarToggleButton x:Name="x_AppBarToggleButton_Filter_Messages" IsChecked="True" Label="Messages" Icon="Message"
                                     Click="AppBarToggleButton_Filter_Click"/>
                 
-                <AppBarToggleButton x:Name="x_AppBarToggleButton_Filter_Warnings" IsChecked="True" Label="Warnings"
+                <AppBarToggleButton x:Name="x_AppBarToggleButton_Filter_Warnings" IsChecked="False" Label="Warnings"
                                     Click="AppBarToggleButton_Filter_Click">
                     <AppBarToggleButton.Icon>
                         <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE7BA;" />

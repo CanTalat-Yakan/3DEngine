@@ -1,19 +1,17 @@
-﻿using System.Drawing;
-using System.Numerics;
-using System.Linq;
+﻿using System.Linq;
 using System;
 using Editor.Controller;
 using Engine.Components;
 using Engine.ECS;
 using Engine.Utilities;
-using Texture = Vortice.Direct3D11.Texture2DArrayShaderResourceView;
+using System.Drawing;
 
 namespace Engine.Editor;
 
 internal class SceneBoot : EditorComponent
 {
     public Camera SceneCamera;
-    public CameraController CameraController;
+    public Color Color;
 
     public Entity Cubes;
 
@@ -29,7 +27,7 @@ internal class SceneBoot : EditorComponent
         SceneCamera.CameraOrder = byte.MaxValue;
 
         // Add the DeactivateSceneCameraOnPlay and CameraController components to the camera entity.
-        SceneCamera.Entity.AddComponent<DeactivateOnPlay>();
+        SceneCamera.Entity.AddComponent<DeactivateCameraOnPlay>();
         SceneCamera.Entity.AddComponent<CameraController>();
 
         // Set the initial position and rotation of the camera entity.
@@ -42,15 +40,8 @@ internal class SceneBoot : EditorComponent
 
     public override void OnStart()
     {
-        // Create a player entity with the name "Player" and the tag ETags.Player.
-        var player = SceneManager.Scene.EntitytManager.CreateEntity(null, "Player", ETags.Player.ToString());
-        player.Transform.LocalPosition.Z -= 2;
-        // Add PlayerMovement and Example component to the player entity.
-        player.AddComponent<PlayerMovement>();
-        player.AddComponent<Example>();
-
         // Create a camera entity with the name "Camera" and the tag ETags.MainCamera.
-        SceneManager.Scene.EntitytManager.CreateCamera("Camera", ETags.MainCamera.ToString(), player);
+        SceneManager.Scene.EntitytManager.CreateCamera("Camera", ETags.MainCamera.ToString());
 
         // Create a parent entity for all cube entities with the name "Cubes".
         Cubes = SceneManager.Scene.EntitytManager.CreateEntity(null, "Cubes");
@@ -91,7 +82,7 @@ internal class SceneBoot : EditorComponent
     }
 }
 
-internal class DeactivateOnPlay : Component, IHide
+internal class DeactivateCameraOnPlay : Component, IHide
 {
     public Camera SceneCamera;
 
@@ -110,87 +101,4 @@ internal class DeactivateOnPlay : Component, IHide
             // Deactivate the SceneCamera after OnUpdate is called from the ScriptSystem.
             SceneCamera.IsEnabled = false;
     }
-}
-
-internal class PlayerMovement : Component
-{
-    public float MovementSpeed = 2;
-    public float RotationSpeed = 5;
-
-    private Vector3 _targetDirection;
-    private Vector2 _cameraRotataion;
-
-    public override void OnRegister() =>
-        // Register the component with the ScriptSystem.
-        ScriptSystem.Register(this);
-
-    public override void OnUpdate()
-    {
-        // Compute the target direction and the camera rotation.
-        Movement();
-        Rotation();
-
-        // Check if the target direction is not NaN.
-        if (!_targetDirection.IsNaN())
-            // Add the target direction to the entity's position.
-            Entity.Transform.LocalPosition += _targetDirection;
-        // Add the horizontal camera rotation to the entity's rotation.
-        Entity.Transform.EulerAngles = Vector3.UnitY * _cameraRotataion.Y;
-
-        // Limit the camera's vertical rotation between -89 and 89 degrees.
-        _cameraRotataion.X = Math.Clamp(_cameraRotataion.X, -89, 89);
-        // Add the vertical camera rotation to the main camera.
-        Camera.Main.Entity.Transform.EulerAngles = Vector3.UnitX * _cameraRotataion.X;
-    }
-
-    internal void Movement()
-    {
-        // Calculate the destination position based on the input axis values.
-        Vector3 destination =
-            Input.GetAxis().X * Entity.Transform.Right +
-            Input.GetAxis().Y * Entity.Transform.Forward;
-
-        // Return the normalized movement direction with a magnitude of MovementSpeed multiplied by the delta time.
-        _targetDirection = Vector3.Normalize(destination) * MovementSpeed * (float)Time.Delta;
-    }
-
-    internal void Rotation()
-    {
-        if (!Input.GetButton(EMouseButton.IsRightButtonPressed))
-            return;
-
-        // Create a new rotation based on the mouse X and Y axis inputs.
-        Vector2 rotation = new(
-            Input.GetMouseAxis().Y,
-            Input.GetMouseAxis().X);
-
-        // Update the entity's rotation based on the calculated rotation and rotation speed.
-        _cameraRotataion -= rotation * (float)Time.Delta * RotationSpeed;
-    }
-}
-
-internal class Example : Component
-{
-    [ToolTip("This is a ToolTip")]
-    [Show]
-    private string _visibleString = "This field is private";
-    [Hide]
-    public string HiddenString = "This field is public";
-    public Color Color;
-    public string String = "";
-    public int Int;
-    public float Float;
-    public Vector2 Vector2;
-    public Vector3 Vector3;
-    [Slider(1, 100)]
-    public float Slider;
-    public bool Bool;
-    public Texture Texture;
-    public Entity _Entity;
-    [Spacer]
-    [Header("Header")]
-    public event EventHandler Event;
-
-    public override void OnRegister() =>
-        ScriptSystem.Register(this);
 }

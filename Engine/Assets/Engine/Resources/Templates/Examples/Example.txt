@@ -1,0 +1,32 @@
+﻿using System.Collections;
+using System.Numerics;
+using System;
+using Editor.Controller;
+using Engine.Components;
+using Engine.ECS;
+using Engine.Editor;
+using Engine.Helper;
+using Engine.Utilities;
+
+public class Example : Component
+{
+    [ToolTip("This is a ToolTip")]
+    [Show]
+    private string _visibleString = "This field is private";
+    [Hide]
+    public string HiddenString = "This field is public";
+    public int Int;
+    public float Float;
+    public Vector2 Vector2;
+    public Vector3 Vector3;
+    [Slider(1, 100)]
+    public float Slider;
+    public bool Bool;
+    public Entity _Entity;
+    [Spacer]
+    [Header("Header")]
+    public event EventHandler Event;
+
+    public override void OnRegister() =>
+        ScriptSystem.Register(this);
+}

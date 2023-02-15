@@ -252,7 +252,7 @@ public class Output
         string filePath = "";
         if (!string.IsNullOrEmpty(m.Script))
             filePath = Path.GetRelativePath(Directory.GetCurrentDirectory(), m.Script);
-        HyperlinkButton hyperlinkButton = new() { Content = filePath + ":" + m.Line, Foreground = new SolidColorBrush(Colors.CadetBlue) };
+        HyperlinkButton hyperlinkButton = new() { Content = filePath + ":" + m.Line, Width = 400, Foreground = new SolidColorBrush(Colors.CadetBlue) };
         if (File.Exists(filePath))
             hyperlinkButton.Click += (s, e) => Process.Start(new ProcessStartInfo { FileName = filePath, UseShellExecute = true });
 

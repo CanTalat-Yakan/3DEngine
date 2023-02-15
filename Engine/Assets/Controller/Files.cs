@@ -31,6 +31,7 @@ internal struct Category
 internal partial class Files
 {
     public static string AssetsPath { get; private set; }
+    public static string TemplatesPath { get; private set; }
 
     public Grid Content;
     public BreadcrumbBar Bar;
@@ -54,12 +55,16 @@ internal partial class Files
 
         // Assign the ProjectPath value from static property in "Home".
         AssetsPath = Path.Combine(Home.ProjectPath, "Assets");
+        TemplatesPath = Path.Combine(AppContext.BaseDirectory, Home.TEMPLATES);
 
         // Call the method to initialize and populate the files categories with a DataTemplate.
         PopulateFilesCategories();
 
         // Call the refresh method to update the category and file list.
         Refresh();
+
+        //Create example scripts.
+        GenerateExampleScriptsAsync();
     }
 
     public void PopulateFilesCategories()
@@ -79,6 +84,14 @@ internal partial class Files
             new() { Name = "Shaders", Glyph = "\xE706", FileTypes = new string[] { ".hlsl" }, Creatable = true },
             new() { Name = "Documents", Symbol = Symbol.Document, FileTypes = new string[] { ".txt", ".pdf", ".doc", ".docx" }, Creatable = true },
             new() { Name = "Packages", Glyph = "\xE7B8", FileTypes = new string[] { ".zip", ".7zip", ".rar" } });
+    }
+
+    public async void GenerateExampleScriptsAsync()
+    {
+        foreach (var exampleTemplate in Directory.GetFiles(Path.Combine(TemplatesPath, "Examples")))
+            await WriteFileFromTemplatesAsync(
+                Path.Combine(AssetsPath, "Scripts", Path.GetFileNameWithoutExtension(exampleTemplate) + ".cs"),
+                exampleTemplate);
     }
 
     public async void SelectFilesAsync()
@@ -695,8 +708,11 @@ internal partial class Files
             // Increment the file name if it already exists.
             path = IncrementFileIfExists(path);
 
+            // Get the path of the template file.
+            string templatesPath = Path.Combine(TemplatesPath, _currentCategory.Value.Name + ".txt");
+
             // Write the file from the templates.
-            await WriteFileFromTemplatesAsync(path);
+            await WriteFileFromTemplatesAsync(path, templatesPath);
 
             // Check if the path was provided, if yes, call the CreateFileSystemEntryTilesAsync method.
             if (pathProvided)
@@ -885,22 +901,19 @@ internal partial class Files
         }
     }
 
-    private async Task WriteFileFromTemplatesAsync(string path)
+    private async Task WriteFileFromTemplatesAsync(string targetPath, string templatesPath = null)
     {
         // Create a file stream to write the new file.
-        using (FileStream fs = File.Create(path))
+        using (FileStream fs = File.Create(targetPath))
         {
-            // Get the path of the template file.
-            string templatePath = Path.Combine(AppContext.BaseDirectory, Home.TEMPLATES, _currentCategory.Value.Name + ".txt");
-
             // Check if the template file exists.
-            if (File.Exists(templatePath))
+            if (File.Exists(templatesPath))
             {
                 // Read the contents of the template file.
-                string text = await File.ReadAllTextAsync(templatePath);
+                string text = await File.ReadAllTextAsync(templatesPath);
 
                 // Get the name of the new file without the extension.
-                string fileName = Path.GetFileNameWithoutExtension(path);
+                string fileName = Path.GetFileName(targetPath).Split('.').First();
 
                 // Replace the placeholder {{FileName}} with the actual file name.
                 if (text.Contains("{{FileName}}"))

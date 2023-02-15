@@ -32,6 +32,9 @@
     <Content Remove="Assets\Engine\Resources\Templates\Project.zip" />
     <Content Remove="Assets\Engine\Utilities\RuntimeCompiler.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="Assets\Engine\Resources\Templates\Examples\Example.txt" />
+  </ItemGroup>
 	
   <ItemGroup>
     <PackageReference Include="Aspose.3D" Version="23.1.0" />
@@ -121,6 +124,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="Assets\Engine\Resources\Shader\Unlit.hlsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Templates\Examples\Example.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Templates\Examples\PlayerController.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="Assets\Engine\Resources\Templates\Materials.txt">
