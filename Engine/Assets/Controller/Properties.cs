@@ -58,8 +58,8 @@ internal partial class Properties
         Grid[] properties = new[]
         {
                 CreateBool(false, (s, r) => entity.IsStatic = (s as CheckBox).IsChecked.Value).WrapInField("Is Static"),
-                CreateEnum(Enum.GetNames(typeof(ETags))).WrapInField("Tag"),
-                CreateEnum(Enum.GetNames(typeof(ELayers))).WrapInField("Layer")
+                CreateEnum(Enum.GetNames(typeof(Tags))).WrapInField("Tag"),
+                CreateEnum(Enum.GetNames(typeof(Layers))).WrapInField("Layer")
             };
 
         Grid[] transform = new[]

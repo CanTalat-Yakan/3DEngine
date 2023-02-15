@@ -15,7 +15,7 @@ internal class SceneBoot : EditorComponent
     public override void OnAwake()
     {
         // Create a camera entity with the name "Camera" and tag "SceneCamera".
-        SceneCamera = SceneManager.Scene.EntitytManager.CreateCamera("Camera", EEditorTags.SceneCamera.ToString()).GetComponent<Camera>();
+        SceneCamera = SceneManager.Scene.EntitytManager.CreateCamera("Camera", EditorTags.SceneCamera.ToString()).GetComponent<Camera>();
         // Set the camera order to the maximum value.
         SceneCamera.CameraOrder = byte.MaxValue;
 
@@ -34,13 +34,13 @@ internal class SceneBoot : EditorComponent
     public override void OnStart()
     {
         // Create a camera entity with the name "Camera" and the tag ETags.MainCamera.
-        SceneManager.Scene.EntitytManager.CreateCamera("Camera", ETags.MainCamera.ToString());
+        SceneManager.Scene.EntitytManager.CreateCamera("Camera", Tags.MainCamera.ToString());
 
         // Create a parent entity for all cube entities with the name "Cubes".
         Cubes = SceneManager.Scene.EntitytManager.CreateEntity(null, "Cubes");
 
         // Create a cube primitive under the Cubes entity.
-        SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Cube, Cubes);
+        SceneManager.Scene.EntitytManager.CreatePrimitive(PrimitiveTypes.Cube, Cubes);
     }
 
     public override void OnUpdate()
@@ -53,7 +53,7 @@ internal class SceneBoot : EditorComponent
 
         // Example.
         // Check for the 'C' key press to trigger cube spawning.
-        if (Input.GetKey(Windows.System.VirtualKey.C, EInputState.Down))
+        if (Input.GetKey(Windows.System.VirtualKey.C, InputState.Down))
         {
             // Log message indicating that 10 cubes have been spawned.
             Output.Log("Spawned 10 Cubes");
@@ -62,7 +62,7 @@ internal class SceneBoot : EditorComponent
             for (int i = 0; i < 10; i++)
             {
                 // Create a new cube and add it to the Cubes entity.
-                var newCube = SceneManager.Scene.EntitytManager.CreatePrimitive(EPrimitiveTypes.Cube, Cubes);
+                var newCube = SceneManager.Scene.EntitytManager.CreatePrimitive(PrimitiveTypes.Cube, Cubes);
 
                 // Set the position of the new cube with an offset on the Y axis.
                 newCube.Transform.LocalPosition.Y -= 3;
@@ -90,7 +90,7 @@ internal class DeactivateCameraOnPlay : Component, IHide
     public override void OnUpdate()
     {
         // Check if the playmode is set to "Playing" before deactivating the SceneCamera.
-        if (Main.Instance.PlayerControl.PlayMode == EPlayMode.Playing)
+        if (Main.Instance.PlayerControl.PlayMode == PlayMode.Playing)
             // Deactivate the SceneCamera after OnUpdate is called from the ScriptSystem.
             SceneCamera.IsEnabled = false;
     }

@@ -30,7 +30,7 @@ public class Transform : Component, IHide
     public Vector3 Scale => Parent is null ? LocalScale : LocalScale * Parent.Scale;
     public Vector3 LocalScale = Vector3.One;
 
-    private SPerModelConstantBuffer _modelConstantBuffer;
+    private PerModelConstantBuffer _modelConstantBuffer;
 
     public override void OnRegister() =>
         // Register the component with the TransformSystem.
@@ -59,7 +59,7 @@ public class Transform : Component, IHide
         WorldMatrix = Matrix4x4.Transpose(scaleMatrix * rotationMatrix * translationMatrix);
     }
 
-    internal SPerModelConstantBuffer GetConstantBuffer()
+    internal PerModelConstantBuffer GetConstantBuffer()
     {
         // Set the ModelView matrix in the ModelConstantBuffer to the WorldMatrix.
         _modelConstantBuffer.ModelView = WorldMatrix;

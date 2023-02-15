@@ -11,16 +11,16 @@ using System.Runtime.CompilerServices;
 
 namespace Editor.Controller;
 
-public enum EMessageType
+public enum MessageType
 {
     Message,
     Warning,
     Error
 }
 
-internal struct SMessageInfo
+internal struct MessageInfo
 {
-    public EMessageType Type;
+    public MessageType Type;
     public string Script;
     public string Method;
     public int Line;
@@ -32,7 +32,7 @@ internal struct SMessageInfo
 
 public class Output
 {
-    private static Dictionary<SMessageInfo, List<DateTime>> s_messageCollection = new();
+    private static Dictionary<MessageInfo, List<DateTime>> s_messageCollection = new();
 
     private static TextBlock s_status;
     private static Viewbox s_statusIcon;
@@ -46,7 +46,7 @@ public class Output
 
     internal AppBarToggleButton _clearPlay;
 
-    private static Dictionary<DateTime, SMessageInfo> _dic = new();
+    private static Dictionary<DateTime, MessageInfo> _dic = new();
 
     public Output(StackPanel stack, ScrollViewer scroll, AppBarToggleButton collapse, AppBarToggleButton filterMessages, AppBarToggleButton filterWarnings, AppBarToggleButton filterErrors, AppBarToggleButton pauseError, AppBarToggleButton clearPlay)
     {
@@ -64,14 +64,14 @@ public class Output
         s_statusIcon = Main.Instance.StatusIcon;
     }
 
-    public static void Log(object o, EMessageType t = EMessageType.Message, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null) =>
+    public static void Log(object o, MessageType t = MessageType.Message, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null) =>
         // Logs a message, with a string representation of an object.
         Log(o.ToString(), t, l, c, s);
 
-    public static void Log(string m, EMessageType t = EMessageType.Message, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null)
+    public static void Log(string m, MessageType t = MessageType.Message, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null)
     {
         // Create a new instance of SMessageInfo with the given properties.
-        SMessageInfo message = new()
+        MessageInfo message = new()
         {
             Script = s,
             Method = c,
@@ -87,7 +87,7 @@ public class Output
 
         // Check if the "Pause on Error" checkbox is checked and if the message type is an error.
         if (s_pauseError.IsChecked.Value)
-            if (t == EMessageType.Error)
+            if (t == MessageType.Error)
                 // Pause the Playmode with the message type error.
                 Main.Instance.PlayerControl.Pause();
 
@@ -121,13 +121,13 @@ public class Output
         {
             switch (kv.Key.Type)
             {
-                case EMessageType.Message:
+                case MessageType.Message:
                     numMessages += kv.Value.Count;
                     break;
-                case EMessageType.Warning:
+                case MessageType.Warning:
                     numWarnings += kv.Value.Count;
                     break;
-                case EMessageType.Error:
+                case MessageType.Error:
                     numErrors += kv.Value.Count;
                     break;
                 default:
@@ -165,19 +165,19 @@ public class Output
         {
             switch (kv.Value.Type)
             {
-                case EMessageType.Message:
+                case MessageType.Message:
                     // Check if the "Message" filter is checked.
                     if (!s_filterMessages.IsChecked.Value)
                         // If it's not, continue to the next iteration.
                         continue;
                     break;
-                case EMessageType.Warning:
+                case MessageType.Warning:
                     // Check if the "Warning" filter is checked.
                     if (!s_filterWarnings.IsChecked.Value)
                         // If it's not, continue to the next iteration.
                         continue;
                     break;
-                case EMessageType.Error:
+                case MessageType.Error:
                     // Check if the "Error" filter is checked.
                     if (!s_filterErrors.IsChecked.Value)
                         // If it's not, continue to the next iteration.
@@ -214,29 +214,29 @@ public class Output
         s_filterErrors.Label = $" Errors";
     }
 
-    private static void SetStatus(SMessageInfo m)
+    private static void SetStatus(MessageInfo m)
     {
         s_status.Text = m.Message.Split("\n")[0];
 
-        if (m.Type == EMessageType.Warning)
+        if (m.Type == MessageType.Warning)
             s_statusIcon.Child = new FontIcon() { Glyph = "\uE7BA" };
-        else if (m.Type == EMessageType.Message)
+        else if (m.Type == MessageType.Message)
             s_statusIcon.Child = new SymbolIcon() { Symbol = Symbol.Message };
-        else if (m.Type == EMessageType.Error)
+        else if (m.Type == MessageType.Error)
             s_statusIcon.Child = new SymbolIcon() { Symbol = Symbol.ReportHacked };
     }
 
-    private static UIElement CreateMessage(DateTime d, SMessageInfo m, int? i)
+    private static UIElement CreateMessage(DateTime d, MessageInfo m, int? i)
     {
         // Content of the message.
         StackPanel stack = new() { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Top, Spacing = 10, Margin = new(10, 0, 0, 0), Padding = new(5) };
         Viewbox viewbox = new() { Width = 14, Height = 14 };
 
-        if (m.Type == EMessageType.Warning)
+        if (m.Type == MessageType.Warning)
             viewbox.Child = new FontIcon() { Glyph = "\uE7BA" };
-        else if (m.Type == EMessageType.Message)
+        else if (m.Type == MessageType.Message)
             viewbox.Child = new SymbolIcon() { Symbol = Symbol.Message };
-        else if (m.Type == EMessageType.Error)
+        else if (m.Type == MessageType.Error)
             viewbox.Child = new SymbolIcon() { Symbol = Symbol.ReportHacked };
 
         stack.Children.Add(viewbox);
@@ -273,11 +273,11 @@ public class Output
             HorizontalAlignment = HorizontalAlignment.Stretch,
             VerticalAlignment = VerticalAlignment.Stretch,
             Background = new SolidColorBrush(
-                m.Type == EMessageType.Message ?
+                m.Type == MessageType.Message ?
                     s_stack.Children.Count() % 2 == 0 ?
                         Colors.Transparent :
                         Windows.UI.Color.FromArgb(50, 10, 10, 10) :
-                    m.Type == EMessageType.Error ?
+                    m.Type == MessageType.Error ?
                         Windows.UI.Color.FromArgb(88, 255, 0, 0) :
                         Windows.UI.Color.FromArgb(88, 255, 255, 0))
         });

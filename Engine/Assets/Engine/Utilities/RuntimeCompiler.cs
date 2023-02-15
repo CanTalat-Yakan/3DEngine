@@ -55,7 +55,7 @@ namespace Engine.Utilities
                         string updatedCode = File.ReadAllText(path);
                         scriptEntry.Script = CSharpScript.Create(updatedCode, scriptOptions);
 
-                        Output.Log("Updated the file");
+                        Output.Log("Updated file");
                     }
                 }
                 else
@@ -83,8 +83,8 @@ namespace Engine.Utilities
                             Output.Log(
                                 string.Join("\r\n", result), 
                                 result.WarningLevel == 0 
-                                    ? EMessageType.Error
-                                    : EMessageType.Warning);
+                                    ? MessageType.Error
+                                    : MessageType.Warning);
                 }
             }
 

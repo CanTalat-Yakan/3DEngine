@@ -66,12 +66,12 @@ internal class SceneManager
 
         // If the playmode is set to None and is not running,
         // call the Awake method on the EditorScriptSystem.
-        if (Main.Instance.PlayerControl.PlayMode == EPlayMode.None)
+        if (Main.Instance.PlayerControl.PlayMode == PlayMode.None)
             EditorScriptSystem.Awake();
 
         // If the playmode is set to Playing and is not paused,
         // call the Awake method on the ScriptSystem.
-        if (Main.Instance.PlayerControl.PlayMode == EPlayMode.Playing)
+        if (Main.Instance.PlayerControl.PlayMode == PlayMode.Playing)
             ScriptSystem.Awake();
     }
 
@@ -79,12 +79,12 @@ internal class SceneManager
     {
         // If the playmode is set to None and is not running,
         // call the Start method on the EditorScriptSystem.
-        if (Main.Instance.PlayerControl.PlayMode == EPlayMode.None)
+        if (Main.Instance.PlayerControl.PlayMode == PlayMode.None)
             EditorScriptSystem.Start();
 
         // If the playmode is set to Playing and is not paused,
         // call the Start method on the ScriptSystem.
-        if (Main.Instance.PlayerControl.PlayMode == EPlayMode.Playing)
+        if (Main.Instance.PlayerControl.PlayMode == PlayMode.Playing)
             ScriptSystem.Start();
     }
 
@@ -97,12 +97,12 @@ internal class SceneManager
 
         // If the playmode is set to None and is not running,
         // call the Update method on the EditorScriptSystem.
-        if (Main.Instance.PlayerControl.PlayMode == EPlayMode.None)
+        if (Main.Instance.PlayerControl.PlayMode == PlayMode.None)
             EditorScriptSystem.Update();
 
         // If the playmode is set to Playing and is not paused,
         // call the Update method on the ScriptSystem.
-        if (Main.Instance.PlayerControl.PlayMode == EPlayMode.Playing)
+        if (Main.Instance.PlayerControl.PlayMode == PlayMode.Playing)
             ScriptSystem.Update();
     }
 
@@ -110,12 +110,12 @@ internal class SceneManager
     {
         // If the playmode is set to None and is not running,
         // call the LateUpdate method on the EditorScriptSystem.
-        if (Main.Instance.PlayerControl.PlayMode == EPlayMode.None)
+        if (Main.Instance.PlayerControl.PlayMode == PlayMode.None)
             EditorScriptSystem.LateUpdate();
 
         // If the playmode is set to Playing and is not paused,
         // call the LateUpdate method on the ScriptSystem.
-        if (Main.Instance.PlayerControl.PlayMode == EPlayMode.Playing)
+        if (Main.Instance.PlayerControl.PlayMode == PlayMode.Playing)
             ScriptSystem.LateUpdate();
     }
 

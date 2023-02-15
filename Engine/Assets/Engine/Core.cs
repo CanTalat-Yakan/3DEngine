@@ -43,7 +43,7 @@ internal class Core
 
         // Creates an entity with the "Boot" editortag and adds a "SceneBoot" component to it.
         SceneManager.Scene.EntitytManager
-            .CreateEntity(null, "Boot", EEditorTags.SceneBoot.ToString())
+            .CreateEntity(null, "Boot", EditorTags.SceneBoot.ToString())
             .AddComponent(new SceneBoot());
 
         // Compile all projec scripts and add components for the editor's "AddComponent" function.

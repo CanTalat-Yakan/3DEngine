@@ -6,14 +6,14 @@ using Windows.System;
 
 namespace Engine.Utilities;
 
-public enum EMouseButton
+public enum MouseButton
 {
     IsLeftButtonPressed,
     IsRightButtonPressed,
     IsMiddleButtonPressed
 }
 
-public enum EInputState
+public enum InputState
 {
     Down,
     Pressed,
@@ -25,8 +25,8 @@ public class Input
     private static Dictionary<VirtualKey, bool[]> _virtualKeyDic = new();
     private static List<VirtualKey> _bufferKeys = new();
 
-    private static Dictionary<EMouseButton, bool[]> _pointerPointDic = new();
-    private static List<EMouseButton> _bufferPoints = new();
+    private static Dictionary<MouseButton, bool[]> _pointerPointDic = new();
+    private static List<MouseButton> _bufferPoints = new();
 
     private static PointerPoint _pointer;
     private static int _mouseWheelDelta;
@@ -62,14 +62,14 @@ public class Input
         // Reset the input state of all keys and pointer points.
         foreach (var item in _bufferKeys)
         {
-            _virtualKeyDic[item][(int)EInputState.Down] = false;
-            _virtualKeyDic[item][(int)EInputState.Up] = false;
+            _virtualKeyDic[item][(int)InputState.Down] = false;
+            _virtualKeyDic[item][(int)InputState.Up] = false;
         }
         // Reset the input state of all pointer points.
         foreach (var item in _bufferPoints)
         {
-            _pointerPointDic[item][(int)EInputState.Down] = false;
-            _pointerPointDic[item][(int)EInputState.Up] = false;
+            _pointerPointDic[item][(int)InputState.Down] = false;
+            _pointerPointDic[item][(int)InputState.Up] = false;
         }
 
         // Clear the buffer of keys and pointer points.
@@ -80,7 +80,7 @@ public class Input
         _mouseWheelDelta = 0;
     }
 
-    public static bool GetKey(VirtualKey key, EInputState state = EInputState.Pressed)
+    public static bool GetKey(VirtualKey key, InputState state = InputState.Pressed)
     {
         // Check if the dictionary contains the key.
         if (_virtualKeyDic.ContainsKey(key))
@@ -91,7 +91,7 @@ public class Input
         return false;
     }
 
-    public static bool GetButton(EMouseButton button, EInputState state = EInputState.Pressed)
+    public static bool GetButton(MouseButton button, InputState state = InputState.Pressed)
     {
         // Check if the input button is stored in the dictionary.
         if (_pointerPointDic.ContainsKey(button))
@@ -116,10 +116,10 @@ public class Input
         var newBool = new bool[3];
 
         // Set the "Down" and "Pressed" states to true for the virtual key.
-        newBool[(int)EInputState.Down] = true;
-        newBool[(int)EInputState.Pressed] = true;
+        newBool[(int)InputState.Down] = true;
+        newBool[(int)InputState.Pressed] = true;
         // Set the "Up" state to false for the virtual key.
-        newBool[(int)EInputState.Up] = false;
+        newBool[(int)InputState.Up] = false;
 
         // Update the virtual key state in the virtual key dictionary.
         SetKeyDic(e.Key, newBool);
@@ -134,10 +134,10 @@ public class Input
         var newBool = new bool[3];
 
         // Set the "Down" and "Pressed" states to false for the virtual key.
-        newBool[(int)EInputState.Down] = false;
-        newBool[(int)EInputState.Pressed] = false;
+        newBool[(int)InputState.Down] = false;
+        newBool[(int)InputState.Pressed] = false;
         // Set the "Up" state to true for the virtual key.
-        newBool[(int)EInputState.Up] = true;
+        newBool[(int)InputState.Up] = true;
 
         // Update the virtual key state in the virtual key dictionary.
         SetKeyDic(e.Key, newBool);
@@ -158,25 +158,25 @@ public class Input
             var newBool = new bool[3];
 
             // Set the "Down" and "Pressed" states to true for the virtual mouse button.
-            newBool[(int)EInputState.Down] = true;
-            newBool[(int)EInputState.Pressed] = true;
+            newBool[(int)InputState.Down] = true;
+            newBool[(int)InputState.Pressed] = true;
             // Set the "Up" state to false for the virtual mouse button.
-            newBool[(int)EInputState.Up] = false;
+            newBool[(int)InputState.Up] = false;
 
             // Check if the left mouse button is pressed.
             if (_pointer.Properties.IsLeftButtonPressed)
                 // Update the dictionary for the left mouse button with the new state.
-                SetPointerDic(EMouseButton.IsLeftButtonPressed, newBool);
+                SetPointerDic(MouseButton.IsLeftButtonPressed, newBool);
 
             // Check if the middle mouse button is pressed.
             if (_pointer.Properties.IsMiddleButtonPressed)
                 // Update the dictionary for the middle mouse button with the new state.
-                SetPointerDic(EMouseButton.IsMiddleButtonPressed, newBool);
+                SetPointerDic(MouseButton.IsMiddleButtonPressed, newBool);
 
             // Check if the right mouse button is pressed.
             if (_pointer.Properties.IsRightButtonPressed)
                 // Update the dictionary for the right mouse button with the new state.
-                SetPointerDic(EMouseButton.IsRightButtonPressed, newBool);
+                SetPointerDic(MouseButton.IsRightButtonPressed, newBool);
         }
 
         // Mark the event as handled to prevent it from being processed further.
@@ -194,25 +194,25 @@ public class Input
             var newBool = new bool[3];
 
             // Set the "Down" and "Pressed" states to false for the virtual mouse button.
-            newBool[(int)EInputState.Down] = false;
-            newBool[(int)EInputState.Pressed] = false;
+            newBool[(int)InputState.Down] = false;
+            newBool[(int)InputState.Pressed] = false;
             // Set the "Up" state to true for the virtual mouse button.
-            newBool[(int)EInputState.Up] = true;
+            newBool[(int)InputState.Up] = true;
 
             // Check if the left mouse button is not pressed.
             if (!_pointer.Properties.IsLeftButtonPressed)
                 // Update the dictionary for the left mouse button with the new state.
-                SetPointerDic(EMouseButton.IsLeftButtonPressed, newBool);
+                SetPointerDic(MouseButton.IsLeftButtonPressed, newBool);
 
             // Check if the middle mouse button is not pressed.
             if (!_pointer.Properties.IsMiddleButtonPressed)
                 // Update the dictionary for the middle mouse button with the new state.
-                SetPointerDic(EMouseButton.IsMiddleButtonPressed, newBool);
+                SetPointerDic(MouseButton.IsMiddleButtonPressed, newBool);
 
             // Check if the right mouse button is not pressed.
             if (!_pointer.Properties.IsRightButtonPressed)
                 // Update the dictionary for the right mouse button with the new state.
-                SetPointerDic(EMouseButton.IsRightButtonPressed, newBool);
+                SetPointerDic(MouseButton.IsRightButtonPressed, newBool);
         }
 
         // Mark the event as handled to prevent it from being processed further.
@@ -266,7 +266,7 @@ public class Input
         _bufferKeys.Add(key);
     }
 
-    private static void SetPointerDic(EMouseButton input, bool[] newBool)
+    private static void SetPointerDic(MouseButton input, bool[] newBool)
     {
         // Check if the current pointer point is already in the dictionary.
         if (!_pointerPointDic.ContainsKey(input))

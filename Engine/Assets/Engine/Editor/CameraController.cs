@@ -23,12 +23,12 @@ internal class CameraController : EditorComponent
         MovementSpeedCalc();
 
         // Check if the middle mouse button is pressed. If so, call the ScreenMovement function.
-        if (Input.GetButton(EMouseButton.IsMiddleButtonPressed))
+        if (Input.GetButton(MouseButton.IsMiddleButtonPressed))
             ScreenMovement();
 
         // Check if the right mouse button is pressed.
         // If so, call the TransformMovement, CameraMovement and HeightTransformMovement functions.
-        if (Input.GetButton(EMouseButton.IsRightButtonPressed))
+        if (Input.GetButton(MouseButton.IsRightButtonPressed))
         {
             TransformMovement();
             CameraRotation();
@@ -55,8 +55,8 @@ internal class CameraController : EditorComponent
     {
         // Check if either the right or middle mouse button is pressed.
         // If so, update the movement speed based on the mouse wheel input.
-        if (Input.GetButton(EMouseButton.IsRightButtonPressed)
-            || Input.GetButton(EMouseButton.IsRightButtonPressed))
+        if (Input.GetButton(MouseButton.IsRightButtonPressed)
+            || Input.GetButton(MouseButton.IsRightButtonPressed))
             s_movementSpeed += Input.GetMouseWheel();
 
         // Clamp the movement speed between 0.1 and 10.
@@ -81,9 +81,9 @@ internal class CameraController : EditorComponent
     {
         // Check if none of the right, middle, and left mouse buttons are pressed.
         // If so, update the direction based on the mouse wheel input and the forward vector of the entity's transform.
-        if (!Input.GetButton(EMouseButton.IsRightButtonPressed)
-            && !Input.GetButton(EMouseButton.IsMiddleButtonPressed)
-            && !Input.GetButton(EMouseButton.IsRightButtonPressed))
+        if (!Input.GetButton(MouseButton.IsRightButtonPressed)
+            && !Input.GetButton(MouseButton.IsMiddleButtonPressed)
+            && !Input.GetButton(MouseButton.IsRightButtonPressed))
             _direction += 5 * Entity.Transform.Forward * Input.GetMouseWheel();
     }
 

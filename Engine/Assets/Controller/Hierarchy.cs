@@ -227,7 +227,7 @@ internal partial class Hierarchy
 
     private TreeEntry AddTreeEntry(SceneEntry sceneEntry, Entity entity)
     {
-        if (entity.CompareTag(Enum.GetNames(typeof(EEditorTags))))
+        if (entity.CompareTag(Enum.GetNames(typeof(EditorTags))))
             return null;
 
         TreeEntry treeEntry = new() { Name = entity.Name, ID = entity.ID };
@@ -382,13 +382,13 @@ internal partial class Hierarchy
         MenuFlyoutItem item;
 
         MenuFlyoutSubItem objectSubItem = new() { Text = "Mesh" };
-        foreach (var type in Enum.GetNames(typeof(EPrimitiveTypes)))
+        foreach (var type in Enum.GetNames(typeof(PrimitiveTypes)))
         {
             item = new() { Text = type.ToString().FormatString() };
             if (sceneEntry is not null)
-                item.Click += (s, e) => SceneManager.GetFromID(sceneEntry.ID).EntitytManager.CreatePrimitive((EPrimitiveTypes)Enum.Parse(typeof(EPrimitiveTypes), type));
+                item.Click += (s, e) => SceneManager.GetFromID(sceneEntry.ID).EntitytManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
             else
-                item.Click += (s, e) => SceneManager.Scene.EntitytManager.CreatePrimitive((EPrimitiveTypes)Enum.Parse(typeof(EPrimitiveTypes), type));
+                item.Click += (s, e) => SceneManager.Scene.EntitytManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
 
             objectSubItem.Items.Add(item);
         }

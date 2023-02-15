@@ -63,7 +63,7 @@ public class Material
 
         #region //Create ConstantBuffers for Model
         // Create the constant buffer for model-related data.
-        SPerModelConstantBuffer cbModel = new();
+        PerModelConstantBuffer cbModel = new();
 
         // Set up the description for the constant buffer.
         BufferDescription bufferDescription = new()
@@ -100,7 +100,7 @@ public class Material
         #endregion
     }
 
-    internal void Set(SPerModelConstantBuffer constantBuffer)
+    internal void Set(PerModelConstantBuffer constantBuffer)
     {
         // Set input layout, vertex shader, and pixel shader in the device context.
         _d3d.DeviceContext.IASetInputLayout(_inputLayout);

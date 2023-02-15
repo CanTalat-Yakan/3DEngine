@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Engine.Utilities;
 
-public enum EPrimitiveTypes
+public enum PrimitiveTypes
 {
     Plane,
     Quad,
@@ -110,7 +110,7 @@ public class EntityManager
         return newEntity;
     }
 
-    public Entity CreatePrimitive(EPrimitiveTypes type = EPrimitiveTypes.Cube, Entity parent = null)
+    public Entity CreatePrimitive(PrimitiveTypes type = PrimitiveTypes.Cube, Entity parent = null)
     {
         // Create a new entity with the specified name and parent.
         Entity newEntity = new()
@@ -157,13 +157,13 @@ public class EntityManager
         Sky = new Entity()
         {
             Name = "Sky", // Set entity name to "Sky".
-            Tag = EEditorTags.SceneSky.ToString(), // Set entity tag to SceneSky.
+            Tag = EditorTags.SceneSky.ToString(), // Set entity tag to SceneSky.
         };
         // Set scale of the Sky's transform.
         Sky.Transform.LocalScale = new Vector3(-1000, 1000, 1000);
 
         // Add Mesh component to Sky entity.
-        Sky.AddComponent(new Mesh(ModelLoader.LoadFile(Path.Combine(PATH_PRIMITIVES, EPrimitiveTypes.Sphere.ToString()) + ".obj")));
+        Sky.AddComponent(new Mesh(ModelLoader.LoadFile(Path.Combine(PATH_PRIMITIVES, PrimitiveTypes.Sphere.ToString()) + ".obj")));
         // Set material of Sky's Mesh component.
         Sky.GetComponent<Mesh>().Material = _materialSky;
 

@@ -13,7 +13,7 @@ public class Camera : Component
     private Renderer _d3d => Renderer.Instance;
 
     private ID3D11Buffer _view;
-    private SViewConstantBuffer _viewConstantBuffer;
+    private ViewConstantBuffer _viewConstantBuffer;
 
     public override void OnRegister() =>
         // Register the component with the CameraSystem.
@@ -21,12 +21,12 @@ public class Camera : Component
 
     public Camera() =>
         //Create View Constant Buffer when Camera is intialized.
-        _view = _d3d.Device.CreateConstantBuffer<SViewConstantBuffer>();
+        _view = _d3d.Device.CreateConstantBuffer<ViewConstantBuffer>();
 
     public override void OnAwake()
     {
         // Assign this camera instance as the main camera if it has "MainCamera" tag.
-        if (Entity.Tag == ETags.MainCamera.ToString())
+        if (Entity.Tag == Tags.MainCamera.ToString())
             Main = this;
     }
 

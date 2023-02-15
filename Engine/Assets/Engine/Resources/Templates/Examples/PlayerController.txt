@@ -52,7 +52,7 @@ public class PlayerMovement : Component
 
     internal void Rotation()
     {
-        if (!Input.GetButton(EMouseButton.IsRightButtonPressed))
+        if (!Input.GetButton(MouseButton.IsRightButtonPressed))
             return;
 
         // Create a new rotation based on the mouse X and Y axis inputs.

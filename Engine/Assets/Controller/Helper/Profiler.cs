@@ -1,6 +1,4 @@
-﻿namespace Editor.Controller;
-
-internal class Profiler
+﻿internal class Profiler
 {
     public static int FPS => Time.FPS;
     public static double Delta => Time.Delta;

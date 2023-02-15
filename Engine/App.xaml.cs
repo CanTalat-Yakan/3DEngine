@@ -54,7 +54,7 @@ public partial class App : Application
             Debug.WriteLine(e.Exception + "\n\n");
 
             if (Controller.Main.Instance is not null)
-                Controller.Output.Log(e.Exception, Controller.EMessageType.Error);
+                Controller.Output.Log(e.Exception, Controller.MessageType.Error);
 
             // Mark the event as handled to prevent it from being processed further.
             e.Handled = true;
