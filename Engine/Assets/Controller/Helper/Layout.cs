@@ -244,7 +244,7 @@ internal partial class Layout
         Grid grid = new();
         grid.Children.Add(content);
 
-        if (list != null)
+        if (list is not null)
             list.Add(grid);
 
         return grid;

@@ -153,12 +153,12 @@ internal class SceneManager
     public static Scene GetFromEntityID(Guid guid)
     {
         // Check if the main scene contains the entity with an ID that matches the provided GUID.
-        if (Scene.EntitytManager.GetFromID(guid) != null)
+        if (Scene.EntitytManager.GetFromID(guid) is not null)
             return Scene;
 
         // Check if any of the subscenes contains the entity with an ID that matches the provided GUID.
         foreach (var subscene in Subscenes)
-            if (subscene.EntitytManager.GetFromID(guid) != null)
+            if (subscene.EntitytManager.GetFromID(guid) is not null)
                 return subscene;
 
         // Return null if entity is not found in any scene with the provided GUID.

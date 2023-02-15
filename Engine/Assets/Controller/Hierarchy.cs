@@ -103,7 +103,7 @@ internal partial class Hierarchy
 
     public TreeEntry GetParent(TreeEntry treeEntry)
     {
-        if (treeEntry.IDparent != null)
+        if (treeEntry.IDparent is not null)
             foreach (var item in SceneEntry.Hierarchy)
                 if (item.ID == treeEntry.IDparent.Value)
                     return item;
@@ -115,7 +115,7 @@ internal partial class Hierarchy
     {
         List<TreeEntry> list = new List<TreeEntry>();
         foreach (var item in SceneEntry.Hierarchy)
-            if (item.IDparent != null)
+            if (item.IDparent is not null)
                 if (item.IDparent.Value == treeEntry.ID)
                     list.Add(item);
 
@@ -124,7 +124,7 @@ internal partial class Hierarchy
 
     public TreeEntry GetTreeEntry(Guid guid, SceneEntry sceneEntry = null)
     {
-        if (sceneEntry != null)
+        if (sceneEntry is not null)
             foreach (var entry in sceneEntry.Hierarchy)
                 if (entry.ID == guid)
                     return entry;
@@ -133,7 +133,7 @@ internal partial class Hierarchy
             if (entry.ID == guid)
                 return entry;
 
-        if (SubsceneEntries != null)
+        if (SubsceneEntries is not null)
             foreach (var subSceneEntry in SubsceneEntries)
                 foreach (var treeEntry in subSceneEntry.Hierarchy)
                     if (treeEntry.ID == guid)
@@ -148,7 +148,7 @@ internal partial class Hierarchy
             if (entry.ID == treeEntry.ID)
                 return SceneEntry;
 
-        if (SubsceneEntries != null)
+        if (SubsceneEntries is not null)
             foreach (var subSceneEntry in SubsceneEntries)
                 foreach (var entry in subSceneEntry.Hierarchy)
                     if (entry.ID == treeEntry.ID)
@@ -169,7 +169,7 @@ internal partial class Hierarchy
                 sceneEntry = SceneEntry;
             }
 
-        if (SubsceneEntries != null)
+        if (SubsceneEntries is not null)
             foreach (var subSceneEntry in SubsceneEntries)
                 foreach (var entry in subSceneEntry.Hierarchy)
                     if (entry.ID == guid)
@@ -237,7 +237,7 @@ internal partial class Hierarchy
         TreeEntry treeEntry = new() { Name = entity.Name, ID = entity.ID };
         treeEntry.IconNode = new() { Name = treeEntry.Name, TreeEntry = treeEntry, IsExpanded = false };
         treeEntry.IconNode.IsActive = true;
-        treeEntry.IDparent = entity.Parent != null ? entity.Parent.ID : null;
+        treeEntry.IDparent = entity.Parent is not null ? entity.Parent.ID : null;
 
         var components = entity.GetComponents();
         treeEntry.IconNode.Camera = components.OfType<Camera>().Any();
@@ -247,7 +247,7 @@ internal partial class Hierarchy
         sceneEntry.Hierarchy.Add(treeEntry);
 
         TreeEntry parent;
-        if ((parent = GetParent(treeEntry)) != null)
+        if ((parent = GetParent(treeEntry)) is not null)
             parent.IconNode.Children.Add(treeEntry.IconNode);
         else
             sceneEntry.DataSource.Add(treeEntry.IconNode);
@@ -389,7 +389,7 @@ internal partial class Hierarchy
         foreach (var type in Enum.GetNames(typeof(EPrimitiveTypes)))
         {
             item = new() { Text = type.ToString().FormatString() };
-            if (sceneEntry != null)
+            if (sceneEntry is not null)
                 item.Click += (s, e) => SceneManager.GetFromID(sceneEntry.ID).EntitytManager.CreatePrimitive((EPrimitiveTypes)Enum.Parse(typeof(EPrimitiveTypes), type));
             else
                 item.Click += (s, e) => SceneManager.Scene.EntitytManager.CreatePrimitive((EPrimitiveTypes)Enum.Parse(typeof(EPrimitiveTypes), type));
@@ -400,7 +400,7 @@ internal partial class Hierarchy
         menuFlyout.Items.Add(new MenuFlyoutSeparator());
         menuFlyout.Items.Add(objectSubItem);
         menuFlyout.Items.Add(item = new MenuFlyoutItem() { Text = "Camera" });
-        if (sceneEntry != null)
+        if (sceneEntry is not null)
             item.Click += (s, e) => SceneManager.GetFromID(sceneEntry.ID).EntitytManager.CreateCamera();
         else
             item.Click += (s, e) => SceneManager.Scene.EntitytManager.CreateCamera();
@@ -590,7 +590,7 @@ internal partial class Hierarchy : Controller.Helper
     {
         Entity entity;
 
-        if (sceneEntry != null)
+        if (sceneEntry is not null)
             entity = SceneManager.GetFromID(sceneEntry.ID).EntitytManager.GetFromID(guid);
         else
         {
@@ -678,7 +678,7 @@ internal partial class Hierarchy : Controller.Helper
 
         GetScenes(out Scene sourceScene, out Scene targetScene, sourceSceneEntry, targetSceneEntry);
 
-        if (sourceEntity != null)
+        if (sourceEntity is not null)
             if (requestedOperation == DataPackageOperation.Move)
             {
                 sourceTreeEntry.IDparent = targetTreeEntry.ID;
@@ -703,7 +703,7 @@ internal partial class Hierarchy : Controller.Helper
         GetEntity(out Entity sourceEntity, sourceEntityGuid, sourceSceneEntry);
         GetScenes(out Scene sourceScene, out Scene targetScene, sourceSceneEntry, targetSceneEntry);
 
-        if (sourceEntity != null)
+        if (sourceEntity is not null)
             if (requestedOperation == DataPackageOperation.Move)
             {
                 sourceTreeEntry.IDparent = null;
@@ -731,14 +731,14 @@ internal partial class Hierarchy : Controller.Helper
     public void MigrateIconNode(TreeEntry sourceTreeEntry, SceneEntry sourceSceneEntry, TreeEntry targetTreeEntry, SceneEntry targetSceneEntry)
     {
         var parent = GetParent(sourceTreeEntry);
-        if (parent != null)
+        if (parent is not null)
             parent.IconNode.Children.Remove(sourceTreeEntry.IconNode);
         else
             sourceSceneEntry.DataSource.Remove(sourceTreeEntry.IconNode);
 
-        if (targetTreeEntry != null)
+        if (targetTreeEntry is not null)
             targetTreeEntry.IconNode.Children.Add(sourceTreeEntry.IconNode);
-        else if (targetSceneEntry != null)
+        else if (targetSceneEntry is not null)
             targetSceneEntry.DataSource.Add(sourceTreeEntry.IconNode);
     }
 

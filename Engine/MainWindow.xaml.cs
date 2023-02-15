@@ -12,7 +12,7 @@ public sealed partial class MainWindow : WindowEx
 {
     internal Controller.Theme _themeControl;
 
-    public ModelView.Main Main { get => _main != null ? _main : _main = new(this); }
+    public ModelView.Main Main { get => _main is not null ? _main : _main = new(this); }
     private ModelView.Main _main;
 
     public MainWindow()
@@ -35,7 +35,7 @@ public sealed partial class MainWindow : WindowEx
             x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
         }
 
-        if (args.SelectedItemContainer != null)
+        if (args.SelectedItemContainer is not null)
             switch (args.SelectedItemContainer.Tag)
             {
                 case "home":

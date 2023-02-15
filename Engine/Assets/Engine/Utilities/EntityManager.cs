@@ -38,7 +38,7 @@ public class EventList<T> : List<T>
         // Adds an item to the list.
         base.Add(item);
 
-        if (OnAdd != null)
+        if (OnAdd is not null)
             if (invokeEvent)
                 // Raises the OnAddEvent event.
                 OnAdd(this, item);
@@ -46,7 +46,7 @@ public class EventList<T> : List<T>
 
     public void Remove(T item, bool invokeEvent = true)
     {
-        if (OnRemove != null)
+        if (OnRemove is not null)
             if (invokeEvent)
                 // Raises the OnRemoveEvent event.
                 OnRemove(this, item);
@@ -186,7 +186,7 @@ public class EntityManager
         // Loop through all entities in the EntityList.
         foreach (var entity in EntityList)
             // Check if the entity is not null.
-            if (entity != null)
+            if (entity is not null)
                 // Check if the entity's ID matches the given ID.
                 if (entity.ID == id)
                     // Return the entity if its ID matches the given ID.
@@ -201,7 +201,7 @@ public class EntityManager
         // Iterate over all entities in the EntityList.
         foreach (var entity in EntityList)
             // Check if the current entity is not null.
-            if (entity != null)
+            if (entity is not null)
                 // Check if the tag of the current entity matches the given tag.
                 if (entity.Tag.ToString() == tag)
                     // Return the entity if a match is found.

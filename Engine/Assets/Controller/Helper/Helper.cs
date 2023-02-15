@@ -134,7 +134,7 @@ internal class Helper
         RangeBaseValueChangedEventHandler onValueChanged = null)
     {
         Slider numInput = new() { Value = f, Minimum = min, Maximum = max, Width = 200, Margin = new(0, 0, 0, -5.5) };
-        if (onValueChanged != null)
+        if (onValueChanged is not null)
             numInput.ValueChanged += onValueChanged;
 
         TextBlock numPreview = new() { Padding = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
@@ -178,17 +178,17 @@ internal class Helper
     {
         Rectangle rectangleR = new() { Fill = new SolidColorBrush(Colors.IndianRed), RadiusX = 2, RadiusY = 2, Width = 4 };
         NumberBox numInput = new() { Value = Math.Round(v.X, 4), Margin = new(0, 0, 4, 0), Width = 64 };
-        if (e[0] != null)
+        if (e[0] is not null)
             numInput.ValueChanged += e[0];
 
         Rectangle rectangleG = new() { Fill = new SolidColorBrush(Colors.SeaGreen), RadiusX = 2, RadiusY = 2, Width = 4 };
         NumberBox num2Input = new() { Value = Math.Round(v.Y, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
-        if (e[1] != null)
+        if (e[1] is not null)
             num2Input.ValueChanged += e[1];
 
         Rectangle rectangleB = new() { Fill = new SolidColorBrush(Colors.DodgerBlue), RadiusX = 2, RadiusY = 2, Width = 4 };
         NumberBox num3Input = new() { Value = Math.Round(v.Z, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
-        if (e[2] != null)
+        if (e[2] is not null)
             num3Input.ValueChanged += e[2];
 
         return StackInGrid(rectangleR, numInput, rectangleG, num2Input, rectangleB, num3Input);
@@ -215,7 +215,7 @@ internal class Helper
     internal virtual Grid CreateBool(bool b = false, RoutedEventHandler OnClick = null)
     {
         CheckBox check = new() { IsChecked = b, Margin = new(0, 0, 0, -5.5) };
-        if (OnClick != null)
+        if (OnClick is not null)
             check.Click += OnClick;
 
         return StackInGrid(check);
@@ -364,7 +364,7 @@ internal static class ExtensionMethods
     public static UIElement AddToolTip(this UIElement content, ToolTip toolTip)
     {
 
-        if (toolTip != null)
+        if (toolTip is not null)
             if (!string.IsNullOrEmpty((string)toolTip.Content))
                 ToolTipService.SetToolTip(content, toolTip);
 
@@ -373,7 +373,7 @@ internal static class ExtensionMethods
 
     public static Grid AddToolTip(this Grid content, ToolTip toolTip)
     {
-        if (toolTip != null)
+        if (toolTip is not null)
             if (!string.IsNullOrEmpty((string)toolTip.Content))
                 ToolTipService.SetToolTip(content, toolTip);
 
@@ -410,7 +410,7 @@ internal static class ExtensionMethods
 
         grid.Children.Add(content);
 
-        if (toolTip != null)
+        if (toolTip is not null)
             ToolTipService.SetToolTip(grid, toolTip);
 
         return grid;
@@ -513,9 +513,9 @@ internal static class ExtensionMethods
             HorizontalContentAlignment = HorizontalAlignment.Stretch
         };
         ToggleButton toggleButton = new() { Content = text, IsChecked = true };
-        if (isCheckedPropertyPath != null)
+        if (isCheckedPropertyPath is not null)
             BindingHelper.SetBinding(toggleButton, ToggleButton.IsCheckedProperty, source, isCheckedPropertyPath, BindingMode.TwoWay);
-        if (contentPropertyPath != null)
+        if (contentPropertyPath is not null)
             BindingHelper.SetBinding(toggleButton, ToggleButton.ContentProperty, source, contentPropertyPath, BindingMode.TwoWay);
 
         expander.Header = toggleButton;

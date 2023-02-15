@@ -41,7 +41,7 @@ public class Input
     public static void Update()
     {
         // Check if pointer is not null.
-        if (_pointer != null)
+        if (_pointer is not null)
         {
             // Calculate mouse axis based on the difference between the current and previous pointer positions.
             _mouseAxis.X = -(float)(tmpPoint.X - _pointerPosition.X);

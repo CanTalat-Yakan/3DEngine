@@ -80,7 +80,7 @@ internal static class PropertyGenerator
     private static void GenerateProperty(Type type, FieldInfo field, string propertyName)
     {
         var property = type.GetProperty(propertyName);
-        if (property != null)
+        if (property is not null)
             return;
 
         var getMethod = new DynamicMethod("Get" + propertyName, field.FieldType, new[] { type }, type);

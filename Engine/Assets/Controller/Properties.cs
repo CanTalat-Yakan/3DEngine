@@ -132,12 +132,12 @@ internal partial class Properties
 
                 // Add fields to the fields collection.
                 foreach (var info in fieldInfos)
-                    if ((newFieldGrid = CreateFromFieldInfo(info.GetValue(component), info, nonPublicFieldInfos)) != null)
+                    if ((newFieldGrid = CreateFromFieldInfo(info.GetValue(component), info, nonPublicFieldInfos)) is not null)
                         fieldsCollection.Add(newFieldGrid);
 
                 // Add events to the events collection.
                 foreach (var info in eventsInfos)
-                    if ((newFieldGrid = CreateFromEventInfo(info, nonPublicEventsInfos)) != null)
+                    if ((newFieldGrid = CreateFromEventInfo(info, nonPublicEventsInfos)) is not null)
                         eventsCollection.Add(newFieldGrid);
 
                 // Add all the fields and events to the scripts collection.

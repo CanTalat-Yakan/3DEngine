@@ -264,7 +264,7 @@ public class Output
         grid.Children.Add(stack);
 
         // If there is a count the number gets shown on the right.
-        if (i != null)
+        if (i is not null)
             grid.Children.Add(new TextBlock() { Margin = new(0, 0, 10, 0), Padding = new(5), MinWidth = 25, HorizontalAlignment = HorizontalAlignment.Right, Text = i.ToString() });
 
         // Set flyout to button that stretches along the grid.
