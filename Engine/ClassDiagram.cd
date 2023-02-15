@@ -21,13 +21,6 @@
       <FileName>Assets\Controller\Helper\Layout.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Editor.Controller.Player" Collapsed="true">
-    <Position X="6.5" Y="5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AEAgAAAAAEAAIIAAAAAAAAAAABAAJAAAgAAAAAACAAI=</HashCode>
-      <FileName>Assets\Controller\Helper\Player.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="Editor.Controller.Theme" Collapsed="true">
     <Position X="5.75" Y="1.5" Width="1.5" />
     <TypeIdentifier>
@@ -46,7 +39,7 @@
   <Class Name="Editor.Controller.Files" Collapsed="true">
     <Position X="3.75" Y="7.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>C6AgACIAAghCMUBkAAJAAAEAAAwBMkCIEQDSCQAgEIY=</HashCode>
+      <HashCode>C6AgACIAAghCMUAkAAJAAAEAAA0BMkCIEQjQCQAgEIY=</HashCode>
       <FileName>Assets\Controller\Files.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -76,13 +69,6 @@
     <TypeIdentifier>
       <HashCode>AAAAAAAEAgIAAAAAAAEEAAAQAAAAAAAAQAAAAAAAAAA=</HashCode>
       <FileName>Assets\Controller\Main.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Editor.Controller.Output" Collapsed="true">
-    <Position X="2" Y="7.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AEEAAAAAgYCAAAgIAAAAQAAgSAgAAACAgAAIAAAAACA=</HashCode>
-      <FileName>Assets\Controller\Output.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Editor.Controller.Properties" Collapsed="true">
@@ -148,7 +134,7 @@
   <Class Name="Engine.ECS.Entity" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="3" Y="12.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAooBAIgQEARAQoAAAAAAAEAAoAAECAABA=</HashCode>
+      <HashCode>AAAAAAAAAAAooBAIgQEARAQoAAAAAAAEAAoAAACAABA=</HashCode>
       <FileName>Assets\Engine\ECS\Entity.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.1" />
@@ -247,28 +233,14 @@
   <Class Name="Engine.Editor.ImGuiRenderer" Collapsed="true">
     <Position X="1.25" Y="10.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>IAEQAAADADBAABAAEBAEgAMABJAAAQACIBCAIEQgBAI=</HashCode>
+      <HashCode>IAUQAAADADBAABAAEBAEgAMABJAAAQACIBCAIEQgBAI=</HashCode>
       <FileName>Assets\Engine\Editor\ImGui\ImGuiRenderer.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Editor.SceneBoot" Collapsed="true">
     <Position X="3.75" Y="15.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AABEAAAAQAAAAAAAEAAIAAAAAAAAAAAEAAAAAAEAAAA=</HashCode>
-      <FileName>Assets\Engine\Editor\SceneBoot.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Engine.Editor.PlayerMovement" Collapsed="true">
-    <Position X="4.75" Y="17.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAQAAAAIAABAAAAAAAAAgAAAAEAAAAAAEAQAA=</HashCode>
-      <FileName>Assets\Engine\Editor\SceneBoot.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Engine.Editor.Example" Collapsed="true">
-    <Position X="4.75" Y="17.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAIABAAAgQEAAEAAAAgAAAAAEAIIAgAAgBCA=</HashCode>
+      <HashCode>AABEAAAAQAAAAAAAEAAAAAAAAAAAAAAEAAAAgAEAAAA=</HashCode>
       <FileName>Assets\Engine\Editor\SceneBoot.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -284,27 +256,6 @@
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAA=</HashCode>
       <FileName>Assets\Engine\Helper\ModelLoader.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Engine.Utilities.EventList&lt;T&gt;" Collapsed="true">
-    <Position X="4.75" Y="10.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAIAAgAAAEAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Assets\Engine\Utilities\EntityManager.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Engine.Utilities.EntityManager" Collapsed="true">
-    <Position X="4.75" Y="11" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>oAAAAAAAQUAAAAEAACIAAAAAQABQaRKAEAAAgAAAEAA=</HashCode>
-      <FileName>Assets\Engine\Utilities\EntityManager.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Engine.Utilities.Input" Collapsed="true">
-    <Position X="10" Y="10" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>ACQAAEAQAAAAgQAEgAkEIAQQECAAAABAAHgAAACAQEQ=</HashCode>
-      <FileName>Assets\Engine\Utilities\Input.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Utilities.Material" Collapsed="true">
@@ -336,17 +287,17 @@
       <FileName>Assets\Engine\Utilities\SceneManager.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Engine.Utilities.Timer" Collapsed="true">
+  <Class Name="Engine.Utilities.Time" Collapsed="true">
     <Position X="8.25" Y="10" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>QAQAAAEAAAAAIAAFAAAAACAQAAAAQAAAAAAAAAAAAQA=</HashCode>
-      <FileName>Assets\Engine\Utilities\Timer.cs</FileName>
+      <HashCode>QQQAAAEAAAAAIAAFAAAAACAQAAAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>Assets\Engine\Utilities\Time.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Engine.Core" Collapsed="true">
     <Position X="5.5" Y="9" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAjAAAAAAAAAEAAAAABQAAAAQACAIAAABAU=</HashCode>
+      <HashCode>AAAAAAAAAACAAAAAAAAAEAAAAAAAAAAAQECAIAAAAAU=</HashCode>
       <FileName>Assets\Engine\Core.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -401,7 +352,7 @@
   <Class Name="Editor.ModelView.Output" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="2" Y="6.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAgAAAAQQBAgAAAAAEAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+      <HashCode>AAAAAAAgAAAAQQAAAAAAAAEAAAAAAAAAAAAAAAAAAAQ=</HashCode>
       <FileName>Assets\ModelView\UserControls\Output.xaml.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
@@ -441,14 +392,14 @@
   <Class Name="Editor.Controller.Home" Collapsed="true">
     <Position X="7.5" Y="3.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>CYAAAAAAAAgCIIAAEABAIAIAAAQAAAAAAADCAAAAAgo=</HashCode>
+      <HashCode>CYAAAAAAAAgCIIBAEABAIAIAAAQAAAAAAADCAAAAAgo=</HashCode>
       <FileName>Assets\Controller\Home.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Editor.Controller.Profiler" Collapsed="true">
     <Position X="10" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>QAAAQAAAAEAAAAAEAAAAAAAQAgAAAAAAEAAEAAAAAAA=</HashCode>
+      <HashCode>QAAAQAAAAEAAAAAAAAAABAAQAgAAAAAAEAAEAAAAAAA=</HashCode>
       <FileName>Assets\Controller\Helper\Profiler.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -464,13 +415,6 @@
     <TypeIdentifier>
       <HashCode>AAAAAgAAAAAAAAAAAAAACAQAAAAAAAAAAAIAAAAACQA=</HashCode>
       <FileName>Assets\Controller\Files.cs</FileName>
-    </TypeIdentifier>
-  </Struct>
-  <Struct Name="Editor.Controller.SMessageInfo" Collapsed="true">
-    <Position X="2" Y="8" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAgAAAAAAAAAEAAAQAAIAAhAAA=</HashCode>
-      <FileName>Assets\Controller\Output.cs</FileName>
     </TypeIdentifier>
   </Struct>
   <Struct Name="Engine.Data.SViewConstantBuffer" Collapsed="true">
@@ -501,7 +445,7 @@
       <FileName>Assets\Engine\Data\Vertex.cs</FileName>
     </TypeIdentifier>
   </Struct>
-  <Enum Name="Editor.Controller.EPlaymode" Collapsed="true">
+  <Enum Name="Editor.Controller.EPlayMode" Collapsed="true">
     <Position X="6.5" Y="5.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAgAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAEAAAA=</HashCode>
@@ -540,13 +484,6 @@
     <Position X="10" Y="10.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAgAAAAAgA=</HashCode>
-      <FileName>Assets\Engine\Utilities\Input.cs</FileName>
-    </TypeIdentifier>
-  </Enum>
-  <Enum Name="Engine.Utilities.EInputState" Collapsed="true">
-    <Position X="10" Y="10.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAI=</HashCode>
       <FileName>Assets\Engine\Utilities\Input.cs</FileName>
     </TypeIdentifier>
   </Enum>
