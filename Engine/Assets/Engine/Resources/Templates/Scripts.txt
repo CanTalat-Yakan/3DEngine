@@ -8,7 +8,7 @@ using Engine.Editor;
 using Engine.Helper;
 using Engine.Utilities;
 
-public class Test : Component
+public class {{FileName}} : Component
 {
     [Show]
     private string _text = "Hello World!";
