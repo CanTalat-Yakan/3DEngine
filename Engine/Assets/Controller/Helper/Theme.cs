@@ -4,7 +4,6 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
 using System.Runtime.InteropServices;
 using WinRT;
-using Engine.Utilities;
 
 namespace Editor.Controller;
 

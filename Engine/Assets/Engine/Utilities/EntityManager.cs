@@ -2,10 +2,6 @@
 using System.IO;
 using System.Numerics;
 using System;
-using Editor.Controller;
-using Engine.Components;
-using Engine.ECS;
-using Engine.Helper;
 
 namespace Engine.Utilities;
 

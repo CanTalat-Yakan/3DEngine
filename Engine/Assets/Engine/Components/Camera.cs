@@ -2,10 +2,6 @@
 using System.Runtime.CompilerServices;
 using System;
 using Vortice.Direct3D11;
-using Engine.Data;
-using Engine.ECS;
-using Engine.Utilities;
-using Engine.Helper;
 
 namespace Engine.Components;
 

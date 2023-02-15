@@ -8,7 +8,6 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System;
 using Windows.ApplicationModel.DataTransfer;
-using System.Xml.Linq;
 
 namespace Editor.Controller;
 

@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System;
-using Engine.Components;
-using Engine.Utilities;
 
 namespace Engine.ECS;
 

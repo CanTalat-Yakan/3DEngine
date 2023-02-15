@@ -1,11 +1,15 @@
-﻿using ImGuiNET;
+﻿global using Editor.Controller;
+global using Engine.Components;
+global using Engine.Data;
+global using Engine.ECS;
+global using Engine.Editor;
+global using Engine.Helper;
+global using Engine.Utilities;
+
+using ImGuiNET;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using System;
-using Editor.Controller;
-using Engine.ECS;
-using Engine.Editor;
-using Engine.Utilities;
 
 namespace Engine;
 

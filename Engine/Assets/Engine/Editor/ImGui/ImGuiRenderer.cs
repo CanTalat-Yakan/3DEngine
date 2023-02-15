@@ -9,7 +9,6 @@ using Vortice.Direct3D;
 using Vortice.DXGI;
 using Windows.Foundation;
 using ImDrawIdx = System.UInt16;
-using Engine.Utilities;
 
 // based on https://github.com/ocornut/imgui/blob/master/examples/imgui_impl_dx11.cpp
 // copied from https://github.com/YaakovDavis/VorticeImGui/blob/master/VorticeImGui/Framework/ImGuiRenderer.cs
@@ -165,7 +164,7 @@ unsafe internal class ImGuiRenderer
                     ctx.RSSetScissorRect(rect);
 
                     textureResources.TryGetValue(cmd.TextureId, out var texture);
-                    if (texture != null)
+                    if (texture is not null)
                         ctx.PSSetShaderResource(0, texture);
 
                     ctx.DrawIndexed((int)cmd.ElemCount, (int)(cmd.IdxOffset + global_idx_offset), (int)(cmd.VtxOffset + global_vtx_offset));

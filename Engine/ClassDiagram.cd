@@ -39,7 +39,7 @@
   <Class Name="Editor.Controller.Files" Collapsed="true">
     <Position X="3.75" Y="7.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>C6AgACIAAghCMUAkAAJAAAEAAA0BMkCIEQjQCQAgEIY=</HashCode>
+      <HashCode>C6AgACIAAghCMUAkAALAAAEAAA0BMkCIEQjQCQAgEIY=</HashCode>
       <FileName>Assets\Controller\Files.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -240,7 +240,7 @@
   <Class Name="Engine.Editor.SceneBoot" Collapsed="true">
     <Position X="3.75" Y="15.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AABEAAAAQAAAAAAAEAAAAAAAAAAAAAAEAAAAgAEAAAA=</HashCode>
+      <HashCode>AABEAAAAQAAAAAAAEAAAAAAAAAAAAAAEAAAAAAEAAAA=</HashCode>
       <FileName>Assets\Engine\Editor\SceneBoot.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -307,7 +307,6 @@
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\ModelView\Frames\Documentation.xaml.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.ModelView.Home" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="7.5" Y="2.75" Width="1.5" />
@@ -315,7 +314,6 @@
       <HashCode>AAIIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAA=</HashCode>
       <FileName>Assets\ModelView\Frames\Home.xaml.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.ModelView.Main" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="5.75" Y="2.75" Width="1.5" />
@@ -323,7 +321,6 @@
       <HashCode>AAAIAAAACAAAAQAAAAAQAAAAAAAAAAAQIAACAAAAAAA=</HashCode>
       <FileName>Assets\ModelView\Frames\Main.xaml.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.ModelView.Settings" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="4" Y="2.75" Width="1.5" />
@@ -331,7 +328,6 @@
       <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAEA=</HashCode>
       <FileName>Assets\ModelView\Frames\Settings.xaml.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.ModelView.Files" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="3.75" Y="6.25" Width="1.5" />
@@ -339,7 +335,6 @@
       <HashCode>AAAAAAEQAAAEEAABAAAAAAAgAAAAAAAAAAAAAAAAJAQ=</HashCode>
       <FileName>Assets\ModelView\UserControls\Files.xaml.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.ModelView.Hierarchy" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="9" Y="6.25" Width="1.5" />
@@ -347,7 +342,6 @@
       <HashCode>AAAAAAAAAAAAAAEAAAAAAAAAAAAAAQAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\ModelView\UserControls\Hierarchy.xaml.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.ModelView.Output" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="2" Y="6.25" Width="1.5" />
@@ -355,7 +349,6 @@
       <HashCode>AAAAAAAgAAAAQQAAAAAAAAEAAAAAAAAAAAAAAAAAAAQ=</HashCode>
       <FileName>Assets\ModelView\UserControls\Output.xaml.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.ModelView.Properties" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="7.25" Y="6.25" Width="1.5" />
@@ -363,7 +356,6 @@
       <HashCode>AAAAAABAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Assets\ModelView\UserControls\Properties.xaml.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.ModelView.ViewPort" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="5.5" Y="6.25" Width="1.5" />
@@ -371,7 +363,6 @@
       <HashCode>AAAAAAQAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAIAA=</HashCode>
       <FileName>Assets\ModelView\UserControls\ViewPort.xaml.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.App" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="5.75" Y="0.5" Width="1.5" />
@@ -379,7 +370,6 @@
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIQAAACAAAAAA=</HashCode>
       <FileName>App.xaml.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Orientation="Left" Position="0.1" Collapsed="true" />
   </Class>
   <Class Name="Editor.MainWindow" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="5.75" Y="1.75" Width="1.5" />
@@ -387,7 +377,6 @@
       <HashCode>AAAAAAAEAAEAAAAAAAAAAAAAgAAAAAAAAAACBAAAAAA=</HashCode>
       <FileName>MainWindow.xaml.cs</FileName>
     </TypeIdentifier>
-    <Lollipop Orientation="Left" Position="0.1" Collapsed="true" />
   </Class>
   <Class Name="Editor.Controller.Home" Collapsed="true">
     <Position X="7.5" Y="3.75" Width="1.5" />

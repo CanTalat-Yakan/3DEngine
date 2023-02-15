@@ -7,7 +7,6 @@ using Vortice.Direct3D11;
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
-using Editor.Controller;
 
 namespace Engine.Utilities;
 

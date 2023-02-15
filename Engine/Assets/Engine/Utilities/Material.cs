@@ -5,7 +5,6 @@ using Vortice.D3DCompiler;
 using Vortice.Direct3D11;
 using Vortice.DXGI;
 using Engine.Data;
-using Engine.Helper;
 
 namespace Engine.Utilities;
 

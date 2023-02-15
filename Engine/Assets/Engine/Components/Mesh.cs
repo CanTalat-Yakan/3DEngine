@@ -1,9 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
 using Vortice.Direct3D11;
-using Editor.Controller;
-using Engine.Data;
-using Engine.ECS;
-using Engine.Utilities;
 
 namespace Engine.Components;
 

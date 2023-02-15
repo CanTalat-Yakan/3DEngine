@@ -1,9 +1,6 @@
 ﻿using System.Numerics;
 using System;
 using Vortice.Mathematics;
-using Engine.Data;
-using Engine.ECS;
-using Engine.Helper;
 
 namespace Engine.Components;
 

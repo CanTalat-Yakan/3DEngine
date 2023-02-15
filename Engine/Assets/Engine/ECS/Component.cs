@@ -1,6 +1,4 @@
 ﻿using System;
-using Editor.Controller;
-using Engine.Editor;
 
 namespace Engine.ECS;
 

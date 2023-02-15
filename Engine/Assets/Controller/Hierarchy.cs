@@ -8,9 +8,6 @@ using System.Linq;
 using System;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
-using Engine.Components;
-using Engine.ECS;
-using Engine.Utilities;
 
 namespace Editor.Controller;
 

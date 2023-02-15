@@ -5,9 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System;
-using Editor.Controller;
-using Engine.ECS;
-using Engine.Editor;
 
 namespace Engine.Utilities
 {

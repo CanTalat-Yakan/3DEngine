@@ -1,17 +1,11 @@
 ﻿using System.Linq;
 using System;
-using Editor.Controller;
-using Engine.Components;
-using Engine.ECS;
-using Engine.Utilities;
-using System.Drawing;
 
 namespace Engine.Editor;
 
 internal class SceneBoot : EditorComponent
 {
     public Camera SceneCamera;
-    public Color Color;
 
     public Entity Cubes;
 
