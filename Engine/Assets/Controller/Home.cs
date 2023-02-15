@@ -8,6 +8,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System;
 using Windows.ApplicationModel.DataTransfer;
+using System.Xml.Linq;
 
 namespace Editor.Controller;
 
@@ -289,15 +290,25 @@ internal class Home
     {
         ProjectPath = path;
 
-        NavigationViewItem menuItem = new();
-        menuItem.Tag = "engine";
-        menuItem.Name = Path.GetFileName(path);
-        menuItem.Content = Path.GetFileName(path);
-        menuItem.Icon = new FontIcon() { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\xE74C" };
+        NavigationViewItem menuItem = new()
+        {
+            Tag = "engine",
+            Name = Path.GetFileName(path),
+            Content = Path.GetFileName(path),
+            Icon = new FontIcon() { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = "\xE74C" }
+        };
+
+        TeachingTip teachingTip = new()
+        {
+            Target = (FrameworkElement)menuItem,
+            Title = "Click here to open the project",
+            Subtitle = "The editor will load with the engine renderpipeline"
+        };
 
         _navigationView.MenuItems.Add(menuItem);
-
         //_navigationView.SelectedItem = menuItem;
+
+        //teachingTip.IsOpen = true;
     }
 
     private Grid CreateIcon(string glyph)
