@@ -1,4 +1,6 @@
-﻿namespace Engine.Components;
+﻿using Vortice.Mathematics;
+
+namespace Engine.Components;
 
 public class Transform : Component, IHide
 {
