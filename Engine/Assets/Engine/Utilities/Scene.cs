@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Engine.Utilities;
+﻿namespace Engine.Utilities;
 
 public class Scene : BindableBase, ICloneable
 {

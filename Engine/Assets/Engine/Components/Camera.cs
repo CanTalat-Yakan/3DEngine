@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-using System.Runtime.CompilerServices;
-using System;
+﻿using System.Runtime.CompilerServices;
 using Vortice.Direct3D11;
 
 namespace Engine.Components;

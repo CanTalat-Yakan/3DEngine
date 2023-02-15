@@ -1,8 +1,6 @@
 ﻿using ImGuiNET;
 using System.Collections.Generic;
 using System.IO;
-using System.Numerics;
-using System;
 using Vortice.D3DCompiler;
 using Vortice.Direct3D11;
 using Vortice.Direct3D;

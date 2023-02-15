@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-using System;
-using Windows.System;
+﻿using Windows.System;
 
 namespace Engine.Editor;
 

@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.IO.Compression;
 using System.IO;
 using System.Text.RegularExpressions;
-using System;
 using Windows.ApplicationModel.DataTransfer;
 
 namespace Editor.Controller;

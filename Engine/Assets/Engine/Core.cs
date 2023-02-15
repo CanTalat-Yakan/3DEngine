@@ -5,11 +5,13 @@ global using Engine.ECS;
 global using Engine.Editor;
 global using Engine.Helper;
 global using Engine.Utilities;
+global using System.Numerics;
+global using Vortice.Mathematics;
+global using System;
 
 using ImGuiNET;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using System;
 
 namespace Engine;
 

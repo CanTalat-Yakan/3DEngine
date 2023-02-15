@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Engine.Editor;
+﻿namespace Engine.Editor;
 
 public class ToolTipAttribute : Attribute
 {

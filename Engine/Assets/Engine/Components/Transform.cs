@@ -1,8 +1,4 @@
-﻿using System.Numerics;
-using System;
-using Vortice.Mathematics;
-
-namespace Engine.Components;
+﻿namespace Engine.Components;
 
 public class Transform : Component, IHide
 {

@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Linq;
-using System;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
 

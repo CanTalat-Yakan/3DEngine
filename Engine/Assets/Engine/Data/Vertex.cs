@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace Engine.Data;
+﻿namespace Engine.Data;
 
 public struct Vertex
 {

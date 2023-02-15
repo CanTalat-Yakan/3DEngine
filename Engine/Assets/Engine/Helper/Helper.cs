@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace Engine.Helper;
+﻿namespace Engine.Helper;
 
 public class Helper { }
 

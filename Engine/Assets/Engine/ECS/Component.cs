@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Engine.ECS;
+﻿namespace Engine.ECS;
 
 public class Component : BindableBase, ICloneable
 {
