@@ -66,14 +66,14 @@ internal class Renderer
             DeviceCreationFlags.BgraSupport,
             new[]
             {
-                    FeatureLevel.Level_11_1,
-                    FeatureLevel.Level_11_0,
+                FeatureLevel.Level_11_1,
+                FeatureLevel.Level_11_0,
             },
             out var defaultDevice);
 
         // Check if creating the device was successful.
-        if (!result.Success)
-            throw new Exception("D3D11.D3D11CreateDevice()");
+        if (result.Failure)
+            throw new Exception(result.Description);
 
         // Assign the device to a variable.
         Device = defaultDevice.QueryInterface<ID3D11Device2>();
