@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace Engine.Utilities
     internal class ScriptEntry
     {
         public FileInfo FileInfo;
-        public Script Script;
+        public Script<object> Script;
     }
 
     internal class RuntimeCompiler
@@ -30,9 +31,7 @@ namespace Engine.Utilities
                 return;
 
             // create a new scriptEngine and options to be used in the loop.
-            Script scriptEngine;
             ScriptOptions scriptOptions = ScriptOptions.Default
-                //.WithImports("")
                 .WithReferences(typeof(Core).Assembly)
                 .WithAllowUnsafe(true)
                 .WithCheckOverflow(true);
@@ -42,47 +41,54 @@ namespace Engine.Utilities
             string[] fileEntries = Directory.GetFiles(scriptsFolderPath);
             foreach (var path in fileEntries)
             {
-                scriptEngine = null;
-
+                ScriptEntry scriptEntry = null;
                 FileInfo fileInfo = new(path);
-                string code = File.ReadAllText(path);
 
                 // Check if dictionary contains the file info.
                 if (scriptsCollection.ContainsKey(fileInfo.FullName))
                 {
-                    var scriptEntry = scriptsCollection[fileInfo.FullName];
+                    scriptEntry = scriptsCollection[fileInfo.FullName];
 
                     // Check if the file has been modified.
                     if (fileInfo.LastWriteTime > scriptEntry.FileInfo.LastWriteTime)
                     {
                         // Update the file info in the scene entry with the new lastWriteTime.
                         scriptEntry.FileInfo = fileInfo;
-                        // Get the script from the file info.
-                        scriptEngine = scriptEntry.Script;
 
-                        // Continue script with new code from the file.
-                        scriptEngine.ContinueWith(code);
+                        // Create a new script from the file.
+                        string updatedCode = File.ReadAllText(path);
+                        scriptEntry.Script = CSharpScript.Create(updatedCode, scriptOptions);
+
                         Output.Log("Updated the file");
                     }
                 }
                 else
                 {
+                    scriptEntry = new() { FileInfo = fileInfo };
+
                     // Create a new script from the file.
-                    scriptEngine = CSharpScript.Create(code, scriptOptions);
+                    string code = File.ReadAllText(path);
+                    scriptEntry.Script = CSharpScript.Create(code, scriptOptions);
 
                     // Add it into the collection.
-                    scriptsCollection.Add(fileInfo.FullName, new() { FileInfo = fileInfo, Script = scriptEngine });
+                    scriptsCollection.Add(fileInfo.FullName, scriptEntry);
+
                     Output.Log("Created new file");
                 }
 
                 validateScripts.Add(fileInfo.FullName);
 
-                // Compile the script when it was created or updated.
-                if (scriptEngine is not null)
+                // If the scriptEntry is set, compile the script.
+                if (scriptEntry is not null)
                 {
-                    var result = scriptEngine.Compile();
-                    if (result.Length != 0)
-                        Output.Log(string.Join("\r\n", result), EMessageType.Error);
+                    var results = scriptEntry.Script.Compile();
+                    if (results.Length != 0)
+                        foreach (var result in results)
+                            Output.Log(
+                                string.Join("\r\n", result), 
+                                result.WarningLevel == 0 
+                                    ? EMessageType.Error
+                                    : EMessageType.Warning);
                 }
             }
 
@@ -90,9 +96,8 @@ namespace Engine.Utilities
             foreach (var fullName in scriptsCollection.Keys.ToArray())
                 if (!validateScripts.Contains(fullName))
                 {
+                    // Remove script from collection.
                     scriptsCollection.Remove(fullName);
-
-                    // Remove script from assembly.
                     Output.Log("Removed file");
                 }
 
