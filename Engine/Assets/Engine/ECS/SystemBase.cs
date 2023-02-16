@@ -69,19 +69,24 @@ public class SystemBase<T> where T : Component
 
     public static void Destroy(T component)
     {
-        // Remove the specified component from the collection of registered components
-        // and trigger the OnDestroy event for the component.
+        // Remove the specified component from the collection of registered components.
         s_components.Remove(component);
+
+        // Trigger the OnDestroy event for the component.
         component.OnDestroy();
     }
 
     public static void Destroy(Type componentType)
     {
-        // Remove all components of the specified type from the collection of registered components
+        // Remove all components of the specified type from the collection of registered components.
         foreach (var component in s_components
             .Where(c => c.GetType() == componentType)
             .ToArray())
+        {
             Destroy(component);
+
+            component.Entity.RemoveComponent(component);
+        }
     }
 
     private static bool CheckActive(T component) =>

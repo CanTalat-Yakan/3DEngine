@@ -108,7 +108,7 @@ namespace Engine.Utilities
                                         ? MessageType.Error
                                         : MessageType.Warning);
 
-                        // Add assembly to list to ignore in the "CollectComponent" method,
+                        // Add assembly to list to ignore in the "CollectComponents" method,
                         // when the an assembly reference is inside of the script entry.
                         if (scriptEntry.Assembly is not null)
                         {
@@ -131,7 +131,7 @@ namespace Engine.Utilities
                 {
                     var assembly = _scriptsCollection[fullName].Assembly;
 
-                    // Add assembly to list to ignore in the "CollectComponent" method,
+                    // Add assembly to list to ignore in the "CollectComponents" method,
                     // to the assembly reference of the script entry that got deleted.
                     _ignoreAssemblies.Add(assembly);
 
@@ -165,10 +165,15 @@ namespace Engine.Utilities
 
         private void DestroyComponentTypeReferences(Assembly assembly)
         {
+            // Remove the specified components in the script- or editorscript system,
+            // using the types obtained from the provided assembly.
             var types = assembly.GetTypes();
             foreach (var type in types)
                 if (type.IsSubclassOf(typeof(Component)))
+                {
                     ScriptSystem.Destroy(type);
+                    EditorScriptSystem.Destroy(type);
+                }
 
             // TODO: Check if a new type with the same name is available, and if so, replace the existing type with the new one.
             // Update the entity and its component list to use the new type, and update any properties or references to the old type

@@ -896,7 +896,7 @@ internal partial class Files
                 File.Delete(path);
 
             // Refresh the file system entries.
-            CreateFileSystemEntryTilesAsync();
+            Refresh();
         }
     }
 
