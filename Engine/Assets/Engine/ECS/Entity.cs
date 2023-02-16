@@ -64,6 +64,7 @@ public class Entity : ICloneable
     {
         // Add the component to the Entity's component list.
         _components.Add(component);
+
         // Assign this Entity to the component's Entity.
         component.Entity = this;
         // Enable the component by default.
@@ -72,10 +73,11 @@ public class Entity : ICloneable
 
     public void RemoveComponent(Component component)
     {
-        // Remove the component from the Entity's component list.
-        _components.Remove(component);
         // Invoke the component's OnDestroy event.
         component.InvokeEventOnDestroy();
+
+        // Remove the component from the Entity's component list.
+        _components.Remove(component);
     }
 
     public void RemoveComponents()

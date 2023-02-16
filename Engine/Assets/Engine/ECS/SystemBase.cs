@@ -75,6 +75,15 @@ public class SystemBase<T> where T : Component
         component.OnDestroy();
     }
 
+    public static void Destroy(Type componentType)
+    {
+        // Remove all components of the specified type from the collection of registered components
+        foreach (var component in s_components
+            .Where(c => c.GetType() == componentType)
+            .ToArray())
+            Destroy(component);
+    }
+
     private static bool CheckActive(T component) =>
         // Check if the component is active.
         component.IsEnabled &&

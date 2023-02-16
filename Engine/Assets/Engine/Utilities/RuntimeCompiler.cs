@@ -1,10 +1,10 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Microsoft.CodeAnalysis.Emit;
 using System.Reflection;
 
 namespace Engine.Utilities
@@ -82,13 +82,18 @@ namespace Engine.Utilities
                 validateScripts.Add(fileInfo.FullName);
 
                 // If the scriptEntry is set, compile the script.
+                // It is set when the script is newly created or updated.
                 if (scriptEntry is not null)
                 {
+                    // Compilation gives access to the full set of Roslyn APIs.
                     var compilation = scriptEntry.Script.GetCompilation();
                     compilation = compilation.WithOptions(compilation.Options
                        .WithOptimizationLevel(OptimizationLevel.Debug)
                        .WithOutputKind(OutputKind.DynamicallyLinkedLibrary));
 
+                    // Compile script with reference to the assembly.
+                    // It is worth noting that we used OptimizationLevel.Debug which disables all optimizations what improves debugging experience.
+                    // The result of compilations are two streams: assemblyStream contains actual compiled code and symbolStream contains symbols.
                     using (var assemblyStream = new MemoryStream())
                     using (var symbolStream = new MemoryStream())
                     {
@@ -106,10 +111,14 @@ namespace Engine.Utilities
                         // Add assembly to list to ignore in the "CollectComponent" method,
                         // when the an assembly reference is inside of the script entry.
                         if (scriptEntry.Assembly is not null)
+                        {
                             _ignoreAssemblies.Add(scriptEntry.Assembly);
 
+                            DestroyComponentTypeReferences(scriptEntry.Assembly);
+                        }
+
+                        // Load the assenbly with the compiled script.
                         scriptEntry.Assembly = Assembly.Load(assemblyStream.ToArray(), symbolStream.ToArray());
-                        //assembly.GetType("Submission#0");
 
                         Output.Log("Loaded assembly");
                     }
@@ -120,19 +129,17 @@ namespace Engine.Utilities
             foreach (var fullName in _scriptsCollection.Keys.ToArray())
                 if (!validateScripts.Contains(fullName))
                 {
+                    var assembly = _scriptsCollection[fullName].Assembly;
+
                     // Add assembly to list to ignore in the "CollectComponent" method,
                     // to the assembly reference of the script entry that got deleted.
-                    _ignoreAssemblies.Add(_scriptsCollection[fullName].Assembly);
+                    _ignoreAssemblies.Add(assembly);
+
+                    DestroyComponentTypeReferences(assembly);
 
                     // Remove script from collection.
                     _scriptsCollection.Remove(fullName);
                     Output.Log("Removed file");
-                }
-
-            foreach (var scriptEntry in _scriptsCollection.Values)
-                using (var assemblyStream = new MemoryStream())
-                using (var symbolStream = new MemoryStream())
-                {
                 }
 
             // Gather components for the editor's "AddComponent" function.
@@ -154,6 +161,18 @@ namespace Engine.Utilities
             // Add components to the collector.
             ComponentCollector.Components.Clear();
             ComponentCollector.Components.AddRange(componentCollection.ToArray());
+        }
+
+        private void DestroyComponentTypeReferences(Assembly assembly)
+        {
+            var types = assembly.GetTypes();
+            foreach (var type in types)
+                if (type.IsSubclassOf(typeof(Component)))
+                    ScriptSystem.Destroy(type);
+
+            // TODO: Check if a new type with the same name is available, and if so, replace the existing type with the new one.
+            // Update the entity and its component list to use the new type, and update any properties or references to the old type
+            // so that they use the new type instead.
         }
     }
 }
