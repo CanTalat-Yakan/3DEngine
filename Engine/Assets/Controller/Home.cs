@@ -17,7 +17,6 @@ internal class Home
 
     public static readonly string TEMPLATES = @"Assets\Engine\Resources\Templates";
 
-
     private ModelView.Home _home;
     private WrapPanel _wrap;
     private NavigationView _navigationView;
