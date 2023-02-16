@@ -33,6 +33,9 @@ public sealed partial class Files : UserControl
 
     private void AppBarButton_Click_RefreshFiles(object sender, RoutedEventArgs e) =>
         _filesControl.Refresh();
+    
+    private void AppBarButton_Click_OpenVisualStudio(object sender, RoutedEventArgs e) =>
+        _filesControl.OpenFile(System.IO.Path.Combine(Controller.Home.ProjectPath, "Project.sln"));
 
     private void BreadcrumBar_Files_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args) =>
         _filesControl.GoUpDirectoryAndRefresh();

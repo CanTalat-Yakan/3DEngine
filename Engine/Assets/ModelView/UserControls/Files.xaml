@@ -10,8 +10,10 @@
 
     <Grid>
         <CommandBar HorizontalAlignment="Right" Margin="244,-44,0,0">
-            <AppBarButton Label="Add Files" Icon="Add" Click="AppBarButton_Click_AddFiles"/>
-            <AppBarButton Label="Show in Explorer" Click="AppBarButton_Click_OpenFolder">
+            <AppBarButton Label="Add Files" Icon="Add" 
+                          Click="AppBarButton_Click_AddFiles"/>
+            <AppBarButton Label="Show in Explorer" 
+                          Click="AppBarButton_Click_OpenFolder">
                 <AppBarButton.Icon>
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEC50;"/>
                 </AppBarButton.Icon>
@@ -20,10 +22,17 @@
             <AppBarSeparator/>
 
             <CommandBar.SecondaryCommands>
-                <AppBarButton Label="Refresh Files" Icon="Refresh" Click="AppBarButton_Click_RefreshFiles">
+                <AppBarButton Label="Refresh Files" Icon="Refresh" 
+                              Click="AppBarButton_Click_RefreshFiles">
                     <AppBarButton.KeyboardAccelerators>
                         <KeyboardAccelerator Key="R" Modifiers="Control" />
                     </AppBarButton.KeyboardAccelerators>
+                </AppBarButton>
+
+                <AppBarSeparator/>
+
+                <AppBarButton Label="Open Visual Studio"
+                              Click="AppBarButton_Click_OpenVisualStudio">
                 </AppBarButton>
             </CommandBar.SecondaryCommands>
         </CommandBar>
@@ -31,7 +40,8 @@
         <Grid x:Name="x_Grid_Main" Background="#282828" AllowDrop="True" DragOver="Grid_Main_DragOver" Drop="Grid_Main_Drop">
             <ScrollViewer>
                 <StackPanel Orientation="Vertical" Spacing="10">
-                    <BreadcrumbBar x:Name="x_BreadcrumBar_Files" Margin="20, 9, 20, -20" ItemClicked="BreadcrumBar_Files_ItemClicked"/>
+                    <BreadcrumbBar x:Name="x_BreadcrumBar_Files" Margin="20, 9, 20, -20" 
+                                   ItemClicked="BreadcrumBar_Files_ItemClicked"/>
 
                     <controls:WrapPanel x:Name="x_WrapPanel_Files" HorizontalSpacing="10" VerticalSpacing="10" Padding="16"/>
 
