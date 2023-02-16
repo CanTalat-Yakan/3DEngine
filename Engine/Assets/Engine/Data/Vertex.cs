@@ -16,10 +16,10 @@ public struct Vertex
         Normal = new(nx, ny, nz);
     }
 
-    public Vertex(Vector3 _pos, Vector2 _tex, Vector3 _nor)
+    public Vertex(Vector3 position, Vector2 texCoord, Vector3 normal)
     {
-        Position = _pos;
-        TexCoord = _tex;
-        Normal = _nor;
+        Position = position;
+        TexCoord = texCoord;
+        Normal = normal;
     }
 }
