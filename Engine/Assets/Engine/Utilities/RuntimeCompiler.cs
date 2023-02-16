@@ -125,7 +125,7 @@ namespace Engine.Utilities
                 }
             }
 
-            // Remove all compiled project script.
+            // Remove all compiled project script that are not validated.
             foreach (var fullName in _scriptsCollection.Keys.ToArray())
                 if (!validateScripts.Contains(fullName))
                 {
