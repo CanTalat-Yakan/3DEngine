@@ -48,7 +48,8 @@ namespace Engine.ECS
 
         public bool ActiveInHierarchy => Parent is null ? IsEnabled : IsEnabled && (Parent.ActiveInHierarchy && Parent.IsEnabled);
 
-        private List<Component> _components = new();
+        public EventList<Component> Components => _components;
+        private EventList<Component> _components = new();
 
         public Entity() =>
             // Add the Transform component to the Entity when initialized.

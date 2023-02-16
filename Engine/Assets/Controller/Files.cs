@@ -510,11 +510,7 @@ internal partial class Files
             VerticalContentAlignment = VerticalAlignment.Stretch,
         };
         button.ContextFlyout = CreateDefaultMenuFlyout(path, true);
-        button.Tapped += (s, e) =>
-        {
-            Properties.Clear();
-            Properties.Set(new ModelView.Properties(path));
-        };
+        button.Tapped += (s, e) => Properties.Set(path);
         button.DoubleTapped += (s, e) =>
         {
             if ((Path.GetExtension(path) == ".cs")
@@ -720,10 +716,8 @@ internal partial class Files
             // Call the Refresh method.
             Refresh();
 
-            // Clear the properties.
-            Properties.Clear();
             // Set the properties to a new instance of ModelView.Properties with the specified path.
-            Properties.Set(new ModelView.Properties(path));
+            Properties.Set(path);
         }
     }
 

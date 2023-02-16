@@ -64,8 +64,7 @@ internal partial class Hierarchy
         var treeViewIconNode = (TreeViewIconNode)selectedNode.Content;
         var entity = GetEntity(treeViewIconNode.TreeEntry);
 
-        Properties.Clear();
-        Properties.Set(new ModelView.Properties(entity));
+        Properties.Set(entity);
     }
 
     private void CreateDefaultHierarchy()

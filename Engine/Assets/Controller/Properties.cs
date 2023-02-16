@@ -14,11 +14,14 @@ namespace Editor.Controller;
 
 internal partial class Properties
 {
-    private StackPanel _stackPanel;
+    private static StackPanel s_stackPanel = new();
+
+    private static object s_currentlySet;
 
     public Properties(StackPanel stackPanel, object content)
     {
-        _stackPanel = stackPanel;
+        s_stackPanel.Children.Clear();
+        s_stackPanel = stackPanel;
 
         if (content is null)
             CreateEmptyMessage();
@@ -28,13 +31,14 @@ internal partial class Properties
             CreateFilePreviewer((string)content);
     }
 
-    public static void Clear() =>
+    public static void Set(object content = null)
+    {
+        s_currentlySet = content;
         // Clear the children of the PropertiesRoot element in the LayoutControl.
         Main.Instance.LayoutControl.PropertiesRoot.Children.Clear();
-
-    public static void Set(ModelView.Properties properties) =>
         // Set the children of the PropertiesRoot element in the LayoutControl.
-        Main.Instance.LayoutControl.PropertiesRoot.Children.Add(properties);
+        Main.Instance.LayoutControl.PropertiesRoot.Children.Add(new ModelView.Properties(content));
+    }
 
     private void CreateEmptyMessage()
     {
@@ -50,7 +54,7 @@ internal partial class Properties
 
         grid.Children.Add(stack);
 
-        _stackPanel.Children.Add(grid);
+        s_stackPanel.Children.Add(grid);
     }
 
     private void CreateEntityProperties(Entity entity)
@@ -82,7 +86,7 @@ internal partial class Properties
                 .WrapInField("Scale"),
             };
 
-        _stackPanel.Children.Add(
+        s_stackPanel.Children.Add(
             properties.StackInGrid()
             .WrapInExpanderWithEditableHeaderAndCheckBox(
                 entity.Name,
@@ -90,21 +94,20 @@ internal partial class Properties
                 (s, r) => entity.Name = (s as TextBox).Text,
                 (s, r) => entity.IsEnabled = (s as CheckBox).IsChecked.Value));
 
-        _stackPanel.Children.Add(CreateSeperator());
+        s_stackPanel.Children.Add(CreateSeperator());
 
-        _stackPanel.Children.Add(
+        s_stackPanel.Children.Add(
             transform.StackInGrid()
             .WrapInExpander("Transform"));
 
-        _stackPanel.Children.Add(
+        s_stackPanel.Children.Add(
             CreateButtonWithAutoSuggesBoxAndComponentCollector(
                 "Add Component",
                 (s, e) =>
                 {
                     entity.AddComponent(Engine.Core.Instance.RuntimeCompiler.ComponentCollector.GetComponent(e.SelectedItem.ToString()));
 
-                    Properties.Clear();
-                    Properties.Set(new ModelView.Properties(entity));
+                    Properties.Set(entity);
                 }));
 
         // Iterate through all the components of the given entity.
@@ -142,13 +145,20 @@ internal partial class Properties
                 // Initialize the content grid and stack panel.
                 UIElement tmp;
                 Grid content = new Grid();
-                _stackPanel.Children.Add(tmp = scriptsCollection.ToArray()
+                s_stackPanel.Children.Add(tmp = scriptsCollection.ToArray()
                     .StackInGrid().WrapInExpanderWithToggleButton(ref content, component.ToString().FormatString(), component, "IsEnabled", null)
                     .AddContentFlyout(CreateDefaultMenuFlyout(entity, component)));
 
                 // Add an event handler to remove the current component from the stack panel when it's destroyed.
-                component._eventOnDestroy += (s, e) => _stackPanel.Children.Remove(tmp);
+                component._eventOnDestroy += (s, e) => s_stackPanel.Children.Remove(tmp);
             }
+
+            // Add an event handler to update the current stackPanel when a new component is added.
+            entity.Components.OnAdd += (s, e) =>
+            {
+                if (s_currentlySet.Equals(entity))
+                    Properties.Set(entity);
+            };
         }
     }
 
@@ -170,9 +180,9 @@ internal partial class Properties
                 CreateTextEqual(fileInfo.LastWriteTime.ToShortDateString() + "⠀" + fileInfo.LastWriteTime.ToShortTimeString()).WrapInFieldEqual("Last update time:")
             };
 
-        _stackPanel.Children.Add(properties.StackInGrid().WrapInExpander(Path.GetFileName(path)));
-        _stackPanel.Children.Add(CreateSeperator());
-        _stackPanel.Children.Add(CreateButton("Open File", (s, e) =>
+        s_stackPanel.Children.Add(properties.StackInGrid().WrapInExpander(Path.GetFileName(path)));
+        s_stackPanel.Children.Add(CreateSeperator());
+        s_stackPanel.Children.Add(CreateButton("Open File", (s, e) =>
         {
             // Check if the file exists at the specified path and start the process to open it.
             if (File.Exists(path))
@@ -197,7 +207,7 @@ internal partial class Properties
                 Grid[] preview = new[] { CreateTextFullWithOpacity(joinedLines).WrapInGrid() };
 
                 // Add the preview to the stack panel, wrapped in an expander with a label "Preview".
-                _stackPanel.Children.Add(preview.StackInGrid().WrapInExpander("Preview"));
+                s_stackPanel.Children.Add(preview.StackInGrid().WrapInExpander("Preview"));
             }
     }
 

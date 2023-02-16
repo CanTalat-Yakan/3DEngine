@@ -89,6 +89,20 @@ public class SystemBase<T> where T : Component
         }
     }
 
+    public static void Replace(Type componentType, T newComponent)
+    {
+        // Remove all components of the specified type from the collection of registered components.
+        foreach (var component in s_components
+            .Where(c => c.GetType() == componentType)
+            .ToArray())
+        {
+            Destroy(component);
+
+            component.Entity.RemoveComponent(component);
+            component.Entity.AddComponent(newComponent);
+        }
+    }
+
     private static bool CheckActive(T component) =>
         // Check if the component is active.
         component.IsEnabled &&
