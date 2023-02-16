@@ -221,10 +221,6 @@ internal partial class Files
             if (!string.IsNullOrEmpty(_currentSubPath))
                 path = Path.Combine(path, _currentSubPath);
         }
-        else
-        {
-
-        }
 
         if (Directory.Exists(path))
             OpenFolder(path);
@@ -245,6 +241,10 @@ internal partial class Files
 
         // Set the breadcrumb bar with the correct values.
         SetBreadcrumbBar();
+
+        // Compile the project scripts.
+        if (Engine.Core.Instance is not null)
+            Engine.Core.Instance.RuntimeCompiler.CompileProjectScripts();
     }
 
     public void ValidateCategoriesExist()
