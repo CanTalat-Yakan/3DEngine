@@ -10,12 +10,16 @@ namespace Engine.Helper;
 
 internal class ImageLoader
 {
-    public static ID3D11Texture2D LoadTexture(ID3D11Device device, string filePath)
+    public static ID3D11Texture2D LoadTexture(ID3D11Device device, string filePath, bool fromResources = true)
     {
-        // Combine the base directory and the relative path to the resources directory
-        string resourcesPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources");
-        // Define the full path to the texture file.
-        string textureFilePath = Path.Combine(resourcesPath, filePath);
+        string textureFilePath = filePath;
+        if (fromResources)
+        {
+            // Combine the base directory and the relative path to the resources directory
+            string resourcesPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources");
+            // Define the full path to the texture file.
+            textureFilePath = Path.Combine(resourcesPath, filePath);
+        }
 
         #region // Loading images using Vortice.WIC
         using IWICImagingFactory wicFactory = new();

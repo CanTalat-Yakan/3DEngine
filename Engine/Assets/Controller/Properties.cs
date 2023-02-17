@@ -130,7 +130,7 @@ internal partial class Properties
 
                 // Add fields to the fields collection.
                 foreach (var info in fieldInfos)
-                    if ((newFieldGrid = CreateFromFieldInfo(info.GetValue(component), info, nonPublicFieldInfos)) is not null)
+                    if ((newFieldGrid = CreateFromFieldInfo(component, info, nonPublicFieldInfos)) is not null)
                         fieldsCollection.Add(newFieldGrid);
 
                 // Add events to the events collection.
@@ -268,11 +268,12 @@ internal partial class Properties : Controller.Helper
         return grid;
     }
 
-    public Grid CreateFromFieldInfo(object value, FieldInfo fieldInfo, FieldInfo[] nonPublic)
+    public Grid CreateFromFieldInfo(object obj, FieldInfo fieldInfo, FieldInfo[] nonPublic)
     {
         // Initialize a new List of Grid type.
         List<Grid> grid = new();
 
+        var value = fieldInfo.GetValue(obj);
         // Get the type of the current field.
         var type = fieldInfo.FieldType;
         // Get any custom attributes applied to the field.
@@ -352,7 +353,7 @@ internal partial class Properties : Controller.Helper
 
         // String
         else if (type == typeof(string))
-            grid.Add(CreateTextInput((string)value));
+            grid.Add(CreateTextInput((string)value, (s, e) => fieldInfo.SetValue(obj, ((TextBox)s).Text)));
 
         // Vector 2
         else if (type == typeof(Vector2))

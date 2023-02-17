@@ -116,8 +116,15 @@ internal class Helper
     internal virtual UIElement CreateTextFullWithOpacity(string s = "String") =>
         new TextBlock() { Text = s, Opacity = 0.5f, TextWrapping = TextWrapping.Wrap };
 
-    internal virtual Grid CreateTextInput(string placeholder = "Example") =>
-        StackInGrid(new TextBox() { Text = placeholder, MaxWidth = 200 });
+    internal virtual Grid CreateTextInput(string placeholder = "Example",
+        TextChangedEventHandler textChanged = null)
+    {
+        TextBox textBox = new() { Text = placeholder, MaxWidth = 200 };
+        if (textChanged is not null)
+            textBox.TextChanged += textChanged;
+
+        return StackInGrid(textBox);
+    }
 
     internal virtual Grid CreateNumberInput(float f = 0, float min = float.MinValue, float max = float.MaxValue,
         TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs> onValueChanged = null)

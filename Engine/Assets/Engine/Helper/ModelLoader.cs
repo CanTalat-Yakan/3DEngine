@@ -7,12 +7,16 @@ namespace Engine.Helper;
 
 internal class ModelLoader
 {
-    public static MeshInfo LoadFile(string filePath)
+    public static MeshInfo LoadFile(string filePath, bool fromResources = true)
     {
-        // Combine the base directory and the relative path to the resources directory
-        string resourcesPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources");
-        // Define the full path to the model file.
-        string modelFilePath = Path.Combine(resourcesPath, filePath);
+        string modelFilePath = filePath;
+        if (fromResources)
+        {
+            // Combine the base directory and the relative path to the resources directory
+            string resourcesPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources");
+            // Define the full path to the model file.
+            modelFilePath = Path.Combine(resourcesPath, filePath);
+        }
 
         // Create an AssimpContext instance.
         AssimpContext con = new();
@@ -20,7 +24,7 @@ internal class ModelLoader
         importer.SetConfig(new NormalSmoothingAngleConfig(66.0f));
 
         // Load the model file using Assimp.
-        Assimp.Scene file = con.ImportFile(modelFilePath, PostProcessPreset.TargetRealTimeQuality);
+        Assimp.Scene file = con.ImportFile(modelFilePath, PostProcessPreset.TargetRealTimeFast);
 
         // Create new lists for the "MeshInfo" object.
         var vertices = new List<Vertex>();
@@ -59,8 +63,10 @@ internal class ModelLoader
         }
 
         // Return the completed "MeshInfo" object.
-        return new MeshInfo() { 
-            Vertices = vertices.ToArray(), 
-            Indices = indices.ToArray() };
+        return new MeshInfo()
+        {
+            Vertices = vertices.ToArray(),
+            Indices = indices.ToArray()
+        };
     }
 }

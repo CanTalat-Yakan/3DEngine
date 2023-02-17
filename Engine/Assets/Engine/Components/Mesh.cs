@@ -1,10 +1,13 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.IO;
+using System.Runtime.CompilerServices;
 using Vortice.Direct3D11;
 
 namespace Engine.Components;
 
 public class Mesh : Component
 {
+    public string MeshPath;
+
     public MeshInfo MeshInfo => _meshInfo;
     [Show] MeshInfo _meshInfo;
 
@@ -29,6 +32,15 @@ public class Mesh : Component
     {
         SetMeshInfo(EntityManager.GetDefaultMeshInfo());
         SetMaterial(EntityManager.GetDefaultMaterial());
+    }
+
+    public override void OnUpdate()
+    {
+        if (File.Exists(MeshPath))
+        {
+            SetMeshInfo(ModelLoader.LoadFile(MeshPath, false));
+            MeshPath = "";
+        }
     }
 
     public override void OnRender()

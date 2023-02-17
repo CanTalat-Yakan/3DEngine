@@ -90,6 +90,8 @@ internal class SceneManager
 
     public void Update()
     {
+        // Render the MeshSystem.
+        MeshSystem.Update();
         // Update the TransformSystem
         TransformSystem.Update();
         // Update the CameraSystem
