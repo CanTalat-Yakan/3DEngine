@@ -159,7 +159,7 @@ namespace Engine.Utilities
 
             // Add components to the collector.
             ComponentCollector.Components.Clear();
-            ComponentCollector.Components.AddRange(componentCollection.ToArray());
+            ComponentCollector.Components.AddRange(componentCollection);
         }
 
         private void DestroyComponentTypeReferences(Assembly assembly)

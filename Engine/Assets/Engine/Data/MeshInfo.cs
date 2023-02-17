@@ -4,6 +4,6 @@ namespace Engine.Data;
 
 public struct MeshInfo
 {
-    public List<Vertex> Vertices;
-    public List<ushort> Indices;
+    public Vertex[] Vertices;
+    public ushort[] Indices;
 }
