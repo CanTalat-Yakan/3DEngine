@@ -55,13 +55,13 @@ namespace Engine.ECS
             // Add the Transform component to the Entity when initialized.
             AddComponent(_transform = new Transform());
 
-        public void AddComponent<T>() where T : Component, new() =>
+        public Component AddComponent<T>() where T : Component, new() =>
             AddComponent(new T());
 
-        public void AddComponent(Type type) =>
+        public Component AddComponent(Type type) =>
             AddComponent((Component)Activator.CreateInstance(type));
 
-        public void AddComponent(Component component)
+        public Component AddComponent(Component component)
         {
             // Add the component to the Entity's component list.
             _components.Add(component);
@@ -70,6 +70,8 @@ namespace Engine.ECS
             component.Entity = this;
             // Enable the component by default.
             component.IsEnabled = true;
+
+            return component;
         }
 
         public void RemoveComponent(Component component)

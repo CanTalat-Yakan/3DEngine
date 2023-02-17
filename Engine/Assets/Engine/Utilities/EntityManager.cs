@@ -55,9 +55,9 @@ namespace Engine.Utilities
         public EventList<Entity> EntityList = new();
         public Entity Sky;
 
-        private Material _materialDefault;
-        private Material _materialSky;
-        private Material _materialSkyLight;
+        private static Material _materialDefault;
+        private static Material _materialSky;
+        private static Material _materialSkyLight;
 
         private static readonly string SHADER_LIT = @"Shader\Lit.hlsl";
         private static readonly string SHADER_SIMPLELIT = @"Shader\SimpleLit.hlsl";
@@ -72,11 +72,16 @@ namespace Engine.Utilities
         public EntityManager()
         {
             // Create a new material with the default shader and default image.
-            _materialDefault = new(SHADER_SIMPLELIT, IMAGE_DEFAULT);
+            if (_materialDefault is null)
+                _materialDefault = new(SHADER_SIMPLELIT, IMAGE_DEFAULT);
+
             // Create a new material with the unlit shader and sky image.
-            _materialSky = new(SHADER_UNLIT, IMAGE_SKY);
+            if (_materialSky is null)
+                _materialSky = new(SHADER_UNLIT, IMAGE_SKY);
+
             // Create a new material with the unlit shader and a light version of the sky image.
-            _materialSkyLight = new(SHADER_UNLIT, IMAGE_SKY_LIGHT);
+            if (_materialSkyLight is null)
+                _materialSkyLight = new(SHADER_UNLIT, IMAGE_SKY_LIGHT);
         }
 
         public Entity Duplicate(Entity refEntity, Entity parent = null)
@@ -120,9 +125,8 @@ namespace Engine.Utilities
             };
 
             // Add a mesh component to the entity using the specified primitive type.
-            newEntity.AddComponent(new Mesh(ModelLoader.LoadFile(Path.Combine(PATH_PRIMITIVES, type.ToString()) + ".obj")));
-            // Set the material of the mesh component to the default material.
-            newEntity.GetComponent<Mesh>().Material = _materialDefault;
+            var mesh = (Mesh)newEntity.AddComponent<Mesh>();
+            mesh.SetMeshInfo(ModelLoader.LoadFile(Path.Combine(PATH_PRIMITIVES, type.ToString()) + ".obj"));
 
             // Add the new entity to the entity list.
             EntityList.Add(newEntity);
@@ -142,7 +146,7 @@ namespace Engine.Utilities
             };
 
             // Add a Camera component to the Entity.
-            newEntity.AddComponent(new Camera());
+            newEntity.AddComponent<Camera>();
 
             // Add the new Entity to the EntityList.
             EntityList.Add(newEntity);
@@ -163,9 +167,11 @@ namespace Engine.Utilities
             Sky.Transform.LocalScale = new Vector3(-1000, 1000, 1000);
 
             // Add Mesh component to Sky entity.
-            Sky.AddComponent(new Mesh(ModelLoader.LoadFile(Path.Combine(PATH_PRIMITIVES, PrimitiveTypes.Sphere.ToString()) + ".obj")));
+            var skyMesh = (Mesh)Sky.AddComponent<Mesh>();
+            skyMesh.SetMeshInfo(ModelLoader.LoadFile(Path.Combine(PATH_PRIMITIVES, PrimitiveTypes.Sphere.ToString()) + ".obj"));
+
             // Set material of Sky's Mesh component.
-            Sky.GetComponent<Mesh>().Material = _materialSky;
+            skyMesh.SetMaterial(_materialSky);
 
             // Add Sky entity to EntityList.
             EntityList.Add(Sky);
@@ -173,7 +179,15 @@ namespace Engine.Utilities
 
         public void SetTheme(bool light) =>
             // Switch the material of the sky component to either the default or light sky material.
-            Sky.GetComponent<Mesh>().Material = light ? _materialSkyLight : _materialSky;
+            Sky.GetComponent<Mesh>().SetMaterial(light ? _materialSkyLight : _materialSky);
+
+        public static MeshInfo GetDefaultMeshInfo() =>
+            // Set mesh info to a cube from the resources.
+            ModelLoader.LoadFile(Path.Combine("Models", "Primitives", "Cube.obj"));
+
+        public static Material GetDefaultMaterial() =>
+            // Set mesh info to a cube from the resources.
+            _materialDefault;
 
         public Entity GetFromID(Guid id)
         {
