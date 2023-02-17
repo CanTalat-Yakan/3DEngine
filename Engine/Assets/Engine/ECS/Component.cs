@@ -2,10 +2,8 @@
 
 public class Component : BindableBase, ICloneable
 {
-    [Hide]
-    public Entity Entity;
-    [Hide]
-    public byte Order = 0;
+    [Hide] public Entity Entity;
+    [Hide] public byte Order = 0;
 
     private bool _isEnabled;
     public bool IsEnabled
