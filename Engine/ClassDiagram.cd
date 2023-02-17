@@ -391,13 +391,6 @@
       <FileName>Assets\Controller\Home.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Editor.Controller.BindingHelper" Collapsed="true">
-    <Position X="10" Y="4.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Assets\Controller\Helper\Binding.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="Engine.Core" Collapsed="true">
     <Position X="5.5" Y="9" Width="1.5" />
     <TypeIdentifier>
@@ -460,6 +453,20 @@
     <TypeIdentifier>
       <HashCode>AEAgAAAAAEBAAIgAAAAAAAAAABAQJAAAgAAAAAACAAI=</HashCode>
       <FileName>Assets\Controller\Helper\Player.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Editor.Controller.BindingHelper" Collapsed="true">
+    <Position X="10" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Controller\Helper\Binding.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Profiler" Collapsed="true">
+    <Position X="10" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAQAAAAEAAAAAAAAAABAAQAgAAAAAAEAAEAAAAAAA=</HashCode>
+      <FileName>Assets\Controller\Helper\Profiler.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Struct Name="Editor.Controller.Category" Collapsed="true">
