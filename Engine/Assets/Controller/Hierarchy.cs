@@ -288,8 +288,16 @@ internal partial class Hierarchy
         items[4].Click += (s, e) => ContentDialogDeleteTreeEntry(_itemInvoked);
         items[4].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.Delete });
 
-        items[5].Click += (s, e) => SceneManager.Scene.EntitytManager.CreateEntity(GetEntity(GetParent(_itemInvoked)));
-        items[6].Click += (s, e) => SceneManager.Scene.EntitytManager.CreateEntity(GetEntity(_itemInvoked));
+        items[5].Click += (s, e) =>
+        {
+            var entity = GetEntity(_itemInvoked);
+            entity.Scene.EntitytManager.CreateEntity(entity.Parent);
+        };
+        items[6].Click += (s, e) =>
+        {
+            var entity = GetEntity(_itemInvoked);
+            entity.Scene.EntitytManager.CreateEntity(entity);
+        };
 
         MenuFlyout menuFlyout = new();
         foreach (var item in items)
