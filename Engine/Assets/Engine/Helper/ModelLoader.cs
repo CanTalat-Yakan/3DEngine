@@ -23,8 +23,17 @@ internal class ModelLoader
         AssimpContext importer = new();
         importer.SetConfig(new NormalSmoothingAngleConfig(66.0f));
 
+        var postProcessSteps =
+            PostProcessSteps.Triangulate |
+            PostProcessSteps.GenerateSmoothNormals |
+            PostProcessSteps.FlipUVs |
+            PostProcessSteps.JoinIdenticalVertices |
+            PostProcessSteps.PreTransformVertices |
+            PostProcessSteps.CalculateTangentSpace |
+            PostProcessPreset.TargetRealTimeQuality;
+
         // Load the model file using Assimp.
-        Assimp.Scene file = con.ImportFile(modelFilePath, PostProcessPreset.TargetRealTimeFast);
+        Assimp.Scene file = con.ImportFile(modelFilePath, postProcessSteps);
 
         // Create new lists for the "MeshInfo" object.
         var vertices = new List<Vertex>();
@@ -40,7 +49,7 @@ internal class ModelLoader
                     mesh.Vertices[i].Y,
                     mesh.Vertices[i].Z,
                     mesh.TextureCoordinateChannels[0][i].X,
-                    1 - mesh.TextureCoordinateChannels[0][i].Y,
+                    mesh.TextureCoordinateChannels[0][i].Y,
                     mesh.Normals[i].X,
                     mesh.Normals[i].Y,
                     mesh.Normals[i].Z));
@@ -50,15 +59,16 @@ internal class ModelLoader
             {
                 indices.AddRange(new[] {
                         (ushort)face.Indices[0],
-                        (ushort)face.Indices[2],
-                        (ushort)face.Indices[1]});
+                        (ushort)face.Indices[1],
+                        (ushort)face.Indices[2]});
 
-                // If the face has four vertices, add one additional triangles to the MeshInfo object.
+                // Split the face into two triangles,
+                // when the face has four indices. 
                 if (face.IndexCount == 4)
                     indices.AddRange(new[] {
-                            (ushort)face.Indices[0],
-                            (ushort)face.Indices[3],
-                            (ushort)face.Indices[2]});
+                        (ushort)face.Indices[0],
+                        (ushort)face.Indices[2],
+                        (ushort)face.Indices[3]});
             }
         }
 

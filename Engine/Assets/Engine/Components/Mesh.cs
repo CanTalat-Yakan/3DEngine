@@ -36,11 +36,12 @@ public class Mesh : Component
 
     public override void OnUpdate()
     {
-        if (File.Exists(MeshPath))
-        {
-            SetMeshInfo(ModelLoader.LoadFile(MeshPath, false));
-            MeshPath = "";
-        }
+        if (!string.IsNullOrEmpty(MeshPath))
+            if (File.Exists(MeshPath))
+            {
+                SetMeshInfo(ModelLoader.LoadFile(MeshPath, false));
+                MeshPath = null;
+            }
     }
 
     public override void OnRender()

@@ -239,6 +239,7 @@ internal class Renderer
         {
             FillMode = solid ? FillMode.Solid : FillMode.Wireframe,
             CullMode = solid ? CullMode.Back : CullMode.None,
+            FrontCounterClockwise = true
         };
 
         // Create a rasterizer state based on the description
