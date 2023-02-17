@@ -14,9 +14,9 @@ public class Mesh : Component
     internal ID3D11Buffer _vertexBuffer;
     internal ID3D11Buffer _indexBuffer;
 
-    internal int _vertexCount => _meshInfo.Vertices.Count;
+    internal int _vertexCount => _meshInfo.Vertices.Length;
     internal int _vertexStride => Unsafe.SizeOf<Vertex>();
-    internal int _indexCount => _meshInfo.Indices.Count;
+    internal int _indexCount => _meshInfo.Indices.Length;
     internal int _indexStride => Unsafe.SizeOf<int>();
 
     private Renderer _d3d => Renderer.Instance;
@@ -65,13 +65,13 @@ public class Mesh : Component
         //Create a VertexBuffer using the MeshInfo's vertices
         //and bind it with VertexBuffer flag.
         _vertexBuffer = _d3d.Device.CreateBuffer(
-            _meshInfo.Vertices.ToArray(),
+            _meshInfo.Vertices,
             BindFlags.VertexBuffer);
 
         //Create an IndexBuffer using the MeshInfo's indices
         //and bind it with IndexBuffer flag.
         _indexBuffer = _d3d.Device.CreateBuffer(
-            _meshInfo.Indices.ToArray(),
+            _meshInfo.Indices,
             BindFlags.IndexBuffer);
     }
 }
