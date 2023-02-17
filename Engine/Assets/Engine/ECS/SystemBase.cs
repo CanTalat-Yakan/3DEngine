@@ -89,17 +89,17 @@ public class SystemBase<T> where T : Component
         }
     }
 
-    public static void Replace(Type componentType, T newComponent)
+    public static void Replace(Type oldComponentType, Type newComponentType)
     {
         // Remove all components of the specified type from the collection of registered components.
         foreach (var component in s_components
-            .Where(c => c.GetType() == componentType)
+            .Where(c => c.GetType() == oldComponentType)
             .ToArray())
         {
             Destroy(component);
 
             component.Entity.RemoveComponent(component);
-            component.Entity.AddComponent(newComponent);
+            component.Entity.AddComponent(newComponentType);
         }
     }
 

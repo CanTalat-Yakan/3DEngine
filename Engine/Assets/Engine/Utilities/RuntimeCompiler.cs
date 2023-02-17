@@ -151,10 +151,10 @@ namespace Engine.Utilities
             // and ignore all components that have the "IHide" interface.
             var componentCollection = AppDomain.CurrentDomain.GetAssemblies()
                 .Except(_ignoreAssemblies)
-                .SelectMany(s => s.GetTypes())
-                .Where(p =>
-                    (typeof(Component).IsAssignableFrom(p) && !p.Equals(typeof(Component)))
-                    && !(typeof(IHide).IsAssignableFrom(p) && !p.IsInterface))
+                .SelectMany(a => a.GetTypes())
+                .Where(t =>
+                    typeof(Component).IsAssignableFrom(t) && !t.Equals(typeof(Component))
+                    && !(typeof(IHide).IsAssignableFrom(t) && !t.IsInterface))
                 .ToArray();
 
             // Add components to the collector.
@@ -164,15 +164,13 @@ namespace Engine.Utilities
 
         private void DestroyComponentTypeReferences(Assembly assembly)
         {
-            // Remove the specified components in the script- or editorscript system,
+            // Remove the specified components in the script or editorscript system,
             // using the types obtained from the provided assembly.
             foreach (var type in assembly.GetTypes())
-            {
-                if (type.IsSubclassOf(typeof(Component)))
-                    ScriptSystem.Destroy(type);
-                else if (type.IsSubclassOf(typeof(EditorComponent)))
+                if (type.IsSubclassOf(typeof(EditorComponent)))
                     EditorScriptSystem.Destroy(type);
-            }
+                else if (type.IsSubclassOf(typeof(Component)))
+                    ScriptSystem.Destroy(type);
         }
 
         private void ReplaceComponentTypeReferences(Assembly assembly)
@@ -185,10 +183,7 @@ namespace Engine.Utilities
                         foreach (var ignoreType in ignoreAssembly.GetTypes())
                             if (type.IsSubclassOf(typeof(Component)))
                                 if (type.FullName == ignoreType.FullName)
-                                {
-                                    var newComponent = (Component)Activator.CreateInstance(type);
-                                    ScriptSystem.Replace(ignoreType, newComponent);
-                                }
+                                    ScriptSystem.Replace(ignoreType, type);
         }
     }
 }
