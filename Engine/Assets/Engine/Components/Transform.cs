@@ -6,7 +6,7 @@ public class Transform : Component, IHide
 {
     public Transform Parent => Entity.Parent is null ? null : Entity.Parent.Transform;
 
-    public Vector3 Forward => Parent is null ? LocalForward : LocalForward + Parent.Forward;
+    public Vector3 Forward => Parent is null ? LocalForward : Vector3.Transform(LocalForward, Parent.Rotation) + Parent.Forward;
     public Vector3 LocalForward = Vector3.UnitZ;
 
     public Vector3 Right => Parent is null ? LocalRight : LocalRight + Parent.Right;
@@ -15,7 +15,7 @@ public class Transform : Component, IHide
     public Vector3 Up => Parent is null ? LocalUp : LocalUp + Parent.Up;
     public Vector3 LocalUp = Vector3.UnitY;
 
-    public Vector3 Position => Parent is null ? LocalPosition : LocalPosition + Parent.Position;
+    public Vector3 Position => Parent is null ? LocalPosition : Vector3.Transform(LocalPosition, Parent.Rotation) + Parent.Position;
     public Vector3 LocalPosition = Vector3.Zero;
 
     public Quaternion Rotation => Parent is null ? LocalRotation : LocalRotation * Parent.Rotation;
@@ -29,7 +29,6 @@ public class Transform : Component, IHide
     public Vector3 LocalScale = Vector3.One;
 
     private PerModelConstantBuffer _modelConstantBuffer;
-
     private Matrix4x4 _worldMatrix;
 
     public override void OnRegister() =>
@@ -66,14 +65,14 @@ public class Transform : Component, IHide
 
         return _modelConstantBuffer;
     }
-
+    
     private void SetEulerAngles(Vector3 value)
     {
-        // Set the values for the EulerAngles with degrees.
+        // Set the values for the EulerAngles in degrees.
         _eulerAngles = value;
 
-        // Set the LocalRotation with the new quaternion from the euler.
-        _localRotation = value.FromEuler();
+        // Set the LocalRotation with the new quaternion from the euler in radians.
+        _localRotation = value.ToRadians().FromEuler();
     }
 
     private void SetQuaternion(Quaternion value)

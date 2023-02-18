@@ -632,19 +632,6 @@ internal static class ExtensionMethods
 
         return name;
     }
-
-    public static Vector3 ToDegrees(this Vector3 vector) =>
-        new(Vortice.Mathematics.MathHelper.ToDegrees(vector.X),
-            Vortice.Mathematics.MathHelper.ToDegrees(vector.Y),
-            Vortice.Mathematics.MathHelper.ToDegrees(vector.Z));
-
-    public static Vector3 ToRadians(this Vector3 vector) =>
-        new(Vortice.Mathematics.MathHelper.ToRadians(vector.X),
-            Vortice.Mathematics.MathHelper.ToRadians(vector.Y),
-            Vortice.Mathematics.MathHelper.ToRadians(vector.Z));
-
-    public static bool IsNaN(this Vector3 vector3) =>
-        float.IsNaN(vector3.X) || float.IsNaN(vector3.Y) || float.IsNaN(vector3.Z);
 }
 
 internal sealed class BooleanToVisibilityConverter : IValueConverter

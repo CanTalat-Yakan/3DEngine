@@ -102,13 +102,17 @@ namespace Engine.Utilities
             return false;
         }
 
-        public static Vector2 GetAxis() { return _axis; }
+        public static Vector2 GetAxis() =>
+            _axis.IsNaN() ? Vector2.Zero : _axis;
 
-        public static Vector2 GetMouseAxis() { return _mouseAxis; }
+        public static Vector2 GetMouseAxis() =>
+            _mouseAxis.IsNaN() ? Vector2.Zero : _mouseAxis;
 
-        public static Point GetMousePosition() { return _pointerPosition; }
+        public static Point GetMousePosition() =>
+            _pointerPosition;
 
-        public static int GetMouseWheel() { return _mouseWheelDelta; }
+        public static int GetMouseWheel() => 
+            _mouseWheelDelta;
 
         public static void KeyDown(object sender, KeyRoutedEventArgs e)
         {

@@ -6,6 +6,7 @@ public class Time
 {
     public static double Timer => s_timer;
     public static double Delta => s_delta;
+    public static float DeltaF => (float)s_delta;
     public static int FPS => s_fps;
 
     private static double s_timer, s_delta;

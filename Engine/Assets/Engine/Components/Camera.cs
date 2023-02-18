@@ -46,7 +46,7 @@ public class Camera : Component
             Entity.Transform.Position,
             Entity.Transform.Position + Entity.Transform.Forward,
             Vector3.UnitY);
-
+        
         // Get the aspect ratio for the device's screen.
         var aspect = (float)(_d3d.SwapChainPanel.ActualWidth / _d3d.SwapChainPanel.ActualHeight);
         var dAspect = aspect < 1 ? 1 * aspect : 1 / aspect;
