@@ -10,7 +10,7 @@ internal class SceneManager
     public SceneManager(Scene scene = null)
     {
         // Initializes the main scene and creates a new empty list for the subscenes.
-        Scene = scene != null ? scene : new() { ID = Guid.NewGuid(), Name = "Core", IsEnabled = true, EntitytManager = new() };
+        Scene = scene != null ? scene : new() { ID = Guid.NewGuid(), Name = "Core", IsEnabled = true, EntityManager = new() };
         Subscenes = new List<Scene>();
     }
 
@@ -22,7 +22,7 @@ internal class SceneManager
 
         // Adds a new scene with the specified parameters to the list of subscenes.
         Scene scene;
-        Subscenes.Add(scene = new() { ID = guid, Name = name, IsEnabled = enable, EntitytManager = new() });
+        Subscenes.Add(scene = new() { ID = guid, Name = name, IsEnabled = enable, EntityManager = new() });
 
         // Returns the newly added scene.
         return scene;
@@ -52,8 +52,8 @@ internal class SceneManager
         Scene scene = GetFromID(guid);
 
         // Destroys all entities within the scene.
-        foreach (var entity in scene.EntitytManager.EntityList)
-            scene.EntitytManager.Destroy(entity);
+        foreach (var entity in scene.EntityManager.EntityList)
+            scene.EntityManager.Destroy(entity);
 
         // Removes the scene from the list of subscenes.
         Subscenes.Remove(scene);
@@ -152,12 +152,12 @@ internal class SceneManager
     public static Scene GetFromEntityID(Guid guid)
     {
         // Check if the main scene contains the entity with an ID that matches the provided GUID.
-        if (Scene.EntitytManager.GetFromID(guid) is not null)
+        if (Scene.EntityManager.GetFromID(guid) is not null)
             return Scene;
 
         // Check if any of the subscenes contains the entity with an ID that matches the provided GUID.
         foreach (var subscene in Subscenes)
-            if (subscene.EntitytManager.GetFromID(guid) is not null)
+            if (subscene.EntityManager.GetFromID(guid) is not null)
                 return subscene;
 
         // Return null if entity is not found in any scene with the provided GUID.

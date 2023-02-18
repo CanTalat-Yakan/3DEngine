@@ -4,7 +4,7 @@ public class Scene : BindableBase, ICloneable
 {
     public Guid ID = Guid.NewGuid();
 
-    public EntityManager EntitytManager = new();
+    public EntityManager EntityManager = new();
 
     private string _name = "Scene";
     public string Name

@@ -15,7 +15,7 @@ internal class SceneBoot : EditorComponent
     public override void OnAwake()
     {
         // Create a camera entity with the name "Camera" and tag "SceneCamera".
-        SceneCamera = SceneManager.Scene.EntitytManager.CreateCamera("Camera", EditorTags.SceneCamera.ToString()).GetComponent<Camera>();
+        SceneCamera = SceneManager.Scene.EntityManager.CreateCamera("Camera", EditorTags.SceneCamera.ToString()).GetComponent<Camera>();
         // Set the camera order to the maximum value.
         SceneCamera.CameraOrder = byte.MaxValue;
 
@@ -28,25 +28,25 @@ internal class SceneBoot : EditorComponent
         SceneCamera.Entity.Transform.EulerAngles = new(35, -150, 0);
 
         // Create a sky entity in the scene.
-        SceneManager.Scene.EntitytManager.CreateSky();
+        SceneManager.Scene.EntityManager.CreateSky();
     }
 
     public override void OnStart()
     {
         // Create a camera entity with the name "Camera" and the tag ETags.MainCamera.
-        SceneManager.Scene.EntitytManager.CreateCamera("Camera", Tags.MainCamera.ToString());
+        SceneManager.Scene.EntityManager.CreateCamera("Camera", Tags.MainCamera.ToString());
 
         // Create a parent entity for all cube entities with the name "Cubes".
-        Cubes = SceneManager.Scene.EntitytManager.CreateEntity(null, "Cubes");
+        Cubes = SceneManager.Scene.EntityManager.CreateEntity(null, "Cubes");
 
         // Create a cube primitive under the Cubes entity.
-        SceneManager.Scene.EntitytManager.CreatePrimitive(PrimitiveTypes.Cube, Cubes);
+        SceneManager.Scene.EntityManager.CreatePrimitive(PrimitiveTypes.Cube, Cubes);
     }
 
     public override void OnUpdate()
     {
         // Set the skybox's position to the camera's position.
-        SceneManager.Scene.EntitytManager.Sky.Transform.LocalPosition = CameraSystem.Components.First().Entity.Transform.Position;
+        SceneManager.Scene.EntityManager.Sky.Transform.LocalPosition = CameraSystem.Components.First().Entity.Transform.Position;
 
         // Reactivate the SceneCamera after OnUpdate is called from the EditorScriptSystem.
         SceneCamera.IsEnabled = true;
@@ -62,7 +62,7 @@ internal class SceneBoot : EditorComponent
             for (int i = 0; i < 10; i++)
             {
                 // Create a new cube and add it to the Cubes entity.
-                var newCube = SceneManager.Scene.EntitytManager.CreatePrimitive(PrimitiveTypes.Cube, Cubes);
+                var newCube = SceneManager.Scene.EntityManager.CreatePrimitive(PrimitiveTypes.Cube, Cubes);
 
                 // Set the position of the new cube with an offset on the Y axis.
                 newCube.Transform.LocalPosition.Y -= 3;

@@ -28,7 +28,7 @@ internal partial class ViewPort
                 CreateButton(CreateIcon(Symbol.Video),
                     StackInGridVertical(
                             CreateSlider(90, 40, 110,
-                            (s, e) => { SceneManager.Scene.EntitytManager.GetFromTag("SceneCamera").GetComponent<Camera>().FieldOfView= (float)e.NewValue; }).WrapInGridVertical("Field Of View"),
+                            (s, e) => { SceneManager.Scene.EntityManager.GetFromTag("SceneCamera").GetComponent<Camera>().FieldOfView= (float)e.NewValue; }).WrapInGridVertical("Field Of View"),
                             CreateNumberInput(CameraController.MovementSpeed, 1, 100, (s, e) => { CameraController.MovementSpeed = (float)e.NewValue; }).WrapInGridVertical("Movement Speed"))),
                 CreateAppBarSeperator(),
                 CreateComboBox(new[] { "Perspective", "Orthogonal" }),

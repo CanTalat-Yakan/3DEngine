@@ -81,10 +81,10 @@ internal partial class Hierarchy
     {
         Scene scene = SceneManager.GetFromID(sceneEntry.ID);
 
-        scene.EntitytManager.EntityList.OnAdd += (s, e) => AddTreeEntry(sceneEntry, (Entity)e);
-        scene.EntitytManager.EntityList.OnRemove += (s, e) => RemoveTreeEntry(sceneEntry, (Entity)e);
+        scene.EntityManager.EntityList.OnAdd += (s, e) => AddTreeEntry(sceneEntry, (Entity)e);
+        scene.EntityManager.EntityList.OnRemove += (s, e) => RemoveTreeEntry(sceneEntry, (Entity)e);
 
-        foreach (var entity in scene.EntitytManager.EntityList)
+        foreach (var entity in scene.EntityManager.EntityList)
             AddTreeEntry(sceneEntry, entity);
     }
 
@@ -215,7 +215,7 @@ internal partial class Hierarchy
         var sceneGrid = new Grid[]
         {
                 CreateTreeView(out sceneEntry.TreeView, _hierarchy.Resources["x_TreeViewIconNodeTemplateSelector"] as TreeViewIconNodeTemplateSelector),
-                CreateButton("Create Entity", (s, e) => scene.EntitytManager.CreateEntity() )
+                CreateButton("Create Entity", (s, e) => scene.EntityManager.CreateEntity() )
         };
         sceneEntry.TreeView.ItemsSource = sceneEntry.DataSource;
         sceneEntry.TreeView.PointerPressed += (s, e) => GetInvokedItemAndSetContextFlyout(s, e);
@@ -306,12 +306,12 @@ internal partial class Hierarchy
         items[5].Click += (s, e) =>
         {
             var entity = GetEntity(_itemInvoked);
-            entity.Scene.EntitytManager.CreateEntity(entity.Parent);
+            entity.Scene.EntityManager.CreateEntity(entity.Parent);
         };
         items[6].Click += (s, e) =>
         {
             var entity = GetEntity(_itemInvoked);
-            entity.Scene.EntitytManager.CreateEntity(entity);
+            entity.Scene.EntityManager.CreateEntity(entity);
         };
 
         MenuFlyout menuFlyout = new();
@@ -342,7 +342,7 @@ internal partial class Hierarchy
         items[2].Click += (s, e) => PasteEntityFromClipboard(SceneEntry);
         items[2].KeyboardAccelerators.Add(new KeyboardAccelerator() { Modifiers = VirtualKeyModifiers.Control, Key = VirtualKey.V });
 
-        items[3].Click += (s, e) => SceneManager.Scene.EntitytManager.CreateEntity();
+        items[3].Click += (s, e) => SceneManager.Scene.EntityManager.CreateEntity();
 
         MenuFlyout menuFlyout = new();
         foreach (var item in items)
@@ -380,7 +380,7 @@ internal partial class Hierarchy
         items[3].Click += (s, e) => ContentDialogRenameSubscene(sceneEntry);
         items[4].Click += (s, e) => ContentDialogDeleteSubscene(sceneEntry);
 
-        items[7].Click += (s, e) => SceneManager.GetFromID(sceneEntry.ID).EntitytManager.CreateEntity();
+        items[7].Click += (s, e) => SceneManager.GetFromID(sceneEntry.ID).EntityManager.CreateEntity();
 
         MenuFlyout menuFlyout = new();
         foreach (var item in items)
@@ -412,12 +412,12 @@ internal partial class Hierarchy
                 if (_itemInvoked is not null)
                 {
                     var entity = GetEntity(_itemInvoked);
-                    entity.Scene.EntitytManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type), entity);
+                    entity.Scene.EntityManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type), entity);
                 }
                 else if (sceneEntry is not null)
-                    SceneManager.GetFromID(sceneEntry.ID).EntitytManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
+                    SceneManager.GetFromID(sceneEntry.ID).EntityManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
                 else
-                    SceneManager.Scene.EntitytManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
+                    SceneManager.Scene.EntityManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
             };
 
             objectSubItem.Items.Add(item);
@@ -431,12 +431,12 @@ internal partial class Hierarchy
             if (_itemInvoked is not null)
             {
                 var entity = GetEntity(_itemInvoked);
-                entity.Scene.EntitytManager.CreateCamera("Camera", Tags.MainCamera.ToString(), entity);
+                entity.Scene.EntityManager.CreateCamera("Camera", Tags.MainCamera.ToString(), entity);
             }
             else if (sceneEntry is not null)
-                SceneManager.GetFromID(sceneEntry.ID).EntitytManager.CreateCamera();
+                SceneManager.GetFromID(sceneEntry.ID).EntityManager.CreateCamera();
             else
-                SceneManager.Scene.EntitytManager.CreateCamera();
+                SceneManager.Scene.EntityManager.CreateCamera();
         };
 
         return menuFlyout;
@@ -605,11 +605,11 @@ internal partial class Hierarchy
             SceneEntry sceneEntry = GetSceneEntry(treeEntry);
             Scene scene = SceneManager.GetFromID(sceneEntry.ID);
 
-            scene.EntitytManager.Destroy(GetEntity(treeEntry.ID));
+            scene.EntityManager.Destroy(GetEntity(treeEntry.ID));
 
             foreach (var iconNode in treeEntry.IconNode.Children)
             {
-                scene.EntitytManager.Destroy(GetEntity(iconNode.TreeEntry.ID));
+                scene.EntityManager.Destroy(GetEntity(iconNode.TreeEntry.ID));
                 sceneEntry.DataSource.Remove(iconNode);
             }
 
@@ -625,15 +625,15 @@ internal partial class Hierarchy : Controller.Helper
         Entity entity;
 
         if (sceneEntry is not null)
-            entity = SceneManager.GetFromID(sceneEntry.ID).EntitytManager.GetFromID(guid);
+            entity = SceneManager.GetFromID(sceneEntry.ID).EntityManager.GetFromID(guid);
         else
         {
-            entity = SceneManager.Scene.EntitytManager.GetFromID(guid);
+            entity = SceneManager.Scene.EntityManager.GetFromID(guid);
 
             if (entity is null)
                 foreach (var subscene in SceneManager.Subscenes)
                     if (entity is null)
-                        entity = subscene.EntitytManager.GetFromID(guid);
+                        entity = subscene.EntityManager.GetFromID(guid);
                     else break;
         }
 
@@ -724,7 +724,7 @@ internal partial class Hierarchy : Controller.Helper
             }
             else if (requestedOperation == DataPackageOperation.Copy)
             {
-                var newEntity = SceneManager.GetFromID(sourceSceneEntry.ID).EntitytManager.Duplicate(sourceEntity, targetEntity);
+                var newEntity = SceneManager.GetFromID(sourceSceneEntry.ID).EntityManager.Duplicate(sourceEntity, targetEntity);
                 var newTreeEntry = GetTreeEntry(newEntity.ID, sourceSceneEntry);
 
                 MigrateIconNode(newTreeEntry, sourceSceneEntry, targetTreeEntry, null);
@@ -749,12 +749,12 @@ internal partial class Hierarchy : Controller.Helper
             }
             else if (requestedOperation == DataPackageOperation.Copy)
             {
-                var newEntity = SceneManager.GetFromID(sourceSceneEntry.ID).EntitytManager.Duplicate(sourceEntity);
+                var newEntity = SceneManager.GetFromID(sourceSceneEntry.ID).EntityManager.Duplicate(sourceEntity);
                 var newTreeEntry = GetTreeEntry(newEntity.ID, sourceSceneEntry);
 
                 foreach (var childIconNode in sourceTreeEntry.IconNode.Children)
                 {
-                    GetEntity(out Entity childEntity, sourceScene.EntitytManager.GetFromID(childIconNode.TreeEntry.ID).ID, sourceSceneEntry);
+                    GetEntity(out Entity childEntity, sourceScene.EntityManager.GetFromID(childIconNode.TreeEntry.ID).ID, sourceSceneEntry);
                     PasteEntity(childEntity.ID, newEntity.ID, DataPackageOperation.Copy);
                 }
 
@@ -785,10 +785,10 @@ internal partial class Hierarchy : Controller.Helper
                 if (treeEntry.IconNode.Children.Count != 0)
                     MigrateEntityRecurisivally(sourceScene, targetScene, treeEntry.IconNode.Children.Select(TreeViewIconNode => TreeViewIconNode.TreeEntry).ToArray());
 
-                targetScene.EntitytManager.EntityList.Add(sourceScene.EntitytManager.GetFromID(treeEntry.ID), false);
-                sourceScene.EntitytManager.EntityList.Remove(sourceScene.EntitytManager.GetFromID(treeEntry.ID), false);
+                targetScene.EntityManager.EntityList.Add(sourceScene.EntityManager.GetFromID(treeEntry.ID), false);
+                sourceScene.EntityManager.EntityList.Remove(sourceScene.EntityManager.GetFromID(treeEntry.ID), false);
 
-                targetScene.EntitytManager.GetFromID(treeEntry.ID).Scene = targetScene;
+                targetScene.EntityManager.GetFromID(treeEntry.ID).Scene = targetScene;
             }
     }
 }

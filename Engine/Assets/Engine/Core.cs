@@ -42,7 +42,7 @@ internal class Core
         RuntimeCompiler = new();
 
         // Creates an entity with the "Boot" editortag and adds a "SceneBoot" component to it.
-        SceneManager.Scene.EntitytManager
+        SceneManager.Scene.EntityManager
             .CreateEntity(null, "Boot", EditorTags.SceneBoot.ToString())
             .AddComponent(new SceneBoot());
 
