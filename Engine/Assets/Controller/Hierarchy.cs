@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
+using System;
 
 namespace Editor.Controller;
 
@@ -96,23 +97,34 @@ internal partial class Hierarchy
             subsceneTreeView.TreeView.SelectedNode = null;
     }
 
-    public TreeEntry GetParent(TreeEntry treeEntry)
+    public TreeEntry GetParent(TreeEntry treeEntry, SceneEntry sceneEntry = null)
     {
-        if (treeEntry.IDparent is not null)
-            foreach (var item in SceneEntry.Hierarchy)
-                if (item.ID == treeEntry.IDparent.Value)
-                    return item;
+        if (treeEntry.IDparent is null)
+            return null;
+
+        var hierarchy = sceneEntry.Hierarchy;
+        if (sceneEntry is not null)
+            hierarchy = GetSceneEntry(treeEntry).Hierarchy;
+
+        foreach (var entry in hierarchy)
+            if (entry.ID == treeEntry.IDparent.Value)
+                return entry;
 
         return null;
     }
 
-    public TreeEntry[] GetChildren(TreeEntry treeEntry)
+    public TreeEntry[] GetChildren(TreeEntry treeEntry, SceneEntry sceneEntry = null)
     {
         List<TreeEntry> list = new List<TreeEntry>();
-        foreach (var item in SceneEntry.Hierarchy)
-            if (item.IDparent is not null)
-                if (item.IDparent.Value == treeEntry.ID)
-                    list.Add(item);
+
+        var hierarchy = sceneEntry.Hierarchy;
+        if (sceneEntry is not null)
+            hierarchy = GetSceneEntry(treeEntry).Hierarchy;
+
+        foreach (var entry in hierarchy)
+            if (entry.IDparent is not null)
+                if (entry.IDparent.Value == treeEntry.ID)
+                    list.Add(entry);
 
         return list.ToArray();
     }
@@ -242,7 +254,7 @@ internal partial class Hierarchy
         sceneEntry.Hierarchy.Add(treeEntry);
 
         TreeEntry parent;
-        if ((parent = GetParent(treeEntry)) is not null)
+        if ((parent = GetParent(treeEntry, sceneEntry)) is not null)
             parent.IconNode.Children.Add(treeEntry.IconNode);
         else
             sceneEntry.DataSource.Add(treeEntry.IconNode);
@@ -392,10 +404,18 @@ internal partial class Hierarchy
         foreach (var type in Enum.GetNames(typeof(PrimitiveTypes)))
         {
             item = new() { Text = type.ToString().FormatString() };
-            if (sceneEntry is not null)
-                item.Click += (s, e) => SceneManager.GetFromID(sceneEntry.ID).EntitytManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
-            else
-                item.Click += (s, e) => SceneManager.Scene.EntitytManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
+            item.Click += (s, e) =>
+            {
+                if (_itemInvoked is not null)
+                {
+                    var entity = GetEntity(_itemInvoked);
+                    entity.Scene.EntitytManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type), entity);
+                }
+                else if (sceneEntry is not null)
+                    SceneManager.GetFromID(sceneEntry.ID).EntitytManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
+                else
+                    SceneManager.Scene.EntitytManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
+            };
 
             objectSubItem.Items.Add(item);
         }
@@ -403,10 +423,18 @@ internal partial class Hierarchy
         menuFlyout.Items.Add(new MenuFlyoutSeparator());
         menuFlyout.Items.Add(objectSubItem);
         menuFlyout.Items.Add(item = new MenuFlyoutItem() { Text = "Camera" });
-        if (sceneEntry is not null)
-            item.Click += (s, e) => SceneManager.GetFromID(sceneEntry.ID).EntitytManager.CreateCamera();
-        else
-            item.Click += (s, e) => SceneManager.Scene.EntitytManager.CreateCamera();
+        item.Click += (s, e) =>
+        {
+            if (_itemInvoked is not null)
+            {
+                var entity = GetEntity(_itemInvoked);
+                entity.Scene.EntitytManager.CreateCamera("Camera", Tags.MainCamera.ToString(), entity);
+            }
+            else if (sceneEntry is not null)
+                SceneManager.GetFromID(sceneEntry.ID).EntitytManager.CreateCamera();
+            else
+                SceneManager.Scene.EntitytManager.CreateCamera();
+        };
 
         return menuFlyout;
     }
