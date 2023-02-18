@@ -102,8 +102,10 @@ internal partial class Hierarchy
         if (treeEntry.IDparent is null)
             return null;
 
-        var hierarchy = sceneEntry.Hierarchy;
+        List<TreeEntry> hierarchy;
         if (sceneEntry is not null)
+            hierarchy = sceneEntry.Hierarchy;
+        else
             hierarchy = GetSceneEntry(treeEntry).Hierarchy;
 
         foreach (var entry in hierarchy)
@@ -117,8 +119,10 @@ internal partial class Hierarchy
     {
         List<TreeEntry> list = new List<TreeEntry>();
 
-        var hierarchy = sceneEntry.Hierarchy;
+        List<TreeEntry> hierarchy;
         if (sceneEntry is not null)
+            hierarchy = sceneEntry.Hierarchy;
+        else
             hierarchy = GetSceneEntry(treeEntry).Hierarchy;
 
         foreach (var entry in hierarchy)
