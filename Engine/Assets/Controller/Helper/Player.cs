@@ -32,7 +32,7 @@ namespace Editor.Controller
             _status = Main.Instance.Status;
         }
 
-        public void Play()
+        public void Play() 
         {
             // Check if the current playmode is None.
             if (PlayMode == PlayMode.None)
@@ -51,6 +51,8 @@ namespace Editor.Controller
 
             // Log the current status of the game.
             Output.Log(_play.IsChecked.Value ? "Now Playing..." : "Stopped Playmode");
+
+            Main.Instance.OpenPane.IsChecked = !_play.IsChecked.Value;
         }
 
         public void Pause()

@@ -14,7 +14,7 @@ public sealed partial class Main : Frame
     {
         this.InitializeComponent();
 
-        _mainControl = new(mainWindow, x_Grid_Main, x_TextBlock_Status_Content, x_TextBlock_StatusIcon_Content);
+        _mainControl = new(mainWindow, x_Grid_Main, x_TextBlock_Status_Content, x_TextBlock_StatusIcon_Content, x_AppBarToggleButton_Status_OpenPane);
         _mainControl.PlayerControl = new(x_AppBarToggleButton_Status_Play, x_AppBarToggleButton_Status_Pause, x_AppBarButton_Status_Forward);
 
         InitializeInput();

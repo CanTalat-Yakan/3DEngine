@@ -12,8 +12,9 @@ internal class Main
     public TextBlock Status;
     public Viewbox StatusIcon;
     public MainWindow MainWindow;
+    public AppBarToggleButton OpenPane;
 
-    public Main(MainWindow mainWindow, Grid content, TextBlock status, Viewbox icon)
+    public Main(MainWindow mainWindow, Grid content, TextBlock status, Viewbox icon, AppBarToggleButton openPane)
     {
         // Initializes the singleton instance of the class, if it hasn't been already.
         if (Instance is null)
@@ -24,6 +25,7 @@ internal class Main
         Content = content;
         Status = status;
         StatusIcon = icon;
+        OpenPane = openPane;
 
         // Create a new layout control and pass in the content and views.
         LayoutControl = new Layout(
