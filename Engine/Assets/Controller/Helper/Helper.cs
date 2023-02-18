@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
 using Microsoft.UI;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Windows.Foundation;
@@ -631,6 +632,39 @@ internal static class ExtensionMethods
             name += " (" + (i + 1).ToString() + ")";
 
         return name;
+    }
+
+    public static string IncrementPathIfExists(this string path, string[] list)
+    {
+        var name = Path.GetFileNameWithoutExtension(path);
+
+        name = name.IncrementNameIfExists(list);
+
+        return Path.Combine(Path.GetDirectoryName(path), name + Path.GetExtension(path));
+    }
+
+    public static bool? IsFileLocked(this string path)
+    {
+        if (!File.Exists(path))
+            return null;
+
+        try
+        {
+            FileInfo file = new FileInfo(path);
+            using (FileStream stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None))
+                stream.Close();
+        }
+        catch (IOException)
+        {
+            //the file is unavailable because it is:
+            //still being written to
+            //or being processed by another thread
+            //or does not exist (has already been processed)
+            return true;
+        }
+
+        //file is not locked
+        return false;
     }
 }
 

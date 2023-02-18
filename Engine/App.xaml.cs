@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -28,6 +29,13 @@ public partial class App : Application
         if (!Directory.Exists(rootPath))
             Directory.CreateDirectory(rootPath);
 
+        // Increment log if it is locked by another process.
+        if (logFilePath.IsFileLocked().Value)
+            logFilePath = logFilePath.IncrementPathIfExists(
+                Directory.GetFiles(rootPath)
+                    .Select(p => Path.GetFileNameWithoutExtension(p))
+                    .ToArray());
+
         // Reset log.
         if (File.Exists(logFilePath))
             File.WriteAllText(logFilePath, String.Empty);
@@ -53,8 +61,8 @@ public partial class App : Application
             // Write exception.
             Debug.WriteLine(e.Exception + "\n\n");
 
-            if (Controller.Main.Instance is not null)
-                Controller.Output.Log(e.Exception, Controller.MessageType.Error);
+            if (Main.Instance is not null)
+                Output.Log(e.Exception, MessageType.Error);
 
             // Mark the event as handled to prevent it from being processed further.
             e.Handled = true;
