@@ -20,7 +20,7 @@ public class Transform : Component, IHide
 
     public Quaternion Rotation => Parent is null ? LocalRotation : LocalRotation * Parent.Rotation;
     public Quaternion LocalRotation { get => _localRotation; set => SetQuaternion(value); }
-    public Quaternion _localRotation = Quaternion.Identity;
+    private Quaternion _localRotation = Quaternion.Identity;
 
     public Vector3 EulerAngles { get => _eulerAngles; set => SetEulerAngles(value); }
     private Vector3 _eulerAngles = Vector3.Zero;
