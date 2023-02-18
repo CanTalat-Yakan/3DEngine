@@ -292,7 +292,7 @@ internal partial class Properties : Controller.Helper
                     return null;
 
         ToolTip toolTip = new();
-        // Create a ToolTip if the field has a ToolTipAttribute and is not a non-public field.
+        // Create a ToolTip if the field has a ToolTipAttribute.
         if (attributes.OfType<ToolTipAttribute>().Any())
             toolTip.Content = (string)attributes.OfType<ToolTipAttribute>().First().ToolTip;
         #endregion
@@ -437,6 +437,11 @@ internal partial class Properties : Controller.Helper
                 if (eventInfo.Equals(info))
                     return null;
 
+        ToolTip toolTip = new();
+        // Create a ToolTip if the field has a ToolTipAttribute.
+        if (attributes.OfType<ToolTipAttribute>().Any())
+            toolTip.Content = (string)attributes.OfType<ToolTipAttribute>().First().ToolTip;
+
         // Create the grid that contains the event information and attributes.
         return
             (new Grid[] {
@@ -444,7 +449,7 @@ internal partial class Properties : Controller.Helper
                     ProcessAttributes(attributes).StackInGrid(),
                     // Stack event grid and wrap it with field name.
                     CreateEvent(eventInfo.Name, (s, e) => eventInfo.GetRaiseMethod()).WrapInField(eventInfo.Name)})
-            .StackInGrid(0);
+            .StackInGrid(0).AddToolTip(toolTip);
     }
 
     public Grid[] ProcessAttributes(object[] attributes)

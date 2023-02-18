@@ -72,14 +72,8 @@ public class Transform : Component, IHide
         // Set the values for the EulerAngles with degrees.
         _eulerAngles = value;
 
-        // Convert the EulerAngles to radians and create a quaternion from Yaw, Pitch and Roll,
-        // where X is Pitch for the horizontal rotation, 
-        // Y is the Yaw for the vertical rotation and 
-        // Z is for the roll rotation.
-        _localRotation = Quaternion.CreateFromYawPitchRoll(
-            _eulerAngles.Y.ToRadians(),
-            _eulerAngles.X.ToRadians(),
-            _eulerAngles.Z.ToRadians());
+        // Set the LocalRotation with the new quaternion from the euler.
+        _localRotation = value.FromEuler();
     }
 
     private void SetQuaternion(Quaternion value)

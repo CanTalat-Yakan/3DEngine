@@ -44,11 +44,14 @@ internal class CameraController : EditorComponent
         Entity.Transform.EulerAngles -= _rotation * (float)Time.Delta * _rotationSpeed;
 
         //// Limit the entity's vertical rotation between -89 and 89 degrees.
-        //Entity.Transform.EulerAngles = Math.Clamp(Entity.Transform.EulerAngles.X, -89, 89);
+        Entity.Transform.EulerAngles = new(
+            Math.Clamp(Entity.Transform.EulerAngles.X, -89, 89),
+            Entity.Transform.EulerAngles.Y,
+            Entity.Transform.EulerAngles.Z);
 
         // Reset the rotation and direction vector.
-        _rotation = new();
-        _direction = new();
+        _rotation = Vector3.Zero;
+        _direction = Vector3.Zero;
     }
 
     private void MovementSpeedCalc()
