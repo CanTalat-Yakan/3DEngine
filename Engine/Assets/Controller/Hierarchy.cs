@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
-using System;
 
 namespace Editor.Controller;
 
@@ -635,6 +634,7 @@ internal partial class Hierarchy : Controller.Helper
                 foreach (var subscene in SceneManager.Subscenes)
                     if (entity is null)
                         entity = subscene.EntitytManager.GetFromID(guid);
+                    else break;
         }
 
         return entity;
