@@ -9,7 +9,7 @@ public class Transform : Component, IHide
     public Vector3 Forward => Parent is null ? LocalForward : Vector3.Transform(LocalForward, Parent.Rotation) + Parent.Forward;
     public Vector3 LocalForward = Vector3.UnitZ;
 
-    public Vector3 Right => Parent is null ? LocalRight : LocalRight + Parent.Right;
+    public Vector3 Right => Parent is null ? LocalRight : Vector3.Transform(LocalRight, Parent.Rotation) + Parent.Right;
     public Vector3 LocalRight = Vector3.UnitX;
 
     public Vector3 Up => Parent is null ? LocalUp : LocalUp + Parent.Up;
