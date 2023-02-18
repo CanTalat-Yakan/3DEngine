@@ -4,8 +4,6 @@ namespace Engine.Components;
 
 public class Transform : Component, IHide
 {
-    public Matrix4x4 WorldMatrix = Matrix4x4.Identity;
-
     public Transform Parent => Entity.Parent is null ? null : Entity.Parent.Transform;
 
     public Vector3 Forward => Parent is null ? LocalForward : LocalForward + Parent.Forward;
@@ -32,6 +30,8 @@ public class Transform : Component, IHide
 
     private PerModelConstantBuffer _modelConstantBuffer;
 
+    private Matrix4x4 _worldMatrix;
+
     public override void OnRegister() =>
         // Register the component with the TransformSystem.
         TransformSystem.Register(this);
@@ -56,13 +56,13 @@ public class Transform : Component, IHide
         Matrix4x4 scaleMatrix = Matrix4x4.CreateScale(Scale);
 
         // Calculate the world matrix as the transposed result of the combination of scale, rotation and translation matrices.
-        WorldMatrix = Matrix4x4.Transpose(scaleMatrix * rotationMatrix * translationMatrix);
+        _worldMatrix = Matrix4x4.Transpose(scaleMatrix * rotationMatrix * translationMatrix);
     }
 
     internal PerModelConstantBuffer GetConstantBuffer()
     {
         // Set the ModelView matrix in the ModelConstantBuffer to the WorldMatrix.
-        _modelConstantBuffer.ModelView = WorldMatrix;
+        _modelConstantBuffer.ModelView = _worldMatrix;
 
         return _modelConstantBuffer;
     }
