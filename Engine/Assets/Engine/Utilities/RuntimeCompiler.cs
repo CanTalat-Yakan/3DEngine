@@ -33,6 +33,7 @@ namespace Engine.Utilities
 
             // create a new scriptEngine and options to be used in the loop.
             ScriptOptions scriptOptions = ScriptOptions.Default
+                .WithImports("System")
                 .WithReferences(typeof(Core).Assembly)
                 .WithAllowUnsafe(true)
                 .WithCheckOverflow(true);
