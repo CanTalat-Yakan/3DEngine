@@ -67,6 +67,15 @@
     <PackageReference Include="WinUIEx" Version="2.1.0" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
+	
+  <ItemGroup>
+    <Content Update="Assets\Engine\Resources\Textures\VS.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Textures\VS2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="Assets\Engine\Resources\Templates\Project.zip">

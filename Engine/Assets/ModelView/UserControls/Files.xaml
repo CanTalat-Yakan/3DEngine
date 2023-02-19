@@ -33,6 +33,9 @@
 
                 <AppBarButton Label="Open Visual Studio"
                               Click="AppBarButton_Click_OpenVisualStudio">
+                    <AppBarButton.Icon>
+                        <BitmapIcon UriSource="/Assets/Engine/Resources/Textures/VS2.png" />
+                    </AppBarButton.Icon>
                 </AppBarButton>
             </CommandBar.SecondaryCommands>
         </CommandBar>
