@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using System;
 using Engine.Components;
 using Engine.ECS;
 using Engine.Helper;
