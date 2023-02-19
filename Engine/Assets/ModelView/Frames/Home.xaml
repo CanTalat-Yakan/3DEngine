@@ -43,6 +43,8 @@
 
         <!--MAIN-->
         <Grid x:Name="x_Grid_Main" HorizontalAlignment="Stretch">
+            <TextBlock x:Name="x_TextBlock_AppVersion" Opacity="0.5" Padding="10" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+
             <ScrollViewer>
                 <StackPanel Spacing="20" Padding="50">
                     <Grid HorizontalAlignment="Stretch" CornerRadius="5">

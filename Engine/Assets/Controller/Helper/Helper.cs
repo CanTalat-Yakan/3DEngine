@@ -11,6 +11,7 @@ using Microsoft.UI;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Windows.ApplicationModel;
 using Windows.Foundation;
 using ColorPicker = CommunityToolkit.WinUI.UI.Controls.ColorPicker;
 using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
@@ -342,6 +343,16 @@ internal class Helper
         TextBlock reference = new() { Text = s + $" ({type})", TextWrapping = TextWrapping.WrapWholeWords, MaxWidth = 200, Margin = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
 
         return StackInGrid(button, reference);
+    }
+
+    internal static string GetAppVersion()
+    {
+        Package package = Package.Current;
+        PackageId packageId = package.Id;
+        PackageVersion version = packageId.Version;
+
+        return "Version " + string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision);
+
     }
 
     internal static string SizeSuffix(Int64 value, int decimalPlaces = 1)

@@ -14,11 +14,13 @@ public sealed partial class Home : Frame
     {
         this.InitializeComponent();
 
+        x_TextBlock_AppVersion.Text = Controller.Helper.GetAppVersion();
+
         _homeControl = new(this, x_StackPanel_Projects, navigationView);
     }
 
     private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) =>
-        Controller.Theme.Instance.SetRequstedTheme();
+        Theme.Instance.SetRequstedTheme();
 
     private void AppBarButton_Click_OpenFolder(object sender, RoutedEventArgs e) =>
         _homeControl.OpenFolder();
