@@ -63,7 +63,8 @@ internal partial class Properties
         {
                 CreateBool(false, (s, r) => entity.IsStatic = (s as CheckBox).IsChecked.Value).WrapInField("Is Static"),
                 CreateEnum(Enum.GetNames(typeof(Tags))).WrapInField("Tag"),
-                CreateEnum(Enum.GetNames(typeof(Layers))).WrapInField("Layer")
+                CreateEnum(Enum.GetNames(typeof(Layers))).WrapInField("Layer"),
+                CreateTextFullWithOpacity(entity.GetDebugInformation()).WrapInField("Debug")
             };
 
         Grid[] transform = new[]
@@ -410,7 +411,6 @@ internal partial class Properties : Controller.Helper
             // Add empty reference slot.
             grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
         #endregion
-
 
         // Return the final grid by stacking all the processed attributes, type grid and wrapping the field name.
         return

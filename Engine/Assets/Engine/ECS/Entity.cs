@@ -174,5 +174,22 @@ namespace Engine.ECS
             // Return the new Entity object.
             return newEntity;
         }
+
+        public string GetDebugInformation()
+        {
+            var info = $"""
+                Name: {Name}
+                ID: {ID}
+                Scene: {Scene.Name}
+                """;
+
+            if(Parent is not null)
+                info += $"""
+                    Parent: {Parent}
+                    Parent ID: {Parent.ID}
+                    """;
+
+            return info;
+        }
     }
 }
