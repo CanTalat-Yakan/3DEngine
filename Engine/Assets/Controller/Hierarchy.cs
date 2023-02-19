@@ -96,117 +96,6 @@ internal partial class Hierarchy
             subsceneTreeView.TreeView.SelectedNode = null;
     }
 
-    public TreeEntry GetParent(TreeEntry treeEntry, SceneEntry sceneEntry = null)
-    {
-        if (treeEntry.IDparent is null)
-            return null;
-
-        List<TreeEntry> hierarchy;
-        if (sceneEntry is not null)
-            hierarchy = sceneEntry.Hierarchy;
-        else
-            hierarchy = GetSceneEntry(treeEntry).Hierarchy;
-
-        foreach (var entry in hierarchy)
-            if (entry.ID == treeEntry.IDparent.Value)
-                return entry;
-
-        return null;
-    }
-
-    public TreeEntry[] GetChildren(TreeEntry treeEntry, SceneEntry sceneEntry = null)
-    {
-        List<TreeEntry> list = new List<TreeEntry>();
-
-        List<TreeEntry> hierarchy;
-        if (sceneEntry is not null)
-            hierarchy = sceneEntry.Hierarchy;
-        else
-            hierarchy = GetSceneEntry(treeEntry).Hierarchy;
-
-        foreach (var entry in hierarchy)
-            if (entry.IDparent is not null)
-                if (entry.IDparent.Value == treeEntry.ID)
-                    list.Add(entry);
-
-        return list.ToArray();
-    }
-
-    public TreeEntry GetTreeEntry(Guid guid, SceneEntry sceneEntry = null)
-    {
-        if (sceneEntry is not null)
-            foreach (var entry in sceneEntry.Hierarchy)
-                if (entry.ID == guid)
-                    return entry;
-
-        foreach (var entry in SceneEntry.Hierarchy)
-            if (entry.ID == guid)
-                return entry;
-
-        if (SubsceneEntries is not null)
-            foreach (var subSceneEntry in SubsceneEntries)
-                foreach (var treeEntry in subSceneEntry.Hierarchy)
-                    if (treeEntry.ID == guid)
-                        return treeEntry;
-
-        return null;
-    }
-
-    public SceneEntry GetSceneEntry(TreeEntry treeEntry)
-    {
-        foreach (var entry in SceneEntry.Hierarchy)
-            if (entry.ID == treeEntry.ID)
-                return SceneEntry;
-
-        if (SubsceneEntries is not null)
-            foreach (var subSceneEntry in SubsceneEntries)
-                foreach (var entry in subSceneEntry.Hierarchy)
-                    if (entry.ID == treeEntry.ID)
-                        return subSceneEntry;
-
-        return null;
-    }
-
-    public void GetEntries(out TreeEntry treeEntry, out SceneEntry sceneEntry, Guid guid)
-    {
-        treeEntry = null;
-        sceneEntry = null;
-
-        foreach (var entry in SceneEntry.Hierarchy)
-            if (entry.ID == guid)
-            {
-                treeEntry = entry;
-                sceneEntry = SceneEntry;
-            }
-
-        if (SubsceneEntries is not null)
-            foreach (var subSceneEntry in SubsceneEntries)
-                foreach (var entry in subSceneEntry.Hierarchy)
-                    if (entry.ID == guid)
-                    {
-                        treeEntry = entry;
-                        sceneEntry = subSceneEntry;
-
-                        return;
-                    }
-    }
-
-    private void GetInvokedItemAndSetContextFlyout(object sender, PointerRoutedEventArgs e)
-    {
-        var properties = e.GetCurrentPoint((UIElement)sender).Properties;
-        if (properties.IsRightButtonPressed)
-        {
-            var dc = ((FrameworkElement)e.OriginalSource).DataContext;
-            if (dc is null)
-                return;
-
-            _itemInvoked = ((TreeViewIconNode)dc).TreeEntry;
-
-            ((TreeView)sender).ContextFlyout = CreateDefaultMenuFlyout();
-            ((TreeView)sender).ContextFlyout.Opened += (s, e) => ((TreeView)sender).ContextFlyout = null;
-        }
-    }
-
     private Grid[] CreateSceneHierarchy(in SceneEntry sceneEntry, Scene scene = null)
     {
         if (scene is null)
@@ -295,7 +184,7 @@ internal partial class Hierarchy
         items[0].KeyboardAccelerators.Add(new KeyboardAccelerator() { Modifiers = VirtualKeyModifiers.Control, Key = VirtualKey.X });
         items[1].Click += (s, e) => CopyToClipboard(_itemInvoked.ID, DataPackageOperation.Copy);
         items[1].KeyboardAccelerators.Add(new KeyboardAccelerator() { Modifiers = VirtualKeyModifiers.Control, Key = VirtualKey.C });
-        items[2].Click += (s, e) => PasteEntityFromClipboard(_itemInvoked.ID);
+        items[2].Click += (s, e) => PasteEntityFromClipboardAsnyc(_itemInvoked.ID);
         items[2].KeyboardAccelerators.Add(new KeyboardAccelerator() { Modifiers = VirtualKeyModifiers.Control, Key = VirtualKey.V });
 
         items[3].Click += (s, e) => ContentDialogRenameTreeEntry(_itemInvoked);
@@ -339,7 +228,7 @@ internal partial class Hierarchy
                 //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Create Entity" },
             };
-        items[2].Click += (s, e) => PasteEntityFromClipboard(SceneEntry);
+        items[2].Click += (s, e) => PasteEntityFromClipboardAsync(SceneEntry);
         items[2].KeyboardAccelerators.Add(new KeyboardAccelerator() { Modifiers = VirtualKeyModifiers.Control, Key = VirtualKey.V });
 
         items[3].Click += (s, e) => SceneManager.Scene.EntityManager.CreateEntity();
@@ -375,7 +264,7 @@ internal partial class Hierarchy
                 //new MenuFlyoutSeparator(),
                 new MenuFlyoutItem() { Text = "Create Entity" },
             };
-        items[2].Click += (s, e) => PasteEntityFromClipboard(sceneEntry);
+        items[2].Click += (s, e) => PasteEntityFromClipboardAsync(sceneEntry);
 
         items[3].Click += (s, e) => ContentDialogRenameSubscene(sceneEntry);
         items[4].Click += (s, e) => ContentDialogDeleteSubscene(sceneEntry);
@@ -616,16 +505,138 @@ internal partial class Hierarchy
             sceneEntry.DataSource.Remove(treeEntry.IconNode);
         }
     }
+
+    private TreeEntry GetParent(TreeEntry treeEntry, SceneEntry sceneEntry = null)
+    {
+        if (treeEntry.IDparent is null)
+            return null;
+
+        List<TreeEntry> hierarchy;
+        if (sceneEntry is not null)
+            hierarchy = sceneEntry.Hierarchy;
+        else
+            hierarchy = GetSceneEntry(treeEntry).Hierarchy;
+
+        foreach (var entry in hierarchy)
+            if (entry.ID == treeEntry.IDparent.Value)
+                return entry;
+
+        return null;
+    }
+
+    private TreeEntry[] GetChildren(TreeEntry treeEntry, SceneEntry sceneEntry = null)
+    {
+        List<TreeEntry> list = new List<TreeEntry>();
+
+        List<TreeEntry> hierarchy;
+        if (sceneEntry is not null)
+            hierarchy = sceneEntry.Hierarchy;
+        else
+            hierarchy = GetSceneEntry(treeEntry).Hierarchy;
+
+        foreach (var entry in hierarchy)
+            if (entry.IDparent is not null)
+                if (entry.IDparent.Value == treeEntry.ID)
+                    list.Add(entry);
+
+        return list.ToArray();
+    }
+
+    private TreeEntry GetTreeEntry(Guid guid, SceneEntry sceneEntry = null)
+    {
+        if (sceneEntry is not null)
+            foreach (var entry in sceneEntry.Hierarchy)
+                if (entry.ID == guid)
+                    return entry;
+
+        foreach (var entry in SceneEntry.Hierarchy)
+            if (entry.ID == guid)
+                return entry;
+
+        if (SubsceneEntries is not null)
+            foreach (var subSceneEntry in SubsceneEntries)
+                foreach (var treeEntry in subSceneEntry.Hierarchy)
+                    if (treeEntry.ID == guid)
+                        return treeEntry;
+
+        return null;
+    }
+
+    private SceneEntry GetSceneEntry(TreeEntry treeEntry)
+    {
+        foreach (var entry in SceneEntry.Hierarchy)
+            if (entry.ID == treeEntry.ID)
+                return SceneEntry;
+
+        if (SubsceneEntries is not null)
+            foreach (var subSceneEntry in SubsceneEntries)
+                foreach (var entry in subSceneEntry.Hierarchy)
+                    if (entry.ID == treeEntry.ID)
+                        return subSceneEntry;
+
+        return null;
+    }
+
+    public void GetEntries(out TreeEntry treeEntry, out SceneEntry sceneEntry, Guid guid)
+    {
+        treeEntry = null;
+        sceneEntry = null;
+
+        foreach (var entry in SceneEntry.Hierarchy)
+            if (entry.ID == guid)
+            {
+                treeEntry = entry;
+                sceneEntry = SceneEntry;
+
+                return;
+            }
+
+        if (SubsceneEntries is not null)
+            foreach (var subSceneEntry in SubsceneEntries)
+                foreach (var entry in subSceneEntry.Hierarchy)
+                    if (entry.ID == guid)
+                    {
+                        treeEntry = entry;
+                        sceneEntry = subSceneEntry;
+
+                        return;
+                    }
+    }
+
+    private void GetInvokedItemAndSetContextFlyout(object sender, PointerRoutedEventArgs e)
+    {
+        var properties = e.GetCurrentPoint((UIElement)sender).Properties;
+        if (properties.IsRightButtonPressed)
+        {
+            var dc = ((FrameworkElement)e.OriginalSource).DataContext;
+            if (dc is null)
+                return;
+
+            _itemInvoked = ((TreeViewIconNode)dc).TreeEntry;
+
+            ((TreeView)sender).ContextFlyout = CreateDefaultMenuFlyout();
+            ((TreeView)sender).ContextFlyout.Opened += (s, e) => ((TreeView)sender).ContextFlyout = null;
+        }
+    }
+
 }
 
 internal partial class Hierarchy : Controller.Helper
 {
+    /// <summary>
+    /// This method returns an Entity object with the specified GUID, optionally searching in a specific SceneEntry.
+    /// </summary>
+    /// <param name="guid"></param>
+    /// <param name="sceneEntry"></param>
+    /// <returns></returns>
     public Entity GetEntity(Guid guid, SceneEntry sceneEntry = null)
     {
         Entity entity;
 
+        // If sceneEntry is specified, get the entity with the given GUID from that scene.
         if (sceneEntry is not null)
             entity = SceneManager.GetFromID(sceneEntry.ID).EntityManager.GetFromID(guid);
+        // Otherwise, search through all subscenes of the scene manager.
         else
         {
             entity = SceneManager.Scene.EntityManager.GetFromID(guid);
@@ -640,155 +651,303 @@ internal partial class Hierarchy : Controller.Helper
         return entity;
     }
 
+    /// <summary>
+    /// This method returns an Entity object corresponding to the given TreeEntry and optionally searching in a specific SceneEntry.
+    /// </summary>
+    /// <param name="entry"></param>
+    /// <param name="sceneEntry"></param>
+    /// <returns></returns>
     public Entity GetEntity(TreeEntry entry, SceneEntry sceneEntry = null)
     {
+        // If entry is null, return null.
         if (entry is null)
             return null;
 
+        // Return the entity with the ID of the given TreeEntry, optionally searching in the specified SceneEntry.
         return GetEntity(entry.ID, sceneEntry);
     }
 
+    /// <summary>
+    /// This method retrieves an Entity object corresponding to the given TreeEntry and optionally searching in a specific SceneEntry,
+    /// and stores it in the out parameter 'entity'.
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <param name="entry"></param>
+    /// <param name="sceneEntry"></param>
     public void GetEntity(out Entity entity, TreeEntry entry, SceneEntry sceneEntry = null) =>
         entity = GetEntity(entry.ID, sceneEntry);
 
+    /// <summary>
+    /// This method retrieves an Entity object with the specified GUID, optionally searching in a specific SceneEntry,
+    /// and stores it in the out parameter 'entity'.
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <param name="guid"></param>
+    /// <param name="sceneEntry"></param>
     public void GetEntity(out Entity entity, Guid guid, SceneEntry sceneEntry = null) =>
         entity = GetEntity(guid, sceneEntry);
 
+    /// <summary>
+    /// This method retrieves two Scene objects corresponding to the given SceneEntry objects, and stores them in the out parameters 'sourceScene' and 'targetScene'.
+    /// </summary>
+    /// <param name="sourceScene"></param>
+    /// <param name="targetScene"></param>
+    /// <param name="sourceSceneEntry"></param>
+    /// <param name="targetSceneEntry"></param>
     public void GetScenes(out Scene sourceScene, out Scene targetScene, SceneEntry sourceSceneEntry, SceneEntry targetSceneEntry)
     {
         sourceScene = SceneManager.GetFromID(sourceSceneEntry.ID);
         targetScene = SceneManager.GetFromID(targetSceneEntry.ID);
     }
 
+    /// <summary>
+    /// This method sets the parent TreeEntry of the given TreeViewIconNodes to the given newParent,
+    /// and updates the parent Entity of each affected Entity accordingly.
+    /// </summary>
+    /// <param name="newParent"></param>
+    /// <param name="treeViewIconNodes"></param>
     public void SetNewParentTreeEntry(TreeViewIconNode newParent, params TreeViewIconNode[] treeViewIconNodes)
     {
+        // If newParent is null, do nothing.
         if (newParent is null)
             return;
 
+        // Iterate over the given TreeViewIconNodes and update their parent TreeEntry and parent Entity.
         foreach (var node in treeViewIconNodes)
         {
-            (newParent.TreeEntry).IDparent = (node.TreeEntry).ID;
+            (node.TreeEntry).IDparent = (newParent.TreeEntry).ID;
             GetEntity(node.TreeEntry).Parent = GetEntity(newParent.TreeEntry);
         }
     }
 
+    /// <summary>
+    /// This method copies the given GUID to the clipboard with the given operation.
+    /// </summary>
+    /// <param name="guid"></param>
+    /// <param name="requestedOpertion"></param>
     private void CopyToClipboard(Guid guid, DataPackageOperation requestedOpertion)
     {
+        // Create a new DataPackage object and set its text to the given GUID.
         DataPackage data = new();
         data.SetText(guid.ToString());
+
+        // Set the requested operation for the DataPackage.
         data.RequestedOperation = requestedOpertion;
 
+        // Set the clipboard content to the DataPackage.
         Clipboard.SetContent(data);
     }
 
-    public async void PasteEntityFromClipboard(Guid guid)
+    /// <summary>
+    /// This method pastes an entity from the clipboard to an Entity with the given Guid.
+    /// </summary>
+    /// <param name="guid"></param>
+    public async void PasteEntityFromClipboardAsnyc(Guid guid)
     {
+        // Get the content from the clipboard.
         DataPackageView dataPackageView = Clipboard.GetContent();
+
+        // Check if the content has text.
         if (dataPackageView.Contains(StandardDataFormats.Text))
         {
+            // Get the text content.
             var sourceText = await dataPackageView.GetTextAsync();
+
+            // Check if the text is a valid GUID.
             if (Guid.TryParse(sourceText, out Guid sourceGuid))
+                // Call the PasteEntity method to paste the entity.
                 PasteEntity(sourceGuid, guid, dataPackageView.RequestedOperation);
         }
     }
 
-    public async void PasteEntityFromClipboard(SceneEntry sceneEntry)
+    /// <summary>
+    /// This method pastes an entity from clipboard to a specific scene.
+    /// </summary>
+    /// <param name="sceneEntry"></param>
+    public async void PasteEntityFromClipboardAsync(SceneEntry sceneEntry)
     {
+        // Get the content from the clipboard.
         DataPackageView dataPackageView = Clipboard.GetContent();
+
+        // Check if the content has text.
         if (dataPackageView.Contains(StandardDataFormats.Text))
         {
+            // Get the text content.
             var sourceText = await dataPackageView.GetTextAsync();
+
+            // Check if the text is a valid GUID.
             if (Guid.TryParse(sourceText, out Guid sourceGuid))
+                // Call the PasteEntity method to paste the entity.
                 PasteEntity(sourceGuid, sceneEntry, dataPackageView.RequestedOperation);
         }
     }
 
+    /// <summary>
+    /// This method is used to paste an entity into a target entity as a child with a requested operation.
+    /// </summary>
+    /// <param name="sourceEntityGuid"></param>
+    /// <param name="targetEntityGuid"></param>
+    /// <param name="requestedOperation"></param>
     public void PasteEntity(Guid sourceEntityGuid, Guid targetEntityGuid, DataPackageOperation requestedOperation)
     {
+        // Get the source tree entry, entity and target tree entry from their respective GUIDs.
         GetEntries(out TreeEntry sourceTreeEntry, out SceneEntry sourceSceneEntry, sourceEntityGuid);
         GetEntity(out Entity sourceEntity, sourceEntityGuid, sourceSceneEntry);
 
         GetEntries(out TreeEntry targetTreeEntry, out SceneEntry targetSceneEntry, targetEntityGuid);
         GetEntity(out Entity targetEntity, targetEntityGuid, targetSceneEntry);
 
+        // Get the source and target scenes from their respective entries.
         GetScenes(out Scene sourceScene, out Scene targetScene, sourceSceneEntry, targetSceneEntry);
 
+        // Check if the source entity is not null.
         if (sourceEntity is not null)
+        {
+            // Check the requested operation.
             if (requestedOperation == DataPackageOperation.Move)
             {
+                // Move the source entity to the target entity.
                 sourceTreeEntry.IDparent = targetTreeEntry.ID;
                 sourceEntity.Parent = targetEntity;
 
-                MigrateIconNode(sourceTreeEntry, sourceSceneEntry, targetTreeEntry, null);
-                MigrateEntityRecurisivally(sourceScene, targetScene, sourceTreeEntry);
+                // Migrate the icon node and entity recursively to the target scene.
+                MigrateIconNodeBetweenTreeEntries(sourceTreeEntry, sourceSceneEntry, targetTreeEntry, null);
+                MigrateEntityBetweenScenesRecurisivally(sourceScene, targetScene, sourceTreeEntry);
             }
             else if (requestedOperation == DataPackageOperation.Copy)
             {
+                // Duplicate the source entity to the target entity and get the new tree entry.
                 var newEntity = SceneManager.GetFromID(sourceSceneEntry.ID).EntityManager.Duplicate(sourceEntity, targetEntity);
-                var newTreeEntry = GetTreeEntry(newEntity.ID, sourceSceneEntry);
+                var newTreeEntry = GetTreeEntry(newEntity.ID, targetSceneEntry);
 
-                MigrateIconNode(newTreeEntry, sourceSceneEntry, targetTreeEntry, null);
-                MigrateEntityRecurisivally(sourceScene, targetScene, sourceTreeEntry);
-            }
-    }
-
-    public void PasteEntity(Guid sourceEntityGuid, SceneEntry targetSceneEntry, DataPackageOperation requestedOperation)
-    {
-        GetEntries(out TreeEntry sourceTreeEntry, out SceneEntry sourceSceneEntry, sourceEntityGuid);
-        GetEntity(out Entity sourceEntity, sourceEntityGuid, sourceSceneEntry);
-        GetScenes(out Scene sourceScene, out Scene targetScene, sourceSceneEntry, targetSceneEntry);
-
-        if (sourceEntity is not null)
-            if (requestedOperation == DataPackageOperation.Move)
-            {
-                sourceTreeEntry.IDparent = null;
-                sourceEntity.Parent = null;
-
-                MigrateIconNode(sourceTreeEntry, sourceSceneEntry, null, targetSceneEntry);
-                MigrateEntityRecurisivally(sourceScene, targetScene, sourceTreeEntry);
-            }
-            else if (requestedOperation == DataPackageOperation.Copy)
-            {
-                var newEntity = SceneManager.GetFromID(sourceSceneEntry.ID).EntityManager.Duplicate(sourceEntity);
-                var newTreeEntry = GetTreeEntry(newEntity.ID, sourceSceneEntry);
-
+                // Iterate through each child icon node of the source tree entry.
                 foreach (var childIconNode in sourceTreeEntry.IconNode.Children)
                 {
+                    // Get the child entity for the child icon node.
                     GetEntity(out Entity childEntity, sourceScene.EntityManager.GetFromID(childIconNode.TreeEntry.ID).ID, sourceSceneEntry);
+                    // Recursively paste the child entity and its children to the new entity.
                     PasteEntity(childEntity.ID, newEntity.ID, DataPackageOperation.Copy);
                 }
 
-                MigrateIconNode(newTreeEntry, sourceSceneEntry, null, targetSceneEntry);
-                MigrateEntityRecurisivally(sourceScene, targetScene, sourceTreeEntry);
+                // Migrate the icon node and entity recursively to the target scene.
+                MigrateIconNodeBetweenTreeEntries(newTreeEntry, sourceSceneEntry, targetTreeEntry, null);
+                MigrateEntityBetweenScenesRecurisivally(sourceScene, targetScene, newTreeEntry);
+            }
+        }
+    }
+
+    /// <summary>
+    /// This method is used to paste an entity into a target scene entry with a requested operation.
+    /// </summary>
+    /// <param name="sourceEntityGuid"></param>
+    /// <param name="targetSceneEntry"></param>
+    /// <param name="requestedOperation"></param>
+    public void PasteEntity(Guid sourceEntityGuid, SceneEntry targetSceneEntry, DataPackageOperation requestedOperation)
+    {
+        // Get the source tree entry, entity and target tree entry from their respective GUIDs.
+        GetEntries(out TreeEntry sourceTreeEntry, out SceneEntry sourceSceneEntry, sourceEntityGuid);
+        GetEntity(out Entity sourceEntity, sourceEntityGuid, sourceSceneEntry);
+
+        // Get the source and target scene.
+        GetScenes(out Scene sourceScene, out Scene targetScene, sourceSceneEntry, targetSceneEntry);
+
+        // Check if the source entity exists.
+        if (sourceEntity is not null)
+            // If the requested operation is a move.
+            if (requestedOperation == DataPackageOperation.Move)
+            {
+                // Set the Parent and IDparent of the sourceTreeEntry to null.
+                sourceTreeEntry.IDparent = null;
+                sourceEntity.Parent = null;
+
+                // Migrate the icon node and entity recursively to the target scene.
+                MigrateIconNodeBetweenTreeEntries(sourceTreeEntry, sourceSceneEntry, null, targetSceneEntry);
+                MigrateEntityBetweenScenesRecurisivally(sourceScene, targetScene, sourceTreeEntry);
+            }
+            // If the requested operation is a copy.
+            else if (requestedOperation == DataPackageOperation.Copy)
+            {
+                // Duplicate the source entity to the target scene and get the new tree entry.
+                var newEntity = SceneManager.GetFromID(sourceSceneEntry.ID).EntityManager.Duplicate(sourceEntity);
+                var newTreeEntry = GetTreeEntry(newEntity.ID, targetSceneEntry);
+
+                // Iterate through each child icon node of the source tree entry.
+                foreach (var childIconNode in sourceTreeEntry.IconNode.Children)
+                {
+                    // Get the child entity for the child icon node.
+                    GetEntity(out Entity childEntity, sourceScene.EntityManager.GetFromID(childIconNode.TreeEntry.ID).ID, sourceSceneEntry);
+                    // Recursively paste the child entity and its children to the new entity.
+                    PasteEntity(childEntity.ID, newEntity.ID, DataPackageOperation.Copy);
+                }
+
+                // Migrate the icon node and entity recursively to the target scene.
+                MigrateIconNodeBetweenTreeEntries(newTreeEntry, sourceSceneEntry, null, targetSceneEntry);
+                MigrateEntityBetweenScenesRecurisivally(sourceScene, targetScene, newTreeEntry);
             }
     }
 
-    public void MigrateIconNode(TreeEntry sourceTreeEntry, SceneEntry sourceSceneEntry, TreeEntry targetTreeEntry, SceneEntry targetSceneEntry)
+    /// <summary>
+    /// This method is used to migrate an icon node to a new parent and scene.
+    /// </summary>
+    /// <param name="sourceTreeEntry"></param>
+    /// <param name="sourceSceneEntry"></param>
+    /// <param name="targetTreeEntry"></param>
+    /// <param name="targetSceneEntry"></param>
+    public void MigrateIconNodeBetweenTreeEntries(TreeEntry sourceTreeEntry, SceneEntry sourceSceneEntry, TreeEntry targetTreeEntry, SceneEntry targetSceneEntry)
     {
+        // Check if the scenes are different, since there is no need to migrate entities if they are in the same scene.
+        if (sourceSceneEntry.Equals(targetSceneEntry))
+            return;
+
+        // Get the parent of the source tree entry's icon node.
         var parent = GetParent(sourceTreeEntry);
+
+        // If the parent is not null, remove the source tree entry's icon node from the parent's children list.
         if (parent is not null)
             parent.IconNode.Children.Remove(sourceTreeEntry.IconNode);
+        // If the parent is null, remove the source tree entry's icon node from the source scene entry's data source.
         else
             sourceSceneEntry.DataSource.Remove(sourceTreeEntry.IconNode);
 
+        // If the target tree entry is not null, add the source tree entry's icon node to the target tree entry's children list.
         if (targetTreeEntry is not null)
             targetTreeEntry.IconNode.Children.Add(sourceTreeEntry.IconNode);
+        // and if the target scene entry is not null, add the source tree entry's icon node to the target scene entry's root list.
         else if (targetSceneEntry is not null)
             targetSceneEntry.DataSource.Add(sourceTreeEntry.IconNode);
     }
 
-    public void MigrateEntityRecurisivally(Scene sourceScene, Scene targetScene, params TreeEntry[] treeEntries)
+    /// <summary>
+    /// This method migrates entities from a source scene to a target scene recursively,
+    /// updating the entity lists and the scene of the migrated entities as needed.
+    /// </summary>
+    /// <param name="sourceScene"></param>
+    /// <param name="targetScene"></param>
+    /// <param name="treeEntries"></param>
+    public void MigrateEntityBetweenScenesRecurisivally(Scene sourceScene, Scene targetScene, params TreeEntry[] treeEntries)
     {
-        if (sourceScene != targetScene)
-            foreach (var treeEntry in treeEntries)
-            {
-                if (treeEntry.IconNode.Children.Count != 0)
-                    MigrateEntityRecurisivally(sourceScene, targetScene, treeEntry.IconNode.Children.Select(TreeViewIconNode => TreeViewIconNode.TreeEntry).ToArray());
+        // Check if the scenes are different, since there is no need to migrate entities if they are in the same scene.
+        if (sourceScene.Equals(targetScene))
+            return;
 
-                targetScene.EntityManager.EntityList.Add(sourceScene.EntityManager.GetFromID(treeEntry.ID), false);
-                sourceScene.EntityManager.EntityList.Remove(sourceScene.EntityManager.GetFromID(treeEntry.ID), false);
+        // Iterate over the list of tree entries provided.
+        foreach (var treeEntry in treeEntries)
+        {
+            // If the current tree entry has children, call this method recursively with the child tree entries.
+            if (treeEntry.IconNode.Children.Count != 0)
+                MigrateEntityBetweenScenesRecurisivally(
+                    sourceScene, 
+                    targetScene, 
+                    treeEntry.IconNode.Children
+                        .Select(TreeViewIconNode => TreeViewIconNode.TreeEntry)
+                        .ToArray());
 
-                targetScene.EntityManager.GetFromID(treeEntry.ID).Scene = targetScene;
-            }
+            // Add the current entity to the target scene's entity list, removing it from the source scene's entity list.
+            targetScene.EntityManager.EntityList.Add(sourceScene.EntityManager.GetFromID(treeEntry.ID), false);
+            sourceScene.EntityManager.EntityList.Remove(sourceScene.EntityManager.GetFromID(treeEntry.ID), false);
+
+            // Update the migrated entity's scene reference to the target scene.
+            targetScene.EntityManager.GetFromID(treeEntry.ID).Scene = targetScene;
+        }
     }
 }
