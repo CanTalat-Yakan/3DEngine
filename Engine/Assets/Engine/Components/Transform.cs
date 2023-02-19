@@ -6,16 +6,16 @@ public class Transform : Component, IHide
 {
     public Transform Parent => Entity.Parent is null ? null : Entity.Parent.Transform;
 
-    public Vector3 Forward => Parent is null ? LocalForward : Vector3.Transform(LocalForward, Parent.Rotation) + Parent.Forward;
+    public Vector3 Forward => Parent is null ? LocalForward : Vector3.Transform(LocalForward, Rotation) + Parent.Forward;
     public Vector3 LocalForward = Vector3.UnitZ;
 
-    public Vector3 Right => Parent is null ? LocalRight : Vector3.Transform(LocalRight, Parent.Rotation) + Parent.Right;
+    public Vector3 Right => Parent is null ? LocalRight : Vector3.Transform(LocalRight, Rotation) + Parent.Right;
     public Vector3 LocalRight = Vector3.UnitX;
 
-    public Vector3 Up => Parent is null ? LocalUp : LocalUp + Parent.Up;
+    public Vector3 Up => Parent is null ? LocalUp : Vector3.Transform(LocalUp, Rotation) + Parent.Right;
     public Vector3 LocalUp = Vector3.UnitY;
 
-    public Vector3 Position => Parent is null ? LocalPosition : Vector3.Transform(LocalPosition, Parent.Rotation) + Parent.Position;
+    public Vector3 Position => Parent is null ? LocalPosition : Vector3.Transform(LocalPosition, Rotation) + Parent.Position;
     public Vector3 LocalPosition = Vector3.Zero;
 
     public Quaternion Rotation => Parent is null ? LocalRotation : LocalRotation * Parent.Rotation;
