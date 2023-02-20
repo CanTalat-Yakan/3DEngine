@@ -350,7 +350,7 @@ internal partial class Properties : Controller.Helper
                     .WrapInGrid());
             // If the field doesn't have the `SliderAttribute`, add a number input element.
             else
-                grid.Add(CreateNumberInput((float)value));
+                grid.Add(CreateNumberInput((float)value, float.MinValue, float.MaxValue, (s, e) => fieldInfo.SetValue(obj, (float)e.NewValue)));
 
         // String
         else if (type == typeof(string))
