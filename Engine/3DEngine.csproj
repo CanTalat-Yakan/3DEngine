@@ -28,14 +28,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm64'">
     <DefineConstants>TRACE;DEBUG;NET;NET7_0;NETCOREAPP</DefineConstants>
   </PropertyGroup>
-  <ItemGroup>
-    <Content Remove="Assets\Engine\Resources\Templates\Project.zip" />
-    <Content Remove="Assets\Engine\Utilities\RuntimeCompiler.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Assets\Engine\Resources\Templates\Examples\Example.txt" />
-  </ItemGroup>
-	
+  
   <ItemGroup>
     <PackageReference Include="Aspose.3D" Version="23.1.0" />
     <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
@@ -69,6 +62,111 @@
   </ItemGroup>
 	
   <ItemGroup>
+    <Content Update="Assets\Engine\Resources\Models\Primitives\Cube.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Models\Primitives\Cylinder.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Models\Primitives\Duck.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Models\Primitives\Icosphere.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Models\Primitives\Plane.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Models\Primitives\Quad.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Models\Primitives\Sphere.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Models\Primitives\Suzanne.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Models\Primitives\Torus.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Models\Primitives\Tree.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Shader\ImGui.hlsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Shader\Lit.hlsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Shader\ShaderHelper.hlsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Shader\SimpleLit.hlsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Shader\Unlit.hlsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Templates\Project.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Templates\Examples\Example.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Templates\Examples\PlayerController.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Templates\Materials.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Templates\Scenes.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Templates\Scripts.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Templates\Shaders.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Textures\BG.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Textures\dark.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Textures\Default.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Textures\Sky.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Textures\Sky2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Textures\Sky3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Textures\Sky4.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Textures\Sky4k.hdr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Textures\Sky5.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Textures\SkyFish.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Textures\SkyGradient.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Textures\SkyGradient_Light.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Engine\Resources\Textures\UVMap.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Update="Assets\Engine\Resources\Textures\VS.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -77,9 +175,4 @@
     </Content>
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Assets\Engine\Resources\Templates\Project.zip">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 </Project>
