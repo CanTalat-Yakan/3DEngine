@@ -185,7 +185,6 @@ internal partial class Hierarchy
         items[1].Click += (s, e) => CopyToClipboard(_itemInvoked.ID, DataPackageOperation.Copy);
         items[1].KeyboardAccelerators.Add(new KeyboardAccelerator() { Modifiers = VirtualKeyModifiers.Control, Key = VirtualKey.C });
         items[2].Click += (s, e) => PasteEntityFromClipboardAsnyc(_itemInvoked.ID);
-        items[2].KeyboardAccelerators.Add(new KeyboardAccelerator() { Modifiers = VirtualKeyModifiers.Control, Key = VirtualKey.V });
 
         items[3].Click += (s, e) => ContentDialogRenameTreeEntry(_itemInvoked);
         items[3].KeyboardAccelerators.Add(new KeyboardAccelerator() { Modifiers = VirtualKeyModifiers.Control, Key = VirtualKey.F2 });
@@ -229,7 +228,6 @@ internal partial class Hierarchy
                 new MenuFlyoutItem() { Text = "Create Entity" },
             };
         items[2].Click += (s, e) => PasteEntityFromClipboardAsync(SceneEntry);
-        items[2].KeyboardAccelerators.Add(new KeyboardAccelerator() { Modifiers = VirtualKeyModifiers.Control, Key = VirtualKey.V });
 
         items[3].Click += (s, e) => SceneManager.Scene.EntityManager.CreateEntity();
 
@@ -267,7 +265,9 @@ internal partial class Hierarchy
         items[2].Click += (s, e) => PasteEntityFromClipboardAsync(sceneEntry);
 
         items[3].Click += (s, e) => ContentDialogRenameSubscene(sceneEntry);
+        items[3].KeyboardAccelerators.Add(new KeyboardAccelerator() { Modifiers = VirtualKeyModifiers.Control, Key = VirtualKey.F2 });
         items[4].Click += (s, e) => ContentDialogDeleteSubscene(sceneEntry);
+        items[4].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.Delete });
 
         items[7].Click += (s, e) => SceneManager.GetFromID(sceneEntry.ID).EntityManager.CreateEntity();
 
