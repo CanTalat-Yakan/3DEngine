@@ -555,9 +555,9 @@ internal partial class Hierarchy
 
         if (SubsceneEntries is not null)
             foreach (var subSceneEntry in SubsceneEntries)
-                foreach (var treeEntry in subSceneEntry.Hierarchy)
-                    if (treeEntry.ID == guid)
-                        return treeEntry;
+                foreach (var entry in subSceneEntry.Hierarchy)
+                    if (entry.ID == guid)
+                        return entry;
 
         return null;
     }
@@ -696,8 +696,13 @@ internal partial class Hierarchy : Controller.Helper
     /// <param name="targetSceneEntry"></param>
     public void GetScenes(out Scene sourceScene, out Scene targetScene, SceneEntry sourceSceneEntry, SceneEntry targetSceneEntry)
     {
-        sourceScene = SceneManager.GetFromID(sourceSceneEntry.ID);
-        targetScene = SceneManager.GetFromID(targetSceneEntry.ID);
+        sourceScene = null;
+        targetScene = null;
+
+        if (sourceSceneEntry is not null)
+            sourceScene = SceneManager.GetFromID(sourceSceneEntry.ID);
+        if (targetSceneEntry is not null)
+            targetScene = SceneManager.GetFromID(targetSceneEntry.ID);
     }
 
     /// <summary>
@@ -733,6 +738,23 @@ internal partial class Hierarchy : Controller.Helper
 
         // Set the requested operation for the DataPackage.
         data.RequestedOperation = requestedOpertion;
+
+        // Set the clipboard content to the DataPackage.
+        Clipboard.SetContent(data);
+    }
+
+    /// <summary>
+    /// This method resets the clipboard to only paste an entity once.
+    /// </summary>
+    /// <param name="guid"></param>
+    /// <param name="requestedOpertion"></param>
+    private void ResetClipboard()
+    {
+        // Create a new DataPackage object and set its text to the given GUID.
+        DataPackage data = new();
+
+        // Set the requested operation for the DataPackage.
+        data.RequestedOperation = DataPackageOperation.None;
 
         // Set the clipboard content to the DataPackage.
         Clipboard.SetContent(data);
@@ -790,6 +812,10 @@ internal partial class Hierarchy : Controller.Helper
     /// <param name="requestedOperation"></param>
     public void PasteEntity(Guid sourceEntityGuid, Guid targetEntityGuid, DataPackageOperation requestedOperation)
     {
+        // Prevent pasting the entity into itself.
+        if (sourceEntityGuid.Equals(targetEntityGuid))
+            return;
+
         // Get the source tree entry, entity and target tree entry from their respective GUIDs.
         GetEntries(out TreeEntry sourceTreeEntry, out SceneEntry sourceSceneEntry, sourceEntityGuid);
         GetEntity(out Entity sourceEntity, sourceEntityGuid, sourceSceneEntry);
@@ -800,19 +826,47 @@ internal partial class Hierarchy : Controller.Helper
         // Get the source and target scenes from their respective entries.
         GetScenes(out Scene sourceScene, out Scene targetScene, sourceSceneEntry, targetSceneEntry);
 
+        // Check if every information for the operation is obtained.
+        if (sourceTreeEntry is null ||
+            sourceSceneEntry is null ||
+            sourceEntity is null ||
+            targetTreeEntry is null ||
+            targetSceneEntry is null ||
+            targetEntity is null)
+        {
+            Output.Log($"""
+                Couldn't {requestedOperation} from one entity to another.
+                    Source TreeEntry: {sourceTreeEntry?.Name}
+                    Source SceneEntry: {sourceSceneEntry?.Name}
+                    Source Entity: {sourceEntity?.Name}
+
+                    Target TreeEntry: {targetTreeEntry?.Name}
+                    Target SceneEntry: {targetSceneEntry?.Name}
+                    Target Entity: {targetEntity?.Name}
+                """);
+
+            return;
+        }
+
         // Check if the source entity is not null.
         if (sourceEntity is not null)
         {
             // Check the requested operation.
             if (requestedOperation == DataPackageOperation.Move)
             {
+                // Migrate the icon node and entity recursively to the target scene.
+                MigrateIconNodeBetweenTreeEntries(sourceTreeEntry, sourceSceneEntry, targetTreeEntry, null);
+                MigrateEntityBetweenScenesRecurisivally(sourceScene, targetScene, sourceTreeEntry);
+
+                // Iterate through each child icon node of the source tree entry.
+                foreach (var childIconNode in sourceTreeEntry.IconNode.Children)
+                    MigrateTreeEntryBetweenHierarchies(childIconNode.TreeEntry, sourceSceneEntry, sourceTreeEntry, null);
+
                 // Move the source entity to the target entity.
                 sourceTreeEntry.IDparent = targetTreeEntry.ID;
                 sourceEntity.Parent = targetEntity;
 
-                // Migrate the icon node and entity recursively to the target scene.
-                MigrateIconNodeBetweenTreeEntries(sourceTreeEntry, sourceSceneEntry, targetTreeEntry, null);
-                MigrateEntityBetweenScenesRecurisivally(sourceScene, targetScene, sourceTreeEntry);
+                ResetClipboard();
             }
             else if (requestedOperation == DataPackageOperation.Copy)
             {
@@ -851,18 +905,39 @@ internal partial class Hierarchy : Controller.Helper
         // Get the source and target scene.
         GetScenes(out Scene sourceScene, out Scene targetScene, sourceSceneEntry, targetSceneEntry);
 
+        // Check if every information for the operation is obtained.
+        if (sourceTreeEntry is null ||
+            sourceSceneEntry is null ||
+            sourceEntity is null)
+        {
+            Output.Log($"""
+                Couldn't {requestedOperation} entity to another scene!
+                    Source TreeEntry: {sourceTreeEntry.Name}
+                    Source SceneEntry: {sourceSceneEntry.Name}
+                    Source Entity: {sourceEntity.Name}
+                """);
+
+            return;
+        }
+
         // Check if the source entity exists.
         if (sourceEntity is not null)
             // If the requested operation is a move.
             if (requestedOperation == DataPackageOperation.Move)
             {
+                // Migrate the icon node and entity recursively to the target scene.
+                MigrateIconNodeBetweenTreeEntries(sourceTreeEntry, sourceSceneEntry, null, targetSceneEntry);
+                MigrateEntityBetweenScenesRecurisivally(sourceScene, targetScene, sourceTreeEntry);
+
+                // Iterate through each child icon node of the source tree entry.
+                foreach (var childIconNode in sourceTreeEntry.IconNode.Children)
+                    MigrateTreeEntryBetweenHierarchies(childIconNode.TreeEntry, sourceSceneEntry, sourceTreeEntry, null);
+
                 // Set the Parent and IDparent of the sourceTreeEntry to null.
                 sourceTreeEntry.IDparent = null;
                 sourceEntity.Parent = null;
 
-                // Migrate the icon node and entity recursively to the target scene.
-                MigrateIconNodeBetweenTreeEntries(sourceTreeEntry, sourceSceneEntry, null, targetSceneEntry);
-                MigrateEntityBetweenScenesRecurisivally(sourceScene, targetScene, sourceTreeEntry);
+                ResetClipboard();
             }
             // If the requested operation is a copy.
             else if (requestedOperation == DataPackageOperation.Copy)
@@ -915,6 +990,14 @@ internal partial class Hierarchy : Controller.Helper
         // and if the target scene entry is not null, add the source tree entry's icon node to the target scene entry's root list.
         else if (targetSceneEntry is not null)
             targetSceneEntry.DataSource.Add(sourceTreeEntry.IconNode);
+
+        // Add the tree entry into the hierarchy of the respective scene entry.
+        sourceSceneEntry.Hierarchy.Remove(sourceTreeEntry);
+        if (targetTreeEntry is not null)
+            GetSceneEntry(targetTreeEntry).Hierarchy.Add(sourceTreeEntry);
+        // and if the target scene entry is not null, add the source tree entry to the target scene entry's hierarchy.
+        else if (targetSceneEntry is not null)
+            targetSceneEntry.Hierarchy.Add(sourceTreeEntry);
     }
 
     /// <summary>
@@ -936,8 +1019,8 @@ internal partial class Hierarchy : Controller.Helper
             // If the current tree entry has children, call this method recursively with the child tree entries.
             if (treeEntry.IconNode.Children.Count != 0)
                 MigrateEntityBetweenScenesRecurisivally(
-                    sourceScene, 
-                    targetScene, 
+                    sourceScene,
+                    targetScene,
                     treeEntry.IconNode.Children
                         .Select(TreeViewIconNode => TreeViewIconNode.TreeEntry)
                         .ToArray());
@@ -949,5 +1032,22 @@ internal partial class Hierarchy : Controller.Helper
             // Update the migrated entity's scene reference to the target scene.
             targetScene.EntityManager.GetFromID(treeEntry.ID).Scene = targetScene;
         }
+    }
+
+    public void MigrateTreeEntryBetweenHierarchies(TreeEntry sourceTreeEntry, SceneEntry sourceSceneEntry, TreeEntry targetTreeEntry, SceneEntry targetSceneEntry)
+    {
+        // Add the tree entry into the hierarchy of the respective scene entry.
+        sourceSceneEntry.Hierarchy.Remove(sourceTreeEntry);
+
+        // If the target tree entry is not null, add the source tree entry to the target tree entry's hierarchy,
+        if (targetTreeEntry is not null)
+            GetSceneEntry(targetTreeEntry).Hierarchy.Add(sourceTreeEntry);
+        // and if the target scene entry is not null, add the source tree entry to the target scene entry's hierarchy.
+        else if (targetSceneEntry is not null)
+            targetSceneEntry.Hierarchy.Add(sourceTreeEntry);
+
+        // Iterate through each child icon node of the source tree entry.
+        foreach (var childIconNode in sourceTreeEntry.IconNode.Children)
+            MigrateTreeEntryBetweenHierarchies(childIconNode.TreeEntry, sourceSceneEntry, sourceTreeEntry, null);
     }
 }
