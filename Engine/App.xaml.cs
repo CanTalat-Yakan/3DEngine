@@ -30,11 +30,13 @@ public partial class App : Application
             Directory.CreateDirectory(rootPath);
 
         // Increment log if it is locked by another process.
-        if (logFilePath.IsFileLocked().Value)
-            logFilePath = logFilePath.IncrementPathIfExists(
-                Directory.GetFiles(rootPath)
-                    .Select(p => Path.GetFileNameWithoutExtension(p))
-                    .ToArray());
+        bool? isLocked = logFilePath.IsFileLocked();
+        if (isLocked is not null)
+            if (isLocked.Value)
+                logFilePath = logFilePath.IncrementPathIfExists(
+                    Directory.GetFiles(rootPath)
+                        .Select(p => Path.GetFileNameWithoutExtension(p))
+                        .ToArray());
 
         // Reset log.
         if (File.Exists(logFilePath))

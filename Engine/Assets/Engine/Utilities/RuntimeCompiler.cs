@@ -114,8 +114,12 @@ namespace Engine.Utilities
                         if (scriptEntry.Assembly is not null)
                             _ignoreAssemblies.Add(scriptEntry.Assembly);
 
-                        // Load the assenbly with the compiled script.
-                        scriptEntry.Assembly = Assembly.Load(assemblyStream.ToArray(), symbolStream.ToArray());
+                        try
+                        {
+                            // Load the assenbly with the compiled script.
+                            scriptEntry.Assembly = Assembly.Load(assemblyStream.ToArray(), symbolStream.ToArray());
+                        }
+                        catch (Exception) { throw; }
 
                         // Replace all matching components with the new one.
                         ReplaceComponentTypeReferences(scriptEntry.Assembly);
