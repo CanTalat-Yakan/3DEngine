@@ -185,7 +185,8 @@ namespace Engine.ECS
 
             if(Parent is not null)
                 info += $"""
-                    Parent: {Parent}
+
+                    Parent: {Parent.Name}
                     Parent ID: {Parent.ID}
                     """;
 
