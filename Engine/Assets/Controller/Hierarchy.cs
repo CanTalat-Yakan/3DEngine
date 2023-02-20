@@ -912,9 +912,9 @@ internal partial class Hierarchy : Controller.Helper
         {
             Output.Log($"""
                 Couldn't {requestedOperation} entity to another scene!
-                    Source TreeEntry: {sourceTreeEntry.Name}
-                    Source SceneEntry: {sourceSceneEntry.Name}
-                    Source Entity: {sourceEntity.Name}
+                    Source TreeEntry: {sourceTreeEntry?.Name}
+                    Source SceneEntry: {sourceSceneEntry?.Name}
+                    Source Entity: {sourceEntity?.Name}
                 """);
 
             return;
