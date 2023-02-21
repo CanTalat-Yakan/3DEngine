@@ -229,7 +229,7 @@ namespace Editor.Controller
         private static UIElement CreateMessage(DateTime d, MessageInfo m, int? i)
         {
             // Content of the message.
-            StackPanel stack = new() { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Top, Spacing = 10, Margin = new(10, 0, 0, 0), Padding = new(5) };
+            StackPanel stack = new() { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Top, Spacing = 10, Margin = new(10, 0, 50, 0), Padding = new(5) };
             Viewbox viewbox = new() { Width = 14, Height = 14 };
 
             if (m.Type == MessageType.Warning)
@@ -240,7 +240,7 @@ namespace Editor.Controller
                 viewbox.Child = new SymbolIcon() { Symbol = Symbol.ReportHacked };
 
             stack.Children.Add(viewbox);
-            stack.Children.Add(new TextBlock() { Text = "[" + d.TimeOfDay.ToString("hh\\:mm\\:ss").ToString() + "]" });
+            stack.Children.Add(new TextBlock() { Text = "[" + d.ToShortTimeString().ToString() + "]" });
             stack.Children.Add(new TextBlock() { Text = m.Message });
 
             // The flyout when clicked on the message.
