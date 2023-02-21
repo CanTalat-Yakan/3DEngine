@@ -44,15 +44,13 @@ internal class ModelLoader
         {
             // Add each vertex to the list.
             for (int i = 0; i < mesh.VertexCount; i++)
-                vertices.Add(new(
-                    mesh.Vertices[i].X,
-                    mesh.Vertices[i].Y,
-                    mesh.Vertices[i].Z,
-                    mesh.TextureCoordinateChannels[0][i].X,
-                    mesh.TextureCoordinateChannels[0][i].Y,
-                    mesh.Normals[i].X,
-                    mesh.Normals[i].Y,
-                    mesh.Normals[i].Z));
+                vertices.Add(new()
+                {
+                    Position = mesh.HasVertices ? new Vector3(mesh.Vertices[i].X, mesh.Vertices[i].Y, mesh.Vertices[i].Z) : Vector3.Zero,
+                    TexCoord = mesh.HasTextureCoords(0) ? new Vector2(mesh.TextureCoordinateChannels[0][i].X, mesh.TextureCoordinateChannels[0][i].Y) : Vector2.Zero,
+                    Normal = mesh.HasNormals ? new Vector3(mesh.Normals[i].X, mesh.Normals[i].Y, mesh.Normals[i].Z) : Vector3.Zero,
+                    Tangent = mesh.HasTangentBasis ? new Vector3(mesh.Tangents[i].X, mesh.Tangents[i].Y, mesh.Tangents[i].Z) : Vector3.Zero,
+                });
 
             // Add each face to the list.
             foreach (var face in mesh.Faces)

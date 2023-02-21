@@ -38,10 +38,14 @@ public class Mesh : Component
     {
         if (!string.IsNullOrEmpty(MeshPath))
             if (File.Exists(MeshPath))
-            {
-                SetMeshInfo(ModelLoader.LoadFile(MeshPath, false));
-                MeshPath = null;
-            }
+                try
+                {
+                    SetMeshInfo(ModelLoader.LoadFile(MeshPath, false));
+                }
+                finally
+                {
+                    MeshPath = null;
+                }
     }
 
     public override void OnRender()
