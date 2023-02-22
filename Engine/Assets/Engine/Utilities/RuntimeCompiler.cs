@@ -40,7 +40,7 @@ namespace Engine.Utilities
 
             List<string> validateScripts = new();
 
-            string[] fileEntries = Directory.GetFiles(scriptsFolderPath);
+            string[] fileEntries = Directory.GetFiles(scriptsFolderPath, "*", SearchOption.AllDirectories);
             foreach (var path in fileEntries)
             {
                 ScriptEntry scriptEntry = null;
