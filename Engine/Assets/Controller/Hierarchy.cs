@@ -241,7 +241,7 @@ internal partial class Hierarchy
                 menuFlyout.Items.Add(new MenuFlyoutSeparator());
         }
 
-        menuFlyout = AppendDynamicMenuFlyoutSubItems(menuFlyout);
+        menuFlyout = AppendDynamicMenuFlyoutSubItems(menuFlyout, SceneEntry);
 
         return menuFlyout;
     }
@@ -298,13 +298,13 @@ internal partial class Hierarchy
             item = new() { Text = type.ToString().FormatString() };
             item.Click += (s, e) =>
             {
-                if (_itemInvoked is not null)
+                if (sceneEntry is not null)
+                    SceneManager.GetFromID(sceneEntry.ID).EntityManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
+                else if (_itemInvoked is not null)
                 {
                     var entity = GetEntity(_itemInvoked);
                     entity.Scene.EntityManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type), entity);
                 }
-                else if (sceneEntry is not null)
-                    SceneManager.GetFromID(sceneEntry.ID).EntityManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
                 else
                     SceneManager.Scene.EntityManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
             };
@@ -317,13 +317,13 @@ internal partial class Hierarchy
         menuFlyout.Items.Add(item = new MenuFlyoutItem() { Text = "Camera" });
         item.Click += (s, e) =>
         {
-            if (_itemInvoked is not null)
+            if (sceneEntry is not null)
+                SceneManager.GetFromID(sceneEntry.ID).EntityManager.CreateCamera();
+            else if (_itemInvoked is not null)
             {
                 var entity = GetEntity(_itemInvoked);
                 entity.Scene.EntityManager.CreateCamera("Camera", Tags.MainCamera.ToString(), entity);
             }
-            else if (sceneEntry is not null)
-                SceneManager.GetFromID(sceneEntry.ID).EntityManager.CreateCamera();
             else
                 SceneManager.Scene.EntityManager.CreateCamera();
         };
