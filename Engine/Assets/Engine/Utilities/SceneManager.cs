@@ -52,7 +52,7 @@ internal class SceneManager
         Scene scene = GetFromID(guid);
 
         // Destroys all entities within the scene.
-        foreach (var entity in scene.EntityManager.EntityList)
+        foreach (var entity in scene.EntityManager.EntityList.ToArray())
             scene.EntityManager.Destroy(entity);
 
         // Removes the scene from the list of subscenes.

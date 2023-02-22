@@ -158,6 +158,9 @@ internal partial class Hierarchy
     {
         var treeEntry = GetTreeEntry(entity.ID);
 
+        if(treeEntry is null) 
+            return;
+
         TreeEntry parent;
         if ((parent = GetParent(treeEntry)) is null)
             sceneEntry.DataSource.Remove(treeEntry.IconNode);
