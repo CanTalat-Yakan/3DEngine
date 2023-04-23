@@ -89,7 +89,7 @@ public class Material
             AddressU = TextureAddressMode.Clamp,
             AddressV = TextureAddressMode.Clamp,
             AddressW = TextureAddressMode.Clamp,
-            ComparisonFunction = ComparisonFunction.Always,
+            ComparisonFunc = ComparisonFunction.Always,
             MaxAnisotropy = 16,
             MinLOD = 0,
             MaxLOD = float.MaxValue,

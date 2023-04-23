@@ -159,7 +159,7 @@ internal class Renderer
         // Render target blend description setup.
         RenderTargetBlendDescription renTarDesc = new()
         {
-            IsBlendEnabled = true, // Enable blend.
+            BlendEnable = true, // Enable blend.
             SourceBlend = Blend.SourceAlpha,
             DestinationBlend = Blend.InverseSourceAlpha,
             BlendOperation = BlendOperation.Add,

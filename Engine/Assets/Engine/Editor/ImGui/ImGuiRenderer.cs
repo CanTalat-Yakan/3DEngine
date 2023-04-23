@@ -261,7 +261,7 @@ unsafe internal class ImGuiRenderer
             AddressV = TextureAddressMode.Wrap,
             AddressW = TextureAddressMode.Wrap,
             MipLODBias = 0f,
-            ComparisonFunction = ComparisonFunction.Always,
+            ComparisonFunc = ComparisonFunction.Always,
             MinLOD = 0f,
             MaxLOD = 0f
         };
@@ -317,7 +317,7 @@ unsafe internal class ImGuiRenderer
 
         blendDesc.RenderTarget[0] = new()
         {
-            IsBlendEnabled = true,
+            BlendEnable = true,
             SourceBlend = Blend.SourceAlpha,
             DestinationBlend = Blend.InverseSourceAlpha,
             BlendOperation = BlendOperation.Add,
