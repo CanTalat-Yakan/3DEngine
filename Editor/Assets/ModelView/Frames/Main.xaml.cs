@@ -22,7 +22,7 @@ public sealed partial class Main : Frame
 
     private void InitializeInput()
     {
-        PointerMoved += Input.PointerMoved;
+        PointerMoved += Engine.Utilities.Input.PointerMoved;
         PointerReleased += Input.PointerReleased;
         KeyUp += Input.KeyUp;
     }

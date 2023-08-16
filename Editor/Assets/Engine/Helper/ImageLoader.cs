@@ -157,7 +157,7 @@ internal class ImageLoader
             converter.CopyPixels(rowPitch, pixels);
         }
 
-        return device.CreateTexture2D(format, size.Width, size.Height, pixels);
+        return device.CreateTexture2D(pixels, format, size.Width, size.Height);
     }
 
     internal static readonly Dictionary<Guid, Format> s_WICFormats = new()
