@@ -137,6 +137,8 @@ namespace VorticeImGui
             lastFrameTime = now;
             io.DeltaTime = (float)delta.TotalSeconds;
 
+            io.DisplaySize = new Vector2(Win32Window.Width, Win32Window.Height);
+
             imguiInputHandler.Update();
 
             ImGui.NewFrame();
@@ -151,8 +153,6 @@ namespace VorticeImGui
             dc.OMSetRenderTargets(renderView);
             dc.RSSetViewport(0, 0, Win32Window.Width, Win32Window.Height);
             
-            ImGui.GetIO().DisplaySize = new Vector2(Win32Window.Width, Win32Window.Height);
-
             imGuiRenderer.Render(ImGui.GetDrawData());
             DoRender();
 

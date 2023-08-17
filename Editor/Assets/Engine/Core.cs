@@ -25,16 +25,11 @@ internal class Core
     public ImGuiRenderer ImGuiRenderer;
     private IntPtr _imGuiContext;
 
-    private TextBlock _profile;
-
-    public Core(SwapChainPanel swapChainPanel, TextBlock profile)
+    public Core(SwapChainPanel swapChainPanel)
     {
         // Initializes the singleton instance of the class, if it hasn't been already.
         if (Instance is null)
             Instance = this;
-
-        // Assign local variable.
-        _profile = profile;
 
         // Initializes the renderer, scene manager, and the runtimeCompiler.
         Renderer = new(swapChainPanel);
@@ -65,21 +60,16 @@ internal class Core
 
         Output.Log("Engine Initialized...");
 
-        #region // Render Pipeline Loop
-        // Call Awake method for all scenens.
+        // Render Pipeline Loop
         SceneManager.Awake();
-        // Call Start method for all scenens.
         SceneManager.Start();
-
-        // Adds an event handler for the CompositionTarget.Rendering event,
-        // which is triggered when the composition system is rendering a frame.
-        // The code inside the event handler will be executed each time the event is raised.
-        CompositionTarget.Rendering += (s, e) => Frame();
-        #endregion
     }
 
     public void Frame()
     {
+        if (!Renderer.IsRendering)
+            return;
+
         // Clears the render target, discarding the contents and preparing it for the next frame.
         Renderer.Clear();
 
@@ -125,8 +115,5 @@ internal class Core
         // Updates the time values, such as delta time and time scale,
         // used in the game or application.
         Time.Update();
-
-        // Updates the text of the profile with the profiling information.
-        _profile.Text = Profiler.GetString();
     }
 }

@@ -13,6 +13,8 @@ internal class Renderer
 {
     public static Renderer Instance { get; private set; }
 
+    public bool IsRendering { get => _renderTargetView.NativePointer is not 0; }
+
     public ID3D11Device2 Device { get; private set; }
     public ID3D11DeviceContext DeviceContext { get; private set; }
     public SwapChainPanel SwapChainPanel { get; private set; }
@@ -186,26 +188,23 @@ internal class Renderer
         #endregion
     }
 
-    public void Dispose()
+    public void Present() =>
+        // Present the final render to the screen.
+        _swapChain.Present(0, PresentFlags.None);
+
+    public void Draw(ID3D11Buffer vertexBuffer, int vertexStride, ID3D11Buffer indexBuffer, int indexCount, int vertexOffset = 0, int indexOffset = 0)
     {
-        // Dispose all DirectX resources that were created.
-        Device.Dispose();
-        DeviceContext.Dispose();
+        // Set the type of the primitive to be rendered in trianglelist.
+        DeviceContext.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
+        // Set the vertex buffer.
+        DeviceContext.IASetVertexBuffer(0, vertexBuffer, vertexStride, vertexOffset);
+        // Set the index buffer in R16_UInt format.
+        DeviceContext.IASetIndexBuffer(indexBuffer, Format.R16_UInt, indexOffset);
+        // Set the blend state.
+        DeviceContext.OMSetBlendState(_blendState);
 
-        // Dispose of the swap chain.
-        _swapChain.Dispose();
-
-        // Dispose of the render target texture and view.
-        _renderTargetTexture.Dispose();
-        _renderTargetView.Dispose();
-
-        // Dispose of the depth stencil texture and view.
-        _depthStencilTexture.Dispose();
-        _depthStencilView.Dispose();
-
-        // Dispose of the blend state.
-        _blendState.Dispose();
-
+        // Make the draw call to render the geometry.
+        DeviceContext.DrawIndexed(indexCount, 0, 0);
     }
 
     public void Clear()
@@ -226,12 +225,6 @@ internal class Renderer
         Profiler.DrawCalls = 0;
     }
 
-    public void Present()
-    {
-        // Present the final render to the screen.
-        _swapChain.Present(0, PresentFlags.None);
-    }
-
     public void SetRasterizerDesc(bool solid = true)
     {
         // Create a rasterizer state with specified fill and cull modes.
@@ -247,19 +240,26 @@ internal class Renderer
         DeviceContext.RSSetState(Device.CreateRasterizerState(rasterizerDesc));
     }
 
-    public void Draw(ID3D11Buffer vertexBuffer, int vertexStride, ID3D11Buffer indexBuffer, int indexCount, int vertexOffset = 0, int indexOffset = 0)
+    public void Dispose()
     {
-        // Set the type of the primitive to be rendered in trianglelist.
-        DeviceContext.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
-        // Set the vertex buffer.
-        DeviceContext.IASetVertexBuffer(0, vertexBuffer, vertexStride, vertexOffset);
-        // Set the index buffer in R16_UInt format.
-        DeviceContext.IASetIndexBuffer(indexBuffer, Format.R16_UInt, indexOffset);
-        // Set the blend state.
-        DeviceContext.OMSetBlendState(_blendState);
+        // Dispose all DirectX resources that were created.
+        Device.Dispose();
+        DeviceContext.Dispose();
 
-        // Make the draw call to render the geometry.
-        DeviceContext.DrawIndexed(indexCount, 0, 0);
+        // Dispose of the swap chain.
+        _swapChain.Dispose();
+
+        // Dispose of the render target texture and view.
+        _renderTargetTexture.Dispose();
+        _renderTargetView.Dispose();
+
+        // Dispose of the depth stencil texture and view.
+        _depthStencilTexture.Dispose();
+        _depthStencilView.Dispose();
+
+        // Dispose of the blend state.
+        _blendState.Dispose();
+
     }
 
     public void OnSwapChainPanelSizeChanged(object sender, SizeChangedEventArgs e)

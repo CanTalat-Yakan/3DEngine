@@ -1,4 +1,4 @@
-﻿using Engine.Utilities;
+﻿namespace Editor.Controller;
 
 internal class Profiler
 {
