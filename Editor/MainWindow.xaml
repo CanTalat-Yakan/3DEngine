@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:winex="using:WinUIEx"
-    MinWidth="1064" MinHeight="768"
+    MinWidth="1524" MinHeight="768"
     mc:Ignorable="d">
 
     <Page x:Name="x_Page_Main">
