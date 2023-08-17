@@ -113,12 +113,14 @@ internal class Core
         Renderer.SetRasterizerDesc(false);
         SceneManager.Render();
 
+#if EDITOR
         // Updates and renders the ImGui user interface.
         ImGuiRenderer.Update(_imGuiContext);
         ImGuiRenderer.Render(ImGui.GetDrawData());
 
         // Presents the final rendered image on the screen.
         Renderer.Present();
+#endif
 
         // Updates the time values, such as delta time and time scale,
         // used in the game or application.
