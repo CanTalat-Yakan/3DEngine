@@ -1,8 +1,12 @@
 ﻿using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml;
 using System.ComponentModel;
-using System.Reflection.Emit;
-using System.Reflection;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Text;
+using Microsoft.CodeAnalysis;
+using System.Linq;
+using System.Text;
 
 namespace Editor.Controller;
 
@@ -49,53 +53,57 @@ public class BindableBase : INotifyPropertyChanged
 }
 
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-internal class PropertyAttribute : Attribute
+public class GeneratePropertyAttribute : Attribute
 {
-    public PropertyAttribute(string name)
+    public GeneratePropertyAttribute(string name)
     {
         Name = name;
-
-        //PropertyGenerator.GenerateProperties();
     }
 
     public string Name { get; }
 }
 
-internal static class PropertyGenerator
+[Generator]
+public class PropertyGenerator : ISourceGenerator
 {
-    public static void GenerateProperties(Type type)
+    public void Initialize(GeneratorInitializationContext context)
     {
-        foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic))
-        {
-            var propertyAttribute = field.GetCustomAttribute<PropertyAttribute>();
-            if (propertyAttribute == null)
-                continue;
-
-            GenerateProperty(type, field, propertyAttribute.Name);
-        }
+        // No initialization required.
     }
 
-    private static void GenerateProperty(Type type, FieldInfo field, string propertyName)
+    public void Execute(GeneratorExecutionContext context)
     {
-        var property = type.GetProperty(propertyName);
-        if (property is not null)
-            return;
+        var sourceBuilder = new StringBuilder();
 
-        var getMethod = new DynamicMethod("Get" + propertyName, field.FieldType, new[] { type }, type);
-        var getIL = getMethod.GetILGenerator();
-        getIL.Emit(OpCodes.Ldarg_0);
-        getIL.Emit(OpCodes.Ldfld, field);
-        getIL.Emit(OpCodes.Ret);
+        foreach (var syntaxTree in context.Compilation.SyntaxTrees)
+        {
+            var semanticModel = context.Compilation.GetSemanticModel(syntaxTree);
 
-        var setMethod = new DynamicMethod("Set" + propertyName, typeof(void), new[] { type, field.FieldType }, type);
-        var setIL = setMethod.GetILGenerator();
-        setIL.Emit(OpCodes.Ldarg_0);
-        setIL.Emit(OpCodes.Ldarg_1);
-        setIL.Emit(OpCodes.Stfld, field);
-        setIL.Emit(OpCodes.Ret);
+            var fieldsWithAttributes = syntaxTree.GetRoot().DescendantNodes().OfType<FieldDeclarationSyntax>()
+                .Where(f => f.AttributeLists.Count > 0);
 
-        //var propertyBuilder = type.DefineProperty(propertyName, PropertyAttributes.None, field.FieldType, Type.EmptyTypes);
-        //propertyBuilder.SetGetMethod(getMethod);
-        //propertyBuilder.SetSetMethod(setMethod);
+            foreach (var field in fieldsWithAttributes)
+            {
+                var fieldSymbol = semanticModel.GetDeclaredSymbol(field.Declaration.Variables[0]) as IFieldSymbol;
+
+                var generatePropertyAttribute = fieldSymbol.GetAttributes().FirstOrDefault(attr => attr.AttributeClass.Name == nameof(GeneratePropertyAttribute));
+
+                if (generatePropertyAttribute != null)
+                {
+                    var propertyName = (string)generatePropertyAttribute.ConstructorArguments[0].Value;
+                    var fieldType = fieldSymbol.Type.Name;
+                    var fieldName = fieldSymbol.Name;
+
+                    sourceBuilder.AppendLine($@"
+                        public {fieldType} {propertyName}
+                        {{
+                            get => {fieldName};
+                            set => SetProperty(ref {fieldName}, value);
+                        }}");
+                }
+            }
+        }
+
+        context.AddSource("GeneratedProperties", SourceText.From(sourceBuilder.ToString(), Encoding.UTF8));
     }
 }

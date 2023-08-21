@@ -10,7 +10,6 @@ global using System;
 
 using ImGuiNET;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 
 namespace Engine;
 
@@ -77,6 +76,11 @@ internal class Core
         // or changes in the state of the pointer or the keyboard.
         Input.Update();
 
+#if EDITOR
+        // Updates and renders the ImGui user interface.
+        ImGuiRenderer.Update(_imGuiContext);
+        ImGuiRenderer.Render(ImGui.GetDrawData());
+
         // Invokes Awake and Start if playmode has started.
         if (Main.Instance.PlayerControl.CheckPlaymodeStarted())
         {
@@ -88,6 +92,7 @@ internal class Core
             // Call Start method for all scenens again.
             SceneManager.Start();
         }
+#endif
 
         // Call Update method for all scenens.
         SceneManager.Update();
@@ -103,14 +108,8 @@ internal class Core
         Renderer.SetRasterizerDesc(false);
         SceneManager.Render();
 
-#if EDITOR
-        // Updates and renders the ImGui user interface.
-        ImGuiRenderer.Update(_imGuiContext);
-        ImGuiRenderer.Render(ImGui.GetDrawData());
-
         // Presents the final rendered image on the screen.
         Renderer.Present();
-#endif
 
         // Updates the time values, such as delta time and time scale,
         // used in the game or application.

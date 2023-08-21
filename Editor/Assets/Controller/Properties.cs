@@ -280,7 +280,6 @@ internal partial class Properties : Controller.Helper
         // Get any custom attributes applied to the field.
         var attributes = fieldInfo.GetCustomAttributes(true);
 
-
         #region // Process Attributes
         // Return null if the field has a HideAttribute applied.
         if (attributes.OfType<HideAttribute>().Any())

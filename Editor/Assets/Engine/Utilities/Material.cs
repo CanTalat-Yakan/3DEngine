@@ -142,7 +142,7 @@ public class Material
         shaderFlags |= ShaderFlags.Debug;
         shaderFlags |= ShaderFlags.SkipValidation;
 #else
-            shaderFlags |= ShaderFlags.OptimizationLevel3;
+        shaderFlags |= ShaderFlags.OptimizationLevel3;
 #endif
 
         // Compile the shader from the specified file using the specified entry point, profile, and flags.

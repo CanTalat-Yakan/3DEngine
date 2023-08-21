@@ -8,8 +8,8 @@ public class Component : BindableBase, ICloneable
     private bool _isEnabled;
     public bool IsEnabled
     {
-        get { return _isEnabled; }
-        set { SetProperty(ref _isEnabled, value); }
+        get => _isEnabled;
+        set => SetProperty(ref _isEnabled, value);
     }
 
     internal event EventHandler _eventOnDestroy;

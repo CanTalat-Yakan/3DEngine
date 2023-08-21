@@ -77,8 +77,16 @@ public class Mesh : Component
         // Assign to local variable.
         _material = material;
 
+    public void Dispose()
+    {
+        _vertexBuffer?.Dispose();
+        _indexBuffer?.Dispose();
+    }
+
     private void CreateBuffer()
     {
+        Dispose();
+
         //Create a VertexBuffer using the MeshInfo's vertices
         //and bind it with VertexBuffer flag.
         _vertexBuffer = _d3d.Device.CreateBuffer(

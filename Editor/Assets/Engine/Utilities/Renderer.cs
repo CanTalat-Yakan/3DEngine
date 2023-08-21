@@ -300,7 +300,7 @@ internal class Renderer
         // Update the viewport to match the new window size.
         DeviceContext.RSSetViewport(
             0, 0,
-            (int)e.NewSize.Width,
-            (int)e.NewSize.Height);
+            newSize.Width,
+            newSize.Height);
     }
 }
