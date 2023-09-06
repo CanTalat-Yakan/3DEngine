@@ -31,7 +31,7 @@ public class Component : BindableBase, ICloneable
 
     public virtual void OnDestroy() { }
 
-    public void InvokeEventOnDestroy() =>
+    public void InvokeEventOnDestroy() => 
         // Invoke the Event when the Component is destroyed.
         _eventOnDestroy(this, null);
 
