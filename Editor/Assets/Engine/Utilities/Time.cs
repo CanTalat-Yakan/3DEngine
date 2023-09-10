@@ -2,7 +2,7 @@
 
 namespace Engine.Utilities;
 
-public class Time
+public sealed class Time
 {
     public static double Timer => s_timer;
     public static double Delta => s_delta;

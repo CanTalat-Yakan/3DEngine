@@ -9,14 +9,14 @@ using System.Reflection;
 
 namespace Engine.Utilities
 {
-    internal class ScriptEntry
+    internal sealed class ScriptEntry
     {
         public FileInfo FileInfo;
         public Script<object> Script;
         public Assembly Assembly;
     }
 
-    internal class RuntimeCompiler
+    internal sealed class RuntimeCompiler
     {
         public ComponentCollector ComponentCollector = new();
 

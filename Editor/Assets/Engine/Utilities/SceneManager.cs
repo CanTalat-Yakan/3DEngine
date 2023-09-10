@@ -2,7 +2,7 @@
 
 namespace Engine.Utilities;
 
-internal class SceneManager
+internal sealed class SceneManager
 {
     public static Scene Scene;
     public static List<Scene> Subscenes;

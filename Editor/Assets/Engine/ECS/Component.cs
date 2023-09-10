@@ -42,6 +42,6 @@ public class Component : BindableBase, ICloneable
         (Component)MemberwiseClone();
 }
 
-public class EditorComponent : Component, IHide { }
+public sealed class EditorComponent : Component, IHide { }
 
 public interface IHide { }

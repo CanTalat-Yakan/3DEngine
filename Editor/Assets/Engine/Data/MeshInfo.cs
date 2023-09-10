@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Engine.Data;
+﻿namespace Engine.Data;
 
 public struct MeshInfo
 {

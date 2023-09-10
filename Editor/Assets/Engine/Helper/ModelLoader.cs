@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Engine.Helper;
 
-internal class ModelLoader
+internal sealed class ModelLoader
 {
     public static MeshInfo LoadFile(string filePath, bool fromResources = true)
     {

@@ -6,7 +6,7 @@ using Vortice.DXGI;
 
 namespace Engine.Utilities;
 
-public class Material
+public sealed class Material
 {
     private Renderer _d3d => Renderer.Instance;
 

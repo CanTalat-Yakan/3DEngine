@@ -4,7 +4,7 @@ using Vortice.Direct3D11;
 
 namespace Engine.Components;
 
-public class Mesh : Component
+public sealed class Mesh : Component
 {
     public string MeshPath;
 

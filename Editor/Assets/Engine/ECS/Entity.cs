@@ -28,7 +28,7 @@ namespace Engine.ECS
         UI
     }
 
-    public class Entity : ICloneable
+    public sealed class Entity : ICloneable
     {
         public Guid ID = Guid.NewGuid();
 

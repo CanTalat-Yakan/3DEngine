@@ -2,7 +2,7 @@
 
 namespace Engine.Editor;
 
-internal class SceneBoot : EditorComponent
+internal sealed class SceneBoot : EditorComponent
 {
     public Camera SceneCamera;
 
@@ -75,7 +75,7 @@ internal class SceneBoot : EditorComponent
     }
 }
 
-internal class DeactivateCameraOnPlay : Component, IHide
+internal sealed class DeactivateCameraOnPlay : Component, IHide
 {
     public Camera SceneCamera;
 

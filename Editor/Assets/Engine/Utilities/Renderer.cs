@@ -6,10 +6,11 @@ using Vortice.Direct3D11;
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
+using PostSharp.Aspects.Advices;
 
 namespace Engine.Utilities;
 
-internal class Renderer
+internal sealed class Renderer
 {
     public static Renderer Instance { get; private set; }
 
@@ -55,7 +56,7 @@ internal class Renderer
             SampleDescription = new(1, 0),
             Scaling = Scaling.Stretch,
             Stereo = false,
-            SwapEffect = SwapEffect.FlipSequential,
+            SwapEffect = SwapEffect.FlipDiscard,
             BufferUsage = Usage.RenderTargetOutput
         };
 
@@ -88,13 +89,15 @@ internal class Renderer
         using (IDXGISwapChain1 swapChain1 = dxgiFactory.CreateSwapChainForComposition(dxgiDevice3, swapChainDescription))
             _swapChain = swapChain1.QueryInterface<IDXGISwapChain2>();
 
+        //var dxgiFactory = Device.QueryInterface<IDXGIDevice>().GetParent<IDXGIAdapter>().GetParent<IDXGIFactory>();
+
         // Gets the native object for the SwapChainPanel control.
         using (var nativeObject = ComObject.As<Vortice.WinUI.ISwapChainPanelNative2>(this.SwapChainPanel))
             result = nativeObject.SetSwapChain(_swapChain);
 
         // Throws an exception if setting the swap chain failed.
-        if (!result.Success)
-            throw new Exception("nativeObject.SetSwapChain()");
+        if (result.Failure)
+            throw new Exception(result.Description);
         #endregion
 
         #region //Create render target view, get back buffer texture before

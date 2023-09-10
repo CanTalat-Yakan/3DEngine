@@ -1,6 +1,6 @@
 ﻿namespace Engine.Helper;
 
-public class Helper { }
+public sealed class Helper { }
 
 public static class ExtensionMethods
 {

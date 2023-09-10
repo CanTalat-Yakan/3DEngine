@@ -1,6 +1,6 @@
 ﻿namespace Engine.Utilities;
 
-public class Scene : BindableBase, ICloneable
+public sealed class Scene : BindableBase, ICloneable
 {
     public Guid ID = Guid.NewGuid();
 

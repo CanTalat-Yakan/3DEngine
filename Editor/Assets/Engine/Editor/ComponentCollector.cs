@@ -2,7 +2,7 @@
 
 namespace Engine.Editor;
 
-internal class ComponentCollector
+internal sealed class ComponentCollector
 {
     public List<Type> Components = new();
 

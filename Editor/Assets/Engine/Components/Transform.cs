@@ -2,7 +2,7 @@
 
 namespace Engine.Components;
 
-public class Transform : Component, IHide
+public sealed class Transform : Component, IHide
 {
     public Transform Parent => Entity.Parent is null ? null : Entity.Parent.Transform;
 

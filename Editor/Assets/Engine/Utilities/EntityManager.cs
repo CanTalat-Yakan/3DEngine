@@ -17,7 +17,7 @@ namespace Engine.Utilities
         Duck,
     }
 
-    public class EventList<T> : List<T>
+    public sealed class EventList<T> : List<T>
     {
         // Event that is raised when an item is added to the list.
         public event EventHandler<T> OnAdd;
@@ -47,7 +47,7 @@ namespace Engine.Utilities
         }
     }
 
-    public class EntityManager
+    public sealed class EntityManager
     {
         public EventList<Entity> EntityList = new();
         public Entity Sky;

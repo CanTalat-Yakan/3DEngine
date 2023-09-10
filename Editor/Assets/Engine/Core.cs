@@ -9,11 +9,13 @@ global using System.Numerics;
 global using System;
 
 using ImGuiNET;
+#if EDITOR
 using Microsoft.UI.Xaml.Controls;
+#endif
 
 namespace Engine;
 
-internal class Core
+internal sealed partial class Core
 {
     public static Core Instance { get; private set; }
 
@@ -114,5 +116,48 @@ internal class Core
         // Updates the time values, such as delta time and time scale,
         // used in the game or application.
         Time.Update();
+    }
+}
+
+internal partial class Core
+{
+    public Core()
+    {
+        //// Initializes the singleton instance of the class, if it hasn't been already.
+        //if (Instance is null)
+        //    Instance = this;
+
+        //// Initializes the renderer, scene manager, and the runtimeCompiler.
+        //Renderer = new(swapChainPanel);
+        //SceneManager = new();
+        //RuntimeCompiler = new();
+
+        //// Creates an entity with the "Boot" editortag and adds a "SceneBoot" component to it.
+        //SceneManager.Scene.EntityManager
+        //    .CreateEntity(null, "Boot", EditorTags.SceneBoot.ToString())
+        //    .AddComponent(new SceneBoot());
+
+        //// Compile all projec scripts and add components for the editor's "AddComponent" function.
+        //RuntimeCompiler.CompileProjectScripts();
+
+        //#region // ImGui
+        //// Creates a new ImGui context and sets it as the current context.
+        //_imGuiContext = ImGui.CreateContext();
+        //ImGui.SetCurrentContext(_imGuiContext);
+
+        //// Initializes the ImGui renderer.
+        //ImGuiRenderer = new();
+
+        //// Set the displaySize with the actual size of the SwapChainPanel.
+        //ImGui.GetIO().DisplaySize = new(
+        //    (float)swapChainPanel.ActualWidth,
+        //    (float)swapChainPanel.ActualHeight);
+        //#endregion
+
+        //Output.Log("Engine Initialized...");
+
+        //// Render Pipeline Loop
+        //SceneManager.Awake();
+        //SceneManager.Start();
     }
 }

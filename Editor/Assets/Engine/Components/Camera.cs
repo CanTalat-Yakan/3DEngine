@@ -3,7 +3,7 @@ using Vortice.Direct3D11;
 
 namespace Engine.Components;
 
-public class Camera : Component
+public sealed class Camera : Component
 {
     public static Camera Main { get; private set; }
 

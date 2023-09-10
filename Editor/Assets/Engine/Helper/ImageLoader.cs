@@ -8,7 +8,7 @@ using Vortice.WIC;
 
 namespace Engine.Helper;
 
-internal class ImageLoader
+internal sealed class ImageLoader
 {
     public static ID3D11Texture2D LoadTexture(ID3D11Device device, string filePath, bool fromResources = true)
     {

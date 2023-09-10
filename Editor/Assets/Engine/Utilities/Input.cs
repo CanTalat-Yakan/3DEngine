@@ -20,7 +20,7 @@ namespace Engine.Utilities
         Up
     }
 
-    public class Input
+    public sealed class Input
     {
         private static Dictionary<VirtualKey, bool[]> _virtualKeyDic = new();
         private static List<VirtualKey> _bufferKeys = new();
