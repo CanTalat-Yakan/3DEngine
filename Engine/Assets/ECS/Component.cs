@@ -6,12 +6,11 @@ public class Component : ICloneable // BindableBase
     [Hide] public byte Order = 0;
 
     private bool _isEnabled;
-    public bool IsEnabled;
-    //public bool IsEnabled
-    //{
-    //    get => _isEnabled;
-    //    set => SetProperty(ref _isEnabled, value);
-    //}
+    public bool IsEnabled
+    {
+        get => _isEnabled;
+        set => _isEnabled = value; // SetProperty(ref _isEnabled, value);
+    }
 
     public event EventHandler _eventOnDestroy;
 

@@ -32,8 +32,9 @@ public sealed class Core
 
         // Initializes the renderer, scene manager, and the runtimeCompiler.
         Renderer = renderer is not null ? renderer : new(win32Window);
-        SceneManager = new();
         RuntimeCompiler = new();
+
+        SceneManager = new();
 
         // Creates an entity with the "Boot" editortag and adds a "SceneBoot" component to it.
         SceneManager.MainScene.EntityManager

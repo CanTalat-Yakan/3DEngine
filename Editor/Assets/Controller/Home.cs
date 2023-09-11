@@ -16,7 +16,7 @@ public class Home
     public static string RootPath { get; private set; }
     public static string ProjectPath { get; private set; }
 
-    public static readonly string TEMPLATES = @"Assets\Engine\Resources\Templates";
+    public static readonly string TEMPLATES = @"Assets\Resources\Templates";
 
     private ModelView.Home _home;
     private WrapPanel _wrap;

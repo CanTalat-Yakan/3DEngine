@@ -40,7 +40,6 @@ internal partial class Layout
         ModelView.Output output,
         ModelView.Files files)
     {
-        // Assign local variables.
         MainContent = content;
         ViewPort = viewPort;
         Hierarchy = hierarchy;

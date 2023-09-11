@@ -52,12 +52,14 @@ public sealed class Renderer
     }
 #endif
 
-    public Renderer(Vector2 size)
+    public Renderer(int sizeX = 640, int sizeY = 480)
     {
         if (Instance is null)
             Instance = this;
 
-        Size = new Size((int)size.X, (int)size.Y);
+        Size = new Size(
+            Math.Max(640, sizeX), 
+            Math.Max(480, sizeY));
     }
 
     public Result Initilization(bool forHwnd = false)
@@ -90,8 +92,8 @@ public sealed class Renderer
             AlphaMode = AlphaMode.Ignore,
             BufferCount = 2,
             Format = Format.R8G8B8A8_UNorm,
-            Height = Size.Height,
             Width = Size.Width,
+            Height = Size.Height,
             SampleDescription = new(1, 0),
             Scaling = Scaling.Stretch,
             Stereo = false,
@@ -102,16 +104,15 @@ public sealed class Renderer
         try
         {
             // Obtain instance of the IDXGIDevice3 interface from the Direct3D device.
-            using (var dxgiDevice3 = Device.QueryInterface<IDXGIDevice3>())
+            IDXGIDevice3 dxgiDevice3 = Device.QueryInterface<IDXGIDevice3>();
             // Obtain instance of the IDXGIFactory2 interface from the DXGI device.
-            using (var dxgiFactory2 = dxgiDevice3.GetParent<IDXGIAdapter>().GetParent<IDXGIFactory2>())
-                // Creates a swap chain using the swap chain description.
-                if (forHwnd)
-                    using (var swapChain1 = dxgiFactory2.CreateSwapChainForHwnd(dxgiDevice3, Win32Window.Handle, swapChainDescription1))
-                        _swapChain = swapChain1.QueryInterface<IDXGISwapChain2>();
-                else
-                    using (var swapChain1 = dxgiFactory2.CreateSwapChainForComposition(dxgiDevice3, swapChainDescription1))
-                        _swapChain = swapChain1.QueryInterface<IDXGISwapChain2>();
+            IDXGIFactory2 dxgiFactory2 = dxgiDevice3.GetParent<IDXGIAdapter>().GetParent<IDXGIFactory2>();
+            // Creates a swap chain using the swap chain description.
+            IDXGISwapChain1 swapChain1 = forHwnd
+                ? dxgiFactory2.CreateSwapChainForHwnd(dxgiDevice3, Win32Window.Handle, swapChainDescription1)
+                : dxgiFactory2.CreateSwapChainForComposition(dxgiDevice3, swapChainDescription1);
+
+            _swapChain = swapChain1.QueryInterface<IDXGISwapChain2>();
         }
         catch (Exception e)
         {
@@ -287,14 +288,14 @@ public sealed class Renderer
 
     }
 
-#if EDITOR
-    public void OnSwapChainPanelSizeChanged(object sender, SizeChangedEventArgs e)
+#if !EDITOR
+    public void OnSwapChainPanelSizeChanged(int newWidth, int newHeight)
     {
         // Resize the buffers, depth stencil texture, render target texture and viewport
         // when the size of the window changes.
-        var newSize = new Size(
-            Math.Max(1, (int)e.NewSize.Width),
-            Math.Max(1, (int)e.NewSize.Height));
+        Size = new Size(
+            Math.Max(640, newWidth),
+            Math.Max(480, newHeight));
 
         // Dispose the existing render target view, render target texture, depth stencil view, and depth stencil texture.
         _renderTargetView.Dispose();
@@ -305,8 +306,8 @@ public sealed class Renderer
         // Resize the swap chain buffers to match the new window size.
         _swapChain.ResizeBuffers(
             _swapChain.Description.BufferCount,
-            newSize.Width,
-            newSize.Height,
+            Size.Width,
+            Size.Height,
             _swapChain.Description1.Format,
             _swapChain.Description1.Flags);
 
@@ -315,19 +316,19 @@ public sealed class Renderer
         _renderTargetView = Device.CreateRenderTargetView(_renderTargetTexture);
 
         // Update the depth stencil texture description and create the depth stencil texture and view.
-        _depthStencilTextureDescription.Width = newSize.Width;
-        _depthStencilTextureDescription.Height = newSize.Height;
+        _depthStencilTextureDescription.Width = Size.Width;
+        _depthStencilTextureDescription.Height = Size.Height;
         using (_depthStencilTexture = Device.CreateTexture2D(_depthStencilTextureDescription))
             _depthStencilView = Device.CreateDepthStencilView(_depthStencilTexture);
 
         // Update the size of the source in the swap chain.
-        _swapChain.SourceSize = newSize;
+        _swapChain.SourceSize = Size;
 
         // Update the viewport to match the new window size.
         DeviceContext.RSSetViewport(
             0, 0,
-            newSize.Width,
-            newSize.Height);
+            Size.Width,
+            Size.Height);
     }
 #endif
 }
