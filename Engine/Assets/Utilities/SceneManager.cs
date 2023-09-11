@@ -119,12 +119,12 @@ public sealed class SceneManager
 #else
         // If the playmode is set to None and is not running,
         if (Main.Instance.PlayerControl.PlayMode == PlayMode.None)
-            // Update method on the EditorScriptSystem.
+            // Update the EditorScriptSystem.
             EditorScriptSystem.Update();
 
         // If the playmode is set to Playing and is not paused,
         if (Main.Instance.PlayerControl.PlayMode == PlayMode.Playing)
-            // Update method on the ScriptSystem.
+            // Update the ScriptSystem.
             ScriptSystem.Update();
 #endif
     }

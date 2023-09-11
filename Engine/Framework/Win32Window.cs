@@ -1,15 +1,11 @@
 ﻿// Copyright (c) Amer Koleci and contributors.
 // Distributed under the MIT license. See the LICENSE file in the project root for more information.
 
-using System;
-using System.Diagnostics;
-using Vortice;
-using Vortice.Mathematics;
-using Vortice.Win32;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static Vortice.Win32.User32;
+using Vortice.Win32;
+using Vortice;
 
-namespace VorticeImGui
+namespace Engine
 {
     public class Win32Window
     {

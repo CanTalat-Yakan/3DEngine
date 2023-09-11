@@ -4,7 +4,6 @@ using Vortice.Direct3D11;
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
-using VorticeImGui;
 
 namespace Engine.Utilities;
 
@@ -105,7 +104,7 @@ public sealed class Renderer
             // Obtain instance of the IDXGIDevice3 interface from the Direct3D device.
             using (var dxgiDevice3 = Device.QueryInterface<IDXGIDevice3>())
             // Obtain instance of the IDXGIFactory2 interface from the DXGI device.
-            using (var dxgiFactory2 = dxgiDevice3.GetAdapter().GetParent<IDXGIFactory2>())
+            using (var dxgiFactory2 = dxgiDevice3.GetParent<IDXGIAdapter>().GetParent<IDXGIFactory2>())
                 // Creates a swap chain using the swap chain description.
                 if (forHwnd)
                     using (var swapChain1 = dxgiFactory2.CreateSwapChainForHwnd(dxgiDevice3, Win32Window.Handle, swapChainDescription1))

@@ -28,15 +28,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm64'">
     <DefineConstants>$(DefineConstants);EDITOR;TRACE;DEBUG;NET;NET7_0;NETCOREAPP</DefineConstants>
   </PropertyGroup>
-  <ItemGroup>
-    <Content Remove="Assets\Controller\Engine\Editor\Attributes.cs" />
-    <Content Remove="Assets\Controller\Engine\Editor\CameraController.cs" />
-    <Content Remove="Assets\Controller\Engine\Editor\ComponentCollector.cs" />
-    <Content Remove="Assets\Controller\Engine\Editor\ImGui.zip" />
-    <Content Remove="Assets\Controller\Engine\Editor\SceneBoot.cs" />
-    <Content Remove="Assets\Controller\Engine\Utilities\Input.cs" />
-  </ItemGroup>
-  
+	
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.13.8" />
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />

@@ -1,9 +1,9 @@
-﻿using Editor.Controller;
-using Microsoft.UI.Xaml;
-using System;
+﻿using Microsoft.UI.Xaml;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System;
+using Editor.Controller;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -80,7 +80,7 @@ public partial class App : Application
     /// will be used such as when the application is launched to open a specific file.
     /// </summary>
     /// <param name="args">Details about the launch request and process.</param>
-    protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+    protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         window = new MainWindow();
         window.Activate();

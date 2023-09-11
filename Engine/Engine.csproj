@@ -14,47 +14,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DefineConstants>$(DefineConstants);ENGINE</DefineConstants>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="Assets\Resources\Models\Primitives\Cube.obj" />
-    <None Remove="Assets\Resources\Models\Primitives\Cylinder.obj" />
-    <None Remove="Assets\Resources\Models\Primitives\Duck.obj" />
-    <None Remove="Assets\Resources\Models\Primitives\Icosphere.obj" />
-    <None Remove="Assets\Resources\Models\Primitives\Plane.obj" />
-    <None Remove="Assets\Resources\Models\Primitives\Quad.obj" />
-    <None Remove="Assets\Resources\Models\Primitives\Sphere.obj" />
-    <None Remove="Assets\Resources\Models\Primitives\Suzanne.obj" />
-    <None Remove="Assets\Resources\Models\Primitives\Torus.obj" />
-    <None Remove="Assets\Resources\Models\Primitives\Tree.obj" />
-    <None Remove="Assets\Resources\Models\sponza.obj" />
-    <None Remove="Assets\Resources\Shader\ImGui.hlsl" />
-    <None Remove="Assets\Resources\Shader\Lit.hlsl" />
-    <None Remove="Assets\Resources\Shader\ShaderHelper.hlsl" />
-    <None Remove="Assets\Resources\Shader\SimpleLit.hlsl" />
-    <None Remove="Assets\Resources\Shader\Unlit.hlsl" />
-    <None Remove="Assets\Resources\Templates\Examples\Example.txt" />
-    <None Remove="Assets\Resources\Templates\Examples\PlayerController.txt" />
-    <None Remove="Assets\Resources\Templates\Materials.txt" />
-    <None Remove="Assets\Resources\Templates\Project.zip" />
-    <None Remove="Assets\Resources\Templates\Scenes.txt" />
-    <None Remove="Assets\Resources\Templates\Scripts.txt" />
-    <None Remove="Assets\Resources\Templates\Shaders.txt" />
-    <None Remove="Assets\Resources\Textures\dark.png" />
-    <None Remove="Assets\Resources\Textures\Default.png" />
-    <None Remove="Assets\Resources\Textures\Sky.png" />
-    <None Remove="Assets\Resources\Textures\Sky2.png" />
-    <None Remove="Assets\Resources\Textures\Sky3.png" />
-    <None Remove="Assets\Resources\Textures\Sky4.png" />
-    <None Remove="Assets\Resources\Textures\Sky4k.hdr" />
-    <None Remove="Assets\Resources\Textures\Sky5.png" />
-    <None Remove="Assets\Resources\Textures\SkyFish.png" />
-    <None Remove="Assets\Resources\Textures\SkyGradient.png" />
-    <None Remove="Assets\Resources\Textures\SkyGradient_Light.png" />
-    <None Remove="Assets\Resources\Textures\UVMap.png" />
-    <None Remove="Assets\Resources\Textures\VS.png" />
-    <None Remove="Assets\Resources\Textures\VS2.png" />
-  </ItemGroup>
-
+	
   <ItemGroup>
     <Content Include="Assets\Resources\Models\Primitives\Cube.obj">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

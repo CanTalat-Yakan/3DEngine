@@ -1,16 +1,13 @@
-using System;
+using ImGuiNET;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
+using Vortice.Direct3D11;
+using Vortice.Direct3D;
 using Vortice.Win32;
 using static Vortice.Win32.Kernel32;
 using static Vortice.Win32.User32;
-using System.Runtime.CompilerServices;
-using Vortice.Direct3D11;
-using ImGuiNET;
-using Vortice.Direct3D;
 
-namespace VorticeImGui
+namespace Engine
 {
     class MainWindow : AppWindow
     {
@@ -63,13 +60,15 @@ namespace VorticeImGui
             var win32Window = new Win32Window(wndClass.ClassName, "3D Engine", 1600, 1000);
             var mainWindow = new MainWindow(win32Window, device, deviceContext);
             windows.Add(mainWindow.Win32Window.Handle, mainWindow);
-            //Engine.Core engineCore = new(null, win32Window);
+            Engine.Core engineCore = new(null, win32Window);
 
             //ShowWindow(win32Window.Handle, ShowWindowCommand.Normal);
             mainWindow.Show();
 
             while (!quitRequested)
             {
+                Engine.Core.Instance.Frame();
+
                 if (PeekMessage(out var msg, IntPtr.Zero, 0, 0, PM_REMOVE))
                 {
                     TranslateMessage(ref msg);

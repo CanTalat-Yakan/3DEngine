@@ -1,16 +1,12 @@
 ﻿using ImGuiNET;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Numerics;
-using System.Text;
 using Vortice.Direct3D11;
 using Vortice.DXGI;
 using Vortice.Mathematics;
 using Vortice.Win32;
 using VorticeImGui;
 
-namespace VorticeImGui
+namespace Engine
 {
     class AppWindow
     {
@@ -104,7 +100,7 @@ namespace VorticeImGui
                     OutputWindow = Win32Window.Handle,
                     SampleDescription = new SampleDescription(1, 0),
                     SwapEffect = SwapEffect.Discard,
-                    BufferUsage = Vortice.DXGI.Usage.RenderTargetOutput
+                    BufferUsage = Usage.RenderTargetOutput
                 };
 
                 swapChain = dxgiFactory.CreateSwapChain(device, swapchainDesc);

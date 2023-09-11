@@ -1,14 +1,12 @@
 ﻿//based on https://github.com/ocornut/imgui/blob/master/examples/imgui_impl_dx11.cpp
 
-using System;
-using System.Collections.Generic;
-using System.Numerics;
-using Vortice.DXGI;
-using Vortice.Direct3D;
-using Vortice.Direct3D11;
-using Vortice.D3DCompiler;
-using Vortice.Mathematics;
 using ImGuiNET;
+using System.Collections.Generic;
+using Vortice.D3DCompiler;
+using Vortice.Direct3D11;
+using Vortice.Direct3D;
+using Vortice.DXGI;
+using Vortice.Mathematics;
 using Vortice;
 using ImDrawIdx = System.UInt16;
 
@@ -65,7 +63,7 @@ namespace VorticeImGui
 
                 vertexBufferSize = data.TotalVtxCount + 5000;
                 BufferDescription desc = new BufferDescription();
-                desc.Usage = Vortice.Direct3D11.ResourceUsage.Dynamic;
+                desc.Usage = ResourceUsage.Dynamic;
                 desc.ByteWidth = vertexBufferSize * sizeof(ImDrawVert);
                 desc.BindFlags = BindFlags.VertexBuffer;
                 desc.CPUAccessFlags = CpuAccessFlags.Write;
@@ -79,7 +77,7 @@ namespace VorticeImGui
                 indexBufferSize = data.TotalIdxCount + 10000;
 
                 BufferDescription desc = new BufferDescription();
-                desc.Usage = Vortice.Direct3D11.ResourceUsage.Dynamic;
+                desc.Usage = ResourceUsage.Dynamic;
                 desc.ByteWidth = indexBufferSize * sizeof(ImDrawIdx);
                 desc.BindFlags = BindFlags.IndexBuffer;
                 desc.CPUAccessFlags = CpuAccessFlags.Write;

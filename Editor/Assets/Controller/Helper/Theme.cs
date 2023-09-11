@@ -78,7 +78,7 @@ internal class Theme
         }
 
         // Check if the Main instance is not null.
-        if (Main.Instance != null)
+        if (Main.Instance is not null)
         {
             // If it's not null, set the background color of tabs root and change the color with theme of output and files.
             Main.Instance.LayoutControl.TabsRoot.Background =
@@ -98,7 +98,7 @@ internal class Theme
         }
 
         // Check if the Engine.Core instance is not null.
-        if (Engine.Core.Instance != null)
+        if (Engine.Core.Instance is not null)
             // If it's not null, set the theme for entity manager.
             Engine.Utilities.SceneManager.MainScene.EntityManager.SetTheme(_page.RequestedTheme == ElementTheme.Light);
     }
@@ -111,7 +111,7 @@ internal class Theme
     {
         // Make sure any Mica/Acrylic controller is disposed so it doesn't try to
         // use this closed window.
-        if (_micaController != null)
+        if (_micaController is not null)
         {
             _micaController.Dispose();
             _micaController = null;

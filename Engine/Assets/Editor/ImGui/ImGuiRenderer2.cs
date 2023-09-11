@@ -13,7 +13,7 @@ using ImDrawIdx = System.UInt16;
 
 namespace Engine.Editor;
 
-unsafe public class ImGuiRenderer
+unsafe public class ImGuiRenderer2
 {
     const int VertexConstantBufferSize = 16 * 4;
 
@@ -38,7 +38,7 @@ unsafe public class ImGuiRenderer
 
     private static readonly string SHADER_IMGUI = @"Resources\Shader\ImGui.hlsl";
 
-    public ImGuiRenderer()
+    public ImGuiRenderer2()
     {
         this.device = Renderer.Instance.Device;
         this.deviceContext = Renderer.Instance.DeviceContext;
