@@ -12,7 +12,7 @@ public class Component : ICloneable // BindableBase
         set => _isEnabled = value; // SetProperty(ref _isEnabled, value);
     }
 
-    public event EventHandler _eventOnDestroy;
+    [Hide] public event EventHandler _eventOnDestroy;
 
     public Component() =>
         OnRegister();

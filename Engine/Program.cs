@@ -60,14 +60,13 @@ namespace Engine
             var win32Window = new Win32Window(wndClass.ClassName, "3D Engine", 1600, 1000);
             var mainWindow = new MainWindow(win32Window, device, deviceContext);
             windows.Add(mainWindow.Win32Window.Handle, mainWindow);
-            Engine.Core engineCore = new(null, win32Window);
+            Core engineCore = new(null, win32Window);
 
-            //ShowWindow(win32Window.Handle, ShowWindowCommand.Normal);
             mainWindow.Show();
 
             while (!quitRequested)
             {
-                Engine.Core.Instance.Frame();
+                engineCore.Frame();
 
                 if (PeekMessage(out var msg, IntPtr.Zero, 0, 0, PM_REMOVE))
                 {

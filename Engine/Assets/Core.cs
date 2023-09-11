@@ -24,7 +24,7 @@ public sealed class Core
     //public Editor.ImGuiRenderer ImGuiRenderer;
     //private IntPtr _imGuiContext;
 
-    public Core(Renderer renderer = null, Win32Window win32Window = null)
+    public Core(Renderer renderer = null, Win32Window win32Window = null, string assetsPath = null)
     {
         // Initializes the singleton instance of the class, if it hasn't been already.
         if (Instance is null)

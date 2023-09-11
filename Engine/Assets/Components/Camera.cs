@@ -7,8 +7,8 @@ public sealed class Camera : Component
 {
     public static Camera Main { get; private set; }
 
-    public float FieldOfView = 90;
-    public byte CameraOrder = 0;
+    public float FOV = 90;
+    public byte CameraID = 0;
 
     private Renderer _d3d => Renderer.Instance;
 
@@ -32,7 +32,7 @@ public sealed class Camera : Component
 
     public override void OnUpdate() =>
         // Override the Component Order with the local variable.
-        Order = CameraOrder;
+        Order = CameraID;
 
     public override void OnRender() =>
         // Recreates the view constants data to be used by the Camera.
@@ -52,7 +52,7 @@ public sealed class Camera : Component
         var dAspect = aspect < 1 ? 1 * aspect : 1 / aspect;
 
         // Convert the field of view from degrees to radians.
-        var radAngle = FieldOfView.ToRadians();
+        var radAngle = FOV.ToRadians();
         var radHFOV = 2 * MathF.Atan(MathF.Tan(radAngle * 0.5f) * dAspect);
         var hFOV = radHFOV.ToDegrees();
 

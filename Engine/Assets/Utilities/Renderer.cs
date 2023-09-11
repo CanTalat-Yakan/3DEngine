@@ -4,6 +4,7 @@ using Vortice.Direct3D11;
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
+using ABI.Windows.ApplicationModel.Activation;
 
 namespace Engine.Utilities;
 
@@ -46,7 +47,7 @@ public sealed class Renderer
         // Set the size.
         Size = new Size(Win32Window.Width, Win32Window.Height);
 
-        var result = Initilization(true);
+        var result = Initialization(true);
         if (result.Failure)
             throw new Exception(result.Description);
     }
@@ -62,7 +63,7 @@ public sealed class Renderer
             Math.Max(480, sizeY));
     }
 
-    public Result Initilization(bool forHwnd = false)
+    public Result Initialization(bool forHwnd = false)
     {
         #region //Create device, device context & swap chain with result
         // Create a Direct3D 11 device.
@@ -288,9 +289,11 @@ public sealed class Renderer
 
     }
 
-#if !EDITOR
-    public void OnSwapChainPanelSizeChanged(int newWidth, int newHeight)
+    public void OnSwapChainSizeChanged(int newWidth, int newHeight)
     {
+        if (!IsRendering)
+            return;
+
         // Resize the buffers, depth stencil texture, render target texture and viewport
         // when the size of the window changes.
         Size = new Size(
@@ -330,5 +333,4 @@ public sealed class Renderer
             Size.Width,
             Size.Height);
     }
-#endif
 }

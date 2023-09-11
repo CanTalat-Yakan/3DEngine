@@ -17,7 +17,7 @@ internal sealed class SceneBoot : EditorComponent
         // Create a camera entity with the name "Camera" and tag "SceneCamera".
         SceneCamera = SceneManager.MainScene.EntityManager.CreateCamera("Camera", EditorTags.SceneCamera.ToString()).GetComponent<Camera>();
         // Set the camera order to the maximum value.
-        SceneCamera.CameraOrder = byte.MaxValue;
+        SceneCamera.CameraID = byte.MaxValue;
 
         // Add the DeactivateSceneCameraOnPlay and CameraController components to the camera entity.
         SceneCamera.Entity.AddComponent<DeactivateCameraOnPlay>();
