@@ -16,15 +16,6 @@ public sealed partial class Main : Frame
 
         _mainControl = new(mainWindow, x_Grid_Main, x_TextBlock_Status_Content, x_TextBlock_StatusIcon_Content, x_AppBarToggleButton_Status_OpenPane);
         _mainControl.PlayerControl = new(x_AppBarToggleButton_Status_Play, x_AppBarToggleButton_Status_Pause, x_AppBarButton_Status_Forward);
-
-        InitializeInput();
-    }
-
-    private void InitializeInput()
-    {
-        PointerMoved += Engine.Utilities.Input.PointerMoved;
-        PointerReleased += Input.PointerReleased;
-        KeyUp += Input.KeyUp;
     }
 
     private void AppBarToggleButton_Status_Play_Click(object sender, RoutedEventArgs e) =>

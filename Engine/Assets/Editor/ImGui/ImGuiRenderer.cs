@@ -13,7 +13,7 @@ using ImDrawIdx = System.UInt16;
 
 namespace Engine.Editor;
 
-unsafe internal class ImGuiRenderer
+unsafe public class ImGuiRenderer
 {
     const int VertexConstantBufferSize = 16 * 4;
 
@@ -36,7 +36,7 @@ unsafe internal class ImGuiRenderer
 
     Dictionary<IntPtr, ID3D11ShaderResourceView> textureResources = new();
 
-    private static readonly string SHADER_IMGUI = @"Shader\ImGui.hlsl";
+    private static readonly string SHADER_IMGUI = @"Resources\Shader\ImGui.hlsl";
 
     public ImGuiRenderer()
     {
@@ -374,7 +374,7 @@ unsafe internal class ImGuiRenderer
 
     protected static ReadOnlyMemory<byte> CompileBytecode(string shaderName, string entryPoint, string profile)
     {
-        string assetsPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources\");
+        string assetsPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Resources\");
         string fileName = Path.Combine(assetsPath, shaderName);
         //string shaderSource = File.ReadAllText(Path.Combine(assetsPath, shaderName));
 

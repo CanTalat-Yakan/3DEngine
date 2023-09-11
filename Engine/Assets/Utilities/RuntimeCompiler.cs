@@ -16,7 +16,7 @@ namespace Engine.Utilities
         public Assembly Assembly;
     }
 
-    internal sealed class RuntimeCompiler
+    public sealed class RuntimeCompiler
     {
         public ComponentCollector ComponentCollector = new();
 
@@ -24,10 +24,13 @@ namespace Engine.Utilities
 
         private List<Assembly> _ignoreAssemblies = new();
 
-        public void CompileProjectScripts()
+        public void CompileProjectScripts(string assetsPath = null)
         {
+            if (assetsPath is null)
+                return;
+
             // Process the list of files found in the directory.
-            string scriptsFolderPath = Path.Combine(Files.AssetsPath, "Scripts");
+            string scriptsFolderPath = Path.Combine(assetsPath, "Scripts");
             if (!Directory.Exists(scriptsFolderPath))
                 return;
 

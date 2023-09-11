@@ -2,7 +2,7 @@
 
 namespace Engine.Editor;
 
-internal sealed class CameraController : EditorComponent
+public sealed class SceneCameraController : EditorComponent
 {
     public string Profile => Entity.Transform.ToString();
 

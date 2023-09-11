@@ -1,26 +1,26 @@
-﻿using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml;
-using SharpGen.Runtime;
+﻿using SharpGen.Runtime;
 using System.Drawing;
 using Vortice.Direct3D11;
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
-using PostSharp.Aspects.Advices;
+using VorticeImGui;
 
 namespace Engine.Utilities;
 
-internal sealed class Renderer
+public sealed class Renderer
 {
     public static Renderer Instance { get; private set; }
 
-    public bool IsRendering { get => _renderTargetView.NativePointer is not 0; }
+    public bool IsRendering { get => _renderTargetView.NativePointer is not 0; } // 0x0
+
+    public Size Size { get; private set; }
 
     public ID3D11Device2 Device { get; private set; }
     public ID3D11DeviceContext DeviceContext { get; private set; }
-    public SwapChainPanel SwapChainPanel { get; private set; }
 
-    private readonly IDXGISwapChain2 _swapChain;
+    public IDXGISwapChain2 SwapChain { get => _swapChain; }
+    private IDXGISwapChain2 _swapChain;
 
     private ID3D11Texture2D _renderTargetTexture;
     private ID3D11RenderTargetView _renderTargetView;
@@ -29,42 +29,46 @@ internal sealed class Renderer
     private ID3D11DepthStencilView _depthStencilView;
     private ID3D11BlendState _blendState;
 
-    public Renderer(SwapChainPanel swapChainPanel)
+#if !EDITOR
+    private Win32Window Win32Window;
+
+    public Renderer(Win32Window win32Window)
     {
-        #region //Create Instance
         // Initializes the singleton instance of the class, if it hasn't been already.
         if (Instance is null)
             Instance = this;
-        #endregion
 
-        #region //Set SwapChainPanel and SizeChanger
-        // Store the instance of SwapChainPanel.
-        SwapChainPanel = swapChainPanel;
-        // Register an event handler for the SizeChanged event of the SwapChainPanel. This will be used to handle any changes in the size of the panel.
-        SwapChainPanel.SizeChanged += OnSwapChainPanelSizeChanged;
-        #endregion
+        // Store the instance of Win32Window.
+        if (win32Window is not null)
+            Win32Window = win32Window;
+        else
+            throw new Exception("Null Win32Window Instance was passed to the Renderer!");
 
+        // Set the size.
+        Size = new Size(Win32Window.Width, Win32Window.Height);
+
+        var result = Initilization(true);
+        if (result.Failure)
+            throw new Exception(result.Description);
+    }
+#endif
+
+    public Renderer(Vector2 size)
+    {
+        if (Instance is null)
+            Instance = this;
+
+        Size = new Size((int)size.X, (int)size.Y);
+    }
+
+    public Result Initilization(bool forHwnd = false)
+    {
         #region //Create device, device context & swap chain with result
-        // Initialize the SwapChainDescription structure.
-        SwapChainDescription1 swapChainDescription = new()
-        {
-            AlphaMode = AlphaMode.Ignore,
-            BufferCount = 2,
-            Format = Format.R8G8B8A8_UNorm,
-            Height = (int)SwapChainPanel.RenderSize.Height,
-            Width = (int)SwapChainPanel.RenderSize.Width,
-            SampleDescription = new(1, 0),
-            Scaling = Scaling.Stretch,
-            Stereo = false,
-            SwapEffect = SwapEffect.FlipDiscard,
-            BufferUsage = Usage.RenderTargetOutput
-        };
-
         // Create a Direct3D 11 device.
         var result = D3D11.D3D11CreateDevice(
             null,
             DriverType.Hardware,
-            DeviceCreationFlags.BgraSupport,
+            DeviceCreationFlags.BgraSupport | DeviceCreationFlags.Debug,
             new[]
             {
                 FeatureLevel.Level_11_1,
@@ -74,30 +78,47 @@ internal sealed class Renderer
 
         // Check if creating the device was successful.
         if (result.Failure)
-            throw new Exception(result.Description);
+            return result;
 
         // Assign the device to a variable.
         Device = defaultDevice.QueryInterface<ID3D11Device2>();
         // Get the immediate context of the device.
         DeviceContext = Device.ImmediateContext2;
 
-        // Obtains an instance of the IDXGIDevice3 interface from the Direct3D device.
-        using (var dxgiDevice3 = Device.QueryInterface<IDXGIDevice3>())
-        // Obtains an instance of the IDXGIFactory2 interface from the DXGI device.
-        using (IDXGIFactory2 dxgiFactory = dxgiDevice3.GetAdapter().GetParent<IDXGIFactory2>())
-        // Creates a swap chain using the swap chain description.
-        using (IDXGISwapChain1 swapChain1 = dxgiFactory.CreateSwapChainForComposition(dxgiDevice3, swapChainDescription))
-            _swapChain = swapChain1.QueryInterface<IDXGISwapChain2>();
+        // Initialize the SwapChainDescription structure.
+        SwapChainDescription1 swapChainDescription1 = new()
+        {
+            AlphaMode = AlphaMode.Ignore,
+            BufferCount = 2,
+            Format = Format.R8G8B8A8_UNorm,
+            Height = Size.Height,
+            Width = Size.Width,
+            SampleDescription = new(1, 0),
+            Scaling = Scaling.Stretch,
+            Stereo = false,
+            SwapEffect = SwapEffect.FlipSequential,
+            BufferUsage = Usage.RenderTargetOutput
+        };
 
-        //var dxgiFactory = Device.QueryInterface<IDXGIDevice>().GetParent<IDXGIAdapter>().GetParent<IDXGIFactory>();
-
-        // Gets the native object for the SwapChainPanel control.
-        using (var nativeObject = ComObject.As<Vortice.WinUI.ISwapChainPanelNative2>(this.SwapChainPanel))
-            result = nativeObject.SetSwapChain(_swapChain);
-
-        // Throws an exception if setting the swap chain failed.
-        if (result.Failure)
-            throw new Exception(result.Description);
+        try
+        {
+            // Obtain instance of the IDXGIDevice3 interface from the Direct3D device.
+            using (var dxgiDevice3 = Device.QueryInterface<IDXGIDevice3>())
+            // Obtain instance of the IDXGIFactory2 interface from the DXGI device.
+            using (IDXGIFactory2 dxgiFactory2 = dxgiDevice3.GetAdapter().GetParent<IDXGIFactory2>())
+                // Creates a swap chain using the swap chain description.
+                if (forHwnd)
+                    using (IDXGISwapChain1 swapChain1 = dxgiFactory2.CreateSwapChainForHwnd(dxgiDevice3, Win32Window.Handle, swapChainDescription1))
+                        _swapChain = swapChain1.QueryInterface<IDXGISwapChain2>();
+                else
+                    using (IDXGISwapChain1 swapChain1 = dxgiFactory2.CreateSwapChainForComposition(dxgiDevice3, swapChainDescription1))
+                        _swapChain = swapChain1.QueryInterface<IDXGISwapChain2>();
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+            //return Result.Fail;
+        }
         #endregion
 
         #region //Create render target view, get back buffer texture before
@@ -114,8 +135,8 @@ internal sealed class Renderer
             Format = Format.D32_Float, // Set format to D32_Float.
             ArraySize = 1,
             MipLevels = 0,
-            Width = swapChainDescription.Width,
-            Height = swapChainDescription.Height,
+            Width = Size.Width,
+            Height = Size.Height,
             SampleDescription = new SampleDescription(1, 0),
             Usage = ResourceUsage.Default,
             BindFlags = BindFlags.DepthStencil,
@@ -186,9 +207,11 @@ internal sealed class Renderer
         // Set the viewport to match the size of the swap chain panel.
         DeviceContext.RSSetViewport(
             0, 0,
-            (int)SwapChainPanel.ActualWidth,
-            (int)SwapChainPanel.ActualHeight);
+            Size.Width,
+            Size.Height);
         #endregion
+
+        return new Result(0);
     }
 
     public void Present() =>
@@ -265,6 +288,7 @@ internal sealed class Renderer
 
     }
 
+#if EDITOR
     public void OnSwapChainPanelSizeChanged(object sender, SizeChangedEventArgs e)
     {
         // Resize the buffers, depth stencil texture, render target texture and viewport
@@ -306,4 +330,5 @@ internal sealed class Renderer
             newSize.Width,
             newSize.Height);
     }
+#endif
 }

@@ -2,14 +2,14 @@
 
 namespace Engine.ECS
 {
-    internal enum EditorTags
+    public enum EditorTags
     {
         SceneBoot,
         SceneCamera,
         SceneSky,
     }
 
-    internal enum Tags
+    public enum Tags
     {
         Untagged,
         MainCamera,
@@ -19,7 +19,7 @@ namespace Engine.ECS
         GameController,
     }
 
-    internal enum Layers
+    public enum Layers
     {
         Default,
         TransparentFX,

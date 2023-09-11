@@ -5,8 +5,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Linq;
+using System;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
+
+using Engine.Utilities;
+using Engine.ECS;
+using Engine.Components;
 
 namespace Editor.Controller;
 
@@ -45,7 +50,7 @@ internal partial class Hierarchy
         _hierarchy = hierarchy;
         _stackPanel = stackPanel;
 
-        SceneEntry = new() { ID = SceneManager.Scene.ID, Name = SceneManager.Scene.Name, Hierarchy = new(), DataSource = new() };
+        SceneEntry = new() { ID = SceneManager.MainScene.ID, Name = SceneManager.MainScene.Name, Hierarchy = new(), DataSource = new() };
         SubsceneEntries = new();
 
         CreateDefaultHierarchy();
@@ -99,7 +104,7 @@ internal partial class Hierarchy
     private Grid[] CreateSceneHierarchy(in SceneEntry sceneEntry, Scene scene = null)
     {
         if (scene is null)
-            scene = SceneManager.Scene;
+            scene = SceneManager.MainScene;
 
         var sceneGrid = new Grid[]
         {
@@ -232,7 +237,7 @@ internal partial class Hierarchy
             };
         items[2].Click += (s, e) => PasteEntityFromClipboardAsync(SceneEntry);
 
-        items[3].Click += (s, e) => SceneManager.Scene.EntityManager.CreateEntity();
+        items[3].Click += (s, e) => SceneManager.MainScene.EntityManager.CreateEntity();
 
         MenuFlyout menuFlyout = new();
         foreach (var item in items)
@@ -309,7 +314,7 @@ internal partial class Hierarchy
                     entity.Scene.EntityManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type), entity);
                 }
                 else
-                    SceneManager.Scene.EntityManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
+                    SceneManager.MainScene.EntityManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
             };
 
             objectSubItem.Items.Add(item);
@@ -328,7 +333,7 @@ internal partial class Hierarchy
                 entity.Scene.EntityManager.CreateCamera("Camera", Tags.MainCamera.ToString(), entity);
             }
             else
-                SceneManager.Scene.EntityManager.CreateCamera();
+                SceneManager.MainScene.EntityManager.CreateCamera();
         };
 
         return menuFlyout;
@@ -642,7 +647,7 @@ internal partial class Hierarchy : Controller.Helper
         // Otherwise, search through all subscenes of the scene manager.
         else
         {
-            entity = SceneManager.Scene.EntityManager.GetFromID(guid);
+            entity = SceneManager.MainScene.EntityManager.GetFromID(guid);
 
             if (entity is null)
                 foreach (var subscene in SceneManager.Subscenes)

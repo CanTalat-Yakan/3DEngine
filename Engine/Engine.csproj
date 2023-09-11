@@ -16,13 +16,181 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ImGui.NET" Version="1.89.7.1" />
-    <PackageReference Include="Vortice.D3DCompiler" Version="3.2.0" />
-    <PackageReference Include="Vortice.Direct3D11" Version="3.2.0" />
+    <None Remove="Assets\Resources\Models\Primitives\Cube.obj" />
+    <None Remove="Assets\Resources\Models\Primitives\Cylinder.obj" />
+    <None Remove="Assets\Resources\Models\Primitives\Duck.obj" />
+    <None Remove="Assets\Resources\Models\Primitives\Icosphere.obj" />
+    <None Remove="Assets\Resources\Models\Primitives\Plane.obj" />
+    <None Remove="Assets\Resources\Models\Primitives\Quad.obj" />
+    <None Remove="Assets\Resources\Models\Primitives\Sphere.obj" />
+    <None Remove="Assets\Resources\Models\Primitives\Suzanne.obj" />
+    <None Remove="Assets\Resources\Models\Primitives\Torus.obj" />
+    <None Remove="Assets\Resources\Models\Primitives\Tree.obj" />
+    <None Remove="Assets\Resources\Models\sponza.obj" />
+    <None Remove="Assets\Resources\Shader\ImGui.hlsl" />
+    <None Remove="Assets\Resources\Shader\Lit.hlsl" />
+    <None Remove="Assets\Resources\Shader\ShaderHelper.hlsl" />
+    <None Remove="Assets\Resources\Shader\SimpleLit.hlsl" />
+    <None Remove="Assets\Resources\Shader\Unlit.hlsl" />
+    <None Remove="Assets\Resources\Templates\Examples\Example.txt" />
+    <None Remove="Assets\Resources\Templates\Examples\PlayerController.txt" />
+    <None Remove="Assets\Resources\Templates\Materials.txt" />
+    <None Remove="Assets\Resources\Templates\Project.zip" />
+    <None Remove="Assets\Resources\Templates\Scenes.txt" />
+    <None Remove="Assets\Resources\Templates\Scripts.txt" />
+    <None Remove="Assets\Resources\Templates\Shaders.txt" />
+    <None Remove="Assets\Resources\Textures\dark.png" />
+    <None Remove="Assets\Resources\Textures\Default.png" />
+    <None Remove="Assets\Resources\Textures\Sky.png" />
+    <None Remove="Assets\Resources\Textures\Sky2.png" />
+    <None Remove="Assets\Resources\Textures\Sky3.png" />
+    <None Remove="Assets\Resources\Textures\Sky4.png" />
+    <None Remove="Assets\Resources\Textures\Sky4k.hdr" />
+    <None Remove="Assets\Resources\Textures\Sky5.png" />
+    <None Remove="Assets\Resources\Textures\SkyFish.png" />
+    <None Remove="Assets\Resources\Textures\SkyGradient.png" />
+    <None Remove="Assets\Resources\Textures\SkyGradient_Light.png" />
+    <None Remove="Assets\Resources\Textures\UVMap.png" />
+    <None Remove="Assets\Resources\Textures\VS.png" />
+    <None Remove="Assets\Resources\Textures\VS2.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Assets\" />
+    <Content Include="Assets\Resources\Models\Primitives\Cube.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Models\Primitives\Cylinder.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Models\Primitives\Duck.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Models\Primitives\Icosphere.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Models\Primitives\Plane.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Models\Primitives\Quad.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Models\Primitives\Sphere.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Models\Primitives\Suzanne.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Models\Primitives\Torus.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Models\Primitives\Tree.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Models\sponza.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Shader\ImGui.hlsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Shader\Lit.hlsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Shader\ShaderHelper.hlsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Shader\SimpleLit.hlsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Shader\Unlit.hlsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Templates\Examples\Example.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Templates\Examples\PlayerController.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Templates\Materials.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Templates\Project.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Templates\Scenes.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Templates\Scripts.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Templates\Shaders.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Textures\dark.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Textures\Default.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Textures\Sky.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Textures\Sky2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Textures\Sky3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Textures\Sky4.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Textures\Sky4k.hdr">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Textures\Sky5.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Textures\SkyFish.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Textures\SkyGradient.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Textures\SkyGradient_Light.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Textures\UVMap.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Textures\VS.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Resources\Textures\VS2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AssimpNet" Version="4.1.0" />
+    <PackageReference Include="ImGui.NET" Version="1.89.7.1" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.7.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.7.0" />
+    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+    <PackageReference Include="Vortice.D3DCompiler" Version="3.2.0" />
+    <PackageReference Include="Vortice.Direct2D1" Version="3.2.0" />
+    <PackageReference Include="Vortice.Direct3D11" Version="3.2.0" />
+    <PackageReference Include="Vortice.Direct3D12" Version="3.2.0" />
+    <PackageReference Include="Vortice.DirectComposition" Version="3.2.0" />
+    <PackageReference Include="Vortice.DirectInput" Version="3.2.0" />
+    <PackageReference Include="Vortice.DirectStorage" Version="3.2.0" />
+    <PackageReference Include="Vortice.DirectX" Version="3.2.0" />
+    <PackageReference Include="Vortice.Dxc" Version="3.2.0" />
+    <PackageReference Include="Vortice.DXGI" Version="3.2.0" />
+    <PackageReference Include="Vortice.Mathematics" Version="1.7.1" />
+    <PackageReference Include="Vortice.MediaFoundation" Version="3.2.0" />
+    <PackageReference Include="Vortice.ShaderCompiler" Version="1.7.1" />
+    <PackageReference Include="Vortice.UIAnimation" Version="3.2.0" />
+    <PackageReference Include="Vortice.XAudio2" Version="3.2.0" />
+    <PackageReference Include="Vortice.XInput" Version="3.2.0" />
   </ItemGroup>
 
 </Project>

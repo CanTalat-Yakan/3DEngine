@@ -19,7 +19,7 @@ internal class ImGuiEditor
         var fonts = ImGuiNET.ImGui.GetIO().Fonts;
         ImGuiNET.ImGui.GetIO().Fonts.AddFontDefault();
         var io = ImGuiNET.ImGui.GetIO();
-        io.DisplaySize = _d3d.SwapChainPanel.ActualSize;
+        //io.DisplaySize = _d3d.Size;
         io.DisplayFramebufferScale = Vector2.One;
         io.DeltaTime = (float)Time.Delta;
         ImGuiNET.ImGui.StyleColorsDark();

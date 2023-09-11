@@ -2,15 +2,15 @@
 
 namespace Engine.Utilities;
 
-internal sealed class SceneManager
+public sealed class SceneManager
 {
-    public static Scene Scene;
+    public static Scene MainScene;
     public static List<Scene> Subscenes;
 
     public SceneManager(Scene scene = null)
     {
         // Initializes the main scene and creates a new empty list for the subscenes.
-        Scene = scene != null ? scene : new() { ID = Guid.NewGuid(), Name = "Core", IsEnabled = true, EntityManager = new() };
+        MainScene = scene != null ? scene : new() { ID = Guid.NewGuid(), Name = "Main", IsEnabled = true, EntityManager = new() };
         Subscenes = new List<Scene>();
     }
 
@@ -64,28 +64,42 @@ internal sealed class SceneManager
         // Update the CameraSystem
         CameraSystem.Awake();
 
+#if !EDITOR
+        // Awake the EditorScriptSystem.
+        EditorScriptSystem.Awake();
+        // Awake the ScriptSystem.
+        ScriptSystem.Awake();
+#else
         // If the playmode is set to None and is not running,
-        // call the Awake method on the EditorScriptSystem.
         if (Main.Instance.PlayerControl.PlayMode == PlayMode.None)
+            // Awake the EditorScriptSystem.
             EditorScriptSystem.Awake();
 
         // If the playmode is set to Playing and is not paused,
-        // call the Awake method on the ScriptSystem.
         if (Main.Instance.PlayerControl.PlayMode == PlayMode.Playing)
+            // Awake the ScriptSystem.
             ScriptSystem.Awake();
+#endif
     }
 
     public void Start()
     {
+#if !EDITOR
+        // Start the EditorScriptSystem.
+        EditorScriptSystem.Start();
+        // Start the ScriptSystem.
+        ScriptSystem.Start();
+#else
         // If the playmode is set to None and is not running,
-        // call the Start method on the EditorScriptSystem.
         if (Main.Instance.PlayerControl.PlayMode == PlayMode.None)
+            // Start the EditorScriptSystem.
             EditorScriptSystem.Start();
 
         // If the playmode is set to Playing and is not paused,
-        // call the Start method on the ScriptSystem.
         if (Main.Instance.PlayerControl.PlayMode == PlayMode.Playing)
+            // Start the ScriptSystem.
             ScriptSystem.Start();
+#endif
     }
 
     public void Update()
@@ -97,28 +111,42 @@ internal sealed class SceneManager
         // Update the CameraSystem
         CameraSystem.Update();
 
+#if !EDITOR
+        // Update the EditorScriptSystem.
+        EditorScriptSystem.Update();
+        // Update the ScriptSystem.
+        ScriptSystem.Update();
+#else
         // If the playmode is set to None and is not running,
-        // call the Update method on the EditorScriptSystem.
         if (Main.Instance.PlayerControl.PlayMode == PlayMode.None)
+            // Update method on the EditorScriptSystem.
             EditorScriptSystem.Update();
 
         // If the playmode is set to Playing and is not paused,
-        // call the Update method on the ScriptSystem.
         if (Main.Instance.PlayerControl.PlayMode == PlayMode.Playing)
+            // Update method on the ScriptSystem.
             ScriptSystem.Update();
+#endif
     }
 
     public void LateUpdate()
     {
+#if !EDITOR
+        // LateUpdate the EditorScriptSystem.
+        EditorScriptSystem.LateUpdate();
+        // LateUpdate the ScriptSystem.
+        ScriptSystem.LateUpdate();
+#else
         // If the playmode is set to None and is not running,
-        // call the LateUpdate method on the EditorScriptSystem.
         if (Main.Instance.PlayerControl.PlayMode == PlayMode.None)
+            // LateUpdate the EditorScriptSystem.
             EditorScriptSystem.LateUpdate();
 
         // If the playmode is set to Playing and is not paused,
-        // call the LateUpdate method on the ScriptSystem.
         if (Main.Instance.PlayerControl.PlayMode == PlayMode.Playing)
+            // LateUpdate the ScriptSystem.
             ScriptSystem.LateUpdate();
+#endif
     }
 
     public void Render()
@@ -137,8 +165,8 @@ internal sealed class SceneManager
     public static Scene GetFromID(Guid guid)
     {
         // Check if the main scene's ID matches the provided GUID.
-        if (Scene.ID == guid)
-            return Scene;
+        if (MainScene.ID == guid)
+            return MainScene;
 
         // Check if any of the subscenes' ID matches the provided GUID.
         foreach (var subscene in Subscenes)
@@ -152,8 +180,8 @@ internal sealed class SceneManager
     public static Scene GetFromEntityID(Guid guid)
     {
         // Check if the main scene contains the entity with an ID that matches the provided GUID.
-        if (Scene.EntityManager.GetFromID(guid) is not null)
-            return Scene;
+        if (MainScene.EntityManager.GetFromID(guid) is not null)
+            return MainScene;
 
         // Check if any of the subscenes contains the entity with an ID that matches the provided GUID.
         foreach (var subscene in Subscenes)

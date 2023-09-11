@@ -100,7 +100,7 @@ internal class Theme
         // Check if the Engine.Core instance is not null.
         if (Engine.Core.Instance != null)
             // If it's not null, set the theme for entity manager.
-            SceneManager.Scene.EntityManager.SetTheme(_page.RequestedTheme == ElementTheme.Light);
+            Engine.Utilities.SceneManager.MainScene.EntityManager.SetTheme(_page.RequestedTheme == ElementTheme.Light);
     }
 
     private void Window_Activated(object sender, WindowActivatedEventArgs args) =>

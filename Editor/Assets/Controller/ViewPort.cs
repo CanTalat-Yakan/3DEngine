@@ -1,5 +1,8 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
+using Engine.Components;
+using Engine.Editor;
+using Engine.Utilities;
 
 namespace Editor.Controller;
 
@@ -28,8 +31,8 @@ internal partial class ViewPort
                 CreateButton(CreateIcon(Symbol.Video),
                     StackInGridVertical(
                             CreateSlider(90, 40, 110,
-                            (s, e) => { SceneManager.Scene.EntityManager.GetFromTag("SceneCamera").GetComponent<Camera>().FieldOfView= (float)e.NewValue; }).WrapInGridVertical("Field Of View"),
-                            CreateNumberInput(CameraController.MovementSpeed, 1, 100, (s, e) => { CameraController.MovementSpeed = (float)e.NewValue; }).WrapInGridVertical("Movement Speed"))),
+                            (s, e) => { SceneManager.MainScene.EntityManager.GetFromTag("SceneCamera").GetComponent<Camera>().FieldOfView= (float)e.NewValue; }).WrapInGridVertical("Field Of View"),
+                            CreateNumberInput(SceneCameraController.MovementSpeed, 1, 100, (s, e) => { SceneCameraController.MovementSpeed = (float)e.NewValue; }).WrapInGridVertical("Movement Speed"))),
                 CreateAppBarSeperator(),
                 CreateComboBox(new[] { "Perspective", "Orthogonal" }),
                 CreateComboBox(new[] { "Lit", "Unlit", "Wireframe", "Shaded Wireframe" }),
@@ -43,8 +46,8 @@ internal partial class ViewPort
                 CreateToggleButton(CreateIcon("\xEA80"), true),
                 CreateToggleButton(CreateIcon("\xE81E"), true),
                 CreateAppBarSeperator(),
-                CreateButtonWithValue(CreateIcon("\xE80A"), 10, CreateNumberInput(10, 1, 100, (s, e) => { CameraController.MovementSpeed = (float)e.NewValue; }).WrapInGridVertical("Grid Snap")),
-                CreateButtonWithValue(CreateIcon(Symbol.Rotate), 15, CreateNumberInput(15, 1, 90, (s, e) => { CameraController.MovementSpeed = (float)e.NewValue; }).WrapInGridVertical("Rotation Snap")),
+                CreateButtonWithValue(CreateIcon("\xE80A"), 10, CreateNumberInput(10, 1, 100, (s, e) => { SceneCameraController.MovementSpeed = (float)e.NewValue; }).WrapInGridVertical("Grid Snap")),
+                CreateButtonWithValue(CreateIcon(Symbol.Rotate), 15, CreateNumberInput(15, 1, 90, (s, e) => { SceneCameraController.MovementSpeed = (float)e.NewValue; }).WrapInGridVertical("Rotation Snap")),
                 CreateAppBarSeperator(),
                 CreateToggleButton(CreateIcon(Symbol.Globe), true),
             };

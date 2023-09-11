@@ -1,18 +1,19 @@
 ﻿namespace Engine.ECS;
 
-public class Component : BindableBase, ICloneable
+public class Component : ICloneable // BindableBase
 {
     [Hide] public Entity Entity;
     [Hide] public byte Order = 0;
 
     private bool _isEnabled;
-    public bool IsEnabled
-    {
-        get => _isEnabled;
-        set => SetProperty(ref _isEnabled, value);
-    }
+    public bool IsEnabled;
+    //public bool IsEnabled
+    //{
+    //    get => _isEnabled;
+    //    set => SetProperty(ref _isEnabled, value);
+    //}
 
-    internal event EventHandler _eventOnDestroy;
+    public event EventHandler _eventOnDestroy;
 
     public Component() =>
         OnRegister();

@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
+using Editor.Controller;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -14,7 +15,7 @@ public sealed partial class Home : Frame
     {
         this.InitializeComponent();
 
-        x_TextBlock_AppVersion.Text = Controller.Helper.GetAppVersion();
+        x_TextBlock_AppVersion.Text = Helper.GetAppVersion();
 
         _homeControl = new(this, x_StackPanel_Projects, navigationView);
     }

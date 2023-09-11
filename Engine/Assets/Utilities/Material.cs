@@ -6,7 +6,7 @@ using Vortice.DXGI;
 
 namespace Engine.Utilities;
 
-public sealed class Material
+public class Material
 {
     private Renderer _d3d => Renderer.Instance;
 
@@ -132,7 +132,7 @@ public sealed class Material
     protected static ReadOnlyMemory<byte> CompileBytecode(string shaderPath, string entryPoint, string profile)
     {
         // Combine the base directory and the relative path to the resources directory.
-        string resourcesPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources\");
+        string resourcesPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Resources\");
         // Define the full path to the shader file.
         string shaderFilePath = Path.Combine(resourcesPath, shaderPath);
 

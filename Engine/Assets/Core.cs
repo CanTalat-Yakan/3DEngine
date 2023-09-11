@@ -1,5 +1,4 @@
-﻿global using Editor.Controller;
-global using Engine.Components;
+﻿global using Engine.Components;
 global using Engine.Data;
 global using Engine.ECS;
 global using Engine.Editor;
@@ -9,13 +8,16 @@ global using System.Numerics;
 global using System;
 
 using ImGuiNET;
+using VorticeImGui;
+using System.Runtime.CompilerServices;
+using Vortice.Win32;
 #if EDITOR
-using Microsoft.UI.Xaml.Controls;
+using Engine.Editor;
 #endif
 
 namespace Engine;
 
-internal sealed partial class Core
+public sealed partial class Core
 {
     public static Core Instance { get; private set; }
 
@@ -23,41 +25,41 @@ internal sealed partial class Core
     public Renderer Renderer;
     public RuntimeCompiler RuntimeCompiler;
 
-    public ImGuiRenderer ImGuiRenderer;
-    private IntPtr _imGuiContext;
+    //public Editor.ImGuiRenderer ImGuiRenderer;
+    //private IntPtr _imGuiContext;
 
-    public Core(SwapChainPanel swapChainPanel)
+    public Core(Renderer renderer = null, Win32Window win32Window = null)
     {
         // Initializes the singleton instance of the class, if it hasn't been already.
         if (Instance is null)
             Instance = this;
 
         // Initializes the renderer, scene manager, and the runtimeCompiler.
-        Renderer = new(swapChainPanel);
+        Renderer = renderer is not null ? renderer : new(win32Window);
         SceneManager = new();
         RuntimeCompiler = new();
 
         // Creates an entity with the "Boot" editortag and adds a "SceneBoot" component to it.
-        SceneManager.Scene.EntityManager
+        SceneManager.MainScene.EntityManager
             .CreateEntity(null, "Boot", EditorTags.SceneBoot.ToString())
             .AddComponent(new SceneBoot());
 
         // Compile all projec scripts and add components for the editor's "AddComponent" function.
         RuntimeCompiler.CompileProjectScripts();
 
-        #region // ImGui
-        // Creates a new ImGui context and sets it as the current context.
-        _imGuiContext = ImGui.CreateContext();
-        ImGui.SetCurrentContext(_imGuiContext);
+        //#region // ImGui
+        //// Creates a new ImGui context and sets it as the current context.
+        //_imGuiContext = ImGui.CreateContext();
+        //ImGui.SetCurrentContext(_imGuiContext);
 
-        // Initializes the ImGui renderer.
-        ImGuiRenderer = new();
+        //// Initializes the ImGui renderer.
+        //ImGuiRenderer = new();
 
-        // Set the displaySize with the actual size of the SwapChainPanel.
-        ImGui.GetIO().DisplaySize = new(
-            (float)swapChainPanel.ActualWidth,
-            (float)swapChainPanel.ActualHeight);
-        #endregion
+        //// Set the displaySize with the actual size of the SwapChainPanel.
+        //ImGui.GetIO().DisplaySize = new(
+        //    Renderer.Size.Width,
+        //    Renderer.Size.Height);
+        //#endregion
 
         Output.Log("Engine Initialized...");
 
@@ -119,7 +121,7 @@ internal sealed partial class Core
     }
 }
 
-internal partial class Core
+public sealed partial class Core
 {
     public Core()
     {

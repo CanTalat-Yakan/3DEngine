@@ -13,7 +13,7 @@ internal sealed class ModelLoader
         if (fromResources)
         {
             // Combine the base directory and the relative path to the resources directory
-            string resourcesPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Engine\Resources");
+            string resourcesPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Resources");
             // Define the full path to the model file.
             modelFilePath = Path.Combine(resourcesPath, filePath);
         }

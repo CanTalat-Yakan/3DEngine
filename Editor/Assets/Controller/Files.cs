@@ -6,9 +6,10 @@ using Microsoft.UI.Xaml;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Text;
-using System.Threading.Tasks;
+using System;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
@@ -244,7 +245,7 @@ internal partial class Files
 
         // Compile the project scripts.
         if (Engine.Core.Instance is not null)
-            Engine.Core.Instance.RuntimeCompiler.CompileProjectScripts();
+            Engine.Core.Instance.RuntimeCompiler.CompileProjectScripts(AssetsPath);
     }
 
     public void ValidateCategoriesExist()

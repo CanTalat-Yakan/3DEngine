@@ -7,10 +7,11 @@ using System.IO.Compression;
 using System.IO;
 using System.Text.RegularExpressions;
 using Windows.ApplicationModel.DataTransfer;
+using System;
 
 namespace Editor.Controller;
 
-internal class Home
+public class Home
 {
     public static string RootPath { get; private set; }
     public static string ProjectPath { get; private set; }

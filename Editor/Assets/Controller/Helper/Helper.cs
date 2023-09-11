@@ -20,6 +20,8 @@ using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
 using Image = Microsoft.UI.Xaml.Controls.Image;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 using Rectangle = Microsoft.UI.Xaml.Shapes.Rectangle;
+using System;
+using System.Numerics;
 
 namespace Editor.Controller;
 

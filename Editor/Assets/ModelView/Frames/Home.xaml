@@ -48,7 +48,7 @@
             <ScrollViewer>
                 <StackPanel Spacing="20" Padding="50">
                     <Grid HorizontalAlignment="Stretch" CornerRadius="5">
-                        <Image Height="250" Stretch="UniformToFill" Source="/Assets/Engine/Resources/Textures/BG.png" />
+                        <Image Height="250" Stretch="UniformToFill" Source="/Assets/Resources/Textures/BG.png" />
 
                         <StackPanel Padding="50">
                             <TextBlock FontSize="28" FontWeight="SemiBold" Foreground="Black" Text="3D Engine"/>
@@ -77,14 +77,6 @@
                         <HyperlinkButton NavigateUri="https://engine3d.gitbook.io/documentation/">
                             <StackPanel Spacing="10" Orientation="Horizontal">
                                 <TextBlock Text="Documentation" FontWeight="Medium"/>
-
-                                <SymbolIcon Symbol="Link"/>
-                            </StackPanel>
-                        </HyperlinkButton>
-
-                        <HyperlinkButton NavigateUri="https://docs.google.com/forms/d/e/1FAIpQLSf6PbepYNPx7FZDTJ8hLyYYC6zGo2Qqz1nO2AkZx2jF99tNyg/viewform">
-                            <StackPanel Spacing="10" Orientation="Horizontal">
-                                <TextBlock Text="Feedback" FontWeight="Medium"/>
 
                                 <SymbolIcon Symbol="Link"/>
                             </StackPanel>

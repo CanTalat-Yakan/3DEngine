@@ -1,12 +1,12 @@
-﻿namespace Editor.Controller;
+﻿namespace Engine;
 
-internal class Profiler
+public sealed class Profiler
 {
     public static int FPS => Time.FPS;
     public static double Delta => Time.Delta;
 
-    public static double SwapChainSizeWidth => Renderer.Instance.SwapChainPanel.ActualWidth;
-    public static double SwapChainSizeHeight => Renderer.Instance.SwapChainPanel.ActualHeight;
+    public static double SwapChainSizeWidth => Renderer.Instance.Size.Width;
+    public static double SwapChainSizeHeight => Renderer.Instance.Size.Height;
 
     public static float DrawCalls { get; set; }
     public static float Vertices { get; set; }
