@@ -153,8 +153,16 @@ namespace Engine.Utilities
         public static Vector2 GetMouseAxis() =>
             _mouseAxis.IsNaN() ? Vector2.Zero : _mouseAxis;
 
-        public static Vector2 GetMousePosition() =>
-            new Vector2(_mouse.GetCurrentMouseState().X, _mouse.GetCurrentMouseState().Y);
+        public static Vector2 GetMousePosition()
+        {
+            try
+            {
+                return new Vector2(
+                    _mouse.GetCurrentMouseState().X, 
+                    _mouse.GetCurrentMouseState().Y);
+            }
+            catch (Exception) { return Vector2.Zero; }
+        }
 
         public static int GetMouseWheel()
         {
