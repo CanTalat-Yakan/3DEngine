@@ -32,7 +32,7 @@ The Entity Component System is an architectural pattern often used in video game
 In order to compile, make sure **no spaces** are present in the solution path otherwise SharpGen will fail to generate bindings.
 Also, you need to install [Visual Studio 2022 Preview](https://visualstudio.microsoft.com/vs/preview/) with the following components:
 
-- [x] [Windows 11 SDK (10.0.22621.0)](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk)
+- [x] [Windows 11 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk)
 - [x] [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)
 - [x] [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 
