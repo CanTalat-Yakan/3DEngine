@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Linq;
 using Vortice.DirectInput;
+using Windows.Devices.Input;
 
 namespace Engine.Utilities
 {
@@ -29,6 +30,8 @@ namespace Engine.Utilities
 
         private static Vector2 _axis = Vector2.Zero;
         private static Vector2 _mouseAxis = Vector2.Zero;
+        private static Vector2 _mousePosition = Vector2.Zero;
+        private static int _mouseDelta = 0;
 
         public static void Initialize(IntPtr windowHandle)
         {
@@ -70,6 +73,11 @@ namespace Engine.Utilities
                 _mouseAxis.X = currentMouseState.X - _mouseState.X;
                 _mouseAxis.Y = currentMouseState.Y - _mouseState.Y;
                 _mouseAxis.Y *= -1; // The DirectX Y Coord starts at the top.
+
+                _mousePosition.X = currentMouseState.X; 
+                _mousePosition.Y = currentMouseState.Y;
+
+                _mouseDelta = currentMouseState.Z;
             }
             catch (Exception) { }
 
@@ -153,24 +161,10 @@ namespace Engine.Utilities
         public static Vector2 GetMouseAxis() =>
             _mouseAxis.IsNaN() ? Vector2.Zero : _mouseAxis;
 
-        public static Vector2 GetMousePosition()
-        {
-            try
-            {
-                return new Vector2(
-                    _mouse.GetCurrentMouseState().X, 
-                    _mouse.GetCurrentMouseState().Y);
-            }
-            catch (Exception) { return Vector2.Zero; }
-        }
+        public static Vector2 GetMousePosition() =>
+            _mousePosition.IsNaN() ? Vector2.Zero : _mousePosition;
 
-        public static int GetMouseWheel()
-        {
-            try
-            {
-                return _mouse.GetCurrentMouseState().Z;
-            }
-            catch (Exception) { return 0; }
-        }
+        public static int GetMouseDelta() =>
+            _mouseDelta;
     }
 }
