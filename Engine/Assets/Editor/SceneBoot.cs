@@ -53,7 +53,7 @@ internal sealed class SceneBoot : EditorComponent
 
         // Example.
         // Check for the 'C' key press to trigger cube spawning.
-        if (Input.GetKey(Windows.System.VirtualKey.C, InputState.Down))
+        if (Input.GetKey(Key.C, InputState.Down))
         {
             // Log message indicating that 10 cubes have been spawned.
             Output.Log("Spawned 10 Cubes");

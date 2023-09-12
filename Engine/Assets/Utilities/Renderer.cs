@@ -4,7 +4,6 @@ using Vortice.Direct3D11;
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
-using ABI.Windows.ApplicationModel.Activation;
 
 namespace Engine.Utilities;
 

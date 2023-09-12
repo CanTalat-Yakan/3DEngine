@@ -87,6 +87,5 @@ public partial class App : Application
     }
 
     private Window window;
-    public Window Window => window;
-    //var window = (Application.Current as App)?.Window as MainWindow;
+    public Window Window => window; //USE CASE: var window = (Microsoft.UI.Xaml.Application.Current as App)?.Window as MainWindow;
 }

@@ -1,11 +1,12 @@
-﻿global using Engine.Components;
+﻿global using System.Numerics;
+global using System;
+global using Engine.Components;
 global using Engine.Data;
 global using Engine.ECS;
 global using Engine.Editor;
 global using Engine.Helper;
 global using Engine.Utilities;
-global using System.Numerics;
-global using System;
+global using Key = Vortice.DirectInput.Key;
 
 #if EDITOR
 using Engine.Editor;
@@ -21,48 +22,59 @@ public sealed class Core
     public Renderer Renderer;
     public RuntimeCompiler RuntimeCompiler;
 
-    //public Editor.ImGuiRenderer ImGuiRenderer;
-    //private IntPtr _imGuiContext;
-
-    public Core(Renderer renderer = null, Win32Window win32Window = null, string assetsPath = null)
+    public Core(Renderer renderer, nint hWnd, string assetsPath = null)
     {
         // Initializes the singleton instance of the class, if it hasn't been already.
         if (Instance is null)
             Instance = this;
 
+        Input.Initialize(hWnd);
+
         // Initializes the renderer, scene manager, and the runtimeCompiler.
-        Renderer = renderer is not null ? renderer : new(win32Window);
+        Renderer = renderer;
+
+        Initialize();
+    }
+
+    public Core(Win32Window win32Window, string assetsPath = null)
+    {
+        // Initializes the singleton instance of the class, if it hasn't been already.
+        if (Instance is null)
+            Instance = this;
+
+        Input.Initialize(win32Window.Handle);
+
+        // Initializes the renderer, scene manager, and the runtimeCompiler.
+        Renderer = new(win32Window);
+
+        Initialize();
+    }
+
+    public void Initialize()
+    {
         RuntimeCompiler = new();
 
         SceneManager = new();
 
-        // Creates an entity with the "Boot" editortag and adds a "SceneBoot" component to it.
+        // Creates an entity with the "Boot" editor tag and adds a "SceneBoot" component to it.
         SceneManager.MainScene.EntityManager
             .CreateEntity(null, "Boot", EditorTags.SceneBoot.ToString())
             .AddComponent(new SceneBoot());
 
-        // Compile all projec scripts and add components for the editor's "AddComponent" function.
+        // Compile all project scripts and add components for the editor's "AddComponent" function.
         RuntimeCompiler.CompileProjectScripts();
-
-        //#region // ImGui
-        //// Creates a new ImGui context and sets it as the current context.
-        //_imGuiContext = ImGui.CreateContext();
-        //ImGui.SetCurrentContext(_imGuiContext);
-
-        //// Initializes the ImGui renderer.
-        //ImGuiRenderer = new();
-
-        //// Set the displaySize with the actual size of the SwapChainPanel.
-        //ImGui.GetIO().DisplaySize = new(
-        //    Renderer.Size.Width,
-        //    Renderer.Size.Height);
-        //#endregion
 
         Output.Log("Engine Initialized...");
 
         // Render Pipeline Loop
         SceneManager.Awake();
         SceneManager.Start();
+    }
+
+    public void Dispose()
+    {
+        Renderer.Dispose();
+        Input.Dispose();
     }
 
     public void Frame()
@@ -95,9 +107,9 @@ public sealed class Core
         }
 #endif
 
-        // Call Update method for all scenens.
+        // Call Update method for all scenes.
         SceneManager.Update();
-        // Call LateUpdate method for all scenens.
+        // Call LateUpdate method for all scenes.
         SceneManager.LateUpdate();
 
         // Finishes the state of input processing.
