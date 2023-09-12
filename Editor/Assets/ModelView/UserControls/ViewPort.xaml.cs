@@ -1,7 +1,9 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml;
 using SharpGen.Runtime;
 using System;
+using WinUIEx;
 using Engine.Utilities;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -12,8 +14,9 @@ namespace Editor.ModelView;
 public sealed partial class ViewPort : UserControl
 {
     internal Engine.Core _engineCore;
-    internal Controller.ViewPort _viewPortControl;
     internal Renderer _renderer;
+
+    internal Controller.ViewPort _viewPortControl;
 
     public ViewPort()
     {
@@ -23,8 +26,10 @@ public sealed partial class ViewPort : UserControl
 
         _viewPortControl = new Controller.ViewPort(this, x_Grid_Overlay);
 
-        Loaded += (s, e) => _engineCore = new Engine.Core(_renderer, null, Controller.Files.AssetsPath);
-        Unloaded += (s, e) => _engineCore.Renderer.Dispose();
+        var hWnd = (Application.Current as App)?.Window.GetWindowHandle();
+
+        Loaded += (s, e) => _engineCore = new Engine.Core(_renderer, hWnd.Value, Controller.Files.AssetsPath);
+        Unloaded += (s, e) => _engineCore.Dispose();
 
         // Adds an event handler for the CompositionTarget.Rendering event,
         // which is triggered when the composition system is rendering a frame.
@@ -34,8 +39,6 @@ public sealed partial class ViewPort : UserControl
 
         // Register an event handler for the SizeChanged event of the SwapChainPanel. This will be used to handle any changes in the size of the panel.
         x_SwapChainPanel_ViewPort.SizeChanged += (s, e) => _renderer.OnSwapChainSizeChanged((int)e.NewSize.Width, (int)e.NewSize.Height);
-
-        InitializeInput();
     }
 
     private void InitializeRenderer()
@@ -51,12 +54,5 @@ public sealed partial class ViewPort : UserControl
             result = nativeObject.SetSwapChain(_renderer.SwapChain);
         if (result.Failure)
             throw new Exception(result.Description);
-    }
-
-    private void InitializeInput()
-    {
-        //PointerPressed += Input.PointerPressed;
-        //PointerWheelChanged += Input.PointerWheelChanged;
-        //KeyDown += Input.KeyDown;
     }
 }

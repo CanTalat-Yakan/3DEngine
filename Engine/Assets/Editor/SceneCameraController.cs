@@ -96,20 +96,20 @@ public sealed class SceneCameraController : EditorComponent
         float input = 0;
 
         // Check if the E or Q key is pressed and update the input variable accordingly.
-        if (Input.GetKey(VirtualKey.E)) input = 1;
-        if (Input.GetKey(VirtualKey.Q)) input = -1;
+        if (Input.GetKey(Key.E)) input = 1;
+        if (Input.GetKey(Key.Q)) input = -1;
 
         // Check if both the E and W or Q and W keys are pressed and update the input variable accordingly.
-        if (Input.GetKey(VirtualKey.E) && Input.GetKey(VirtualKey.W)) input = 1;
-        if (Input.GetKey(VirtualKey.Q) && Input.GetKey(VirtualKey.W)) input = -1;
+        if (Input.GetKey(Key.E) && Input.GetKey(Key.W)) input = 1;
+        if (Input.GetKey(Key.Q) && Input.GetKey(Key.W)) input = -1;
 
         // Check if both the E and S or Q and S keys are pressed and update the input variable accordingly.
-        if (Input.GetKey(VirtualKey.E) && Input.GetKey(VirtualKey.S)) input = 1;
-        if (Input.GetKey(VirtualKey.Q) && Input.GetKey(VirtualKey.S)) input = -1;
+        if (Input.GetKey(Key.E) && Input.GetKey(Key.S)) input = 1;
+        if (Input.GetKey(Key.Q) && Input.GetKey(Key.S)) input = -1;
 
         // Check if either the W or S key is pressed and update the direction
         // based on the local up vector of the entity's transform and the input variable.
-        if (Input.GetKey(VirtualKey.W) || Input.GetKey(VirtualKey.S))
+        if (Input.GetKey(Key.W) || Input.GetKey(Key.S))
             _direction += input * Entity.Transform.Up;
         // If neither the W or S key is pressed, update the direction
         // based on the global Y unit vector and the input variable.
