@@ -6,9 +6,9 @@ namespace Engine.Utilities
 {
     public enum MouseButton
     {
-        IsLeftButtonPressed,
-        IsRightButtonPressed,
-        IsMiddleButtonPressed
+        Left,
+        Right,
+        Middle
     }
 
     public enum InputState
@@ -124,23 +124,23 @@ namespace Engine.Utilities
             {
                 InputState.Down => button switch
                 {
-                    MouseButton.IsLeftButtonPressed => currentMouseState.Buttons[0] && !_mouseState.Buttons[0],
-                    MouseButton.IsRightButtonPressed => currentMouseState.Buttons[1] && !_mouseState.Buttons[1],
-                    MouseButton.IsMiddleButtonPressed => currentMouseState.Buttons[2] && !_mouseState.Buttons[2],
+                    MouseButton.Left => currentMouseState.Buttons[0] && !_mouseState.Buttons[0],
+                    MouseButton.Right => currentMouseState.Buttons[1] && !_mouseState.Buttons[1],
+                    MouseButton.Middle => currentMouseState.Buttons[2] && !_mouseState.Buttons[2],
                     _ => false
                 },
                 InputState.Pressed => button switch
                 {
-                    MouseButton.IsLeftButtonPressed => currentMouseState.Buttons[0],
-                    MouseButton.IsRightButtonPressed => currentMouseState.Buttons[1],
-                    MouseButton.IsMiddleButtonPressed => currentMouseState.Buttons[2],
+                    MouseButton.Left => currentMouseState.Buttons[0],
+                    MouseButton.Right => currentMouseState.Buttons[1],
+                    MouseButton.Middle => currentMouseState.Buttons[2],
                     _ => false
                 },
                 InputState.Up => button switch
                 {
-                    MouseButton.IsLeftButtonPressed => !currentMouseState.Buttons[0] && _mouseState.Buttons[0],
-                    MouseButton.IsRightButtonPressed => !currentMouseState.Buttons[1] && _mouseState.Buttons[1],
-                    MouseButton.IsMiddleButtonPressed => !currentMouseState.Buttons[2] && _mouseState.Buttons[2],
+                    MouseButton.Left => !currentMouseState.Buttons[0] && _mouseState.Buttons[0],
+                    MouseButton.Right => !currentMouseState.Buttons[1] && _mouseState.Buttons[1],
+                    MouseButton.Middle => !currentMouseState.Buttons[2] && _mouseState.Buttons[2],
                     _ => false
                 },
                 _ => false
