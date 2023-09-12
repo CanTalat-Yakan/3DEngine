@@ -85,8 +85,8 @@ public sealed class Core
         // Clears the render target, discarding the contents and preparing it for the next frame.
         Renderer.Clear();
 
-        // Updates the input state, polling for any new events
-        // or changes in the state of the pointer or the keyboard.
+        // Acquire and Poll Mouse and Keyboard and Update the States and the Input.
+        Input.Fetch();
         Input.Update();
 
 #if EDITOR
@@ -100,16 +100,16 @@ public sealed class Core
             // Gather Components for the Editor's AddComponent function.
             RuntimeCompiler.CompileProjectScripts();
 
-            // Call Awake method for all scenens again.
+            // Call Awake for all scenens again.
             SceneManager.Awake();
-            // Call Start method for all scenens again.
+            // Call Start for all scenens again.
             SceneManager.Start();
         }
 #endif
 
-        // Call Update method for all scenes.
+        // Call Update for all scenes.
         SceneManager.Update();
-        // Call LateUpdate method for all scenes.
+        // Call LateUpdate for all scenes.
         SceneManager.LateUpdate();
 
         // Finishes the state of input processing.

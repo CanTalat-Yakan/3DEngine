@@ -36,6 +36,7 @@ public sealed partial class ViewPort : UserControl
         // The code inside the event handler will be executed each time the event is raised.
         CompositionTarget.Rendering += (s, e) => _engineCore.Frame();
         CompositionTarget.Rendering += (s, e) => _viewPortControl.Profile.Text = Engine.Profiler.GetString();
+        CompositionTarget.Rendering += (s, e) => Controller.Output.Log(Engine.Output.DequeueLog());
 
         // Register an event handler for the SizeChanged event of the SwapChainPanel. This will be used to handle any changes in the size of the panel.
         x_SwapChainPanel_ViewPort.SizeChanged += (s, e) => _renderer.OnSwapChainSizeChanged((int)e.NewSize.Width, (int)e.NewSize.Height);

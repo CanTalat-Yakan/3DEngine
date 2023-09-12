@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualBasic.Devices;
+﻿using System.Diagnostics;
 using System.Linq;
 using Vortice.DirectInput;
 
@@ -24,8 +24,8 @@ namespace Engine.Utilities
         private static IDirectInputDevice8 _keyboard;
         private static IDirectInputDevice8 _mouse;
 
-        private static MouseState _mouseState;
-        private static KeyboardState _keyboardState;
+        private static MouseState _mouseState = new();
+        private static KeyboardState _keyboardState = new();
 
         private static Vector2 _axis = Vector2.Zero;
         private static Vector2 _mouseAxis = Vector2.Zero;
@@ -34,22 +34,15 @@ namespace Engine.Utilities
         {
             _directInput = DInput.DirectInput8Create();
 
-            var mouseGuid = _directInput.GetDevices(DeviceClass.Pointer, DeviceEnumerationFlags.AttachedOnly).First().InstanceGuid;
-            _mouse = _directInput.CreateDevice(mouseGuid);
+            var _mouseGuid = _directInput.GetDevices(DeviceClass.Pointer, DeviceEnumerationFlags.AttachedOnly).First().InstanceGuid;
+            _mouse = _directInput.CreateDevice(_mouseGuid);
             _mouse.SetCooperativeLevel(windowHandle, CooperativeLevel.Foreground | CooperativeLevel.NonExclusive);
-            _mouse.SetDataFormat<RawKeyboardState>();
-            _mouse.Acquire();
-            _mouse.Poll();
-            _mouse.GetCurrentMouseState(ref _mouseState);
+            _mouse.SetDataFormat<RawMouseState>();
 
-            var keyboardGuid = _directInput.GetDevices(DeviceClass.Keyboard, DeviceEnumerationFlags.AttachedOnly).First().InstanceGuid;
-            _keyboard = _directInput.CreateDevice(keyboardGuid);
+            var _keyboardGuid = _directInput.GetDevices(DeviceClass.Keyboard, DeviceEnumerationFlags.AttachedOnly).First().InstanceGuid;
+            _keyboard = _directInput.CreateDevice(_keyboardGuid);
             _keyboard.SetCooperativeLevel(windowHandle, CooperativeLevel.Foreground | CooperativeLevel.NonExclusive);
             _keyboard.SetDataFormat<RawKeyboardState>();
-            _keyboard.Acquire();
-            _keyboard.Poll();
-            _keyboardState = new();
-            _keyboard.GetCurrentKeyboardState(ref _keyboardState);
         }
 
         public static void Dispose()
@@ -59,17 +52,26 @@ namespace Engine.Utilities
             _mouse.Dispose();
         }
 
-        public static void Update()
+        public static void Fetch()
         {
             _keyboard.Acquire();
             _keyboard.Poll();
 
             _mouse.Acquire();
             _mouse.Poll();
+        }
 
-            // Calculate mouse axis based on the difference between the current and previous pointer positions.
-            _mouseAxis.X = -_mouseState.X - _mouse.GetCurrentMouseState().X;
-            _mouseAxis.Y = _mouseState.Y - _mouse.GetCurrentMouseState().Y;
+        public static void Update()
+        {
+            try
+            {
+                // Calculate mouse axis based on the difference between the current and previous pointer positions.
+                var currentMouseState = _mouse.GetCurrentMouseState();
+                _mouseAxis.X = currentMouseState.X - _mouseState.X;
+                _mouseAxis.Y = currentMouseState.Y - _mouseState.Y;
+                _mouseAxis.Y *= -1; // The DirectX Y Coord starts at the top.
+            }
+            catch (Exception) { }
 
             // Reset axis vector.
             _axis = Vector2.Zero;
@@ -82,13 +84,24 @@ namespace Engine.Utilities
 
         public static void LateUpdate()
         {
-            _mouseState = _mouse.GetCurrentMouseState();
-            _keyboardState = _keyboard.GetCurrentKeyboardState();
+            try
+            {
+                _mouseState = _mouse.GetCurrentMouseState();
+                _keyboardState = _keyboard.GetCurrentKeyboardState();
+            }
+            catch (Exception) { }
+
         }
 
         public static bool GetKey(Key key, InputState state = InputState.Pressed)
         {
-            var currentKeyboardState = _keyboard.GetCurrentKeyboardState();
+            KeyboardState currentKeyboardState = null;
+            try
+            {
+                currentKeyboardState = _keyboard.GetCurrentKeyboardState();
+            }
+            catch (Exception) { return false; }
+
             return state switch
             {
                 InputState.Down => currentKeyboardState.IsPressed(key) && !_keyboardState.IsPressed(key),
@@ -100,7 +113,12 @@ namespace Engine.Utilities
 
         public static bool GetButton(MouseButton button, InputState state = InputState.Pressed)
         {
-            var currentMouseState = _mouse.GetCurrentMouseState();
+            MouseState currentMouseState = null;
+            try
+            {
+                currentMouseState = _mouse.GetCurrentMouseState();
+            }
+            catch (Exception) { return false; }
 
             return state switch
             {
@@ -138,7 +156,13 @@ namespace Engine.Utilities
         public static Vector2 GetMousePosition() =>
             new Vector2(_mouse.GetCurrentMouseState().X, _mouse.GetCurrentMouseState().Y);
 
-        public static int GetMouseWheel() =>
-            _mouse.GetCurrentMouseState().Z;
+        public static int GetMouseWheel()
+        {
+            try
+            {
+                return _mouse.GetCurrentMouseState().Z;
+            }
+            catch (Exception) { return 0; }
+        }
     }
 }

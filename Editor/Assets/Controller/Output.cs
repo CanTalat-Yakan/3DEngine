@@ -65,6 +65,13 @@ namespace Editor.Controller
             s_statusIcon = Main.Instance.StatusIcon;
         }
 
+        public static void Log(Engine.MessageLog log)
+        {
+            if (log is not null)
+                // Logs a message, with a string representation of an object.
+                Log(log.o.ToString(), (MessageType)log.t, log.l, log.c, log.s);
+        }
+
         public static void Log(object o, MessageType t = MessageType.Message, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null) =>
             // Logs a message, with a string representation of an object.
             Log(o.ToString(), t, l, c, s);
