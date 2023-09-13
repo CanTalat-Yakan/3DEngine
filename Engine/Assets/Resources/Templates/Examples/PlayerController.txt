@@ -36,7 +36,7 @@ public class PlayerMovement : Component
 
     private void HandleRotation()
     {
-        if (!Input.GetButton(MouseButton.IsRightButtonPressed))
+        if (!Input.GetButton(MouseButton.Right))
             return;
 
         var mouseInput = Input.GetMouseAxis();

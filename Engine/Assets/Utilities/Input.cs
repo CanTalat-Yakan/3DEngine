@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Linq;
+﻿using System.Linq;
 using Vortice.DirectInput;
 
 namespace Engine.Utilities
@@ -18,7 +17,7 @@ namespace Engine.Utilities
         Up
     }
 
-    internal class Input
+    public class Input
     {
         private static IDirectInput8 s_directInput;
         private static IDirectInputDevice8 s_mouse;

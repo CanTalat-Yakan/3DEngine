@@ -101,6 +101,12 @@ namespace Engine.Utilities
                     using (var assemblyStream = new MemoryStream())
                     using (var symbolStream = new MemoryStream())
                     {
+                        if (assemblyStream is null)
+                            throw new Exception("AssemblyStream is null!");
+
+                        if (assemblyStream is null)
+                            throw new Exception("SymbolStream is null!");
+
                         var emitOptions = new EmitOptions(false, DebugInformationFormat.PortablePdb);
                         var result = compilation.Emit(assemblyStream, symbolStream, options: emitOptions);
 
@@ -119,7 +125,7 @@ namespace Engine.Utilities
 
                         try
                         {
-                            // Load the assenbly with the compiled script.
+                            // Load the assembly with the compiled script.
                             scriptEntry.Assembly = Assembly.Load(assemblyStream.ToArray(), symbolStream.ToArray());
                         }
                         catch (Exception) { throw; }
