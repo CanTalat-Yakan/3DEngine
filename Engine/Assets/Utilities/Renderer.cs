@@ -30,7 +30,7 @@ public sealed class Renderer
     private ID3D11BlendState _blendState;
 
 #if !EDITOR
-    private Win32Window Win32Window;
+    private Win32Window _win32Window;
 
     public Renderer(Win32Window win32Window)
     {
@@ -40,7 +40,7 @@ public sealed class Renderer
 
         // Store the instance of Win32Window.
         if (win32Window is not null)
-            Win32Window = win32Window;
+            _win32Window = win32Window;
         else
             throw new Exception("""
                 An invalid or null Win32Window instance was passed to the Renderer. 
@@ -48,7 +48,7 @@ public sealed class Renderer
                 """);
 
         // Set the size.
-        Size = new Size(Win32Window.Width, Win32Window.Height);
+        Size = new Size(_win32Window.Width, _win32Window.Height);
 
         var result = Initialization(true);
         if (result.Failure)
@@ -113,7 +113,7 @@ public sealed class Renderer
             IDXGIFactory2 dxgiFactory2 = dxgiDevice3.GetParent<IDXGIAdapter>().GetParent<IDXGIFactory2>();
             // Creates a swap chain using the swap chain description.
             IDXGISwapChain1 swapChain1 = forHwnd
-                ? dxgiFactory2.CreateSwapChainForHwnd(dxgiDevice3, Win32Window.Handle, swapChainDescription1)
+                ? dxgiFactory2.CreateSwapChainForHwnd(dxgiDevice3, _win32Window.Handle, swapChainDescription1)
                 : dxgiFactory2.CreateSwapChainForComposition(dxgiDevice3, swapChainDescription1);
 
             _swapChain = swapChain1.QueryInterface<IDXGISwapChain2>();
@@ -169,7 +169,7 @@ public sealed class Renderer
         #endregion
 
         #region //Create rasterizer state
-        // Create a rasterizer state to fill the triangle using solid fillmode.
+        // Create a rasterizer state to fill the triangle using solid fill mode.
         RasterizerDescription rasterizerDesc = new()
         {
             FillMode = FillMode.Solid,
@@ -223,7 +223,7 @@ public sealed class Renderer
 
     public void Draw(ID3D11Buffer vertexBuffer, int vertexStride, ID3D11Buffer indexBuffer, int indexCount, int vertexOffset = 0, int indexOffset = 0)
     {
-        // Set the type of the primitive to be rendered in trianglelist.
+        // Set the type of the primitive to be rendered in triangle list.
         DeviceContext.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
         // Set the vertex buffer.
         DeviceContext.IASetVertexBuffer(0, vertexBuffer, vertexStride, vertexOffset);

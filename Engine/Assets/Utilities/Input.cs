@@ -113,7 +113,7 @@ namespace Engine.Utilities
                     s_joystickAxis.Y = currentJoystickState.Y / 32767f;
                 }
             }
-            catch (Exception) { }
+            catch { }
 
             // Reset axis vector.
             s_axis = Vector2.Zero;
@@ -132,14 +132,14 @@ namespace Engine.Utilities
                 s_keyboardState = s_keyboard?.GetCurrentKeyboardState();
                 s_joystickState = s_joystick?.GetCurrentJoystickState();
             }
-            catch (Exception) { }
+            catch { }
         }
 
         public static bool GetKey(Key key, InputState state = InputState.Pressed)
         {
             KeyboardState currentKeyboardState = null;
             try { currentKeyboardState = s_keyboard?.GetCurrentKeyboardState(); }
-            catch (Exception) { return false; }
+            catch { return false; }
 
             return state switch
             {
@@ -154,7 +154,7 @@ namespace Engine.Utilities
         {
             MouseState currentMouseState = null;
             try { currentMouseState = s_mouse?.GetCurrentMouseState(); }
-            catch (Exception) { return false; }
+            catch { return false; }
 
             return state switch
             {

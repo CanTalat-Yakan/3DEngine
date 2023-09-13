@@ -88,7 +88,7 @@ namespace Engine.Utilities
             try
             {
                 Compilation compilation = scriptEntry.Script.GetCompilation();
-                compilation.GetDiagnostics();
+
                 compilation = compilation.WithOptions(compilation.Options
                    .WithOptimizationLevel(OptimizationLevel.Debug)
                    .WithOutputKind(OutputKind.DynamicallyLinkedLibrary));
