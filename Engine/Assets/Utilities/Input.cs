@@ -195,6 +195,9 @@ namespace Engine.Utilities
         public static Vector2 GetMousePosition() =>
             s_mousePosition.IsNaN() ? Vector2.Zero : s_mousePosition;
 
+        public static Vector2 GetRawMousePosition() =>
+            s_mousePosition;
+
         public static int GetMouseDelta() =>
             s_mouseDelta;
     }

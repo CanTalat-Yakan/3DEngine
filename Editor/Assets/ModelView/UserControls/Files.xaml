@@ -43,8 +43,8 @@
         <Grid x:Name="x_Grid_Main" Background="#282828" AllowDrop="True" DragOver="Grid_Main_DragOver" Drop="Grid_Main_Drop">
             <ScrollViewer>
                 <StackPanel Orientation="Vertical" Spacing="10">
-                    <BreadcrumbBar x:Name="x_BreadcrumBar_Files" Margin="20, 9, 20, -20" 
-                                   ItemClicked="BreadcrumBar_Files_ItemClicked"/>
+                    <BreadcrumbBar x:Name="x_BreadcrumbBar_Files" Margin="20, 9, 20, -20" 
+                                   ItemClicked="BreadcrumbBar_Files_ItemClicked"/>
 
                     <controls:WrapPanel x:Name="x_WrapPanel_Files" HorizontalSpacing="10" VerticalSpacing="10" Padding="16"/>
 

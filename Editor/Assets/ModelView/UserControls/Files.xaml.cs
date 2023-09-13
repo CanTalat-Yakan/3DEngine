@@ -22,7 +22,7 @@ public sealed partial class Files : UserControl
 
         ChangeColorWithTheme = x_Grid_Main;
 
-        _filesControl = new(this, x_Grid_Main, x_WrapPanel_Files, x_BreadcrumBar_Files);
+        _filesControl = new(this, x_Grid_Main, x_WrapPanel_Files, x_BreadcrumbBar_Files);
     }
 
     private void AppBarButton_Click_AddFiles(object sender, RoutedEventArgs e) =>
@@ -36,8 +36,8 @@ public sealed partial class Files : UserControl
     
     private void AppBarButton_Click_OpenVisualStudio(object sender, RoutedEventArgs e) =>
         _filesControl.OpenFile(System.IO.Path.Combine(Controller.Home.ProjectPath, "Project.sln"));
-
-    private void BreadcrumBar_Files_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args) =>
+    //Breadcrumb
+    private void BreadcrumbBar_Files_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args) =>
         _filesControl.GoUpDirectoryAndRefresh();
 
     private void Grid_Main_DragOver(object sender, DragEventArgs e) =>

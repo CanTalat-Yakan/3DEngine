@@ -7,6 +7,7 @@ global using Engine.Editor;
 global using Engine.Helper;
 global using Engine.Utilities;
 global using Key = Vortice.DirectInput.Key;
+using Vortice.Win32;
 
 #if EDITOR
 using Engine.Editor;
@@ -17,6 +18,7 @@ namespace Engine;
 public sealed class Core
 {
     public static Core Instance { get; private set; }
+    public static string AssetsPath { get; private set; }
 
     public SceneManager SceneManager;
     public Renderer Renderer;
@@ -27,6 +29,8 @@ public sealed class Core
         // Initializes the singleton instance of the class, if it hasn't been already.
         if (Instance is null)
             Instance = this;
+
+        AssetsPath = assetsPath;
 
         Input.Initialize(hWnd);
 
@@ -41,6 +45,8 @@ public sealed class Core
         // Initializes the singleton instance of the class, if it hasn't been already.
         if (Instance is null)
             Instance = this;
+
+        AssetsPath = assetsPath;
 
         Input.Initialize(win32Window.Handle);
 
@@ -62,7 +68,7 @@ public sealed class Core
             .AddComponent(new SceneBoot());
 
         // Compile all project scripts and add components for the editor's "AddComponent" function.
-        RuntimeCompiler.CompileProjectScripts();
+        RuntimeCompiler.CompileProjectScripts(AssetsPath);
 
         Output.Log("Engine Initialized...");
 

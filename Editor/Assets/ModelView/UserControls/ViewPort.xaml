@@ -9,13 +9,9 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
+    <local:CustomGrid x:Name="x_CustomGrid">
         <muxc:SwapChainPanel x:Name="x_SwapChainPanel_ViewPort" MinWidth="1" MinHeight="1"/>
 
         <Grid x:Name="x_Grid_Overlay"/>
-
-        <InfoBar IsOpen="True" Severity="Informational" Width="600" Margin="30, 50" HorizontalAlignment="Left"
-                 Title="To Fix:" 
-                 Message="Register keyboard input by clicking a button within the Viewport." />
-    </Grid>
+    </local:CustomGrid>
 </UserControl>

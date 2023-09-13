@@ -21,7 +21,6 @@ namespace Engine.Utilities
         public ComponentCollector ComponentCollector = new();
 
         private Dictionary<string, ScriptEntry> _scriptsCollection = new();
-
         private List<Assembly> _ignoreAssemblies = new();
 
         public void CompileProjectScripts(string assetsPath = null)
@@ -29,140 +28,129 @@ namespace Engine.Utilities
             if (assetsPath is null)
                 return;
 
-            // Process the list of files found in the directory.
             string scriptsFolderPath = Path.Combine(assetsPath, "Scripts");
             if (!Directory.Exists(scriptsFolderPath))
                 return;
 
-            // create a new scriptEngine and options to be used in the loop.
-            ScriptOptions scriptOptions = ScriptOptions.Default
+            ScriptOptions scriptOptions = CreateScriptOptions();
+
+            foreach (var path in Directory.GetFiles(scriptsFolderPath, "*", SearchOption.AllDirectories))
+            {
+                ScriptEntry scriptEntry = GetScriptEntry(path);
+
+                if (scriptEntry != null)
+                    CompileScript(scriptEntry, scriptOptions);
+            }
+
+            RemoveObsoleteScripts();
+            CollectComponents();
+        }
+
+        private ScriptOptions CreateScriptOptions() =>
+            ScriptOptions.Default
                 .WithImports("System")
                 .WithReferences(typeof(Core).Assembly)
                 .WithAllowUnsafe(true)
                 .WithCheckOverflow(true);
 
-            List<string> validateScripts = new();
+        private ScriptEntry GetScriptEntry(string path)
+        {
+            FileInfo fileInfo = new(path);
 
-            string[] fileEntries = Directory.GetFiles(scriptsFolderPath, "*", SearchOption.AllDirectories);
-            foreach (var path in fileEntries)
+            if (_scriptsCollection.TryGetValue(fileInfo.FullName, out ScriptEntry scriptEntry))
             {
-                ScriptEntry scriptEntry = null;
-                FileInfo fileInfo = new(path);
-
-                // Check if dictionary contains the file info.
-                if (_scriptsCollection.ContainsKey(fileInfo.FullName))
+                if (fileInfo.LastWriteTime > scriptEntry.FileInfo.LastWriteTime)
                 {
-                    scriptEntry = _scriptsCollection[fileInfo.FullName];
+                    scriptEntry.FileInfo = fileInfo;
+                    string updatedCode = File.ReadAllText(path);
+                    scriptEntry.Script = CSharpScript.Create(updatedCode, CreateScriptOptions());
 
-                    // Check if the file has been modified.
-                    if (fileInfo.LastWriteTime > scriptEntry.FileInfo.LastWriteTime)
-                    {
-                        // Update the file info in the scene entry with the new lastWriteTime.
-                        scriptEntry.FileInfo = fileInfo;
-
-                        // Create a new script from the file.
-                        string updatedCode = File.ReadAllText(path);
-                        scriptEntry.Script = CSharpScript.Create(updatedCode, scriptOptions);
-
-                        Output.Log("Updated file");
-                    }
-                    else
-                        scriptEntry = null;
+                    Output.Log("Updated file");
                 }
                 else
-                {
-                    scriptEntry = new() { FileInfo = fileInfo };
+                    scriptEntry = null;
+            }
+            else
+            {
+                scriptEntry = new() { FileInfo = fileInfo };
+                string code = File.ReadAllText(path);
+                scriptEntry.Script = CSharpScript.Create(code, CreateScriptOptions());
+                _scriptsCollection.Add(fileInfo.FullName, scriptEntry);
 
-                    // Create a new script from the file.
-                    string code = File.ReadAllText(path);
-                    scriptEntry.Script = CSharpScript.Create(code, scriptOptions);
-
-                    // Add it into the collection.
-                    _scriptsCollection.Add(fileInfo.FullName, scriptEntry);
-
-                    Output.Log("Created new file");
-                }
-
-                validateScripts.Add(fileInfo.FullName);
-
-                // If the scriptEntry is set, compile the script.
-                // It is set when the script is newly created or updated.
-                if (scriptEntry is not null)
-                {
-                    // Compilation gives access to the full set of Roslyn APIs.
-                    var compilation = scriptEntry.Script.GetCompilation();
-                    compilation = compilation.WithOptions(compilation.Options
-                       .WithOptimizationLevel(OptimizationLevel.Debug)
-                       .WithOutputKind(OutputKind.DynamicallyLinkedLibrary));
-
-                    // Compile script with reference to the assembly.
-                    // It is worth noting that we used OptimizationLevel.Debug which disables all optimizations what improves debugging experience.
-                    // The result of compilations are two streams: assemblyStream contains actual compiled code and symbolStream contains symbols.
-                    using (var assemblyStream = new MemoryStream())
-                    using (var symbolStream = new MemoryStream())
-                    {
-                        if (assemblyStream is null)
-                            throw new Exception("AssemblyStream is null!");
-
-                        if (assemblyStream is null)
-                            throw new Exception("SymbolStream is null!");
-
-                        var emitOptions = new EmitOptions(false, DebugInformationFormat.PortablePdb);
-                        var result = compilation.Emit(assemblyStream, symbolStream, options: emitOptions);
-
-                        if (!result.Success)
-                            foreach (var error in result.Diagnostics)
-                                Output.Log(
-                                    string.Join("\r\n", error),
-                                    error.WarningLevel == 0
-                                        ? MessageType.Error
-                                        : MessageType.Warning);
-
-                        // Add assembly to list to ignore in the "CollectComponents" method,
-                        // when the an assembly reference is inside of the script entry.
-                        if (scriptEntry.Assembly is not null)
-                            _ignoreAssemblies.Add(scriptEntry.Assembly);
-
-                        try
-                        {
-                            // Load the assembly with the compiled script.
-                            scriptEntry.Assembly = Assembly.Load(assemblyStream.ToArray(), symbolStream.ToArray());
-                        }
-                        catch (Exception) { throw; }
-
-                        // Replace all matching components with the new one.
-                        ReplaceComponentTypeReferences(scriptEntry.Assembly);
-
-                        Output.Log("Loaded assembly");
-                    }
-                }
+                Output.Log("Read new file");
             }
 
-            // Remove all compiled project script that are not validated.
+            return scriptEntry;
+        }
+
+        private void CompileScript(ScriptEntry scriptEntry, ScriptOptions scriptOptions)
+        {
+            try
+            {
+                Compilation compilation = scriptEntry.Script.GetCompilation();
+                compilation.GetDiagnostics();
+                compilation = compilation.WithOptions(compilation.Options
+                   .WithOptimizationLevel(OptimizationLevel.Debug)
+                   .WithOutputKind(OutputKind.DynamicallyLinkedLibrary));
+
+                using (var assemblyStream = new MemoryStream())
+                using (var symbolStream = new MemoryStream())
+                {
+                    var emitOptions = new EmitOptions(false, DebugInformationFormat.PortablePdb);
+                    var result = compilation.Emit(assemblyStream, symbolStream, options: emitOptions);
+
+                    if (!result.Success)
+                    {
+                        LogCompilationErrors(result, scriptEntry);
+
+                        return;
+                    }
+
+                    if (scriptEntry.Assembly != null)
+                        _ignoreAssemblies.Add(scriptEntry.Assembly);
+
+                    scriptEntry.Assembly = Assembly.Load(assemblyStream.ToArray(), symbolStream.ToArray());
+                    ReplaceComponentTypeReferences(scriptEntry.Assembly);
+
+                    Output.Log("Loaded assembly");
+                }
+            }
+            catch { }
+        }
+
+        private void LogCompilationErrors(EmitResult result, ScriptEntry scriptEntry)
+        {
+            foreach (var error in result.Diagnostics)
+            {
+                Output.Log(
+                    string.Join("\r\n", error),
+                    error.WarningLevel == 0
+                        ? MessageType.Error
+                        : MessageType.Warning,
+                    error.Location.GetLineSpan().StartLinePosition.Line,
+                    null,
+                    scriptEntry.FileInfo.Name);
+            }
+        }
+
+        private void RemoveObsoleteScripts()
+        {
             foreach (var fullName in _scriptsCollection.Keys.ToArray())
-                if (!validateScripts.Contains(fullName))
+                if (!_scriptsCollection[fullName].FileInfo.Exists)
                 {
                     var assembly = _scriptsCollection[fullName].Assembly;
-
-                    // Add assembly to list to ignore in the "CollectComponents" method,
-                    // with the assembly reference of the script entry that got deleted.
                     _ignoreAssemblies.Add(assembly);
 
                     DestroyComponentTypeReferences(assembly);
 
-                    // Remove script from collection.
                     _scriptsCollection.Remove(fullName);
+
                     Output.Log("Removed file");
                 }
-
-            // Gather components for the editor's "AddComponent" function.
-            CollectComponents();
         }
 
-        public void CollectComponents()
+        private void CollectComponents()
         {
-            // Collect all components in the Assembly
-            // and ignore all components that have the "IHide" interface.
             var componentCollection = AppDomain.CurrentDomain.GetAssemblies()
                 .Except(_ignoreAssemblies)
                 .SelectMany(a => a.GetTypes())
@@ -171,15 +159,12 @@ namespace Engine.Utilities
                     && !(typeof(IHide).IsAssignableFrom(t) && !t.IsInterface))
                 .ToArray();
 
-            // Add components to the collector.
             ComponentCollector.Components.Clear();
             ComponentCollector.Components.AddRange(componentCollection);
         }
 
         private void DestroyComponentTypeReferences(Assembly assembly)
         {
-            // Remove the specified components in the script or editorscript system,
-            // using the types obtained from the provided assembly.
             foreach (var type in assembly.GetTypes())
                 if (type.IsSubclassOf(typeof(EditorComponent)))
                     EditorScriptSystem.Destroy(type);
@@ -189,15 +174,12 @@ namespace Engine.Utilities
 
         private void ReplaceComponentTypeReferences(Assembly assembly)
         {
-            // Remove the specified components in the script- or editorscript system,
-            // using the types obtained from the provided assembly.
             foreach (var type in assembly.GetTypes())
                 if (type.IsSubclassOf(typeof(Component)))
                     foreach (var ignoreAssembly in _ignoreAssemblies)
                         foreach (var ignoreType in ignoreAssembly.GetTypes())
-                            if (type.IsSubclassOf(typeof(Component)))
-                                if (type.FullName == ignoreType.FullName)
-                                    ScriptSystem.Replace(ignoreType, type);
+                            if (type.FullName == ignoreType.FullName)
+                                ScriptSystem.Replace(ignoreType, type);
         }
     }
 }

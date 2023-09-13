@@ -1,15 +1,22 @@
-﻿namespace Engine.Editor;
+﻿using System.Windows.Forms;
+using Vortice.Win32;
+
+namespace Engine.Editor;
 
 public sealed class SceneCameraController : EditorComponent
 {
     public string Profile => Entity.Transform.ToString();
 
     public static float MovementSpeed { get => s_movementSpeed; set => s_movementSpeed = value; }
+    public static bool ViewportFocused { get; set; }
+
     private static float s_movementSpeed = 2;
 
     private float _rotationSpeed = 5;
     private Vector3 _direction;
     private Vector3 _rotation;
+
+    private Vector2 _mousePosition;
 
     public override void OnRegister() =>
         // Register the component with the EditorScriptSystem.
@@ -20,21 +27,39 @@ public sealed class SceneCameraController : EditorComponent
         // Call the MovementSpeedCalc function to calculate the movement speed.
         MovementSpeedCalc();
 
+
+        if (Input.GetButton(MouseButton.Right, InputState.Down) 
+            || Input.GetButton(MouseButton.Middle, InputState.Down))
+        {
+            User32.GetCursorPos(out var point);
+            _mousePosition.X = point.X;
+            _mousePosition.Y = point.Y;
+        }
+
+
         // Check if the middle mouse button is pressed. If so, call the ScreenMovement function.
-        if (Input.GetButton(MouseButton.Middle))
+        if (Input.GetButton(MouseButton.Middle) && ViewportFocused)
+        {
+            User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
+
             ScreenMovement();
+        }
 
         // Check if the right mouse button is pressed.
         // If so, call the TransformMovement, CameraMovement and HeightTransformMovement functions.
-        if (Input.GetButton(MouseButton.Right))
+        if (Input.GetButton(MouseButton.Right) && ViewportFocused)
         {
             TransformMovement();
             CameraRotation();
             HeightTransformMovement();
+
+            User32.SetCursor(User32.LoadCursor(IntPtr.Zero, SystemCursor.IDC_CROSS));
+            User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
         }
 
-        // Call the ScrollMovement function to handle the movement using the scroll wheel.
-        ScrollMovement();
+        if (ViewportFocused)
+            // Call the ScrollMovement function to handle the movement using the scroll wheel.
+            ScrollMovement();
 
         // Update the entity's position based on the calculated direction and movement speed.
         Entity.Transform.LocalPosition += _direction * (float)Time.Delta * s_movementSpeed;

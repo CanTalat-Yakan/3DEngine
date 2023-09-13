@@ -60,15 +60,18 @@ public partial class App : Application
             // Write date and time.
             Debug.WriteLine($"[{DateTime.Now}]");
 
-            //// Write call stack.
-            //foreach (var stackFrame in new StackTrace().GetFrames())
-            //    Debug.Write(stackFrame.ToString());
+            // Write file name, line number, and method name.
+            StackTrace stackTrace = new StackTrace(e.Exception, true);
+            StackFrame frame = stackTrace.GetFrame(0); // Get the top frame (most recent method call).
 
-            // Write exception.
-            Debug.WriteLine(e.Exception + "\n\n");
+            string fileName = frame.GetFileName();
+            int lineNumber = frame.GetFileLineNumber();
+            string methodName = frame.GetMethod().Name;
+
+            Debug.WriteLine($"File: {fileName}, Line: {lineNumber}, Method: {methodName}");
 
             if (Main.Instance is not null)
-                Output.Log(e.Exception, MessageType.Error);
+                Output.Log(e.Exception, MessageType.Error, lineNumber, methodName, fileName);
 
             // Mark the event as handled to prevent it from being processed further.
             e.Handled = true;

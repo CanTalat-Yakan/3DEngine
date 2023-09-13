@@ -53,7 +53,9 @@ public class PlayerMovement : Component
         if (!_cameraRotation.IsNaN())
         {
             Entity.Transform.EulerAngles = Vector3.UnitY * _cameraRotation.Y;
-            Camera.Main.Entity.Transform.EulerAngles = Vector3.UnitX * _cameraRotation.X;
+
+            if (Camera.Main is not null)
+                Camera.Main.Entity.Transform.EulerAngles = Vector3.UnitX * _cameraRotation.X;
         }
     }
 }

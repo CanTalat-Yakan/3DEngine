@@ -28,7 +28,9 @@ namespace Editor.Controller
         public string Message;
 
         public string GetInfo() =>
-            Script.Split("\\").Last() + $":{Line} ({Method})";
+            Method is not null
+                ? Script.Split("\\").Last() + $":{Line} ({Method})"
+                : Script.Split("\\").Last() + $":{Line}";
     }
 
     public class Output
@@ -96,7 +98,7 @@ namespace Editor.Controller
             // Check if the "Pause on Error" checkbox is checked and if the message type is an error.
             if (s_pauseError.IsChecked.Value)
                 if (t == MessageType.Error)
-                    // Pause the Playmode with the message type error.
+                    // Pause the Play mode with the message type error.
                     Main.Instance.PlayerControl.Pause();
 
             // Check if the message is not already in the message collection.
@@ -107,7 +109,7 @@ namespace Editor.Controller
                 // Find the message in the collection and add a new timestamp.
                 s_messageCollection[message].Add(DateTime.Now);
 
-            // Set the message to the Statusbar.
+            // Set the message to the Status bar.
             SetStatus(message);
 
             // Iterate, sort, filter or collapse Messages and present them.

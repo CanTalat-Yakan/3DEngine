@@ -70,7 +70,7 @@ internal partial class Files
     public void PopulateFilesCategories()
     {
         // Create a list of categories presented with attrubutes Name, Smybol or Glyph, FileType, Creatable and Thumbnail.
-        CreateCatergoryTiles(
+        CreateCategoryTiles(
             new() { Name = "Scenes", Glyph = "\xEA86", FileTypes = new string[] { ".usd", ".usda", ".usdc", ".usdz" }, Creatable = true },
             new() { Name = "Scripts", Symbol = Symbol.Document, FileTypes = new string[] { ".cs" }, Creatable = true },
             new() { Name = "Prefabs", Glyph = "\xE734", FileTypes = new string[] { ".prefab" } },
@@ -191,7 +191,7 @@ internal partial class Files
             _currentSubPath = null;
 
             // Create category tiles based on the Categories list.
-            CreateCatergoryTiles(Categories);
+            CreateCategoryTiles(Categories);
         }
     }
 
@@ -235,7 +235,7 @@ internal partial class Files
 
         // If the current category is not set, create the category tiles.
         if (_currentCategory is null)
-            CreateCatergoryTiles(Categories);
+            CreateCategoryTiles(Categories);
         // If currently inside category, create the file system entry tiles.
         else
             CreateFileSystemEntryTilesAsync();
@@ -301,7 +301,7 @@ internal partial class Files
             CreateFileSystemEntryTilesAsync();
     }
 
-    public void CreateCatergoryTiles(params Category[] categories)
+    public void CreateCategoryTiles(params Category[] categories)
     {
         // Set the Categories property to the categories argument.
         Categories = categories;

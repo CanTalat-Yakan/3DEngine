@@ -12,7 +12,7 @@ public sealed class Renderer
 {
     public static Renderer Instance { get; private set; }
 
-    public bool IsRendering { get => _renderTargetView.NativePointer is not 0; } // 0x0
+    public bool IsRendering { get => _renderTargetView.NativePointer is not 0; }
 
     public Size Size { get; private set; }
 

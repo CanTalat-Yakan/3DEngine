@@ -15,7 +15,7 @@ internal partial class ViewPort
 
     public ViewPort(ModelView.ViewPort viewPort, Grid content)
     {
-        // Set the Viewport and Maincontent variable.
+        // Set the Viewport and Main content variable.
         _viewPort = viewPort;
         Content = content;
 
