@@ -1,4 +1,5 @@
 ﻿using SharpGen.Runtime;
+using System.Diagnostics;
 using System.Drawing;
 using Vortice.Direct3D11;
 using Vortice.Direct3D;
@@ -41,7 +42,10 @@ public sealed class Renderer
         if (win32Window is not null)
             Win32Window = win32Window;
         else
-            throw new Exception("Null Win32Window Instance was passed to the Renderer!");
+            throw new Exception("""
+                An invalid or null Win32Window instance was passed to the Renderer. 
+                Please ensure that you provide a valid Win32Window object when constructing the Renderer.
+                """);
 
         // Set the size.
         Size = new Size(Win32Window.Width, Win32Window.Height);
@@ -116,8 +120,7 @@ public sealed class Renderer
         }
         catch (Exception e)
         {
-            throw new Exception(e.Message);
-            //return Result.Fail;
+            Trace.Write(e.Message);
         }
         #endregion
 

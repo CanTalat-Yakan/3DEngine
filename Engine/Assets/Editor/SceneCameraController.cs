@@ -1,6 +1,4 @@
-﻿using Windows.System;
-
-namespace Engine.Editor;
+﻿namespace Engine.Editor;
 
 public sealed class SceneCameraController : EditorComponent
 {
@@ -87,7 +85,7 @@ public sealed class SceneCameraController : EditorComponent
         if (!Input.GetButton(MouseButton.Right)
             && !Input.GetButton(MouseButton.Middle)
             && !Input.GetButton(MouseButton.Right))
-            _direction += 5 * Entity.Transform.Forward * Input.GetMouseDelta();
+            _direction += 25 * Entity.Transform.Forward * Input.GetMouseDelta();
     }
 
     private void HeightTransformMovement()

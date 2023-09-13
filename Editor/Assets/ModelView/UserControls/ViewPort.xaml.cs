@@ -24,10 +24,7 @@ public sealed partial class ViewPort : UserControl
 
         InitializeRenderer();
 
-        _viewPortControl = new Controller.ViewPort(this, x_Grid_Overlay);
-
         var hWnd = (Application.Current as App)?.Window.GetWindowHandle();
-
         Loaded += (s, e) => _engineCore = new Engine.Core(_renderer, hWnd.Value, Controller.Files.AssetsPath);
         Unloaded += (s, e) => _engineCore.Dispose();
 
@@ -40,6 +37,8 @@ public sealed partial class ViewPort : UserControl
 
         // Register an event handler for the SizeChanged event of the SwapChainPanel. This will be used to handle any changes in the size of the panel.
         x_SwapChainPanel_ViewPort.SizeChanged += (s, e) => _renderer.OnSwapChainSizeChanged((int)e.NewSize.Width, (int)e.NewSize.Height);
+
+        _viewPortControl = new Controller.ViewPort(this, x_Grid_Overlay);
     }
 
     private void InitializeRenderer()
