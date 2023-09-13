@@ -137,7 +137,7 @@ public class Home
                     new ContentDialog()
                     {
                         XamlRoot = _home.XamlRoot,
-                        Title = "A projectname can't contain any of the following characters",
+                        Title = "A project name can't contain any of the following characters",
                         CloseButtonText = "Close",
                         DefaultButton = ContentDialogButton.Close,
                         Content = new TextBlock() { Text = "\\ / : * ? \" < > |" },
@@ -300,7 +300,7 @@ public class Home
         {
             Target = (FrameworkElement)menuItem,
             Title = "Click here to open the project",
-            Subtitle = "The editor will load with the engine renderpipeline"
+            Subtitle = "The editor will load with the engine render pipeline"
         };
 
         _navigationView.MenuItems.Add(menuItem);

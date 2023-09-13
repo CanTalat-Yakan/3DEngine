@@ -12,18 +12,18 @@ public enum MessageType
 
 public record MessageLog(
     object o, 
-    MessageType t, 
-    int l, 
-    string c, 
-    string s);
+    MessageType type, 
+    int line, 
+    string method, 
+    string script);
 
 public class Output
 {
     public static Queue<MessageLog> GetLogs  => _logs;
     private static Queue<MessageLog> _logs = new();
 
-    public static void Log(object o, MessageType t = MessageType.Message, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null) =>
-        _logs.Enqueue(new(o, (MessageType)(int)t, l, c, s));
+    public static void Log(object o, MessageType type = MessageType.Message, [CallerLineNumber] int line = 0, [CallerMemberName] string method = null, [CallerFilePath] string script = null) =>
+        _logs.Enqueue(new(o, (MessageType)(int)type, line, method, script));
 
     public static MessageLog DequeueLog()
     {

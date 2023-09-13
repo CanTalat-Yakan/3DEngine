@@ -71,23 +71,23 @@ namespace Editor.Controller
         {
             if (log is not null)
                 // Logs a message, with a string representation of an object.
-                Log(log.o.ToString(), (MessageType)log.t, log.l, log.c, log.s);
+                Log(log.o.ToString(), (MessageType)log.type, log.line, log.method, log.script);
         }
 
-        public static void Log(object o, MessageType t = MessageType.Message, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null) =>
+        public static void Log(object o, MessageType type = MessageType.Message, [CallerLineNumber] int line = 0, [CallerMemberName] string method = null, [CallerFilePath] string script = null) =>
             // Logs a message, with a string representation of an object.
-            Log(o.ToString(), t, l, c, s);
+            Log(o.ToString(), type, line, method, script);
 
-        public static void Log(string m, MessageType t = MessageType.Message, [CallerLineNumber] int l = 0, [CallerMemberName] string c = null, [CallerFilePath] string s = null)
+        public static void Log(string s, MessageType type = MessageType.Message, [CallerLineNumber] int line = 0, [CallerMemberName] string method = null, [CallerFilePath] string script = null)
         {
             // Create a new instance of SMessageInfo with the given properties.
             MessageInfo message = new()
             {
-                Script = s,
-                Method = c,
-                Line = l,
-                Message = m,
-                Type = t
+                Script = script,
+                Method = method,
+                Line = line,
+                Message = s,
+                Type = type
             };
 
             // Check if s_status is null and if it is, return,
@@ -97,7 +97,7 @@ namespace Editor.Controller
 
             // Check if the "Pause on Error" checkbox is checked and if the message type is an error.
             if (s_pauseError.IsChecked.Value)
-                if (t == MessageType.Error)
+                if (type == MessageType.Error)
                     // Pause the Play mode with the message type error.
                     Main.Instance.PlayerControl.Pause();
 

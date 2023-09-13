@@ -65,18 +65,16 @@ public sealed class SceneManager
         CameraSystem.Awake();
 
 #if !EDITOR
-        // Awake the EditorScriptSystem.
-        EditorScriptSystem.Awake();
         // Awake the ScriptSystem.
         ScriptSystem.Awake();
-#else
-        // If the playmode is set to None and is not running,
-        if (Main.Instance.PlayerControl.PlayMode == PlayMode.None)
+//#else
+        // If the play mode is set to None and is not running,
+        if (!Core.PlayMode)
             // Awake the EditorScriptSystem.
             EditorScriptSystem.Awake();
 
-        // If the playmode is set to Playing and is not paused,
-        if (Main.Instance.PlayerControl.PlayMode == PlayMode.Playing)
+        // If the play mode is set to Playing and is not paused,
+        if (Core.PlayMode)
             // Awake the ScriptSystem.
             ScriptSystem.Awake();
 #endif
@@ -85,18 +83,16 @@ public sealed class SceneManager
     public void Start()
     {
 #if !EDITOR
-        // Start the EditorScriptSystem.
-        EditorScriptSystem.Start();
         // Start the ScriptSystem.
         ScriptSystem.Start();
-#else
-        // If the playmode is set to None and is not running,
-        if (Main.Instance.PlayerControl.PlayMode == PlayMode.None)
+//#else
+        // If the play mode is set to None and is not running,
+        if (!Core.PlayMode)
             // Start the EditorScriptSystem.
             EditorScriptSystem.Start();
 
-        // If the playmode is set to Playing and is not paused,
-        if (Main.Instance.PlayerControl.PlayMode == PlayMode.Playing)
+        // If the play mode is set to Playing and is not paused,
+        if (Core.PlayMode)
             // Start the ScriptSystem.
             ScriptSystem.Start();
 #endif
@@ -112,18 +108,16 @@ public sealed class SceneManager
         CameraSystem.Update();
 
 #if !EDITOR
-        // Update the EditorScriptSystem.
-        EditorScriptSystem.Update();
         // Update the ScriptSystem.
         ScriptSystem.Update();
-#else
-        // If the playmode is set to None and is not running,
-        if (Main.Instance.PlayerControl.PlayMode == PlayMode.None)
+//#else
+        // If the play mode is set to None and is not running,
+        if (!Core.PlayMode)
             // Update the EditorScriptSystem.
             EditorScriptSystem.Update();
 
-        // If the playmode is set to Playing and is not paused,
-        if (Main.Instance.PlayerControl.PlayMode == PlayMode.Playing)
+        // If the play mode is set to Playing and is not paused,
+        if (Core.PlayMode)
             // Update the ScriptSystem.
             ScriptSystem.Update();
 #endif
@@ -132,18 +126,16 @@ public sealed class SceneManager
     public void LateUpdate()
     {
 #if !EDITOR
-        // LateUpdate the EditorScriptSystem.
-        EditorScriptSystem.LateUpdate();
         // LateUpdate the ScriptSystem.
         ScriptSystem.LateUpdate();
-#else
-        // If the playmode is set to None and is not running,
-        if (Main.Instance.PlayerControl.PlayMode == PlayMode.None)
+//#else
+        // If the play mode is set to None and is not running,
+        if (!Core.PlayMode)
             // LateUpdate the EditorScriptSystem.
             EditorScriptSystem.LateUpdate();
 
-        // If the playmode is set to Playing and is not paused,
-        if (Main.Instance.PlayerControl.PlayMode == PlayMode.Playing)
+        // If the play mode is set to Playing and is not paused,
+        if (Core.PlayMode)
             // LateUpdate the ScriptSystem.
             ScriptSystem.LateUpdate();
 #endif
@@ -151,7 +143,7 @@ public sealed class SceneManager
 
     public void Render()
     {
-        // Update the TransforSystem.
+        // Update the TransformSystem.
         TransformSystem.Update();
 
         // Sort and Render the Cameras.

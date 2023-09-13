@@ -21,7 +21,7 @@ namespace Editor.Controller
         private TextBlock _status;
         private Output _output;
 
-        private PlayMode _playmode = PlayMode.None;
+        private PlayMode _playMode = PlayMode.None;
 
         public Player(AppBarToggleButton play, AppBarToggleButton pause, AppBarButton forward)
         {
@@ -34,7 +34,7 @@ namespace Editor.Controller
 
         public void Play() 
         {
-            // Check if the current playmode is None.
+            // Check if the current play mode is None.
             if (PlayMode == PlayMode.None)
                 // If the clear play option is checked, clear the output.
                 if (_output._clearPlay.IsChecked.Value)
@@ -50,14 +50,14 @@ namespace Editor.Controller
             SetStatusAppBarButtons(_play.IsChecked.Value);
 
             // Log the current status of the game.
-            Output.Log(_play.IsChecked.Value ? "Now Playing..." : "Stopped Playmode");
+            Output.Log(_play.IsChecked.Value ? "Now Playing..." : "Stopped PlayMode");
 
             Main.Instance.OpenPane.IsChecked = !_play.IsChecked.Value;
         }
 
         public void Pause()
         {
-            // Set enum variable Playmode value based on the checked state of "_pause".
+            // Set enum variable play mode value based on the checked state of "_pause".
             PlayMode = _pause.IsChecked.Value ? PlayMode.Paused : PlayMode.Playing;
             // Enable the "_forward" Button with the checked state of "_pause".
             _forward.IsEnabled = _pause.IsChecked.Value;
@@ -66,12 +66,12 @@ namespace Editor.Controller
             Main.Instance.LayoutControl.ViewPort._viewPortControl.Content.BorderBrush = new SolidColorBrush(_pause.IsChecked.Value ? Colors.Orange : Colors.GreenYellow);
 
             // Log the current status of the game.
-            Output.Log(_pause.IsChecked.Value ? "Paused Playmode" : "Continued Playmode");
+            Output.Log(_pause.IsChecked.Value ? "Paused PlayMode" : "Continued Play;ode");
         }
 
         public void Forward()
         {
-            // Check if the current playmode is not paused.
+            // Check if the current play mode is not paused.
             if (PlayMode != PlayMode.Paused)
                 return;
 
@@ -87,7 +87,7 @@ namespace Editor.Controller
             // Uncheck the play button.
             _play.IsChecked = false;
 
-            // Disable all AppBarButtons in the Statusbar.
+            // Disable all AppBarButtons in the Status bar.
             SetStatusAppBarButtons(false);
 
             // Log the current status of the game.
@@ -111,15 +111,15 @@ namespace Editor.Controller
             _play.Icon = b ? new SymbolIcon(Symbol.Stop) : new SymbolIcon(Symbol.Play);
         }
 
-        public bool CheckPlaymodeStarted()
+        public bool CheckPlayModeStarted()
         {
             bool b = false;
 
             if (Main.Instance.PlayerControl.PlayMode == PlayMode.Playing)
-                if (_playmode != Main.Instance.PlayerControl.PlayMode)
+                if (_playMode != Main.Instance.PlayerControl.PlayMode)
                     b = true;
 
-            _playmode = Main.Instance.PlayerControl.PlayMode;
+            _playMode = Main.Instance.PlayerControl.PlayMode;
 
             return b;
         }

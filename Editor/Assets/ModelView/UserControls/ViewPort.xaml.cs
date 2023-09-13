@@ -6,6 +6,7 @@ using System;
 using WinUIEx;
 using Engine.Utilities;
 using Microsoft.UI.Input;
+using Editor.Controller;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -34,6 +35,8 @@ public sealed partial class ViewPort : UserControl
         // Adds an event handler for the CompositionTarget.Rendering event,
         // which is triggered when the composition system is rendering a frame.
         // The code inside the event handler will be executed each time the event is raised.
+        CompositionTarget.Rendering += (s, e) => _engineCore.SetPlayMode(Controller.Main.Instance.PlayerControl.PlayMode == PlayMode.Playing);
+        CompositionTarget.Rendering += (s, e) => _engineCore.SetPlayModeStarted(Controller.Main.Instance.PlayerControl.CheckPlayModeStarted());
         CompositionTarget.Rendering += (s, e) => _engineCore.Frame();
         CompositionTarget.Rendering += (s, e) => _viewPortControl.Profile.Text = Engine.Profiler.GetString();
         CompositionTarget.Rendering += (s, e) => Controller.Output.Log(Engine.Output.DequeueLog());

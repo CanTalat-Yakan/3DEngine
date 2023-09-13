@@ -1,12 +1,6 @@
-﻿using System.Collections;
-using System.Numerics;
-using System;
-using Editor.Controller;
-using Engine.Components;
-using Engine.ECS;
+﻿using Engine.ECS;
 using Engine.Editor;
-using Engine.Helper;
-using Engine.Utilities;
+using Engine;
 
 public class {{FileName}} : Component
 {

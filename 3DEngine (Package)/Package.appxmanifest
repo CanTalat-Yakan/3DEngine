@@ -9,7 +9,7 @@
   <Identity
     Name="28256CanTalatYakan.3DEngine"
     Publisher="CN=Can Talat Yakan"
-    Version="1.0.87.0" />
+    Version="1.1.0.0" />
 
   <Properties>
     <DisplayName>3D Engine</DisplayName>
@@ -37,7 +37,7 @@
         Square150x150Logo="Images\Square150x150Logo.png"
         Square44x44Logo="Images\Square44x44Logo.png">
         <uap:DefaultTile Wide310x150Logo="Images\Wide310x150Logo.png"  Square71x71Logo="Images\SmallTile.png" Square310x310Logo="Images\LargeTile.png"/>
-        <uap:SplashScreen Image="Images\SplashScreen.png" />
+        <uap:SplashScreen Image="Images\SplashScreen.png"  BackgroundColor="transparent"/>
         <uap:LockScreen BadgeLogo="Images\BadgeLogo.png" Notification="badge"/>
       </uap:VisualElements>
     </Application>

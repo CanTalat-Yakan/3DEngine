@@ -87,11 +87,11 @@ internal sealed class DeactivateCameraOnPlay : Component, IHide
         // Get the SceneCamera component from the entity with the tag "SceneCamera".
         SceneCamera = Entity.GetComponent<Camera>();
 
-#if EDITOR
+#if !EDITOR
     public override void OnUpdate()
     {
-        // Check if the playmode is set to "Playing" before deactivating the SceneCamera.
-        if (Main.Instance.PlayerControl.PlayMode == PlayMode.Playing)
+        // Check if the play mode is set to "Playing" before deactivating the SceneCamera.
+        if (Core.PlayMode)
             // Deactivate the SceneCamera after OnUpdate is called from the ScriptSystem.
             SceneCamera.IsEnabled = false;
     }

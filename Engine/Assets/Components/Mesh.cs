@@ -9,10 +9,10 @@ public sealed class Mesh : Component
     public string MeshPath;
 
     public MeshInfo MeshInfo => _meshInfo;
-    [Show] MeshInfo _meshInfo;
+    [Show] private MeshInfo _meshInfo;
 
     public Material Material => _material;
-    [Show] Material _material;
+    [Show] private Material _material;
 
     internal ID3D11Buffer _vertexBuffer;
     internal ID3D11Buffer _indexBuffer;

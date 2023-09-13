@@ -20,7 +20,7 @@ public sealed class Camera : Component
         CameraSystem.Register(this);
 
     public Camera() =>
-        //Create View Constant Buffer when Camera is intialized.
+        //Create View Constant Buffer when Camera is initialized.
         _view = _d3d.Device.CreateConstantBuffer<ViewConstantBuffer>();
 
     public override void OnAwake()
@@ -66,7 +66,7 @@ public sealed class Camera : Component
         _viewConstantBuffer = new()
         {
             ViewProjection = viewProjection,
-            CameraPositon = Entity.Transform.Position,
+            CameraPosition = Entity.Transform.Position,
         };
         #endregion
 

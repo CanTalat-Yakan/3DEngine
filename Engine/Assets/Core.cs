@@ -7,7 +7,6 @@ global using Engine.Editor;
 global using Engine.Helper;
 global using Engine.Utilities;
 global using Key = Vortice.DirectInput.Key;
-using Vortice.Win32;
 
 #if EDITOR
 using Engine.Editor;
@@ -19,6 +18,8 @@ public sealed class Core
 {
     public static Core Instance { get; private set; }
     public static string AssetsPath { get; private set; }
+    public static bool PlayMode { get; private set; }
+    public static bool PlayModeStarted { get; private set; }
 
     public SceneManager SceneManager;
     public Renderer Renderer;
@@ -95,20 +96,20 @@ public sealed class Core
         Input.Fetch();
         Input.Update();
 
-#if EDITOR
+#if !EDITOR
         // Updates and renders the ImGui user interface.
-        ImGuiRenderer.Update(_imGuiContext);
-        ImGuiRenderer.Render(ImGui.GetDrawData());
+        //ImGuiRenderer.Update(_imGuiContext);
+        //ImGuiRenderer.Render(ImGui.GetDrawData());
 
-        // Invokes Awake and Start if playmode has started.
-        if (Main.Instance.PlayerControl.CheckPlaymodeStarted())
+        // Invokes Awake and Start if play mode has started.
+        if (PlayModeStarted)
         {
             // Gather Components for the Editor's AddComponent function.
             RuntimeCompiler.CompileProjectScripts();
 
-            // Call Awake for all scenens again.
+            // Call Awake for all scenes again.
             SceneManager.Awake();
-            // Call Start for all scenens again.
+            // Call Start for all scenes again.
             SceneManager.Start();
         }
 #endif
@@ -134,4 +135,10 @@ public sealed class Core
         // used in the game or application.
         Time.Update();
     }
+
+    public void SetPlayMode(bool b) =>
+        PlayMode = b;
+
+    public void SetPlayModeStarted(bool b) =>
+        PlayModeStarted = b;
 }
