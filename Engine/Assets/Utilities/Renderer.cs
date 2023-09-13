@@ -104,7 +104,7 @@ public sealed class Renderer
             SwapEffect = SwapEffect.FlipSequential,
             BufferUsage = Usage.RenderTargetOutput
         };
-
+        
         try
         {
             // Obtain instance of the IDXGIDevice3 interface from the Direct3D device.
@@ -120,7 +120,7 @@ public sealed class Renderer
         }
         catch (Exception e)
         {
-            Trace.Write(e.Message);
+            throw new Exception(e.Message);
         }
         #endregion
 

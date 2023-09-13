@@ -68,7 +68,10 @@ public partial class App : Application
             int lineNumber = frame.GetFileLineNumber();
             string methodName = frame.GetMethod().Name;
 
-            Debug.WriteLine($"File: {fileName}, Line: {lineNumber}, Method: {methodName}");
+            if (fileName is not null)
+                Debug.WriteLine($"{fileName}:{lineNumber} ({methodName})");
+
+            Debug.WriteLine(e.Exception);
 
             if (Main.Instance is not null)
                 Output.Log(e.Exception, MessageType.Error, lineNumber, methodName, fileName);
