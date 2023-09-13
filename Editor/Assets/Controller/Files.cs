@@ -372,8 +372,6 @@ internal partial class Files
 
             // Add the folder tile and its icon to the Wrap StackLayout.
             Wrap.Children.Add(FolderTile(path, icon));
-
-
         }
 
         // Enumerate the files in the current path.
@@ -393,8 +391,8 @@ internal partial class Files
                 // Get the file from the path.
                 var file = await StorageFile.GetFileFromPathAsync(path);
 
-                // Call the PreviewfileToImageAsync method with the file and the image.
-                PreviewfileToImageAsync(file, image);
+                // Call the PreviewFileToImageAsync method with the file and the image.
+                PreviewFileToImageAsync(file, image);
             }
 
             // Add the file tile, its icon, and image to the Wrap StackLayout.
@@ -440,6 +438,8 @@ internal partial class Files
         button.Content = grid2;
         grid.Children.Add(button);
 
+        grid.AddToolTip(category.Name);
+
         Content.ContextFlyout = null;
 
         return grid;
@@ -484,6 +484,8 @@ internal partial class Files
         grid2.Children.Add(label);
         button.Content = grid2;
         grid.Children.Add(button);
+
+        grid.AddToolTip(Path.GetFileName(path));
 
         return grid;
     }
@@ -548,6 +550,8 @@ internal partial class Files
         stack.Children.Add(button);
         stack.Children.Add(label);
         grid.Children.Add(stack);
+
+        grid.AddToolTip(Path.GetFileName(path));
 
         return grid;
     }
@@ -953,10 +957,16 @@ internal partial class Files
 
             // Set the ItemsSource of the Bar to "newSource".
             Bar.ItemsSource = newSource;
+
+            Bar.AddToolTip(subPathSource.LastOrDefault());
         }
         else
+        {
             // Set the ItemsSource of the Bar to the "source" array.
             Bar.ItemsSource = source;
+
+            Bar.AddToolTip(_currentCategory.Value.Name);
+        }
     }
 }
 
@@ -1252,7 +1262,7 @@ internal partial class Files
         return grid;
     }
 
-    private async void PreviewfileToImageAsync(StorageFile file, Image image)
+    private async void PreviewFileToImageAsync(StorageFile file, Image image)
     {
         using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
         {

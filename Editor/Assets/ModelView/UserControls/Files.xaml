@@ -11,9 +11,11 @@
     <Grid>
         <CommandBar HorizontalAlignment="Right" Margin="244,-44,0,0">
             <AppBarButton Label="Add Files" Icon="Add" 
-                          Click="AppBarButton_Click_AddFiles"/>
+                          Click="AppBarButton_Click_AddFiles"
+                          ToolTipService.ToolTip="Add Files"/>
             <AppBarButton Label="Show in Explorer" 
-                          Click="AppBarButton_Click_OpenFolder">
+                          Click="AppBarButton_Click_OpenFolder"
+                          ToolTipService.ToolTip="Show in Explorer">
                 <AppBarButton.Icon>
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xEC50;"/>
                 </AppBarButton.Icon>
@@ -23,7 +25,8 @@
 
             <CommandBar.SecondaryCommands>
                 <AppBarButton Label="Refresh Files" Icon="Refresh" 
-                              Click="AppBarButton_Click_RefreshFiles">
+                              Click="AppBarButton_Click_RefreshFiles"
+                              ToolTipService.ToolTip="Refresh Files">
                     <AppBarButton.KeyboardAccelerators>
                         <KeyboardAccelerator Key="R" Modifiers="Control" />
                     </AppBarButton.KeyboardAccelerators>
@@ -32,7 +35,8 @@
                 <AppBarSeparator/>
 
                 <AppBarButton Label="Open Visual Studio"
-                              Click="AppBarButton_Click_OpenVisualStudio">
+                              Click="AppBarButton_Click_OpenVisualStudio"
+                              ToolTipService.ToolTip="Open Visual Studio">
                     <AppBarButton.Icon>
                         <BitmapIcon UriSource="/Assets/Resources/Textures/VS2.png" />
                     </AppBarButton.Icon>

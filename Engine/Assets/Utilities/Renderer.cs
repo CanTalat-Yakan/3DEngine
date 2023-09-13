@@ -254,13 +254,13 @@ public sealed class Renderer
         Profiler.DrawCalls = 0;
     }
 
-    public void SetRasterizerDesc(bool solid = true)
+    public void SetRasterizerDesc(FillMode fillMode = FillMode.Solid)
     {
         // Create a rasterizer state with specified fill and cull modes.
         RasterizerDescription rasterizerDesc = new()
         {
-            FillMode = solid ? FillMode.Solid : FillMode.Wireframe,
-            CullMode = solid ? CullMode.Back : CullMode.None,
+            FillMode = fillMode,
+            CullMode = fillMode == FillMode.Solid ? CullMode.Back : CullMode.None,
             FrontCounterClockwise = true
         };
 

@@ -21,8 +21,14 @@ public sealed class SceneManager
             guid = Guid.NewGuid();
 
         // Adds a new scene with the specified parameters to the list of subscenes.
-        Scene scene;
-        Subscenes.Add(scene = new() { ID = guid, Name = name, IsEnabled = enable, EntityManager = new() });
+        Scene scene = new()
+        {
+            ID = guid,
+            Name = name,
+            IsEnabled = enable,
+            EntityManager = new()
+        };
+        Subscenes.Add(scene);
 
         // Returns the newly added scene.
         return scene;
@@ -64,38 +70,24 @@ public sealed class SceneManager
         // Update the CameraSystem
         CameraSystem.Awake();
 
-#if !EDITOR
-        // Awake the ScriptSystem.
-        ScriptSystem.Awake();
-//#else
-        // If the play mode is set to None and is not running,
         if (!Core.PlayMode)
             // Awake the EditorScriptSystem.
             EditorScriptSystem.Awake();
 
-        // If the play mode is set to Playing and is not paused,
         if (Core.PlayMode)
             // Awake the ScriptSystem.
             ScriptSystem.Awake();
-#endif
     }
 
     public void Start()
     {
-#if !EDITOR
-        // Start the ScriptSystem.
-        ScriptSystem.Start();
-//#else
-        // If the play mode is set to None and is not running,
         if (!Core.PlayMode)
             // Start the EditorScriptSystem.
             EditorScriptSystem.Start();
 
-        // If the play mode is set to Playing and is not paused,
         if (Core.PlayMode)
             // Start the ScriptSystem.
             ScriptSystem.Start();
-#endif
     }
 
     public void Update()
@@ -107,38 +99,24 @@ public sealed class SceneManager
         // Update the CameraSystem
         CameraSystem.Update();
 
-#if !EDITOR
-        // Update the ScriptSystem.
-        ScriptSystem.Update();
-//#else
-        // If the play mode is set to None and is not running,
         if (!Core.PlayMode)
             // Update the EditorScriptSystem.
             EditorScriptSystem.Update();
 
-        // If the play mode is set to Playing and is not paused,
         if (Core.PlayMode)
             // Update the ScriptSystem.
             ScriptSystem.Update();
-#endif
     }
 
     public void LateUpdate()
     {
-#if !EDITOR
-        // LateUpdate the ScriptSystem.
-        ScriptSystem.LateUpdate();
-//#else
-        // If the play mode is set to None and is not running,
         if (!Core.PlayMode)
             // LateUpdate the EditorScriptSystem.
             EditorScriptSystem.LateUpdate();
 
-        // If the play mode is set to Playing and is not paused,
         if (Core.PlayMode)
             // LateUpdate the ScriptSystem.
             ScriptSystem.LateUpdate();
-#endif
     }
 
     public void Render()

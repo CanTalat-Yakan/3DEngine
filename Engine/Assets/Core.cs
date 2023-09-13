@@ -8,15 +8,12 @@ global using Engine.Helper;
 global using Engine.Utilities;
 global using Key = Vortice.DirectInput.Key;
 
-#if EDITOR
-using Engine.Editor;
-#endif
-
 namespace Engine;
 
 public sealed class Core
 {
     public static Core Instance { get; private set; }
+
     public static string AssetsPath { get; private set; }
     public static bool PlayMode { get; private set; }
     public static bool PlayModeStarted { get; private set; }
@@ -96,11 +93,6 @@ public sealed class Core
         Input.Fetch();
         Input.Update();
 
-#if !EDITOR
-        // Updates and renders the ImGui user interface.
-        //ImGuiRenderer.Update(_imGuiContext);
-        //ImGuiRenderer.Render(ImGui.GetDrawData());
-
         // Invokes Awake and Start if play mode has started.
         if (PlayModeStarted)
         {
@@ -112,7 +104,6 @@ public sealed class Core
             // Call Start for all scenes again.
             SceneManager.Start();
         }
-#endif
 
         // Call Update for all scenes.
         SceneManager.Update();
@@ -125,7 +116,7 @@ public sealed class Core
         // Renders the scene twice, once in solid mode and once in wireframe mode.
         Renderer.SetRasterizerDesc();
         SceneManager.Render();
-        Renderer.SetRasterizerDesc(false);
+        Renderer.SetRasterizerDesc(Vortice.Direct3D11.FillMode.Wireframe);
         SceneManager.Render();
 
         // Presents the final rendered image on the screen.

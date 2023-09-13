@@ -25,7 +25,7 @@ public sealed class Scene : ICloneable // BindableBase
 
     public Scene Clone()
     {
-        // Copy the current scene object using MemberwiseClone method.
+        // Copy the current scene object using memberwise clone method.
         var newScene = (Scene)this.MemberwiseClone();
 
         // Assign a new Guid to the cloned scene object.

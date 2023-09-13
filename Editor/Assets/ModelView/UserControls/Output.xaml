@@ -10,32 +10,38 @@
     <Grid>
         <CommandBar HorizontalAlignment="Right" Margin="244,-44,0,0">
             <AppBarButton Label="Clear" Icon="Delete" 
-                              Click="AppBarButton_Output_Clear"/>
+                          Click="AppBarButton_Output_Clear"
+                          ToolTipService.ToolTip="Clear"/>
             
             <AppBarToggleButton x:Name="x_AppBarToggleButton_Output_Collapse" IsChecked="True" Label="Collapse" Icon="List" 
-                                    Click="AppBarToggleButton_Output_Collapse_Click"/>
-
+                                Click="AppBarToggleButton_Output_Collapse_Click"
+                                ToolTipService.ToolTip="Collapse"/>
             <AppBarSeparator/>
 
             <CommandBar.SecondaryCommands>
-                <AppBarToggleButton x:Name="x_AppBarToggleButton_Debug_ErrorPause" IsChecked="False" Label="Error Pause" Icon="Pause"/>
+                <AppBarToggleButton x:Name="x_AppBarToggleButton_Debug_ErrorPause" IsChecked="False" Label="Error Pause" Icon="Pause"
+                                    ToolTipService.ToolTip="Pause on Error"/>
                 
-                <AppBarToggleButton x:Name="x_AppBarToggleButton_Debug_ClearPlay" IsChecked="true" Label="Clear Play" Icon="Clear"/>
+                <AppBarToggleButton x:Name="x_AppBarToggleButton_Debug_ClearPlay" IsChecked="true" Label="Clear Play" Icon="Clear"
+                                    ToolTipService.ToolTip="Clear on Play"/>
                 
                 <AppBarSeparator />
                 
                 <AppBarToggleButton x:Name="x_AppBarToggleButton_Filter_Messages" IsChecked="True" Label="Messages" Icon="Message"
-                                    Click="AppBarToggleButton_Filter_Click"/>
+                                    Click="AppBarToggleButton_Filter_Click"
+                                    ToolTipService.ToolTip="Filter Messages"/>
                 
                 <AppBarToggleButton x:Name="x_AppBarToggleButton_Filter_Warnings" IsChecked="False" Label="Warnings"
-                                    Click="AppBarToggleButton_Filter_Click">
+                                    Click="AppBarToggleButton_Filter_Click"
+                                    ToolTipService.ToolTip="Filter Warnings">
                     <AppBarToggleButton.Icon>
                         <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE7BA;" />
                     </AppBarToggleButton.Icon>
                 </AppBarToggleButton>
                 
                 <AppBarToggleButton x:Name="x_AppBarToggleButton_Filter_Errors" IsChecked="True" Label="Error" Icon="ReportHacked"
-                                    Click="AppBarToggleButton_Filter_Click"/>
+                                    Click="AppBarToggleButton_Filter_Click"
+                                    ToolTipService.ToolTip="Filer Errors"/>
             </CommandBar.SecondaryCommands>
         </CommandBar>
 
