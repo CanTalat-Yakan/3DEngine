@@ -73,7 +73,7 @@ public sealed class Core
 
     public void Dispose()
     {
-        Renderer.Dispose();
+        Renderer?.Dispose();
         Input.Dispose();
     }
 

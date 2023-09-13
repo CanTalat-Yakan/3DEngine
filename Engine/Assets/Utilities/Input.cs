@@ -21,13 +21,16 @@ namespace Engine.Utilities
     internal class Input
     {
         private static IDirectInput8 s_directInput;
-        private static IDirectInputDevice8 s_keyboard;
         private static IDirectInputDevice8 s_mouse;
+        private static IDirectInputDevice8 s_keyboard;
+        private static IDirectInputDevice8 s_joystick;
 
         private static MouseState s_mouseState = new();
         private static KeyboardState s_keyboardState = new();
+        private static JoystickState s_joystickState = new();
 
         private static Vector2 s_axis = Vector2.Zero;
+        private static Vector2 s_joystickAxis = Vector2.Zero;
         private static Vector2 s_mouseAxis = Vector2.Zero;
         private static Vector2 s_mousePosition = Vector2.Zero;
         private static int s_mouseDelta = 0;
@@ -36,50 +39,80 @@ namespace Engine.Utilities
         {
             s_directInput = DInput.DirectInput8Create();
 
-            var _mouseGuid = s_directInput.GetDevices(DeviceClass.Pointer, DeviceEnumerationFlags.AttachedOnly).First().InstanceGuid;
-            s_mouse = s_directInput.CreateDevice(_mouseGuid);
-            s_mouse.SetCooperativeLevel(windowHandle, CooperativeLevel.Foreground | CooperativeLevel.NonExclusive);
-            s_mouse.SetDataFormat<RawMouseState>();
+            var _mouseGuid = s_directInput.GetDevices(DeviceClass.Pointer, DeviceEnumerationFlags.AttachedOnly).FirstOrDefault()?.InstanceGuid;
+            if (_mouseGuid != null)
+            {
+                s_mouse = s_directInput.CreateDevice(_mouseGuid.Value);
+                s_mouse.SetCooperativeLevel(windowHandle, CooperativeLevel.Foreground | CooperativeLevel.NonExclusive);
+                s_mouse.SetDataFormat<RawMouseState>();
+            }
 
-            var _keyboardGuid = s_directInput.GetDevices(DeviceClass.Keyboard, DeviceEnumerationFlags.AttachedOnly).First().InstanceGuid;
-            s_keyboard = s_directInput.CreateDevice(_keyboardGuid);
-            s_keyboard.SetCooperativeLevel(windowHandle, CooperativeLevel.Foreground | CooperativeLevel.NonExclusive);
-            s_keyboard.SetDataFormat<RawKeyboardState>();
+            var _keyboardGuid = s_directInput.GetDevices(DeviceClass.Keyboard, DeviceEnumerationFlags.AttachedOnly).FirstOrDefault()?.InstanceGuid;
+            if (_keyboardGuid != null)
+            {
+                s_keyboard = s_directInput.CreateDevice(_keyboardGuid.Value);
+                s_keyboard.SetCooperativeLevel(windowHandle, CooperativeLevel.Foreground | CooperativeLevel.NonExclusive);
+                s_keyboard.SetDataFormat<RawKeyboardState>();
+            }
+
+            var joystickGuid = s_directInput.GetDevices(DeviceClass.GameControl, DeviceEnumerationFlags.AttachedOnly).FirstOrDefault()?.InstanceGuid;
+            if (joystickGuid != null)
+            {
+                s_joystick = s_directInput.CreateDevice(joystickGuid.Value);
+                s_joystick.SetCooperativeLevel(windowHandle, CooperativeLevel.Foreground | CooperativeLevel.NonExclusive);
+                s_joystick.SetDataFormat<RawJoystickState>();
+            }
         }
 
         public static void Dispose()
         {
-            s_directInput.Dispose();
-            s_keyboard.Dispose();
-            s_mouse.Dispose();
+            s_directInput?.Dispose();
+            s_keyboard?.Dispose();
+            s_mouse?.Dispose();
+            s_joystick?.Dispose();
         }
 
         public static void Fetch()
         {
-            s_keyboard.Acquire();
-            s_keyboard.Poll();
+            s_mouse?.Acquire();
+            s_mouse?.Poll();
 
-            s_mouse.Acquire();
-            s_mouse.Poll();
+            s_keyboard?.Acquire();
+            s_keyboard?.Poll();
+
+            s_joystick?.Acquire();
+            s_joystick?.Poll();
         }
 
         public static void Update()
         {
             try
             {
-                var currentMouseState = s_mouse.GetCurrentMouseState();
+                var currentMouseState = s_mouse?.GetCurrentMouseState();
+                if (currentMouseState is not null)
+                {
+                    // Calculate mouse axis based on the difference between the current and previous pointer positions.
+                    s_mouseAxis.X = currentMouseState.X - s_mouseState.X;
+                    s_mouseAxis.Y = currentMouseState.Y - s_mouseState.Y;
+                    s_mouseAxis.Y *= -1; // The DirectX Y Coord starts at the top.
 
-                // Calculate mouse axis based on the difference between the current and previous pointer positions.
-                s_mouseAxis.X = currentMouseState.X - s_mouseState.X;
-                s_mouseAxis.Y = currentMouseState.Y - s_mouseState.Y;
-                s_mouseAxis.Y *= -1; // The DirectX Y Coord starts at the top.
+                    // Get the mouse position.
+                    s_mousePosition.X = currentMouseState.X;
+                    s_mousePosition.Y = currentMouseState.Y;
 
-                // Get the mouse position.
-                s_mousePosition.X = currentMouseState.X;
-                s_mousePosition.Y = currentMouseState.Y;
+                    // Get the mouse delta clamped to -1 and 1.
+                    s_mouseDelta = Math.Clamp(currentMouseState.Z, -1, 1);
+                }
 
-                // Get the mouse delta clamped to -1 and 1.
-                s_mouseDelta = Math.Clamp(currentMouseState.Z, -1, 1);
+                var currentJoystickState = s_joystick?.GetCurrentJoystickState();
+                if (currentJoystickState is not null)
+                {
+                    // Reset joystick axis vector.
+                    s_joystickAxis = Vector2.Zero;
+                    // Update joystick axis based on input.
+                    s_joystickAxis.X = currentJoystickState.X / 32767f; // Normalize joystick values to a range of -1 to 1.
+                    s_joystickAxis.Y = currentJoystickState.Y / 32767f;
+                }
             }
             catch (Exception) { }
 
@@ -96,8 +129,9 @@ namespace Engine.Utilities
         {
             try
             {
-                s_mouseState = s_mouse.GetCurrentMouseState();
-                s_keyboardState = s_keyboard.GetCurrentKeyboardState();
+                s_mouseState = s_mouse?.GetCurrentMouseState();
+                s_keyboardState = s_keyboard?.GetCurrentKeyboardState();
+                s_joystickState = s_joystick?.GetCurrentJoystickState();
             }
             catch (Exception) { }
         }
@@ -105,7 +139,7 @@ namespace Engine.Utilities
         public static bool GetKey(Key key, InputState state = InputState.Pressed)
         {
             KeyboardState currentKeyboardState = null;
-            try { currentKeyboardState = s_keyboard.GetCurrentKeyboardState(); }
+            try { currentKeyboardState = s_keyboard?.GetCurrentKeyboardState(); }
             catch (Exception) { return false; }
 
             return state switch
@@ -120,7 +154,7 @@ namespace Engine.Utilities
         public static bool GetButton(MouseButton button, InputState state = InputState.Pressed)
         {
             MouseState currentMouseState = null;
-            try { currentMouseState = s_mouse.GetCurrentMouseState(); }
+            try { currentMouseState = s_mouse?.GetCurrentMouseState(); }
             catch (Exception) { return false; }
 
             return state switch
@@ -152,6 +186,9 @@ namespace Engine.Utilities
 
         public static Vector2 GetAxis() =>
             s_axis.IsNaN() ? Vector2.Zero : s_axis;
+
+        public static Vector2 GetJoystickAxis() =>
+            s_joystickAxis.IsNaN() ? Vector2.Zero : s_axis;
 
         public static Vector2 GetMouseAxis() =>
             s_mouseAxis.IsNaN() ? Vector2.Zero : s_mouseAxis;

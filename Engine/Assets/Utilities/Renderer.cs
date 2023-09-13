@@ -272,22 +272,22 @@ public sealed class Renderer
     public void Dispose()
     {
         // Dispose all DirectX resources that were created.
-        Device.Dispose();
-        DeviceContext.Dispose();
+        Device?.Dispose();
+        DeviceContext?.Dispose();
 
         // Dispose of the swap chain.
-        _swapChain.Dispose();
+        _swapChain?.Dispose();
 
         // Dispose of the render target texture and view.
-        _renderTargetTexture.Dispose();
-        _renderTargetView.Dispose();
+        _renderTargetTexture?.Dispose();
+        _renderTargetView?.Dispose();
 
         // Dispose of the depth stencil texture and view.
-        _depthStencilTexture.Dispose();
-        _depthStencilView.Dispose();
+        _depthStencilTexture?.Dispose();
+        _depthStencilView?.Dispose();
 
         // Dispose of the blend state.
-        _blendState.Dispose();
+        _blendState?.Dispose();
 
     }
 
@@ -303,10 +303,10 @@ public sealed class Renderer
             Math.Max(480, newHeight));
 
         // Dispose the existing render target view, render target texture, depth stencil view, and depth stencil texture.
-        _renderTargetView.Dispose();
-        _renderTargetTexture.Dispose();
-        _depthStencilView.Dispose();
-        _depthStencilTexture.Dispose();
+        _renderTargetView?.Dispose();
+        _renderTargetTexture?.Dispose();
+        _depthStencilView?.Dispose();
+        _depthStencilTexture?.Dispose();
 
         // Resize the swap chain buffers to match the new window size.
         _swapChain.ResizeBuffers(
