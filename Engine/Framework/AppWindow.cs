@@ -6,7 +6,7 @@ using Vortice.Mathematics;
 using Vortice.Win32;
 using VorticeImGui;
 
-namespace Engine
+namespace Engine.Utilities
 {
     class AppWindow
     {
@@ -21,7 +21,6 @@ namespace Engine
         Format format = Format.R8G8B8A8_UNorm;
 
         ImGuiRenderer imGuiRenderer;
-        ImGuiRenderer2 imGuiRenderer2;
         ImGuiInputHandler imGuiInputHandler;
         Stopwatch stopwatch = Stopwatch.StartNew();
         TimeSpan lastFrameTime;
@@ -37,7 +36,6 @@ namespace Engine
             imGuiContext = ImGui.CreateContext();
             ImGui.SetCurrentContext(imGuiContext);
 
-            imGuiRenderer2 = new ImGuiRenderer2(this.device, this.deviceContext);
             imGuiRenderer = new ImGuiRenderer(this.device, this.deviceContext);
             imGuiInputHandler = new ImGuiInputHandler(Win32Window.Handle);
 
@@ -149,9 +147,8 @@ namespace Engine
             dc.ClearRenderTargetView(renderView, new Color4(0, 0, 0));
             dc.OMSetRenderTargets(renderView);
             dc.RSSetViewport(0, 0, Win32Window.Width, Win32Window.Height);
-            
+
             imGuiRenderer.Render(ImGui.GetDrawData());
-            //imGuiRenderer2.Render(ImGui.GetDrawData());
             DoRender();
 
             swapChain.Present(0, PresentFlags.None);

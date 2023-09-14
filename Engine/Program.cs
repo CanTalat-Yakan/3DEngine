@@ -2,7 +2,6 @@ using ImGuiNET;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Vortice.Direct3D11;
-using Vortice.Direct3D;
 using Vortice.Win32;
 
 using static Vortice.Win32.Kernel32;
@@ -10,7 +9,7 @@ using static Vortice.Win32.User32;
 
 namespace Engine
 {
-    class MainWindow : AppWindow
+    sealed class MainWindow : AppWindow
     {
         public MainWindow(Win32Window win32window, ID3D11Device device, ID3D11DeviceContext deviceContext) : base(win32window, device, deviceContext) { }
 
@@ -21,27 +20,18 @@ namespace Engine
         }
     }
 
-    class Program
+    sealed class Program
     {
         const uint PM_REMOVE = 1;
 
+        Dictionary<IntPtr, AppWindow> windows = new();
+
         [STAThread]
-        static void Main()
-        {
+        private static void Main() =>
             new Program().Run();
-        }
 
-        bool quitRequested;
-
-        ID3D11Device device;
-        ID3D11DeviceContext deviceContext;
-
-        Dictionary<IntPtr, AppWindow> windows = new Dictionary<IntPtr, AppWindow>();
-
-        void Run()
+        private void Run()
         {
-            D3D11.D3D11CreateDevice(null, DriverType.Hardware, DeviceCreationFlags.None, null, out device, out deviceContext);
-
             var moduleHandle = GetModuleHandle(null);
 
             var wndClass = new WNDCLASSEX
@@ -58,17 +48,13 @@ namespace Engine
 
             RegisterClassEx(ref wndClass);
 
-            var win32Window = new Win32Window(wndClass.ClassName, "3D Engine", 1600, 1000);
-
+            Win32Window win32Window = new(wndClass.ClassName, "3D Engine", 1600, 1000);
             Core engineCore = new(win32Window);
-
-            var mainWindow = new MainWindow(win32Window, Core.Instance.Renderer.Device, Core.Instance.Renderer.DeviceContext);
-            //var mainWindow = new MainWindow(win32Window, device, deviceContext);
+            MainWindow mainWindow = new(win32Window, engineCore.Renderer.Device, engineCore.Renderer.DeviceContext);
             windows.Add(mainWindow.Win32Window.Handle, mainWindow);
-
-
             mainWindow.Show();
 
+            bool quitRequested = false;
             while (!quitRequested)
             {
                 engineCore.Frame();
@@ -90,7 +76,7 @@ namespace Engine
             }
         }
 
-        IntPtr WndProc(IntPtr hWnd, uint msg, UIntPtr wParam, IntPtr lParam)
+        private IntPtr WndProc(IntPtr hWnd, uint msg, UIntPtr wParam, IntPtr lParam)
         {
             AppWindow window;
             windows.TryGetValue(hWnd, out window);

@@ -33,7 +33,7 @@ PS_INPUT VS(VS_INPUT i)
 float4 PS(PS_INPUT i) : SV_Target
 {
     float4 out_col = i.col * texture0.Sample(sampler0, i.uv);
-    out_col.a *= i.col.a; // Multiply output alpha by input alpha for transparency
+    out_col.a *= i.col.a;
 
     return out_col;
 }

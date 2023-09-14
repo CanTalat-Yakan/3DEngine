@@ -54,8 +54,8 @@ internal partial class Files
         _files = files;
 
         // Assign the ProjectPath value from static property in "Home".
-        AssetsPath = Path.Combine(Home.ProjectPath, "Assets");
-        TemplatesPath = Path.Combine(AppContext.BaseDirectory, Home.TEMPLATES);
+        AssetsPath = Path.Combine(Home.ProjectPath, Engine.Paths.ASSETS);
+        TemplatesPath = Path.Combine(AppContext.BaseDirectory, Engine.Paths.TEMPLATES);
 
         // Call the method to initialize and populate the files categories with a DataTemplate.
         PopulateFilesCategories();

@@ -16,7 +16,7 @@ internal sealed class ImageLoader
         if (fromResources)
         {
             // Combine the base directory and the relative path to the resources directory
-            string resourcesPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Resources");
+            string resourcesPath = Path.Combine(AppContext.BaseDirectory, Paths.TEXTURES);
             // Define the full path to the texture file.
             textureFilePath = Path.Combine(resourcesPath, filePath);
         }

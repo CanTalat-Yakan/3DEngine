@@ -16,8 +16,6 @@ public class Home
     public static string RootPath { get; private set; }
     public static string ProjectPath { get; private set; }
 
-    public static readonly string TEMPLATES = @"Assets\Resources\Templates";
-
     private ModelView.Home _home;
     private WrapPanel _wrap;
     private NavigationView _navigationView;
@@ -158,9 +156,9 @@ public class Home
             path = IncrementFolderIfExists(path);
 
             Directory.CreateDirectory(path);
-            Directory.CreateDirectory(Path.Combine(path, "Assets"));
+            Directory.CreateDirectory(Path.Combine(path, Engine.Paths.ASSETS));
 
-            string zipPath = Path.Combine(AppContext.BaseDirectory, Home.TEMPLATES, "Project.zip");
+            string zipPath = Path.Combine(AppContext.BaseDirectory, Engine.Paths.TEMPLATES, "Project.zip");
             if (File.Exists(zipPath))
                 ZipFile.ExtractToDirectory(zipPath, path);
 

@@ -132,7 +132,7 @@ public class Material
     protected static ReadOnlyMemory<byte> CompileBytecode(string shaderPath, string entryPoint, string profile)
     {
         // Combine the base directory and the relative path to the resources directory.
-        string resourcesPath = Path.Combine(AppContext.BaseDirectory, @"Assets\Resources\");
+        string resourcesPath = Path.Combine(AppContext.BaseDirectory, Paths.SHADERS);
         // Define the full path to the shader file.
         string shaderFilePath = Path.Combine(resourcesPath, shaderPath);
 
