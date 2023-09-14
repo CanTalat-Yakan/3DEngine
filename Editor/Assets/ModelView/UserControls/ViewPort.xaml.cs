@@ -62,7 +62,7 @@ public sealed partial class ViewPort : UserControl
     {
         _renderer = renderer;
 
-        var result = _renderer.Initialization();
+        var result = _renderer.Initialize();
         if (result.Failure)
             throw new Exception(result.Description);
 

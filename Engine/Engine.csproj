@@ -147,11 +147,5 @@
 		<Content Include="Assets\Resources\Textures\UVMap.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-		<Content Include="Assets\Resources\Textures\VS.png">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Assets\Resources\Textures\VS2.png">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
 	</ItemGroup>
 </Project>

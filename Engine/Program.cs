@@ -59,10 +59,13 @@ namespace Engine
             RegisterClassEx(ref wndClass);
 
             var win32Window = new Win32Window(wndClass.ClassName, "3D Engine", 1600, 1000);
-            var mainWindow = new MainWindow(win32Window, device, deviceContext);
-            windows.Add(mainWindow.Win32Window.Handle, mainWindow);
 
             Core engineCore = new(win32Window);
+
+            var mainWindow = new MainWindow(win32Window, Core.Instance.Renderer.Device, Core.Instance.Renderer.DeviceContext);
+            //var mainWindow = new MainWindow(win32Window, device, deviceContext);
+            windows.Add(mainWindow.Win32Window.Handle, mainWindow);
+
 
             mainWindow.Show();
 

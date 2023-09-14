@@ -23,7 +23,7 @@ public class Output
     private static Queue<MessageLog> _logs = new();
 
     public static void Log(object o, MessageType type = MessageType.Message, [CallerLineNumber] int line = 0, [CallerMemberName] string method = null, [CallerFilePath] string script = null) =>
-        _logs.Enqueue(new(o, (MessageType)(int)type, line, method, script));
+        _logs.Enqueue(new(o, type, line, method, script));
 
     public static MessageLog DequeueLog()
     {

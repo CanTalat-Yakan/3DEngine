@@ -28,7 +28,6 @@ public sealed class Renderer
     private ID3D11DepthStencilView _depthStencilView;
     private ID3D11BlendState _blendState;
 
-#if !EDITOR
     private Win32Window _win32Window;
 
     public Renderer(Win32Window win32Window)
@@ -49,11 +48,10 @@ public sealed class Renderer
         // Set the size.
         Size = new Size(_win32Window.Width, _win32Window.Height);
 
-        var result = Initialization(true);
+        var result = Initialize(true);
         if (result.Failure)
             throw new Exception(result.Description);
     }
-#endif
 
     public Renderer(int sizeX = 640, int sizeY = 480)
     {
@@ -65,7 +63,7 @@ public sealed class Renderer
             Math.Max(480, sizeY));
     }
 
-    public Result Initialization(bool forHwnd = false)
+    public Result Initialize(bool forHwnd = false)
     {
         #region //Create device, device context & swap chain with result
         // Create a Direct3D 11 device.

@@ -21,7 +21,8 @@ namespace Engine
         Format format = Format.R8G8B8A8_UNorm;
 
         ImGuiRenderer imGuiRenderer;
-        ImGuiInputHandler imguiInputHandler;
+        ImGuiRenderer2 imGuiRenderer2;
+        ImGuiInputHandler imGuiInputHandler;
         Stopwatch stopwatch = Stopwatch.StartNew();
         TimeSpan lastFrameTime;
 
@@ -36,21 +37,20 @@ namespace Engine
             imGuiContext = ImGui.CreateContext();
             ImGui.SetCurrentContext(imGuiContext);
 
+            imGuiRenderer2 = new ImGuiRenderer2(this.device, this.deviceContext);
             imGuiRenderer = new ImGuiRenderer(this.device, this.deviceContext);
-            imguiInputHandler = new ImGuiInputHandler(Win32Window.Handle);
+            imGuiInputHandler = new ImGuiInputHandler(Win32Window.Handle);
 
             ImGui.GetIO().DisplaySize = new Vector2(Win32Window.Width, Win32Window.Height);
         }
 
-        public void Show()
-        {
+        public void Show() =>
             User32.ShowWindow(Win32Window.Handle, ShowWindowCommand.Normal);
-        }
 
         public virtual bool ProcessMessage(uint msg, UIntPtr wParam, IntPtr lParam)
         {
             ImGui.SetCurrentContext(imGuiContext);
-            if (imguiInputHandler.ProcessMessage((WindowMessage)msg, wParam, lParam))
+            if (imGuiInputHandler.ProcessMessage((WindowMessage)msg, wParam, lParam))
                 return true;
 
             switch ((WindowMessage)msg)
@@ -66,6 +66,7 @@ namespace Engine
                             Win32Window.Width = Utils.Loword(lp);
                             Win32Window.Height = Utils.Hiword(lp);
 
+                            Core.Instance.Renderer.OnSwapChainSizeChanged(Win32Window.Width, Win32Window.Height);
                             resize(); // <-- This is where resizing is handled
                             break;
                         case SizeMessage.SIZE_MINIMIZED:
@@ -92,7 +93,7 @@ namespace Engine
             {
                 var dxgiFactory = device.QueryInterface<IDXGIDevice>().GetParent<IDXGIAdapter>().GetParent<IDXGIFactory>();
 
-                var swapchainDesc = new SwapChainDescription()
+                var swapChainDesc = new SwapChainDescription()
                 {
                     BufferCount = 1,
                     BufferDescription = new ModeDescription(Win32Window.Width, Win32Window.Height, format),
@@ -103,7 +104,7 @@ namespace Engine
                     BufferUsage = Usage.RenderTargetOutput
                 };
 
-                swapChain = dxgiFactory.CreateSwapChain(device, swapchainDesc);
+                swapChain = dxgiFactory.CreateSwapChain(device, swapChainDesc);
                 dxgiFactory.MakeWindowAssociation(Win32Window.Handle, WindowAssociationFlags.IgnoreAll);
 
                 backBuffer = swapChain.GetBuffer<ID3D11Texture2D>(0);
@@ -135,7 +136,7 @@ namespace Engine
 
             io.DisplaySize = new Vector2(Win32Window.Width, Win32Window.Height);
 
-            imguiInputHandler.Update();
+            imGuiInputHandler.Update();
 
             ImGui.NewFrame();
         }
@@ -150,6 +151,7 @@ namespace Engine
             dc.RSSetViewport(0, 0, Win32Window.Width, Win32Window.Height);
             
             imGuiRenderer.Render(ImGui.GetDrawData());
+            //imGuiRenderer2.Render(ImGui.GetDrawData());
             DoRender();
 
             swapChain.Present(0, PresentFlags.None);

@@ -1,39 +1,39 @@
-cbuffer vertexBuffer : register(b2)
+cbuffer vertexBuffer : register(b0) 
 {
-    float4x4 ProjectionMatrix;
+    float4x4 ProjectionMatrix; 
 };
 
-struct appdata
+struct VS_INPUT
 {
     float2 pos : POSITION;
     float4 col : COLOR0;
     float2 uv  : TEXCOORD0;
 };
 
-struct VS_OUTPUT
+struct PS_INPUT
 {
     float4 pos : SV_POSITION;
     float4 col : COLOR0;
     float2 uv  : TEXCOORD0;
 };
 
-Texture2D texture0 : register(t0);
-sampler sampler0 : register(s0);
+sampler sampler0;
+Texture2D texture0;
 
-VS_OUTPUT VS(appdata v)
+PS_INPUT VS(VS_INPUT i)
 {
-    VS_OUTPUT o;
+    PS_INPUT output;
+    output.pos = mul(ProjectionMatrix, float4(i.pos.xy, 0.f, 1.f));
+    output.col = i.col;
+    output.uv  = i.uv;
 
-    o.pos = mul(ProjectionMatrix, float4(v.pos.xy, 0.f, 1.f));
-    o.col = v.col;
-    o.uv = v.uv;
-
-    return o;
+    return output;
 }
 
-float4 PS(VS_OUTPUT i) : SV_Target
+float4 PS(PS_INPUT i) : SV_Target
 {
     float4 out_col = i.col * texture0.Sample(sampler0, i.uv);
+    out_col.a *= i.col.a; // Multiply output alpha by input alpha for transparency
 
     return out_col;
 }

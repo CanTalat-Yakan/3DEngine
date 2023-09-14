@@ -36,12 +36,12 @@ unsafe public class ImGuiRenderer2
 
     Dictionary<IntPtr, ID3D11ShaderResourceView> textureResources = new();
 
-    private static readonly string SHADER_IMGUI = @"Resources\Shader\ImGui.hlsl";
+    private static readonly string SHADER_IMGUI = @"Shader\ImGui.hlsl";
 
-    public ImGuiRenderer2()
+    public ImGuiRenderer2(ID3D11Device device, ID3D11DeviceContext deviceContext)
     {
-        this.device = Renderer.Instance.Device;
-        this.deviceContext = Renderer.Instance.DeviceContext;
+        this.device = device;
+        this.deviceContext = deviceContext;
 
         device.AddRef();
         deviceContext.AddRef();
@@ -57,7 +57,7 @@ unsafe public class ImGuiRenderer2
         ImGui.SetCurrentContext(imGuiContext);
         var io = ImGui.GetIO();
 
-        io.DeltaTime = (float)Time.Delta;
+        io.DeltaTime = Time.DeltaF;
 
         ImGui.NewFrame();
         ImGui.Render();

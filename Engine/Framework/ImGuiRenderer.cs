@@ -145,11 +145,11 @@ namespace VorticeImGui
                     else
                     {
                         var rect = new RawRect((int)(cmd.ClipRect.X - clip_off.X), (int)(cmd.ClipRect.Y - clip_off.Y), (int)(cmd.ClipRect.Z - clip_off.X), (int)(cmd.ClipRect.W - clip_off.Y));
-                        ctx.RSSetScissorRects(new []{rect});
+                        ctx.RSSetScissorRects(new[] { rect });
 
                         textureResources.TryGetValue(cmd.TextureId, out var texture);
                         if (texture != null)
-                            ctx.PSSetShaderResources(0, new[]{ texture });
+                            ctx.PSSetShaderResources(0, new[] { texture });
 
                         ctx.DrawIndexed((int)cmd.ElemCount, (int)(cmd.IdxOffset + global_idx_offset), (int)(cmd.VtxOffset + global_vtx_offset));
                     }
@@ -185,7 +185,7 @@ namespace VorticeImGui
                 MinDepth = 0.0f,
                 MaxDepth = 1.0f,
             };
-            ctx.RSSetViewports(new []{viewport});
+            ctx.RSSetViewports(new[] { viewport });
 
             int stride = sizeof(ImDrawVert);
             int offset = 0;
@@ -194,9 +194,9 @@ namespace VorticeImGui
             ctx.IASetIndexBuffer(indexBuffer, sizeof(ImDrawIdx) == 2 ? Format.R16_UInt : Format.R32_UInt, 0);
             ctx.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
             ctx.VSSetShader(vertexShader);
-            ctx.VSSetConstantBuffers(0, new [] {constantBuffer});
+            ctx.VSSetConstantBuffers(0, new[] { constantBuffer });
             ctx.PSSetShader(pixelShader);
-            ctx.PSSetSamplers(0, new[] {fontSampler});
+            ctx.PSSetSamplers(0, new[] { fontSampler });
             ctx.GSSetShader(null);
             ctx.HSSetShader(null);
             ctx.DSSetShader(null);
@@ -222,7 +222,7 @@ namespace VorticeImGui
                 ArraySize = 1,
                 Format = Format.R8G8B8A8_UNorm,
                 SampleDescription = new SampleDescription { Count = 1 },
-                Usage = Vortice.Direct3D11.ResourceUsage.Default,
+                Usage = ResourceUsage.Default,
                 BindFlags = BindFlags.ShaderResource,
                 CPUAccessFlags = CpuAccessFlags.None
             };
@@ -319,7 +319,7 @@ namespace VorticeImGui
             var constBufferDesc = new BufferDescription
             {
                 ByteWidth = VertexConstantBufferSize,
-                Usage = Vortice.Direct3D11.ResourceUsage.Dynamic,
+                Usage = ResourceUsage.Dynamic,
                 BindFlags = BindFlags.ConstantBuffer,
                 CPUAccessFlags = CpuAccessFlags.Write
             };
@@ -338,8 +338,9 @@ namespace VorticeImGui
             
                     float4 main(PS_INPUT input) : SV_Target
                     {
-                        float4 out_col = input.col * texture0.Sample(sampler0, input.uv); 
-                        return out_col; 
+                        float4 out_col = input.col * texture0.Sample(sampler0, input.uv);
+                        out_col.a *= input.col.a; // Multiply output alpha by input alpha for transparency
+                        return out_col;
                     }";
 
             Compiler.Compile(pixelShaderCode, "main", "ps", "ps_4_0", out pixelShaderBlob, out errorBlob);
@@ -348,9 +349,21 @@ namespace VorticeImGui
 
             pixelShader = device.CreatePixelShader(pixelShaderBlob.AsBytes());
 
+            RenderTargetBlendDescription renTarDesc = new()
+            {
+                BlendEnable = true, // Enable blend.
+                SourceBlend = Blend.SourceAlpha,
+                DestinationBlend = Blend.InverseSourceAlpha,
+                BlendOperation = BlendOperation.Add,
+                SourceBlendAlpha = Blend.One,
+                DestinationBlendAlpha = Blend.Zero,
+                BlendOperationAlpha = BlendOperation.Add,
+                RenderTargetWriteMask = ColorWriteEnable.All
+            };
+
             var blendDesc = new BlendDescription
             {
-                AlphaToCoverageEnable = false
+                AlphaToCoverageEnable = false,
             };
 
             blendDesc.RenderTarget[0] = new RenderTargetBlendDescription
@@ -364,6 +377,8 @@ namespace VorticeImGui
                 BlendOperationAlpha = BlendOperation.Add,
                 RenderTargetWriteMask = ColorWriteEnable.All
             };
+
+            blendDesc.RenderTarget[0] = renTarDesc;
 
             blendState = device.CreateBlendState(blendDesc);
 
