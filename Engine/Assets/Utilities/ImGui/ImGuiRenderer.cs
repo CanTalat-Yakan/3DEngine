@@ -64,7 +64,9 @@ unsafe public class ImGuiRenderer
 
     public void InitializeSwapChain()
     {
-        var dxgiFactory = _device.QueryInterface<IDXGIDevice>().GetAdapter().GetParent<IDXGIFactory>();
+        //var dxgiFactory = _device.QueryInterface<IDXGIDevice>().GetAdapter().GetParent<IDXGIFactory>();
+        //dxgiFactory.CreateSwapChain(_device, new());
+        //dxgiFactory.MakeWindowAssociation(_win32Window.Handle, WindowAssociationFlags.Valid);
 
         // Initialize the SwapChainDescription structure.
         SwapChainDescription1 swapChainDescription1 = new()
@@ -89,8 +91,7 @@ unsafe public class ImGuiRenderer
         IDXGISwapChain1 swapChain1 = dxgiFactory2.CreateSwapChainForHwnd(dxgiDevice3, _win32Window.Handle, swapChainDescription1);
 
         _swapChain = swapChain1.QueryInterface<IDXGISwapChain2>();
-
-        dxgiFactory.MakeWindowAssociation(_win32Window.Handle, WindowAssociationFlags.Valid);
+        _swapChain.BackgroundColor = new Color4(0, 0, 0, 0);
 
         _renderTargetTexture = _swapChain.GetBuffer<ID3D11Texture2D>(0);
         _renderTargetView = _device.CreateRenderTargetView(_renderTargetTexture);
@@ -243,13 +244,13 @@ unsafe public class ImGuiRenderer
         int offset = 0;
 
         _deviceContext.IASetInputLayout(_inputLayout);
-        _deviceContext.IASetVertexBuffers(0, 1, new[] { _vertexBuffer }, new[] { stride }, new[] { offset });
+        _deviceContext.IASetVertexBuffer(0, _vertexBuffer, stride, offset);
         _deviceContext.IASetIndexBuffer(_indexBuffer, sizeof(ImDrawIdx) == 2 ? Format.R16_UInt : Format.R32_UInt, 0);
         _deviceContext.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
         _deviceContext.VSSetShader(_vertexShader);
-        _deviceContext.VSSetConstantBuffers(0, new[] { _constantBuffer });
+        _deviceContext.VSSetConstantBuffer(0, _constantBuffer);
         _deviceContext.PSSetShader(_pixelShader);
-        _deviceContext.PSSetSamplers(0, new[] { _fontSampler });
+        _deviceContext.PSSetSampler(0, _fontSampler);
         _deviceContext.GSSetShader(null);
         _deviceContext.HSSetShader(null);
         _deviceContext.DSSetShader(null);
@@ -281,21 +282,9 @@ unsafe public class ImGuiRenderer
             CPUAccessFlags = CpuAccessFlags.Write
         };
         _constantBuffer = _device.CreateBuffer(constBufferDesc);
-
+        
         ReadOnlyMemory<byte> pixelShaderByteCode = CompileBytecode("ImGui.hlsl", "PS", "ps_4_0");
         _pixelShader = _device.CreatePixelShader(pixelShaderByteCode.Span);
-
-        RenderTargetBlendDescription renTarDesc = new()
-        {
-            BlendEnable = true, // Enable blend.
-            SourceBlend = Blend.SourceAlpha,
-            DestinationBlend = Blend.InverseSourceAlpha,
-            BlendOperation = BlendOperation.Add,
-            SourceBlendAlpha = Blend.One,
-            DestinationBlendAlpha = Blend.Zero,
-            BlendOperationAlpha = BlendOperation.Add,
-            RenderTargetWriteMask = ColorWriteEnable.All
-        };
 
         BlendDescription blendDesc = new()
         {
@@ -308,14 +297,11 @@ unsafe public class ImGuiRenderer
             SourceBlend = Blend.SourceAlpha,
             DestinationBlend = Blend.InverseSourceAlpha,
             BlendOperation = BlendOperation.Add,
-            SourceBlendAlpha = Blend.InverseSourceAlpha,
+            SourceBlendAlpha = Blend.One,
             DestinationBlendAlpha = Blend.Zero,
             BlendOperationAlpha = BlendOperation.Add,
             RenderTargetWriteMask = ColorWriteEnable.All
         };
-
-        blendDesc.RenderTarget[0] = renTarDesc;
-
         _blendState = _device.CreateBlendState(blendDesc);
 
         RasterizerDescription rasterDesc = new()

@@ -38,7 +38,7 @@
                               Click="AppBarButton_Click_OpenVisualStudio"
                               ToolTipService.ToolTip="Open Visual Studio">
                     <AppBarButton.Icon>
-                        <BitmapIcon UriSource="/Assets/Resources/Textures/VS2.png" />
+                        <BitmapIcon UriSource="/Assets/Resources/Textures/VS.png" />
                     </AppBarButton.Icon>
                 </AppBarButton>
             </CommandBar.SecondaryCommands>

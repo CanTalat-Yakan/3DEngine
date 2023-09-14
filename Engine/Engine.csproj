@@ -111,7 +111,7 @@
 		<Content Include="Assets\Resources\Templates\Shaders.txt">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-		<Content Include="Assets\Resources\Textures\dark.png">
+		<Content Include="Assets\Resources\Textures\Dark.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Resources\Textures\Default.png">
@@ -143,6 +143,9 @@
 		</Content>
 		<Content Include="Assets\Resources\Textures\SkyGradient_Light.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Assets\Resources\Textures\Transparent.png">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Resources\Textures\UVMap.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

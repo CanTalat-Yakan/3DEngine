@@ -60,7 +60,7 @@ public sealed class Renderer
             Instance = this;
 
         Size = new Size(
-            Math.Max(640, sizeX), 
+            Math.Max(640, sizeX),
             Math.Max(480, sizeY));
 
         var result = Initialize();
@@ -106,7 +106,7 @@ public sealed class Renderer
             SwapEffect = SwapEffect.FlipSequential,
             BufferUsage = Usage.RenderTargetOutput
         };
-        
+
         try
         {
             // Obtain instance of the IDXGIDevice3 interface from the Direct3D device.
@@ -119,6 +119,7 @@ public sealed class Renderer
                 : dxgiFactory2.CreateSwapChainForComposition(dxgiDevice3, swapChainDescription1);
 
             _swapChain = swapChain1.QueryInterface<IDXGISwapChain2>();
+            _swapChain.BackgroundColor = new Color4(0, 0, 0, 0);
         }
         catch (Exception e)
         {
@@ -185,7 +186,10 @@ public sealed class Renderer
 
         #region //Create Blend State
         // Set up the blend state description.
-        BlendDescription blendStateDesc = new();
+        BlendDescription blendStateDesc = new()
+        {
+            AlphaToCoverageEnable = false
+        };
 
         // Render target blend description setup.
         RenderTargetBlendDescription renTarDesc = new()
@@ -241,7 +245,7 @@ public sealed class Renderer
     public void Clear()
     {
         // Set the background color to a dark gray.
-        var col = new Color4(0.15f, 0.15f, 0.15f, 1);
+        var col = new Color4(0.15f, 0.15f, 0.15f, 0);
 
         // Clear the render target view and depth stencil view with the set color.
         DeviceContext.ClearRenderTargetView(_renderTargetView, col);

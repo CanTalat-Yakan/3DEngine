@@ -41,7 +41,7 @@ sealed class Program
         #region // Instance Engine and AppWindow, then show Window
         _engineCore = new(win32Window);
 
-        D3D11.D3D11CreateDevice(null, DriverType.Hardware, DeviceCreationFlags.None, null, out var device, out var deviceContext);
+        D3D11.D3D11CreateDevice(null, DriverType.Hardware, DeviceCreationFlags.BgraSupport, null, out var device, out var deviceContext);
         _appWindow = new(win32Window, device, deviceContext);
 
         _appWindow.Show();
