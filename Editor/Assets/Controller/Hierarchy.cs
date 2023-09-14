@@ -18,7 +18,7 @@ namespace Editor.Controller;
 internal class TreeEntry
 {
     public Guid ID;
-    public Guid? IDparent;
+    public Guid? ParentID;
     public string Name;
 
     public TreeViewIconNode IconNode;
@@ -53,7 +53,7 @@ internal partial class Hierarchy
         SceneEntry = new() { ID = SceneManager.MainScene.ID, Name = SceneManager.MainScene.Name, Hierarchy = new(), DataSource = new() };
         SubsceneEntries = new();
 
-        CreateDefaultHierarchy();
+        CreateHierarchy();
     }
 
     public void SetProperties(TreeView treeView)
@@ -72,7 +72,7 @@ internal partial class Hierarchy
         Properties.Set(entity);
     }
 
-    private void CreateDefaultHierarchy()
+    private void CreateHierarchy()
     {
         _stackPanel.Children.Add(CreateSceneHierarchy(SceneEntry).StackInGrid().WrapInExpander("Scene").AddContentFlyout(CreateRootMenuFlyout()));
         _stackPanel.Children.Add(CreateSeperator());
@@ -141,7 +141,7 @@ internal partial class Hierarchy
         TreeEntry treeEntry = new() { Name = entity.Name, ID = entity.ID };
         treeEntry.IconNode = new() { Name = treeEntry.Name, TreeEntry = treeEntry, IsExpanded = false };
         treeEntry.IconNode.IsActive = true;
-        treeEntry.IDparent = entity.Parent is not null ? entity.Parent.ID : null;
+        treeEntry.ParentID = entity.Parent is not null ? entity.Parent.ID : null;
 
         var components = entity.GetComponents();
         treeEntry.IconNode.Camera = components.OfType<Camera>().Any();
@@ -163,7 +163,7 @@ internal partial class Hierarchy
     {
         var treeEntry = GetTreeEntry(entity.ID);
 
-        if(treeEntry is null) 
+        if (treeEntry is null)
             return;
 
         TreeEntry parent;
@@ -516,7 +516,7 @@ internal partial class Hierarchy
 
     private TreeEntry GetParent(TreeEntry treeEntry, SceneEntry sceneEntry = null)
     {
-        if (treeEntry.IDparent is null)
+        if (treeEntry.ParentID is null)
             return null;
 
         List<TreeEntry> hierarchy;
@@ -526,7 +526,7 @@ internal partial class Hierarchy
             hierarchy = GetSceneEntry(treeEntry).Hierarchy;
 
         foreach (var entry in hierarchy)
-            if (entry.ID == treeEntry.IDparent.Value)
+            if (entry.ID == treeEntry.ParentID.Value)
                 return entry;
 
         return null;
@@ -543,8 +543,8 @@ internal partial class Hierarchy
             hierarchy = GetSceneEntry(treeEntry).Hierarchy;
 
         foreach (var entry in hierarchy)
-            if (entry.IDparent is not null)
-                if (entry.IDparent.Value == treeEntry.ID)
+            if (entry.ParentID is not null)
+                if (entry.ParentID.Value == treeEntry.ID)
                     list.Add(entry);
 
         return list.ToArray();
@@ -728,7 +728,7 @@ internal partial class Hierarchy : Controller.Helper
         // Iterate over the given TreeViewIconNodes and update their parent TreeEntry and parent Entity.
         foreach (var node in treeViewIconNodes)
         {
-            (node.TreeEntry).IDparent = (newParent.TreeEntry).ID;
+            (node.TreeEntry).ParentID = (newParent.TreeEntry).ID;
             GetEntity(node.TreeEntry).Parent = GetEntity(newParent.TreeEntry);
         }
     }
@@ -871,7 +871,7 @@ internal partial class Hierarchy : Controller.Helper
                     MigrateTreeEntryBetweenHierarchies(childIconNode.TreeEntry, sourceSceneEntry, sourceTreeEntry, null);
 
                 // Move the source entity to the target entity.
-                sourceTreeEntry.IDparent = targetTreeEntry.ID;
+                sourceTreeEntry.ParentID = targetTreeEntry.ID;
                 sourceEntity.Parent = targetEntity;
 
                 ResetClipboard();
@@ -942,7 +942,7 @@ internal partial class Hierarchy : Controller.Helper
                     MigrateTreeEntryBetweenHierarchies(childIconNode.TreeEntry, sourceSceneEntry, sourceTreeEntry, null);
 
                 // Set the Parent and IDparent of the sourceTreeEntry to null.
-                sourceTreeEntry.IDparent = null;
+                sourceTreeEntry.ParentID = null;
                 sourceEntity.Parent = null;
 
                 ResetClipboard();

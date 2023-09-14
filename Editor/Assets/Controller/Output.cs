@@ -24,13 +24,18 @@ namespace Editor.Controller
         public MessageType Type;
         public string Script;
         public string Method;
-        public int Line;
+        public int? Line;
         public string Message;
 
-        public string GetInfo() =>
-            Method is not null
-                ? Script.Split("\\").Last() + $":{Line} ({Method})"
-                : Script.Split("\\").Last() + $":{Line}";
+        public readonly string GetInfo()
+        {
+            if (Script is not null)
+                return Method is not null
+                   ? Script.Split("\\").Last() + $":{Line} ({Method})"
+                   : Script.Split("\\").Last() + $":{Line}";
+
+            return string.Empty;
+        }
     }
 
     public class Output
@@ -255,18 +260,27 @@ namespace Editor.Controller
 
             // The flyout when clicked on the message.
             StackPanel stackFlyout = new() { Orientation = Orientation.Vertical };
-            stackFlyout.Children.Add(new TextBlock() { Text = m.GetInfo() + "\n" });
-            stackFlyout.Children.Add(new MarkdownTextBlock() { Text = m.Message, TextWrapping = TextWrapping.WrapWholeWords, Width = 400, Padding = new Thickness(2) });
-
-            string filePath = "";
             if (!string.IsNullOrEmpty(m.Script))
-                filePath = Path.GetRelativePath(Directory.GetCurrentDirectory(), m.Script);
-            HyperlinkButton hyperlinkButton = new() { Content = filePath + ":" + m.Line, Width = 400, HorizontalContentAlignment = HorizontalAlignment.Left, Foreground = new SolidColorBrush(Colors.CadetBlue) };
-            if (File.Exists(filePath))
-                hyperlinkButton.Click += (s, e) => Process.Start(new ProcessStartInfo { FileName = filePath, UseShellExecute = true });
+                stackFlyout.Children.Add(new TextBlock() { Text = m.GetInfo() + "\n" });
 
-            stackFlyout.Children.Add(hyperlinkButton);
+            stackFlyout.Children.Add(new MarkdownTextBlock() { Text = m.Message, TextWrapping = TextWrapping.Wrap, Width = 800, Padding = new(8) });
+
+            if (!string.IsNullOrEmpty(m.Script))
+            {
+                var filePath = Path.GetRelativePath(Directory.GetCurrentDirectory(), m.Script);
+
+                HyperlinkButton hyperlinkButton = new() { Content = filePath + ":" + m.Line, HorizontalContentAlignment = HorizontalAlignment.Stretch, Foreground = new SolidColorBrush(Colors.CadetBlue) };
+                if (File.Exists(filePath))
+                    hyperlinkButton.Click += (s, e) => Process.Start(new ProcessStartInfo { FileName = filePath, UseShellExecute = true });
+
+                stackFlyout.Children.Add(hyperlinkButton);
+            }
+
             Flyout flyout = new Flyout() { OverlayInputPassThroughElement = stack, Content = stackFlyout };
+
+            Style style = new Style { TargetType = typeof(FlyoutPresenter) };
+            style.Setters.Add(new Setter(FlyoutPresenter.MinWidthProperty, "830"));
+            flyout.FlyoutPresenterStyle = style;
 
             // Create main grid that gets returned
             Grid grid = new() { HorizontalAlignment = HorizontalAlignment.Stretch };

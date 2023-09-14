@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Editor.Controller;
 
-internal class GridDataTemeplate
+internal class GridDataTemplate
 {
     public GridLength Length = new(1, GridUnitType.Star);
     public double MinWidth = 1;
@@ -30,7 +30,7 @@ internal partial class Layout
     public ModelView.Files Files;
     public Grid TabsRoot;
 
-    public bool OneCollumnPaneLayout = true;
+    public bool OneColumnPaneLayout = true;
     public List<Grid> GridsToClear = new();
 
     public Layout(Grid content,
@@ -82,8 +82,8 @@ internal partial class Layout
 
     public void SwitchPaneLayout()
     {
-        //Inverse bool variable OneCollumnPaneLayout that toggles between a one collumn and two collumn layout.
-        OneCollumnPaneLayout = !OneCollumnPaneLayout;
+        //Inverse bool variable OneColumnPaneLayout that toggles between a one column and two column layout.
+        OneColumnPaneLayout = !OneColumnPaneLayout;
 
         //Loop through all grids in GridsToClear and clear their children
         foreach (var grid in GridsToClear)
@@ -92,27 +92,27 @@ internal partial class Layout
         //Clear the children of PaneRoot
         PaneRoot.Children.Clear();
 
-        //Check if the layout is one collumn, if so add the Hierarchy and PropertiesRoot to PaneRoot vertically
-        if (OneCollumnPaneLayout)
+        //Check if the layout is one column, if so add the Hierarchy and PropertiesRoot to PaneRoot vertically
+        if (OneColumnPaneLayout)
             PaneRoot.Children.Add(PairVertical(
                 new() { Content = WrapGrid(Hierarchy, GridsToClear), MinHeight = 0 },
                 new() { Content = WrapGrid(PropertiesRoot, GridsToClear), MinHeight = 0, Length = new(1, GridUnitType.Star) },
                 true, true));
-        //If not a one collumn layout, add the Hierarchy and PropertiesRoot to PaneRoot horizontally
+        //If not a one column layout, add the Hierarchy and PropertiesRoot to PaneRoot horizontally
         else
             PaneRoot.Children.Add(PairHorizontal(
                 new() { Content = WrapGrid(Hierarchy, GridsToClear), MinWidth = 0 },
                 new() { Content = WrapGrid(PropertiesRoot, GridsToClear), MinWidth = 0, Length = new(1, GridUnitType.Star) },
                 false, true));
 
-        //Set the OpenPaneLength of the SplitView to be 333 pixels if OneCollumnPaneLayout is true, and 666 pixels otherwise.
-        SplitView.OpenPaneLength = OneCollumnPaneLayout ? 333 : 666;
+        //Set the OpenPaneLength of the SplitView to be 333 pixels if OneColumnPaneLayout is true, and 666 pixels otherwise.
+        SplitView.OpenPaneLength = OneColumnPaneLayout ? 333 : 666;
     }
 }
 
 internal partial class Layout
 {
-    private Grid PairVertical(GridDataTemeplate top, GridDataTemeplate bottom, bool gridSplitter = true, bool seperator = false)
+    private Grid PairVertical(GridDataTemplate top, GridDataTemplate bottom, bool gridSplitter = true, bool separator = false)
     {
         Grid grid = new();
         Grid grid2 = new();
@@ -134,17 +134,17 @@ internal partial class Layout
         if (gridSplitter)
             grid2.Children.Add(splitV);
 
-        AppBarSeparator separator = new() { HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(-2, 0, 0, 0) };
+        AppBarSeparator appBarSeparator = new() { HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(-2, 0, 0, 0) };
         grid.Children.Add(grid2);
-        if (seperator)
-            grid.Children.Add(separator);
+        if (separator)
+            grid.Children.Add(appBarSeparator);
 
         BindingOperations.SetBinding(bottomRowDefinition, RowDefinition.HeightProperty, new Binding() { ElementName = "x_AppBarToggleButton_Status_OpenPane", Path = new("IsChecked"), Converter = new BooleanToRowHeightConverter(bottom.Length) });
 
         return grid;
     }
 
-    private Grid PairHorizontal(GridDataTemeplate left, GridDataTemeplate right, bool gridSplitter = true, bool seperator = false)
+    private Grid PairHorizontal(GridDataTemplate left, GridDataTemplate right, bool gridSplitter = true, bool separator = false)
     {
         Grid grid = new();
         Grid grid2 = new() { ColumnSpacing = gridSplitter ? 16 : 0 };
@@ -169,15 +169,15 @@ internal partial class Layout
         else
             grid2.Children.Add(new AppBarSeparator() { HorizontalAlignment = HorizontalAlignment.Right, Margin = new(0, 0, -2, 0) });
 
-        AppBarSeparator separator = new() { HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(-2, 0, 0, 0) };
+        AppBarSeparator appBarSeparator = new() { HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(-2, 0, 0, 0) };
         grid.Children.Add(grid2);
-        if (seperator)
-            grid.Children.Add(separator);
+        if (separator)
+            grid.Children.Add(appBarSeparator);
 
         return grid;
     }
 
-    private Grid PairHorizontal(GridDataTemeplate left, GridDataTemeplate center, GridDataTemeplate right, bool gridSplitter = true)
+    private Grid PairHorizontal(GridDataTemplate left, GridDataTemplate center, GridDataTemplate right, bool gridSplitter = true)
     {
         Grid grid = new() { ColumnSpacing = 16 };
         grid.ColumnDefinitions.Add(new() { Width = left.Length, MinWidth = left.MinWidth });

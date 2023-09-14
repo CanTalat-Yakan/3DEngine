@@ -72,12 +72,16 @@ namespace Engine.Utilities
             }
             else
             {
-                scriptEntry = new() { FileInfo = fileInfo };
-                string code = File.ReadAllText(path);
-                scriptEntry.Script = CSharpScript.Create(code, CreateScriptOptions());
-                _scriptsCollection.Add(fileInfo.FullName, scriptEntry);
+                using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+                using (StreamReader reader = new StreamReader(fs))
+                {
+                    scriptEntry = new ScriptEntry() { FileInfo = fileInfo };
+                    string code = reader.ReadToEnd();
+                    scriptEntry.Script = CSharpScript.Create(code, CreateScriptOptions());
+                    _scriptsCollection.Add(fileInfo.FullName, scriptEntry);
 
-                Output.Log("Read new file");
+                    Output.Log("Read new file");
+                }
             }
 
             return scriptEntry;

@@ -13,8 +13,6 @@ public sealed partial class Hierarchy : UserControl
     {
         this.InitializeComponent();
 
-        Controller.Main.Instance.Content.Loaded += (s, e) =>
-            Controller.Main.Instance.LayoutControl.ViewPort.Loaded += (s, e) =>
                 _hierarchyControl = new(this, x_StackPanel_Hierarchy);
     }
 

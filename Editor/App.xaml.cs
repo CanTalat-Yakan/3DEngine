@@ -76,6 +76,8 @@ public partial class App : Application
             if (Main.Instance is not null)
                 Output.Log(e.Exception, MessageType.Error, lineNumber, methodName, fileName);
 
+            Debug.WriteLine("\n");
+
             // Mark the event as handled to prevent it from being processed further.
             e.Handled = true;
         };

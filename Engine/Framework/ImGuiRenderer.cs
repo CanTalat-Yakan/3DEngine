@@ -8,6 +8,7 @@ using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
 using Vortice;
+
 using ImDrawIdx = System.UInt16;
 
 namespace VorticeImGui

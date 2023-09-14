@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using Vortice.Direct3D11;
 using Vortice.Direct3D;
 using Vortice.Win32;
+
 using static Vortice.Win32.Kernel32;
 using static Vortice.Win32.User32;
 

@@ -1,6 +1,7 @@
-﻿using static Vortice.Win32.User32;
+﻿using ImGuiNET;
 using Vortice.Win32;
-using ImGuiNET;
+
+using static Vortice.Win32.User32;
 
 namespace VorticeImGui
 {

@@ -1,11 +1,13 @@
 ﻿global using System.Numerics;
 global using System;
+
 global using Engine.Components;
 global using Engine.Data;
 global using Engine.ECS;
 global using Engine.Editor;
 global using Engine.Helper;
 global using Engine.Utilities;
+
 global using Key = Vortice.DirectInput.Key;
 
 namespace Engine;

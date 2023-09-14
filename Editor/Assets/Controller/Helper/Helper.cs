@@ -10,9 +10,12 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Text;
+using System;
 using Windows.ApplicationModel;
 using Windows.Foundation;
+
 using ColorPicker = CommunityToolkit.WinUI.UI.Controls.ColorPicker;
 using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
 using Expander = Microsoft.UI.Xaml.Controls.Expander;
@@ -20,8 +23,6 @@ using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
 using Image = Microsoft.UI.Xaml.Controls.Image;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 using Rectangle = Microsoft.UI.Xaml.Shapes.Rectangle;
-using System;
-using System.Numerics;
 
 namespace Editor.Controller;
 

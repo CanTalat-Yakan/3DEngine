@@ -10,7 +10,8 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <local:CustomGrid x:Name="x_CustomGrid">
-        <muxc:SwapChainPanel x:Name="x_SwapChainPanel_ViewPort" MinWidth="1" MinHeight="1"/>
+        <muxc:SwapChainPanel x:Name="x_SwapChainPanel_ViewPort" MinWidth="1" MinHeight="1" 
+                             SizeChanged="x_SwapChainPanel_ViewPort_SizeChanged"/>
 
         <Grid x:Name="x_Grid_Overlay"/>
     </local:CustomGrid>

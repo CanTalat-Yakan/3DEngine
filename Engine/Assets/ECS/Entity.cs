@@ -23,7 +23,7 @@ namespace Engine.ECS
     {
         Default,
         TransparentFX,
-        IgnoreRaycast,
+        IgnoreRayCast,
         Water,
         UI
     }

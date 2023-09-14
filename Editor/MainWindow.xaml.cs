@@ -19,7 +19,7 @@ public sealed partial class MainWindow : WindowEx
     {
         this.InitializeComponent();
 
-        ExtendsContentIntoTitleBar = true; // enable custom titlebar
+        ExtendsContentIntoTitleBar = true; // enable custom title bar
 
         _themeControl = new(this, x_Page_Main);
     }
