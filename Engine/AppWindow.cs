@@ -71,11 +71,7 @@ class AppWindow
                         _win32Window.Width = Utils.Loword(lp);
                         _win32Window.Height = Utils.Hiword(lp);
 
-                        Core.Instance.Renderer.OnSwapChainSizeChanged(_win32Window.Width, _win32Window.Height);
-                        Core.Instance.Frame();
-
-                        _imGuiRenderer.Resize(); // <-- This is where resizing is handled
-                        Render();
+                        Resize(); // <-- This is where resizing is handled
                         break;
                     case SizeMessage.SIZE_MINIMIZED:
                         _win32Window.IsMinimized = true;
@@ -87,5 +83,14 @@ class AppWindow
         }
 
         return false;
+    }
+
+    public void Resize()
+    {
+        Core.Instance.Renderer.OnSwapChainSizeChanged(_win32Window.Width, _win32Window.Height);
+        Core.Instance.Frame();
+
+        _imGuiRenderer.Resize(); 
+        Render();
     }
 }

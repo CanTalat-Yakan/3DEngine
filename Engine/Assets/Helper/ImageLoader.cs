@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+
 using Vortice.Direct3D11;
 using Vortice.DXGI;
 using Vortice.WIC;

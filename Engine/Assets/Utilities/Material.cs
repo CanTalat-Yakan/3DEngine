@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Runtime.CompilerServices;
+
 using Vortice.D3DCompiler;
 using Vortice.Direct3D11;
 using Vortice.DXGI;
