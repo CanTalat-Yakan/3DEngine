@@ -48,24 +48,22 @@ unsafe public class ImGuiRenderer
 
     private Win32Window _win32Window;
 
-    public ImGuiRenderer(ID3D11Device device, ID3D11DeviceContext deviceContext)
+    public ImGuiRenderer(Win32Window win32Window, ID3D11Device device, ID3D11DeviceContext deviceContext)
     {
+        _win32Window = win32Window;
+
         _device = device;
         _deviceContext = deviceContext;
-
-        device.AddRef();
-        deviceContext.AddRef();
 
         var io = ImGuiNET.ImGui.GetIO();
         io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;  // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
 
+        InitializeSwapChain();
         CreateMaterial();
     }
 
-    public void InitializeSwapChain(Win32Window win32Window)
+    public void InitializeSwapChain()
     {
-        _win32Window = win32Window;
-
         var dxgiFactory = _device.QueryInterface<IDXGIDevice>().GetAdapter().GetParent<IDXGIFactory>();
 
         // Initialize the SwapChainDescription structure.

@@ -27,7 +27,7 @@ class AppWindow
         _imGuiContext = ImGuiNET.ImGui.CreateContext();
         ImGuiNET.ImGui.SetCurrentContext(_imGuiContext);
 
-        _imGuiRenderer = new ImGuiRenderer(_device, _deviceContext);
+        _imGuiRenderer = new ImGuiRenderer(_win32Window, _device, _deviceContext);
         _imGuiInputHandler = new ImGuiInputHandler(_win32Window.Handle);
 
         ImGuiNET.ImGui.GetIO().DisplaySize = new Vector2(_win32Window.Width, _win32Window.Height);
@@ -63,9 +63,6 @@ class AppWindow
         ImGuiNET.ImGui.SetCurrentContext(_imGuiContext);
         if (_imGuiInputHandler.ProcessMessage((WindowMessage)msg, wParam, lParam))
             return true;
-
-        if (!_imGuiRenderer.IsRendering)
-            _imGuiRenderer.InitializeSwapChain(_win32Window);
 
         switch ((WindowMessage)msg)
         {
