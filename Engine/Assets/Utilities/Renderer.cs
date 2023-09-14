@@ -293,7 +293,7 @@ public sealed class Renderer
 
     }
 
-    public void OnSwapChainSizeChanged(int newWidth, int newHeight)
+    public void Resize(int newWidth, int newHeight)
     {
         if (!IsRendering)
             return;

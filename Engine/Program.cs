@@ -62,14 +62,21 @@ sealed class Program
                 {
                     quitRequested = true;
 
+                    _appWindow?.Dispose();
+
                     break;
                 }
             }
 
-            _appWindow.Render();
-            _engineCore.Frame();
+            Loop();
         }
         #endregion
+    }
+
+    private void Loop()
+    {
+        _engineCore.Frame();
+        _appWindow.Render();
     }
 
     private IntPtr WndProc(IntPtr hWnd, uint msg, UIntPtr wParam, IntPtr lParam)

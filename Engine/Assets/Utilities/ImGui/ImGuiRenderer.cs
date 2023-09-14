@@ -98,10 +98,6 @@ unsafe public class ImGuiRenderer
         _renderTargetView = _device.CreateRenderTargetView(_renderTargetTexture);
     }
 
-    public void Present() =>
-        // Present the final render to the screen.
-        _swapChain.Present(0, PresentFlags.None);
-
     public void Update(IntPtr imGuiContext, Vector2 newSize)
     {
         ImGuiNET.ImGui.SetCurrentContext(imGuiContext);
@@ -113,9 +109,16 @@ unsafe public class ImGuiRenderer
         ImGuiNET.ImGui.NewFrame();
     }
 
+    public void Present() =>
+        // Present the final render to the screen.
+        _swapChain.Present(0, PresentFlags.None);
+
     public void Render()
     {
-        _deviceContext.ClearRenderTargetView(_renderTargetView, new Color4(0, 0, 10, 0));
+        // Set the background color to a dark gray.
+        var col = new Color4(0.1f, 0.1f, 0.1f, 0);
+
+        _deviceContext.ClearRenderTargetView(_renderTargetView, col);
         _deviceContext.OMSetRenderTargets(_renderTargetView);
         _deviceContext.RSSetViewport(0, 0, _win32Window.Width, _win32Window.Height);
 
@@ -426,31 +429,25 @@ unsafe public class ImGuiRenderer
 
         InvalidateDeviceObjects();
 
-        ReleaseAndNullify(ref _device);
-        ReleaseAndNullify(ref _deviceContext);
+        _device?.Release();
+        _deviceContext?.Release();
     }
 
     private void InvalidateDeviceObjects()
     {
-        ReleaseAndNullify(ref _fontSampler);
-        ReleaseAndNullify(ref _fontTextureView);
-        ReleaseAndNullify(ref _indexBuffer);
-        ReleaseAndNullify(ref _vertexBuffer);
-        ReleaseAndNullify(ref _blendState);
-        ReleaseAndNullify(ref _depthStencilState);
-        ReleaseAndNullify(ref _rasterizerState);
-        ReleaseAndNullify(ref _pixelShader);
-        ReleaseAndNullify(ref _pixelShaderBlob);
-        ReleaseAndNullify(ref _constantBuffer);
-        ReleaseAndNullify(ref _inputLayout);
-        ReleaseAndNullify(ref _vertexShader);
-        ReleaseAndNullify(ref _vertexShaderBlob);
-    }
-
-    private void ReleaseAndNullify<T>(ref T o) where T : SharpGen.Runtime.ComObject
-    {
-        o.Release();
-        o = null;
+        _fontSampler?.Release();
+        _fontTextureView?.Release();
+        _indexBuffer?.Release();
+        _vertexBuffer?.Release();
+        _blendState?.Release();
+        _depthStencilState?.Release();
+        _rasterizerState?.Release();
+        _pixelShader?.Release();
+        _pixelShaderBlob?.Release();
+        _constantBuffer?.Release();
+        _inputLayout?.Release();
+        _vertexShader?.Release();
+        _vertexShaderBlob?.Release();
     }
 
     protected static ReadOnlyMemory<byte> CompileBytecode(string shaderName, string entryPoint, string profile)

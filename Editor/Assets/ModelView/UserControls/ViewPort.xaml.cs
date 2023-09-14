@@ -73,7 +73,7 @@ public sealed partial class ViewPort : UserControl
 
     private void x_SwapChainPanel_ViewPort_SizeChanged(object sender, SizeChangedEventArgs e) =>
         // Register an event handler for the SizeChanged event of the SwapChainPanel. This will be used to handle any changes in the size of the panel.
-        _renderer.OnSwapChainSizeChanged(
+        _renderer.Resize(
             (int)e.NewSize.Width,
             (int)e.NewSize.Height);
 }

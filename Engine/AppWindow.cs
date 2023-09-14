@@ -49,6 +49,15 @@ class AppWindow
         _imGuiRenderer.Present();        
     }
 
+    public void Resize()
+    {
+        Core.Instance.Renderer.Resize(_win32Window.Width, _win32Window.Height);
+        Core.Instance.Frame();
+
+        _imGuiRenderer.Resize();
+        Render();
+    }
+
     public bool ProcessMessage(uint msg, UIntPtr wParam, IntPtr lParam)
     {
         ImGuiNET.ImGui.SetCurrentContext(_imGuiContext);
@@ -85,12 +94,9 @@ class AppWindow
         return false;
     }
 
-    public void Resize()
+    public void Dispose()
     {
-        Core.Instance.Renderer.OnSwapChainSizeChanged(_win32Window.Width, _win32Window.Height);
-        Core.Instance.Frame();
-
-        _imGuiRenderer.Resize(); 
-        Render();
+        Core.Instance?.Dispose();
+        _imGuiRenderer?.Dispose();
     }
 }
