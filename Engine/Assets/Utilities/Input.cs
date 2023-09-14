@@ -32,7 +32,7 @@ namespace Engine.Utilities
         private static Vector2 s_joystickAxis = Vector2.Zero;
         private static Vector2 s_mouseAxis = Vector2.Zero;
         private static Vector2 s_mousePosition = Vector2.Zero;
-        private static int s_mouseDelta = 0;
+        private static int s_mouseWheel = 0;
         private static bool s_lockMouse;
 
         public static void Initialize(IntPtr windowHandle)
@@ -101,7 +101,7 @@ namespace Engine.Utilities
                     s_mousePosition.Y = currentMouseState.Y;
 
                     // Get the mouse delta clamped to -1 and 1.
-                    s_mouseDelta = Math.Clamp(currentMouseState.Z, -1, 1);
+                    s_mouseWheel = Math.Clamp(currentMouseState.Z, -1, 1);
                 }
 
                 var currentJoystickState = s_joystick?.GetCurrentJoystickState();
@@ -202,8 +202,8 @@ namespace Engine.Utilities
         public static Vector2 GetRawMousePosition() =>
             s_mousePosition;
 
-        public static int GetMouseDelta() =>
-            s_mouseDelta;
+        public static int GetMouseWheel() =>
+            s_mouseWheel;
 
         public static void LockMouse(bool b) => s_lockMouse = b;
     }

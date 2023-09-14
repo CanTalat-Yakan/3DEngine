@@ -80,7 +80,7 @@ public sealed class SceneCameraController : EditorComponent
         // Check if either the right or middle mouse button is pressed.
         // If so, update the movement speed based on the mouse wheel input.
         if (Input.GetButton(MouseButton.Right))
-            s_movementSpeed += Input.GetMouseDelta();
+            s_movementSpeed += Input.GetMouseWheel();
 
         // Clamp the movement speed between 0.1 and 10.
         s_movementSpeed = Math.Clamp(s_movementSpeed, 0.1f, 10);
@@ -107,7 +107,7 @@ public sealed class SceneCameraController : EditorComponent
         if (!Input.GetButton(MouseButton.Right)
             && !Input.GetButton(MouseButton.Middle)
             && !Input.GetButton(MouseButton.Right))
-            _direction += 25 * Entity.Transform.Forward * Input.GetMouseDelta();
+            _direction += 25 * Entity.Transform.Forward * Input.GetMouseWheel();
     }
 
     private void HeightTransformMovement()
