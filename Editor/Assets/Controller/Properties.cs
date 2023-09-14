@@ -250,7 +250,7 @@ internal partial class Properties : Controller.Helper
 
         Button button = new() { Content = s, HorizontalAlignment = HorizontalAlignment.Center, Margin = new(10) };
 
-        AutoSuggestBox autoSuggestBox = new() { Width = 200 };
+        AutoSuggestBox autoSuggestBox = new() { Width = 200, IsSuggestionListOpen = true };
         autoSuggestBox.TextChanged += (s, e) =>
         {
             // Since selecting an item will also change the text,

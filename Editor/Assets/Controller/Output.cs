@@ -297,14 +297,14 @@ namespace Editor.Controller
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
                 Background = new SolidColorBrush(
-                    m.Type == MessageType.Message ?
-                        s_stack.Children.Count() % 2 == 0 ?
-                            Colors.Transparent :
-                            Windows.UI.Color.FromArgb(50, 10, 10, 10) :
-                        m.Type == MessageType.Error ?
-                            Windows.UI.Color.FromArgb(88, 255, 0, 0) :
-                            Windows.UI.Color.FromArgb(88, 255, 255, 0))
-            });
+                    m.Type == MessageType.Message 
+                        ? s_stack.Children.Count() % 2 == 0 
+                            ? Colors.Transparent 
+                            : Windows.UI.Color.FromArgb(50, 10, 10, 10) 
+                        : m.Type == MessageType.Error 
+                            ? Windows.UI.Color.FromArgb(88, 255, 0, 0) 
+                            : Windows.UI.Color.FromArgb(88, 255, 255, 0))
+            }.AddToolTip(m.Script));
 
             // return new message.
             return grid;

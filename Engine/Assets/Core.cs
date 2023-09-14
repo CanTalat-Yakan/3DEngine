@@ -24,7 +24,13 @@ public sealed class Core
     public Renderer Renderer;
     public RuntimeCompiler RuntimeCompiler;
 
-    public Core(Renderer renderer, nint hWnd, string assetsPath = null)
+    public Core(Renderer renderer, nint hWnd, string assetsPath = null) =>
+        Initialize(renderer, hWnd, assetsPath);
+
+    public Core(Win32Window win32Window, string assetsPath = null) =>
+        Initialize(new(win32Window), win32Window.Handle, assetsPath);
+
+    public void Initialize(Renderer renderer, nint hWnd, string assetsPath = null)
     {
         // Initializes the singleton instance of the class, if it hasn't been already.
         if (Instance is null)
@@ -34,32 +40,8 @@ public sealed class Core
 
         Input.Initialize(hWnd);
 
-        // Initializes the renderer, scene manager, and the runtimeCompiler.
         Renderer = renderer;
-
-        Initialize();
-    }
-
-    public Core(Win32Window win32Window, string assetsPath = null)
-    {
-        // Initializes the singleton instance of the class, if it hasn't been already.
-        if (Instance is null)
-            Instance = this;
-
-        AssetsPath = assetsPath;
-
-        Input.Initialize(win32Window.Handle);
-
-        // Initializes the renderer, scene manager, and the runtimeCompiler.
-        Renderer = new(win32Window);
-
-        Initialize();
-    }
-
-    public void Initialize()
-    {
         RuntimeCompiler = new();
-
         SceneManager = new();
 
         // Creates an entity with the "Boot" editor tag and adds a "SceneBoot" component to it.
@@ -72,7 +54,7 @@ public sealed class Core
 
         Output.Log("Engine Initialized...");
 
-        // Render Pipeline Loop
+        // Render Pipeline Init
         SceneManager.Awake();
         SceneManager.Start();
     }

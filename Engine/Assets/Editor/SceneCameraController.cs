@@ -35,7 +35,6 @@ public sealed class SceneCameraController : EditorComponent
             _mousePosition.Y = point.Y;
         }
 
-
         // Check if the middle mouse button is pressed. If so, call the ScreenMovement function.
         if (Input.GetButton(MouseButton.Middle) && ViewportFocused)
         {
@@ -52,7 +51,7 @@ public sealed class SceneCameraController : EditorComponent
             CameraRotation();
             HeightTransformMovement();
 
-            User32.SetCursor(User32.LoadCursor(IntPtr.Zero, SystemCursor.IDC_CROSS));
+            //User32.SetCursor(User32.LoadCursor(IntPtr.Zero, SystemCursor.IDC_CROSS));
             User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
         }
 
@@ -61,9 +60,9 @@ public sealed class SceneCameraController : EditorComponent
             ScrollMovement();
 
         // Update the entity's position based on the calculated direction and movement speed.
-        Entity.Transform.LocalPosition += _direction * (float)Time.Delta * s_movementSpeed;
+        Entity.Transform.LocalPosition += _direction * Time.DeltaF * s_movementSpeed;
         // Update the entity's rotation based on the calculated rotation and rotation speed.
-        Entity.Transform.EulerAngles -= _rotation * (float)Time.Delta * _rotationSpeed;
+        Entity.Transform.EulerAngles -= _rotation * Time.DeltaF * _rotationSpeed;
 
         //// Limit the entity's vertical rotation between -89 and 89 degrees.
         Entity.Transform.EulerAngles = new(
@@ -80,8 +79,7 @@ public sealed class SceneCameraController : EditorComponent
     {
         // Check if either the right or middle mouse button is pressed.
         // If so, update the movement speed based on the mouse wheel input.
-        if (Input.GetButton(MouseButton.Right)
-            || Input.GetButton(MouseButton.Right))
+        if (Input.GetButton(MouseButton.Right))
             s_movementSpeed += Input.GetMouseDelta();
 
         // Clamp the movement speed between 0.1 and 10.
@@ -100,7 +98,7 @@ public sealed class SceneCameraController : EditorComponent
     private void ScreenMovement() =>
         // Update the direction by subtracting the right vector multiplied by the mouse X axis input,
         // and the local up vector multiplied by the mouse Y axis input, both scaled by the time delta.
-        _direction -= Entity.Transform.Right * Input.GetMouseAxis().X * (float)Time.Delta + Entity.Transform.Up * Input.GetMouseAxis().Y * (float)Time.Delta;
+        _direction -= Entity.Transform.Right * Input.GetMouseAxis().X * 0.5f + Entity.Transform.Up * Input.GetMouseAxis().Y * 0.5f;
 
     private void ScrollMovement()
     {

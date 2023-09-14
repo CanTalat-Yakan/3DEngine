@@ -33,6 +33,7 @@ namespace Engine.Utilities
         private static Vector2 s_mouseAxis = Vector2.Zero;
         private static Vector2 s_mousePosition = Vector2.Zero;
         private static int s_mouseDelta = 0;
+        private static bool s_lockMouse;
 
         public static void Initialize(IntPtr windowHandle)
         {
@@ -114,6 +115,9 @@ namespace Engine.Utilities
                 }
             }
             catch { }
+
+            if (s_lockMouse)
+                Vortice.Win32.User32.SetCursorPos(0, 0);
 
             // Reset axis vector.
             s_axis = Vector2.Zero;
@@ -200,5 +204,7 @@ namespace Engine.Utilities
 
         public static int GetMouseDelta() =>
             s_mouseDelta;
+
+        public static void LockMouse(bool b) => s_lockMouse = b;
     }
 }
