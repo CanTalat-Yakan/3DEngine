@@ -109,7 +109,7 @@ public class Material
         _d3d.DeviceContext.GSSetShader(_geometryShader);
 
         #region //Update constant buffer data
-        // Map the constant buffer and copy the models's model-view matrix into it.
+        // Map the constant buffer and copy the models model-view matrix into it.
         unsafe
         {
             // Map the constant buffer to memory for write access.

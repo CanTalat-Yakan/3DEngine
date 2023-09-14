@@ -59,12 +59,6 @@ public sealed class Core
         SceneManager.Start();
     }
 
-    public void Dispose()
-    {
-        Renderer?.Dispose();
-        Input.Dispose();
-    }
-
     public void Frame()
     {
         if (!Renderer.IsRendering)
@@ -109,6 +103,12 @@ public sealed class Core
         // Updates the time values, such as delta time and time scale,
         // used in the game or application.
         Time.Update();
+    }
+
+    public void Dispose()
+    {
+        Renderer?.Dispose();
+        Input.Dispose();
     }
 
     public void SetPlayMode(bool b) =>

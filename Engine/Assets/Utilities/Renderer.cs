@@ -24,8 +24,8 @@ public sealed class Renderer
     private ID3D11Texture2D _renderTargetTexture;
     private ID3D11RenderTargetView _renderTargetView;
     private ID3D11Texture2D _depthStencilTexture;
-    private Texture2DDescription _depthStencilTextureDescription;
     private ID3D11DepthStencilView _depthStencilView;
+    private Texture2DDescription _depthStencilTextureDescription;
     private ID3D11BlendState _blendState;
 
     private Win32Window _win32Window;
@@ -61,6 +61,10 @@ public sealed class Renderer
         Size = new Size(
             Math.Max(640, sizeX), 
             Math.Max(480, sizeY));
+
+        var result = Initialize();
+        if (result.Failure)
+            throw new Exception(result.Description);
     }
 
     public Result Initialize(bool forHwnd = false)
@@ -107,7 +111,7 @@ public sealed class Renderer
             // Obtain instance of the IDXGIDevice3 interface from the Direct3D device.
             IDXGIDevice3 dxgiDevice3 = Device.QueryInterface<IDXGIDevice3>();
             // Obtain instance of the IDXGIFactory2 interface from the DXGI device.
-            IDXGIFactory2 dxgiFactory2 = dxgiDevice3.GetParent<IDXGIAdapter>().GetParent<IDXGIFactory2>();
+            IDXGIFactory2 dxgiFactory2 = dxgiDevice3.GetAdapter().GetParent<IDXGIFactory2>();
             // Creates a swap chain using the swap chain description.
             IDXGISwapChain1 swapChain1 = forHwnd
                 ? dxgiFactory2.CreateSwapChainForHwnd(dxgiDevice3, _win32Window.Handle, swapChainDescription1)

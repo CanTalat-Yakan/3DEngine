@@ -3,7 +3,7 @@ using Vortice.Win32;
 
 using static Vortice.Win32.User32;
 
-namespace VorticeImGui;
+namespace ImGui;
 
 class ImGuiInputHandler
 {
@@ -18,7 +18,7 @@ class ImGuiInputHandler
 
     void InitKeyMap()
     {
-        var io = ImGui.GetIO();
+        var io = ImGuiNET.ImGui.GetIO();
 
         io.KeyMap[(int)ImGuiKey.Tab] = (int)VK.TAB;
         io.KeyMap[(int)ImGuiKey.LeftArrow] = (int)VK.LEFT;
@@ -49,7 +49,7 @@ class ImGuiInputHandler
         UpdateKeyModifiers();
         UpdateMousePosition();
 
-        var mouseCursor = ImGui.GetIO().MouseDrawCursor ? ImGuiMouseCursor.None : ImGui.GetMouseCursor();
+        var mouseCursor = ImGuiNET.ImGui.GetIO().MouseDrawCursor ? ImGuiMouseCursor.None : ImGuiNET.ImGui.GetMouseCursor();
         if (mouseCursor != lastCursor)
         {
             lastCursor = mouseCursor;
@@ -59,7 +59,7 @@ class ImGuiInputHandler
 
     void UpdateKeyModifiers()
     {
-        var io = ImGui.GetIO();
+        var io = ImGuiNET.ImGui.GetIO();
         io.KeyCtrl = (GetKeyState(VK.CONTROL) & 0x8000) != 0;
         io.KeyShift = (GetKeyState(VK.SHIFT) & 0x8000) != 0;
         io.KeyAlt = (GetKeyState(VK.MENU) & 0x8000) != 0;
@@ -68,11 +68,11 @@ class ImGuiInputHandler
 
     public bool UpdateMouseCursor()
     {
-        var io = ImGui.GetIO();
+        var io = ImGuiNET.ImGui.GetIO();
         if ((io.ConfigFlags & ImGuiConfigFlags.NoMouseCursorChange) != 0)
             return false;
 
-        var requestedCursor = ImGui.GetMouseCursor();
+        var requestedCursor = ImGuiNET.ImGui.GetMouseCursor();
         if (requestedCursor == ImGuiMouseCursor.None || io.MouseDrawCursor)
             SetCursor(IntPtr.Zero);
         else
@@ -98,7 +98,7 @@ class ImGuiInputHandler
 
     void UpdateMousePosition()
     {
-        var io = ImGui.GetIO();
+        var io = ImGuiNET.ImGui.GetIO();
 
         if (io.WantSetMousePos)
         {
@@ -120,10 +120,10 @@ class ImGuiInputHandler
 
     public bool ProcessMessage(WindowMessage msg, UIntPtr wParam, IntPtr lParam)
     {
-        if (ImGui.GetCurrentContext() == IntPtr.Zero)
+        if (ImGuiNET.ImGui.GetCurrentContext() == nint.Zero)
             return false;
 
-        var io = ImGui.GetIO();
+        var io = ImGuiNET.ImGui.GetIO();
         switch (msg)
         {
             case WindowMessage.LButtonDown:
@@ -140,7 +140,7 @@ class ImGuiInputHandler
                     if (msg == WindowMessage.RButtonDown || msg == WindowMessage.RButtonDoubleClick) { button = 1; }
                     if (msg == WindowMessage.MButtonDown || msg == WindowMessage.MButtonDoubleClick) { button = 2; }
                     if (msg == WindowMessage.XButtonDown || msg == WindowMessage.XButtonDoubleClick) { button = (GET_XBUTTON_WPARAM(wParam) == 1) ? 3 : 4; }
-                    if (!ImGui.IsAnyMouseDown() && GetCapture() == IntPtr.Zero)
+                    if (!ImGuiNET.ImGui.IsAnyMouseDown() && GetCapture() == nint.Zero)
                         SetCapture(hwnd);
                     io.MouseDown[button] = true;
                     return false;
@@ -156,7 +156,7 @@ class ImGuiInputHandler
                     if (msg == WindowMessage.MButtonUp) { button = 2; }
                     if (msg == WindowMessage.XButtonUp) { button = (GET_XBUTTON_WPARAM(wParam) == 1) ? 3 : 4; }
                     io.MouseDown[button] = false;
-                    if (!ImGui.IsAnyMouseDown() && GetCapture() == hwnd)
+                    if (!ImGuiNET.ImGui.IsAnyMouseDown() && GetCapture() == hwnd)
                         ReleaseCapture();
                     return false;
                 }

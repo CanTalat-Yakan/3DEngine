@@ -1,28 +1,34 @@
 ﻿using ImGuiNET;
 using System.Collections.Generic;
 using System.IO;
-using Windows.Foundation;
 
 using Vortice.D3DCompiler;
 using Vortice.Direct3D11;
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
+using Vortice;
 
 using ImDrawIdx = System.UInt16;
-using Vortice;
 
 // based on https://github.com/ocornut/imgui/blob/master/examples/imgui_impl_dx11.cpp
 // copied from https://github.com/YaakovDavis/VorticeImGui/blob/master/VorticeImGui/Framework/ImGuiRenderer.cs
 
-namespace Engine.Editor;
+namespace Engine.Utilities;
 
 unsafe public class ImGuiRenderer
 {
+    public bool IsRendering { get => _renderTargetView is not null; }
+
     private const int _vertexConstantBufferSize = 16 * 4;
 
     private ID3D11Device _device;
     private ID3D11DeviceContext _deviceContext;
+
+    private IDXGISwapChain2 _swapChain;
+    private ID3D11Texture2D _renderTargetTexture;
+    private ID3D11RenderTargetView _renderTargetView;
+
     private ID3D11Buffer _vertexBuffer;
     private ID3D11Buffer _indexBuffer;
     private Blob _vertexShaderBlob;
@@ -40,6 +46,8 @@ unsafe public class ImGuiRenderer
 
     private Dictionary<IntPtr, ID3D11ShaderResourceView> _textureResources = new();
 
+    private Win32Window _win32Window;
+
     public ImGuiRenderer(ID3D11Device device, ID3D11DeviceContext deviceContext)
     {
         _device = device;
@@ -48,30 +56,77 @@ unsafe public class ImGuiRenderer
         device.AddRef();
         deviceContext.AddRef();
 
-        var io = ImGui.GetIO();
+        var io = ImGuiNET.ImGui.GetIO();
         io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;  // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
 
-        CreateDeviceObjects();
+        CreateMaterial();
     }
 
-    public void Update(IntPtr imGuiContext)
+    public void InitializeSwapChain(Win32Window win32Window)
     {
-        ImGui.SetCurrentContext(imGuiContext);
-        var io = ImGui.GetIO();
+        _win32Window = win32Window;
+
+        var dxgiFactory = _device.QueryInterface<IDXGIDevice>().GetAdapter().GetParent<IDXGIFactory>();
+
+        // Initialize the SwapChainDescription structure.
+        SwapChainDescription1 swapChainDescription1 = new()
+        {
+            AlphaMode = AlphaMode.Ignore,
+            BufferCount = 2,
+            Format = Format.R8G8B8A8_UNorm,
+            Width = _win32Window.Width,
+            Height = _win32Window.Height,
+            SampleDescription = new(1, 0),
+            Scaling = Scaling.Stretch,
+            Stereo = false,
+            SwapEffect = SwapEffect.Discard,
+            BufferUsage = Usage.RenderTargetOutput
+        };
+
+        // Obtain instance of the IDXGIDevice3 interface from the Direct3D device.
+        IDXGIDevice3 dxgiDevice3 = _device.QueryInterface<IDXGIDevice3>();
+        // Obtain instance of the IDXGIFactory2 interface from the DXGI device.
+        IDXGIFactory2 dxgiFactory2 = dxgiDevice3.GetAdapter().GetParent<IDXGIFactory2>();
+        // Creates a swap chain using the swap chain description.
+        IDXGISwapChain1 swapChain1 = dxgiFactory2.CreateSwapChainForHwnd(dxgiDevice3, _win32Window.Handle, swapChainDescription1);
+
+        _swapChain = swapChain1.QueryInterface<IDXGISwapChain2>();
+
+        dxgiFactory.MakeWindowAssociation(_win32Window.Handle, WindowAssociationFlags.Valid);
+
+        _renderTargetTexture = _swapChain.GetBuffer<ID3D11Texture2D>(0);
+        _renderTargetView = _device.CreateRenderTargetView(_renderTargetTexture);
+    }
+
+    public void Present() =>
+        // Present the final render to the screen.
+        _swapChain.Present(0, PresentFlags.None);
+
+    public void Update(IntPtr imGuiContext, Vector2 newSize)
+    {
+        ImGuiNET.ImGui.SetCurrentContext(imGuiContext);
+        var io = ImGuiNET.ImGui.GetIO();
 
         io.DeltaTime = Time.DeltaF;
+        io.DisplaySize = newSize;
 
-        ImGui.NewFrame();
-        ImGui.Render();
+        ImGuiNET.ImGui.NewFrame();
     }
 
-    public void Render(ImDrawDataPtr data)
+    public void Render()
+    {
+        _deviceContext.ClearRenderTargetView(_renderTargetView, new Color4(0, 0, 10, 0));
+        _deviceContext.OMSetRenderTargets(_renderTargetView);
+        _deviceContext.RSSetViewport(0, 0, _win32Window.Width, _win32Window.Height);
+
+        Draw(ImGuiNET.ImGui.GetDrawData());
+    }
+
+    private void Draw(ImDrawDataPtr data)
     {
         // Avoid rendering when minimized
         if (data.DisplaySize.X <= 0.0f || data.DisplaySize.Y <= 0.0f)
             return;
-
-        ID3D11DeviceContext ctx = _deviceContext;
 
         if (_vertexBuffer == null || _vertexBufferSize < data.TotalVtxCount)
         {
@@ -101,8 +156,8 @@ unsafe public class ImGuiRenderer
         }
 
         // Upload vertex/index data into a single contiguous GPU buffer
-        var vertexResource = ctx.Map(_vertexBuffer, 0, MapMode.WriteDiscard, Vortice.Direct3D11.MapFlags.None);
-        var indexResource = ctx.Map(_indexBuffer, 0, MapMode.WriteDiscard, Vortice.Direct3D11.MapFlags.None);
+        var vertexResource = _deviceContext.Map(_vertexBuffer, 0, MapMode.WriteDiscard, Vortice.Direct3D11.MapFlags.None);
+        var indexResource = _deviceContext.Map(_indexBuffer, 0, MapMode.WriteDiscard, Vortice.Direct3D11.MapFlags.None);
         var vertexResourcePointer = (ImDrawVert*)vertexResource.DataPointer;
         var indexResourcePointer = (ImDrawIdx*)indexResource.DataPointer;
         for (int n = 0; n < data.CmdListsCount; n++)
@@ -118,13 +173,13 @@ unsafe public class ImGuiRenderer
             vertexResourcePointer += cmdlList.VtxBuffer.Size;
             indexResourcePointer += cmdlList.IdxBuffer.Size;
         }
-        ctx.Unmap(_vertexBuffer, 0);
-        ctx.Unmap(_indexBuffer, 0);
+        _deviceContext.Unmap(_vertexBuffer, 0);
+        _deviceContext.Unmap(_indexBuffer, 0);
 
         // Setup orthographic projection matrix into our constant buffer
         // Our visible imGui space lies from draw_data.DisplayPos (top left) to draw_data.DisplayPos+data_data.DisplaySize (bottom right). DisplayPos is (0,0) for single viewport apps.
 
-        var constResource = ctx.Map(_constantBuffer, 0, MapMode.WriteDiscard, Vortice.Direct3D11.MapFlags.None);
+        var constResource = _deviceContext.Map(_constantBuffer, 0, MapMode.WriteDiscard, Vortice.Direct3D11.MapFlags.None);
         var span = constResource.AsSpan<float>(_vertexConstantBufferSize);
         float L = data.DisplayPos.X;
         float R = data.DisplayPos.X + data.DisplaySize.X;
@@ -138,9 +193,9 @@ unsafe public class ImGuiRenderer
                 (R+L)/(L-R),  (T+B)/(B-T),    0.5f,       1.0f,
         };
         mvp.CopyTo(span);
-        ctx.Unmap(_constantBuffer, 0);
+        _deviceContext.Unmap(_constantBuffer, 0);
 
-        SetupRenderState(data, ctx);
+        SetupRenderState(data);
 
         // Render command lists
         // (Because we merged all buffers into a single one, we maintain our own offset into them)
@@ -158,13 +213,13 @@ unsafe public class ImGuiRenderer
                 else
                 {
                     var rect = new RawRect((int)(cmd.ClipRect.X - clip_off.X), (int)(cmd.ClipRect.Y - clip_off.Y), (int)(cmd.ClipRect.Z - clip_off.X), (int)(cmd.ClipRect.W - clip_off.Y));
-                    ctx.RSSetScissorRects(new[] { rect });
+                    _deviceContext.RSSetScissorRects(new[] { rect });
 
                     _textureResources.TryGetValue(cmd.TextureId, out var texture);
                     if (texture != null)
-                        ctx.PSSetShaderResources(0, new[] { texture });
+                        _deviceContext.PSSetShaderResources(0, new[] { texture });
 
-                    ctx.DrawIndexed((int)cmd.ElemCount, (int)(cmd.IdxOffset + global_idx_offset), (int)(cmd.VtxOffset + global_vtx_offset));
+                    _deviceContext.DrawIndexed((int)cmd.ElemCount, (int)(cmd.IdxOffset + global_idx_offset), (int)(cmd.VtxOffset + global_vtx_offset));
                 }
             }
             global_idx_offset += cmdList.IdxBuffer.Size;
@@ -172,18 +227,7 @@ unsafe public class ImGuiRenderer
         }
     }
 
-    public void Dispose()
-    {
-        if (_device is null)
-            return;
-
-        InvalidateDeviceObjects();
-
-        ReleaseAndNullify(ref _device);
-        ReleaseAndNullify(ref _deviceContext);
-    }
-
-    private void SetupRenderState(ImDrawDataPtr drawData, ID3D11DeviceContext ctx)
+    private void SetupRenderState(ImDrawDataPtr drawData)
     {
         var viewport = new Viewport
         {
@@ -192,95 +236,32 @@ unsafe public class ImGuiRenderer
             MinDepth = 0.0f,
             MaxDepth = 1.0f,
         };
-        ctx.RSSetViewports(new[] { viewport });
+        _deviceContext.RSSetViewports(new[] { viewport });
 
         int stride = sizeof(ImDrawVert);
         int offset = 0;
 
-        ctx.IASetInputLayout(_inputLayout);
-        ctx.IASetVertexBuffers(0, 1, new[] { _vertexBuffer }, new[] { stride }, new[] { offset });
-        ctx.IASetIndexBuffer(_indexBuffer, sizeof(ImDrawIdx) == 2 ? Format.R16_UInt : Format.R32_UInt, 0);
-        ctx.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
-        ctx.VSSetShader(_vertexShader);
-        ctx.VSSetConstantBuffers(0, new[] { _constantBuffer });
-        ctx.PSSetShader(_pixelShader);
-        ctx.PSSetSamplers(0, new[] { _fontSampler });
-        ctx.GSSetShader(null);
-        ctx.HSSetShader(null);
-        ctx.DSSetShader(null);
-        ctx.CSSetShader(null);
+        _deviceContext.IASetInputLayout(_inputLayout);
+        _deviceContext.IASetVertexBuffers(0, 1, new[] { _vertexBuffer }, new[] { stride }, new[] { offset });
+        _deviceContext.IASetIndexBuffer(_indexBuffer, sizeof(ImDrawIdx) == 2 ? Format.R16_UInt : Format.R32_UInt, 0);
+        _deviceContext.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
+        _deviceContext.VSSetShader(_vertexShader);
+        _deviceContext.VSSetConstantBuffers(0, new[] { _constantBuffer });
+        _deviceContext.PSSetShader(_pixelShader);
+        _deviceContext.PSSetSamplers(0, new[] { _fontSampler });
+        _deviceContext.GSSetShader(null);
+        _deviceContext.HSSetShader(null);
+        _deviceContext.DSSetShader(null);
+        _deviceContext.CSSetShader(null);
 
-        ctx.OMSetBlendState(_blendState);
-        ctx.OMSetDepthStencilState(_depthStencilState);
-        ctx.RSSetState(_rasterizerState);
+        _deviceContext.OMSetBlendState(_blendState);
+        _deviceContext.OMSetDepthStencilState(_depthStencilState);
+        _deviceContext.RSSetState(_rasterizerState);
     }
 
-    private void CreateFontsTexture()
-    {
-        var io = ImGui.GetIO();
-        byte* pixels;
-        int width, height;
-        io.Fonts.GetTexDataAsRGBA32(out pixels, out width, out height);
-
-        Texture2DDescription texDesc = new()
-        {
-            Width = width,
-            Height = height,
-            MipLevels = 1,
-            ArraySize = 1,
-            Format = Format.R8G8B8A8_UNorm,
-            SampleDescription = new SampleDescription { Count = 1 },
-            Usage = ResourceUsage.Default,
-            BindFlags = BindFlags.ShaderResource,
-            CPUAccessFlags = CpuAccessFlags.None
-        };
-
-        SubresourceData subResource = new()
-        {
-            DataPointer = (IntPtr)pixels,
-            RowPitch = texDesc.Width * 4,
-            SlicePitch = 0
-        };
-
-        var texture = _device.CreateTexture2D(texDesc, new[] { subResource });
-
-        ShaderResourceViewDescription resViewDesc = new()
-        {
-            Format = Format.R8G8B8A8_UNorm,
-            ViewDimension = ShaderResourceViewDimension.Texture2D,
-            Texture2D = new Texture2DShaderResourceView { MipLevels = texDesc.MipLevels, MostDetailedMip = 0 }
-        };
-        _fontTextureView = _device.CreateShaderResourceView(texture, resViewDesc);
-        texture.Release();
-
-        io.Fonts.TexID = RegisterTexture(_fontTextureView);
-
-        SamplerDescription samplerDesc = new()
-        {
-            Filter = Filter.MinMagMipLinear,
-            AddressU = TextureAddressMode.Wrap,
-            AddressV = TextureAddressMode.Wrap,
-            AddressW = TextureAddressMode.Wrap,
-            MipLODBias = 0f,
-            ComparisonFunc = ComparisonFunction.Always,
-            MinLOD = 0f,
-            MaxLOD = 0f
-        };
-        _fontSampler = _device.CreateSamplerState(samplerDesc);
-    }
-
-    private IntPtr RegisterTexture(ID3D11ShaderResourceView texture)
-    {
-        var imGuiID = texture.NativePointer;
-        _textureResources.Add(imGuiID, texture);
-
-        return imGuiID;
-    }
-
-    private void CreateDeviceObjects()
+    private void CreateMaterial()
     {
         ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode("ImGui.hlsl", "VS", "vs_4_0");
-
         _vertexShader = _device.CreateVertexShader(vertexShaderByteCode.Span);
 
         var inputElements = new[]
@@ -288,8 +269,7 @@ unsafe public class ImGuiRenderer
                 new InputElementDescription( "POSITION", 0, Format.R32G32_Float,   0, 0, InputClassification.PerVertexData, 0 ),
                 new InputElementDescription( "TEXCOORD", 0, Format.R32G32_Float,   8,  0, InputClassification.PerVertexData, 0 ),
                 new InputElementDescription( "COLOR",    0, Format.R8G8B8A8_UNorm, 16, 0, InputClassification.PerVertexData, 0 ),
-            };
-
+        };
         _inputLayout = _device.CreateInputLayout(inputElements, vertexShaderByteCode.Span);
 
         BufferDescription constBufferDesc = new()
@@ -302,7 +282,6 @@ unsafe public class ImGuiRenderer
         _constantBuffer = _device.CreateBuffer(constBufferDesc);
 
         ReadOnlyMemory<byte> pixelShaderByteCode = CompileBytecode("ImGui.hlsl", "PS", "ps_4_0");
-
         _pixelShader = _device.CreatePixelShader(pixelShaderByteCode.Span);
 
         RenderTargetBlendDescription renTarDesc = new()
@@ -362,6 +341,93 @@ unsafe public class ImGuiRenderer
         _depthStencilState = _device.CreateDepthStencilState(depthDesc);
 
         CreateFontsTexture();
+    }
+
+    private void CreateFontsTexture()
+    {
+        var io = ImGuiNET.ImGui.GetIO();
+        byte* pixels;
+        int width, height;
+        io.Fonts.GetTexDataAsRGBA32(out pixels, out width, out height);
+
+        Texture2DDescription texDesc = new()
+        {
+            Width = width,
+            Height = height,
+            MipLevels = 1,
+            ArraySize = 1,
+            Format = Format.R8G8B8A8_UNorm,
+            SampleDescription = new SampleDescription { Count = 1 },
+            Usage = ResourceUsage.Default,
+            BindFlags = BindFlags.ShaderResource,
+            CPUAccessFlags = CpuAccessFlags.None
+        };
+
+        SubresourceData subResource = new()
+        {
+            DataPointer = (IntPtr)pixels,
+            RowPitch = texDesc.Width * 4,
+            SlicePitch = 0
+        };
+
+        var texture = _device.CreateTexture2D(texDesc, new[] { subResource });
+
+        ShaderResourceViewDescription resViewDesc = new()
+        {
+            Format = Format.R8G8B8A8_UNorm,
+            ViewDimension = ShaderResourceViewDimension.Texture2D,
+            Texture2D = new Texture2DShaderResourceView { MipLevels = texDesc.MipLevels, MostDetailedMip = 0 }
+        };
+        _fontTextureView = _device.CreateShaderResourceView(texture, resViewDesc);
+        texture.Release();
+
+        io.Fonts.TexID = RegisterTexture(_fontTextureView);
+
+        SamplerDescription samplerDesc = new()
+        {
+            Filter = Filter.MinMagMipLinear,
+            AddressU = TextureAddressMode.Wrap,
+            AddressV = TextureAddressMode.Wrap,
+            AddressW = TextureAddressMode.Wrap,
+            MipLODBias = 0f,
+            ComparisonFunc = ComparisonFunction.Always,
+            MinLOD = 0f,
+            MaxLOD = 0f
+        };
+        _fontSampler = _device.CreateSamplerState(samplerDesc);
+    }
+
+    private IntPtr RegisterTexture(ID3D11ShaderResourceView texture)
+    {
+        var imGuiID = texture.NativePointer;
+        _textureResources.Add(imGuiID, texture);
+
+        return imGuiID;
+    }
+
+    public void Resize()
+    {
+        if (!IsRendering)
+            return;
+
+        _renderTargetView.Dispose();
+        _renderTargetTexture.Dispose();
+
+        _swapChain.ResizeBuffers(1, _win32Window.Width, _win32Window.Height, Format.R8G8B8A8_UNorm, SwapChainFlags.None);
+
+        _renderTargetTexture = _swapChain.GetBuffer<ID3D11Texture2D1>(0);
+        _renderTargetView = _device.CreateRenderTargetView(_renderTargetTexture);
+    }
+
+    public void Dispose()
+    {
+        if (_device is null)
+            return;
+
+        InvalidateDeviceObjects();
+
+        ReleaseAndNullify(ref _device);
+        ReleaseAndNullify(ref _deviceContext);
     }
 
     private void InvalidateDeviceObjects()

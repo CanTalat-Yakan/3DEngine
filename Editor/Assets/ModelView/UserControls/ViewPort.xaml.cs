@@ -62,21 +62,19 @@ public sealed partial class ViewPort : UserControl
     {
         _renderer = renderer;
 
-        var result = _renderer.Initialize();
-        if (result.Failure)
-            throw new Exception(result.Description);
-
         // Gets the native object for the SwapChainPanel control.
         using (var nativeObject = ComObject.As<Vortice.WinUI.ISwapChainPanelNative2>(x_SwapChainPanel_ViewPort))
-            result = nativeObject.SetSwapChain(_renderer.SwapChain);
-        if (result.Failure)
-            throw new Exception(result.Description);
+        {
+            var result = nativeObject.SetSwapChain(_renderer.SwapChain);
+            if (result.Failure)
+                throw new Exception(result.Description);
+        }
     }
 
     private void x_SwapChainPanel_ViewPort_SizeChanged(object sender, SizeChangedEventArgs e) =>
         // Register an event handler for the SizeChanged event of the SwapChainPanel. This will be used to handle any changes in the size of the panel.
         _renderer.OnSwapChainSizeChanged(
-            (int)e.NewSize.Width, 
+            (int)e.NewSize.Width,
             (int)e.NewSize.Height);
 }
 
