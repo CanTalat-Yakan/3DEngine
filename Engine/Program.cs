@@ -16,6 +16,12 @@ sealed class Program
     private static void Main() =>
         new Program().Run();
 
+    private void Loop()
+    {
+        _engineCore.Frame();
+        _appWindow.Render();
+    }
+
     private void Run()
     {
         #region // Create Window
@@ -67,12 +73,6 @@ sealed class Program
             Loop();
         }
         #endregion
-    }
-
-    private void Loop()
-    {
-        _engineCore.Frame();
-        _appWindow.Render();
     }
 
     private IntPtr WndProc(IntPtr hWnd, uint msg, UIntPtr wParam, IntPtr lParam)
