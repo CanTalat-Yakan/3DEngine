@@ -349,3 +349,5 @@ MigrationBackup/
 .ionide/
 Engine (Package)/Package.appxmanifest
 Engine (Package)/3DEngine (Package).wapproj
+/Engine/FodyWeavers.xml
+/Engine/FodyWeavers.xsd
