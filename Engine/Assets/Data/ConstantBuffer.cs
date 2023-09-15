@@ -4,7 +4,6 @@ internal struct ViewConstantBuffer
 {
     public Matrix4x4 ViewProjection;
     public Vector3 CameraPosition;
-    public float Pad;
 }
 
 internal struct PerModelConstantBuffer

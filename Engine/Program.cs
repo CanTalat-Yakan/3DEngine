@@ -1,7 +1,5 @@
 using System.Runtime.CompilerServices;
 
-using Vortice.Direct3D;
-using Vortice.Direct3D11;
 using Vortice.Win32;
 
 using static Vortice.Win32.Kernel32;
@@ -40,9 +38,7 @@ sealed class Program
 
         #region // Instance Engine and AppWindow, then show Window
         _engineCore = new(win32Window);
-
-        D3D11.D3D11CreateDevice(null, DriverType.Hardware, DeviceCreationFlags.BgraSupport, null, out var device, out var deviceContext);
-        _appWindow = new(win32Window, device, deviceContext);
+        _appWindow = new(win32Window);
 
         _appWindow.Show();
         #endregion

@@ -16,11 +16,9 @@ using ImDrawIdx = System.UInt16;
 
 namespace Engine.Utilities;
 
-unsafe public class ImGuiRenderer
+unsafe public sealed class ImGuiRenderer
 {
     public bool IsRendering { get => _renderTargetView is not null; }
-
-    private const int _vertexConstantBufferSize = 16 * 4;
 
     private ID3D11Device _device;
     private ID3D11DeviceContext _deviceContext;
@@ -28,6 +26,10 @@ unsafe public class ImGuiRenderer
     private IDXGISwapChain2 _swapChain;
     private ID3D11Texture2D _renderTargetTexture;
     private ID3D11RenderTargetView _renderTargetView;
+
+    private ID3D11RasterizerState _rasterizerState;
+    private ID3D11BlendState _blendState;
+    private ID3D11DepthStencilState _depthStencilState;
 
     private ID3D11Buffer _vertexBuffer;
     private ID3D11Buffer _indexBuffer;
@@ -39,25 +41,30 @@ unsafe public class ImGuiRenderer
     private ID3D11PixelShader _pixelShader;
     private ID3D11SamplerState _fontSampler;
     private ID3D11ShaderResourceView _fontTextureView;
-    private ID3D11RasterizerState _rasterizerState;
-    private ID3D11BlendState _blendState;
-    private ID3D11DepthStencilState _depthStencilState;
-    private int _vertexBufferSize = 5000, _indexBufferSize = 10000;
 
     private Dictionary<IntPtr, ID3D11ShaderResourceView> _textureResources = new();
 
+    private int _vertexBufferSize = 5000, _indexBufferSize = 10000;
+
+    private const int _vertexConstantBufferSize = 16 * 4;
+
     private Win32Window _win32Window;
 
-    public ImGuiRenderer(Win32Window win32Window, ID3D11Device device, ID3D11DeviceContext deviceContext)
+    public ImGuiRenderer(Win32Window win32Window)
     {
         _win32Window = win32Window;
 
-        _device = device;
-        _deviceContext = deviceContext;
-
-        var io = ImGuiNET.ImGui.GetIO();
+        var io = ImGui.GetIO();
         io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;  // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
 
+        D3D11.D3D11CreateDevice(
+            null, 
+            DriverType.Hardware, 
+            DeviceCreationFlags.BgraSupport, 
+            null, 
+            out _device, 
+            out _deviceContext);
+        
         InitializeSwapChain();
         CreateMaterial();
     }
@@ -99,13 +106,13 @@ unsafe public class ImGuiRenderer
 
     public void Update(IntPtr imGuiContext, Vector2 newSize)
     {
-        ImGuiNET.ImGui.SetCurrentContext(imGuiContext);
-        var io = ImGuiNET.ImGui.GetIO();
+        ImGui.SetCurrentContext(imGuiContext);
+        var io = ImGui.GetIO();
 
         io.DeltaTime = Time.DeltaF;
         io.DisplaySize = newSize;
 
-        ImGuiNET.ImGui.NewFrame();
+        ImGui.NewFrame();
     }
 
     public void Present() =>
@@ -121,7 +128,7 @@ unsafe public class ImGuiRenderer
         _deviceContext.OMSetRenderTargets(_renderTargetView);
         _deviceContext.RSSetViewport(0, 0, _win32Window.Width, _win32Window.Height);
 
-        Draw(ImGuiNET.ImGui.GetDrawData());
+        Draw(ImGui.GetDrawData());
     }
 
     private void Draw(ImDrawDataPtr data)
@@ -332,7 +339,7 @@ unsafe public class ImGuiRenderer
 
     private void CreateFontsTexture()
     {
-        var io = ImGuiNET.ImGui.GetIO();
+        var io = ImGui.GetIO();
         byte* pixels;
         int width, height;
         io.Fonts.GetTexDataAsRGBA32(out pixels, out width, out height);
@@ -434,7 +441,7 @@ unsafe public class ImGuiRenderer
         _vertexShaderBlob?.Release();
     }
 
-    protected static ReadOnlyMemory<byte> CompileBytecode(string shaderName, string entryPoint, string profile)
+    private static ReadOnlyMemory<byte> CompileBytecode(string shaderName, string entryPoint, string profile)
     {
         string assetsPath = Path.Combine(AppContext.BaseDirectory, Paths.SHADERS);
         string fileName = Path.Combine(assetsPath, shaderName);

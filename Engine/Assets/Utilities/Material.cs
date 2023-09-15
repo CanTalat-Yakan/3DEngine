@@ -7,7 +7,7 @@ using Vortice.DXGI;
 
 namespace Engine.Utilities;
 
-public class Material
+public sealed class Material
 {
     private Renderer _d3d => Renderer.Instance;
 
@@ -130,7 +130,7 @@ public class Material
         _d3d.DeviceContext.PSSetSampler(0, _sampler);
     }
 
-    protected static ReadOnlyMemory<byte> CompileBytecode(string shaderPath, string entryPoint, string profile)
+    private static ReadOnlyMemory<byte> CompileBytecode(string shaderPath, string entryPoint, string profile)
     {
         // Combine the base directory and the relative path to the resources directory.
         string resourcesPath = Path.Combine(AppContext.BaseDirectory, Paths.SHADERS);
