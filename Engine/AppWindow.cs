@@ -51,11 +51,11 @@ class AppWindow
 
     public void Resize()
     {
-        Core.Instance.Renderer.Resize(_win32Window.Width, _win32Window.Height);
-        Core.Instance.Frame();
-
         _imGuiRenderer.Resize();
         Render();
+
+        Core.Instance.Renderer.Resize(_win32Window.Width, _win32Window.Height);
+        Core.Instance.Frame();
     }
 
     public bool ProcessMessage(uint msg, UIntPtr wParam, IntPtr lParam)

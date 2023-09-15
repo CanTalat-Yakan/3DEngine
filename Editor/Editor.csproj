@@ -10,24 +10,25 @@
     <UseWinUI>true</UseWinUI>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <LangVersion>preview</LangVersion>
+    <ApplicationIcon>Assets\Resources\Textures\App.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <DefineConstants>$(DefineConstants);EDITOR;TRACE;DEBUG;NET;NET8_0;NETCOREAPP</DefineConstants>
+    <DefineConstants>$(DefineConstants);EDITOR;TRACE;DEBUG;NET;NET8_0</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <DefineConstants>$(DefineConstants);EDITOR;TRACE;DEBUG;NET;NET8_0;NETCOREAPP</DefineConstants>
+    <DefineConstants>$(DefineConstants);EDITOR;TRACE;DEBUG;NET;NET8_0</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <DefineConstants>$(DefineConstants);EDITOR;TRACE;DEBUG;NET;NET8_0;NETCOREAPP</DefineConstants>
+    <DefineConstants>$(DefineConstants);EDITOR;TRACE;DEBUG;NET;NET8_0</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <DefineConstants>$(DefineConstants);EDITOR;TRACE;DEBUG;NET;NET8_0;NETCOREAPP</DefineConstants>
+    <DefineConstants>$(DefineConstants);EDITOR;TRACE;DEBUG;NET;NET8_0</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm64'">
-    <DefineConstants>$(DefineConstants);EDITOR;TRACE;DEBUG;NET;NET8_0;NETCOREAPP</DefineConstants>
+    <DefineConstants>$(DefineConstants);EDITOR;TRACE;DEBUG;NET;NET8_0</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm64'">
-    <DefineConstants>$(DefineConstants);EDITOR;TRACE;DEBUG;NET;NET8_0;NETCOREAPP</DefineConstants>
+    <DefineConstants>$(DefineConstants);EDITOR;TRACE;DEBUG;NET;NET8_0</DefineConstants>
   </PropertyGroup>
 	
   <ItemGroup>
@@ -49,6 +50,9 @@
   </ItemGroup>
   
   <ItemGroup>
+    <Content Update="Assets\Resources\Textures\App.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Update="Assets\Resources\Textures\BG.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -56,5 +60,4 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
 </Project>

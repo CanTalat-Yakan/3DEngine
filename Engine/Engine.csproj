@@ -3,20 +3,28 @@
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
-		<UseWindowsForms>true</UseWindowsForms>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<LangVersion>preview</LangVersion>
+		<PublishAot>true</PublishAot>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 	</PropertyGroup>
-
+	
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<DefineConstants>$(DefineConstants);ENGINE</DefineConstants>
+		<GenerateAssemblyInfo>True</GenerateAssemblyInfo>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DefineConstants>$(DefineConstants);ENGINE</DefineConstants>
+		<GenerateAssemblyInfo>True</GenerateAssemblyInfo>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Costura.Fody" Version="5.7.0">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="AssimpNet" Version="4.1.0" />
 		<PackageReference Include="ImGui.NET" Version="1.89.7.1" />
 		<PackageReference Include="Microsoft.CodeAnalysis" Version="4.7.0" />
@@ -145,7 +153,7 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Resources\Textures\Transparent.png">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Resources\Textures\UVMap.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
