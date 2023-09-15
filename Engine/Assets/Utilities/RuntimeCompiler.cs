@@ -16,6 +16,14 @@ namespace Engine.Utilities
         public Assembly Assembly;
     }
 
+    public sealed class ComponentCollector
+    {
+        public List<Type> Components = new();
+
+        public Type GetComponent(string name) =>
+            Components.Find(Type => Type.Name.ToString() == name);
+    }
+
     public sealed class RuntimeCompiler
     {
         public ComponentCollector ComponentCollector = new();
@@ -186,12 +194,4 @@ namespace Engine.Utilities
                                 ScriptSystem.Replace(ignoreType, type);
         }
     }
-}
-
-public sealed class ComponentCollector
-{
-    public List<Type> Components = new();
-
-    public Type GetComponent(string name) =>
-        Components.Find(Type => Type.Name.ToString() == name);
 }
