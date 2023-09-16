@@ -9,7 +9,7 @@ namespace Engine.Utilities
         Quad,
         Cube,
         Sphere,
-        Icosphere,
+        IcoSphere,
         Cylinder,
         Torus,
         Tree,

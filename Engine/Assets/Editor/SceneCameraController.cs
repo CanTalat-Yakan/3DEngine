@@ -6,8 +6,8 @@ public sealed class SceneCameraController : EditorComponent
 {
     public string Profile => Entity.Transform.ToString();
 
-    public static float MovementSpeed { get => s_movementSpeed; set => s_movementSpeed = value; }
     public static bool ViewportFocused { get; set; }
+    public static float MovementSpeed { get => s_movementSpeed; set => s_movementSpeed = value; }
 
     private static float s_movementSpeed = 2;
 

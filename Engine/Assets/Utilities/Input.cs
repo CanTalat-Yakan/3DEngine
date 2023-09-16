@@ -18,7 +18,7 @@ namespace Engine.Utilities
         Up
     }
 
-    public class Input
+    public sealed class Input
     {
         private static IDirectInput8 s_directInput;
         private static IDirectInputDevice8 s_mouse;

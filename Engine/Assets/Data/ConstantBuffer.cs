@@ -1,17 +1,17 @@
 ﻿namespace Engine.Data;
 
-internal struct ViewConstantBuffer
+public struct ViewConstantBuffer
 {
     public Matrix4x4 ViewProjection;
     public Vector3 CameraPosition;
 }
 
-internal struct PerModelConstantBuffer
+public struct PerModelConstantBuffer
 {
     public Matrix4x4 ModelView;
 }
 
-//internal struct DirectionalLightConstantBuffer
+//public struct DirectionalLightConstantBuffer
 //{
 //    public Vector3 Direction;
 //    public float Pad;
@@ -21,7 +21,7 @@ internal struct PerModelConstantBuffer
 //    public Vector3 Pad2;
 //}
 
-//internal struct PointLightConstantBuffer
+//public struct PointLightConstantBuffer
 //{
 //    public Vector3 Position;
 //    public float Pad;

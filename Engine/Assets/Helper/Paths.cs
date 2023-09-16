@@ -1,6 +1,6 @@
 ﻿namespace Engine;
 
-public class Paths
+public sealed class Paths
 {
     public static readonly string ASSETS = @"Assets\";
 
