@@ -32,19 +32,15 @@
   </PropertyGroup>
 	
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.13.8" />
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
     <PackageReference Include="ImGui.NET" Version="1.89.7.1" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.230822000" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.25346-preview" />
-    <PackageReference Include="PostSharp" Version="2023.0.8" />
-    <PackageReference Include="PostSharp.Patterns.Model" Version="2023.0.8" />
-    <PackageReference Include="PostSharp.Patterns.Xaml" Version="2023.0.8" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.25936-preview" />
     <PackageReference Include="Vortice.WinUI" Version="3.2.0" />
     <PackageReference Include="WinUIEx" Version="2.3.0" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
-  
+	
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.csproj" />
   </ItemGroup>

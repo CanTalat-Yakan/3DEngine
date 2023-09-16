@@ -145,7 +145,7 @@
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.230822000">
       <IncludeAssets>build</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.25346-preview">
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.25936-preview">
       <IncludeAssets>build</IncludeAssets>
     </PackageReference>
   </ItemGroup>
