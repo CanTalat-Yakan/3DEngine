@@ -33,11 +33,9 @@ unsafe public sealed class ImGuiRenderer
 
     private ID3D11Buffer _vertexBuffer;
     private ID3D11Buffer _indexBuffer;
-    private Blob _vertexShaderBlob;
     private ID3D11VertexShader _vertexShader;
     private ID3D11InputLayout _inputLayout;
     private ID3D11Buffer _constantBuffer;
-    private Blob _pixelShaderBlob;
     private ID3D11PixelShader _pixelShader;
     private ID3D11SamplerState _fontSampler;
     private ID3D11ShaderResourceView _fontTextureView;
@@ -434,11 +432,9 @@ unsafe public sealed class ImGuiRenderer
         _depthStencilState?.Release();
         _rasterizerState?.Release();
         _pixelShader?.Release();
-        _pixelShaderBlob?.Release();
         _constantBuffer?.Release();
         _inputLayout?.Release();
         _vertexShader?.Release();
-        _vertexShaderBlob?.Release();
     }
 
     private static ReadOnlyMemory<byte> CompileBytecode(string shaderName, string entryPoint, string profile)
