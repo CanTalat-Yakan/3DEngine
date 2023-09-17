@@ -36,6 +36,8 @@ Also, you need to install [Visual Studio 2022 Preview](https://visualstudio.micr
 - [x] [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)
 - [x] [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 
+*Rolled back to .Net 7 for now, because it lead to errors due to the WinAppSDK and the newest .Net 8 SDK Preview RC that gets installed with the Visual Studio Preview Workload of the .Net Environment!*
+
 # Preview
 ![3D Engine](https://drive.google.com/uc?export=view&id=170eLySL90SpNPX44mh-mmovyXwpWQZVj)
 ![Home](https://drive.google.com/uc?export=view&id=1v-Z-WKouFL75Nlg85uCq9ffLggrpPKE0)
