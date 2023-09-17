@@ -16,7 +16,7 @@ public sealed class Renderer
 
     public Size Size { get; private set; }
 
-    public ID3D11Device2 Device { get; private set; }
+    public ID3D11Device Device { get; private set; }
     public ID3D11DeviceContext DeviceContext { get; private set; }
 
     public IDXGISwapChain2 SwapChain { get => _swapChain; }
@@ -72,10 +72,11 @@ public sealed class Renderer
     {
         #region //Create device, device context & swap chain with result
         // Create a Direct3D 11 device.
+
         var result = D3D11.D3D11CreateDevice(
             null,
             DriverType.Hardware,
-            DeviceCreationFlags.BgraSupport | DeviceCreationFlags.Debug,
+            DeviceCreationFlags.BgraSupport,
             new[]
             {
                 FeatureLevel.Level_11_1,
@@ -88,9 +89,9 @@ public sealed class Renderer
             return result;
 
         // Assign the device to a variable.
-        Device = defaultDevice.QueryInterface<ID3D11Device2>();
+        Device = defaultDevice.QueryInterface<ID3D11Device>(); // Due to unsupported SDK (Idk), switched from ID3D11Device1 to ID3D11Device Interface, Context too.
         // Get the immediate context of the device.
-        DeviceContext = Device.ImmediateContext2;
+        DeviceContext = Device.ImmediateContext;
 
         // Initialize the SwapChainDescription structure.
         SwapChainDescription1 swapChainDescription1 = new()
@@ -119,7 +120,6 @@ public sealed class Renderer
                 : dxgiFactory2.CreateSwapChainForComposition(dxgiDevice3, swapChainDescription1);
 
             _swapChain = swapChain1.QueryInterface<IDXGISwapChain2>();
-            _swapChain.BackgroundColor = new Color4(0, 0, 0, 0);
         }
         catch (Exception e)
         {

@@ -6,7 +6,9 @@ public sealed class SceneCameraController : EditorComponent
 {
     public string Profile => Entity.Transform.ToString();
 
-    public static bool ViewportFocused { get; set; }
+    public static bool ViewportFocused { get => s_viewportFocused; set => s_viewportFocused = value; }
+    private static bool s_viewportFocused = true;
+
     public static float MovementSpeed { get => s_movementSpeed; set => s_movementSpeed = value; }
 
     private static float s_movementSpeed = 2;
