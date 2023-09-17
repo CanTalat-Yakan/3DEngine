@@ -5,9 +5,8 @@ namespace Engine.ECS;
 
 public class SystemBase<T> where T : Component
 {
-    protected static List<T> s_components = new();
-
     public static T[] Components => s_components.ToArray();
+    private static List<T> s_components = new();
 
     public static void Register(T component)
     {

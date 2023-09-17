@@ -5,7 +5,7 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<LangVersion>preview</LangVersion>
 		<PublishAot>true</PublishAot>
-		<!--<UseWindowsForms>true</UseWindowsForms>-->
+		<LangVersion>preview</LangVersion>
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 	</PropertyGroup>
 
