@@ -31,6 +31,8 @@ public sealed partial class ViewPort : UserControl
         _engineCore = new Engine.Core(_renderer, hWnd.Value, Controller.Files.AssetsPath);
         //Unloaded += (s, e) => _engineCore.Dispose();
 
+        _engineCore.Renderer.Data.SetSuperSample(true);
+
         _viewPortControl = new Controller.ViewPort(this, x_Grid_Overlay);
 
         // Adds an event handler for the CompositionTarget.Rendering event,
