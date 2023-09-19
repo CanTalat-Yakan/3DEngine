@@ -92,11 +92,11 @@ public sealed class Core
         // Call LateUpdate for all scenes.
         SceneManager.LateUpdate();
 
-        // Finishes the state of input processing.
-        Input.LateUpdate();
-
         if (Time.TimeStepEllapsed)
             FixedFrame();
+
+        // Finishes the state of input processing.
+        Input.LateUpdate();
 
         // Renders the scene twice, once in solid mode and once in wireframe mode.
         Renderer.Data.SetRasterizerDescFillMode();
