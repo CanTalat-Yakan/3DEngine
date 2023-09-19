@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 
 using Vortice.Direct3D11;
+using Vortice.Direct3D;
 
 namespace Engine.Components;
 
@@ -53,6 +54,8 @@ public sealed class Mesh : Component
     {
         // Set the material's constant buffer to the entity's transform constant buffer.
         _material.Set(Entity.Transform.GetConstantBuffer());
+
+        _d3d.Data.SetPrimitiveTopology(PrimitiveTopology.TriangleList);
 
         // Draw the mesh using the Direct3D context.
         _d3d.Draw(
