@@ -25,12 +25,10 @@ public class PlayerMovement : Component
 
     private void HandleMovement()
     {
-        var horizontalInput = Input.GetAxis().X;
-        var verticalInput = Input.GetAxis().Y;
-
-        _targetDirection = Entity.Transform.Right * horizontalInput +
-                           Entity.Transform.Forward * verticalInput;
+        _targetDirection = Entity.Transform.Right * Input.GetAxis().X +
+                           Entity.Transform.Forward * Input.GetAxis().Y;
         _targetDirection.Y = 0;
+
         _targetDirection = Vector3.Normalize(_targetDirection) * MovementSpeed;
     }
 
@@ -39,7 +37,7 @@ public class PlayerMovement : Component
         if (!Input.GetButton(MouseButton.Right))
             return;
 
-        var mouseInput = Input.GetMouseAxis();
+        var mouseInput = Input.GetMouseDelta();
         _cameraRotation.Y -= mouseInput.X * RotationSpeed * Time.DeltaF;
         _cameraRotation.X -= mouseInput.Y * RotationSpeed * Time.DeltaF;
         _cameraRotation.X = Math.Clamp(_cameraRotation.X, -89f, 89f);
