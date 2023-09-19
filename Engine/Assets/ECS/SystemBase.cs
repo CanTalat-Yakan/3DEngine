@@ -25,7 +25,7 @@ public class SystemBase<T> where T : Component
     {
         // Loop through all the components in the static components array
         // and call OnAwake method on the component if it is active.
-        foreach (T component in s_components.ToArray())
+        foreach (T component in Components)
             if (CheckActive(component))
                 component.OnAwake();
     }
@@ -34,7 +34,7 @@ public class SystemBase<T> where T : Component
     {
         // Loop through all the components in the static components array
         // and call OnStart method on the component if it is active.
-        foreach (T component in s_components.ToArray())
+        foreach (T component in Components)
             if (CheckActive(component))
                 component.OnStart();
     }
@@ -43,7 +43,7 @@ public class SystemBase<T> where T : Component
     {
         // Loop through all the components in the static components array
         // and call OnUpdate method on the component if it is active.
-        foreach (T component in s_components.ToArray())
+        foreach (T component in Components)
             if (CheckActive(component))
                 component.OnUpdate();
     }
@@ -52,7 +52,7 @@ public class SystemBase<T> where T : Component
     {
         // Loop through all the components in the static components array
         // and call OnLateUpdate method on the component if it is active.
-        foreach (T component in s_components.ToArray())
+        foreach (T component in Components)
             if (CheckActive(component))
                 component.OnLateUpdate();
     }
@@ -61,7 +61,7 @@ public class SystemBase<T> where T : Component
     {
         // Loop through all the components in the static components array
         // and call OnLateUpdate method on the component if it is active.
-        foreach (T component in s_components.ToArray())
+        foreach (T component in Components)
             if (CheckActive(component))
                 component.OnFixedUpdate();
     }
@@ -70,7 +70,7 @@ public class SystemBase<T> where T : Component
     {
         // Loop through all the components in the static components array
         // and call OnRender method on the component if it is active.
-        foreach (T component in s_components.ToArray())
+        foreach (T component in Components)
             if (CheckActive(component))
                 component.OnRender();
     }
