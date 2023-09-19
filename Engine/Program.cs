@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
 
 using Vortice.Win32;
-
 using static Vortice.Win32.Kernel32;
 using static Vortice.Win32.User32;
 
@@ -39,23 +38,24 @@ sealed class Program
 
         RegisterClassEx(ref wndClass);
 
-        Win32Window win32Window = new(wndClass.ClassName, "3D Engine", 1600, 1000);
+        Win32Window win32Window = new(wndClass.ClassName, "3D Engine", 1080, 720);
         #endregion
 
         #region // Instance Engine and AppWindow, then show Window
         _engineCore = new(win32Window);
         _appWindow = new(win32Window);
 
-        _appWindow.Show();
+        //_engineCore.Renderer.Data.SetSuperSample(true);
+
+        _appWindow.Show(ShowWindowCommand.Maximize);
         #endregion
 
         #region // LOOP
-        const uint PM_REMOVE = 1;
-
+        // Create a while loop and break when window requested quit.
         bool quitRequested = false;
         while (!quitRequested)
         {
-            if (PeekMessage(out var msg, IntPtr.Zero, 0, 0, PM_REMOVE))
+            if (PeekMessage(out var msg, IntPtr.Zero, 0, 0, 1))
             {
                 TranslateMessage(ref msg);
                 DispatchMessage(ref msg);
@@ -70,7 +70,7 @@ sealed class Program
                 }
             }
 
-            Loop();
+            Loop(); // <-- This is where the loop is handled.
         }
         #endregion
     }

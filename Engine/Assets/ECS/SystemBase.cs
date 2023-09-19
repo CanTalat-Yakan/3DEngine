@@ -57,6 +57,15 @@ public class SystemBase<T> where T : Component
                 component.OnLateUpdate();
     }
 
+    public static void FixedUpdate()
+    {
+        // Loop through all the components in the static components array
+        // and call OnLateUpdate method on the component if it is active.
+        foreach (T component in s_components.ToArray())
+            if (CheckActive(component))
+                component.OnFixedUpdate();
+    }
+
     public static void Render()
     {
         // Loop through all the components in the static components array

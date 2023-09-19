@@ -119,6 +119,17 @@ public sealed class SceneManager
             ScriptSystem.LateUpdate();
     }
 
+    public void FixedUpdate()
+    {
+        if (!Core.PlayMode)
+            // FixedUpdate the EditorScriptSystem.
+            EditorScriptSystem.FixedUpdate();
+
+        if (Core.PlayMode)
+            // FixedUpdate the ScriptSystem.
+            ScriptSystem.FixedUpdate();
+    }
+
     public void Render()
     {
         // Update the TransformSystem.
