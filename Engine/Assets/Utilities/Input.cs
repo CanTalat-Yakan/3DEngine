@@ -31,7 +31,8 @@ namespace Engine.Utilities
 
         private static Vector2 s_axis = Vector2.Zero;
         private static Vector2 s_joystickAxis = Vector2.Zero;
-        private static Vector2 s_mouseAxis = Vector2.Zero;
+
+        private static Vector2 s_mouseDelta = Vector2.Zero;
         private static Vector2 s_mousePosition = Vector2.Zero;
         private static int s_mouseWheel = 0;
         private static bool s_lockMouse;
@@ -92,11 +93,6 @@ namespace Engine.Utilities
                 var currentMouseState = s_mouse?.GetCurrentMouseState();
                 if (currentMouseState is not null)
                 {
-                    // Calculate mouse axis based on the difference between the current and previous pointer positions.
-                    s_mouseAxis.X = currentMouseState.X - s_mouseState.X;
-                    s_mouseAxis.Y = currentMouseState.Y - s_mouseState.Y;
-                    s_mouseAxis.Y *= -1; // The DirectX Y Coord starts at the top.
-
                     // Get the mouse position.
                     s_mousePosition.X = currentMouseState.X;
                     s_mousePosition.Y = currentMouseState.Y;
@@ -127,6 +123,23 @@ namespace Engine.Utilities
             if (GetKey(Key.S)) s_axis.Y--;
             if (GetKey(Key.D)) s_axis.X++;
             if (GetKey(Key.A)) s_axis.X--;
+        }
+
+        public static void FixedUpdate()
+        {
+            try
+            {
+                var currentMouseState = s_mouse?.GetCurrentMouseState();
+                if (currentMouseState is not null)
+                {
+                    // Calculate mouse axis based on the difference between the current and previous pointer positions.
+                    s_mouseDelta.X = s_mousePosition.X - currentMouseState.X;
+                    s_mouseDelta.Y = s_mousePosition.Y - currentMouseState.Y;
+
+                    s_mouseDelta.Y *= -1; // The DirectX Y Coord starts at the top.
+                }
+            }
+            catch { }
         }
 
         public static void LateUpdate()
@@ -194,8 +207,8 @@ namespace Engine.Utilities
         public static Vector2 GetJoystickAxis() =>
             s_joystickAxis.IsNaN() ? Vector2.Zero : s_axis;
 
-        public static Vector2 GetMouseAxis() =>
-            s_mouseAxis.IsNaN() ? Vector2.Zero : s_mouseAxis;
+        public static Vector2 GetMouseDelta() =>
+            s_mouseDelta.IsNaN() ? Vector2.Zero : s_mouseDelta;
 
         public static Vector2 GetMousePosition() =>
             s_mousePosition.IsNaN() ? Vector2.Zero : s_mousePosition;

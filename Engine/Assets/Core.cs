@@ -20,9 +20,9 @@ public sealed class Core
     public static bool PlayMode { get; private set; }
     public static bool PlayModeStarted { get; private set; }
 
-    public SceneManager SceneManager;
     public Renderer Renderer;
     public RuntimeCompiler RuntimeCompiler;
+    public SceneManager SceneManager;
 
     public Core(Renderer renderer, nint hWnd, string assetsPath = null) =>
         Initialize(renderer, hWnd, assetsPath);
@@ -67,6 +67,10 @@ public sealed class Core
         // Clears the render target, discarding the contents and preparing it for the next frame.
         Renderer.Clear();
 
+        // Updates the time values, such as delta time and time scale,
+        // used in the game or application.
+        Time.Update();
+
         // Acquire and Poll Mouse and Keyboard and Update the States and the Input.
         Input.Fetch();
         Input.Update();
@@ -82,7 +86,7 @@ public sealed class Core
             // Call Start for all scenes again.
             SceneManager.Start();
         }
-
+        
         // Call Update for all scenes.
         SceneManager.Update();
         // Call LateUpdate for all scenes.
@@ -91,18 +95,25 @@ public sealed class Core
         // Finishes the state of input processing.
         Input.LateUpdate();
 
+        if (Time.TimeStepEllapsed)
+            FixedFrame();
+
         // Renders the scene twice, once in solid mode and once in wireframe mode.
-        Renderer.SetRasterizerDesc();
+        Renderer.Data.SetRasterizerDescFillMode();
         SceneManager.Render();
-        Renderer.SetRasterizerDesc(Vortice.Direct3D11.FillMode.Wireframe);
+        Renderer.Data.SetRasterizerDescFillModeWireframe();
         SceneManager.Render();
 
         // Presents the final rendered image on the screen.
         Renderer.Present();
+    }
 
-        // Updates the time values, such as delta time and time scale,
-        // used in the game or application.
-        Time.Update();
+    public void FixedFrame()
+    {
+        // Call FixedUpdate for input.
+        Input.FixedUpdate();
+        // Call FixedUpdate for all scenes.
+        SceneManager.FixedUpdate();
     }
 
     public void Dispose()

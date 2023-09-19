@@ -15,7 +15,7 @@ public sealed class SceneCameraController : EditorComponent
 
     private float _rotationSpeed = 5;
     private Vector3 _direction;
-    private Vector3 _rotation;
+    private Vector3 _euler;
 
     private Vector2 _mousePosition;
 
@@ -28,8 +28,7 @@ public sealed class SceneCameraController : EditorComponent
         // Call the MovementSpeedCalc function to calculate the movement speed.
         MovementSpeedCalc();
 
-
-        if (Input.GetButton(MouseButton.Right, InputState.Down) 
+        if (Input.GetButton(MouseButton.Right, InputState.Down)
             || Input.GetButton(MouseButton.Middle, InputState.Down))
         {
             User32.GetCursorPos(out var point);
@@ -37,20 +36,11 @@ public sealed class SceneCameraController : EditorComponent
             _mousePosition.Y = point.Y;
         }
 
-        // Check if the middle mouse button is pressed. If so, call the ScreenMovement function.
-        if (Input.GetButton(MouseButton.Middle) && ViewportFocused)
-        {
-            User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
-
-            ScreenMovement();
-        }
-
         // Check if the right mouse button is pressed.
         // If so, call the TransformMovement, CameraMovement and HeightTransformMovement functions.
         if (Input.GetButton(MouseButton.Right) && ViewportFocused)
         {
             TransformMovement();
-            CameraRotation();
             HeightTransformMovement();
 
             //User32.SetCursor(User32.LoadCursor(IntPtr.Zero, SystemCursor.IDC_CROSS));
@@ -63,18 +53,32 @@ public sealed class SceneCameraController : EditorComponent
 
         // Update the entity's position based on the calculated direction and movement speed.
         Entity.Transform.LocalPosition += _direction * Time.DeltaF * s_movementSpeed;
-        // Update the entity's rotation based on the calculated rotation and rotation speed.
-        Entity.Transform.EulerAngles -= _rotation * Time.DeltaF * _rotationSpeed;
 
-        //// Limit the entity's vertical rotation between -89 and 89 degrees.
-        Entity.Transform.EulerAngles = new(
-            Math.Clamp(Entity.Transform.EulerAngles.X, -89, 89),
-            Entity.Transform.EulerAngles.Y,
-            Entity.Transform.EulerAngles.Z);
-
-        // Reset the rotation and direction vector.
-        _rotation = Vector3.Zero;
+        // Reset the direction vector.
         _direction = Vector3.Zero;
+    }
+
+    public override void OnFixedUpdate()
+    {
+        // Check if the middle mouse button is pressed. If so, call the ScreenMovement function.
+        if (Input.GetButton(MouseButton.Middle) && ViewportFocused)
+        {
+            User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
+
+            ScreenMovement();
+        }
+
+        if (Input.GetButton(MouseButton.Right) && ViewportFocused)
+        {
+            //User32.SetCursor(User32.LoadCursor(IntPtr.Zero, SystemCursor.IDC_CROSS));
+            User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
+
+            _euler.X = Math.Clamp(Input.GetMouseDelta().Y, -89, 89);
+            _euler.Y = Input.GetMouseDelta().X;
+
+            // Update the entity's rotation based on the calculated rotation and rotation speed.
+            Entity.Transform.EulerAngles -= _euler * Time.DeltaF * _rotationSpeed;
+        }
     }
 
     private void MovementSpeedCalc()
@@ -88,10 +92,6 @@ public sealed class SceneCameraController : EditorComponent
         s_movementSpeed = Math.Clamp(s_movementSpeed, 0.1f, 10);
     }
 
-    private void CameraRotation() =>
-        // Create a new rotation based on the mouse X and Y axis inputs.
-        _rotation = new(Input.GetMouseAxis().Y, Input.GetMouseAxis().X, 0);
-
     private void TransformMovement() =>
         // Calculate the direction based on the forward and right vectors of the entity's transform
         // and the X and Y axis inputs from the Input class.
@@ -100,7 +100,7 @@ public sealed class SceneCameraController : EditorComponent
     private void ScreenMovement() =>
         // Update the direction by subtracting the right vector multiplied by the mouse X axis input,
         // and the local up vector multiplied by the mouse Y axis input, both scaled by the time delta.
-        _direction -= Entity.Transform.Right * Input.GetMouseAxis().X * 0.5f + Entity.Transform.Up * Input.GetMouseAxis().Y * 0.5f;
+        _direction -= Entity.Transform.Right * Input.GetMouseDelta().X * 0.5f + Entity.Transform.Up * Input.GetMouseDelta().Y * 0.5f;
 
     private void ScrollMovement()
     {

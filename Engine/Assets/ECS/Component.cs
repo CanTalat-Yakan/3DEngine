@@ -27,6 +27,8 @@ public class Component : ICloneable // BindableBase
 
     public virtual void OnLateUpdate() { }
 
+    public virtual void OnFixedUpdate() { }
+
     public virtual void OnRender() { }
 
     public virtual void OnDestroy() { }
