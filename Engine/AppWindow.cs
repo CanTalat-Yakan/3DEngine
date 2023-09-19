@@ -24,8 +24,8 @@ class AppWindow
         ImGuiNET.ImGui.GetIO().DisplaySize = new Vector2(_win32Window.Width, _win32Window.Height);
     }
 
-    public void Show() =>
-        User32.ShowWindow(_win32Window.Handle, ShowWindowCommand.Normal);
+    public void Show(ShowWindowCommand command = ShowWindowCommand.Normal) =>
+        User32.ShowWindow(_win32Window.Handle, command);
 
     public void Render()
     {
@@ -68,7 +68,7 @@ class AppWindow
                         _win32Window.Width = Utils.Loword(lp);
                         _win32Window.Height = Utils.Hiword(lp);
 
-                        Resize(); // <-- This is where resizing is handled
+                        Resize(); // <-- This is where resizing is handled.
                         break;
                     case SizeMessage.SIZE_MINIMIZED:
                         _win32Window.IsMinimized = true;
