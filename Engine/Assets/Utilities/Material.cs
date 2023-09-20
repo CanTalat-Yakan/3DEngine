@@ -13,7 +13,6 @@ public sealed class Material
 
     private ID3D11VertexShader _vertexShader;
     private ID3D11PixelShader _pixelShader;
-    private ID3D11GeometryShader _geometryShader;
 
     private ID3D11InputLayout _inputLayout;
 
@@ -22,16 +21,8 @@ public sealed class Material
 
     private ID3D11Buffer _model;
 
-    public Material(string shaderFileName, string imageFileName, bool includeGeometryShader = false)
+    public Material(string shaderFileName, string imageFileName)
     {
-        #region //Create InputLayout
-        // Define the input layout for the vertex buffer.
-        InputElementDescription[] inputElements = new[] {
-                new InputElementDescription("POSITION", 0, Format.R32G32B32_Float, 0, 0), // Position element.
-                new InputElementDescription("TEXCOORD", 0, Format.R32G32_Float, InputElementDescription.AppendAligned, 0), // Texture coordinate element.
-                new InputElementDescription("NORMAL", 0, Format.R32G32B32_Float, InputElementDescription.AppendAligned, 0)}; // Normal element.
-        #endregion
-
         #region //Create VertexShader
         // Compile the vertex shader bytecode from the specified shader file name.
         ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(shaderFileName, "VS", "vs_4_0");
@@ -39,6 +30,15 @@ public sealed class Material
         // Create the vertex shader using the compiled bytecode.
         _vertexShader = _d3d.Device.CreateVertexShader(vertexShaderByteCode.Span);
         // Create the input layout using the specified input elements and vertex shader bytecode.
+        #endregion
+
+        #region //Create InputLayout
+        // Define the input layout for the vertex buffer.
+        InputElementDescription[] inputElements = new[] {
+                new InputElementDescription("POSITION", 0, Format.R32G32B32_Float, 0, 0), // Position element.
+                new InputElementDescription("TEXCOORD", 0, Format.R32G32_Float, InputElementDescription.AppendAligned, 0), // Texture coordinate element.
+                new InputElementDescription("NORMAL", 0, Format.R32G32B32_Float, InputElementDescription.AppendAligned, 0)}; // Normal element.
+
         _inputLayout = _d3d.Device.CreateInputLayout(inputElements, vertexShaderByteCode.Span);
         #endregion
 
@@ -50,19 +50,7 @@ public sealed class Material
         _pixelShader = _d3d.Device.CreatePixelShader(pixelShaderByteCode.Span);
         #endregion
 
-        #region //Create GeometryShader
-        // This code creates a Geometry Shader, if the includeGeometryShader flag is set to true.
-        if (includeGeometryShader)
-        {
-            // Compile the bytecode for the geometry shader using the specified shader file name and target profile.
-            ReadOnlyMemory<byte> geometryShaderByteCode = CompileBytecode(shaderFileName, "GS", "ps_4_0");
-
-            // Create the geometry shader using the compiled bytecode.
-            _geometryShader = _d3d.Device.CreateGeometryShader(geometryShaderByteCode.Span);
-        }
-        #endregion
-
-        #region //Create ConstantBuffers for Model
+        #region //Create ConstantBuffer for Model
         // Create the constant buffer for model-related data.
         PerModelConstantBuffer cbModel = new();
 
@@ -103,31 +91,24 @@ public sealed class Material
 
     internal void Set(PerModelConstantBuffer constantBuffer)
     {
-        // Set input layout, vertex shader, and pixel shader in the device context.
-        _d3d.DeviceContext.IASetInputLayout(_inputLayout);
-        _d3d.DeviceContext.VSSetShader(_vertexShader);
-        _d3d.DeviceContext.PSSetShader(_pixelShader);
-        _d3d.DeviceContext.GSSetShader(_geometryShader);
-
         #region //Update constant buffer data
         // Map the constant buffer and copy the models model-view matrix into it.
         unsafe
         {
             // Map the constant buffer to memory for write access.
-            MappedSubresource mappedResource = _d3d.DeviceContext.Map(_model, MapMode.WriteDiscard);
+            MappedSubresource mappedResource = _d3d.Data.DeviceContext.Map(_model, MapMode.WriteDiscard);
             // Copy the data from the constant buffer to the mapped resource.
             Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref constantBuffer);
             // Unmap the constant buffer from memory.
-            _d3d.DeviceContext.Unmap(_model, 0);
+            _d3d.Data.DeviceContext.Unmap(_model, 0);
         }
         #endregion
 
-        // Set the constant buffer in the vertex shader stage of the device context.
-        _d3d.DeviceContext.VSSetConstantBuffer(1, _model);
-
+        // Set input layout, vertex shader, and pixel shader in the device context.
         // Set the shader resource and sampler in the pixel shader stage of the device context.
-        _d3d.DeviceContext.PSSetShaderResource(0, _resourceView);
-        _d3d.DeviceContext.PSSetSampler(0, _sampler);
+        _d3d.Data.SetupMaterial(_inputLayout, _vertexShader, _pixelShader, _sampler, _resourceView);
+        // Set the constant buffer in the vertex shader stage of the device context.
+        _d3d.Data.SetupConstantBuffer(1, _model);
     }
 
     private static ReadOnlyMemory<byte> CompileBytecode(string shaderPath, string entryPoint, string profile)

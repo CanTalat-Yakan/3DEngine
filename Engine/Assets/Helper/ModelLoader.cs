@@ -19,9 +19,8 @@ internal sealed class ModelLoader
         }
 
         // Create an AssimpContext instance.
-        AssimpContext con = new();
-        AssimpContext importer = new();
-        importer.SetConfig(new NormalSmoothingAngleConfig(66.0f));
+        AssimpContext context = new();
+        //context.SetConfig(new NormalSmoothingAngleConfig(66.0f));
 
         var postProcessSteps =
             PostProcessSteps.Triangulate |
@@ -33,7 +32,7 @@ internal sealed class ModelLoader
             PostProcessPreset.TargetRealTimeQuality;
 
         // Load the model file using Assimp.
-        Assimp.Scene file = con.ImportFile(modelFilePath, postProcessSteps);
+        Assimp.Scene file = context.ImportFile(modelFilePath, postProcessSteps);
 
         // Create new lists for the "MeshInfo" object.
         var vertices = new List<Vertex>();

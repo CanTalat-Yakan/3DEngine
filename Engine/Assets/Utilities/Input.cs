@@ -97,6 +97,12 @@ namespace Engine.Utilities
                     s_mousePosition.X = currentMouseState.X;
                     s_mousePosition.Y = currentMouseState.Y;
 
+                    // Calculate mouse axis based on the difference between the current and previous pointer positions.
+                    s_mouseDelta.X = s_mousePosition.X - currentMouseState.X;
+                    s_mouseDelta.Y = s_mousePosition.Y - currentMouseState.Y;
+
+                    s_mouseDelta.Y *= -1; // The DirectX Y Coord starts at the top.
+
                     // Get the mouse delta clamped to -1 and 1.
                     s_mouseWheel = Math.Clamp(currentMouseState.Z, -1, 1);
                 }

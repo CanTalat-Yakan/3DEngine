@@ -58,9 +58,7 @@ public sealed class Mesh : Component
         _d3d.Data.SetPrimitiveTopology(PrimitiveTopology.TriangleList);
 
         // Draw the mesh using the Direct3D context.
-        _d3d.Draw(
-            _vertexBuffer, _vertexStride,
-            _indexBuffer, _indexCount);
+        _d3d.Draw(_vertexBuffer, _indexBuffer, _indexCount, _vertexStride, 0, 0);
 
         // Increment the vertex, index and draw call count in the profiler.
         Profiler.Vertices += _vertexCount;

@@ -9,6 +9,7 @@ using Vortice.Mathematics;
 using Vortice;
 
 using ImDrawIdx = System.UInt16;
+using System.Collections.Generic;
 
 // based on https://github.com/ocornut/imgui/blob/master/examples/imgui_impl_dx11.cpp
 // copied from https://github.com/YaakovDavis/VorticeImGui/blob/master/VorticeImGui/Framework/ImGuiRenderer.cs
@@ -27,6 +28,8 @@ unsafe public sealed class ImGuiRenderer
     private int _vertexBufferSize = 5000, _indexBufferSize = 10000;
     private const int _vertexConstantBufferSize = 16 * 4;
 
+    private Dictionary<IntPtr, ID3D11ShaderResourceView> _textureResources = new();
+
     private Win32Window _win32Window;
 
     public ImGuiRenderer(Win32Window win32Window)
@@ -37,14 +40,14 @@ unsafe public sealed class ImGuiRenderer
         io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;  // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
 
         D3D11.D3D11CreateDevice(
-            null, 
-            DriverType.Hardware, 
-            DeviceCreationFlags.BgraSupport, 
-            null, 
-            out _device, 
+            null,
+            DriverType.Hardware,
+            DeviceCreationFlags.BgraSupport,
+            null,
+            out _device,
             out _deviceContext);
 
-        _data.TextureResources = new();
+        _data.DeviceContext = _deviceContext;
 
         InitializeSwapChain();
         CreateMaterial();
@@ -205,7 +208,7 @@ unsafe public sealed class ImGuiRenderer
                     var rect = new RawRect((int)(cmd.ClipRect.X - clip_off.X), (int)(cmd.ClipRect.Y - clip_off.Y), (int)(cmd.ClipRect.Z - clip_off.X), (int)(cmd.ClipRect.W - clip_off.Y));
                     _deviceContext.RSSetScissorRects(new[] { rect });
 
-                    _data.TextureResources.TryGetValue(cmd.TextureId, out var texture);
+                    _textureResources.TryGetValue(cmd.TextureId, out var texture);
                     if (texture != null)
                         _deviceContext.PSSetShaderResources(0, new[] { texture });
 
@@ -219,34 +222,16 @@ unsafe public sealed class ImGuiRenderer
 
     private void SetupRenderState(ImDrawDataPtr drawData)
     {
-        var viewport = new Viewport
+        _data.SetupViewports(new Viewport
         {
             Width = drawData.DisplaySize.X,
             Height = drawData.DisplaySize.Y,
             MinDepth = 0.0f,
-            MaxDepth = 1.0f,
-        };
-        _deviceContext.RSSetViewports(new[] { viewport });
+            MaxDepth = 1.0f
+        });
 
-        int stride = sizeof(ImDrawVert);
-        int offset = 0;
-
-        _deviceContext.IASetInputLayout(_data.InputLayout);
-        _deviceContext.IASetVertexBuffer(0, _data.VertexBuffer, stride, offset);
-        _deviceContext.IASetIndexBuffer(_data.IndexBuffer, sizeof(ImDrawIdx) == 2 ? Format.R16_UInt : Format.R32_UInt, 0);
-        _deviceContext.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
-        _deviceContext.VSSetShader(_data.VertexShader);
-        _deviceContext.VSSetConstantBuffer(0, _data.ConstantBuffer);
-        _deviceContext.PSSetShader(_data.PixelShader);
-        _deviceContext.PSSetSampler(0, _data.FontSampler);
-        _deviceContext.GSSetShader(null);
-        _deviceContext.HSSetShader(null);
-        _deviceContext.DSSetShader(null);
-        _deviceContext.CSSetShader(null);
-
-        _deviceContext.OMSetBlendState(_data.BlendState);
-        _deviceContext.OMSetDepthStencilState(_data.DepthStencilState);
-        _deviceContext.RSSetState(_data.RasterizerState);
+        _data.PrimitiveTopology = PrimitiveTopology.TriangleList;
+        _data.SetupRenderState(sizeof(ImDrawVert), 0, sizeof(ImDrawIdx) == 2 ? Format.R16_UInt : Format.R32_UInt);
     }
 
     private void CreateMaterial()
@@ -270,7 +255,7 @@ unsafe public sealed class ImGuiRenderer
             CPUAccessFlags = CpuAccessFlags.Write
         };
         _data.ConstantBuffer = _device.CreateBuffer(constBufferDesc);
-        
+
         ReadOnlyMemory<byte> pixelShaderByteCode = CompileBytecode("ImGui.hlsl", "PS", "ps_4_0");
         _data.PixelShader = _device.CreatePixelShader(pixelShaderByteCode.Span);
 
@@ -353,10 +338,10 @@ unsafe public sealed class ImGuiRenderer
             ViewDimension = ShaderResourceViewDimension.Texture2D,
             Texture2D = new Texture2DShaderResourceView { MipLevels = texDesc.MipLevels, MostDetailedMip = 0 }
         };
-        _data.FontTextureView = _device.CreateShaderResourceView(texture, resViewDesc);
+        _data.ResourceView = _device.CreateShaderResourceView(texture, resViewDesc);
         texture.Release();
 
-        io.Fonts.TexID = _data.RegisterTexture(_data.FontTextureView);
+        io.Fonts.TexID = RegisterTexture(_data.ResourceView);
 
         SamplerDescription samplerDesc = new()
         {
@@ -369,7 +354,15 @@ unsafe public sealed class ImGuiRenderer
             MinLOD = 0f,
             MaxLOD = 0f
         };
-        _data.FontSampler = _device.CreateSamplerState(samplerDesc);
+        _data.SamplerState = _device.CreateSamplerState(samplerDesc);
+    }
+
+    public IntPtr RegisterTexture(ID3D11ShaderResourceView texture)
+    {
+        var id = texture.NativePointer;
+        _textureResources.Add(id, texture);
+
+        return id;
     }
 
     public void Resize()
@@ -399,8 +392,8 @@ unsafe public sealed class ImGuiRenderer
 
     private void InvalidateDeviceObjects()
     {
-        _data.FontSampler?.Release();
-        _data.FontTextureView?.Release();
+        _data.SamplerState?.Release();
+        _data.ResourceView?.Release();
         _data.IndexBuffer?.Release();
         _data.VertexBuffer?.Release();
         _data.BlendState?.Release();

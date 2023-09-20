@@ -37,16 +37,16 @@ class AppWindow
         ImGuiNET.ImGui.Render();
         _imGuiRenderer.Render();        
 
-        _imGuiRenderer.Present();        
+        _imGuiRenderer.Present();
     }
 
     public void Resize()
     {
-        _imGuiRenderer.Resize();
-        Render();
-
         Core.Instance.Renderer.Resize(_win32Window.Width, _win32Window.Height);
-        Core.Instance.Frame();
+        //Core.Instance.Frame();
+
+        _imGuiRenderer.Resize();
+        //Render();
     }
 
     public bool ProcessMessage(uint msg, UIntPtr wParam, IntPtr lParam)

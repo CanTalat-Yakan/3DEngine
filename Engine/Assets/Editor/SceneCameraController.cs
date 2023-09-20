@@ -10,10 +10,11 @@ public sealed class SceneCameraController : EditorComponent
     private static bool s_viewportFocused = true;
 
     public static float MovementSpeed { get => s_movementSpeed; set => s_movementSpeed = value; }
-
     private static float s_movementSpeed = 2;
 
-    private float _rotationSpeed = 5;
+    public static float RotationSpeed { get => s_rotationSpeed; set => s_rotationSpeed = value; }
+    private static float s_rotationSpeed = 5;
+
     private Vector3 _direction;
     private Vector3 _euler;
 
@@ -77,7 +78,7 @@ public sealed class SceneCameraController : EditorComponent
             _euler.Y = Input.GetMouseDelta().X;
 
             // Update the entity's rotation based on the calculated rotation and rotation speed.
-            Entity.Transform.EulerAngles -= _euler * Time.DeltaF * _rotationSpeed;
+            Entity.Transform.EulerAngles -= _euler * Time.DeltaF * s_rotationSpeed;
         }
     }
 

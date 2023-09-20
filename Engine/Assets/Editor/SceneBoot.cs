@@ -46,7 +46,8 @@ internal sealed class SceneBoot : EditorComponent
     public override void OnUpdate()
     {
         // Set the skybox's position to the camera's position.
-        SceneManager.MainScene.EntityManager.Sky.Transform.LocalPosition = CameraSystem.Components.First().Entity.Transform.Position;
+        SceneManager.MainScene.EntityManager.Sky.Transform.LocalPosition = 
+            CameraSystem.Components.First().Entity.Transform.Position;
 
         // Reactivate the SceneCamera after OnUpdate is called from the EditorScriptSystem.
         SceneCamera.IsEnabled = true;

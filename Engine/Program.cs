@@ -18,7 +18,7 @@ sealed class Program
     private void Loop()
     {
         _engineCore.Frame();
-        _appWindow.Render();
+        //_appWindow.Render();
     }
 
     private void Run()

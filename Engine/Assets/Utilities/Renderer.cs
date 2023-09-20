@@ -18,7 +18,6 @@ public sealed class Renderer
     public Size Size { get; private set; }
 
     public ID3D11Device Device { get; private set; }
-    public ID3D11DeviceContext DeviceContext { get; private set; }
 
     public RenderData Data = new();
 
@@ -83,10 +82,10 @@ public sealed class Renderer
         // Assign the device to a variable.
         Device = defaultDevice.QueryInterface<ID3D11Device>(); // Due to unsupported SDK (Idk), switched from ID3D11Device1 to ID3D11Device Interface, Context too.
                                                                // Get the immediate context of the device.
-        DeviceContext = Device.ImmediateContext;
+        Data.DeviceContext = Device.ImmediateContext;
 
         // Initialize the SwapChainDescription structure.
-        SwapChainDescription1 swapChainDescription1 = new()
+        Data.SwapChainDescription = new()
         {
             AlphaMode = AlphaMode.Ignore,
             BufferCount = 2,
@@ -108,8 +107,8 @@ public sealed class Renderer
             IDXGIFactory2 dxgiFactory2 = dxgiDevice3.GetAdapter().GetParent<IDXGIFactory2>();
             // Creates a swap chain using the swap chain description.
             IDXGISwapChain1 swapChain1 = forHwnd
-                ? dxgiFactory2.CreateSwapChainForHwnd(dxgiDevice3, _win32Window.Handle, swapChainDescription1)
-                : dxgiFactory2.CreateSwapChainForComposition(dxgiDevice3, swapChainDescription1);
+                ? dxgiFactory2.CreateSwapChainForHwnd(dxgiDevice3, _win32Window.Handle, Data.SwapChainDescription)
+                : dxgiFactory2.CreateSwapChainForComposition(dxgiDevice3, Data.SwapChainDescription);
 
             Data.SwapChain = swapChain1.QueryInterface<IDXGISwapChain2>();
         }
@@ -126,7 +125,46 @@ public sealed class Renderer
         Data.RenderTargetView = Device.CreateRenderTargetView(Data.RenderTargetTexture);
         #endregion
 
+        #region //Create Blend State
+        // Set up the blend state description.
+        Data.BlendStateDescription = new()
+        {
+            AlphaToCoverageEnable = false
+        };
+
+        // Render target blend description setup.
+        Data.RenderTargetBlendDescription = new()
+        {
+            BlendEnable = true, // Enable blend.
+            SourceBlend = Blend.SourceAlpha,
+            DestinationBlend = Blend.InverseSourceAlpha,
+            BlendOperation = BlendOperation.Add,
+            SourceBlendAlpha = Blend.One,
+            DestinationBlendAlpha = Blend.Zero,
+            BlendOperationAlpha = BlendOperation.Add,
+            RenderTargetWriteMask = ColorWriteEnable.All
+        };
+
+        // Assign the render target blend description to the blend state description.
+        Data.BlendStateDescription.RenderTarget[0] = Data.RenderTargetBlendDescription;
+        // Create the blend state.
+        Data.BlendState = Device.CreateBlendState(Data.BlendStateDescription);
+        // Set the blend state.
+        Data.DeviceContext.OMSetBlendState(Data.BlendState);
+        #endregion
+
         #region //Create depth stencil view
+        // Set up depth stencil description.
+        Data.DepthStencilDescription = new()
+        {
+            DepthEnable = true,
+            DepthFunc = ComparisonFunction.Less,
+            DepthWriteMask = DepthWriteMask.All,
+        };
+
+        // Create a depth stencil state from the description.
+        Data.DepthStencilState = Device.CreateDepthStencilState(Data.DepthStencilDescription);
+
         // Create a depth stencil texture description with the specified properties.
         Data.DepthStencilTextureDescription = new()
         {
@@ -143,24 +181,13 @@ public sealed class Renderer
         };
 
         // Create the depth stencil texture and view based on the description.
-        using (Data.DepthStencilTexture = Device.CreateTexture2D(Data.DepthStencilTextureDescription))
-            Data.DepthStencilView = Device.CreateDepthStencilView(Data.DepthStencilTexture);
-
-        // Set up depth stencil description.
-        DepthStencilDescription desc = new()
-        {
-            DepthEnable = true,
-            DepthFunc = ComparisonFunction.Less,
-            DepthWriteMask = DepthWriteMask.All,
-        };
-
-        // Create a depth stencil state from the description.
-        ID3D11DepthStencilState state = Device.CreateDepthStencilState(desc);
+        Data.DepthStencilTexture = Device.CreateTexture2D(Data.DepthStencilTextureDescription);
+        Data.DepthStencilView = Device.CreateDepthStencilView(Data.DepthStencilTexture);
 
         // Set the device context's OM state to the created depth stencil state.
-        DeviceContext.OMSetDepthStencilState(state);
+        Data.DeviceContext.OMSetDepthStencilState(Data.DepthStencilState);
         // Set the device context's render targets to the created render target view and depth stencil view.
-        DeviceContext.OMSetRenderTargets(Data.RenderTargetView, Data.DepthStencilView);
+        Data.DeviceContext.OMSetRenderTargets(Data.RenderTargetView, Data.DepthStencilView);
         #endregion
 
         #region //Create rasterizer state
@@ -172,41 +199,16 @@ public sealed class Renderer
         };
 
         // Create a rasterizer state based on the description
-        // and set it as the current state in the device context.
-        DeviceContext.RSSetState(Device.CreateRasterizerState(Data.RasterizerDescription));
+        Data.RasterizerState = Device.CreateRasterizerState(Data.RasterizerDescription);
+
+        // Set it as the current state in the device context.
+        Data.DeviceContext.RSSetState(Data.RasterizerState);
         #endregion
 
-        #region //Create Blend State
-        // Set up the blend state description.
-        BlendDescription blendStateDesc = new()
-        {
-            AlphaToCoverageEnable = false
-        };
-
-        // Render target blend description setup.
-        RenderTargetBlendDescription renTarDesc = new()
-        {
-            BlendEnable = true, // Enable blend.
-            SourceBlend = Blend.SourceAlpha,
-            DestinationBlend = Blend.InverseSourceAlpha,
-            BlendOperation = BlendOperation.Add,
-            SourceBlendAlpha = Blend.One,
-            DestinationBlendAlpha = Blend.Zero,
-            BlendOperationAlpha = BlendOperation.Add,
-            RenderTargetWriteMask = ColorWriteEnable.All
-        };
-
-        // Assign the render target blend description to the blend state description.
-        blendStateDesc.RenderTarget[0] = renTarDesc;
-        // Create the blend state.
-        Data.BlendState = Device.CreateBlendState(blendStateDesc);
-        // Set the blend state.
-        DeviceContext.OMSetBlendState(Data.BlendState);
-        #endregion
 
         #region //Set ViewPort
         // Set the viewport to match the size of the swap chain panel.
-        DeviceContext.RSSetViewport(
+        Data.DeviceContext.RSSetViewport(
             0, 0,
             Size.Width,
             Size.Height);
@@ -219,23 +221,13 @@ public sealed class Renderer
         // Present the final render to the screen.
         Data.SwapChain.Present(Data.VSync ? 1 : 0, PresentFlags.None);
 
-    public void Draw(ID3D11Buffer vertexBuffer, int vertexStride, ID3D11Buffer indexBuffer, int indexCount, int vertexOffset = 0, int indexOffset = 0)
+    public void Draw(ID3D11Buffer vertexBuffer, ID3D11Buffer indexBuffer, int indexCount, int vertexStride, int vertexOffset = 0, int indexOffset = 0)
     {
-        // Create a rasterizer state based on the description
-        // and set it as the current state in the device context.
-        DeviceContext.RSSetState(Device.CreateRasterizerState(Data.RasterizerDescription));
+        Data.VertexBuffer = vertexBuffer;
+        Data.IndexBuffer = indexBuffer;
 
-        // Set the type of the primitive to be rendered in triangle list.
-        DeviceContext.IASetPrimitiveTopology(Data.PrimitiveTopology);
-        // Set the vertex buffer.
-        DeviceContext.IASetVertexBuffer(0, vertexBuffer, vertexStride, vertexOffset);
-        // Set the index buffer in R16_UInt format.
-        DeviceContext.IASetIndexBuffer(indexBuffer, Format.R16_UInt, indexOffset);
-        // Set the blend state.
-        DeviceContext.OMSetBlendState(Data.BlendState);
-
-        // Make the draw call to render the geometry.
-        DeviceContext.DrawIndexed(indexCount, 0, 0);
+        Data.SetupRenderState(vertexStride, vertexOffset);
+        Data.DeviceContext.DrawIndexed(indexCount, 0, 0);
     }
 
     public void Clear()
@@ -244,11 +236,11 @@ public sealed class Renderer
         var col = new Color4(0.15f, 0.15f, 0.15f, 0);
 
         // Clear the render target view and depth stencil view with the set color.
-        DeviceContext.ClearRenderTargetView(Data.RenderTargetView, col);
-        DeviceContext.ClearDepthStencilView(Data.DepthStencilView, DepthStencilClearFlags.Depth, 1.0f, 0);
+        Data.DeviceContext.ClearRenderTargetView(Data.RenderTargetView, col);
+        Data.DeviceContext.ClearDepthStencilView(Data.DepthStencilView, DepthStencilClearFlags.Depth, 1.0f, 0);
 
         // Set the render target and depth stencil view for the device context.
-        DeviceContext.OMSetRenderTargets(Data.RenderTargetView, Data.DepthStencilView);
+        Data.DeviceContext.OMSetRenderTargets(Data.RenderTargetView, Data.DepthStencilView);
 
         // Reset the profiler values for vertices, indices, and draw calls.
         Profiler.Vertices = 0;
@@ -260,7 +252,7 @@ public sealed class Renderer
     {
         // Dispose all DirectX resources that were created.
         Device?.Dispose();
-        DeviceContext?.Dispose();
+        Data.DeviceContext?.Dispose();
 
         // Dispose of the swap chain.
         Data.SwapChain?.Dispose();
@@ -316,14 +308,14 @@ public sealed class Renderer
         // Update the depth stencil texture description and create the depth stencil texture and view.
         Data.DepthStencilTextureDescription.Width = Size.Width;
         Data.DepthStencilTextureDescription.Height = Size.Height;
-        using (Data.DepthStencilTexture = Device.CreateTexture2D(Data.DepthStencilTextureDescription))
-            Data.DepthStencilView = Device.CreateDepthStencilView(Data.DepthStencilTexture);
+        Data.DepthStencilTexture = Device.CreateTexture2D(Data.DepthStencilTextureDescription);
+        Data.DepthStencilView = Device.CreateDepthStencilView(Data.DepthStencilTexture);
 
         // Update the size of the source in the swap chain.
         Data.SwapChain.SourceSize = Size;
 
         // Update the viewport to match the new window size.
-        DeviceContext.RSSetViewport(
+        Data.DeviceContext.RSSetViewport(
             0, 0,
             Size.Width,
             Size.Height);

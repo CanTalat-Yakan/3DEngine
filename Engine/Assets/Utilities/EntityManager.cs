@@ -56,15 +56,16 @@ namespace Engine.Utilities
         private static Material _materialSky;
         private static Material _materialSkyLight;
 
-        //private static readonly string SHADER_LIT = @"Lit.hlsl";
-        private static readonly string SHADER_SIMPLELIT = @"SimpleLit.hlsl";
-        private static readonly string SHADER_UNLIT = @"Unlit.hlsl";
+        //private static readonly string SHADER_LIT = "Lit.hlsl";
+        private static readonly string SHADER_SIMPLELIT = "SimpleLit.hlsl";
+        private static readonly string SHADER_UNLIT = "Unlit.hlsl";
+        private static readonly string SHADER_SKYBOX = "Skybox.hlsl";
 
-        private static readonly string IMAGE_DEFAULT = @"Dark.png";
-        private static readonly string IMAGE_SKY = @"SkyGradient.png";
-        private static readonly string IMAGE_SKY_LIGHT = @"SkyGradient_Light.png";
+        private static readonly string IMAGE_DEFAULT = "Dark.png";
+        private static readonly string IMAGE_SKY = "SkyGradient.png";
+        private static readonly string IMAGE_SKY_LIGHT = "SkyGradient_Light.png";
 
-        private static readonly string PRIMITIVES = @"Primitives";
+        private static readonly string PRIMITIVES = "Primitives";
 
         public EntityManager()
         {
@@ -74,7 +75,7 @@ namespace Engine.Utilities
 
             // Create a new material with the unlit shader and sky image.
             if (_materialSky is null)
-                _materialSky = new(SHADER_UNLIT, IMAGE_SKY);
+                _materialSky = new(SHADER_SKYBOX, IMAGE_SKY);
 
             // Create a new material with the unlit shader and a light version of the sky image.
             if (_materialSkyLight is null)
@@ -161,7 +162,7 @@ namespace Engine.Utilities
                 Tag = EditorTags.SceneSky.ToString(), // Set entity tag to SceneSky.
             };
             // Set scale of the Sky's transform.
-            Sky.Transform.LocalScale = new Vector3(-1000, 1000, 1000);
+            Sky.Transform.LocalScale = new Vector3(-100, 100, 100);
 
             // Add Mesh component to Sky entity.
             var skyMesh = (Mesh)Sky.AddComponent<Mesh>();
