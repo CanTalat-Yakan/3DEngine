@@ -1,8 +1,8 @@
 using System.Runtime.CompilerServices;
 
-using Vortice.Win32;
 using static Vortice.Win32.Kernel32;
 using static Vortice.Win32.User32;
+using Vortice.Win32;
 
 namespace Engine;
 
@@ -15,11 +15,8 @@ sealed class Program
     private static void Main() =>
         new Program().Run();
 
-    private void Loop()
-    {
+    private void Loop() =>
         _engineCore.Frame();
-        _appWindow.Render();
-    }
 
     private void Run()
     {
@@ -45,7 +42,8 @@ sealed class Program
         _engineCore = new(win32Window);
         _appWindow = new(win32Window);
 
-        _engineCore.Renderer.Data.SetSuperSample(true);
+        //_engineCore.Renderer.Data.SetSuperSample(true);
+        _engineCore.OnRender += (s, e) => _appWindow.Render();
 
         _appWindow.Show(ShowWindowCommand.Maximize);
         #endregion
@@ -64,7 +62,7 @@ sealed class Program
                 {
                     quitRequested = true;
 
-                    _appWindow?.Dispose();
+                    Core.Instance?.Dispose();
 
                     break;
                 }

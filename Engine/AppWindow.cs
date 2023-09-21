@@ -1,4 +1,6 @@
-﻿using Vortice.Win32;
+﻿using ImGuiNET;
+
+using Vortice.Win32;
 
 namespace Engine;
 
@@ -15,13 +17,11 @@ class AppWindow
     {
         _win32Window = win32window;
 
-        _imGuiContext = ImGuiNET.ImGui.CreateContext();
-        ImGuiNET.ImGui.SetCurrentContext(_imGuiContext);
+        _imGuiContext = ImGui.CreateContext();
+        ImGui.SetCurrentContext(_imGuiContext);
 
-        _imGuiRenderer = new ImGuiRenderer(_win32Window);
+        _imGuiRenderer = new ImGuiRenderer();
         _imGuiInputHandler = new ImGuiInputHandler(_win32Window.Handle);
-
-        ImGuiNET.ImGui.GetIO().DisplaySize = new Vector2(_win32Window.Width, _win32Window.Height);
     }
 
     public void Show(ShowWindowCommand command = ShowWindowCommand.Normal) =>
@@ -29,29 +29,21 @@ class AppWindow
 
     public void Render()
     {
-        _imGuiRenderer.Update(_imGuiContext, new Vector2(_win32Window.Width, _win32Window.Height));
-        _imGuiInputHandler.Update();
+        _imGuiRenderer.Update(_imGuiContext, Core.Instance.Renderer.Size);
+        _imGuiInputHandler.Update(Core.Instance.Renderer.Data.SuperSample);
 
-        ImGuiNET.ImGui.ShowDemoWindow();
+        ImGui.ShowDemoWindow();
 
-        ImGuiNET.ImGui.Render();
+        ImGui.Render();
         _imGuiRenderer.Render();        
-
-        _imGuiRenderer.Present();
     }
 
-    public void Resize()
-    {
+    public void Resize() =>
         Core.Instance.Renderer.Resize(_win32Window.Width, _win32Window.Height);
-        //Core.Instance.Frame();
-
-        _imGuiRenderer.Resize();
-        //Render();
-    }
 
     public bool ProcessMessage(uint msg, UIntPtr wParam, IntPtr lParam)
     {
-        ImGuiNET.ImGui.SetCurrentContext(_imGuiContext);
+        ImGui.SetCurrentContext(_imGuiContext);
         if (_imGuiInputHandler.ProcessMessage((WindowMessage)msg, wParam, lParam))
             return true;
 
@@ -80,11 +72,5 @@ class AppWindow
         }
 
         return false;
-    }
-
-    public void Dispose()
-    {
-        Core.Instance?.Dispose();
-        _imGuiRenderer?.Dispose();
     }
 }

@@ -24,7 +24,7 @@ public sealed class Mesh : Component
     internal int _indexCount => _meshInfo.Indices.Length;
     internal int _indexStride => Unsafe.SizeOf<int>();
 
-    private Renderer _d3d => Renderer.Instance;
+    private Renderer _renderer => Renderer.Instance;
 
     public override void OnRegister() =>
         // Register the component with the MeshSystem.
@@ -55,10 +55,10 @@ public sealed class Mesh : Component
         // Set the material's constant buffer to the entity's transform constant buffer.
         _material.Set(Entity.Transform.GetConstantBuffer());
 
-        _d3d.Data.SetPrimitiveTopology(PrimitiveTopology.TriangleList);
+        _renderer.Data.SetPrimitiveTopology(PrimitiveTopology.TriangleList);
 
         // Draw the mesh using the Direct3D context.
-        _d3d.Draw(_vertexBuffer, _indexBuffer, _indexCount, _vertexStride, 0, 0);
+        _renderer.Draw(_vertexBuffer, _indexBuffer, _indexCount, _vertexStride, 0, 0);
 
         // Increment the vertex, index and draw call count in the profiler.
         Profiler.Vertices += _vertexCount;
@@ -91,13 +91,13 @@ public sealed class Mesh : Component
 
         //Create a VertexBuffer using the MeshInfo's vertices
         //and bind it with VertexBuffer flag.
-        _vertexBuffer = _d3d.Device.CreateBuffer(
+        _vertexBuffer = _renderer.Device.CreateBuffer(
             _meshInfo.Vertices,
             BindFlags.VertexBuffer);
 
         //Create an IndexBuffer using the MeshInfo's indices
         //and bind it with IndexBuffer flag.
-        _indexBuffer = _d3d.Device.CreateBuffer(
+        _indexBuffer = _renderer.Device.CreateBuffer(
             _meshInfo.Indices,
             BindFlags.IndexBuffer);
     }

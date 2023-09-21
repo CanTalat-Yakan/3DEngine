@@ -11,7 +11,7 @@ public sealed class Camera : Component
     public float FOV = 90;
     public byte CameraID = 0;
 
-    private Renderer _d3d => Renderer.Instance;
+    private Renderer _renderer => Renderer.Instance;
 
     private ID3D11Buffer _view;
     private ViewConstantBuffer _viewConstantBuffer;
@@ -22,7 +22,7 @@ public sealed class Camera : Component
 
     public Camera() =>
         //Create View Constant Buffer when Camera is initialized.
-        _view = _d3d.Device.CreateConstantBuffer<ViewConstantBuffer>();
+        _view = _renderer.Device.CreateConstantBuffer<ViewConstantBuffer>();
 
     public override void OnAwake()
     {
@@ -49,7 +49,7 @@ public sealed class Camera : Component
             Vector3.UnitY);
         
         // Get the aspect ratio for the device's screen.
-        var aspect = (float)_d3d.Size.Width / (float)_d3d.Size.Height;
+        var aspect = (float)_renderer.Size.Width / (float)_renderer.Size.Height;
         var dAspect = aspect < 1 ? 1 * aspect : 1 / aspect;
 
         // Convert the field of view from degrees to radians.
@@ -94,15 +94,15 @@ public sealed class Camera : Component
         unsafe
         {
             // Map the constant buffer to memory for write access.
-            MappedSubresource mappedResource = _d3d.Data.DeviceContext.Map(_view, MapMode.WriteDiscard);
+            MappedSubresource mappedResource = _renderer.Data.DeviceContext.Map(_view, MapMode.WriteDiscard);
             // Copy the data from the constant buffer to the mapped resource.
             Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref _viewConstantBuffer);
             // Unmap the constant buffer from memory.
-            _d3d.Data.DeviceContext.Unmap(_view, 0);
+            _renderer.Data.DeviceContext.Unmap(_view, 0);
         }
         #endregion
 
         // Set the constant buffer in the vertex shader stage of the device context.
-        _d3d.Data.SetupConstantBuffer(0, _view);
+        _renderer.Data.SetupConstantBuffer(0, _view);
     }
 }

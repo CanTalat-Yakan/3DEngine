@@ -16,7 +16,9 @@ public sealed class Renderer
     public IDXGISwapChain2 SwapChain { get => Data.SwapChain; }
 
     public ID3D11Device Device { get; private set; }
-    public Size Size { get; private set; }
+
+    public Size Size => Data.SuperSample ? NativeSize * 2 : NativeSize;
+    public Size NativeSize { get; private set; }
 
     public RenderData Data = new();
 
@@ -38,7 +40,9 @@ public sealed class Renderer
                 """);
 
         // Set the size.
-        Size = new Size(_win32Window.Width, _win32Window.Height);
+        NativeSize = new Size(
+            _win32Window.Width,
+            _win32Window.Height);
 
         var result = Initialize(true);
         if (result.Failure)
@@ -50,7 +54,7 @@ public sealed class Renderer
         if (Instance is null)
             Instance = this;
 
-        Size = new Size(
+        NativeSize = new Size(
             Math.Max(640, sizeX),
             Math.Max(480, sizeY));
 
@@ -197,17 +201,6 @@ public sealed class Renderer
         Data.RasterizerState = Device.CreateRasterizerState(Data.RasterizerDescription);
         #endregion
 
-        #region //Set ViewPort
-        // Set the viewport to match the size of the swap chain panel.
-        Data.SetupViewports(new Viewport
-        {
-            Width = Size.Width,
-            Height = Size.Height,
-            MinDepth = 0.0f,
-            MaxDepth = 1.0f
-        });
-        #endregion
-
         return new Result(0);
     }
 
@@ -223,6 +216,8 @@ public sealed class Renderer
         Data.RasterizerState = Device.CreateRasterizerState(Data.RasterizerDescription);
 
         Data.SetupRenderState(vertexStride, vertexOffset);
+        Data.SetupViewport(Size.Width, Size.Height);
+
         Data.DeviceContext.DrawIndexed(indexCount, 0, 0);
     }
 
@@ -271,15 +266,9 @@ public sealed class Renderer
         if (!IsRendering)
             return;
 
-        if (Data.SuperSample)
-        {
-            newWidth *= 2;
-            newHeight *= 2;
-        }
-
         // Resize the buffers, depth stencil texture, render target texture and viewport
         // when the size of the window changes.
-        Size = new Size(
+        NativeSize = new Size(
             Math.Max(640, newWidth),
             Math.Max(480, newHeight));
 
@@ -309,14 +298,5 @@ public sealed class Renderer
 
         // Update the size of the source in the swap chain.
         Data.SwapChain.SourceSize = Size;
-
-        // Update the viewport to match the new window size.
-        Data.SetupViewports(new Viewport
-        {
-            Width = Size.Width,
-            Height = Size.Height,
-            MinDepth = 0.0f,
-            MaxDepth = 1.0f
-        });
     }
 }

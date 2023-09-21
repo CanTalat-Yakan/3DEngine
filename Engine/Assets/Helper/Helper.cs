@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Drawing;
+using System.Linq;
 using System.Text;
 
 namespace Engine.Helper;
@@ -18,6 +19,9 @@ public static class ExtensionMethods
 
     public static Vector3 ToRadians(this Vector3 vector) =>
         new(vector.X.ToRadians(), vector.Y.ToRadians(), vector.Z.ToRadians());
+
+    public static Vector2 ToVector2(this Size size) =>
+        new Vector2(size.Width, size.Height);
 
     public static bool IsNaN(this float value) =>
         float.IsNaN(value);

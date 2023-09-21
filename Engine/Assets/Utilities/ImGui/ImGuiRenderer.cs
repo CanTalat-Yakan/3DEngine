@@ -1,8 +1,7 @@
 ﻿using ImGuiNET;
 using System.Collections.Generic;
-using System.IO;
+using System.Drawing;
 
-using Vortice.D3DCompiler;
 using Vortice.Direct3D11;
 using Vortice.Direct3D;
 using Vortice.DXGI;
@@ -20,10 +19,9 @@ unsafe public sealed class ImGuiRenderer
 {
     public bool IsRendering { get => _data.RenderTargetView is not null; }
 
+    private ID3D11Device _device;
     private RenderData _data = new();
 
-    private ID3D11Device _device;
-    
     private int _vertexBufferSize = 5000, _indexBufferSize = 10000;
     private const int _vertexConstantBufferSize = 16 * 4;
 
@@ -31,90 +29,30 @@ unsafe public sealed class ImGuiRenderer
 
     private Dictionary<IntPtr, ID3D11ShaderResourceView> _textureResources = new();
 
-    private Win32Window _win32Window;
-
-    public ImGuiRenderer(Win32Window win32Window)
+    public ImGuiRenderer()
     {
-        _win32Window = win32Window;
-
         var io = ImGui.GetIO();
         io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;  // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
 
-        D3D11.D3D11CreateDevice(
-            null,
-            DriverType.Hardware,
-            DeviceCreationFlags.BgraSupport,
-            null,
-            out _device,
-            out var _deviceContext);
+        _data = Core.Instance.Renderer.Data; // Make a copy of the Renderers Data and fill it with CreateMaterial
+        _device = Core.Instance.Renderer.Device;
 
-        _data.DeviceContext = _deviceContext;
-
-        InitializeSwapChain();
         CreateMaterial();
     }
 
-    public void InitializeSwapChain()
-    {
-        //var dxgiFactory = _device.QueryInterface<IDXGIDevice>().GetAdapter().GetParent<IDXGIFactory>();
-        //dxgiFactory.CreateSwapChain(_device, new());
-        //dxgiFactory.MakeWindowAssociation(_win32Window.Handle, WindowAssociationFlags.Valid);
-
-        // Initialize the SwapChainDescription structure.
-        SwapChainDescription1 swapChainDescription1 = new()
-        {
-            AlphaMode = AlphaMode.Ignore,
-            BufferCount = 2,
-            Format = Format.R8G8B8A8_UNorm,
-            Width = _win32Window.Width,
-            Height = _win32Window.Height,
-            SampleDescription = new(1, 0),
-            Scaling = Scaling.Stretch,
-            Stereo = false,
-            SwapEffect = SwapEffect.Discard,
-            BufferUsage = Usage.RenderTargetOutput
-        };
-
-        // Obtain instance of the IDXGIDevice3 interface from the Direct3D device.
-        IDXGIDevice3 dxgiDevice3 = _device.QueryInterface<IDXGIDevice3>();
-        // Obtain instance of the IDXGIFactory2 interface from the DXGI device.
-        IDXGIFactory2 dxgiFactory2 = dxgiDevice3.GetAdapter().GetParent<IDXGIFactory2>();
-        // Creates a swap chain using the swap chain description.
-        IDXGISwapChain1 swapChain1 = dxgiFactory2.CreateSwapChainForHwnd(dxgiDevice3, _win32Window.Handle, swapChainDescription1);
-
-        _data.SwapChain = swapChain1.QueryInterface<IDXGISwapChain2>();
-        _data.SwapChain.BackgroundColor = new Color4(0, 0, 0, 0);
-
-        _data.RenderTargetTexture = _data.SwapChain.GetBuffer<ID3D11Texture2D>(0);
-        _data.RenderTargetView = _device.CreateRenderTargetView(_data.RenderTargetTexture);
-    }
-
-    public void Update(IntPtr imGuiContext, Vector2 newSize)
+    public void Update(IntPtr imGuiContext, Size newSize)
     {
         ImGui.SetCurrentContext(imGuiContext);
         var io = ImGui.GetIO();
 
         io.DeltaTime = Time.DeltaF;
-        io.DisplaySize = newSize;
+        io.DisplaySize = newSize.ToVector2();
 
         ImGui.NewFrame();
     }
-
-    public void Present() =>
-        // Present the final render to the screen.
-        _data.SwapChain.Present(_data.VSync ? 1 : 0, PresentFlags.None);
-
-    public void Render()
-    {
-        // Set the background color to a dark gray.
-        var col = new Color4(0.1f, 0.1f, 0.1f, 0);
-
-        _data.DeviceContext.ClearRenderTargetView(_data.RenderTargetView, col);
-        _data.DeviceContext.OMSetRenderTargets(_data.RenderTargetView);
-        _data.DeviceContext.RSSetViewport(0, 0, _win32Window.Width, _win32Window.Height);
-
+    
+    public void Render() =>
         Draw(ImGui.GetDrawData());
-    }
 
     private void Draw(ImDrawDataPtr data)
     {
@@ -193,14 +131,7 @@ unsafe public sealed class ImGuiRenderer
 
 
         _data.SetupConstantBuffer(0, _viewConstantBuffer);
-        _data.SetupViewports(new Viewport
-        {
-            Width = data.DisplaySize.X,
-            Height = data.DisplaySize.Y,
-            MinDepth = 0.0f,
-            MaxDepth = 1.0f
-        });
-
+        
         _data.PrimitiveTopology = PrimitiveTopology.TriangleList;
         _data.SetupRenderState(sizeof(ImDrawVert), 0, sizeof(ImDrawIdx) == 2 ? Format.R16_UInt : Format.R32_UInt);
 
@@ -237,23 +168,9 @@ unsafe public sealed class ImGuiRenderer
         }
     }
 
-    private void SetupRenderState(ImDrawDataPtr drawData)
-    {
-        _data.SetupViewports(new Viewport
-        {
-            Width = drawData.DisplaySize.X,
-            Height = drawData.DisplaySize.Y,
-            MinDepth = 0.0f,
-            MaxDepth = 1.0f
-        });
-
-        _data.PrimitiveTopology = PrimitiveTopology.TriangleList;
-        _data.SetupRenderState(sizeof(ImDrawVert), 0, sizeof(ImDrawIdx) == 2 ? Format.R16_UInt : Format.R32_UInt);
-    }
-
     private void CreateMaterial()
     {
-        ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode("ImGui.hlsl", "VS", "vs_4_0");
+        ReadOnlyMemory<byte> vertexShaderByteCode = Material.CompileBytecode("ImGui.hlsl", "VS", "vs_4_0");
         _data.VertexShader = _device.CreateVertexShader(vertexShaderByteCode.Span);
 
         var inputElements = new[]
@@ -273,7 +190,7 @@ unsafe public sealed class ImGuiRenderer
         };
         _viewConstantBuffer = _device.CreateBuffer(constBufferDesc);
 
-        ReadOnlyMemory<byte> pixelShaderByteCode = CompileBytecode("ImGui.hlsl", "PS", "ps_4_0");
+        ReadOnlyMemory<byte> pixelShaderByteCode = Material.CompileBytecode("ImGui.hlsl", "PS", "ps_4_0");
         _data.PixelShader = _device.CreatePixelShader(pixelShaderByteCode.Span);
 
         BlendDescription blendDesc = new()
@@ -358,7 +275,10 @@ unsafe public sealed class ImGuiRenderer
         _data.ResourceView = _device.CreateShaderResourceView(texture, resViewDesc);
         texture.Release();
 
-        io.Fonts.TexID = RegisterTexture(_data.ResourceView);
+        var id = _data.ResourceView.NativePointer;
+        _textureResources.Add(id, _data.ResourceView);
+
+        io.Fonts.TexID = id;
 
         SamplerDescription samplerDesc = new()
         {
@@ -372,70 +292,5 @@ unsafe public sealed class ImGuiRenderer
             MaxLOD = 0f
         };
         _data.SamplerState = _device.CreateSamplerState(samplerDesc);
-    }
-
-    public IntPtr RegisterTexture(ID3D11ShaderResourceView texture)
-    {
-        var id = texture.NativePointer;
-        _textureResources.Add(id, texture);
-
-        return id;
-    }
-
-    public void Resize()
-    {
-        if (!IsRendering)
-            return;
-
-        _data.RenderTargetView.Dispose();
-        _data.RenderTargetTexture.Dispose();
-
-        _data.SwapChain.ResizeBuffers(1, _win32Window.Width, _win32Window.Height, Format.R8G8B8A8_UNorm, SwapChainFlags.None);
-
-        _data.RenderTargetTexture = _data.SwapChain.GetBuffer<ID3D11Texture2D1>(0);
-        _data.RenderTargetView = _device.CreateRenderTargetView(_data.RenderTargetTexture);
-    }
-
-    public void Dispose()
-    {
-        if (_device is null)
-            return;
-
-        InvalidateDeviceObjects();
-
-        _device?.Release();
-        _data.DeviceContext?.Release();
-    }
-
-    private void InvalidateDeviceObjects()
-    {
-        _viewConstantBuffer?.Release();
-
-        _data.SamplerState?.Release();
-        _data.ResourceView?.Release();
-        _data.IndexBuffer?.Release();
-        _data.VertexBuffer?.Release();
-        _data.BlendState?.Release();
-        _data.DepthStencilState?.Release();
-        _data.RasterizerState?.Release();
-        _data.PixelShader?.Release();
-        _data.InputLayout?.Release();
-        _data.VertexShader?.Release();
-    }
-
-    private static ReadOnlyMemory<byte> CompileBytecode(string shaderName, string entryPoint, string profile)
-    {
-        string assetsPath = Path.Combine(AppContext.BaseDirectory, Paths.SHADERS);
-        string fileName = Path.Combine(assetsPath, shaderName);
-
-        ShaderFlags shaderFlags = ShaderFlags.EnableStrictness;
-#if DEBUG
-        shaderFlags |= ShaderFlags.Debug;
-        shaderFlags |= ShaderFlags.SkipValidation;
-#else
-        shaderFlags |= ShaderFlags.OptimizationLevel3;
-#endif
-
-        return Compiler.CompileFromFile(fileName, entryPoint, profile, shaderFlags);
     }
 }

@@ -9,7 +9,7 @@ namespace Engine.Utilities;
 
 public sealed class Material
 {
-    private Renderer _d3d => Renderer.Instance;
+    private Renderer _renderer => Renderer.Instance;
 
     private ID3D11VertexShader _vertexShader;
     private ID3D11PixelShader _pixelShader;
@@ -28,7 +28,7 @@ public sealed class Material
         ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(shaderFileName, "VS", "vs_4_0");
 
         // Create the vertex shader using the compiled bytecode.
-        _vertexShader = _d3d.Device.CreateVertexShader(vertexShaderByteCode.Span);
+        _vertexShader = _renderer.Device.CreateVertexShader(vertexShaderByteCode.Span);
         // Create the input layout using the specified input elements and vertex shader bytecode.
         #endregion
 
@@ -39,7 +39,7 @@ public sealed class Material
                 new InputElementDescription("TEXCOORD", 0, Format.R32G32_Float, InputElementDescription.AppendAligned, 0), // Texture coordinate element.
                 new InputElementDescription("NORMAL", 0, Format.R32G32B32_Float, InputElementDescription.AppendAligned, 0)}; // Normal element.
 
-        _inputLayout = _d3d.Device.CreateInputLayout(inputElements, vertexShaderByteCode.Span);
+        _inputLayout = _renderer.Device.CreateInputLayout(inputElements, vertexShaderByteCode.Span);
         #endregion
 
         #region //Create PixelShader 
@@ -47,7 +47,7 @@ public sealed class Material
         ReadOnlyMemory<byte> pixelShaderByteCode = CompileBytecode(shaderFileName, "PS", "ps_4_0");
 
         // Create the pixel shader using the compiled bytecode.
-        _pixelShader = _d3d.Device.CreatePixelShader(pixelShaderByteCode.Span);
+        _pixelShader = _renderer.Device.CreatePixelShader(pixelShaderByteCode.Span);
         #endregion
 
         #region //Create ConstantBuffer for Model
@@ -63,13 +63,13 @@ public sealed class Material
         };
 
         // Create the constant buffer with the given description.
-        _model = _d3d.Device.CreateBuffer(cbModel, bufferDescription);
+        _model = _renderer.Device.CreateBuffer(cbModel, bufferDescription);
         #endregion
 
         #region //Create Texture and Sampler
         // Load the texture and create a shader resource view for it.
-        var texture = ImageLoader.LoadTexture(_d3d.Device, imageFileName);
-        _resourceView = _d3d.Device.CreateShaderResourceView(texture);
+        var texture = ImageLoader.LoadTexture(_renderer.Device, imageFileName);
+        _resourceView = _renderer.Device.CreateShaderResourceView(texture);
 
         // Set the properties for the sampler state.
         SamplerDescription samplerStateDescription = new()
@@ -85,7 +85,7 @@ public sealed class Material
         };
 
         // Create the sampler state using the sampler state description.
-        _sampler = _d3d.Device.CreateSamplerState(samplerStateDescription);
+        _sampler = _renderer.Device.CreateSamplerState(samplerStateDescription);
         #endregion
     }
 
@@ -96,22 +96,22 @@ public sealed class Material
         unsafe
         {
             // Map the constant buffer to memory for write access.
-            MappedSubresource mappedResource = _d3d.Data.DeviceContext.Map(_model, MapMode.WriteDiscard);
+            MappedSubresource mappedResource = _renderer.Data.DeviceContext.Map(_model, MapMode.WriteDiscard);
             // Copy the data from the constant buffer to the mapped resource.
             Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref constantBuffer);
             // Unmap the constant buffer from memory.
-            _d3d.Data.DeviceContext.Unmap(_model, 0);
+            _renderer.Data.DeviceContext.Unmap(_model, 0);
         }
         #endregion
 
         // Set input layout, vertex shader, and pixel shader in the device context.
         // Set the shader resource and sampler in the pixel shader stage of the device context.
-        _d3d.Data.SetupMaterial(_inputLayout, _vertexShader, _pixelShader, _sampler, _resourceView);
+        _renderer.Data.SetupMaterial(_inputLayout, _vertexShader, _pixelShader, _sampler, _resourceView);
         // Set the constant buffer in the vertex shader stage of the device context.
-        _d3d.Data.SetupConstantBuffer(1, _model);
+        _renderer.Data.SetupConstantBuffer(1, _model);
     }
 
-    private static ReadOnlyMemory<byte> CompileBytecode(string shaderPath, string entryPoint, string profile)
+    internal static ReadOnlyMemory<byte> CompileBytecode(string shaderPath, string entryPoint, string profile)
     {
         // Combine the base directory and the relative path to the resources directory.
         string resourcesPath = Path.Combine(AppContext.BaseDirectory, Paths.SHADERS);

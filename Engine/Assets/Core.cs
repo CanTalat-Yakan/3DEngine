@@ -20,6 +20,8 @@ public sealed class Core
     public static bool PlayMode { get; private set; }
     public static bool PlayModeStarted { get; private set; }
 
+    public event EventHandler OnRender;
+
     public Renderer Renderer;
     public RuntimeCompiler RuntimeCompiler;
     public SceneManager SceneManager;
@@ -103,6 +105,8 @@ public sealed class Core
         SceneManager.Render();
         Renderer.Data.SetRasterizerDescFillModeWireframe();
         SceneManager.Render();
+
+        OnRender?.Invoke(null, null);
 
         // Presents the final rendered image on the screen.
         Renderer.Present();
