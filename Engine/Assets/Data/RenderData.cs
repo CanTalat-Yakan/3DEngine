@@ -40,8 +40,6 @@ public struct RenderData
 
     public ID3D11InputLayout InputLayout;
 
-    public ID3D11Buffer ConstantBuffer;
-
     public ID3D11SamplerState SamplerState;
     public ID3D11ShaderResourceView ResourceView;
 
@@ -82,7 +80,6 @@ public struct RenderData
         DeviceContext.IASetIndexBuffer(IndexBuffer, indexFormat, indexOffset);
         DeviceContext.IASetPrimitiveTopology(PrimitiveTopology);
         DeviceContext.VSSetShader(VertexShader);
-        DeviceContext.VSSetConstantBuffer(0, ConstantBuffer);
         DeviceContext.PSSetShader(PixelShader);
         DeviceContext.PSSetSampler(0, SamplerState);
         DeviceContext.PSSetShaderResource(0, ResourceView);

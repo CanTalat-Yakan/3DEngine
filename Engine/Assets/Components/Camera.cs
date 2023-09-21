@@ -94,15 +94,15 @@ public sealed class Camera : Component
         unsafe
         {
             // Map the constant buffer to memory for write access.
-            MappedSubresource mappedResource = _d3d.Data.DeviceContext.Map(this._view, MapMode.WriteDiscard);
+            MappedSubresource mappedResource = _d3d.Data.DeviceContext.Map(_view, MapMode.WriteDiscard);
             // Copy the data from the constant buffer to the mapped resource.
             Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref _viewConstantBuffer);
             // Unmap the constant buffer from memory.
-            _d3d.Data.DeviceContext.Unmap(this._view, 0);
+            _d3d.Data.DeviceContext.Unmap(_view, 0);
         }
-
-        // Set the constant buffer to be used by the vertex shader.
-        _d3d.Data.DeviceContext.VSSetConstantBuffer(0, this._view);
         #endregion
+
+        // Set the constant buffer in the vertex shader stage of the device context.
+        _d3d.Data.SetupConstantBuffer(0, _view);
     }
 }

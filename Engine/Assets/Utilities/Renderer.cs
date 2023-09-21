@@ -226,6 +226,8 @@ public sealed class Renderer
         Data.VertexBuffer = vertexBuffer;
         Data.IndexBuffer = indexBuffer;
 
+        Data.RasterizerState = Device.CreateRasterizerState(Data.RasterizerDescription);
+
         Data.SetupRenderState(vertexStride, vertexOffset);
         Data.DeviceContext.DrawIndexed(indexCount, 0, 0);
     }

@@ -18,7 +18,7 @@ sealed class Program
     private void Loop()
     {
         _engineCore.Frame();
-        //_appWindow.Render();
+        _appWindow.Render();
     }
 
     private void Run()
@@ -45,7 +45,7 @@ sealed class Program
         _engineCore = new(win32Window);
         _appWindow = new(win32Window);
 
-        //_engineCore.Renderer.Data.SetSuperSample(true);
+        _engineCore.Renderer.Data.SetSuperSample(true);
 
         _appWindow.Show(ShowWindowCommand.Maximize);
         #endregion

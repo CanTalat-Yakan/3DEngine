@@ -23,10 +23,11 @@ unsafe public sealed class ImGuiRenderer
     private RenderData _data = new();
 
     private ID3D11Device _device;
-    private ID3D11DeviceContext _deviceContext;
-
+    
     private int _vertexBufferSize = 5000, _indexBufferSize = 10000;
     private const int _vertexConstantBufferSize = 16 * 4;
+
+    private ID3D11Buffer _viewConstantBuffer;
 
     private Dictionary<IntPtr, ID3D11ShaderResourceView> _textureResources = new();
 
@@ -45,7 +46,7 @@ unsafe public sealed class ImGuiRenderer
             DeviceCreationFlags.BgraSupport,
             null,
             out _device,
-            out _deviceContext);
+            out var _deviceContext);
 
         _data.DeviceContext = _deviceContext;
 
@@ -108,9 +109,9 @@ unsafe public sealed class ImGuiRenderer
         // Set the background color to a dark gray.
         var col = new Color4(0.1f, 0.1f, 0.1f, 0);
 
-        _deviceContext.ClearRenderTargetView(_data.RenderTargetView, col);
-        _deviceContext.OMSetRenderTargets(_data.RenderTargetView);
-        _deviceContext.RSSetViewport(0, 0, _win32Window.Width, _win32Window.Height);
+        _data.DeviceContext.ClearRenderTargetView(_data.RenderTargetView, col);
+        _data.DeviceContext.OMSetRenderTargets(_data.RenderTargetView);
+        _data.DeviceContext.RSSetViewport(0, 0, _win32Window.Width, _win32Window.Height);
 
         Draw(ImGui.GetDrawData());
     }
@@ -149,8 +150,8 @@ unsafe public sealed class ImGuiRenderer
         }
 
         // Upload vertex/index data into a single contiguous GPU buffer
-        var vertexResource = _deviceContext.Map(_data.VertexBuffer, 0, MapMode.WriteDiscard, Vortice.Direct3D11.MapFlags.None);
-        var indexResource = _deviceContext.Map(_data.IndexBuffer, 0, MapMode.WriteDiscard, Vortice.Direct3D11.MapFlags.None);
+        var vertexResource = _data.DeviceContext.Map(_data.VertexBuffer, 0, MapMode.WriteDiscard, Vortice.Direct3D11.MapFlags.None);
+        var indexResource = _data.DeviceContext.Map(_data.IndexBuffer, 0, MapMode.WriteDiscard, Vortice.Direct3D11.MapFlags.None);
         var vertexResourcePointer = (ImDrawVert*)vertexResource.DataPointer;
         var indexResourcePointer = (ImDrawIdx*)indexResource.DataPointer;
         for (int n = 0; n < data.CmdListsCount; n++)
@@ -166,13 +167,13 @@ unsafe public sealed class ImGuiRenderer
             vertexResourcePointer += cmdlList.VtxBuffer.Size;
             indexResourcePointer += cmdlList.IdxBuffer.Size;
         }
-        _deviceContext.Unmap(_data.VertexBuffer, 0);
-        _deviceContext.Unmap(_data.IndexBuffer, 0);
+        _data.DeviceContext.Unmap(_data.VertexBuffer, 0);
+        _data.DeviceContext.Unmap(_data.IndexBuffer, 0);
 
         // Setup orthographic projection matrix into our constant buffer
         // Our visible imGui space lies from draw_data.DisplayPos (top left) to draw_data.DisplayPos+data_data.DisplaySize (bottom right). DisplayPos is (0,0) for single viewport apps.
 
-        var constResource = _deviceContext.Map(_data.ConstantBuffer, 0, MapMode.WriteDiscard, Vortice.Direct3D11.MapFlags.None);
+        var constResource = _data.DeviceContext.Map(_viewConstantBuffer, 0, MapMode.WriteDiscard, Vortice.Direct3D11.MapFlags.None);
         var span = constResource.AsSpan<float>(_vertexConstantBufferSize);
         float L = data.DisplayPos.X;
         float R = data.DisplayPos.X + data.DisplaySize.X;
@@ -186,9 +187,25 @@ unsafe public sealed class ImGuiRenderer
                 (R+L)/(L-R),  (T+B)/(B-T),    0.5f,       1.0f,
         };
         mvp.CopyTo(span);
-        _deviceContext.Unmap(_data.ConstantBuffer, 0);
+        _data.DeviceContext.Unmap(_viewConstantBuffer, 0);
 
-        SetupRenderState(data);
+
+
+
+        _data.SetupConstantBuffer(0, _viewConstantBuffer);
+        _data.SetupViewports(new Viewport
+        {
+            Width = data.DisplaySize.X,
+            Height = data.DisplaySize.Y,
+            MinDepth = 0.0f,
+            MaxDepth = 1.0f
+        });
+
+        _data.PrimitiveTopology = PrimitiveTopology.TriangleList;
+        _data.SetupRenderState(sizeof(ImDrawVert), 0, sizeof(ImDrawIdx) == 2 ? Format.R16_UInt : Format.R32_UInt);
+
+
+
 
         // Render command lists
         // (Because we merged all buffers into a single one, we maintain our own offset into them)
@@ -206,13 +223,13 @@ unsafe public sealed class ImGuiRenderer
                 else
                 {
                     var rect = new RawRect((int)(cmd.ClipRect.X - clip_off.X), (int)(cmd.ClipRect.Y - clip_off.Y), (int)(cmd.ClipRect.Z - clip_off.X), (int)(cmd.ClipRect.W - clip_off.Y));
-                    _deviceContext.RSSetScissorRects(new[] { rect });
+                    _data.DeviceContext.RSSetScissorRects(new[] { rect });
 
                     _textureResources.TryGetValue(cmd.TextureId, out var texture);
                     if (texture != null)
-                        _deviceContext.PSSetShaderResources(0, new[] { texture });
+                        _data.DeviceContext.PSSetShaderResources(0, new[] { texture });
 
-                    _deviceContext.DrawIndexed((int)cmd.ElemCount, (int)(cmd.IdxOffset + global_idx_offset), (int)(cmd.VtxOffset + global_vtx_offset));
+                    _data.DeviceContext.DrawIndexed((int)cmd.ElemCount, (int)(cmd.IdxOffset + global_idx_offset), (int)(cmd.VtxOffset + global_vtx_offset));
                 }
             }
             global_idx_offset += cmdList.IdxBuffer.Size;
@@ -254,7 +271,7 @@ unsafe public sealed class ImGuiRenderer
             BindFlags = BindFlags.ConstantBuffer,
             CPUAccessFlags = CpuAccessFlags.Write
         };
-        _data.ConstantBuffer = _device.CreateBuffer(constBufferDesc);
+        _viewConstantBuffer = _device.CreateBuffer(constBufferDesc);
 
         ReadOnlyMemory<byte> pixelShaderByteCode = CompileBytecode("ImGui.hlsl", "PS", "ps_4_0");
         _data.PixelShader = _device.CreatePixelShader(pixelShaderByteCode.Span);
@@ -387,11 +404,13 @@ unsafe public sealed class ImGuiRenderer
         InvalidateDeviceObjects();
 
         _device?.Release();
-        _deviceContext?.Release();
+        _data.DeviceContext?.Release();
     }
 
     private void InvalidateDeviceObjects()
     {
+        _viewConstantBuffer?.Release();
+
         _data.SamplerState?.Release();
         _data.ResourceView?.Release();
         _data.IndexBuffer?.Release();
@@ -400,7 +419,6 @@ unsafe public sealed class ImGuiRenderer
         _data.DepthStencilState?.Release();
         _data.RasterizerState?.Release();
         _data.PixelShader?.Release();
-        _data.ConstantBuffer?.Release();
         _data.InputLayout?.Release();
         _data.VertexShader?.Release();
     }
