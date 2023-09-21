@@ -15,9 +15,8 @@ public sealed class Renderer
     public bool IsRendering { get => Data.RenderTargetView.NativePointer is not 0; }
     public IDXGISwapChain2 SwapChain { get => Data.SwapChain; }
 
-    public Size Size { get; private set; }
-
     public ID3D11Device Device { get; private set; }
+    public Size Size { get; private set; }
 
     public RenderData Data = new();
 
@@ -149,8 +148,6 @@ public sealed class Renderer
         Data.BlendStateDescription.RenderTarget[0] = Data.RenderTargetBlendDescription;
         // Create the blend state.
         Data.BlendState = Device.CreateBlendState(Data.BlendStateDescription);
-        // Set the blend state.
-        Data.DeviceContext.OMSetBlendState(Data.BlendState);
         #endregion
 
         #region //Create depth stencil view
@@ -184,8 +181,6 @@ public sealed class Renderer
         Data.DepthStencilTexture = Device.CreateTexture2D(Data.DepthStencilTextureDescription);
         Data.DepthStencilView = Device.CreateDepthStencilView(Data.DepthStencilTexture);
 
-        // Set the device context's OM state to the created depth stencil state.
-        Data.DeviceContext.OMSetDepthStencilState(Data.DepthStencilState);
         // Set the device context's render targets to the created render target view and depth stencil view.
         Data.DeviceContext.OMSetRenderTargets(Data.RenderTargetView, Data.DepthStencilView);
         #endregion
@@ -200,18 +195,17 @@ public sealed class Renderer
 
         // Create a rasterizer state based on the description
         Data.RasterizerState = Device.CreateRasterizerState(Data.RasterizerDescription);
-
-        // Set it as the current state in the device context.
-        Data.DeviceContext.RSSetState(Data.RasterizerState);
         #endregion
-
 
         #region //Set ViewPort
         // Set the viewport to match the size of the swap chain panel.
-        Data.DeviceContext.RSSetViewport(
-            0, 0,
-            Size.Width,
-            Size.Height);
+        Data.SetupViewports(new Viewport
+        {
+            Width = Size.Width,
+            Height = Size.Height,
+            MinDepth = 0.0f,
+            MaxDepth = 1.0f
+        });
         #endregion
 
         return new Result(0);
@@ -317,9 +311,12 @@ public sealed class Renderer
         Data.SwapChain.SourceSize = Size;
 
         // Update the viewport to match the new window size.
-        Data.DeviceContext.RSSetViewport(
-            0, 0,
-            Size.Width,
-            Size.Height);
+        Data.SetupViewports(new Viewport
+        {
+            Width = Size.Width,
+            Height = Size.Height,
+            MinDepth = 0.0f,
+            MaxDepth = 1.0f
+        });
     }
 }

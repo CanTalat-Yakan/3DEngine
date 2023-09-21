@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-using Vortice.Direct3D11;
+﻿using Vortice.Direct3D11;
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;

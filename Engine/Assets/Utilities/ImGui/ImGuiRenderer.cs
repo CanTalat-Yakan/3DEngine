@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+using System.Collections.Generic;
 using System.IO;
 
 using Vortice.D3DCompiler;
@@ -9,7 +10,6 @@ using Vortice.Mathematics;
 using Vortice;
 
 using ImDrawIdx = System.UInt16;
-using System.Collections.Generic;
 
 // based on https://github.com/ocornut/imgui/blob/master/examples/imgui_impl_dx11.cpp
 // copied from https://github.com/YaakovDavis/VorticeImGui/blob/master/VorticeImGui/Framework/ImGuiRenderer.cs
