@@ -68,7 +68,7 @@ public sealed class Material
 
         #region //Create Texture and Sampler
         // Load the texture and create a shader resource view for it.
-        var texture = ImageLoader.LoadTexture(_renderer.Device, imageFileName);
+        var texture = Loader.ImageLoader.LoadTexture(_renderer.Device, imageFileName);
         _resourceView = _renderer.Device.CreateShaderResourceView(texture);
 
         // Set the properties for the sampler state.
@@ -108,7 +108,7 @@ public sealed class Material
         // Set the shader resource and sampler in the pixel shader stage of the device context.
         _renderer.Data.SetupMaterial(_inputLayout, _vertexShader, _pixelShader, _sampler, _resourceView);
         // Set the constant buffer in the vertex shader stage of the device context.
-        _renderer.Data.SetupConstantBuffer(1, _model);
+        _renderer.Data.SetConstantBuffer(1, _model);
     }
 
     internal static ReadOnlyMemory<byte> CompileBytecode(string shaderPath, string entryPoint, string profile)

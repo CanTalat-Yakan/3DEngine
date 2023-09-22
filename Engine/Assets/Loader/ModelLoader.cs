@@ -1,9 +1,8 @@
-﻿using Assimp.Configs;
-using Assimp;
+﻿using Assimp;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Engine.Helper;
+namespace Engine.Loader;
 
 internal sealed class ModelLoader
 {

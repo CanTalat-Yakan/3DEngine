@@ -5,7 +5,6 @@ using System.Drawing;
 using Vortice.Direct3D11;
 using Vortice.Direct3D;
 using Vortice.DXGI;
-using Vortice.Mathematics;
 using Vortice;
 
 using ImDrawIdx = System.UInt16;
@@ -50,7 +49,7 @@ unsafe public sealed class ImGuiRenderer
 
         ImGui.NewFrame();
     }
-    
+
     public void Render() =>
         Draw(ImGui.GetDrawData());
 
@@ -60,6 +59,7 @@ unsafe public sealed class ImGuiRenderer
         if (data.DisplaySize.X <= 0.0f || data.DisplaySize.Y <= 0.0f)
             return;
 
+        #region // Vertex Buffer
         if (_data.VertexBuffer == null || _vertexBufferSize < data.TotalVtxCount)
         {
             _data.VertexBuffer?.Release();
@@ -72,7 +72,9 @@ unsafe public sealed class ImGuiRenderer
             desc.CPUAccessFlags = CpuAccessFlags.Write;
             _data.VertexBuffer = _device.CreateBuffer(desc);
         }
+        #endregion
 
+        #region // Index Buffer
         if (_data.IndexBuffer == null || _indexBufferSize < data.TotalIdxCount)
         {
             _data.IndexBuffer?.Release();
@@ -86,7 +88,9 @@ unsafe public sealed class ImGuiRenderer
             desc.CPUAccessFlags = CpuAccessFlags.Write;
             _data.IndexBuffer = _device.CreateBuffer(desc);
         }
+        #endregion
 
+        #region // Set Buffers
         // Upload vertex/index data into a single contiguous GPU buffer
         var vertexResource = _data.DeviceContext.Map(_data.VertexBuffer, 0, MapMode.WriteDiscard, Vortice.Direct3D11.MapFlags.None);
         var indexResource = _data.DeviceContext.Map(_data.IndexBuffer, 0, MapMode.WriteDiscard, Vortice.Direct3D11.MapFlags.None);
@@ -107,10 +111,11 @@ unsafe public sealed class ImGuiRenderer
         }
         _data.DeviceContext.Unmap(_data.VertexBuffer, 0);
         _data.DeviceContext.Unmap(_data.IndexBuffer, 0);
+        #endregion
 
+        #region // Set Model View Projection Matrix
         // Setup orthographic projection matrix into our constant buffer
         // Our visible imGui space lies from draw_data.DisplayPos (top left) to draw_data.DisplayPos+data_data.DisplaySize (bottom right). DisplayPos is (0,0) for single viewport apps.
-
         var constResource = _data.DeviceContext.Map(_viewConstantBuffer, 0, MapMode.WriteDiscard, Vortice.Direct3D11.MapFlags.None);
         var span = constResource.AsSpan<float>(_vertexConstantBufferSize);
         float L = data.DisplayPos.X;
@@ -127,18 +132,15 @@ unsafe public sealed class ImGuiRenderer
         mvp.CopyTo(span);
         _data.DeviceContext.Unmap(_viewConstantBuffer, 0);
 
+        _data.SetConstantBuffer(0, _viewConstantBuffer);
+        #endregion
 
-
-
-        _data.SetupConstantBuffer(0, _viewConstantBuffer);
-        
+        #region // Setup Render State
         _data.PrimitiveTopology = PrimitiveTopology.TriangleList;
         _data.SetupRenderState(sizeof(ImDrawVert), 0, sizeof(ImDrawIdx) == 2 ? Format.R16_UInt : Format.R32_UInt);
+        #endregion
 
-
-
-
-        // Render command lists
+        #region // Render command lists
         // (Because we merged all buffers into a single one, we maintain our own offset into them)
         int global_idx_offset = 0;
         int global_vtx_offset = 0;
@@ -166,13 +168,20 @@ unsafe public sealed class ImGuiRenderer
             global_idx_offset += cmdList.IdxBuffer.Size;
             global_vtx_offset += cmdList.VtxBuffer.Size;
         }
+        #endregion
     }
 
     private void CreateMaterial()
     {
+        #region // Create Vertex and Pixel Shader
         ReadOnlyMemory<byte> vertexShaderByteCode = Material.CompileBytecode("ImGui.hlsl", "VS", "vs_4_0");
         _data.VertexShader = _device.CreateVertexShader(vertexShaderByteCode.Span);
 
+        ReadOnlyMemory<byte> pixelShaderByteCode = Material.CompileBytecode("ImGui.hlsl", "PS", "ps_4_0");
+        _data.PixelShader = _device.CreatePixelShader(pixelShaderByteCode.Span);
+        #endregion
+
+        #region // Create Input Layout
         var inputElements = new[]
         {
                 new InputElementDescription( "POSITION", 0, Format.R32G32_Float,   0, 0, InputClassification.PerVertexData, 0 ),
@@ -180,7 +189,9 @@ unsafe public sealed class ImGuiRenderer
                 new InputElementDescription( "COLOR",    0, Format.R8G8B8A8_UNorm, 16, 0, InputClassification.PerVertexData, 0 ),
         };
         _data.InputLayout = _device.CreateInputLayout(inputElements, vertexShaderByteCode.Span);
+        #endregion
 
+        #region // Create View Constant Buffer
         BufferDescription constBufferDesc = new()
         {
             ByteWidth = _vertexConstantBufferSize,
@@ -189,10 +200,9 @@ unsafe public sealed class ImGuiRenderer
             CPUAccessFlags = CpuAccessFlags.Write
         };
         _viewConstantBuffer = _device.CreateBuffer(constBufferDesc);
+        #endregion
 
-        ReadOnlyMemory<byte> pixelShaderByteCode = Material.CompileBytecode("ImGui.hlsl", "PS", "ps_4_0");
-        _data.PixelShader = _device.CreatePixelShader(pixelShaderByteCode.Span);
-
+        #region // Create Blend, Rasterizer and Stencil Description
         BlendDescription blendDesc = new()
         {
             AlphaToCoverageEnable = false
@@ -233,6 +243,7 @@ unsafe public sealed class ImGuiRenderer
         };
 
         _data.DepthStencilState = _device.CreateDepthStencilState(depthDesc);
+        #endregion
 
         CreateFontsTexture();
     }

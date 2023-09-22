@@ -65,10 +65,10 @@ public struct RenderData
     public void SetPrimitiveTopology(PrimitiveTopology primitiveTopology) => 
         PrimitiveTopology = primitiveTopology;
 
-    public void SetupConstantBuffer(int slot, ID3D11Buffer constantBuffer) =>
+    public void SetConstantBuffer(int slot, ID3D11Buffer constantBuffer) =>
         DeviceContext.VSSetConstantBuffer(slot, constantBuffer);
 
-    public void SetupViewport(float width, float height) =>
+    public void SetViewport(float width, float height) =>
         DeviceContext.RSSetViewport(new Viewport(0, 0, width, height, 0.0f, 1.0f));
 
     public void SetupRenderState(int vertexStride, int vertexOffset, Format indexFormat = Format.R16_UInt, int indexOffset = 0)

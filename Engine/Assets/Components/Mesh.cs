@@ -42,7 +42,7 @@ public sealed class Mesh : Component
             if (File.Exists(MeshPath))
                 try
                 {
-                    SetMeshInfo(ModelLoader.LoadFile(MeshPath, false));
+                    SetMeshInfo(Loader.ModelLoader.LoadFile(MeshPath, false));
                 }
                 finally
                 {

@@ -12,13 +12,13 @@ public sealed class Renderer
 {
     public static Renderer Instance { get; private set; }
 
-    public bool IsRendering { get => Data.RenderTargetView.NativePointer is not 0; }
-    public IDXGISwapChain2 SwapChain { get => Data.SwapChain; }
-
-    public ID3D11Device Device { get; private set; }
+    public bool IsRendering => Data.RenderTargetView.NativePointer is not 0;
+    public IDXGISwapChain2 SwapChain => Data.SwapChain;
 
     public Size Size => Data.SuperSample ? NativeSize * 2 : NativeSize;
     public Size NativeSize { get; private set; }
+
+    public ID3D11Device Device { get; private set; }
 
     public RenderData Data = new();
 
@@ -216,7 +216,7 @@ public sealed class Renderer
         Data.RasterizerState = Device.CreateRasterizerState(Data.RasterizerDescription);
 
         Data.SetupRenderState(vertexStride, vertexOffset);
-        Data.SetupViewport(Size.Width, Size.Height);
+        Data.SetViewport(Size.Width, Size.Height);
 
         Data.DeviceContext.DrawIndexed(indexCount, 0, 0);
     }

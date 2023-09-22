@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Text;
 
+using Vortice.Mathematics;
+
 namespace Engine.Helper;
 
 public sealed class Helper { }
@@ -9,10 +11,10 @@ public sealed class Helper { }
 public static class ExtensionMethods
 {
     public static float ToDegrees(this float value) =>
-        Vortice.Mathematics.MathHelper.ToDegrees(value);
+        MathHelper.ToDegrees(value);
 
     public static float ToRadians(this float value) =>
-        Vortice.Mathematics.MathHelper.ToRadians(value);
+        MathHelper.ToRadians(value);
 
     public static Vector3 ToDegrees(this Vector3 vector) =>
         new(vector.X.ToDegrees(), vector.Y.ToDegrees(), vector.Z.ToDegrees());

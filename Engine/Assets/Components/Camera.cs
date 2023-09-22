@@ -103,6 +103,6 @@ public sealed class Camera : Component
         #endregion
 
         // Set the constant buffer in the vertex shader stage of the device context.
-        _renderer.Data.SetupConstantBuffer(0, _view);
+        _renderer.Data.SetConstantBuffer(0, _view);
     }
 }

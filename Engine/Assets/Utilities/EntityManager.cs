@@ -124,7 +124,7 @@ namespace Engine.Utilities
 
             // Add a mesh component to the entity using the specified primitive type.
             var mesh = (Mesh)newEntity.AddComponent<Mesh>();
-            mesh.SetMeshInfo(ModelLoader.LoadFile(Path.Combine(PRIMITIVES, type.ToString()) + ".obj"));
+            mesh.SetMeshInfo(Loader.ModelLoader.LoadFile(Path.Combine(PRIMITIVES, type.ToString()) + ".obj"));
 
             // Add the new entity to the entity list.
             EntityList.Add(newEntity);
@@ -166,7 +166,7 @@ namespace Engine.Utilities
 
             // Add Mesh component to Sky entity.
             var skyMesh = (Mesh)Sky.AddComponent<Mesh>();
-            skyMesh.SetMeshInfo(ModelLoader.LoadFile(Path.Combine(PRIMITIVES, PrimitiveTypes.Sphere.ToString()) + ".obj"));
+            skyMesh.SetMeshInfo(Loader.ModelLoader.LoadFile(Path.Combine(PRIMITIVES, PrimitiveTypes.Sphere.ToString()) + ".obj"));
 
             // Set material of Sky's Mesh component.
             skyMesh.SetMaterial(_materialSky);
@@ -181,7 +181,7 @@ namespace Engine.Utilities
 
         public static MeshInfo GetDefaultMeshInfo() =>
             // Set mesh info to a cube from the resources.
-            ModelLoader.LoadFile(Path.Combine(PRIMITIVES, "Cube.obj"));
+            Loader.ModelLoader.LoadFile(Path.Combine(PRIMITIVES, "Cube.obj"));
 
         public static Material GetDefaultMaterial() =>
             // Set mesh info to a cube from the resources.

@@ -7,7 +7,7 @@ using Vortice.Direct3D11;
 using Vortice.DXGI;
 using Vortice.WIC;
 
-namespace Engine.Helper;
+namespace Engine.Loader;
 
 internal sealed class ImageLoader
 {

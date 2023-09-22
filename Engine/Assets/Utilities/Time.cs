@@ -31,6 +31,9 @@ public sealed class Time
         // Adds the elapsed time to the running total time.
         s_timer += s_delta;
 
+        // Muultiply the delta time witht the time scale.
+        s_delta *= s_timeScale;
+
         // Increases the temporary frame count by 1.
         ++s_tmpFPS;
 
