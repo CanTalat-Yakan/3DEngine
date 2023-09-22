@@ -59,7 +59,7 @@ unsafe public sealed class ImGuiRenderer
         if (data.DisplaySize.X <= 0.0f || data.DisplaySize.Y <= 0.0f)
             return;
 
-        #region // Vertex Buffer
+        #region // Create Vertex and Index Buffer
         if (_data.VertexBuffer == null || _vertexBufferSize < data.TotalVtxCount)
         {
             _data.VertexBuffer?.Release();
@@ -72,9 +72,7 @@ unsafe public sealed class ImGuiRenderer
             desc.CPUAccessFlags = CpuAccessFlags.Write;
             _data.VertexBuffer = _device.CreateBuffer(desc);
         }
-        #endregion
 
-        #region // Index Buffer
         if (_data.IndexBuffer == null || _indexBufferSize < data.TotalIdxCount)
         {
             _data.IndexBuffer?.Release();
