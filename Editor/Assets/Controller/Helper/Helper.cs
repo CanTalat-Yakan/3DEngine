@@ -560,9 +560,8 @@ internal static class ExtensionMethods
 
         reference = grid;
 
-        var entityBindings = Binding.EntityBindings;
-        if (entityBindings.Keys.Contains("IsEnabled" + name))
-            entityBindings["IsEnabled" + name].Set(toggleButton, "IsChecked", "Click");
+        if (Binding.SceneBindings.Keys.Contains("IsEnabled" + name))
+            Binding.SceneBindings["IsEnabled" + name].Set(toggleButton, "IsChecked", "Click");
 
         return grid;
     }
@@ -590,11 +589,10 @@ internal static class ExtensionMethods
 
         sceneEntry.Content = grid;
 
-        var sceneBindings = Binding.SceneBindings;
-        if (sceneBindings.Keys.Contains("IsEnabled" + sceneEntry.ID))
-            sceneBindings["IsEnabled" + sceneEntry.ID].Set(toggleButton, "IsChecked", "Checked", typeof(RoutedEventHandler));
-        if (sceneBindings.Keys.Contains("Name" + sceneEntry.ID))
-            sceneBindings["Name" + sceneEntry.ID].Set(toggleButton, "Content");
+        if (Binding.SceneBindings.Keys.Contains("IsEnabled" + sceneEntry.ID))
+            Binding.SceneBindings["IsEnabled" + sceneEntry.ID].Set(toggleButton, "IsChecked", "Checked");
+        if (Binding.SceneBindings.Keys.Contains("Name" + sceneEntry.ID))
+            Binding.SceneBindings["Name" + sceneEntry.ID].Set(toggleButton, "Content");
 
         return grid;
     }

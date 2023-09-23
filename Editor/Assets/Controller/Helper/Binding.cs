@@ -21,14 +21,12 @@ internal class BindEntry(object source, string sourcePath)
 
     public string PathEvent;
     public EventHandler Event;
-    public object TargetPathEventType;
 
-    public void Set(object target, string targetPath, string pathEvent = null, object targetPathEventType = null)
+    public void Set(object target, string targetPath, string pathEvent = null)
     {
         Target = target;
         TargetPath = targetPath;
         PathEvent = pathEvent;
-        TargetPathEventType = targetPathEventType;
     }
 }
 
