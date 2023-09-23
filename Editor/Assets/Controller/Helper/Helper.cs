@@ -562,7 +562,7 @@ internal static class ExtensionMethods
 
         var entityBindings = Binding.EntityBindings;
         if (entityBindings.Keys.Contains("IsEnabled" + name))
-            entityBindings["IsEnabled" + name].Set(toggleButton, "IsChecked", "Checked");
+            entityBindings["IsEnabled" + name].Set(toggleButton, "IsChecked", "Click");
 
         return grid;
     }
