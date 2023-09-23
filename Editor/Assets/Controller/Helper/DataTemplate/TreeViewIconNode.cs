@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace Editor.Controller;
 
-internal class TreeViewIconNode : INotifyPropertyChanged
+internal sealed class TreeViewIconNode : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler PropertyChanged;
 

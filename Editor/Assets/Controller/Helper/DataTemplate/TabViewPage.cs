@@ -3,14 +3,14 @@ using Microsoft.UI.Xaml;
 
 namespace Editor.Controller;
 
-internal class TabViewItemDataTemplate
+internal sealed class TabViewItemDataTemplate
 {
     public string Header;
     public object Content;
     public Symbol Symbol;
 }
 
-internal class TabViewPage
+internal sealed class TabViewPage
 {
     public TabView TabView;
 
@@ -31,26 +31,6 @@ internal class TabViewPage
         foreach (var dataTemplate in tabViewDataTemplate)
             TabView.TabItems.Add(CreateNewTab(dataTemplate));
     }
-
-    //public async void TabViewWindowingButton_Click(object sender, RoutedEventArgs e)
-    //{
-    //    // Create a new CoreApplicationView
-    //    CoreApplicationView newView = CoreApplication.CreateNewView();
-    //    int newViewId = 0;
-
-    //    // Set the current window's content to a new Page and activate it.
-    //    await newView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-    //    {
-    //        Window.Current.Content = new Page();
-    //        Window.Current.Activate();
-
-    //        // Get the Id of the newly created view.
-    //        newViewId = ApplicationView.GetForCurrentView().Id;
-    //    });
-
-    //    // Try to show the new view as a standalone window.
-    //    bool viewShown = await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
-    //}
 
     private void TabView_AddButtonClick(TabView sender, object args)
     {
