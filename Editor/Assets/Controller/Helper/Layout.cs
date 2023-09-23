@@ -139,7 +139,15 @@ internal partial class Layout
         if (separator)
             grid.Children.Add(appBarSeparator);
 
-        BindingOperations.SetBinding(bottomRowDefinition, RowDefinition.HeightProperty, new Binding() { ElementName = "x_AppBarToggleButton_Status_OpenPane", Path = new("IsChecked"), Converter = new BooleanToRowHeightConverter(bottom.Length) });
+        BindingOperations.SetBinding(
+            bottomRowDefinition,
+            RowDefinition.HeightProperty,
+            new Microsoft.UI.Xaml.Data.Binding()
+            {
+                ElementName = "x_AppBarToggleButton_Status_OpenPane",
+                Path = new("IsChecked"),
+                Converter = new BooleanToRowHeightConverter(bottom.Length)
+            });
 
         return grid;
     }
@@ -230,7 +238,14 @@ internal partial class Layout
         Grid grid = new();
         SplitView = new() { OpenPaneLength = 333, IsPaneOpen = true, DisplayMode = SplitViewDisplayMode.Inline, PanePlacement = SplitViewPanePlacement.Right, Pane = pane, Content = content };
 
-        BindingOperations.SetBinding(SplitView, SplitView.IsPaneOpenProperty, new Binding() { ElementName = "x_AppBarToggleButton_Status_OpenPane", Path = new("IsChecked") });
+        BindingOperations.SetBinding(
+            SplitView,
+            SplitView.IsPaneOpenProperty,
+            new Microsoft.UI.Xaml.Data.Binding()
+            {
+                ElementName = "x_AppBarToggleButton_Status_OpenPane",
+                Path = new("IsChecked")
+            });
 
         grid.Children.Add(SplitView);
 

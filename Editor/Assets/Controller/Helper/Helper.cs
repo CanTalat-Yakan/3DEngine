@@ -23,9 +23,6 @@ using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
 using Image = Microsoft.UI.Xaml.Controls.Image;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 using Rectangle = Microsoft.UI.Xaml.Shapes.Rectangle;
-using Vortice.DirectStorage;
-using Vortice.UIAnimation;
-using Vortice;
 
 namespace Editor.Controller;
 
@@ -563,7 +560,7 @@ internal static class ExtensionMethods
 
         reference = grid;
 
-        var entityBindings = Engine.Editor.Binding.EntityBindings;
+        var entityBindings = Binding.EntityBindings;
         if (entityBindings.Keys.Contains("IsEnabled" + name))
             entityBindings["IsEnabled" + name].Set(toggleButton, "IsChecked", "Checked");
 
@@ -593,9 +590,9 @@ internal static class ExtensionMethods
 
         sceneEntry.Content = grid;
 
-        var sceneBindings = Engine.Editor.Binding.SceneBindings;
+        var sceneBindings = Binding.SceneBindings;
         if (sceneBindings.Keys.Contains("IsEnabled" + sceneEntry.ID))
-            sceneBindings["IsEnabled" + sceneEntry.ID].Set(toggleButton, "IsChecked", "Checked");
+            sceneBindings["IsEnabled" + sceneEntry.ID].Set(toggleButton, "IsChecked", "Checked", typeof(RoutedEventHandler));
         if (sceneBindings.Keys.Contains("Name" + sceneEntry.ID))
             sceneBindings["Name" + sceneEntry.ID].Set(toggleButton, "Content");
 

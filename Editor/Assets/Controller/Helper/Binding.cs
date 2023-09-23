@@ -1,114 +1,184 @@
-﻿using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml;
-using System.ComponentModel;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Text;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.UI.Xaml;
+using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Reflection;
 using System;
 
-using Binding = Microsoft.UI.Xaml.Data.Binding;
-
-using Engine.Editor;
+using Engine.Utilities;
+using Engine.ECS;
 
 namespace Editor.Controller;
 
-internal class BindingHelper
+internal class BindEntry(object source, string sourcePath)
 {
-    public static void SetBinding(DependencyObject target, DependencyProperty targetProperty, 
-        object source, BindingMode mode = BindingMode.OneWay)
+    public object Value;
+
+    public object Source = source;
+    public string SourcePath = sourcePath;
+
+    public object Target;
+    public string TargetPath;
+
+    public string PathEvent;
+    public EventHandler Event;
+    public object TargetPathEventType;
+
+    public void Set(object target, string targetPath, string pathEvent = null, object targetPathEventType = null)
     {
-        // Create a new instance of the Binding class and set its source, path, and mode properties.
-        Binding binding = new Binding
+        Target = target;
+        TargetPath = targetPath;
+        PathEvent = pathEvent;
+        TargetPathEventType = targetPathEventType;
+    }
+}
+
+internal class Binding
+{
+    public static Dictionary<string, BindEntry> SceneBindings = new();
+    public static Dictionary<string, BindEntry> EntityBindings = new();
+
+    public static void Update()
+    {
+        SetBinding(Engine.Editor.Binding.DequeueAddedScenes());
+        Remove(Engine.Editor.Binding.DequeueRemovedScenes());
+
+        UpdateEntityBindings();
+        UpdateSceneBindings();
+    }
+
+    public static void SetBinding(Scene scene)
+    {
+        if (scene is null)
+            return;
+
+        SceneBindings.Add("Scene@" + scene.ID, new(scene, "Scene@"));
+        SceneBindings.Add("Name" + scene.ID, new(scene, "Name"));
+        SceneBindings.Add("IsEnabled" + scene.ID, new(scene, "IsEnabled"));
+    }
+
+    public static void SetBinding(Entity entity)
+    {
+        if (entity is null)
+            return;
+
+        EntityBindings.Add("Entity@" + entity.ID, new(entity, "Entity@"));
+        EntityBindings.Add("Name" + entity.ID, new(entity, "Name"));
+        EntityBindings.Add("IsStatic" + entity.ID, new(entity, "IsStatic"));
+        EntityBindings.Add("IsEnabled" + entity.ID, new(entity, "IsEnabled"));
+
+        var components = entity.Components;
+        for (int i = 1; i < components.Count; i++) // Skip transform.
+            foreach (var field in components[i].GetType().GetFields())
+                EntityBindings.Add(field.Name + components[i], new(components[i], field.Name));
+    }
+
+    private static void UpdateEntityBindings()
+    {
+        if (EntityBindings.Count == 0)
+            return;
+
+        Entity entity = EntityBindings.FirstOrDefault().Value.Source as Entity;
+
+        UpdateBindings(entity, entity.ID, EntityBindings);
+        UpdateComponentBindings(entity);
+    }
+
+    private static void UpdateComponentBindings(Entity entity)
+    {
+        var components = entity.Components;
+
+        for (int i = 1; i < components.Count; i++) // Skip transform.
+            UpdateBindings(components[i], components[i], EntityBindings);
+    }
+
+    private static void UpdateSceneBindings()
+    {
+        if (SceneBindings.Count == 0)
+            return;
+
+        foreach (var entry in SceneBindings.Where(kv => kv.Key.Contains("Scene@")))
+            if (entry.Value.Source is Scene scene)
+                UpdateBindings(scene, scene.ID, SceneBindings);
+    }
+
+    private static void UpdateBindings(object source, object sufix, Dictionary<string, BindEntry> bindings)
+    {
+        foreach (var field in source.GetType().GetFields())
+            foreach (var bindName in bindings.Keys)
+                if (string.Equals(field.Name + sufix, bindName) &&
+                    bindings.TryGetValue(bindName, out var bindEntry) &&
+                    !Equals(
+                        field.GetValue(source),
+                        bindEntry.Value))
+                    InvokeBindEntry(bindEntry, field, source);
+    }
+
+    public static void InvokeBindEntry(BindEntry bindEntry, FieldInfo field, object source)
+    {
+        bindEntry.Value = field.GetValue(source);
+
+        BindingFlags bindingFlags =
+            BindingFlags.NonPublic |
+            BindingFlags.Public |
+            BindingFlags.Static |
+            BindingFlags.Instance;
+
+        var fieldFromPath = bindEntry.Target?.GetType().GetField(bindEntry.TargetPath, bindingFlags);
+        if (fieldFromPath is not null)
+            fieldFromPath.SetValue(bindEntry.Target, bindEntry.Value);
+
+        var propertyFromPath = bindEntry.Target?.GetType().GetProperty(bindEntry.TargetPath, bindingFlags);
+        if (propertyFromPath is not null)
+            propertyFromPath.SetValue(bindEntry.Target, bindEntry.Value);
+
+        if (!string.IsNullOrEmpty(bindEntry.PathEvent))
+            CheckPathEvent(bindEntry, bindingFlags);
+
+        bindEntry.Event?.Invoke(null, null);
+    }
+
+    public static void CheckPathEvent(BindEntry bindEntry, BindingFlags bindingFlags)
+    {
+        var eventInfo = bindEntry.Target.GetType().GetEvent(bindEntry.PathEvent, bindingFlags);
+        Output.Log($"Check Path Event {eventInfo}");
+        if (eventInfo is null)
+            return;
+
+        // Create a new delegate that incorporates the dynamic logic.
+        RoutedEventHandler handler = (s, e) =>
         {
-            Source = source,
-            Mode = mode
+            Output.Log("Handled Event Dynamic");
+
+            // Cast the sender object to the type specified by bindEntry.Target.GetType().
+            var targetType = bindEntry.Target.GetType();
+            var castedSender = Convert.ChangeType(s, targetType);
+
+            var newValue = castedSender.GetType().GetProperty(bindEntry.TargetPath).GetValue(castedSender);
+
+            bindEntry.Source.GetType().GetField(bindEntry.SourcePath, bindingFlags)?
+                .SetValue(bindEntry.Source, newValue);
+
+            bindEntry.Value = newValue;
+
+            // Invoke the original event handler, if it exists.
+            bindEntry.Event?.Invoke(null, null);
         };
 
-        // Apply the binding to the target property of the target object.
-        BindingOperations.SetBinding(target, targetProperty, binding);
-    }
-}
-
-public class BindableBase : INotifyPropertyChanged
-{
-    [Hide]
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    protected bool SetProperty<T>(ref T storage, T value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
-    {
-        // Check if the new value to be set is equal to the current value of the property.
-        if (Equals(storage, value))
-            return false;
-
-        // Set the new value for the property.
-        storage = value;
-        // Raise the PropertyChanged event, notifying that the value of the property has changed.
-        RaisePropertyChanged(propertyName);
-
-        // Return true to indicate that the value has been successfully changed.
-        return true;
+        // Add the new delegate as an event handler.
+        eventInfo.AddEventHandler(bindEntry.Target, handler);
     }
 
-    protected void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null) =>
-        // Raise the PropertyChanged event with the provided property name argument.
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-}
-
-[AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-public class GeneratePropertyAttribute : Attribute
-{
-    public GeneratePropertyAttribute(string name)
+    public static void Clear(Dictionary<string, BindEntry> dictionary)
     {
-        Name = name;
+        if (dictionary is not null)
+            dictionary.Clear();
     }
 
-    public string Name { get; }
-}
-
-[Generator]
-public class PropertyGenerator : ISourceGenerator
-{
-    public void Initialize(GeneratorInitializationContext context)
+    public static void Remove(Guid? guid)
     {
-        // No initialization required.
-    }
-
-    public void Execute(GeneratorExecutionContext context)
-    {
-        var sourceBuilder = new StringBuilder();
-
-        foreach (var syntaxTree in context.Compilation.SyntaxTrees)
-        {
-            var semanticModel = context.Compilation.GetSemanticModel(syntaxTree);
-
-            var fieldsWithAttributes = syntaxTree.GetRoot().DescendantNodes().OfType<FieldDeclarationSyntax>()
-                .Where(f => f.AttributeLists.Count > 0);
-
-            foreach (var field in fieldsWithAttributes)
-            {
-                var fieldSymbol = semanticModel.GetDeclaredSymbol(field.Declaration.Variables[0]) as IFieldSymbol;
-
-                var generatePropertyAttribute = fieldSymbol.GetAttributes().FirstOrDefault(attr => attr.AttributeClass.Name == nameof(GeneratePropertyAttribute));
-
-                if (generatePropertyAttribute != null)
-                {
-                    var propertyName = (string)generatePropertyAttribute.ConstructorArguments[0].Value;
-                    var fieldType = fieldSymbol.Type.Name;
-                    var fieldName = fieldSymbol.Name;
-
-                    sourceBuilder.AppendLine($@"
-                        public {fieldType} {propertyName}
-                        {{
-                            get => {fieldName};
-                            set => SetProperty(ref {fieldName}, value);
-                        }}");
-                }
-            }
-        }
-
-        context.AddSource("GeneratedProperties", SourceText.From(sourceBuilder.ToString(), Encoding.UTF8));
+        if (guid is not null)
+            foreach (var bind in SceneBindings.ToArray())
+                if (bind.Key.Contains(guid.ToString()))
+                    SceneBindings.Remove(bind.Key);
     }
 }
