@@ -31,9 +31,6 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm64'">
 		<DefineConstants>$(DefineConstants);EDITOR;TRACE;DEBUG;NET;NET7_0</DefineConstants>
 	</PropertyGroup>
-	<ItemGroup>
-	  <Content Remove="Assets\Controller\Helper\Binding.cs" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
@@ -59,17 +56,5 @@
 		<Content Update="Assets\Resources\Textures\VS.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Update="Assets\Resources\Textures\App.ico">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Assets\Resources\Textures\BG.png">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Assets\Resources\Textures\VS.png">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
 	</ItemGroup>
 </Project>
