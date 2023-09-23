@@ -10,7 +10,10 @@ public sealed class SceneManager
     public SceneManager(Scene scene = null)
     {
         // Initializes the main scene and creates a new empty list for the subscenes.
-        MainScene = scene != null ? scene : new() { ID = Guid.NewGuid(), Name = "Main", IsEnabled = true, EntityManager = new() };
+        MainScene = 
+            scene is not null ? scene : 
+            new() { ID = Guid.NewGuid(), Name = "Main", IsEnabled = true, EntityManager = new() };
+
         Subscenes = new List<Scene>();
     }
 
@@ -30,6 +33,8 @@ public sealed class SceneManager
         };
         Subscenes.Add(scene);
 
+        Binding.SetBinding(scene);
+
         // Returns the newly added scene.
         return scene;
     }
@@ -41,15 +46,14 @@ public sealed class SceneManager
 
         // Adds the loaded subscene to the list of subscenes.
         Subscenes.Add(subscene);
+
+        Binding.SetBinding(subscene);
     }
 
     public static void UnloadSubscene(Scene subscene)
     {
         // Calls the unload method on the specified subscene.
         subscene.Unload();
-
-        // Removes the specified subscene from the list of subscenes.
-        Subscenes.Remove(subscene);
     }
 
     public static void RemoveSubscene(Guid guid)
@@ -63,6 +67,8 @@ public sealed class SceneManager
 
         // Removes the scene from the list of subscenes.
         Subscenes.Remove(scene);
+
+        Binding.Remove(guid);
     }
 
     public void Awake()

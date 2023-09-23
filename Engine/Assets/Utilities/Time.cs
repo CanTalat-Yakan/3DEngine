@@ -8,7 +8,6 @@ public sealed class Time
     public static double Delta => s_delta;
     public static float DeltaF => (float)s_delta;
     public static int FPS => s_fps;
-    public static double TimeStep => s_timeStep;
     public static double TimeScale => s_timeScale;
     public static bool TimeStepEllapsed => s_timeStepCounter == 0;
 
@@ -50,7 +49,7 @@ public sealed class Time
 
 
         // Check for FixedUpdate with the timeStepCounter
-        if (s_timeStepCounter < TimeStep)
+        if (s_timeStepCounter < s_timeStep)
             s_timeStepCounter += Delta;
         else
             s_timeStepCounter = 0;

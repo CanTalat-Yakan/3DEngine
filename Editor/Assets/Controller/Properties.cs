@@ -41,6 +41,10 @@ internal partial class Properties
     public static void Set(object content = null)
     {
         s_currentlySet = content;
+
+        // Clear the Binding for the Entity.
+        Binding.Clear(Binding.EntityBindings);
+
         // Clear the children of the PropertiesRoot element in the LayoutControl.
         Main.Instance.LayoutControl.PropertiesRoot.Children.Clear();
         // Set the children of the PropertiesRoot element in the LayoutControl.
@@ -66,6 +70,9 @@ internal partial class Properties
 
     private void CreateEntityProperties(Entity entity)
     {
+        // Add Bindings for the Entity.
+        Binding.SetBinding(entity);
+
         Grid[] properties = new[]
         {
                 CreateBool(false, (s, r) => entity.IsStatic = (s as CheckBox).IsChecked.Value).WrapInField("Is Static"),
@@ -115,7 +122,7 @@ internal partial class Properties
                 {
                     entity.AddComponent(Engine.Core.Instance.RuntimeCompiler.ComponentCollector.GetComponent(e.SelectedItem.ToString()));
 
-                    Properties.Set(entity);
+                    Set(entity);
                 }));
 
         // Iterate through all the components of the given entity.
@@ -154,7 +161,9 @@ internal partial class Properties
                 UIElement tmp;
                 Grid content = new Grid();
                 s_stackPanel.Children.Add(tmp = scriptsCollection.ToArray()
-                    .StackInGrid().WrapInExpanderWithToggleButton(ref content, component.ToString().FormatString(), component, "IsEnabled", null)
+                    .StackInGrid().WrapInExpanderWithToggleButton(
+                        ref content, 
+                        component.ToString())
                     .AddContentFlyout(CreateDefaultMenuFlyout(entity, component)));
 
                 // Add an event handler to remove the current component from the stack panel when it's destroyed.
@@ -165,7 +174,7 @@ internal partial class Properties
             entity.Components.OnAdd += (s, e) =>
             {
                 if (s_currentlySet.Equals(entity))
-                    Properties.Set(entity);
+                    Set(entity);
             };
         }
     }

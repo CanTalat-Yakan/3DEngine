@@ -23,6 +23,9 @@ using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
 using Image = Microsoft.UI.Xaml.Controls.Image;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 using Rectangle = Microsoft.UI.Xaml.Shapes.Rectangle;
+using Vortice.DirectStorage;
+using Vortice.UIAnimation;
+using Vortice;
 
 namespace Editor.Controller;
 
@@ -522,7 +525,26 @@ internal static class ExtensionMethods
         return grid;
     }
 
-    public static Grid WrapInExpanderWithToggleButton(this Grid content, ref Grid reference, string text, object source, string isCheckedPropertyPath, string contentPropertyPath)
+    public static Grid WrapInExpander(this Grid content, string text, SceneEntry sceneEntry)
+    {
+        Grid grid = new() { Margin = new(0, 0, 0, 2) };
+        Expander expander = new()
+        {
+            Header = text,
+            Padding = new(15),
+            ExpandDirection = ExpandDirection.Down,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            HorizontalContentAlignment = HorizontalAlignment.Stretch
+        };
+        expander.IsExpanded = true;
+        expander.Content = content;
+
+        grid.Children.Add(expander);
+
+        return grid;
+    }
+
+    public static Grid WrapInExpanderWithToggleButton(this Grid content, ref Grid reference, string name)
     {
         Grid grid = new() { Margin = new(0, 0, 0, 2) };
         Expander expander = new()
@@ -532,11 +554,7 @@ internal static class ExtensionMethods
             HorizontalAlignment = HorizontalAlignment.Stretch,
             HorizontalContentAlignment = HorizontalAlignment.Stretch
         };
-        ToggleButton toggleButton = new() { Content = text, IsChecked = true };
-        if (isCheckedPropertyPath is not null)
-            BindingHelper.SetBinding(toggleButton, ToggleButton.IsCheckedProperty, source, isCheckedPropertyPath, BindingMode.TwoWay);
-        if (contentPropertyPath is not null)
-            BindingHelper.SetBinding(toggleButton, ToggleButton.ContentProperty, source, contentPropertyPath, BindingMode.TwoWay);
+        ToggleButton toggleButton = new() { Content = name.ToString().FormatString(), IsChecked = true };
 
         expander.Header = toggleButton;
         expander.Content = content;
@@ -544,6 +562,42 @@ internal static class ExtensionMethods
         grid.Children.Add(expander);
 
         reference = grid;
+
+        var entityBindings = Engine.Editor.Binding.EntityBindings;
+        if (entityBindings.Keys.Contains("IsEnabled" + name))
+            entityBindings["IsEnabled" + name].Set(toggleButton, "IsChecked", "Checked");
+
+        return grid;
+    }
+
+    public static Grid WrapInExpanderWithToggleButton(this Grid content, SceneEntry sceneEntry, string name = null)
+    {
+        Grid grid = new() { Margin = new(0, 0, 0, 2) };
+        Expander expander = new()
+        {
+            Padding = new(15),
+            ExpandDirection = ExpandDirection.Down,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            HorizontalContentAlignment = HorizontalAlignment.Stretch
+        };
+        ToggleButton toggleButton = new()
+        {
+            Content = name is not null ? name : sceneEntry.Name,
+            IsChecked = true
+        };
+
+        expander.Header = toggleButton;
+        expander.Content = content;
+
+        grid.Children.Add(expander);
+
+        sceneEntry.Content = grid;
+
+        var sceneBindings = Engine.Editor.Binding.SceneBindings;
+        if (sceneBindings.Keys.Contains("IsEnabled" + sceneEntry.ID))
+            sceneBindings["IsEnabled" + sceneEntry.ID].Set(toggleButton, "IsChecked", "Checked");
+        if (sceneBindings.Keys.Contains("Name" + sceneEntry.ID))
+            sceneBindings["Name" + sceneEntry.ID].Set(toggleButton, "Content");
 
         return grid;
     }

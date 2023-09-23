@@ -42,7 +42,9 @@ sealed class Program
         _engineCore = new(win32Window);
         _appWindow = new(win32Window);
 
-        //_engineCore.Renderer.Data.SetSuperSample(true);
+        _engineCore.Renderer.Data.SetVsync(false);
+        _engineCore.Renderer.Data.SetSuperSample(false);
+
         _engineCore.OnRender += (s, e) => _appWindow.Render();
 
         _appWindow.Show(ShowWindowCommand.Maximize);

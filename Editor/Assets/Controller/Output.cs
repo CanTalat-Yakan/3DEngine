@@ -76,7 +76,7 @@ namespace Editor.Controller
         {
             if (log is not null)
                 // Logs a message, with a string representation of an object.
-                Log(log.o.ToString(), (MessageType)log.type, log.line, log.method, log.script);
+                Log(log.o?.ToString(), (MessageType)log?.type, log.line, log?.method, log?.script);
         }
 
         public static void Log(object o, MessageType type = MessageType.Message, [CallerLineNumber] int line = 0, [CallerMemberName] string method = null, [CallerFilePath] string script = null) =>
@@ -231,7 +231,8 @@ namespace Editor.Controller
 
         private static void SetStatus(MessageInfo m)
         {
-            s_status.Text = m.Message.Split("\n")[0];
+            if (!string.IsNullOrEmpty(m.Message))
+                s_status.Text = m.Message.Split("\n")[0];
 
             if (m.Type == MessageType.Warning)
                 s_statusIcon.Child = new FontIcon() { Glyph = "\uE7BA" };
@@ -297,12 +298,12 @@ namespace Editor.Controller
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
                 Background = new SolidColorBrush(
-                    m.Type == MessageType.Message 
-                        ? s_stack.Children.Count() % 2 == 0 
-                            ? Colors.Transparent 
-                            : Windows.UI.Color.FromArgb(50, 10, 10, 10) 
-                        : m.Type == MessageType.Error 
-                            ? Windows.UI.Color.FromArgb(88, 255, 0, 0) 
+                    m.Type == MessageType.Message
+                        ? s_stack.Children.Count() % 2 == 0
+                            ? Colors.Transparent
+                            : Windows.UI.Color.FromArgb(50, 10, 10, 10)
+                        : m.Type == MessageType.Error
+                            ? Windows.UI.Color.FromArgb(88, 255, 0, 0)
                             : Windows.UI.Color.FromArgb(88, 255, 255, 0))
             }.AddToolTip(m.Script));
 

@@ -160,8 +160,9 @@ namespace Engine.ECS
             newEntity.Transform.LocalRotation = Transform.LocalRotation;
             newEntity.Transform.LocalScale = Transform.LocalScale;
 
-            // Loop through the original Entity object's Components, clone each one and register it to the new Entity object.
-            for (int i = 1; i < _components.Count; i++)
+            // Loop through the original Entity object's Components,
+            // clone each one and register it to the new Entity object.
+            for (int i = 1; i < _components.Count; i++) // Skip transform.
             {
                 // Clone the Component.
                 var newComponent = _components[i].Clone();

@@ -34,6 +34,8 @@ public sealed partial class ViewPort : UserControl
         _engineCore.Renderer.Data.SetVsync(false);
         _engineCore.Renderer.Data.SetSuperSample(true);
 
+        _engineCore.OnRender += (s, e) => Engine.Editor.Binding.Update();
+
         _viewPortControl = new Controller.ViewPort(this, x_Grid_Overlay);
 
         // Adds an event handler for the CompositionTarget.Rendering event,

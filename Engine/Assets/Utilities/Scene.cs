@@ -1,24 +1,12 @@
 ﻿namespace Engine.Utilities;
 
-public sealed class Scene : ICloneable // BindableBase
+public sealed class Scene : ICloneable
 {
     public Guid ID = Guid.NewGuid();
-
     public EntityManager EntityManager = new();
 
-    private string _name = "Scene";
-    public string Name
-    {
-        get => _name; 
-        set => _name = value; // SetProperty(ref _name, value); 
-    }
-
-    private bool _isEnabled = true;
-    public bool IsEnabled
-    {
-        get => _isEnabled; 
-        set => _isEnabled = value;  // SetProperty(ref _isEnabled, value); 
-    }
+    public string Name = "Scene";
+    public bool IsEnabled;
 
     object ICloneable.Clone() =>
         Clone();

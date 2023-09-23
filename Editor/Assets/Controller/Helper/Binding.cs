@@ -9,19 +9,21 @@ using System.Linq;
 using System.Text;
 using System;
 
+using Binding = Microsoft.UI.Xaml.Data.Binding;
+
 using Engine.Editor;
 
 namespace Editor.Controller;
 
 internal class BindingHelper
 {
-    public static void SetBinding(DependencyObject target, DependencyProperty targetProperty, object source, string sourcePropertyPath, BindingMode mode = BindingMode.OneWay)
+    public static void SetBinding(DependencyObject target, DependencyProperty targetProperty, 
+        object source, BindingMode mode = BindingMode.OneWay)
     {
         // Create a new instance of the Binding class and set its source, path, and mode properties.
         Binding binding = new Binding
         {
             Source = source,
-            Path = new PropertyPath(sourcePropertyPath),
             Mode = mode
         };
 
