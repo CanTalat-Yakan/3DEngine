@@ -31,12 +31,10 @@ internal sealed class SceneBoot : EditorComponent
         SceneManager.MainScene.EntityManager.CreateSky();
     }
 
-    Camera cam = null;
     public override void OnStart()
     {
         // Create a camera entity with the name "Camera" and the tag ETags.MainCamera.
-        var e = SceneManager.MainScene.EntityManager.CreateCamera("Camera", Tags.MainCamera.ToString());
-        cam = e.GetComponent<Camera>();
+        SceneManager.MainScene.EntityManager.CreateCamera("Camera", Tags.MainCamera.ToString());
 
         // Create a parent entity for all cube entities with the name "Cubes".
         Cubes = SceneManager.MainScene.EntityManager.CreateEntity(null, "Cubes");
@@ -53,14 +51,6 @@ internal sealed class SceneBoot : EditorComponent
 
         // Reactivate the SceneCamera after OnUpdate is called from the EditorScriptSystem.
         SceneCamera.IsEnabled = true;
-
-        if (Input.GetKey(Key.S, InputState.Down))
-            SceneManager.Subscenes.FirstOrDefault().IsEnabled = 
-                !SceneManager.Subscenes.FirstOrDefault().IsEnabled;
-        if (Input.GetKey(Key.S, InputState.Down))
-            SceneManager.Subscenes.FirstOrDefault().Name = Time.Timer.ToString();
-        if (Input.GetKey(Key.X, InputState.Down))
-            cam.IsEnabled = !cam.IsEnabled;
 
         // Example.
         // Check for the 'C' key press to trigger cube spawning.
