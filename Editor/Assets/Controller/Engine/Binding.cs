@@ -6,6 +6,7 @@ using System;
 
 using Engine.Utilities;
 using Engine.ECS;
+using Engine.Editor;
 
 namespace Editor.Controller;
 
@@ -28,18 +29,29 @@ internal class BindEntry(object source, string sourcePath)
         TargetPath = targetPath;
         PathEvent = pathEvent;
     }
+
+    public void SetEvent(EventHandler eventHandler) =>
+        Event += eventHandler;
 }
 
 internal class Binding
 {
+    public static Dictionary<string, BindEntry> RendererBindings = new();
     public static Dictionary<string, BindEntry> SceneBindings = new();
     public static Dictionary<string, BindEntry> EntityBindings = new();
 
     public static void Update()
     {
-        UpdateEntityBindings();
+        //if (RendererBindings.Count == 0)
+            //SetRendererBinding();
+
+        //UpdateRendererBindings();
         UpdateSceneBindings();
+        UpdateEntityBindings();
     }
+
+    //public static void SetRendererBinding() =>
+        //RendererBindings.Add("FOV" + ViewPortController.Instance?.GetType(), new(ViewPortController.Instance?, "FOV"));
 
     public static void SetBinding(Scene scene)
     {
@@ -61,29 +73,18 @@ internal class Binding
         EntityBindings.Add("IsStatic" + entity.ID, new(entity, "IsStatic"));
         EntityBindings.Add("IsEnabled" + entity.ID, new(entity, "IsEnabled"));
 
-        var components = entity.Components;
-        for (int i = 1; i < components.Count; i++) // Skip transform.
-            foreach (var field in components[i].GetType().GetFields())
-                EntityBindings.Add(field.Name + components[i], new(components[i], field.Name));
+        foreach (var component in entity.Components.ToArray())
+            foreach (var field in component.GetType().GetFields())
+                EntityBindings.Add(field.Name + component, new(component, field.Name));
     }
 
-    private static void UpdateEntityBindings()
+    public static BindEntry Get(string key)
     {
-        if (EntityBindings.Count == 0)
-            return;
-
-        Entity entity = EntityBindings.FirstOrDefault().Value.Source as Entity;
-
-        UpdateBindings(entity, entity.ID, EntityBindings);
-        UpdateComponentBindings(entity);
-    }
-
-    private static void UpdateComponentBindings(Entity entity)
-    {
-        var components = entity.Components;
-
-        for (int i = 1; i < components.Count; i++) // Skip transform.
-            UpdateBindings(components[i], components[i], EntityBindings);
+        if (EntityBindings.Keys.Contains(key))
+            return EntityBindings[key];
+        //else if (RendererBindings.Keys.Contains(key))
+            //return RendererBindings[key];
+        return null;
     }
 
     private static void UpdateSceneBindings()
@@ -96,6 +97,28 @@ internal class Binding
                 UpdateBindings(scene, scene.ID, SceneBindings);
     }
 
+    private static void UpdateRendererBindings()
+    {
+        if (RendererBindings.Count == 0)
+            return;
+
+        foreach (var source in RendererBindings.Select(kv => kv.Value.Source).ToArray())
+            UpdateBindings(source, source, RendererBindings);
+    }
+
+    private static void UpdateEntityBindings()
+    {
+        if (EntityBindings.Count == 0)
+            return;
+
+        Entity entity = EntityBindings.FirstOrDefault().Value.Source as Entity;
+
+        UpdateBindings(entity, entity.ID, EntityBindings);
+
+        foreach (var component in entity.Components.ToArray())
+            UpdateBindings(component, component, EntityBindings);
+    }
+
     private static void UpdateBindings(object source, object sufix, Dictionary<string, BindEntry> bindings)
     {
         foreach (var field in source.GetType().GetFields())
@@ -105,10 +128,10 @@ internal class Binding
                     !Equals(
                         field.GetValue(source),
                         bindEntry.Value))
-                    InvokeBindEntry(bindEntry, field, source);
+                    ProcessBindEntry(bindEntry, field, source);
     }
 
-    public static void InvokeBindEntry(BindEntry bindEntry, FieldInfo field, object source)
+    public static void ProcessBindEntry(BindEntry bindEntry, FieldInfo field, object source)
     {
         bindEntry.Value = field.GetValue(source);
 
@@ -141,28 +164,42 @@ internal class Binding
         if (eventInfo is null)
             return;
 
-        // Create a new delegate that incorporates the dynamic logic.
-        RoutedEventHandler handler = (s, e) =>
+        //Delegate handler = null;
+        //var targetType = eventInfo.EventHandlerType.GetType();
+        //var castedHandler = Convert.ChangeType(handler, targetType);
+
+        //Type eventHandlerType = eventInfo.EventHandlerType;
+        //Delegate handler2 = Delegate.CreateDelegate(eventHandlerType, null, "EventLogic");
+        try
         {
-            // Cast the sender object to the type specified by bindEntry.Target.GetType().
-            var targetType = bindEntry.Target.GetType();
-            var castedSender = Convert.ChangeType(s, targetType);
+            RoutedEventHandler handler = (s, e) => EventLogic(s, bindEntry, bindingFlags);
 
-            var newValue = targetType.GetProperty(bindEntry.TargetPath).GetValue(castedSender);
+            // Add the new delegate as an event handler.
+            eventInfo.AddEventHandler(bindEntry.Target, handler);
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
+    }
 
-            bindEntry.Source.GetType().GetField(bindEntry.SourcePath, bindingFlags)?
-                .SetValue(bindEntry.Source, newValue);
+    public static void EventLogic(object sender, BindEntry bindEntry, BindingFlags bindingFlags)
+    {
+        // Cast the sender object to the type specified by bindEntry.Target.GetType().
+        var targetType = bindEntry.Target.GetType();
+        var castedSender = Convert.ChangeType(sender, targetType);
 
-            bindEntry.Value = newValue;
+        var newValue = targetType.GetProperty(bindEntry.TargetPath).GetValue(castedSender);
 
-            Output.Log($"Handled Event Dynamic: Value {newValue}");
+        bindEntry.Source.GetType().GetField(bindEntry.SourcePath, bindingFlags)?
+            .SetValue(bindEntry.Source, newValue);
 
-            // Invoke the original event handler, if it exists.
-            bindEntry.Event?.Invoke(null, null);
-        };
+        bindEntry.Value = newValue;
 
-        // Add the new delegate as an event handler.
-        eventInfo.AddEventHandler(bindEntry.Target, handler);
+        Output.Log($"Handled Event Dynamic: Value {newValue}");
+
+        // Invoke the original event handler, if it exists.
+        bindEntry.Event?.Invoke(null, null);
     }
 
     public static void Clear(Dictionary<string, BindEntry> dictionary)

@@ -75,8 +75,8 @@ internal partial class Hierarchy
     private void CreateHierarchy()
     {
         _stackPanel.Children.Add(CreateSceneHierarchy(SceneEntry).StackInGrid().WrapInExpander("Scene").AddContentFlyout(CreateRootMenuFlyout()));
-        _stackPanel.Children.Add(CreateSeperator());
-        _stackPanel.Children.Add(CreateButton("Add Subscene", (s, e) => ContentDialogCreateNewSubscene()));
+        _stackPanel.Children.Add(Helper.CreateSeperator());
+        _stackPanel.Children.Add(Helper.CreateButton("Add Subscene", (s, e) => ContentDialogCreateNewSubscene()));
         _stackPanel.Children.Add(CreateSubsceneAndHierarchy(out SceneEntry subsceneEntry)
             .StackInGrid().WrapInExpanderWithToggleButton(subsceneEntry)
             .AddContentFlyout(CreateSubRootMenuFlyout(subsceneEntry)));
@@ -108,8 +108,8 @@ internal partial class Hierarchy
 
         var sceneGrid = new Grid[]
         {
-                CreateTreeView(out sceneEntry.TreeView, _hierarchy.Resources["x_TreeViewIconNodeTemplateSelector"] as TreeViewIconNodeTemplateSelector),
-                CreateButton("Create Entity", (s, e) => scene.EntityManager.CreateEntity() )
+            Helper.CreateTreeView(out sceneEntry.TreeView, _hierarchy.Resources["x_TreeViewIconNodeTemplateSelector"] as TreeViewIconNodeTemplateSelector),
+            Helper.CreateButton("Create Entity", (s, e) => scene.EntityManager.CreateEntity() )
         };
         sceneEntry.TreeView.ItemsSource = sceneEntry.DataSource;
         sceneEntry.TreeView.PointerPressed += (s, e) => GetInvokedItemAndSetContextFlyout(s, e);
@@ -634,7 +634,7 @@ internal partial class Hierarchy
 
 }
 
-internal partial class Hierarchy : Controller.Helper
+internal partial class Hierarchy
 {
     /// <summary>
     /// This method returns an Entity object with the specified GUID, optionally searching in a specific SceneEntry.

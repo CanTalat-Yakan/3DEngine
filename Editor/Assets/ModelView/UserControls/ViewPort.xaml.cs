@@ -58,8 +58,8 @@ public sealed partial class ViewPort : UserControl
             Controller.Output.Log(Engine.Output.DequeueLog());
         };
 
-        PointerEntered += (s, e) => Engine.Editor.SceneCameraController.ViewportFocused = true;
-        PointerExited += (s, e) => Engine.Editor.SceneCameraController.ViewportFocused = false;
+        PointerEntered += (s, e) => Engine.Editor.ViewPortController.ViewportFocused = true;
+        PointerExited += (s, e) => Engine.Editor.ViewPortController.ViewportFocused = false;
 
         var arrow = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         var cross = InputSystemCursor.Create(InputSystemCursorShape.Cross);

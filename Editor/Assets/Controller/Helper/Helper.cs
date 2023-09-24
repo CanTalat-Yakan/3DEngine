@@ -7,14 +7,12 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
-using Microsoft.UI;
 using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
 using System;
 using Windows.ApplicationModel;
-using Windows.Foundation;
 
 using ColorPicker = CommunityToolkit.WinUI.UI.Controls.ColorPicker;
 using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
@@ -22,13 +20,12 @@ using Expander = Microsoft.UI.Xaml.Controls.Expander;
 using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
 using Image = Microsoft.UI.Xaml.Controls.Image;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
-using Rectangle = Microsoft.UI.Xaml.Shapes.Rectangle;
 
 namespace Editor.Controller;
 
 internal class Helper
 {
-    internal virtual Grid StackInGrid(params UIElement[] content)
+    internal static Grid StackInGrid(params UIElement[] content)
     {
         Grid grid = new() { HorizontalAlignment = HorizontalAlignment.Stretch };
         StackPanel stack = new() { Orientation = Orientation.Horizontal, FlowDirection = FlowDirection.LeftToRight };
@@ -41,7 +38,7 @@ internal class Helper
         return grid;
     }
 
-    internal virtual Grid StackInGridVertical(params UIElement[] content)
+    internal static Grid StackInGridVertical(params UIElement[] content)
     {
         Grid grid = new() { HorizontalAlignment = HorizontalAlignment.Stretch };
         StackPanel stack = new() { Orientation = Orientation.Vertical, FlowDirection = FlowDirection.LeftToRight };
@@ -56,7 +53,7 @@ internal class Helper
         return grid;
     }
 
-    internal virtual ComboBox CreateComboBox(params string[] items)
+    internal static ComboBox CreateComboBox(params string[] items)
     {
         ComboBox comboBox = new() { Height = 33, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
 
@@ -66,7 +63,7 @@ internal class Helper
         return comboBox;
     }
 
-    internal virtual UIElement CreateToggleButton(Grid icon, bool isChecked = false)
+    internal static UIElement CreateToggleButton(Grid icon, bool isChecked = false)
     {
         Viewbox viewbox = new() { Width = 16, Height = 16 };
         viewbox.Child = icon;
@@ -77,7 +74,7 @@ internal class Helper
         return button;
     }
 
-    internal virtual UIElement CreateButton(Grid icon, Grid content)
+    internal static UIElement CreateButton(Grid icon, Grid content)
     {
         Button button = new() { Content = icon };
         button.Flyout = new Flyout() { Content = content, Placement = FlyoutPlacementMode.BottomEdgeAlignedRight };
@@ -85,7 +82,7 @@ internal class Helper
         return button;
     }
 
-    internal virtual UIElement CreateButtonWithValue(Grid icon, float f, Grid content)
+    internal static UIElement CreateButtonWithValue(Grid icon, float f, Grid content)
     {
         StackPanel stack = new() { Orientation = Orientation.Horizontal, FlowDirection = FlowDirection.LeftToRight, Spacing = 5 };
         Viewbox viewbox = new() { Width = 16, Height = 16 };
@@ -100,138 +97,118 @@ internal class Helper
         return button;
     }
 
-    internal virtual UIElement CreateAppBarSeperator() =>
+    internal static UIElement CreateAppBarSeperator() =>
         new AppBarSeparator();
 
-    internal virtual UIElement CreateSeperator() =>
+    internal static UIElement CreateSeperator() =>
         new NavigationViewItemSeparator() { Margin = new(10) };
 
-    internal virtual UIElement CreateText(string placeholder = "Example") =>
+    internal static UIElement CreateText(string placeholder = "Example") =>
         new TextBlock() { Text = placeholder, MaxWidth = 200, TextWrapping = TextWrapping.Wrap };
 
-    internal virtual UIElement CreateTextEqual(string placeholder = "Example") =>
+    internal static UIElement CreateTextEqual(string placeholder = "Example") =>
         new TextBlock() { Text = placeholder, MaxWidth = 200 };
 
-    internal virtual UIElement CreateTextFull(out TextBlock textBlock) =>
+    internal static UIElement CreateTextFull(out TextBlock textBlock) =>
         textBlock = new();
 
-    internal virtual UIElement CreateTextFull(string s = "String") =>
+    internal static UIElement CreateTextFull(string s = "String") =>
         new TextBlock() { Text = s, TextWrapping = TextWrapping.Wrap };
 
-    internal virtual UIElement CreateTextFullWithOpacity(string s = "String") =>
+    internal static UIElement CreateTextFullWithOpacity(string s = "String") =>
         new TextBlock() { Text = s, Opacity = 0.5f, TextWrapping = TextWrapping.Wrap };
 
-    internal virtual Grid CreateTextInput(string placeholder = "Example",
-        TextChangedEventHandler textChanged = null)
+
+    #region // Properties View Field Bindings
+    internal static Grid CreateTextInput(object source, string fieldName, string placeholder = "Example")
     {
         TextBox textBox = new() { Text = placeholder, MaxWidth = 200 };
-        if (textChanged is not null)
-            textBox.TextChanged += textChanged;
+
+        Binding.Get(fieldName + source)?.Set(textBox, "Text", "TextChanged");
 
         return StackInGrid(textBox);
     }
 
-    internal virtual Grid CreateNumberInput(float f = 0, float min = float.MinValue, float max = float.MaxValue,
-        TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs> onValueChanged = null)
+    internal static Grid CreateNumberInput(object source, string fieldName, float value = 0, float min = float.MinValue, float max = float.MaxValue)
     {
-        NumberBox numInput = new() { Value = f, Minimum = min, Maximum = max, SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline, MaxWidth = 200 };
-        numInput.ValueChanged += onValueChanged;
+        NumberBox numberBox = new() { Value = value, Minimum = min, Maximum = max, MaxWidth = 200 };
+        numberBox.SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline;
 
-        return StackInGrid(numInput);
+        Binding.Get(fieldName + source)?.Set(numberBox, "Value", "ValueChanged");
+
+        return StackInGrid(numberBox);
     }
 
-    internal virtual UIElement CreateSlider(double f = 0, double min = 0, double max = 100,
-        RangeBaseValueChangedEventHandler onValueChanged = null)
+    internal static Grid CreateNumberInputInt(object source, string fieldName, float value = 0, float min = float.MinValue, float max = float.MaxValue)
     {
-        Slider numInput = new() { Value = f, Minimum = min, Maximum = max, Width = 200, Margin = new(0, 0, 0, -5.5) };
-        if (onValueChanged is not null)
-            numInput.ValueChanged += onValueChanged;
+        NumberBox numberBox = new() { Value = value, Minimum = min, Maximum = max, MaxWidth = 200 };
+        numberBox.SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline;
 
-        TextBlock numPreview = new() { Padding = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
+        Binding.Get(fieldName + source)?.Set(numberBox, "Value", "ValueChanged");
 
-        return StackInGrid(numInput, numPreview);
+        return StackInGrid(numberBox);
     }
 
-    internal virtual Grid CreateVec2Input(Vector2 v = new())
+    internal static UIElement CreateSlider(object source, string fieldName, double value = 0, double min = 0, double max = 100)
     {
-        NumberBox numInput = new() { Value = v.X, Margin = new(0, 0, 4, 0), MaxWidth = 98 };
-        NumberBox num2Input = new() { Value = v.Y, Margin = new(0, 0, 4, 0), MaxWidth = 98 };
+        Slider slider = new() { Value = value, Minimum = min, Maximum = max, Width = 200, Margin = new(0, 0, 0, -5.5) };
+        TextBlock numberPreview = new() { Padding = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
 
-        return StackInGrid(numInput, num2Input);
+        Binding.Get(fieldName + source)?.Set(slider, "Value", "ValueChanged");
+        Binding.Get(fieldName + source)?.SetEvent((s, e) =>
+            numberPreview.Text = Binding.Get(fieldName + source)?.Value.ToString());
+
+        return StackInGrid(slider, numberPreview);
     }
 
-    internal virtual Grid CreateVec3Input(Vector3 v = new())
+    internal static Grid CreateVec2Input(object source, string fieldName, Vector2 value = new())
     {
-        NumberBox numInput = new() { Value = v.X, Margin = new(0, 0, 4, 0), MaxWidth = 64 };
-        NumberBox num2Input = new() { Value = v.Y, Margin = new(0, 0, 4, 0), MaxWidth = 64 };
-        NumberBox num3Input = new() { Value = v.Z, Margin = new(0, 0, 4, 0), MaxWidth = 64 };
+        NumberBoxVector2 numberBoxVector2 = new() { Value = value };
 
-        return StackInGrid(numInput, num2Input, num3Input);
+        Binding.Get(fieldName + source)?.Set(numberBoxVector2, "Value", "ValueChanged");
+
+        return numberBoxVector2.GetStackInGrid();
     }
 
-    internal virtual Grid CreateVec3InputWithRGB(Vector3 v = new())
+    internal static Grid CreateVec2InputWithRG(object source, string fieldName, Vector2 value = new())
     {
-        Rectangle rectangleR = new() { Fill = new SolidColorBrush(Colors.IndianRed), RadiusX = 2, RadiusY = 2, Width = 4 };
-        NumberBox numInput = new() { Value = Math.Round(v.X, 4), Margin = new(0, 0, 4, 0), Width = 64 };
+        NumberBoxVector2 numberBoxVector2 = new() { Value = value };
 
-        Rectangle rectangleG = new() { Fill = new SolidColorBrush(Colors.SeaGreen), RadiusX = 2, RadiusY = 2, Width = 4 };
-        NumberBox num2Input = new() { Value = Math.Round(v.Y, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
+        Binding.Get(fieldName + source)?.Set(numberBoxVector2, "Value", "ValueChanged");
 
-        Rectangle rectangleB = new() { Fill = new SolidColorBrush(Colors.DodgerBlue), RadiusX = 2, RadiusY = 2, Width = 4 };
-        NumberBox num3Input = new() { Value = Math.Round(v.Z, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
-
-        return StackInGrid(rectangleR, numInput, rectangleG, num2Input, rectangleB, num3Input);
+        return numberBoxVector2.GetStackInGridWithRG();
     }
 
-    internal virtual Grid CreateVec3InputWithRGB(Vector3 v = new(),
-        params TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs>[] e)
+    internal static Grid CreateVec3Input(object source, string fieldName, Vector3 value = new())
     {
-        Rectangle rectangleR = new() { Fill = new SolidColorBrush(Colors.IndianRed), RadiusX = 2, RadiusY = 2, Width = 4 };
-        NumberBox numInput = new() { Value = Math.Round(v.X, 4), Margin = new(0, 0, 4, 0), Width = 64 };
-        if (e[0] is not null)
-            numInput.ValueChanged += e[0];
+        NumberBoxVector3 numberBoxVector3 = new() { Value = value };
 
-        Rectangle rectangleG = new() { Fill = new SolidColorBrush(Colors.SeaGreen), RadiusX = 2, RadiusY = 2, Width = 4 };
-        NumberBox num2Input = new() { Value = Math.Round(v.Y, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
-        if (e[1] is not null)
-            num2Input.ValueChanged += e[1];
+        Binding.Get(fieldName + source)?.Set(numberBoxVector3, "Value", "ValueChanged");
 
-        Rectangle rectangleB = new() { Fill = new SolidColorBrush(Colors.DodgerBlue), RadiusX = 2, RadiusY = 2, Width = 4 };
-        NumberBox num3Input = new() { Value = Math.Round(v.Z, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
-        if (e[2] is not null)
-            num3Input.ValueChanged += e[2];
-
-        return StackInGrid(rectangleR, numInput, rectangleG, num2Input, rectangleB, num3Input);
+        return numberBoxVector3.GetStackInGrid();
     }
 
-    internal virtual Grid CreateVec3InputWithRGBAndTransform(Vector3 v = new(), Engine.Components.Transform transform = null)
+    internal static Grid CreateVec3InputWithRGB(object source, string fieldName, Vector3 value = new())
     {
-        Rectangle rectangleR = new() { Fill = new SolidColorBrush(Colors.IndianRed), RadiusX = 2, RadiusY = 2, Width = 4 };
-        NumberBox numInput = new() { Value = Math.Round(v.X, 4), Margin = new(0, 0, 4, 0), Width = 64 };
+        NumberBoxVector3 numberBoxVector3 = new() { Value = value };
 
-        Rectangle rectangleG = new() { Fill = new SolidColorBrush(Colors.SeaGreen), RadiusX = 2, RadiusY = 2, Width = 4 };
-        NumberBox num2Input = new() { Value = Math.Round(v.Y, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
+        Binding.Get(fieldName + source)?.Set(numberBoxVector3, "Value", "ValueChanged");
 
-        Rectangle rectangleB = new() { Fill = new SolidColorBrush(Colors.DodgerBlue), RadiusX = 2, RadiusY = 2, Width = 4 };
-        NumberBox num3Input = new() { Value = Math.Round(v.Z, 4), Margin = new(0, 0, 4, 0), MaxWidth = 64 };
-
-        numInput.ValueChanged += (s, e) => { transform.EulerAngles = new Vector3((float)numInput.Value, (float)num2Input.Value, (float)num3Input.Value); };
-        num2Input.ValueChanged += (s, e) => { transform.EulerAngles = new Vector3((float)numInput.Value, (float)num2Input.Value, (float)num3Input.Value); };
-        num3Input.ValueChanged += (s, e) => { transform.EulerAngles = new Vector3((float)numInput.Value, (float)num2Input.Value, (float)num3Input.Value); };
-
-        return StackInGrid(rectangleR, numInput, rectangleG, num2Input, rectangleB, num3Input);
+        return numberBoxVector3.GetStackInGridWithRGB();
     }
 
-    internal virtual Grid CreateBool(bool b = false, RoutedEventHandler OnClick = null)
+    internal static Grid CreateBool(object source, string fieldName, bool value = false)
     {
-        CheckBox check = new() { IsChecked = b, Margin = new(0, 0, 0, -5.5) };
-        if (OnClick is not null)
-            check.Click += OnClick;
+        CheckBox checkBox = new() { IsChecked = value, Margin = new(0, 0, 0, -5.5) };
 
-        return StackInGrid(check);
+        Binding.Get(fieldName + source)?.Set(checkBox, "IsChecked", "Click");
+
+        return StackInGrid(checkBox);
     }
+    #endregion
 
-    internal virtual Grid CreateEnum(params string[] items)
+
+    internal static Grid CreateEnum(params string[] items)
     {
         ComboBox comboBox = new() { FontSize = 13.5f, HorizontalAlignment = HorizontalAlignment.Stretch };
 
@@ -243,7 +220,7 @@ internal class Helper
         return StackInGrid(comboBox);
     }
 
-    internal virtual Grid CreateEvent(string s = "Event",
+    internal static Grid CreateEvent(string s = "Event",
         RoutedEventHandler e = null)
     {
         Button button = new() { Content = s };
@@ -252,7 +229,7 @@ internal class Helper
         return StackInGrid(button);
     }
 
-    internal virtual Grid CreateColorButton(byte r = 0, byte g = 0, byte b = 0, byte a = 0)
+    internal static Grid CreateColorButton(byte r = 0, byte g = 0, byte b = 0, byte a = 0)
     {
         Windows.UI.Color col = new();
         col.R = r; col.G = g; col.B = b; col.A = a;
@@ -267,7 +244,7 @@ internal class Helper
         return StackInGrid(colbutton);
     }
 
-    internal virtual Grid CreateHeader(string s = "Header")
+    internal static Grid CreateHeader(string s = "Header")
     {
         Grid grid = new();
         TextBlock header = new() { Text = s, FontSize = 18, FontWeight = FontWeights.Bold, Margin = new(0, 20, 0, 0) };
@@ -277,10 +254,10 @@ internal class Helper
         return grid;
     }
 
-    internal virtual Grid CreateSpacer() =>
+    internal static Grid CreateSpacer() =>
         new Grid() { Height = 10 };
 
-    internal virtual Grid CreateButton(string s,
+    internal static Grid CreateButton(string s,
         TappedEventHandler tapped)
     {
         Grid grid = new();
@@ -293,7 +270,7 @@ internal class Helper
         return grid;
     }
 
-    internal virtual Grid CreateTreeView(out TreeView tree,
+    internal static Grid CreateTreeView(out TreeView tree,
         DataTemplateSelector templateSelector = null)
     {
         Grid grid = new();
@@ -305,7 +282,7 @@ internal class Helper
         return grid;
     }
 
-    internal virtual Grid CreateIcon(string glyph)
+    internal static Grid CreateIcon(string glyph)
     {
         Grid grid = new();
 
@@ -316,7 +293,7 @@ internal class Helper
         return grid;
     }
 
-    internal virtual Grid CreateIcon(Symbol symbol)
+    internal static Grid CreateIcon(Symbol symbol)
     {
         Grid grid = new();
 
@@ -327,7 +304,7 @@ internal class Helper
         return grid;
     }
 
-    internal virtual Grid CreateTextureSlot(string s = "None", string type = "type")
+    internal static Grid CreateTextureSlot(string s = "None", string type = "type")
     {
         Grid container = new() { Width = 48, Height = 48 };
         Image img = new() { Stretch = Stretch.UniformToFill };
@@ -340,7 +317,7 @@ internal class Helper
         return StackInGrid(container, path);
     }
 
-    internal virtual Grid CreateReferenceSlot(string s = "None", string type = "type")
+    internal static Grid CreateReferenceSlot(string s = "None", string type = "type")
     {
         Button button = new() { Content = "..." };
         TextBlock reference = new() { Text = s + $" ({type})", TextWrapping = TextWrapping.WrapWholeWords, MaxWidth = 200, Margin = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
@@ -541,7 +518,7 @@ internal static class ExtensionMethods
         return grid;
     }
 
-    public static Grid WrapInExpanderWithToggleButton(this Grid content, ref Grid reference, string name)
+    public static Grid WrapInExpanderWithToggleButton(this Grid content, ref Grid reference, string source)
     {
         Grid grid = new() { Margin = new(0, 0, 0, 2) };
         Expander expander = new()
@@ -551,7 +528,7 @@ internal static class ExtensionMethods
             HorizontalAlignment = HorizontalAlignment.Stretch,
             HorizontalContentAlignment = HorizontalAlignment.Stretch
         };
-        ToggleButton toggleButton = new() { Content = name.ToString().FormatString(), IsChecked = true };
+        ToggleButton toggleButton = new() { Content = source.ToString().FormatString(), IsChecked = true };
 
         expander.Header = toggleButton;
         expander.Content = content;
@@ -560,8 +537,8 @@ internal static class ExtensionMethods
 
         reference = grid;
 
-        if (Binding.EntityBindings.Keys.Contains("IsEnabled" + name))
-            Binding.EntityBindings["IsEnabled" + name].Set(toggleButton, "IsChecked", "Click");
+        if (Binding.EntityBindings.Keys.Contains("IsEnabled" + source))
+            Binding.EntityBindings["IsEnabled" + source].Set(toggleButton, "IsChecked", "Click");
 
         return grid;
     }

@@ -17,6 +17,8 @@ using Color = System.Drawing.Color;
 using Path = System.IO.Path;
 using Texture = Vortice.Direct3D11.Texture2DArrayShaderResourceView;
 
+using static Editor.Controller.Helper;
+
 namespace Editor.Controller;
 
 internal partial class Properties
@@ -75,7 +77,7 @@ internal partial class Properties
 
         Grid[] properties = new[]
         {
-                CreateBool(false, (s, r) => entity.IsStatic = (s as CheckBox).IsChecked.Value).WrapInField("Is Static"),
+                CreateBool(entity, "IsStatic", false),
                 CreateEnum(Enum.GetNames(typeof(Tags))).WrapInField("Tag"),
                 CreateEnum(Enum.GetNames(typeof(Layers))).WrapInField("Layer"),
                 CreateTextFullWithOpacity(entity.GetDebugInformation()).WrapInField("Debug")
@@ -84,20 +86,16 @@ internal partial class Properties
         Grid[] transform = new[]
         {
                 CreateVec3InputWithRGB(
-                    entity.Transform.LocalPosition,
-                    (s, e) => entity.Transform.LocalPosition.X = (float)e.NewValue,
-                    (s, e) => entity.Transform.LocalPosition.Y = (float)e.NewValue,
-                    (s, e) => entity.Transform.LocalPosition.Z = (float)e.NewValue)
+                    entity.Transform, "LocalPosition",
+                    entity.Transform.LocalPosition)
                 .WrapInField("Position"),
-                CreateVec3InputWithRGBAndTransform(
-                    entity.Transform.EulerAngles,
-                    entity.Transform)
+                CreateVec3InputWithRGB(
+                    entity.Transform, "EulerAngles",
+                    entity.Transform.EulerAngles)
                 .WrapInField("Rotation"),
                 CreateVec3InputWithRGB(
-                    entity.Transform.LocalScale,
-                    (s, e) => entity.Transform.LocalScale.X = (float)e.NewValue,
-                    (s, e) => entity.Transform.LocalScale.Y = (float)e.NewValue,
-                    (s, e) => entity.Transform.LocalScale.Z = (float)e.NewValue)
+                    entity.Transform, "LocalScale",
+                    entity.Transform.LocalScale)
                 .WrapInField("Scale"),
             };
 
@@ -162,7 +160,7 @@ internal partial class Properties
                 Grid content = new Grid();
                 s_stackPanel.Children.Add(tmp = scriptsCollection.ToArray()
                     .StackInGrid().WrapInExpanderWithToggleButton(
-                        ref content, 
+                        ref content,
                         component.ToString())
                     .AddContentFlyout(CreateDefaultMenuFlyout(entity, component)));
 
@@ -250,7 +248,7 @@ internal partial class Properties
     }
 }
 
-internal partial class Properties : Controller.Helper
+internal partial class Properties
 {
     public Grid CreateButtonWithAutoSuggesBoxAndComponentCollector(string s,
         TypedEventHandler<AutoSuggestBox, AutoSuggestBoxSuggestionChosenEventArgs> suggestionChosen)
@@ -285,12 +283,12 @@ internal partial class Properties : Controller.Helper
         return grid;
     }
 
-    public Grid CreateFromFieldInfo(object obj, FieldInfo fieldInfo, FieldInfo[] nonPublic)
+    public Grid CreateFromFieldInfo(object source, FieldInfo fieldInfo, FieldInfo[] nonPublic)
     {
         // Initialize a new List of Grid type.
         List<Grid> grid = new();
 
-        var value = fieldInfo.GetValue(obj);
+        var value = fieldInfo.GetValue(source);
         // Get the type of the current field.
         var type = fieldInfo.FieldType;
         // Get any custom attributes applied to the field.
@@ -331,13 +329,14 @@ internal partial class Properties : Controller.Helper
             if (attributes.OfType<SliderAttribute>().Any())
                 grid.Add(
                     CreateSlider(
+                        source, fieldInfo.Name,
                         (byte)value,
                         (byte)attributes.OfType<SliderAttribute>().First().CustomMin,
                         (byte)attributes.OfType<SliderAttribute>().First().CustomMax)
                     .WrapInGrid());
             // If the field doesn't have the `SliderAttribute`, add a number input element.
             else
-                grid.Add(CreateNumberInput((byte)value));
+                grid.Add(CreateNumberInput(source, fieldInfo.Name, (byte)value, byte.MinValue, byte.MaxValue));
 
         // Int
         else if (type == typeof(int))
@@ -345,13 +344,14 @@ internal partial class Properties : Controller.Helper
             if (attributes.OfType<SliderAttribute>().Any())
                 grid.Add(
                     CreateSlider(
+                        source, fieldInfo.Name,
                         (int)value,
                         (int)attributes.OfType<SliderAttribute>().First().CustomMin,
                         (int)attributes.OfType<SliderAttribute>().First().CustomMax)
                     .WrapInGrid());
             // If the field doesn't have the `SliderAttribute`, add a number input element.
             else
-                grid.Add(CreateNumberInput((int)value));
+                grid.Add(CreateNumberInput(source, fieldInfo.Name, (int)value, int.MinValue, int.MaxValue));
 
         // Float
         else if (type == typeof(float))
@@ -359,29 +359,30 @@ internal partial class Properties : Controller.Helper
             if (attributes.OfType<SliderAttribute>().Any())
                 grid.Add(
                     CreateSlider(
+                        source, fieldInfo.Name,
                         (float)value,
                         (float)attributes.OfType<SliderAttribute>().First().CustomMin,
                         (float)attributes.OfType<SliderAttribute>().First().CustomMax)
                     .WrapInGrid());
             // If the field doesn't have the `SliderAttribute`, add a number input element.
             else
-                grid.Add(CreateNumberInput((float)value, float.MinValue, float.MaxValue, (s, e) => fieldInfo.SetValue(obj, (float)e.NewValue)));
+                grid.Add(CreateNumberInput(source, fieldInfo.Name, (float)value, float.MinValue, float.MaxValue));
 
         // String
         else if (type == typeof(string))
-            grid.Add(CreateTextInput((string)value, (s, e) => fieldInfo.SetValue(obj, ((TextBox)s).Text)));
+            grid.Add(CreateTextInput(source, fieldInfo.Name, (string)value));
 
         // Vector 2
         else if (type == typeof(Vector2))
-            grid.Add(CreateVec2Input((Vector2)value));
+            grid.Add(CreateVec2Input(source, fieldInfo.Name, (Vector2)value));
 
         // Vector 3
         else if (type == typeof(Vector3))
-            grid.Add(CreateVec3Input((Vector3)value));
+            grid.Add(CreateVec3Input(source, fieldInfo.Name, (Vector3)value));
 
         // Bool
         else if (type == typeof(bool))
-            grid.Add(CreateBool((bool)value).WrapInGrid());
+            grid.Add(CreateBool(source, fieldInfo.Name, (bool)value).WrapInGrid());
 
         // Material
         else if (type == typeof(Material))

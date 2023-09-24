@@ -2,9 +2,13 @@
 
 namespace Engine.Editor;
 
-public sealed class SceneCameraController : EditorComponent
+public sealed class ViewPortController : EditorComponent
 {
+    public static ViewPortController Instance { get; private set; }
     public string Profile => Entity.Transform.ToString();
+
+    public static Camera Camera => s_camera;
+    private static Camera s_camera;
 
     public static bool ViewportFocused { get => s_viewportFocused; set => s_viewportFocused = value; }
     private static bool s_viewportFocused = true;
@@ -23,6 +27,14 @@ public sealed class SceneCameraController : EditorComponent
     public override void OnRegister() =>
         // Register the component with the EditorScriptSystem.
         EditorScriptSystem.Register(this);
+
+    public override void OnAwake()
+    {
+        if (Instance is null)
+            Instance = this;
+
+        s_camera = Entity.GetComponent<Camera>();
+    }
 
     public override void OnUpdate()
     {

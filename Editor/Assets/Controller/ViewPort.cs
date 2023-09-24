@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 using Engine.Components;
 using Engine.Editor;
 using Engine.Utilities;
+using static Editor.Controller.Helper;
 
 namespace Editor.Controller;
 
@@ -31,9 +32,13 @@ internal partial class ViewPort
         {
                 CreateButton(CreateIcon(Symbol.Video),
                     StackInGridVertical(
-                            CreateSlider(90, 40, 110,
-                            (s, e) => { SceneManager.MainScene.EntityManager.GetFromTag("SceneCamera").GetComponent<Camera>().FOV= (float)e.NewValue; }).WrapInGridVertical("Field Of View"),
-                            CreateNumberInput(SceneCameraController.MovementSpeed, 1, 100, (s, e) => { SceneCameraController.MovementSpeed = (float)e.NewValue; }).WrapInGridVertical("Movement Speed"))),
+                            CreateSlider(
+                                ViewPortController.Camera,
+                                "FOV",
+                                90, 40, 110)
+                                .WrapInGridVertical("Field Of View"),
+                            CreateNumberInput(ViewPortController.Instance, "MovementSpeed", 1, 100)
+                                .WrapInGridVertical("Movement Speed"))),
                 CreateAppBarSeperator(),
                 CreateComboBox(new[] { "Perspective", "Orthogonal" }),
                 CreateComboBox(new[] { "Lit", "Unlit", "Wireframe", "Shaded Wireframe" }),
@@ -43,13 +48,25 @@ internal partial class ViewPort
         UIElement[] topRight = new[]
         {
                 CreateButton(CreateIcon("\xE946"), CreateTextFull(out Profile).WrapInGrid()),
+
                 CreateAppBarSeperator(),
+
                 CreateToggleButton(CreateIcon("\xEA80"), true),
                 CreateToggleButton(CreateIcon("\xE81E"), true),
+
                 CreateAppBarSeperator(),
-                CreateButtonWithValue(CreateIcon("\xE80A"), 10, CreateNumberInput(10, 1, 100, (s, e) => { SceneCameraController.MovementSpeed = (float)e.NewValue; }).WrapInGridVertical("Grid Snap")),
-                CreateButtonWithValue(CreateIcon(Symbol.Rotate), 15, CreateNumberInput(15, 1, 90, (s, e) => { SceneCameraController.MovementSpeed = (float)e.NewValue; }).WrapInGridVertical("Rotation Snap")),
+
+                CreateButtonWithValue(
+                    CreateIcon("\xE80A"), 10,
+                    CreateNumberInput(ViewPortController.Instance, "MovementSpeed", 10, 1, 100)
+                        .WrapInGridVertical("Grid Snap")),
+                CreateButtonWithValue(
+                    CreateIcon(Symbol.Rotate), 15, 
+                    CreateNumberInput(ViewPortController.Instance, "RotationSpeed", 15, 1, 90)
+                        .WrapInGridVertical("Rotation Snap")),
+
                 CreateAppBarSeperator(),
+
                 CreateToggleButton(CreateIcon(Symbol.Globe), true),
             };
 
@@ -59,7 +76,7 @@ internal partial class ViewPort
     }
 }
 
-internal partial class ViewPort : Controller.Helper
+internal partial class ViewPort
 {
     private StackPanel WrapInStackPanelDockTopLeft(params UIElement[] content)
     {
