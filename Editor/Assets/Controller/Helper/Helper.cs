@@ -560,8 +560,8 @@ internal static class ExtensionMethods
 
         reference = grid;
 
-        if (Binding.SceneBindings.Keys.Contains("IsEnabled" + name))
-            Binding.SceneBindings["IsEnabled" + name].Set(toggleButton, "IsChecked", "Click");
+        if (Binding.EntityBindings.Keys.Contains("IsEnabled" + name))
+            Binding.EntityBindings["IsEnabled" + name].Set(toggleButton, "IsChecked", "Click");
 
         return grid;
     }
