@@ -37,9 +37,6 @@ internal class Binding
 
     public static void Update()
     {
-        SetBinding(Engine.Editor.Binding.DequeueAddedScenes());
-        Remove(Engine.Editor.Binding.DequeueRemovedScenes());
-
         UpdateEntityBindings();
         UpdateSceneBindings();
     }
@@ -138,25 +135,27 @@ internal class Binding
     public static void CheckPathEvent(BindEntry bindEntry, BindingFlags bindingFlags)
     {
         var eventInfo = bindEntry.Target.GetType().GetEvent(bindEntry.PathEvent, bindingFlags);
-        Output.Log($"Check Path Event {eventInfo}");
+
+        Output.Log($"Check Path Event: {eventInfo.Name}");
+
         if (eventInfo is null)
             return;
 
         // Create a new delegate that incorporates the dynamic logic.
         RoutedEventHandler handler = (s, e) =>
         {
-            Output.Log("Handled Event Dynamic");
-
             // Cast the sender object to the type specified by bindEntry.Target.GetType().
             var targetType = bindEntry.Target.GetType();
             var castedSender = Convert.ChangeType(s, targetType);
 
-            var newValue = castedSender.GetType().GetProperty(bindEntry.TargetPath).GetValue(castedSender);
+            var newValue = targetType.GetProperty(bindEntry.TargetPath).GetValue(castedSender);
 
             bindEntry.Source.GetType().GetField(bindEntry.SourcePath, bindingFlags)?
                 .SetValue(bindEntry.Source, newValue);
 
             bindEntry.Value = newValue;
+
+            Output.Log($"Handled Event Dynamic: Value {newValue}");
 
             // Invoke the original event handler, if it exists.
             bindEntry.Event?.Invoke(null, null);

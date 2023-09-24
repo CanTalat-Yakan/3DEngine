@@ -13,7 +13,7 @@ public sealed partial class Hierarchy : UserControl
     {
         this.InitializeComponent();
 
-                _hierarchyControl = new(this, x_StackPanel_Hierarchy);
+        _hierarchyControl = new(this, x_StackPanel_Hierarchy);
     }
 
     private void AppBarButton_SwitchLayout_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) =>

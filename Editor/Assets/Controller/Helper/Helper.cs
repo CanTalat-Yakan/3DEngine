@@ -590,7 +590,7 @@ internal static class ExtensionMethods
         sceneEntry.Content = grid;
 
         if (Binding.SceneBindings.Keys.Contains("IsEnabled" + sceneEntry.ID))
-            Binding.SceneBindings["IsEnabled" + sceneEntry.ID].Set(toggleButton, "IsChecked", "Checked");
+            Binding.SceneBindings["IsEnabled" + sceneEntry.ID].Set(toggleButton, "IsChecked", "Click");
         if (Binding.SceneBindings.Keys.Contains("Name" + sceneEntry.ID))
             Binding.SceneBindings["Name" + sceneEntry.ID].Set(toggleButton, "Content");
 

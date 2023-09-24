@@ -24,19 +24,17 @@ public sealed class SceneManager
             guid = Guid.NewGuid();
 
         // Adds a new scene with the specified parameters to the list of subscenes.
-        Scene scene = new()
+        Scene subscene = new()
         {
             ID = guid,
             Name = name,
             IsEnabled = enable,
             EntityManager = new()
         };
-        Subscenes.Add(scene);
-
-        Binding.SetBinding(scene);
+        Subscenes.Add(subscene);
 
         // Returns the newly added scene.
-        return scene;
+        return subscene;
     }
 
     public static void LoadSubscene(Scene subscene)
@@ -46,8 +44,6 @@ public sealed class SceneManager
 
         // Adds the loaded subscene to the list of subscenes.
         Subscenes.Add(subscene);
-
-        Binding.SetBinding(subscene);
     }
 
     public static void UnloadSubscene(Scene subscene)
@@ -67,8 +63,6 @@ public sealed class SceneManager
 
         // Removes the scene from the list of subscenes.
         Subscenes.Remove(scene);
-
-        Binding.Remove(guid);
     }
 
     public void Awake()

@@ -77,9 +77,9 @@ internal partial class Hierarchy
         _stackPanel.Children.Add(CreateSceneHierarchy(SceneEntry).StackInGrid().WrapInExpander("Scene").AddContentFlyout(CreateRootMenuFlyout()));
         _stackPanel.Children.Add(CreateSeperator());
         _stackPanel.Children.Add(CreateButton("Add Subscene", (s, e) => ContentDialogCreateNewSubscene()));
-        _stackPanel.Children.Add(CreateSubsceneHierarchy(out SceneEntry subSceneEntry)
-            .StackInGrid().WrapInExpanderWithToggleButton(subSceneEntry)
-            .AddContentFlyout(CreateSubRootMenuFlyout(subSceneEntry)));
+        _stackPanel.Children.Add(CreateSubsceneAndHierarchy(out SceneEntry subsceneEntry)
+            .StackInGrid().WrapInExpanderWithToggleButton(subsceneEntry)
+            .AddContentFlyout(CreateSubRootMenuFlyout(subsceneEntry)));
     }
 
     public void PopulateTree(SceneEntry sceneEntry)
@@ -121,12 +121,15 @@ internal partial class Hierarchy
         return sceneGrid;
     }
 
-    private Grid[] CreateSubsceneHierarchy(out SceneEntry subsceneEntry, string name = "Subscene", bool enable = true)
+    private Grid[] CreateSubsceneAndHierarchy(out SceneEntry subsceneEntry, string name = "Subscene", bool enable = true)
     {
         subsceneEntry = new SceneEntry() { ID = Guid.NewGuid(), Name = name, Hierarchy = new(), DataSource = new() };
 
-        var subScene = SceneManager.AddSubscene(subsceneEntry.ID, name, enable);
-        var subsceneGrid = CreateSceneHierarchy(subsceneEntry, subScene);
+        var subscene = SceneManager.AddSubscene(subsceneEntry.ID, name, enable);
+
+        Binding.SetBinding(subscene);
+
+        var subsceneGrid = CreateSceneHierarchy(subsceneEntry, subscene);
 
         SubsceneEntries.Add(subsceneEntry);
 
@@ -375,7 +378,7 @@ internal partial class Hierarchy
 
             subsceneName.Text = subsceneName.Text.IncrementNameIfExists(SceneManager.Subscenes.ToArray().Select(Scene => Scene.Name).ToArray());
 
-            _stackPanel.Children.Add(CreateSubsceneHierarchy(out SceneEntry subsceneEntry, subsceneName.Text)
+            _stackPanel.Children.Add(CreateSubsceneAndHierarchy(out SceneEntry subsceneEntry, subsceneName.Text)
                 .StackInGrid().WrapInExpanderWithToggleButton(subsceneEntry, subsceneName.Text)
                 .AddContentFlyout(CreateSubRootMenuFlyout(subsceneEntry)));
         }
@@ -503,6 +506,8 @@ internal partial class Hierarchy
             Scene scene = SceneManager.GetFromID(sceneEntry.ID);
 
             scene.EntityManager.Destroy(GetEntity(treeEntry.ID));
+
+            Binding.Remove(treeEntry.ID);
 
             foreach (var iconNode in treeEntry.IconNode.Children)
             {

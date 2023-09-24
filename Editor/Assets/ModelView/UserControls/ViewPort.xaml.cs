@@ -34,6 +34,8 @@ public sealed partial class ViewPort : UserControl
         _engineCore.Renderer.Data.SetVsync(false);
         _engineCore.Renderer.Data.SetSuperSample(true);
 
+        Binding.Update();
+
         _viewPortControl = new Controller.ViewPort(this, x_Grid_Overlay);
 
         // Adds an event handler for the CompositionTarget.Rendering event,
@@ -44,6 +46,8 @@ public sealed partial class ViewPort : UserControl
             if (_engineCore.Renderer is null)
                 return;
 
+            Binding.Update();
+
             _engineCore.SetPlayMode(Controller.Main.Instance.PlayerControl.PlayMode == PlayMode.Playing);
             _engineCore.SetPlayModeStarted(Controller.Main.Instance.PlayerControl.CheckPlayModeStarted());
 
@@ -51,7 +55,6 @@ public sealed partial class ViewPort : UserControl
 
             _viewPortControl.Profile.Text = Engine.Profiler.GetString();
 
-            Binding.Update();
             Controller.Output.Log(Engine.Output.DequeueLog());
         };
 
