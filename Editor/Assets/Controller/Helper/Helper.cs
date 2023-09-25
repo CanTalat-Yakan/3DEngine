@@ -548,7 +548,8 @@ internal static class ExtensionMethods
         return grid;
     }
 
-    public static Grid WrapInExpanderWithEditableHeaderAndCheckBox(this Grid content, string text, bool isChecked = true, TextChangedEventHandler onTextChanged = null, RoutedEventHandler onClick = null)
+    public static Grid WrapInExpanderWithEditableHeaderAndCheckBox(this Grid content, 
+        object id, string text, bool isChecked = true)
     {
         Grid grid = new();
         Expander expander = new()
@@ -562,8 +563,6 @@ internal static class ExtensionMethods
         Grid grid2 = new();
         CheckBox checkBox = new() { Content = "", IsChecked = isChecked };
         TextBox textBox = new() { Text = text, Margin = new(25, 0, 0, 0), Height = 23 };
-        checkBox.Click += onClick;
-        textBox.TextChanged += onTextChanged;
 
         grid2.Children.Add(checkBox);
         grid2.Children.Add(textBox);
@@ -571,10 +570,10 @@ internal static class ExtensionMethods
         expander.Header = grid2;
         expander.Content = content;
 
-        //Binding.Get("IsEnabled" + sceneEntry.ID, Binding.SceneBindings)?.Set(toggleButton, "IsChecked", "Click");
-        //Binding.Get("Name" + sceneEntry.ID, Binding.SceneBindings)?.Set(toggleButton, "Content");
-
         grid.Children.Add(expander);
+
+        Binding.Get("IsEnabled" + id)?.Set(checkBox, "IsChecked", "Click");
+        Binding.Get("Name" + id)?.Set(textBox, "Text", "TextChanging");
 
         return grid;
     }

@@ -105,10 +105,9 @@ internal partial class Properties
         s_stackPanel.Children.Add(
             properties.StackInGrid()
             .WrapInExpanderWithEditableHeaderAndCheckBox(
+                entity.ID,
                 entity.Name,
-                true,
-                (s, r) => entity.Name = (s as TextBox).Text,
-                (s, r) => entity.IsEnabled = (s as CheckBox).IsChecked.Value));
+                true));
 
         s_stackPanel.Children.Add(CreateSeperator());
 
