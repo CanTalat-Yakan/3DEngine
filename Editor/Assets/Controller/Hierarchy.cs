@@ -78,7 +78,7 @@ internal partial class Hierarchy
         _stackPanel.Children.Add(Helper.CreateSeperator());
         _stackPanel.Children.Add(Helper.CreateButton("Add Subscene", (s, e) => ContentDialogCreateNewSubscene()));
         _stackPanel.Children.Add(CreateSubsceneAndHierarchy(out SceneEntry subsceneEntry)
-            .StackInGrid().WrapInExpanderWithToggleButton(subsceneEntry)
+            .StackInGrid().WrapInExpanderWithToggleButton(ref subsceneEntry.Content, subsceneEntry.ID, subsceneEntry.Name, true)
             .AddContentFlyout(CreateSubRootMenuFlyout(subsceneEntry)));
     }
 
@@ -379,7 +379,7 @@ internal partial class Hierarchy
             subsceneName.Text = subsceneName.Text.IncrementNameIfExists(SceneManager.Subscenes.ToArray().Select(Scene => Scene.Name).ToArray());
 
             _stackPanel.Children.Add(CreateSubsceneAndHierarchy(out SceneEntry subsceneEntry, subsceneName.Text)
-                .StackInGrid().WrapInExpanderWithToggleButton(subsceneEntry, subsceneName.Text)
+                .StackInGrid().WrapInExpanderWithToggleButton(ref subsceneEntry.Content, subsceneEntry.ID, subsceneName.Text, true)
                 .AddContentFlyout(CreateSubRootMenuFlyout(subsceneEntry)));
         }
     }

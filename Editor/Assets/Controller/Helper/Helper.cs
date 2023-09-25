@@ -499,7 +499,8 @@ internal static class ExtensionMethods
         return grid;
     }
 
-    public static Grid WrapInExpanderWithToggleButton(this Grid content, ref Grid reference, string name, string source)
+    public static Grid WrapInExpanderWithToggleButton(this Grid content, ref Grid reference, 
+        object id, object source, bool bindScene = false)
     {
         Grid grid = new() { Margin = new(0, 0, 0, 2) };
         Expander expander = new()
@@ -509,7 +510,7 @@ internal static class ExtensionMethods
             HorizontalAlignment = HorizontalAlignment.Stretch,
             HorizontalContentAlignment = HorizontalAlignment.Stretch
         };
-        ToggleButton toggleButton = new() { Content = name.ToString().FormatString(), IsChecked = true };
+        ToggleButton toggleButton = new() { Content = source.ToString().FormatString(), IsChecked = true };
 
         expander.Header = toggleButton;
         expander.Content = content;
@@ -518,36 +519,13 @@ internal static class ExtensionMethods
 
         reference = grid;
 
-        Binding.Get("IsEnabled" + name + source)?.Set(toggleButton, "IsChecked", "Click");
-
-        return grid;
-    }
-
-    public static Grid WrapInExpanderWithToggleButton(this Grid content, SceneEntry sceneEntry, string name = null)
-    {
-        Grid grid = new() { Margin = new(0, 0, 0, 2) };
-        Expander expander = new()
+        if (bindScene)
         {
-            Padding = new(15),
-            ExpandDirection = ExpandDirection.Down,
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            HorizontalContentAlignment = HorizontalAlignment.Stretch
-        };
-        ToggleButton toggleButton = new()
-        {
-            Content = name is not null ? name : sceneEntry.Name,
-            IsChecked = true
-        };
-
-        expander.Header = toggleButton;
-        expander.Content = content;
-
-        grid.Children.Add(expander);
-
-        sceneEntry.Content = grid;
-
-        Binding.Get("IsEnabled" + sceneEntry.ID, Binding.SceneBindings)?.Set(toggleButton, "IsChecked", "Click");
-        Binding.Get("Name" + sceneEntry.ID, Binding.SceneBindings)?.Set(toggleButton, "Content");
+            Binding.Get("IsEnabled" + id, Binding.SceneBindings)?.Set(toggleButton, "IsChecked", "Click");
+            Binding.Get("Name" + id, Binding.SceneBindings)?.Set(toggleButton, "Content");
+        }
+        else
+            Binding.Get("IsEnabled" + source + id)?.Set(toggleButton, "IsChecked", "Click");
 
         return grid;
     }

@@ -165,8 +165,8 @@ internal partial class Properties
                     .StackInGrid()
                     .WrapInExpanderWithToggleButton(
                         ref content,
-                        component.ToString(),
-                        entity.ID.ToString())
+                        entity.ID,
+                        component)
                     .AddContentFlyout(CreateDefaultMenuFlyout(entity, component)));
 
                 // Add an event handler to remove the current component from the stack panel when it's destroyed.
