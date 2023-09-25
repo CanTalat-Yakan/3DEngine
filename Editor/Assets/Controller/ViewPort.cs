@@ -8,17 +8,17 @@ using static Editor.Controller.Helper;
 
 namespace Editor.Controller;
 
-internal partial class ViewPort
+internal partial class Viewport
 {
     public TextBlock Profile;
     public Grid Content;
 
-    private ModelView.ViewPort _viewPort;
+    private ModelView.Viewport _viewport;
 
-    public ViewPort(ModelView.ViewPort viewPort, Grid content)
+    public Viewport(ModelView.Viewport viewport, Grid content)
     {
         // Set the Viewport and Main content variable.
-        _viewPort = viewPort;
+        _viewport = viewport;
         Content = content;
 
         // Call the CreateViewPortSettings function to build the UI.
@@ -33,11 +33,11 @@ internal partial class ViewPort
                 CreateButton(CreateIcon(Symbol.Video),
                     StackInGridVertical(
                             CreateSlider(
-                                ViewPortController.Camera,
+                                ViewportController.Camera,
                                 "FOV",
                                 90, 40, 110)
                                 .WrapInGridVertical("Field Of View"),
-                            CreateNumberInput(ViewPortController.Instance, "MovementSpeed", 1, 100)
+                            CreateNumberInput(ViewportController.Instance, "MovementSpeed", 1, 100)
                                 .WrapInGridVertical("Movement Speed"))),
                 CreateAppBarSeperator(),
                 CreateComboBox(new[] { "Perspective", "Orthogonal" }),
@@ -58,11 +58,11 @@ internal partial class ViewPort
 
                 CreateButtonWithValue(
                     CreateIcon("\xE80A"), 10,
-                    CreateNumberInput(ViewPortController.Instance, "MovementSpeed", 10, 1, 100)
+                    CreateNumberInput(ViewportController.Instance, "MovementSpeed", 10, 1, 100)
                         .WrapInGridVertical("Grid Snap")),
                 CreateButtonWithValue(
                     CreateIcon(Symbol.Rotate), 15, 
-                    CreateNumberInput(ViewPortController.Instance, "RotationSpeed", 15, 1, 90)
+                    CreateNumberInput(ViewportController.Instance, "RotationSpeed", 15, 1, 90)
                         .WrapInGridVertical("Rotation Snap")),
 
                 CreateAppBarSeperator(),
@@ -76,7 +76,7 @@ internal partial class ViewPort
     }
 }
 
-internal partial class ViewPort
+internal partial class Viewport
 {
     private StackPanel WrapInStackPanelDockTopLeft(params UIElement[] content)
     {

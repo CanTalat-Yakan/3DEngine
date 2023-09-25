@@ -30,7 +30,7 @@ internal class Main
         // Create a new layout control and pass in the content and views.
         LayoutControl = new Layout(
             Content,
-            new ModelView.ViewPort(),
+            new ModelView.Viewport(),
             new ModelView.Hierarchy(),
             new ModelView.Properties(),
             new ModelView.Output(),

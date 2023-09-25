@@ -41,10 +41,10 @@ namespace Editor.Controller
                     _output.ClearOutput();
 
             // Change the border brush, thickness, padding, and margin of the viewport control.
-            Main.Instance.LayoutControl.ViewPort._viewPortControl.Content.BorderBrush = new SolidColorBrush(Colors.GreenYellow);
-            Main.Instance.LayoutControl.ViewPort._viewPortControl.Content.BorderThickness = new(_play.IsChecked.Value ? 2 : 0);
-            Main.Instance.LayoutControl.ViewPort._viewPortControl.Content.Padding = new(_play.IsChecked.Value ? -2 : 0);
-            Main.Instance.LayoutControl.ViewPort._viewPortControl.Content.Margin = new(_play.IsChecked.Value ? 2 : 0);
+            Main.Instance.LayoutControl.Viewport._viewportControl.Content.BorderBrush = new SolidColorBrush(Colors.GreenYellow);
+            Main.Instance.LayoutControl.Viewport._viewportControl.Content.BorderThickness = new(_play.IsChecked.Value ? 2 : 0);
+            Main.Instance.LayoutControl.Viewport._viewportControl.Content.Padding = new(_play.IsChecked.Value ? -2 : 0);
+            Main.Instance.LayoutControl.Viewport._viewportControl.Content.Margin = new(_play.IsChecked.Value ? 2 : 0);
 
             // Set the status of the app bar buttons.
             SetStatusAppBarButtons(_play.IsChecked.Value);
@@ -63,7 +63,7 @@ namespace Editor.Controller
             _forward.IsEnabled = _pause.IsChecked.Value;
 
             // Change the border brush to either Orange or GreenYellow depending on the checked state of "_pause".
-            Main.Instance.LayoutControl.ViewPort._viewPortControl.Content.BorderBrush = new SolidColorBrush(_pause.IsChecked.Value ? Colors.Orange : Colors.GreenYellow);
+            Main.Instance.LayoutControl.Viewport._viewportControl.Content.BorderBrush = new SolidColorBrush(_pause.IsChecked.Value ? Colors.Orange : Colors.GreenYellow);
 
             // Log the current status of the game.
             Output.Log(_pause.IsChecked.Value ? "Paused PlayMode" : "Continued Play;ode");

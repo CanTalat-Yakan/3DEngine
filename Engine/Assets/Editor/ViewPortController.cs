@@ -1,10 +1,8 @@
-﻿using Vortice.Win32;
+﻿namespace Engine.Editor;
 
-namespace Engine.Editor;
-
-public sealed class ViewPortController : EditorComponent
+public sealed class ViewportController : EditorComponent
 {
-    public static ViewPortController Instance { get; private set; }
+    public static ViewportController Instance { get; private set; }
     public string Profile => Entity.Transform.ToString();
 
     public static Camera Camera => s_camera;
@@ -44,7 +42,7 @@ public sealed class ViewPortController : EditorComponent
         if (Input.GetButton(MouseButton.Right, InputState.Down)
             || Input.GetButton(MouseButton.Middle, InputState.Down))
         {
-            User32.GetCursorPos(out var point);
+            Vortice.Win32.User32.GetCursorPos(out var point);
             _mousePosition.X = point.X;
             _mousePosition.Y = point.Y;
         }
@@ -57,7 +55,7 @@ public sealed class ViewPortController : EditorComponent
             HeightTransformMovement();
 
             //User32.SetCursor(User32.LoadCursor(IntPtr.Zero, SystemCursor.IDC_CROSS));
-            User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
+            Vortice.Win32.User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
         }
 
         if (ViewportFocused)
@@ -76,7 +74,7 @@ public sealed class ViewPortController : EditorComponent
         // Check if the middle mouse button is pressed. If so, call the ScreenMovement function.
         if (Input.GetButton(MouseButton.Middle) && ViewportFocused)
         {
-            User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
+            Vortice.Win32.User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
 
             ScreenMovement();
         }
@@ -84,7 +82,7 @@ public sealed class ViewPortController : EditorComponent
         if (Input.GetButton(MouseButton.Right) && ViewportFocused)
         {
             //User32.SetCursor(User32.LoadCursor(IntPtr.Zero, SystemCursor.IDC_CROSS));
-            User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
+            Vortice.Win32.User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
 
             _euler.X = Input.GetMouseDelta().Y;
             _euler.Y = Input.GetMouseDelta().X;

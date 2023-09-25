@@ -14,14 +14,14 @@ using Engine.Utilities;
 
 namespace Editor.ModelView;
 
-public sealed partial class ViewPort : UserControl
+public sealed partial class Viewport : UserControl
 {
     internal Engine.Core _engineCore;
     internal Renderer _renderer;
 
-    internal Controller.ViewPort _viewPortControl;
+    internal Controller.Viewport _viewportControl;
 
-    public ViewPort()
+    public Viewport()
     {
         this.InitializeComponent();
 
@@ -34,7 +34,7 @@ public sealed partial class ViewPort : UserControl
         _engineCore.Renderer.Data.SetVsync(false);
         _engineCore.Renderer.Data.SetSuperSample(true);
 
-        _viewPortControl = new Controller.ViewPort(this, x_Grid_Overlay);
+        _viewportControl = new Controller.Viewport(this, x_Grid_Overlay);
 
         // Adds an event handler for the CompositionTarget.Rendering event,
         // which is triggered when the composition system is rendering a frame.
@@ -49,18 +49,18 @@ public sealed partial class ViewPort : UserControl
 
             _engineCore.Frame();
 
-            _viewPortControl.Profile.Text = Engine.Profiler.GetString();
+            _viewportControl.Profile.Text = Engine.Profiler.GetString();
 
             Binding.Update();
             Controller.Output.Log(Engine.Output.DequeueLog());
         };
 
-        PointerEntered += (s, e) => Engine.Editor.ViewPortController.ViewportFocused = true;
-        PointerExited += (s, e) => Engine.Editor.ViewPortController.ViewportFocused = false;
+        PointerEntered += (s, e) => Engine.Editor.ViewportController.ViewportFocused = true;
+        PointerExited += (s, e) => Engine.Editor.ViewportController.ViewportFocused = false;
 
-        var arrow = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
+        //var arrow = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         var cross = InputSystemCursor.Create(InputSystemCursorShape.Cross);
-        x_CustomGrid.InputCursor = cross;
+        x_CustomCursorGrid.InputCursor = cross;
     }
 
     private void InitializeRenderer(Renderer renderer)
@@ -68,7 +68,7 @@ public sealed partial class ViewPort : UserControl
         _renderer = renderer;
 
         // Gets the native object for the SwapChainPanel control.
-        using (var nativeObject = ComObject.As<Vortice.WinUI.ISwapChainPanelNative2>(x_SwapChainPanel_ViewPort))
+        using (var nativeObject = ComObject.As<Vortice.WinUI.ISwapChainPanelNative2>(x_SwapChainPanel_Viewport))
         {
             var result = nativeObject.SetSwapChain(_renderer.SwapChain);
             if (result.Failure)
@@ -76,14 +76,14 @@ public sealed partial class ViewPort : UserControl
         }
     }
 
-    private void x_SwapChainPanel_ViewPort_SizeChanged(object sender, SizeChangedEventArgs e) =>
+    private void x_SwapChainPanel_Viewport_SizeChanged(object sender, SizeChangedEventArgs e) =>
         // Register an event handler for the SizeChanged event of the SwapChainPanel. This will be used to handle any changes in the size of the panel.
         _renderer.Resize(
             (int)e.NewSize.Width,
             (int)e.NewSize.Height);
 }
 
-public class CustomGrid : Grid
+public class CustomCursorGrid : Grid
 {
     public InputCursor InputCursor
     {

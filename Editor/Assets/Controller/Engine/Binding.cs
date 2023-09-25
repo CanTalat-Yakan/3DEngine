@@ -1,13 +1,14 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System;
-
-using Engine.Utilities;
-using Engine.ECS;
 using Windows.Foundation;
-using Microsoft.UI.Xaml.Controls;
+
+using Engine.Editor;
+using Engine.ECS;
+using Engine.Utilities;
 
 namespace Editor.Controller;
 
@@ -49,16 +50,18 @@ internal class Binding
 
     public static void Update()
     {
-        //if (RendererBindings.Count == 0)
-        //SetRendererBinding();
+        if (RendererBindings.Count == 0)
+            SetRendererBinding();
 
-        //UpdateRendererBindings();
+        UpdateRendererBindings();
         UpdateSceneBindings();
         UpdateEntityBindings();
     }
 
-    //public static void SetRendererBinding() =>
-    //RendererBindings.Add("FOV" + ViewPortController.Instance?.GetType(), new(ViewPortController.Instance?, "FOV"));
+    public static void SetRendererBinding() =>
+        RendererBindings.Add(
+            "FOV" + ViewportController.Camera?.GetType(),
+            new(ViewportController.Camera, "FOV"));
 
     public static void SetBinding(Scene scene)
     {
@@ -93,8 +96,8 @@ internal class Binding
 
         if (EntityBindings.Keys.Contains(key))
             return EntityBindings[key];
-        //else if (RendererBindings.Keys.Contains(key))
-        //return RendererBindings[key];
+        else if (RendererBindings.Keys.Contains(key))
+            return RendererBindings[key];
 
         return null;
     }
@@ -133,20 +136,21 @@ internal class Binding
 
     private static void UpdateBindings(object source, object sufix, Dictionary<string, BindEntry> bindings)
     {
-        foreach (var field in source.GetType().GetFields(AllBindingFlags))
-            foreach (var bindName in bindings.Keys)
-                if (string.Equals(field.Name + sufix, bindName) &&
-                    bindings.TryGetValue(bindName, out var bindEntry) &&
-                    !Equals(
-                        field.GetValue(source),
-                        bindEntry.Value))
-                    ProcessBindEntry(bindEntry, field, source);
+        if (source is not null)
+            foreach (var field in source.GetType().GetFields(AllBindingFlags))
+                foreach (var bindName in bindings.Keys)
+                    if (string.Equals(field.Name + sufix, bindName) &&
+                        bindings.TryGetValue(bindName, out var bindEntry) &&
+                        !Equals(
+                            field.GetValue(source),
+                            bindEntry.Value))
+                        ProcessBindEntry(bindEntry, field, source);
     }
 
     public static void ProcessBindEntry(BindEntry bindEntry, FieldInfo field, object source)
     {
         bindEntry.Value = field.GetValue(source);
-        
+
         var fieldFromPath = bindEntry.Target?.GetType().GetField(bindEntry.TargetPath, AllBindingFlags);
         if (fieldFromPath is not null)
             fieldFromPath.SetValue(bindEntry.Target, bindEntry.Value);

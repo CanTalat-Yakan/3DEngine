@@ -22,7 +22,7 @@ internal partial class Layout
     public Grid PaneRoot;
     public SplitView SplitView;
 
-    public ModelView.ViewPort ViewPort;
+    public ModelView.Viewport Viewport;
     public ModelView.Hierarchy Hierarchy;
     public ModelView.Properties Properties;
     public Grid PropertiesRoot;
@@ -34,14 +34,14 @@ internal partial class Layout
     public List<Grid> GridsToClear = new();
 
     public Layout(Grid content,
-        ModelView.ViewPort viewPort,
+        ModelView.Viewport viewport,
         ModelView.Hierarchy hierarchy,
         ModelView.Properties properties,
         ModelView.Output output,
         ModelView.Files files)
     {
         MainContent = content;
-        ViewPort = viewPort;
+        Viewport = viewport;
         Hierarchy = hierarchy;
         Properties = properties;
         Output = output;
@@ -63,10 +63,10 @@ internal partial class Layout
             new() { Content = Files, Header = "Files", Symbol = Symbol.Document },
             new() { Content = Output, Header = "Output", Symbol = Symbol.Message });
 
-        // Create a new instance of the ContentRoot, and add the ViewPort wrapped in a grid and the tabView to it.
+        // Create a new instance of the ContentRoot, and add the Viewport wrapped in a grid and the tabView to it.
         ContentRoot = new();
         ContentRoot.Children.Add(PairVertical(
-            new() { Content = WrapGrid(ViewPort), MinHeight = 0 },
+            new() { Content = WrapGrid(Viewport), MinHeight = 0 },
             new() { Content = tabView, MinHeight = 0, Length = new(235, GridUnitType.Pixel) }));
 
         // Create a new instance of the PaneRoot and add the Hierarchy and PropertiesRoot wrapped in grids to it.

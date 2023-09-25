@@ -21,7 +21,7 @@ internal sealed class SceneBoot : EditorComponent
 
         // Add the DeactivateSceneCameraOnPlay and CameraController components to the camera entity.
         SceneCamera.Entity.AddComponent<DeactivateCameraOnPlay>();
-        SceneCamera.Entity.AddComponent<ViewPortController>();
+        SceneCamera.Entity.AddComponent<ViewportController>();
 
         // Set the initial position and rotation of the camera entity.
         SceneCamera.Entity.Transform.LocalPosition = new(3, 4, 5);
