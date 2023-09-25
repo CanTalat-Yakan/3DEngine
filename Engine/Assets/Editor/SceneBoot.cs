@@ -15,13 +15,13 @@ internal sealed class SceneBoot : EditorComponent
     public override void OnAwake()
     {
         // Create a camera entity with the name "Camera" and tag "SceneCamera".
-        SceneCamera = SceneManager.MainScene.EntityManager.CreateCamera("Camera", EditorTags.SceneCamera.ToString()).GetComponent<Camera>();
+        SceneCamera = SceneManager.MainScene.EntityManager.CreateCamera("Camera", EditorTags.SceneCamera.ToString());
         // Set the camera order to the maximum value.
         SceneCamera.CameraID = byte.MaxValue;
 
         // Add the DeactivateSceneCameraOnPlay and CameraController components to the camera entity.
         SceneCamera.Entity.AddComponent<DeactivateCameraOnPlay>();
-        SceneCamera.Entity.AddComponent<ViewportController>();
+        SceneCamera.Entity.AddComponent<ViewportController>().SetCamera(SceneCamera);
 
         // Set the initial position and rotation of the camera entity.
         SceneCamera.Entity.Transform.LocalPosition = new(3, 4, 5);
@@ -66,11 +66,11 @@ internal sealed class SceneBoot : EditorComponent
                 var newCube = SceneManager.MainScene.EntityManager.CreatePrimitive(PrimitiveTypes.Cube, Cubes);
 
                 // Set the position of the new cube with an offset on the Y axis.
-                newCube.Transform.LocalPosition.Y -= 3;
+                newCube.Entity.Transform.LocalPosition.Y -= 3;
                 // Set random rotation values for the new cube.
-                newCube.Transform.EulerAngles = new(new Random().Next(1, 360), new Random().Next(1, 360), new Random().Next(1, 360));
+                newCube.Entity.Transform.EulerAngles = new(new Random().Next(1, 360), new Random().Next(1, 360), new Random().Next(1, 360));
                 // Set random scale values for the new cube.
-                newCube.Transform.LocalScale = new(new Random().Next(1, 3), new Random().Next(1, 3), new Random().Next(1, 3));
+                newCube.Entity.Transform.LocalScale = new(new Random().Next(1, 3), new Random().Next(1, 3), new Random().Next(1, 3));
             }
         }
     }

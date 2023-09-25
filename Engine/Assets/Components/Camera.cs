@@ -53,7 +53,7 @@ public sealed class Camera : Component
         var dAspect = aspect < 1 ? 1 * aspect : 1 / aspect;
 
         // Convert the field of view from degrees to radians.
-        var radAngle = FOV.ToRadians();
+        var radAngle = (FOV).ToRadians();
         var radHFOV = 2 * MathF.Atan(MathF.Tan(radAngle * 0.5f) * dAspect);
         var hFOV = radHFOV.ToDegrees();
 

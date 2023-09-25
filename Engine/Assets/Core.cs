@@ -17,10 +17,11 @@ public sealed class Core
     public static Core Instance { get; private set; }
 
     public static string AssetsPath { get; private set; }
-    public static bool PlayMode { get; private set; }
-    public static bool PlayModeStarted { get; private set; }
+    public static bool PlayMode { get; private set; } = false;
+    public static bool PlayModeStarted { get; private set; } = false;
 
     public event EventHandler OnRender;
+    public event EventHandler OnInitialized;
 
     public Renderer Renderer;
     public RuntimeCompiler RuntimeCompiler;
@@ -54,17 +55,20 @@ public sealed class Core
         // Compile all project scripts and add components for the editor's "AddComponent" function.
         RuntimeCompiler.CompileProjectScripts(AssetsPath);
 
-        Output.Log("Engine Initialized...");
-
         // Render Pipeline Init
         SceneManager.Awake();
         SceneManager.Start();
+
+        Output.Log("Engine Initialized...");
     }
 
     public void Frame()
     {
         if (!Renderer.IsRendering)
             return;
+
+        OnInitialized?.Invoke(null, null);
+        OnInitialized = null;
 
         // Clears the render target, discarding the contents and preparing it for the next frame.
         Renderer.Clear();
@@ -88,7 +92,7 @@ public sealed class Core
             // Call Start for all scenes again.
             SceneManager.Start();
         }
-        
+
         // Call Update for all scenes.
         SceneManager.Update();
         // Call LateUpdate for all scenes.

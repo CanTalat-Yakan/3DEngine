@@ -113,7 +113,7 @@ namespace Engine.Utilities
             return newEntity;
         }
 
-        public Entity CreatePrimitive(PrimitiveTypes type = PrimitiveTypes.Cube, Entity parent = null)
+        public Mesh CreatePrimitive(PrimitiveTypes type = PrimitiveTypes.Cube, Entity parent = null)
         {
             // Create a new entity with the specified name and parent.
             Entity newEntity = new()
@@ -123,17 +123,17 @@ namespace Engine.Utilities
             };
 
             // Add a mesh component to the entity using the specified primitive type.
-            var mesh = (Mesh)newEntity.AddComponent<Mesh>();
+            var mesh = newEntity.AddComponent<Mesh>();
             mesh.SetMeshInfo(Loader.ModelLoader.LoadFile(Path.Combine(PRIMITIVES, type.ToString()) + ".obj"));
 
             // Add the new entity to the entity list.
             EntityList.Add(newEntity);
 
             // Return the new entity.
-            return newEntity;
+            return mesh;
         }
 
-        public Entity CreateCamera(string name = "Camera", string tag = "Untagged", Entity parent = null)
+        public Camera CreateCamera(string name = "Camera", string tag = "Untagged", Entity parent = null)
         {
             // Create a new Entity with the given name, parent, and tag.
             Entity newEntity = new()
@@ -144,13 +144,13 @@ namespace Engine.Utilities
             };
 
             // Add a Camera component to the Entity.
-            newEntity.AddComponent<Camera>();
+            var camera = newEntity.AddComponent<Camera>();
 
             // Add the new Entity to the EntityList.
             EntityList.Add(newEntity);
 
-            // Return the new Entity.
-            return newEntity;
+            // Return the new Camera.
+            return camera;
         }
 
         public void CreateSky()

@@ -9,6 +9,7 @@ using Windows.Foundation;
 using Engine.Editor;
 using Engine.ECS;
 using Engine.Utilities;
+using Microsoft.UI.Xaml.Controls.Primitives;
 
 namespace Editor.Controller;
 
@@ -50,19 +51,17 @@ internal class Binding
 
     public static void Update()
     {
-        if (RendererBindings.Count == 0)
-            SetRendererBinding();
-
         UpdateRendererBindings();
         UpdateSceneBindings();
         UpdateEntityBindings();
     }
 
-    public static void SetRendererBinding() =>
+    public static void SetRendererBinding()
+    {
         RendererBindings.Add(
             "FOV" + ViewportController.Camera?.GetType(),
             new(ViewportController.Camera, "FOV"));
-
+    }
     public static void SetBinding(Scene scene)
     {
         if (scene is null)
@@ -169,8 +168,6 @@ internal class Binding
     {
         var eventInfo = bindEntry.Target.GetType().GetEvent(bindEntry.PathEvent, bindingFlags);
 
-        //Output.Log($"Check Path Event: {eventInfo.Name}");
-
         if (eventInfo is null)
             return;
 
@@ -188,13 +185,15 @@ internal class Binding
 
             eventInfo.AddEventHandler(bindEntry.Target, handler);
         }
-        else if (Equals(eventInfo.EventHandlerType, typeof(TypedEventHandler<TextBox, TextBoxTextChangingEventArgs>)))
+        else if (Equals(eventInfo.EventHandlerType, typeof(RangeBaseValueChangedEventHandler)))
         {
-            TypedEventHandler<TextBox, TextBoxTextChangingEventArgs> handler = (s, e) =>
+            RangeBaseValueChangedEventHandler handler = (s, e) =>
                 EventLogic(s, bindEntry);
 
             eventInfo.AddEventHandler(bindEntry.Target, handler);
         }
+
+        //Output.Log($"Check Path Event: {eventInfo.Name}");
     }
 
     public static void EventLogic(object sender, BindEntry bindEntry)
@@ -205,15 +204,22 @@ internal class Binding
 
         var newValue = targetType.GetProperty(bindEntry.TargetPath).GetValue(castedSender);
 
+        newValue = bindEntry.Value switch
+        {
+            float => Convert.ToSingle(newValue),
+            int => Convert.ToInt32(newValue),
+            _ => newValue
+        };
+
         bindEntry.Source.GetType().GetField(bindEntry.SourcePath, AllBindingFlags)?
             .SetValue(bindEntry.Source, newValue);
 
         bindEntry.Value = newValue;
 
-        //Output.Log($"Handled Event: Value {newValue}");
-
         // Invoke the original event handler, if it exists.
         bindEntry.Event?.Invoke(null, null);
+
+        //Output.Log($"Handled Event: Value {newValue}");
     }
 
     public static void Clear(Dictionary<string, BindEntry> dictionary)

@@ -11,11 +11,11 @@ public sealed class ViewportController : EditorComponent
     public static bool ViewportFocused { get => s_viewportFocused; set => s_viewportFocused = value; }
     private static bool s_viewportFocused = true;
 
-    public static float MovementSpeed { get => s_movementSpeed; set => s_movementSpeed = value; }
-    private static float s_movementSpeed = 2;
+    public float MovementSpeed { get => _movementSpeed; set => _movementSpeed = value; }
+    private float _movementSpeed = 2;
 
-    public static float RotationSpeed { get => s_rotationSpeed; set => s_rotationSpeed = value; }
-    private static float s_rotationSpeed = 5;
+    public float RotationSpeed { get => _rotationSpeed; set => _rotationSpeed = value; }
+    private float _rotationSpeed = 5;
 
     private Vector3 _direction;
     private Vector3 _euler;
@@ -30,9 +30,10 @@ public sealed class ViewportController : EditorComponent
     {
         if (Instance is null)
             Instance = this;
-
-        s_camera = Entity.GetComponent<Camera>();
     }
+
+    public void SetCamera(Camera camera) =>
+        s_camera = camera;
 
     public override void OnUpdate()
     {
@@ -63,7 +64,7 @@ public sealed class ViewportController : EditorComponent
             ScrollMovement();
 
         // Update the entity's position based on the calculated direction and movement speed.
-        Entity.Transform.LocalPosition += _direction * Time.DeltaF * s_movementSpeed;
+        Entity.Transform.LocalPosition += _direction * Time.DeltaF * _movementSpeed;
 
         // Reset the direction vector.
         _direction = Vector3.Zero;
@@ -88,7 +89,7 @@ public sealed class ViewportController : EditorComponent
             _euler.Y = Input.GetMouseDelta().X;
 
             // Update the entity's rotation based on the calculated rotation and rotation speed.
-            Entity.Transform.EulerAngles -= _euler * Time.DeltaF * s_rotationSpeed;
+            Entity.Transform.EulerAngles -= _euler * Time.DeltaF * _rotationSpeed;
 
             // Clamp Vertical Rotation to 90 degrees up and down.
             var clampedEuler = Entity.Transform.EulerAngles;
@@ -102,10 +103,10 @@ public sealed class ViewportController : EditorComponent
         // Check if either the right or middle mouse button is pressed.
         // If so, update the movement speed based on the mouse wheel input.
         if (Input.GetButton(MouseButton.Right))
-            s_movementSpeed += Input.GetMouseWheel();
+            _movementSpeed += Input.GetMouseWheel();
 
         // Clamp the movement speed between 0.1 and 10.
-        s_movementSpeed = Math.Clamp(s_movementSpeed, 0.1f, 10);
+        _movementSpeed = Math.Clamp(_movementSpeed, 0.1f, 10);
     }
 
     private void TransformMovement() =>

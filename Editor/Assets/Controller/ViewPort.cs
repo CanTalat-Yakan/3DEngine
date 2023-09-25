@@ -1,9 +1,8 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 
-using Engine.Components;
 using Engine.Editor;
-using Engine.Utilities;
+
 using static Editor.Controller.Helper;
 
 namespace Editor.Controller;
@@ -30,15 +29,17 @@ internal partial class Viewport
         // Initialize an array of UI elements to be positioned in the top-left corner of the main content.
         UIElement[] topLeft = new[]
         {
-                CreateButton(CreateIcon(Symbol.Video),
+                CreateFlyoutButton(
+                    CreateIcon(Symbol.Video),
                     StackInGridVertical(
-                            CreateSlider(
-                                ViewportController.Camera,
-                                "FOV",
-                                90, 40, 110)
-                                .WrapInGridVertical("Field Of View"),
-                            CreateNumberInput(ViewportController.Instance, "MovementSpeed", 1, 100)
-                                .WrapInGridVertical("Movement Speed"))),
+                        CreateSlider(
+                            ViewportController.Camera, "FOV",
+                            90, 40, 110)
+                            .WrapInGridVertical("Field Of View"),
+                        CreateNumberInput(
+                            ViewportController.Instance, "_movementSpeed", 
+                            1, 100)
+                            .WrapInGridVertical("Movement Speed"))),
                 CreateAppBarSeperator(),
                 CreateComboBox(new[] { "Perspective", "Orthogonal" }),
                 CreateComboBox(new[] { "Lit", "Unlit", "Wireframe", "Shaded Wireframe" }),
@@ -47,7 +48,7 @@ internal partial class Viewport
         // Initialize an array of UI elements to be positioned in the top-right corner of the main content.
         UIElement[] topRight = new[]
         {
-                CreateButton(CreateIcon("\xE946"), CreateTextFull(out Profile).WrapInGrid()),
+                CreateFlyoutButton(CreateIcon("\xE946"), CreateTextFull(out Profile).WrapInGrid()),
 
                 CreateAppBarSeperator(),
 
@@ -56,13 +57,17 @@ internal partial class Viewport
 
                 CreateAppBarSeperator(),
 
-                CreateButtonWithValue(
+                CreateFlyoutButtonWithValue(
                     CreateIcon("\xE80A"), 10,
-                    CreateNumberInput(ViewportController.Instance, "MovementSpeed", 10, 1, 100)
+                    CreateNumberInput(
+                        ViewportController.Instance, "_movementSpeed", 
+                        10, 1, 100)
                         .WrapInGridVertical("Grid Snap")),
-                CreateButtonWithValue(
+                CreateFlyoutButtonWithValue(
                     CreateIcon(Symbol.Rotate), 15, 
-                    CreateNumberInput(ViewportController.Instance, "RotationSpeed", 15, 1, 90)
+                    CreateNumberInput(
+                        ViewportController.Instance, "_rotationSpeed", 
+                        15, 1, 90)
                         .WrapInGridVertical("Rotation Snap")),
 
                 CreateAppBarSeperator(),

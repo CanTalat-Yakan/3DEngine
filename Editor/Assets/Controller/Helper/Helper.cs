@@ -74,7 +74,7 @@ internal class Helper
         return button;
     }
 
-    internal static UIElement CreateButton(Grid icon, Grid content)
+    internal static UIElement CreateFlyoutButton(Grid icon, Grid content)
     {
         Button button = new() { Content = icon };
         button.Flyout = new Flyout() { Content = content, Placement = FlyoutPlacementMode.BottomEdgeAlignedRight };
@@ -82,7 +82,7 @@ internal class Helper
         return button;
     }
 
-    internal static UIElement CreateButtonWithValue(Grid icon, float f, Grid content)
+    internal static UIElement CreateFlyoutButtonWithValue(Grid icon, float f, Grid content)
     {
         StackPanel stack = new() { Orientation = Orientation.Horizontal, FlowDirection = FlowDirection.LeftToRight, Spacing = 5 };
         Viewbox viewbox = new() { Width = 16, Height = 16 };

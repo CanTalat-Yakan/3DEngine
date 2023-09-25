@@ -55,8 +55,8 @@ namespace Engine.ECS
             // Add the Transform component to the Entity when initialized.
             AddComponent(_transform = new Transform());
 
-        public Component AddComponent<T>() where T : Component, new() =>
-            AddComponent(new T());
+        public T AddComponent<T>() where T : Component, new() =>
+            (T)AddComponent(new T());
 
         public Component AddComponent(Type type) =>
             AddComponent((Component)Activator.CreateInstance(type));

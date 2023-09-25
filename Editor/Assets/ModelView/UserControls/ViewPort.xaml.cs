@@ -6,7 +6,6 @@ using SharpGen.Runtime;
 using System;
 using WinUIEx;
 
-using Editor.Controller;
 using Engine.Utilities;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -34,26 +33,31 @@ public sealed partial class Viewport : UserControl
         _engineCore.Renderer.Data.SetVsync(false);
         _engineCore.Renderer.Data.SetSuperSample(true);
 
-        _viewportControl = new Controller.Viewport(this, x_Grid_Overlay);
+        _engineCore.OnInitialized += (s, e) =>
+        {
+            Controller.Binding.SetRendererBinding();
+
+            _viewportControl = new Controller.Viewport(this, x_Grid_Overlay);
+        };
+
+        _engineCore.OnRender += (s, e) =>
+        {
+            _engineCore.SetPlayMode(
+                Controller.Main.Instance.PlayerControl.PlayMode == Controller.PlayMode.Playing);
+            _engineCore.SetPlayModeStarted(
+                Controller.Main.Instance.PlayerControl.CheckPlayModeStarted());
+
+            if (_viewportControl is not null)
+                _viewportControl.Profile.Text = Engine.Profiler.GetString();
+
+            Controller.Binding.Update();
+            Controller.Output.Log(Engine.Output.DequeueLog());
+        };
 
         // Adds an event handler for the CompositionTarget.Rendering event,
         // which is triggered when the composition system is rendering a frame.
         // The code inside the event handler will be executed each time the event is raised.
-        CompositionTarget.Rendering += (s, e) =>
-        {
-            if (_engineCore.Renderer is null)
-                return;
-
-            _engineCore.SetPlayMode(Controller.Main.Instance.PlayerControl.PlayMode == PlayMode.Playing);
-            _engineCore.SetPlayModeStarted(Controller.Main.Instance.PlayerControl.CheckPlayModeStarted());
-
-            _engineCore.Frame();
-
-            _viewportControl.Profile.Text = Engine.Profiler.GetString();
-
-            Binding.Update();
-            Controller.Output.Log(Engine.Output.DequeueLog());
-        };
+        CompositionTarget.Rendering += (s, e) => _engineCore.Frame();
 
         PointerEntered += (s, e) => Engine.Editor.ViewportController.ViewportFocused = true;
         PointerExited += (s, e) => Engine.Editor.ViewportController.ViewportFocused = false;
