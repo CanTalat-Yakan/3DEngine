@@ -36,7 +36,7 @@ public sealed class Renderer
         else
             throw new Exception("""
                 An invalid or null Win32Window instance was passed to the Renderer. 
-                Please ensure that you provide a valid Win32Window object when constructing the Renderer.
+                Please ensure that you provide a valid Win32Window object to the Renderer.
                 """);
 
         // Set the size.
