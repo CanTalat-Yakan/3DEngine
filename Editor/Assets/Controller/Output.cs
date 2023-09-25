@@ -305,7 +305,9 @@ namespace Editor.Controller
                         : m.Type == MessageType.Error
                             ? Windows.UI.Color.FromArgb(88, 255, 0, 0)
                             : Windows.UI.Color.FromArgb(88, 255, 255, 0))
-            }.AddToolTip(m.Script));
+            }.AddToolTip(string.IsNullOrEmpty(m.Script) 
+                ? m.Type.ToString() 
+                : m.Script ));
 
             // return new message.
             return grid;
