@@ -499,25 +499,6 @@ internal static class ExtensionMethods
         return grid;
     }
 
-    public static Grid WrapInExpander(this Grid content, string text, SceneEntry sceneEntry)
-    {
-        Grid grid = new() { Margin = new(0, 0, 0, 2) };
-        Expander expander = new()
-        {
-            Header = text,
-            Padding = new(15),
-            ExpandDirection = ExpandDirection.Down,
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            HorizontalContentAlignment = HorizontalAlignment.Stretch
-        };
-        expander.IsExpanded = true;
-        expander.Content = content;
-
-        grid.Children.Add(expander);
-
-        return grid;
-    }
-
     public static Grid WrapInExpanderWithToggleButton(this Grid content, ref Grid reference, string source)
     {
         Grid grid = new() { Margin = new(0, 0, 0, 2) };
