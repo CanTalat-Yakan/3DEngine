@@ -30,7 +30,7 @@ internal partial class Viewport(ModelView.Viewport viewport, Grid content)
         {
             Binding.SetRendererBinding();
 
-            CreateViewPortSettings();
+            CreateViewportSettings();
         };
 
         engineCore.OnRender += (s, e) =>
@@ -63,7 +63,7 @@ internal partial class Viewport(ModelView.Viewport viewport, Grid content)
         }
     }
 
-    public void CreateViewPortSettings()
+    public void CreateViewportSettings()
     {
         // Initialize an array of UI elements to be positioned in the top-left corner of the main content.
         UIElement[] topLeft = new[]
