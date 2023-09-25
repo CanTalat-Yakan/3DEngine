@@ -43,7 +43,7 @@ internal class Binding
     public static void Update()
     {
         //if (RendererBindings.Count == 0)
-            //SetRendererBinding();
+        //SetRendererBinding();
 
         //UpdateRendererBindings();
         UpdateSceneBindings();
@@ -51,7 +51,7 @@ internal class Binding
     }
 
     //public static void SetRendererBinding() =>
-        //RendererBindings.Add("FOV" + ViewPortController.Instance?.GetType(), new(ViewPortController.Instance?, "FOV"));
+    //RendererBindings.Add("FOV" + ViewPortController.Instance?.GetType(), new(ViewPortController.Instance?, "FOV"));
 
     public static void SetBinding(Scene scene)
     {
@@ -78,12 +78,17 @@ internal class Binding
                 EntityBindings.Add(field.Name + component, new(component, field.Name));
     }
 
-    public static BindEntry Get(string key)
+    public static BindEntry Get(string key, Dictionary<string, BindEntry> dictionary = null)
     {
+        if (dictionary is not null)
+            if (dictionary.Keys.Contains(key))
+                return dictionary[key];
+
         if (EntityBindings.Keys.Contains(key))
             return EntityBindings[key];
         //else if (RendererBindings.Keys.Contains(key))
-            //return RendererBindings[key];
+        //return RendererBindings[key];
+
         return null;
     }
 

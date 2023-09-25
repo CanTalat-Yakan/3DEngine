@@ -537,8 +537,7 @@ internal static class ExtensionMethods
 
         reference = grid;
 
-        if (Binding.EntityBindings.Keys.Contains("IsEnabled" + source))
-            Binding.EntityBindings["IsEnabled" + source].Set(toggleButton, "IsChecked", "Click");
+        Binding.Get("IsEnabled" + source)?.Set(toggleButton, "IsChecked", "Click");
 
         return grid;
     }
@@ -566,10 +565,8 @@ internal static class ExtensionMethods
 
         sceneEntry.Content = grid;
 
-        if (Binding.SceneBindings.Keys.Contains("IsEnabled" + sceneEntry.ID))
-            Binding.SceneBindings["IsEnabled" + sceneEntry.ID].Set(toggleButton, "IsChecked", "Click");
-        if (Binding.SceneBindings.Keys.Contains("Name" + sceneEntry.ID))
-            Binding.SceneBindings["Name" + sceneEntry.ID].Set(toggleButton, "Content");
+        Binding.Get("IsEnabled" + sceneEntry.ID, Binding.SceneBindings)?.Set(toggleButton, "IsChecked", "Click");
+        Binding.Get("Name" + sceneEntry.ID, Binding.SceneBindings)?.Set(toggleButton, "Content");
 
         return grid;
     }
