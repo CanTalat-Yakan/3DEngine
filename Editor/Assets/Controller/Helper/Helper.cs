@@ -120,88 +120,88 @@ internal class Helper
 
 
     #region // Properties View Field Bindings
-    internal static Grid CreateTextInput(object source, string fieldName, string placeholder = "Example")
+    internal static Grid CreateTextInput(object id, object source, string fieldName, string placeholder = "Example")
     {
         TextBox textBox = new() { Text = placeholder, MaxWidth = 200 };
 
-        Binding.Get(fieldName + source)?.Set(textBox, "Text", "TextChanging");
+        Binding.Get(fieldName + source + id)?.Set(textBox, "Text", "TextChanging");
 
         return StackInGrid(textBox);
     }
 
-    internal static Grid CreateNumberInput(object source, string fieldName, float value = 0, float min = float.MinValue, float max = float.MaxValue)
+    internal static Grid CreateNumberInput(object id, object source, string fieldName, float value = 0, float min = float.MinValue, float max = float.MaxValue)
     {
         NumberBox numberBox = new() { Value = value, Minimum = min, Maximum = max, MaxWidth = 200 };
         numberBox.SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline;
 
-        Binding.Get(fieldName + source)?.Set(numberBox, "Value", "ValueChanged");
+        Binding.Get(fieldName + source + id)?.Set(numberBox, "Value", "ValueChanged");
 
         return StackInGrid(numberBox);
     }
 
-    internal static Grid CreateNumberInputInt(object source, string fieldName, float value = 0, float min = float.MinValue, float max = float.MaxValue)
+    internal static Grid CreateNumberInputInt(object id, object source, string fieldName, float value = 0, float min = float.MinValue, float max = float.MaxValue)
     {
         NumberBox numberBox = new() { Value = value, Minimum = min, Maximum = max, MaxWidth = 200 };
         numberBox.SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline;
 
-        Binding.Get(fieldName + source)?.Set(numberBox, "Value", "ValueChanged");
+        Binding.Get(fieldName + source + id)?.Set(numberBox, "Value", "ValueChanged");
 
         return StackInGrid(numberBox);
     }
 
-    internal static UIElement CreateSlider(object source, string fieldName, double value = 0, double min = 0, double max = 100)
+    internal static UIElement CreateSlider(object id, object source, string fieldName, double value = 0, double min = 0, double max = 100)
     {
         Slider slider = new() { Value = value, Minimum = min, Maximum = max, Width = 180, Margin = new(0, 0, 0, -5.5) };
         TextBlock numberPreview = new() { Padding = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
 
-        Binding.Get(fieldName + source)?.Set(slider, "Value", "ValueChanged");
-        Binding.Get(fieldName + source)?.SetEvent((s, e) =>
-            numberPreview.Text = Binding.Get(fieldName + source)?.Value.ToString());
+        Binding.Get(fieldName + source + id)?.Set(slider, "Value", "ValueChanged");
+        Binding.Get(fieldName + source + id)?.SetEvent((s, e) =>
+            numberPreview.Text = Binding.Get(fieldName + source + id)?.Value.ToString());
 
         return StackInGrid(slider, numberPreview);
     }
 
-    internal static Grid CreateVec2Input(object source, string fieldName, Vector2 value = new())
+    internal static Grid CreateVec2Input(object id, object source, string fieldName, Vector2 value = new())
     {
         NumberBoxVector2 numberBoxVector2 = new() { Value = value };
 
-        Binding.Get(fieldName + source)?.Set(numberBoxVector2, "Value", "ValueChanged");
+        Binding.Get(fieldName + source + id)?.Set(numberBoxVector2, "Value", "ValueChanged");
 
         return numberBoxVector2.GetStackInGrid();
     }
 
-    internal static Grid CreateVec2InputWithRG(object source, string fieldName, Vector2 value = new())
+    internal static Grid CreateVec2InputWithRG(object id, object source, string fieldName, Vector2 value = new())
     {
         NumberBoxVector2 numberBoxVector2 = new() { Value = value };
 
-        Binding.Get(fieldName + source)?.Set(numberBoxVector2, "Value", "ValueChanged");
+        Binding.Get(fieldName + source + id)?.Set(numberBoxVector2, "Value", "ValueChanged");
 
         return numberBoxVector2.GetStackInGridWithRG();
     }
 
-    internal static Grid CreateVec3Input(object source, string fieldName, Vector3 value = new())
+    internal static Grid CreateVec3Input(object id, object source, string fieldName, Vector3 value = new())
     {
         NumberBoxVector3 numberBoxVector3 = new() { Value = value };
 
-        Binding.Get(fieldName + source)?.Set(numberBoxVector3, "Value", "ValueChanged");
+        Binding.Get(fieldName + source + id)?.Set(numberBoxVector3, "Value", "ValueChanged");
 
         return numberBoxVector3.GetStackInGrid();
     }
 
-    internal static Grid CreateVec3InputWithRGB(object source, string fieldName, Vector3 value = new())
+    internal static Grid CreateVec3InputWithRGB(object id, object source, string fieldName, Vector3 value = new())
     {
         NumberBoxVector3 numberBoxVector3 = new() { Value = value };
 
-        Binding.Get(fieldName + source)?.Set(numberBoxVector3, "Value", "ValueChanged");
+        Binding.Get(fieldName + source + id)?.Set(numberBoxVector3, "Value", "ValueChanged");
 
         return numberBoxVector3.GetStackInGridWithRGB();
     }
 
-    internal static Grid CreateBool(object source, string fieldName, bool value = false)
+    internal static Grid CreateBool(object id, object source, string fieldName, bool value = false)
     {
         CheckBox checkBox = new() { IsChecked = value, Margin = new(0, 0, 0, -5.5) };
 
-        Binding.Get(fieldName + source)?.Set(checkBox, "IsChecked", "Click");
+        Binding.Get(fieldName + source + id)?.Set(checkBox, "IsChecked", "Click");
 
         return StackInGrid(checkBox);
     }
@@ -592,6 +592,9 @@ internal static class ExtensionMethods
 
         expander.Header = grid2;
         expander.Content = content;
+
+        //Binding.Get("IsEnabled" + sceneEntry.ID, Binding.SceneBindings)?.Set(toggleButton, "IsChecked", "Click");
+        //Binding.Get("Name" + sceneEntry.ID, Binding.SceneBindings)?.Set(toggleButton, "Content");
 
         grid.Children.Add(expander);
 

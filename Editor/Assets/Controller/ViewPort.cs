@@ -33,11 +33,13 @@ internal partial class Viewport
                     CreateIcon(Symbol.Video),
                     StackInGridVertical(
                         CreateSlider(
+                            ViewportController.Instance?.Entity.ID,
                             ViewportController.Camera, "FOV",
                             90, 40, 110)
                             .WrapInGridVertical("Field Of View"),
                         CreateNumberInput(
-                            ViewportController.Instance, "_movementSpeed", 
+                            ViewportController.Instance?.Entity.ID,
+                            ViewportController.Instance, "_movementSpeed",
                             1, 100)
                             .WrapInGridVertical("Movement Speed"))),
                 CreateAppBarSeperator(),
@@ -60,13 +62,15 @@ internal partial class Viewport
                 CreateFlyoutButtonWithValue(
                     CreateIcon("\xE80A"), 10,
                     CreateNumberInput(
-                        ViewportController.Instance, "_movementSpeed", 
+                        ViewportController.Instance?.Entity.ID,
+                        ViewportController.Instance, "_movementSpeed",
                         10, 1, 100)
                         .WrapInGridVertical("Grid Snap")),
                 CreateFlyoutButtonWithValue(
-                    CreateIcon(Symbol.Rotate), 15, 
+                    CreateIcon(Symbol.Rotate), 15,
                     CreateNumberInput(
-                        ViewportController.Instance, "_rotationSpeed", 
+                        ViewportController.Instance?.Entity.ID,
+                        ViewportController.Instance, "_rotationSpeed",
                         15, 1, 90)
                         .WrapInGridVertical("Rotation Snap")),
 

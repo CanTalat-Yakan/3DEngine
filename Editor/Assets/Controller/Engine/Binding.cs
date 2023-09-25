@@ -10,6 +10,7 @@ using Engine.Editor;
 using Engine.ECS;
 using Engine.Utilities;
 using Microsoft.UI.Xaml.Controls.Primitives;
+using System.Diagnostics;
 
 namespace Editor.Controller;
 
@@ -220,6 +221,9 @@ internal class Binding
 
             eventInfo.AddEventHandler(bindEntry.Target, handler);
         }
+        else
+            Trace.WriteLine(
+                $"{eventInfo.EventHandlerType} was not considered in the Bindings Event Check!");
 
         //Output.Log($"Check Path Event: {eventInfo.Name}");
     }

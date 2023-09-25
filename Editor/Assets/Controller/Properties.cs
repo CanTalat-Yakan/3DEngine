@@ -18,7 +18,6 @@ using Path = System.IO.Path;
 using Texture = Vortice.Direct3D11.Texture2DArrayShaderResourceView;
 
 using static Editor.Controller.Helper;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Editor.Controller;
 
@@ -78,23 +77,26 @@ internal partial class Properties
 
         Grid[] properties = new[]
         {
-                CreateBool(entity, "IsStatic", false).WrapInField("Static"),
+                CreateBool(entity.ID, null, "IsStatic", false).WrapInField("Static"),
                 CreateEnum(Enum.GetNames(typeof(Tags))).WrapInField("Tag"),
                 CreateEnum(Enum.GetNames(typeof(Layers))).WrapInField("Layer"),
                 CreateTextFullWithOpacity(entity.GetDebugInformation()).WrapInField("Debug")
-            };
+        };
 
         Grid[] transform = new[]
         {
                 CreateVec3InputWithRGB(
+                    entity.ID,
                     entity.Transform, "LocalPosition",
                     entity.Transform.LocalPosition)
                 .WrapInField("Position"),
                 CreateVec3InputWithRGB(
+                    entity.ID,
                     entity.Transform, "_eulerAngles",
                     entity.Transform.EulerAngles)
                 .WrapInField("Rotation"),
                 CreateVec3InputWithRGB(
+                    entity.ID,
                     entity.Transform, "LocalScale",
                     entity.Transform.LocalScale)
                 .WrapInField("Scale"),
@@ -163,7 +165,7 @@ internal partial class Properties
                     .StackInGrid()
                     .WrapInExpanderWithToggleButton(
                         ref content,
-                        component.ToString(), 
+                        component.ToString(),
                         entity.ID.ToString())
                     .AddContentFlyout(CreateDefaultMenuFlyout(entity, component)));
 
@@ -291,7 +293,7 @@ internal partial class Properties
         // Initialize a new List of Grid type.
         List<Grid> grid = new();
 
-        string bindingListKey = component.ToString() + entity.ID;
+        string entityIDcomponent = component.ToString() + entity.ID;
 
         var value = fieldInfo.GetValue(component);
         // Get the type of the current field.
@@ -334,7 +336,7 @@ internal partial class Properties
             if (attributes.OfType<SliderAttribute>().Any())
                 grid.Add(
                     CreateSlider(
-                        bindingListKey, fieldInfo.Name,
+                        entity.ID, component, fieldInfo.Name,
                         (byte)value,
                         (byte)attributes.OfType<SliderAttribute>().First().CustomMin,
                         (byte)attributes.OfType<SliderAttribute>().First().CustomMax)
@@ -342,9 +344,9 @@ internal partial class Properties
             // If the field doesn't have the `SliderAttribute`, add a number input element.
             else
                 grid.Add(CreateNumberInput(
-                    bindingListKey, fieldInfo.Name, 
-                    (byte)value, 
-                    byte.MinValue, 
+                    entity.ID,component, fieldInfo.Name,
+                    (byte)value,
+                    byte.MinValue,
                     byte.MaxValue));
 
         // Int
@@ -353,7 +355,7 @@ internal partial class Properties
             if (attributes.OfType<SliderAttribute>().Any())
                 grid.Add(
                     CreateSlider(
-                        bindingListKey, fieldInfo.Name,
+                        entity.ID,component, fieldInfo.Name,
                         (int)value,
                         (int)attributes.OfType<SliderAttribute>().First().CustomMin,
                         (int)attributes.OfType<SliderAttribute>().First().CustomMax)
@@ -361,9 +363,9 @@ internal partial class Properties
             // If the field doesn't have the `SliderAttribute`, add a number input element.
             else
                 grid.Add(CreateNumberInput(
-                    bindingListKey, fieldInfo.Name, 
-                    (int)value, 
-                    int.MinValue, 
+                    entity.ID, component, fieldInfo.Name,
+                    (int)value,
+                    int.MinValue,
                     int.MaxValue));
 
         // Float
@@ -372,7 +374,7 @@ internal partial class Properties
             if (attributes.OfType<SliderAttribute>().Any())
                 grid.Add(
                     CreateSlider(
-                        bindingListKey, fieldInfo.Name,
+                        entity.ID, component, fieldInfo.Name,
                         (float)value,
                         (float)attributes.OfType<SliderAttribute>().First().CustomMin,
                         (float)attributes.OfType<SliderAttribute>().First().CustomMax)
@@ -380,26 +382,26 @@ internal partial class Properties
             // If the field doesn't have the `SliderAttribute`, add a number input element.
             else
                 grid.Add(CreateNumberInput(
-                    bindingListKey, fieldInfo.Name, 
-                    (float)value, 
-                    float.MinValue, 
+                    entity.ID, component, fieldInfo.Name,
+                    (float)value,
+                    float.MinValue,
                     float.MaxValue));
 
         // String
         else if (type == typeof(string))
-            grid.Add(CreateTextInput(bindingListKey, fieldInfo.Name, (string)value));
+            grid.Add(CreateTextInput(entity.ID, component, fieldInfo.Name, (string)value));
 
         // Vector 2
         else if (type == typeof(Vector2))
-            grid.Add(CreateVec2Input(bindingListKey, fieldInfo.Name, (Vector2)value));
+            grid.Add(CreateVec2Input(entity.ID,component, fieldInfo.Name, (Vector2)value));
 
         // Vector 3
         else if (type == typeof(Vector3))
-            grid.Add(CreateVec3Input(bindingListKey, fieldInfo.Name, (Vector3)value));
+            grid.Add(CreateVec3Input(entity.ID, component, fieldInfo.Name, (Vector3)value));
 
         // Bool
         else if (type == typeof(bool))
-            grid.Add(CreateBool(bindingListKey, fieldInfo.Name, (bool)value).WrapInGrid());
+            grid.Add(CreateBool(entity.ID, component, fieldInfo.Name, (bool)value).WrapInGrid());
 
         // Material
         else if (type == typeof(Material))
