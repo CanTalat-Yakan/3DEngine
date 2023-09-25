@@ -9,6 +9,7 @@ global using Engine.Helper;
 global using Engine.Utilities;
 
 global using Key = Vortice.DirectInput.Key;
+using System.ComponentModel;
 
 namespace Engine;
 
@@ -22,6 +23,7 @@ public sealed class Core
 
     public event EventHandler OnRender;
     public event EventHandler OnInitialized;
+    public event EventHandler OnDispose;
 
     public Renderer Renderer;
     public RuntimeCompiler RuntimeCompiler;
@@ -128,6 +130,7 @@ public sealed class Core
     {
         Renderer?.Dispose();
         Input.Dispose();
+        OnDispose?.Invoke(null, null);
     }
 
     public void SetPlayMode(bool b) =>

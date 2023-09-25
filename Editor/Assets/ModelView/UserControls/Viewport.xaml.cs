@@ -42,6 +42,9 @@ public sealed partial class Viewport : UserControl
 
         _engineCore.OnRender += (s, e) =>
         {
+            Controller.Binding.Update();
+            Controller.Output.Log(Engine.Output.DequeueLog());
+
             _engineCore.SetPlayMode(
                 Controller.Main.Instance.PlayerControl.PlayMode == Controller.PlayMode.Playing);
             _engineCore.SetPlayModeStarted(
@@ -49,10 +52,10 @@ public sealed partial class Viewport : UserControl
 
             if (_viewportControl is not null)
                 _viewportControl.Profile.Text = Engine.Profiler.GetString();
-
-            Controller.Binding.Update();
-            Controller.Output.Log(Engine.Output.DequeueLog());
         };
+
+        _engineCore.OnDispose += (s, e) => 
+            Controller.Binding.Dispose();
 
         // Adds an event handler for the CompositionTarget.Rendering event,
         // which is triggered when the composition system is rendering a frame.

@@ -41,12 +41,12 @@ internal class BindEntry(object source, string sourcePath)
 internal class Binding
 {
     // Key = Field + Component.ToString()
-    public static Dictionary<string, BindEntry> RendererBindings = new(); 
+    public static Dictionary<string, BindEntry> RendererBindings = new();
     // Key = Field + Scene.ID
-    public static Dictionary<string, BindEntry> SceneBindings = new(); 
+    public static Dictionary<string, BindEntry> SceneBindings = new();
     // Key = Field + Entity.ID
     // Key = Field + Component.ToString() + Entity.ID
-    public static Dictionary<string, BindEntry> EntityBindings = new(); 
+    public static Dictionary<string, BindEntry> EntityBindings = new();
 
     public static BindingFlags AllBindingFlags =
         BindingFlags.NonPublic |
@@ -183,7 +183,7 @@ internal class Binding
             return;
 
         if (Equals(
-            eventInfo.EventHandlerType, 
+            eventInfo.EventHandlerType,
             typeof(RoutedEventHandler)))
         {
             RoutedEventHandler handler = (s, e) =>
@@ -193,7 +193,7 @@ internal class Binding
         }
         // TextBox
         else if (Equals(
-            eventInfo.EventHandlerType, 
+            eventInfo.EventHandlerType,
             typeof(TypedEventHandler<TextBox, TextBoxTextChangingEventArgs>)))
         {
             TypedEventHandler<TextBox, TextBoxTextChangingEventArgs> handler = (s, e) =>
@@ -203,7 +203,7 @@ internal class Binding
         }
         // NumberBox
         else if (Equals(
-            eventInfo.EventHandlerType, 
+            eventInfo.EventHandlerType,
             typeof(TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs>)))
         {
             TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs> handler = (s, e) =>
@@ -213,7 +213,7 @@ internal class Binding
         }
         // Slider 
         else if (Equals(
-            eventInfo.EventHandlerType, 
+            eventInfo.EventHandlerType,
             typeof(RangeBaseValueChangedEventHandler)))
         {
             RangeBaseValueChangedEventHandler handler = (s, e) =>
@@ -254,17 +254,19 @@ internal class Binding
         //Output.Log($"Handled Event: Value {newValue}");
     }
 
-    public static void Clear(Dictionary<string, BindEntry> dictionary)
-    {
-        if (dictionary is not null)
-            dictionary.Clear();
-    }
-
     public static void Remove(Guid? guid)
     {
-        if (guid is not null)
-            foreach (var bind in SceneBindings.ToArray())
-                if (bind.Key.Contains(guid.ToString()))
-                    SceneBindings.Remove(bind.Key);
+        if (SceneBindings is not null)
+            if (guid is not null)
+                foreach (var bind in SceneBindings.ToArray())
+                    if (bind.Key.Contains(guid.ToString()))
+                        SceneBindings.Remove(bind.Key);
+    }
+
+    public static void Dispose()
+    {
+        RendererBindings?.Clear();
+        SceneBindings?.Clear();
+        EntityBindings?.Clear();
     }
 }

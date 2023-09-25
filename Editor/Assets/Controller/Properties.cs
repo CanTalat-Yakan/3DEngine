@@ -45,7 +45,7 @@ internal partial class Properties
         s_currentlySet = content;
 
         // Clear the Binding for the Entity.
-        Binding.Clear(Binding.EntityBindings);
+        Binding.EntityBindings?.Clear();
 
         // Clear the children of the PropertiesRoot element in the LayoutControl.
         Main.Instance.LayoutControl.PropertiesRoot.Children.Clear();
