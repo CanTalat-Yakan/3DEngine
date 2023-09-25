@@ -18,6 +18,7 @@ using Path = System.IO.Path;
 using Texture = Vortice.Direct3D11.Texture2DArrayShaderResourceView;
 
 using static Editor.Controller.Helper;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Editor.Controller;
 
@@ -143,7 +144,7 @@ internal partial class Properties
 
                 // Add fields to the fields collection.
                 foreach (var info in fieldInfos)
-                    if ((newFieldGrid = CreateFromFieldInfo(component, info, nonPublicFieldInfos)) is not null)
+                    if ((newFieldGrid = CreateFromFieldInfo(component, entity, info, nonPublicFieldInfos)) is not null)
                         fieldsCollection.Add(newFieldGrid);
 
                 // Add events to the events collection.
@@ -159,9 +160,11 @@ internal partial class Properties
                 UIElement tmp;
                 Grid content = new Grid();
                 s_stackPanel.Children.Add(tmp = scriptsCollection.ToArray()
-                    .StackInGrid().WrapInExpanderWithToggleButton(
+                    .StackInGrid()
+                    .WrapInExpanderWithToggleButton(
                         ref content,
-                        component.ToString())
+                        component.ToString(), 
+                        entity.ID.ToString())
                     .AddContentFlyout(CreateDefaultMenuFlyout(entity, component)));
 
                 // Add an event handler to remove the current component from the stack panel when it's destroyed.
@@ -283,12 +286,14 @@ internal partial class Properties
         return grid;
     }
 
-    public Grid CreateFromFieldInfo(object source, FieldInfo fieldInfo, FieldInfo[] nonPublic)
+    public Grid CreateFromFieldInfo(object component, Entity entity, FieldInfo fieldInfo, FieldInfo[] nonPublic)
     {
         // Initialize a new List of Grid type.
         List<Grid> grid = new();
 
-        var value = fieldInfo.GetValue(source);
+        string bindingListKey = component.ToString() + entity.ID;
+
+        var value = fieldInfo.GetValue(component);
         // Get the type of the current field.
         var type = fieldInfo.FieldType;
         // Get any custom attributes applied to the field.
@@ -329,14 +334,18 @@ internal partial class Properties
             if (attributes.OfType<SliderAttribute>().Any())
                 grid.Add(
                     CreateSlider(
-                        source, fieldInfo.Name,
+                        bindingListKey, fieldInfo.Name,
                         (byte)value,
                         (byte)attributes.OfType<SliderAttribute>().First().CustomMin,
                         (byte)attributes.OfType<SliderAttribute>().First().CustomMax)
                     .WrapInGrid());
             // If the field doesn't have the `SliderAttribute`, add a number input element.
             else
-                grid.Add(CreateNumberInput(source, fieldInfo.Name, (byte)value, byte.MinValue, byte.MaxValue));
+                grid.Add(CreateNumberInput(
+                    bindingListKey, fieldInfo.Name, 
+                    (byte)value, 
+                    byte.MinValue, 
+                    byte.MaxValue));
 
         // Int
         else if (type == typeof(int))
@@ -344,14 +353,18 @@ internal partial class Properties
             if (attributes.OfType<SliderAttribute>().Any())
                 grid.Add(
                     CreateSlider(
-                        source, fieldInfo.Name,
+                        bindingListKey, fieldInfo.Name,
                         (int)value,
                         (int)attributes.OfType<SliderAttribute>().First().CustomMin,
                         (int)attributes.OfType<SliderAttribute>().First().CustomMax)
                     .WrapInGrid());
             // If the field doesn't have the `SliderAttribute`, add a number input element.
             else
-                grid.Add(CreateNumberInput(source, fieldInfo.Name, (int)value, int.MinValue, int.MaxValue));
+                grid.Add(CreateNumberInput(
+                    bindingListKey, fieldInfo.Name, 
+                    (int)value, 
+                    int.MinValue, 
+                    int.MaxValue));
 
         // Float
         else if (type == typeof(float))
@@ -359,30 +372,34 @@ internal partial class Properties
             if (attributes.OfType<SliderAttribute>().Any())
                 grid.Add(
                     CreateSlider(
-                        source, fieldInfo.Name,
+                        bindingListKey, fieldInfo.Name,
                         (float)value,
                         (float)attributes.OfType<SliderAttribute>().First().CustomMin,
                         (float)attributes.OfType<SliderAttribute>().First().CustomMax)
                     .WrapInGrid());
             // If the field doesn't have the `SliderAttribute`, add a number input element.
             else
-                grid.Add(CreateNumberInput(source, fieldInfo.Name, (float)value, float.MinValue, float.MaxValue));
+                grid.Add(CreateNumberInput(
+                    bindingListKey, fieldInfo.Name, 
+                    (float)value, 
+                    float.MinValue, 
+                    float.MaxValue));
 
         // String
         else if (type == typeof(string))
-            grid.Add(CreateTextInput(source, fieldInfo.Name, (string)value));
+            grid.Add(CreateTextInput(bindingListKey, fieldInfo.Name, (string)value));
 
         // Vector 2
         else if (type == typeof(Vector2))
-            grid.Add(CreateVec2Input(source, fieldInfo.Name, (Vector2)value));
+            grid.Add(CreateVec2Input(bindingListKey, fieldInfo.Name, (Vector2)value));
 
         // Vector 3
         else if (type == typeof(Vector3))
-            grid.Add(CreateVec3Input(source, fieldInfo.Name, (Vector3)value));
+            grid.Add(CreateVec3Input(bindingListKey, fieldInfo.Name, (Vector3)value));
 
         // Bool
         else if (type == typeof(bool))
-            grid.Add(CreateBool(source, fieldInfo.Name, (bool)value).WrapInGrid());
+            grid.Add(CreateBool(bindingListKey, fieldInfo.Name, (bool)value).WrapInGrid());
 
         // Material
         else if (type == typeof(Material))

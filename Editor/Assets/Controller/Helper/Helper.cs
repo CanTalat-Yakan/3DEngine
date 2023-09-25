@@ -499,7 +499,7 @@ internal static class ExtensionMethods
         return grid;
     }
 
-    public static Grid WrapInExpanderWithToggleButton(this Grid content, ref Grid reference, string source)
+    public static Grid WrapInExpanderWithToggleButton(this Grid content, ref Grid reference, string name, string source)
     {
         Grid grid = new() { Margin = new(0, 0, 0, 2) };
         Expander expander = new()
@@ -509,7 +509,7 @@ internal static class ExtensionMethods
             HorizontalAlignment = HorizontalAlignment.Stretch,
             HorizontalContentAlignment = HorizontalAlignment.Stretch
         };
-        ToggleButton toggleButton = new() { Content = source.ToString().FormatString(), IsChecked = true };
+        ToggleButton toggleButton = new() { Content = name.ToString().FormatString(), IsChecked = true };
 
         expander.Header = toggleButton;
         expander.Content = content;
@@ -518,7 +518,7 @@ internal static class ExtensionMethods
 
         reference = grid;
 
-        Binding.Get("IsEnabled" + source)?.Set(toggleButton, "IsChecked", "Click");
+        Binding.Get("IsEnabled" + name + source)?.Set(toggleButton, "IsChecked", "Click");
 
         return grid;
     }

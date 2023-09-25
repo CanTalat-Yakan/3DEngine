@@ -18,19 +18,19 @@ internal class BindEntry(object source, string sourcePath)
     public object Value;
 
     public object Source = source;
-    public string SourcePath = sourcePath;
+    public string SourceValuePath = sourcePath;
 
     public object Target;
-    public string TargetPath;
+    public string TargetValuePath;
+    public string TargetEventPath;
 
-    public string PathEvent;
     public EventHandler Event;
 
-    public void Set(object target, string targetPath, string pathEvent = null)
+    public void Set(object target, string targetValuePath, string targetEventPath = null)
     {
         Target = target;
-        TargetPath = targetPath;
-        PathEvent = pathEvent;
+        TargetValuePath = targetValuePath;
+        TargetEventPath = targetEventPath;
     }
 
     public void SetEvent(EventHandler eventHandler) =>
@@ -39,9 +39,13 @@ internal class BindEntry(object source, string sourcePath)
 
 internal class Binding
 {
-    public static Dictionary<string, BindEntry> RendererBindings = new();
-    public static Dictionary<string, BindEntry> SceneBindings = new();
-    public static Dictionary<string, BindEntry> EntityBindings = new();
+    // Key = Field + Component.ToString()
+    public static Dictionary<string, BindEntry> RendererBindings = new(); 
+    // Key = Field + Scene.ID
+    public static Dictionary<string, BindEntry> SceneBindings = new(); 
+    // Key = Field + Entity.ID
+    // Key = Field + Component.ToString() + Entity.ID
+    public static Dictionary<string, BindEntry> EntityBindings = new(); 
 
     public static BindingFlags AllBindingFlags =
         BindingFlags.NonPublic |
@@ -84,9 +88,15 @@ internal class Binding
 
         foreach (var component in entity.Components.ToArray())
             foreach (var field in component.GetType().GetFields(AllBindingFlags))
-                EntityBindings.Add(field.Name + component, new(component, field.Name));
+                EntityBindings.Add(field.Name + component.ToString() + entity.ID, new(component, field.Name));
     }
 
+    /// <summary>
+    /// [Renderer Key = Field.Name + Component.ToString()]   
+    /// [Scene Key = Field.Name + Scene.ID]  
+    /// [Entity Key = Field.Name + Entity.ID]    
+    /// [Component Key = Field.Name + Component.ToString() + Entity.ID]  
+    /// </summary>
     public static BindEntry Get(string key, Dictionary<string, BindEntry> dictionary = null)
     {
         if (dictionary is not null)
@@ -130,7 +140,7 @@ internal class Binding
         UpdateBindings(entity, entity.ID, EntityBindings);
 
         foreach (var component in entity.Components.ToArray())
-            UpdateBindings(component, component, EntityBindings);
+            UpdateBindings(component, component.ToString() + entity.ID, EntityBindings);
     }
 
     private static void UpdateBindings(object source, object sufix, Dictionary<string, BindEntry> bindings)
@@ -150,15 +160,15 @@ internal class Binding
     {
         bindEntry.Value = field.GetValue(source);
 
-        var fieldFromPath = bindEntry.Target?.GetType().GetField(bindEntry.TargetPath, AllBindingFlags);
+        var fieldFromPath = bindEntry.Target?.GetType().GetField(bindEntry.TargetValuePath, AllBindingFlags);
         if (fieldFromPath is not null)
             fieldFromPath.SetValue(bindEntry.Target, bindEntry.Value);
 
-        var propertyFromPath = bindEntry.Target?.GetType().GetProperty(bindEntry.TargetPath, AllBindingFlags);
+        var propertyFromPath = bindEntry.Target?.GetType().GetProperty(bindEntry.TargetValuePath, AllBindingFlags);
         if (propertyFromPath is not null)
             propertyFromPath.SetValue(bindEntry.Target, bindEntry.Value);
 
-        if (!string.IsNullOrEmpty(bindEntry.PathEvent))
+        if (!string.IsNullOrEmpty(bindEntry.TargetEventPath))
             CheckPathEvent(bindEntry, AllBindingFlags);
 
         bindEntry.Event?.Invoke(null, null);
@@ -166,26 +176,44 @@ internal class Binding
 
     public static void CheckPathEvent(BindEntry bindEntry, BindingFlags bindingFlags)
     {
-        var eventInfo = bindEntry.Target.GetType().GetEvent(bindEntry.PathEvent, bindingFlags);
+        var eventInfo = bindEntry.Target.GetType().GetEvent(bindEntry.TargetEventPath, bindingFlags);
 
         if (eventInfo is null)
             return;
 
-        if (Equals(eventInfo.EventHandlerType, typeof(RoutedEventHandler)))
+        if (Equals(
+            eventInfo.EventHandlerType, 
+            typeof(RoutedEventHandler)))
         {
             RoutedEventHandler handler = (s, e) =>
                 EventLogic(s, bindEntry);
 
             eventInfo.AddEventHandler(bindEntry.Target, handler);
         }
-        else if (Equals(eventInfo.EventHandlerType, typeof(TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs>)))
+        // TextBox
+        else if (Equals(
+            eventInfo.EventHandlerType, 
+            typeof(TypedEventHandler<TextBox, TextBoxTextChangingEventArgs>)))
+        {
+            TypedEventHandler<TextBox, TextBoxTextChangingEventArgs> handler = (s, e) =>
+                EventLogic(s, bindEntry);
+
+            eventInfo.AddEventHandler(bindEntry.Target, handler);
+        }
+        // NumberBox
+        else if (Equals(
+            eventInfo.EventHandlerType, 
+            typeof(TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs>)))
         {
             TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs> handler = (s, e) =>
                 EventLogic(s, bindEntry);
 
             eventInfo.AddEventHandler(bindEntry.Target, handler);
         }
-        else if (Equals(eventInfo.EventHandlerType, typeof(RangeBaseValueChangedEventHandler)))
+        // Slider 
+        else if (Equals(
+            eventInfo.EventHandlerType, 
+            typeof(RangeBaseValueChangedEventHandler)))
         {
             RangeBaseValueChangedEventHandler handler = (s, e) =>
                 EventLogic(s, bindEntry);
@@ -202,7 +230,7 @@ internal class Binding
         var targetType = bindEntry.Target.GetType();
         var castedSender = Convert.ChangeType(sender, targetType);
 
-        var newValue = targetType.GetProperty(bindEntry.TargetPath).GetValue(castedSender);
+        var newValue = targetType.GetProperty(bindEntry.TargetValuePath).GetValue(castedSender);
 
         newValue = bindEntry.Value switch
         {
@@ -211,7 +239,7 @@ internal class Binding
             _ => newValue
         };
 
-        bindEntry.Source.GetType().GetField(bindEntry.SourcePath, AllBindingFlags)?
+        bindEntry.Source.GetType().GetField(bindEntry.SourceValuePath, AllBindingFlags)?
             .SetValue(bindEntry.Source, newValue);
 
         bindEntry.Value = newValue;
