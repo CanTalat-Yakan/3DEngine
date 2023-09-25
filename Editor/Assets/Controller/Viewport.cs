@@ -83,8 +83,8 @@ internal partial class Viewport(ModelView.Viewport viewport, Grid content)
                             .WrapInGridVertical("Movement Speed"))),
                 CreateAppBarSeperator(),
                 CreateComboBox(new[] { "Perspective", "Orthogonal" }),
-                CreateComboBox(new[] { "Lit", "Unlit", "Wireframe", "Shaded Wireframe" }),
-            };
+                CreateComboBox(new[] { "Lit", "Unlit", "Wireframe", "Shaded Wireframe" })
+        };
 
         // Initialize an array of UI elements to be positioned in the top-right corner of the main content.
         UIElement[] topRight = new[]
@@ -115,8 +115,8 @@ internal partial class Viewport(ModelView.Viewport viewport, Grid content)
 
                 CreateAppBarSeperator(),
 
-                CreateToggleButton(CreateIcon(Symbol.Globe), true),
-            };
+                CreateToggleButton(CreateIcon(Symbol.Globe), true)
+        };
 
         // Add the top-left and top-right UI elements to the main content.
         Content.Children.Add(WrapInStackPanelDockTopLeft(topLeft));
