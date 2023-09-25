@@ -23,7 +23,7 @@ using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 
 namespace Editor.Controller;
 
-internal class Helper
+internal partial class Helper
 {
     internal static Grid StackInGrid(params UIElement[] content)
     {
@@ -52,7 +52,10 @@ internal class Helper
 
         return grid;
     }
+}
 
+internal partial class Helper
+{
     internal static ComboBox CreateComboBox(params string[] items)
     {
         ComboBox comboBox = new() { Height = 33, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
@@ -118,8 +121,66 @@ internal class Helper
     internal static UIElement CreateTextFullWithOpacity(string s = "String") =>
         new TextBlock() { Text = s, Opacity = 0.5f, TextWrapping = TextWrapping.Wrap };
 
+    internal static Grid CreateEnum(params string[] items)
+    {
+        ComboBox comboBox = new() { FontSize = 13.5f, HorizontalAlignment = HorizontalAlignment.Stretch };
 
-    #region // Properties View Field Bindings
+        foreach (var item in items)
+            comboBox.Items.Add(item);
+
+        comboBox.SelectedIndex = 0;
+
+        return StackInGrid(comboBox);
+    }
+
+    internal static Grid CreateEvent(string s = "Event",
+        RoutedEventHandler e = null)
+    {
+        Button button = new() { Content = s };
+        button.Click += e;
+
+        return StackInGrid(button);
+    }
+
+    internal static Grid CreateColorButton(byte r = 0, byte g = 0, byte b = 0, byte a = 0)
+    {
+        Windows.UI.Color col = new();
+        col.R = r; col.G = g; col.B = b; col.A = a;
+        ColorPickerButton colbutton = new() { SelectedColor = col };
+
+        Style stylee = new() { TargetType = typeof(ColorPicker) };
+        stylee.Setters.Add(new Setter(ColorPicker.ColorSpectrumShapeProperty, ColorSpectrumShape.Ring));
+        stylee.Setters.Add(new Setter(ColorPicker.IsAlphaEnabledProperty, true));
+        stylee.Setters.Add(new Setter(ColorPicker.IsHexInputVisibleProperty, true));
+        colbutton.ColorPickerStyle = stylee;
+
+        return StackInGrid(colbutton);
+    }
+
+    internal static Grid CreateTextureSlot(string s = "None", string type = "type")
+    {
+        Grid container = new() { Width = 48, Height = 48 };
+        Image img = new() { Stretch = Stretch.UniformToFill };
+        Button button = new() { HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch };
+        TextBlock path = new() { Text = s + $" ({type})", TextWrapping = TextWrapping.WrapWholeWords, MaxWidth = 200, Margin = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
+
+        container.Children.Add(img);
+        container.Children.Add(button);
+
+        return StackInGrid(container, path);
+    }
+
+    internal static Grid CreateReferenceSlot(string s = "None", string type = "type")
+    {
+        Button button = new() { Content = "..." };
+        TextBlock reference = new() { Text = s + $" ({type})", TextWrapping = TextWrapping.WrapWholeWords, MaxWidth = 200, Margin = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
+
+        return StackInGrid(button, reference);
+    }
+}
+
+internal partial class Helper
+{
     internal static Grid CreateTextInput(object id, object source, string fieldName, string placeholder = "Example")
     {
         TextBox textBox = new() { Text = placeholder, MaxWidth = 200 };
@@ -205,45 +266,10 @@ internal class Helper
 
         return StackInGrid(checkBox);
     }
-    #endregion
+}
 
-
-    internal static Grid CreateEnum(params string[] items)
-    {
-        ComboBox comboBox = new() { FontSize = 13.5f, HorizontalAlignment = HorizontalAlignment.Stretch };
-
-        foreach (var item in items)
-            comboBox.Items.Add(item);
-
-        comboBox.SelectedIndex = 0;
-
-        return StackInGrid(comboBox);
-    }
-
-    internal static Grid CreateEvent(string s = "Event",
-        RoutedEventHandler e = null)
-    {
-        Button button = new() { Content = s };
-        button.Click += e;
-
-        return StackInGrid(button);
-    }
-
-    internal static Grid CreateColorButton(byte r = 0, byte g = 0, byte b = 0, byte a = 0)
-    {
-        Windows.UI.Color col = new();
-        col.R = r; col.G = g; col.B = b; col.A = a;
-        ColorPickerButton colbutton = new() { SelectedColor = col };
-
-        Style stylee = new() { TargetType = typeof(ColorPicker) };
-        stylee.Setters.Add(new Setter(ColorPicker.ColorSpectrumShapeProperty, ColorSpectrumShape.Ring));
-        stylee.Setters.Add(new Setter(ColorPicker.IsAlphaEnabledProperty, true));
-        stylee.Setters.Add(new Setter(ColorPicker.IsHexInputVisibleProperty, true));
-        colbutton.ColorPickerStyle = stylee;
-
-        return StackInGrid(colbutton);
-    }
-
+internal partial class Helper
+{
     internal static Grid CreateHeader(string s = "Header")
     {
         Grid grid = new();
@@ -304,27 +330,6 @@ internal class Helper
         return grid;
     }
 
-    internal static Grid CreateTextureSlot(string s = "None", string type = "type")
-    {
-        Grid container = new() { Width = 48, Height = 48 };
-        Image img = new() { Stretch = Stretch.UniformToFill };
-        Button button = new() { HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch };
-        TextBlock path = new() { Text = s + $" ({type})", TextWrapping = TextWrapping.WrapWholeWords, MaxWidth = 200, Margin = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
-
-        container.Children.Add(img);
-        container.Children.Add(button);
-
-        return StackInGrid(container, path);
-    }
-
-    internal static Grid CreateReferenceSlot(string s = "None", string type = "type")
-    {
-        Button button = new() { Content = "..." };
-        TextBlock reference = new() { Text = s + $" ({type})", TextWrapping = TextWrapping.WrapWholeWords, MaxWidth = 200, Margin = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Bottom };
-
-        return StackInGrid(button, reference);
-    }
-
     internal static string GetAppVersion()
     {
         Package package = Package.Current;
@@ -353,10 +358,17 @@ internal class Helper
     }
 }
 
-internal static class ExtensionMethods
+internal static partial class ExtensionMethods
 {
-    public static float Remap(this float value, float sourceMin, float sourceMax, float targetMin, float targetMax) =>
-        (value - sourceMin) / (sourceMax - sourceMin) * (targetMax - targetMin) + targetMin;
+    public static UIElement AddContentFlyout(this UIElement content, FlyoutBase flyout)
+    {
+        content.ContextFlyout = flyout;
+
+        return content;
+    }
+
+    public static async void CreateDialogAsync(this ContentDialog contentDialog) =>
+        await contentDialog.ShowAsync();
 
     public static UIElement AddToolTip(this UIElement content, ToolTip toolTip)
     {
@@ -479,7 +491,10 @@ internal static class ExtensionMethods
 
         return grid;
     }
+}
 
+internal static partial class ExtensionMethods
+{
     public static Grid WrapInExpander(this Grid content, string text)
     {
         Grid grid = new() { Margin = new(0, 0, 0, 2) };
@@ -499,7 +514,7 @@ internal static class ExtensionMethods
         return grid;
     }
 
-    public static Grid WrapInExpanderWithToggleButton(this Grid content, ref Grid reference, 
+    public static Grid WrapInExpanderWithToggleButton(this Grid content, ref Grid reference,
         object id, object source, bool bindScene = false)
     {
         Grid grid = new() { Margin = new(0, 0, 0, 2) };
@@ -530,7 +545,7 @@ internal static class ExtensionMethods
         return grid;
     }
 
-    public static Grid WrapInExpanderWithEditableHeader(this Grid content, string text)
+    public static Grid WrapInExpanderWithEditableHeader(this Grid content, string text, object id, object source)
     {
         Grid grid = new();
         Expander expander = new()
@@ -545,10 +560,12 @@ internal static class ExtensionMethods
 
         grid.Children.Add(expander);
 
+        Binding.Get("Name" + id, Binding.SceneBindings)?.Set(expander, "Header");
+
         return grid;
     }
 
-    public static Grid WrapInExpanderWithEditableHeaderAndCheckBox(this Grid content, 
+    public static Grid WrapInExpanderWithEditableHeaderAndCheckBox(this Grid content,
         object id, string text, bool isChecked = true)
     {
         Grid grid = new();
@@ -577,16 +594,12 @@ internal static class ExtensionMethods
 
         return grid;
     }
+}
 
-    public static UIElement AddContentFlyout(this UIElement content, FlyoutBase flyout)
-    {
-        content.ContextFlyout = flyout;
-
-        return content;
-    }
-
-    public static async void CreateDialogAsync(this ContentDialog contentDialog) =>
-        await contentDialog.ShowAsync();
+internal static partial class ExtensionMethods
+{
+    public static float Remap(this float value, float sourceMin, float sourceMax, float targetMin, float targetMax) =>
+        (value - sourceMin) / (sourceMax - sourceMin) * (targetMax - targetMin) + targetMin;
 
     public static string AddSpacesToSentence(this string text, bool preserveAcronyms = true)
     {

@@ -2,9 +2,6 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
-using SharpGen.Runtime;
-using System;
-using WinUIEx;
 
 using Engine.Utilities;
 
@@ -24,38 +21,9 @@ public sealed partial class Viewport : UserControl
     {
         this.InitializeComponent();
 
-        InitializeRenderer(new());
-
-        var hWnd = (Application.Current as App)?.Window.GetWindowHandle();
-        _engineCore = new Engine.Core(_renderer, hWnd.Value, Controller.Files.AssetsPath);
-        //Unloaded += (s, e) => _engineCore.Dispose();
-
-        _engineCore.Renderer.Data.SetVsync(false);
-        _engineCore.Renderer.Data.SetSuperSample(true);
-
-        _engineCore.OnInitialized += (s, e) =>
-        {
-            Controller.Binding.SetRendererBinding();
-
-            _viewportControl = new Controller.Viewport(this, x_Grid_Overlay);
-        };
-
-        _engineCore.OnRender += (s, e) =>
-        {
-            Controller.Binding.Update();
-            Controller.Output.Log(Engine.Output.DequeueLog());
-
-            _engineCore.SetPlayMode(
-                Controller.Main.Instance.PlayerControl.PlayMode == Controller.PlayMode.Playing);
-            _engineCore.SetPlayModeStarted(
-                Controller.Main.Instance.PlayerControl.CheckPlayModeStarted());
-
-            if (_viewportControl is not null)
-                _viewportControl.Profile.Text = Engine.Profiler.GetString();
-        };
-
-        _engineCore.OnDispose += (s, e) => 
-            Controller.Binding.Dispose();
+        _viewportControl = new Controller.Viewport(this, x_Grid_Overlay);
+        _viewportControl.InitializeRenderer(out _renderer, x_SwapChainPanel_Viewport);
+        _viewportControl.InitializeEngineCore(_renderer, out _engineCore);
 
         // Adds an event handler for the CompositionTarget.Rendering event,
         // which is triggered when the composition system is rendering a frame.
@@ -65,26 +33,13 @@ public sealed partial class Viewport : UserControl
         PointerEntered += (s, e) => Engine.Editor.ViewportController.ViewportFocused = true;
         PointerExited += (s, e) => Engine.Editor.ViewportController.ViewportFocused = false;
 
-        //var arrow = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
         var cross = InputSystemCursor.Create(InputSystemCursorShape.Cross);
         x_CustomCursorGrid.InputCursor = cross;
     }
 
-    private void InitializeRenderer(Renderer renderer)
-    {
-        _renderer = renderer;
-
-        // Gets the native object for the SwapChainPanel control.
-        using (var nativeObject = ComObject.As<Vortice.WinUI.ISwapChainPanelNative2>(x_SwapChainPanel_Viewport))
-        {
-            var result = nativeObject.SetSwapChain(_renderer.SwapChain);
-            if (result.Failure)
-                throw new Exception(result.Description);
-        }
-    }
-
     private void x_SwapChainPanel_Viewport_SizeChanged(object sender, SizeChangedEventArgs e) =>
-        // Register an event handler for the SizeChanged event of the SwapChainPanel. This will be used to handle any changes in the size of the panel.
+        // Register an event handler for the SizeChanged event of the SwapChainPanel.
+        // This will be used to handle any changes in the size of the panel.
         _renderer.Resize(
             (int)e.NewSize.Width,
             (int)e.NewSize.Height);

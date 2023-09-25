@@ -1,30 +1,69 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
+using SharpGen.Runtime;
+using System;
+using WinUIEx;
 
 using Engine.Editor;
+using Engine.Utilities;
 
 using static Editor.Controller.Helper;
 
 namespace Editor.Controller;
 
-internal partial class Viewport
+internal partial class Viewport(ModelView.Viewport viewport, Grid content)
 {
     public TextBlock Profile;
-    public Grid Content;
+    public Grid Content = content;
 
-    private ModelView.Viewport _viewport;
+    private ModelView.Viewport _viewport = viewport;
 
-    public Viewport(ModelView.Viewport viewport, Grid content)
+    public void InitializeEngineCore(Renderer renderer, out Engine.Core engineCore)
     {
-        // Set the Viewport and Main content variable.
-        _viewport = viewport;
-        Content = content;
+        var hWnd = (Application.Current as App)?.Window.GetWindowHandle();
+        engineCore = new Engine.Core(renderer, hWnd.Value, Files.AssetsPath);
 
-        // Call the CreateViewPortSettings function to build the UI.
-        CreateViewPortSettings();
+        engineCore.Renderer.Data.SetVsync(false);
+        engineCore.Renderer.Data.SetSuperSample(true);
+
+        engineCore.OnInitialized += (s, e) =>
+        {
+            Binding.SetRendererBinding();
+
+            CreateViewPortSettings();
+        };
+
+        engineCore.OnRender += (s, e) =>
+        {
+            Binding.Update();
+            Output.Log(Engine.Output.DequeueLog());
+
+            _viewport._engineCore.SetPlayMode(
+                Main.Instance.PlayerControl.PlayMode == PlayMode.Playing);
+            _viewport._engineCore.SetPlayModeStarted(
+                Main.Instance.PlayerControl.CheckPlayModeStarted());
+
+            Profile.Text = Engine.Profiler.GetString();
+        };
+
+        engineCore.OnDispose += (s, e) =>
+            Binding.Dispose();
     }
 
-    private void CreateViewPortSettings()
+    public void InitializeRenderer(out Renderer renderer, SwapChainPanel swapChainPanel)
+    {
+        renderer = new();
+
+        // Gets the native object for the SwapChainPanel control.
+        using (var nativeObject = ComObject.As<Vortice.WinUI.ISwapChainPanelNative2>(swapChainPanel))
+        {
+            var result = nativeObject.SetSwapChain(renderer.SwapChain);
+            if (result.Failure)
+                throw new Exception(result.Description);
+        }
+    }
+
+    public void CreateViewPortSettings()
     {
         // Initialize an array of UI elements to be positioned in the top-left corner of the main content.
         UIElement[] topLeft = new[]
