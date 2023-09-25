@@ -9,7 +9,6 @@ global using Engine.Helper;
 global using Engine.Utilities;
 
 global using Key = Vortice.DirectInput.Key;
-using System.ComponentModel;
 
 namespace Engine;
 
