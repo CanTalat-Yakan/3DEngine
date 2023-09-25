@@ -240,6 +240,7 @@ internal class Binding
         {
             float => Convert.ToSingle(newValue),
             int => Convert.ToInt32(newValue),
+            byte => Convert.ToByte(newValue),
             _ => newValue
         };
 
