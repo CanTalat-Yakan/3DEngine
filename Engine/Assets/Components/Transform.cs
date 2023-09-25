@@ -84,7 +84,7 @@ public sealed class Transform : Component, IHide
         _eulerAngles = value.ToEuler();
     }
 
-    public override string ToString() =>
+    public string GetString() =>
         $"""
             {LocalPosition}
             {EulerAngles}

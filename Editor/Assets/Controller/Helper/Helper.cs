@@ -124,7 +124,7 @@ internal class Helper
     {
         TextBox textBox = new() { Text = placeholder, MaxWidth = 200 };
 
-        Binding.Get(fieldName + source)?.Set(textBox, "Text", "TextChanged");
+        Binding.Get(fieldName + source)?.Set(textBox, "Text", "TextChanging");
 
         return StackInGrid(textBox);
     }

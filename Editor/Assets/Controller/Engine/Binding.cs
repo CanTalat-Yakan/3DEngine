@@ -6,7 +6,8 @@ using System;
 
 using Engine.Utilities;
 using Engine.ECS;
-using Engine.Editor;
+using Windows.Foundation;
+using Microsoft.UI.Xaml.Controls;
 
 namespace Editor.Controller;
 
@@ -39,6 +40,12 @@ internal class Binding
     public static Dictionary<string, BindEntry> RendererBindings = new();
     public static Dictionary<string, BindEntry> SceneBindings = new();
     public static Dictionary<string, BindEntry> EntityBindings = new();
+
+    public static BindingFlags AllBindingFlags =
+        BindingFlags.NonPublic |
+        BindingFlags.Public |
+        BindingFlags.Static |
+        BindingFlags.Instance;
 
     public static void Update()
     {
@@ -74,7 +81,7 @@ internal class Binding
         EntityBindings.Add("IsEnabled" + entity.ID, new(entity, "IsEnabled"));
 
         foreach (var component in entity.Components.ToArray())
-            foreach (var field in component.GetType().GetFields())
+            foreach (var field in component.GetType().GetFields(AllBindingFlags))
                 EntityBindings.Add(field.Name + component, new(component, field.Name));
     }
 
@@ -126,7 +133,7 @@ internal class Binding
 
     private static void UpdateBindings(object source, object sufix, Dictionary<string, BindEntry> bindings)
     {
-        foreach (var field in source.GetType().GetFields())
+        foreach (var field in source.GetType().GetFields(AllBindingFlags))
             foreach (var bindName in bindings.Keys)
                 if (string.Equals(field.Name + sufix, bindName) &&
                     bindings.TryGetValue(bindName, out var bindEntry) &&
@@ -139,23 +146,17 @@ internal class Binding
     public static void ProcessBindEntry(BindEntry bindEntry, FieldInfo field, object source)
     {
         bindEntry.Value = field.GetValue(source);
-
-        BindingFlags bindingFlags =
-            BindingFlags.NonPublic |
-            BindingFlags.Public |
-            BindingFlags.Static |
-            BindingFlags.Instance;
-
-        var fieldFromPath = bindEntry.Target?.GetType().GetField(bindEntry.TargetPath, bindingFlags);
+        
+        var fieldFromPath = bindEntry.Target?.GetType().GetField(bindEntry.TargetPath, AllBindingFlags);
         if (fieldFromPath is not null)
             fieldFromPath.SetValue(bindEntry.Target, bindEntry.Value);
 
-        var propertyFromPath = bindEntry.Target?.GetType().GetProperty(bindEntry.TargetPath, bindingFlags);
+        var propertyFromPath = bindEntry.Target?.GetType().GetProperty(bindEntry.TargetPath, AllBindingFlags);
         if (propertyFromPath is not null)
             propertyFromPath.SetValue(bindEntry.Target, bindEntry.Value);
 
         if (!string.IsNullOrEmpty(bindEntry.PathEvent))
-            CheckPathEvent(bindEntry, bindingFlags);
+            CheckPathEvent(bindEntry, AllBindingFlags);
 
         bindEntry.Event?.Invoke(null, null);
     }
@@ -164,31 +165,35 @@ internal class Binding
     {
         var eventInfo = bindEntry.Target.GetType().GetEvent(bindEntry.PathEvent, bindingFlags);
 
-        Output.Log($"Check Path Event: {eventInfo.Name}");
+        //Output.Log($"Check Path Event: {eventInfo.Name}");
 
         if (eventInfo is null)
             return;
 
-        //Delegate handler = null;
-        //var targetType = eventInfo.EventHandlerType.GetType();
-        //var castedHandler = Convert.ChangeType(handler, targetType);
-
-        //Type eventHandlerType = eventInfo.EventHandlerType;
-        //Delegate handler2 = Delegate.CreateDelegate(eventHandlerType, null, "EventLogic");
-        try
+        if (Equals(eventInfo.EventHandlerType, typeof(RoutedEventHandler)))
         {
-            RoutedEventHandler handler = (s, e) => EventLogic(s, bindEntry, bindingFlags);
+            RoutedEventHandler handler = (s, e) =>
+                EventLogic(s, bindEntry);
 
-            // Add the new delegate as an event handler.
             eventInfo.AddEventHandler(bindEntry.Target, handler);
         }
-        catch (Exception e)
+        else if (Equals(eventInfo.EventHandlerType, typeof(TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs>)))
         {
-            throw new Exception(e.Message);
+            TypedEventHandler<NumberBox, NumberBoxValueChangedEventArgs> handler = (s, e) =>
+                EventLogic(s, bindEntry);
+
+            eventInfo.AddEventHandler(bindEntry.Target, handler);
+        }
+        else if (Equals(eventInfo.EventHandlerType, typeof(TypedEventHandler<TextBox, TextBoxTextChangingEventArgs>)))
+        {
+            TypedEventHandler<TextBox, TextBoxTextChangingEventArgs> handler = (s, e) =>
+                EventLogic(s, bindEntry);
+
+            eventInfo.AddEventHandler(bindEntry.Target, handler);
         }
     }
 
-    public static void EventLogic(object sender, BindEntry bindEntry, BindingFlags bindingFlags)
+    public static void EventLogic(object sender, BindEntry bindEntry)
     {
         // Cast the sender object to the type specified by bindEntry.Target.GetType().
         var targetType = bindEntry.Target.GetType();
@@ -196,12 +201,12 @@ internal class Binding
 
         var newValue = targetType.GetProperty(bindEntry.TargetPath).GetValue(castedSender);
 
-        bindEntry.Source.GetType().GetField(bindEntry.SourcePath, bindingFlags)?
+        bindEntry.Source.GetType().GetField(bindEntry.SourcePath, AllBindingFlags)?
             .SetValue(bindEntry.Source, newValue);
 
         bindEntry.Value = newValue;
 
-        Output.Log($"Handled Event Dynamic: Value {newValue}");
+        //Output.Log($"Handled Event: Value {newValue}");
 
         // Invoke the original event handler, if it exists.
         bindEntry.Event?.Invoke(null, null);

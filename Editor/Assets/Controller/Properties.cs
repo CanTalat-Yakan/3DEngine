@@ -77,7 +77,7 @@ internal partial class Properties
 
         Grid[] properties = new[]
         {
-                CreateBool(entity, "IsStatic", false),
+                CreateBool(entity, "IsStatic", false).WrapInField("Static"),
                 CreateEnum(Enum.GetNames(typeof(Tags))).WrapInField("Tag"),
                 CreateEnum(Enum.GetNames(typeof(Layers))).WrapInField("Layer"),
                 CreateTextFullWithOpacity(entity.GetDebugInformation()).WrapInField("Debug")
@@ -90,7 +90,7 @@ internal partial class Properties
                     entity.Transform.LocalPosition)
                 .WrapInField("Position"),
                 CreateVec3InputWithRGB(
-                    entity.Transform, "EulerAngles",
+                    entity.Transform, "_eulerAngles",
                     entity.Transform.EulerAngles)
                 .WrapInField("Rotation"),
                 CreateVec3InputWithRGB(
