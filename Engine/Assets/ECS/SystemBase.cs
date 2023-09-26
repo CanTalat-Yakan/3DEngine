@@ -3,10 +3,11 @@ using System.Linq;
 
 namespace Engine.ECS;
 
-public class SystemBase<T> where T : Component
+public partial class SystemBase<T> where T : Component
 {
     public static T[] Components => s_components.ToArray();
     private static List<T> s_components = new();
+    private static T[] s_componentsArray;
 
     public static void Register(T component)
     {
@@ -15,64 +16,6 @@ public class SystemBase<T> where T : Component
 
         // Register the component's OnDestroy event.
         component._eventOnDestroy += (s, e) => Destroy(component);
-    }
-
-    public static void Sort() =>
-        // Sort components based on the Order value.
-        s_components = s_components.OrderBy(Component => Component.Order).ToList();
-
-    public static void Awake()
-    {
-        // Loop through all the components in the static components array
-        // and call OnAwake method on the component if it is active.
-        foreach (T component in Components)
-            if (CheckActive(component))
-                component.OnAwake();
-    }
-
-    public static void Start()
-    {
-        // Loop through all the components in the static components array
-        // and call OnStart method on the component if it is active.
-        foreach (T component in Components)
-            if (CheckActive(component))
-                component.OnStart();
-    }
-
-    public static void Update()
-    {
-        // Loop through all the components in the static components array
-        // and call OnUpdate method on the component if it is active.
-        foreach (T component in Components)
-            if (CheckActive(component))
-                component.OnUpdate();
-    }
-
-    public static void LateUpdate()
-    {
-        // Loop through all the components in the static components array
-        // and call OnLateUpdate method on the component if it is active.
-        foreach (T component in Components)
-            if (CheckActive(component))
-                component.OnLateUpdate();
-    }
-
-    public static void FixedUpdate()
-    {
-        // Loop through all the components in the static components array
-        // and call OnLateUpdate method on the component if it is active.
-        foreach (T component in Components)
-            if (CheckActive(component))
-                component.OnFixedUpdate();
-    }
-
-    public static void Render()
-    {
-        // Loop through all the components in the static components array
-        // and call OnRender method on the component if it is active.
-        foreach (T component in Components)
-            if (CheckActive(component))
-                component.OnRender();
     }
 
     public static void Destroy(T component)
@@ -111,12 +54,76 @@ public class SystemBase<T> where T : Component
         }
     }
 
+    public static void Sort() =>
+        // Sort components based on the Order value.
+        s_componentsArray = s_componentsArray.OrderBy(Component => Component.Order).ToArray();
+
+    internal static void CopyToArray() =>
+        s_componentsArray = s_components.ToArray();
+
     private static bool CheckActive(T component) =>
         // Check if the component is active.
         component.IsEnabled &&
         component.Entity.IsEnabled &&
         component.Entity.Scene.IsEnabled &&
         component.Entity.ActiveInHierarchy;
+}
+
+public partial class SystemBase<T> where T : Component
+{
+    public static void Awake()
+    {
+        // Loop through all the components in the static components array
+        // and call OnAwake method on the component if it is active.
+        foreach (T component in s_componentsArray)
+            if (CheckActive(component))
+                component.OnAwake();
+    }
+
+    public static void Start()
+    {
+        // Loop through all the components in the static components array
+        // and call OnStart method on the component if it is active.
+        foreach (T component in s_componentsArray)
+            if (CheckActive(component))
+                component.OnStart();
+    }
+
+    public static void Update()
+    {
+        // Loop through all the components in the static components array
+        // and call OnUpdate method on the component if it is active.
+        foreach (T component in s_componentsArray)
+            if (CheckActive(component))
+                component.OnUpdate();
+    }
+
+    public static void LateUpdate()
+    {
+        // Loop through all the components in the static components array
+        // and call OnLateUpdate method on the component if it is active.
+        foreach (T component in s_componentsArray)
+            if (CheckActive(component))
+                component.OnLateUpdate();
+    }
+
+    public static void FixedUpdate()
+    {
+        // Loop through all the components in the static components array
+        // and call OnLateUpdate method on the component if it is active.
+        foreach (T component in s_componentsArray)
+            if (CheckActive(component))
+                component.OnFixedUpdate();
+    }
+
+    public static void Render()
+    {
+        // Loop through all the components in the static components array
+        // and call OnRender method on the component if it is active.
+        foreach (T component in s_componentsArray)
+            if (CheckActive(component))
+                component.OnRender();
+    }
 }
 
 internal class CameraSystem : SystemBase<Camera> { }

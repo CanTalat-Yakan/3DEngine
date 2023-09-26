@@ -65,6 +65,17 @@ public sealed class SceneManager
         Subscenes.Remove(scene);
     }
 
+    public void ProcessSystems()
+    {
+        CameraSystem.CopyToArray();
+        TransformSystem.CopyToArray();
+        MeshSystem.CopyToArray();
+        EditorScriptSystem.CopyToArray();
+        ScriptSystem.CopyToArray();
+
+        CameraSystem.Sort();
+    }
+
     public void Awake()
     {
         // Update the CameraSystem
@@ -135,10 +146,8 @@ public sealed class SceneManager
         // Update the TransformSystem.
         TransformSystem.Update();
 
-        // Sort and Render the Cameras.
-        CameraSystem.Sort();
+        // Render the Cameras.
         CameraSystem.Render();
-
         // Render the MeshSystem.
         MeshSystem.Render();
     }

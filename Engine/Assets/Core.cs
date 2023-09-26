@@ -56,6 +56,9 @@ public sealed class Core
         // Compile all project scripts and add components for the editor's "AddComponent" function.
         RuntimeCompiler.CompileProjectScripts(AssetsPath);
 
+        // Copies the List to the local array once to savely iterate to it.
+        SceneManager.ProcessSystems();
+
         // Render Pipeline Init
         SceneManager.Awake();
         SceneManager.Start();
@@ -81,6 +84,9 @@ public sealed class Core
         // Acquire and Poll Mouse and Keyboard and Update the States and the Input.
         Input.Fetch();
         Input.Update();
+
+        // Copies the List to the local array once to savely iterate to it.
+        SceneManager.ProcessSystems();
 
         // Invokes Awake and Start if play mode has started.
         if (PlayModeStarted)
