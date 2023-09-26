@@ -42,7 +42,7 @@
 		<PackageReference Include="Vortice.DirectX" Version="3.2.0" />
 		<PackageReference Include="Vortice.Dxc" Version="3.2.0" />
 		<PackageReference Include="Vortice.DXGI" Version="3.2.0" />
-		<PackageReference Include="Vortice.Mathematics" Version="1.7.1" />
+		<PackageReference Include="Vortice.Mathematics" Version="1.7.2" />
 		<PackageReference Include="Vortice.MediaFoundation" Version="3.2.0" />
 		<PackageReference Include="Vortice.ShaderCompiler" Version="1.7.1" />
 		<PackageReference Include="Vortice.UIAnimation" Version="3.2.0" />
