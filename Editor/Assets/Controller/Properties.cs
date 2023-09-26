@@ -73,7 +73,7 @@ internal partial class Properties
     private void CreateEntityProperties(Entity entity)
     {
         // Add Bindings for the Entity.
-        Binding.SetBinding(entity);
+        Binding.SetBindings(entity);
 
         Grid[] properties = new[]
         {

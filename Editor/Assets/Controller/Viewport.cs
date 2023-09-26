@@ -28,7 +28,7 @@ internal partial class Viewport(ModelView.Viewport viewport, Grid content)
 
         engineCore.OnInitialize += (s, e) =>
         {
-            Binding.SetRendererBinding();
+            Binding.SetRendererBindings();
 
             CreateViewportSettings();
         };

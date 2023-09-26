@@ -127,7 +127,7 @@ internal partial class Hierarchy
 
         var subscene = SceneManager.AddSubscene(subsceneEntry.ID, name, enable);
 
-        Binding.SetBinding(subscene);
+        Binding.SetBindings(subscene);
 
         var subsceneGrid = CreateSceneHierarchy(subsceneEntry, subscene);
 

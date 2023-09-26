@@ -61,13 +61,13 @@ internal class Binding
         UpdateEntityBindings();
     }
 
-    public static void SetRendererBinding()
+    public static void SetRendererBindings()
     {
         RendererBindings.Add(
             "FOV" + ViewportController.Camera?.GetType(),
             new(ViewportController.Camera, "FOV"));
     }
-    public static void SetBinding(Scene scene)
+    public static void SetBindings(Scene scene)
     {
         if (scene is null)
             return;
@@ -77,7 +77,7 @@ internal class Binding
         SceneBindings.Add("IsEnabled" + scene.ID, new(scene, "IsEnabled"));
     }
 
-    public static void SetBinding(Entity entity)
+    public static void SetBindings(Entity entity)
     {
         if (entity is null)
             return;
