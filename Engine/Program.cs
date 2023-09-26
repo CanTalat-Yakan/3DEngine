@@ -1,12 +1,13 @@
 using System.Runtime.CompilerServices;
 
+using Vortice.Win32;
+
 using static Vortice.Win32.Kernel32;
 using static Vortice.Win32.User32;
-using Vortice.Win32;
 
 namespace Engine;
 
-sealed class Program
+public sealed class Program
 {
     private Core _engineCore;
     private AppWindow _appWindow;
@@ -18,7 +19,7 @@ sealed class Program
     private void Loop() =>
         _engineCore.Frame();
 
-    private void Run()
+    public void Run(bool withImGui = true)
     {
         #region // Create Window
         WNDCLASSEX wndClass = new()
@@ -45,7 +46,8 @@ sealed class Program
         _engineCore.Renderer.Data.SetVsync(false);
         _engineCore.Renderer.Data.SetSuperSample(false);
 
-        _engineCore.OnRender += (s, e) => _appWindow.Render();
+        if (withImGui)
+            _engineCore.OnRender += (s, e) => _appWindow.Render();
 
         _appWindow.Show(ShowWindowCommand.Maximize);
         #endregion

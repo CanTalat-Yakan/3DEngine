@@ -96,7 +96,7 @@ unsafe public sealed class ImGuiRenderer
         var indexResourcePointer = (ImDrawIdx*)indexResource.DataPointer;
         for (int n = 0; n < data.CmdListsCount; n++)
         {
-            var cmdlList = data.CmdListsRange[n];
+            var cmdlList = data.CmdLists[n];
 
             var vertBytes = cmdlList.VtxBuffer.Size * sizeof(ImDrawVert);
             Buffer.MemoryCopy((void*)cmdlList.VtxBuffer.Data, vertexResourcePointer, vertBytes, vertBytes);
@@ -145,7 +145,7 @@ unsafe public sealed class ImGuiRenderer
         Vector2 clip_off = data.DisplayPos;
         for (int n = 0; n < data.CmdListsCount; n++)
         {
-            var cmdList = data.CmdListsRange[n];
+            var cmdList = data.CmdLists[n];
             for (int i = 0; i < cmdList.CmdBuffer.Size; i++)
             {
                 var cmd = cmdList.CmdBuffer[i];
