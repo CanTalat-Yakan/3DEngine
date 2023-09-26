@@ -117,8 +117,8 @@ public sealed class Core
         // Renders the scene twice, once in solid mode and once in wireframe mode.
         Renderer.Data.SetRasterizerDescFillMode();
         SceneManager.Render();
-        Renderer.Data.SetRasterizerDescFillModeWireframe();
-        SceneManager.Render();
+        //Renderer.Data.SetRasterizerDescFillModeWireframe();
+        //SceneManager.Render();
 
         OnRender?.Invoke(null, null);
 
