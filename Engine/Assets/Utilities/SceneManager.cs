@@ -2,20 +2,15 @@
 
 namespace Engine.Utilities;
 
-public sealed class SceneManager
+public sealed partial class SceneManager
 {
     public static Scene MainScene;
-    public static List<Scene> Subscenes;
+    public static List<Scene> Subscenes = new();
 
-    public SceneManager(Scene scene = null)
-    {
+    public SceneManager(Scene scene = null) =>
         // Initializes the main scene and creates a new empty list for the subscenes.
-        MainScene = 
-            scene is not null ? scene : 
-            new() { ID = Guid.NewGuid(), Name = "Main", IsEnabled = true, EntityManager = new() };
-
-        Subscenes = new List<Scene>();
-    }
+        MainScene = scene is not null ? scene 
+            : new() { ID = Guid.NewGuid(), Name = "Main", IsEnabled = true, EntityManager = new() };
 
     public static Scene AddSubscene(Guid guid = new(), string name = "Subscene", bool enable = true)
     {
@@ -65,6 +60,39 @@ public sealed class SceneManager
         Subscenes.Remove(scene);
     }
 
+    public static Scene GetFromID(Guid guid)
+    {
+        // Check if the main scene's ID matches the provided GUID.
+        if (MainScene.ID == guid)
+            return MainScene;
+
+        // Check if any of the subscenes' ID matches the provided GUID.
+        foreach (var subscene in Subscenes)
+            if (subscene.ID == guid)
+                return subscene;
+
+        // Return null if no scene was found with the provided GUID.
+        return null;
+    }
+
+    public static Scene GetFromEntityID(Guid guid)
+    {
+        // Check if the main scene contains the entity with an ID that matches the provided GUID.
+        if (MainScene.EntityManager.GetFromID(guid) is not null)
+            return MainScene;
+
+        // Check if any of the subscenes contains the entity with an ID that matches the provided GUID.
+        foreach (var subscene in Subscenes)
+            if (subscene.EntityManager.GetFromID(guid) is not null)
+                return subscene;
+
+        // Return null if entity is not found in any scene with the provided GUID.
+        return null;
+    }
+}
+
+public sealed partial class SceneManager
+{
     public void ProcessSystems()
     {
         CameraSystem.CopyToArray();
@@ -74,6 +102,7 @@ public sealed class SceneManager
         ScriptSystem.CopyToArray();
 
         CameraSystem.Sort();
+        MeshSystem.Sort();
     }
 
     public void Awake()
@@ -150,35 +179,5 @@ public sealed class SceneManager
         CameraSystem.Render();
         // Render the MeshSystem.
         MeshSystem.Render();
-    }
-
-    public static Scene GetFromID(Guid guid)
-    {
-        // Check if the main scene's ID matches the provided GUID.
-        if (MainScene.ID == guid)
-            return MainScene;
-
-        // Check if any of the subscenes' ID matches the provided GUID.
-        foreach (var subscene in Subscenes)
-            if (subscene.ID == guid)
-                return subscene;
-
-        // Return null if no scene was found with the provided GUID.
-        return null;
-    }
-
-    public static Scene GetFromEntityID(Guid guid)
-    {
-        // Check if the main scene contains the entity with an ID that matches the provided GUID.
-        if (MainScene.EntityManager.GetFromID(guid) is not null)
-            return MainScene;
-
-        // Check if any of the subscenes contains the entity with an ID that matches the provided GUID.
-        foreach (var subscene in Subscenes)
-            if (subscene.EntityManager.GetFromID(guid) is not null)
-                return subscene;
-
-        // Return null if entity is not found in any scene with the provided GUID.
-        return null;
     }
 }

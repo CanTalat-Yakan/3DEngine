@@ -1,9 +1,9 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Runtime.CompilerServices;
 
 using Vortice.Direct3D11;
 using Vortice.Direct3D;
-using Engine.Data;
 
 namespace Engine.Components;
 
@@ -12,6 +12,7 @@ public sealed class Mesh : Component
     public string MeshPath;
 
     public static MeshInfo CurrentMeshOnGPU { get; private set; }
+    public static List<MeshInfo> BatchLookup = new();
 
     public MeshInfo MeshInfo => _meshInfo;
     [Show] private MeshInfo _meshInfo;
@@ -83,6 +84,19 @@ public sealed class Mesh : Component
 
     public void SetMeshInfo(MeshInfo meshInfo)
     {
+        // Batch MeshInfo by sorting the List with the Order of the Component
+        if (BatchLookup.Contains(meshInfo))
+        {
+            for (int i = 0; i < BatchLookup.Count; i++)
+                if (Equals(BatchLookup[i], meshInfo))
+                    Order = (byte)i;
+        }
+        else
+        {
+            Order = (byte)BatchLookup.Count;
+            BatchLookup.Add(meshInfo);
+        }
+
         // Assign to local variable.
         _meshInfo = meshInfo;
 
