@@ -57,7 +57,7 @@ internal sealed class SceneBoot : EditorComponent
         if (Input.GetKey(Key.C, InputState.Down))
         {
             // Log message indicating that 10 cubes have been spawned.
-            Output.Log("Spawned 10 Cubes");
+            Output.Log("Spawned 100 Cubes");
 
             // Loop to spawn 10 cubes with random attributes.
             for (int i = 0; i < 100; i++)
