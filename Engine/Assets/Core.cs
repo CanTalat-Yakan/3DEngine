@@ -32,7 +32,7 @@ public sealed class Core
         Initialize(renderer, hWnd, assetsPath);
 
     public Core(Win32Window win32Window, string assetsPath = null) =>
-        Initialize(new(win32Window), win32Window.Handle, assetsPath);
+        Initialize(new Renderer(win32Window), win32Window.Handle, assetsPath);
 
     public void Initialize(Renderer renderer, nint hWnd, string assetsPath = null)
     {
