@@ -21,7 +21,7 @@ public sealed class Core
     public static bool PlayModeStarted { get; private set; } = false;
 
     public event EventHandler OnRender;
-    public event EventHandler OnInitialized;
+    public event EventHandler OnInitialize;
     public event EventHandler OnDispose;
 
     public Renderer Renderer;
@@ -68,8 +68,8 @@ public sealed class Core
         if (!Renderer.IsRendering)
             return;
 
-        OnInitialized?.Invoke(null, null);
-        OnInitialized = null;
+        OnInitialize?.Invoke(null, null);
+        OnInitialize = null;
 
         // Clears the render target, discarding the contents and preparing it for the next frame.
         Renderer.Clear();

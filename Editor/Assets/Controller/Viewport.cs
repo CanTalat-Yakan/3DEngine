@@ -26,7 +26,7 @@ internal partial class Viewport(ModelView.Viewport viewport, Grid content)
         engineCore.Renderer.Data.SetVsync(false);
         engineCore.Renderer.Data.SetSuperSample(true);
 
-        engineCore.OnInitialized += (s, e) =>
+        engineCore.OnInitialize += (s, e) =>
         {
             Binding.SetRendererBinding();
 
