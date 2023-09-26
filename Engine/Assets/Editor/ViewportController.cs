@@ -3,7 +3,6 @@
 public sealed class ViewportController : EditorComponent
 {
     public static ViewportController Instance { get; private set; }
-    public string Profile => Entity.Transform.ToString();
 
     public static Camera Camera => s_camera;
     private static Camera s_camera;
@@ -37,8 +36,8 @@ public sealed class ViewportController : EditorComponent
 
     public override void OnUpdate()
     {
-        // Call the MovementSpeedCalc function to calculate the movement speed.
-        MovementSpeedCalc();
+        // Call the MovementSpeedCalculation function to calculate the movement speed.
+        MovementSpeedCalculation();
 
         if (Input.GetButton(MouseButton.Right, InputState.Down)
             || Input.GetButton(MouseButton.Middle, InputState.Down))
@@ -98,7 +97,7 @@ public sealed class ViewportController : EditorComponent
         }
     }
 
-    private void MovementSpeedCalc()
+    private void MovementSpeedCalculation()
     {
         // Check if either the right or middle mouse button is pressed.
         // If so, update the movement speed based on the mouse wheel input.
