@@ -149,11 +149,9 @@ internal class Binding
         if (source is not null)
             foreach (var field in source.GetType().GetFields(AllBindingFlags))
                 foreach (var bindName in bindings.Keys)
-                    if (string.Equals(field.Name + sufix, bindName) &&
-                        bindings.TryGetValue(bindName, out var bindEntry) &&
-                        !Equals(
-                            field.GetValue(source),
-                            bindEntry.Value))
+                    if (string.Equals(field.Name + sufix, bindName)
+                        && bindings.TryGetValue(bindName, out var bindEntry)
+                        && !Equals(field.GetValue(source), bindEntry.Value))
                         ProcessBindEntry(bindEntry, field, source);
     }
 

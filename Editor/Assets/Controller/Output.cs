@@ -40,6 +40,8 @@ namespace Editor.Controller
 
     public class Output
     {
+        internal AppBarToggleButton ClearPlay;
+
         private static Dictionary<MessageInfo, List<DateTime>> s_messageCollection = new();
 
         private static TextBlock s_status;
@@ -51,8 +53,6 @@ namespace Editor.Controller
         private static AppBarToggleButton s_filterWarnings;
         private static AppBarToggleButton s_filterErrors;
         private static AppBarToggleButton s_pauseError;
-
-        internal AppBarToggleButton _clearPlay;
 
         private static Dictionary<DateTime, MessageInfo> _dic = new();
 
@@ -66,7 +66,7 @@ namespace Editor.Controller
             s_filterWarnings = filterWarnings;
             s_filterErrors = filterErrors;
             s_pauseError = pauseError;
-            _clearPlay = clearPlay;
+            ClearPlay = clearPlay;
 
             s_status = Main.Instance.Status;
             s_statusIcon = Main.Instance.StatusIcon;

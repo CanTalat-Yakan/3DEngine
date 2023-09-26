@@ -184,7 +184,7 @@ internal partial class Properties
     private async void CreateFilePreviewer(string path)
     {
         // Deselect any highlighted Entity from the TreeViews.
-        Main.Instance.LayoutControl.Hierarchy._hierarchyControl.DeselectTreeViewNodes();
+        Main.Instance.LayoutControl.Hierarchy.HierarchyControl.DeselectTreeViewNodes();
 
         FileInfo fileInfo = new(path);
 

@@ -16,13 +16,13 @@ public sealed class Mesh : Component
     public Material Material => _material;
     [Show] private Material _material;
 
-    internal ID3D11Buffer _vertexBuffer;
-    internal ID3D11Buffer _indexBuffer;
+    internal ID3D11Buffer VertexBuffer;
+    internal ID3D11Buffer IndexBuffer;
 
-    internal int _vertexCount => _meshInfo.Vertices.Length;
-    internal int _vertexStride => Unsafe.SizeOf<Vertex>();
-    internal int _indexCount => _meshInfo.Indices.Length;
-    internal int _indexStride => Unsafe.SizeOf<int>();
+    internal int VertexCount => _meshInfo.Vertices.Length;
+    internal int VertexStride => Unsafe.SizeOf<Vertex>();
+    internal int IndexCount => _meshInfo.Indices.Length;
+    internal int IndexStride => Unsafe.SizeOf<int>();
 
     private Renderer _renderer => Renderer.Instance;
 
@@ -58,11 +58,11 @@ public sealed class Mesh : Component
         _renderer.Data.SetPrimitiveTopology(PrimitiveTopology.TriangleList);
 
         // Draw the mesh using the Direct3D context.
-        _renderer.Draw(_vertexBuffer, _indexBuffer, _indexCount, _vertexStride, 0, 0);
+        _renderer.Draw(VertexBuffer, IndexBuffer, IndexCount, VertexStride, 0, 0);
 
         // Increment the vertex, index and draw call count in the profiler.
-        Profiler.Vertices += _vertexCount;
-        Profiler.Indices += _indexCount;
+        Profiler.Vertices += VertexCount;
+        Profiler.Indices += IndexCount;
         Profiler.DrawCalls++;
     }
 
@@ -81,8 +81,8 @@ public sealed class Mesh : Component
 
     public void Dispose()
     {
-        _vertexBuffer?.Dispose();
-        _indexBuffer?.Dispose();
+        VertexBuffer?.Dispose();
+        IndexBuffer?.Dispose();
     }
 
     private void CreateBuffer()
@@ -91,13 +91,13 @@ public sealed class Mesh : Component
 
         //Create a VertexBuffer using the MeshInfo's vertices
         //and bind it with VertexBuffer flag.
-        _vertexBuffer = _renderer.Device.CreateBuffer(
+        VertexBuffer = _renderer.Device.CreateBuffer(
             _meshInfo.Vertices,
             BindFlags.VertexBuffer);
 
         //Create an IndexBuffer using the MeshInfo's indices
         //and bind it with IndexBuffer flag.
-        _indexBuffer = _renderer.Device.CreateBuffer(
+        IndexBuffer = _renderer.Device.CreateBuffer(
             _meshInfo.Indices,
             BindFlags.IndexBuffer);
     }

@@ -8,12 +8,12 @@ namespace Engine.Utilities;
 
 public sealed class ImGuiInputHandler
 {
-    IntPtr hwnd;
-    ImGuiMouseCursor lastCursor;
+    private IntPtr _hwnd;
+    private ImGuiMouseCursor _lastCursor;
 
     public ImGuiInputHandler(IntPtr hWnd)
     {
-        this.hwnd = hWnd;
+        this._hwnd = hWnd;
         InitKeyMap();
     }
 
@@ -51,9 +51,9 @@ public sealed class ImGuiInputHandler
         UpdateMousePosition(superSample ? 0.5f : 1);
 
         var mouseCursor = ImGui.GetIO().MouseDrawCursor ? ImGuiMouseCursor.None : ImGui.GetMouseCursor();
-        if (mouseCursor != lastCursor)
+        if (mouseCursor != _lastCursor)
         {
-            lastCursor = mouseCursor;
+            _lastCursor = mouseCursor;
             UpdateMouseCursor();
         }
     }
@@ -104,17 +104,17 @@ public sealed class ImGuiInputHandler
         if (io.WantSetMousePos)
         {
             var pos = new POINT((int)(io.MousePos.X * scale), (int)(io.MousePos.Y * scale));
-            ClientToScreen(hwnd, ref pos);
+            ClientToScreen(_hwnd, ref pos);
             SetCursorPos(pos.X, pos.Y);
         }
 
         //io.MousePos = new System.Numerics.Vector2(-FLT_MAX, -FLT_MAX);
 
         var foregroundWindow = GetForegroundWindow();
-        if (foregroundWindow == hwnd || IsChild(foregroundWindow, hwnd))
+        if (foregroundWindow == _hwnd || IsChild(foregroundWindow, _hwnd))
         {
             POINT pos;
-            if (GetCursorPos(out pos) && ScreenToClient(hwnd, ref pos))
+            if (GetCursorPos(out pos) && ScreenToClient(_hwnd, ref pos))
                 io.MousePos = new Vector2(pos.X / scale, pos.Y / scale);
         }
     }
@@ -142,7 +142,7 @@ public sealed class ImGuiInputHandler
                     if (msg == WindowMessage.MButtonDown || msg == WindowMessage.MButtonDoubleClick) { button = 2; }
                     if (msg == WindowMessage.XButtonDown || msg == WindowMessage.XButtonDoubleClick) { button = (GET_XBUTTON_WPARAM(wParam) == 1) ? 3 : 4; }
                     if (!ImGui.IsAnyMouseDown() && GetCapture() == nint.Zero)
-                        SetCapture(hwnd);
+                        SetCapture(_hwnd);
                     io.MouseDown[button] = true;
                     return false;
                 }
@@ -157,7 +157,7 @@ public sealed class ImGuiInputHandler
                     if (msg == WindowMessage.MButtonUp) { button = 2; }
                     if (msg == WindowMessage.XButtonUp) { button = (GET_XBUTTON_WPARAM(wParam) == 1) ? 3 : 4; }
                     io.MouseDown[button] = false;
-                    if (!ImGui.IsAnyMouseDown() && GetCapture() == hwnd)
+                    if (!ImGui.IsAnyMouseDown() && GetCapture() == _hwnd)
                         ReleaseCapture();
                     return false;
                 }

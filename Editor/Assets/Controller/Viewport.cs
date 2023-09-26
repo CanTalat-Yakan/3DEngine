@@ -38,9 +38,9 @@ internal partial class Viewport(ModelView.Viewport viewport, Grid content)
             Binding.Update();
             Output.Log(Engine.Output.DequeueLog());
 
-            _viewport._engineCore.SetPlayMode(
+            _viewport.EngineCore.SetPlayMode(
                 Main.Instance.PlayerControl.PlayMode == PlayMode.Playing);
-            _viewport._engineCore.SetPlayModeStarted(
+            _viewport.EngineCore.SetPlayModeStarted(
                 Main.Instance.PlayerControl.CheckPlayModeStarted());
 
             Profile.Text = Engine.Profiler.GetString();

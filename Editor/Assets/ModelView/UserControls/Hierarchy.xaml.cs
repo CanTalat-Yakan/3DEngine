@@ -7,13 +7,13 @@ namespace Editor.ModelView;
 
 public sealed partial class Hierarchy : UserControl
 {
-    internal Controller.Hierarchy _hierarchyControl;
+    internal Controller.Hierarchy HierarchyControl;
 
     public Hierarchy()
     {
         this.InitializeComponent();
 
-        _hierarchyControl = new(this, x_StackPanel_Hierarchy);
+        HierarchyControl = new(this, x_StackPanel_Hierarchy);
     }
 
     private void AppBarButton_SwitchLayout_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) =>

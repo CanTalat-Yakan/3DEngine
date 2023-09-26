@@ -7,13 +7,13 @@ namespace Editor.ModelView;
 
 public sealed partial class Properties : UserControl
 {
-    internal Controller.Properties _propertiesControl;
+    internal Controller.Properties PropertiesControl;
 
     public Properties(object content = null)
     {
         this.InitializeComponent();
 
-        _propertiesControl = new(x_StackPanel_Properties, content);
+        PropertiesControl = new(x_StackPanel_Properties, content);
     }
 
     private void AppBarButton_SwitchLayout_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e) =>

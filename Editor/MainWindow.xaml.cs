@@ -10,7 +10,7 @@ namespace Editor;
 
 public sealed partial class MainWindow : WindowEx
 {
-    internal Controller.Theme _themeControl;
+    internal Controller.Theme ThemeControl;
 
     public ModelView.Main Main { get => _main is not null ? _main : _main = new(this); }
     private ModelView.Main _main;
@@ -21,7 +21,7 @@ public sealed partial class MainWindow : WindowEx
 
         ExtendsContentIntoTitleBar = true; // enable custom title bar
 
-        _themeControl = new(this, x_Page_Main);
+        ThemeControl = new(this, x_Page_Main);
     }
 
     private void AppBarButton_Help_Click(object sender, RoutedEventArgs e) =>

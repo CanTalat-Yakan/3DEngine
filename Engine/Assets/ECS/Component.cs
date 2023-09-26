@@ -4,7 +4,6 @@ public class Component : ICloneable
 {
     [Hide] public Entity Entity;
     [Hide] public byte Order = 0;
-
     [Hide] public bool IsEnabled;
 
     [Hide] public event EventHandler _eventOnDestroy;

@@ -10,7 +10,7 @@ namespace Editor.ModelView;
 
 public sealed partial class Home : Frame
 {
-    private Controller.Home _homeControl;
+    private Controller.Home HomeControl;
 
     public Home(MainWindow mainWindow, NavigationView navigationView)
     {
@@ -18,12 +18,12 @@ public sealed partial class Home : Frame
 
         x_TextBlock_AppVersion.Text = Helper.GetAppVersion();
 
-        _homeControl = new(this, x_StackPanel_Projects, navigationView);
+        HomeControl = new(this, x_StackPanel_Projects, navigationView);
     }
 
     private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) =>
         Theme.Instance.SetRequstedTheme();
 
     private void AppBarButton_Click_OpenFolder(object sender, RoutedEventArgs e) =>
-        _homeControl.OpenFolder();
+        HomeControl.OpenFolder();
 }

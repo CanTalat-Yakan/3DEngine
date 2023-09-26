@@ -14,7 +14,7 @@ public sealed partial class Files : UserControl
 
     public List<StorageFile> DragDropFiles = new();
 
-    internal Controller.Files _filesControl;
+    internal Controller.Files FilesControl;
 
     public Files()
     {
@@ -22,27 +22,27 @@ public sealed partial class Files : UserControl
 
         ChangeColorWithTheme = x_Grid_Main;
 
-        _filesControl = new(this, x_Grid_Main, x_WrapPanel_Files, x_BreadcrumbBar_Files);
+        FilesControl = new(this, x_Grid_Main, x_WrapPanel_Files, x_BreadcrumbBar_Files);
     }
 
     private void AppBarButton_Click_AddFiles(object sender, RoutedEventArgs e) =>
-        _filesControl.SelectFilesAsync();
+        FilesControl.SelectFilesAsync();
 
     private void AppBarButton_Click_OpenFolder(object sender, RoutedEventArgs e) =>
-        _filesControl.OpenFolder();
+        FilesControl.OpenFolder();
 
     private void AppBarButton_Click_RefreshFiles(object sender, RoutedEventArgs e) =>
-        _filesControl.Refresh();
+        FilesControl.Refresh();
     
     private void AppBarButton_Click_OpenVisualStudio(object sender, RoutedEventArgs e) =>
-        _filesControl.OpenFile(System.IO.Path.Combine(Controller.Home.ProjectPath, "Project.sln"));
+        FilesControl.OpenFile(System.IO.Path.Combine(Controller.Home.ProjectPath, "Project.sln"));
     //Breadcrumb
     private void BreadcrumbBar_Files_ItemClicked(BreadcrumbBar sender, BreadcrumbBarItemClickedEventArgs args) =>
-        _filesControl.GoUpDirectoryAndRefresh();
+        FilesControl.GoUpDirectoryAndRefresh();
 
     private void Grid_Main_DragOver(object sender, DragEventArgs e) =>
-        _filesControl.OnDragOver(e);
+        FilesControl.OnDragOver(e);
 
     private void Grid_Main_Drop(object sender, DragEventArgs e) =>
-        _filesControl.OnDropAsync(e);
+        FilesControl.OnDropAsync(e);
 }

@@ -10,7 +10,7 @@ public sealed partial class Output : UserControl
 {
     public Grid ChangeColorWithTheme;
 
-    internal Controller.Output _outputControl;
+    internal Controller.Output OutputControl;
 
     public Output()
     {
@@ -18,7 +18,7 @@ public sealed partial class Output : UserControl
 
         ChangeColorWithTheme = x_Grid_Main;
 
-        _outputControl = new(
+        OutputControl = new(
             x_Stackpanel_Output,
             x_ScrollViewer_Output,
             x_AppBarToggleButton_Output_Collapse,
@@ -30,7 +30,7 @@ public sealed partial class Output : UserControl
     }
 
     private void AppBarButton_Output_Clear(object sender, RoutedEventArgs e) =>
-        _outputControl.ClearOutput();
+        OutputControl.ClearOutput();
 
     private void AppBarToggleButton_Output_Collapse_Click(object sender, RoutedEventArgs e) =>
         Controller.Output.IterateOutputMessages();
