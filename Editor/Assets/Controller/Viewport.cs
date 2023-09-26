@@ -13,10 +13,11 @@ namespace Editor.Controller;
 
 internal partial class Viewport(ModelView.Viewport viewport, Grid content)
 {
-    public TextBlock Profile;
     public Grid Content = content;
 
     private ModelView.Viewport _viewport = viewport;
+
+    private TextBlock _profile;
 
     public void InitializeEngineCore(Renderer renderer, out Engine.Core engineCore)
     {
@@ -43,7 +44,7 @@ internal partial class Viewport(ModelView.Viewport viewport, Grid content)
             _viewport.EngineCore.SetPlayModeStarted(
                 Main.Instance.PlayerControl.CheckPlayModeStarted());
 
-            Profile.Text = Engine.Profiler.GetString();
+            _profile.Text = Engine.Profiler.GetString();
         };
 
         engineCore.OnDispose += (s, e) =>
@@ -89,7 +90,7 @@ internal partial class Viewport(ModelView.Viewport viewport, Grid content)
         // Initialize an array of UI elements to be positioned in the top-right corner of the main content.
         UIElement[] topRight = new[]
         {
-                CreateFlyoutButton(CreateIcon("\xE946"), CreateTextFull(out Profile).WrapInGrid()),
+                CreateFlyoutButton(CreateIcon("\xE946"), CreateTextFull(out _profile).WrapInGrid()),
 
                 CreateAppBarSeperator(),
 

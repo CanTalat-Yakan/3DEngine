@@ -1,7 +1,7 @@
-﻿using ImGuiNET;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 
+using ImGuiNET;
 using Vortice.Direct3D11;
 using Vortice.Direct3D;
 using Vortice.DXGI;

@@ -216,10 +216,12 @@ public sealed class Renderer
         Data.RasterizerState = Device.CreateRasterizerState(Data.RasterizerDescription);
 
         Data.SetupRenderState(vertexStride, vertexOffset);
-        Data.SetViewport(Size.Width, Size.Height);
 
         Data.DeviceContext.DrawIndexed(indexCount, 0, 0);
     }
+
+    public void DrawDirect(int indexCount) =>
+        Data.DeviceContext.DrawIndexed(indexCount, 0, 0);
 
     public void Clear()
     {

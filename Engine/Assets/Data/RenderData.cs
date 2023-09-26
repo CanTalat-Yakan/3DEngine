@@ -2,6 +2,7 @@
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
+using System.Drawing;
 
 namespace Engine.Data;
 
@@ -68,8 +69,8 @@ public struct RenderData
     public void SetConstantBuffer(int slot, ID3D11Buffer constantBuffer) =>
         DeviceContext.VSSetConstantBuffer(slot, constantBuffer);
 
-    public void SetViewport(float width, float height) =>
-        DeviceContext.RSSetViewport(new Viewport(0, 0, width, height, 0.0f, 1.0f));
+    public void SetViewport(Size size) =>
+        DeviceContext.RSSetViewport(new Viewport(0, 0, size.Width, size.Height, 0.0f, 1.0f));
 
     public void SetupRenderState(int vertexStride, int vertexOffset, Format indexFormat = Format.R16_UInt, int indexOffset = 0)
     {

@@ -1,13 +1,19 @@
-﻿using Assimp;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
+
+using Assimp;
 
 namespace Engine.Loader;
 
 internal sealed class ModelLoader
 {
+    private static Dictionary<string, MeshInfo> s_meshInfoStore = new();
+
     public static MeshInfo LoadFile(string filePath, bool fromResources = true)
     {
+        if (s_meshInfoStore.ContainsKey(filePath))
+            return s_meshInfoStore[filePath];
+
         string modelFilePath = filePath;
         if (fromResources)
         {
@@ -68,11 +74,16 @@ internal sealed class ModelLoader
             }
         }
 
-        // Return the completed "MeshInfo" object.
-        return new MeshInfo()
+        MeshInfo meshInfo = new()
         {
             Vertices = vertices.ToArray(),
             Indices = indices.ToArray()
         };
+
+        // Add the MeshInfo into the store with the filePath as key.
+        s_meshInfoStore.Add(filePath, meshInfo);
+
+        // Return the completed MeshInfo object.
+        return meshInfo;
     }
 }

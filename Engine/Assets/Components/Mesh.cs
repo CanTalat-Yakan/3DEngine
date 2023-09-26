@@ -3,12 +3,15 @@ using System.Runtime.CompilerServices;
 
 using Vortice.Direct3D11;
 using Vortice.Direct3D;
+using Engine.Data;
 
 namespace Engine.Components;
 
 public sealed class Mesh : Component
 {
     public string MeshPath;
+
+    public static MeshInfo CurrentMeshOnGPU { get; private set; }
 
     public MeshInfo MeshInfo => _meshInfo;
     [Show] private MeshInfo _meshInfo;
@@ -52,13 +55,25 @@ public sealed class Mesh : Component
 
     public override void OnRender()
     {
-        // Set the material's constant buffer to the entity's transform constant buffer.
-        _material.Set(Entity.Transform.GetConstantBuffer());
+        if (Equals(Material.CurrentMaterialOnGPU, _material)
+            && Equals(Mesh.CurrentMeshOnGPU, _meshInfo))
+        {
+            _material.UpdateConstantBuffer(Entity.Transform.GetConstantBuffer());
 
-        _renderer.Data.SetPrimitiveTopology(PrimitiveTopology.TriangleList);
+            _renderer.DrawDirect(IndexCount);
+        }
+        else
+        {
+            // Set the material's constant buffer to the entity's transform constant buffer.
+            _material.Set(Entity.Transform.GetConstantBuffer());
 
-        // Draw the mesh using the Direct3D context.
-        _renderer.Draw(VertexBuffer, IndexBuffer, IndexCount, VertexStride, 0, 0);
+            // Draw the mesh with trianglelist.
+            _renderer.Data.SetPrimitiveTopology(PrimitiveTopology.TriangleList);
+            _renderer.Draw(VertexBuffer, IndexBuffer, IndexCount, VertexStride, 0, 0);
+
+            // Assign meshInfo to the static variable.
+            CurrentMeshOnGPU = _meshInfo;
+        }
 
         // Increment the vertex, index and draw call count in the profiler.
         Profiler.Vertices += VertexCount;

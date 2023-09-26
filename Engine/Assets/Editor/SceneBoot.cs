@@ -60,7 +60,7 @@ internal sealed class SceneBoot : EditorComponent
             Output.Log("Spawned 10 Cubes");
 
             // Loop to spawn 10 cubes with random attributes.
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 100; i++)
             {
                 // Create a new cube and add it to the Cubes entity.
                 var newCube = SceneManager.MainScene.EntityManager.CreatePrimitive(PrimitiveTypes.Cube, Cubes);

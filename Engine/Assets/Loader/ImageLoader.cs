@@ -11,8 +11,13 @@ namespace Engine.Loader;
 
 internal sealed class ImageLoader
 {
+    private static Dictionary<string, ID3D11Texture2D> s_textureStore = new();
+
     public static ID3D11Texture2D LoadTexture(ID3D11Device device, string filePath, bool fromResources = true)
     {
+        if (s_textureStore.ContainsKey(filePath))
+            return s_textureStore[filePath];
+
         string textureFilePath = filePath;
         if (fromResources)
         {
@@ -158,7 +163,13 @@ internal sealed class ImageLoader
             converter.CopyPixels(rowPitch, pixels);
         }
 
-        return device.CreateTexture2D(pixels, format, size.Width, size.Height);
+
+        var texture = device.CreateTexture2D(pixels, format, size.Width, size.Height);
+
+        // Add the Texture into the store with the filePath as key.
+        s_textureStore.Add(filePath, texture);
+
+        return texture;
     }
 
     internal static readonly Dictionary<Guid, Format> s_WICFormats = new()

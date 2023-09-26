@@ -74,8 +74,11 @@ public sealed class Core
         OnInitialize?.Invoke(null, null);
         OnInitialize = null;
 
-        // Clears the render target, discarding the contents and preparing it for the next frame.
+        // Clears the render target,
+        // discarding the contents and preparing it for the next frame
+        // and sets the viewport size.
         Renderer.Clear();
+        Renderer.Data.SetViewport(Renderer.Size);
 
         // Updates the time values, such as delta time and time scale,
         // used in the game or application.

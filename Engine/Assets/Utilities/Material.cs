@@ -9,6 +9,8 @@ namespace Engine.Utilities;
 
 public sealed class Material
 {
+    public static Material CurrentMaterialOnGPU { get; private set; }
+
     private Renderer _renderer => Renderer.Instance;
 
     private ID3D11VertexShader _vertexShader;
@@ -91,7 +93,18 @@ public sealed class Material
 
     internal void Set(PerModelConstantBuffer constantBuffer)
     {
-        #region //Update constant buffer data
+        UpdateConstantBuffer(constantBuffer);
+
+        // Set input layout, vertex shader, and pixel shader in the device context.
+        // Set the shader resource and sampler in the pixel shader stage of the device context.
+        _renderer.Data.SetupMaterial(_inputLayout, _vertexShader, _pixelShader, _sampler, _resourceView);
+        
+        // Assign material to the static variable.
+        CurrentMaterialOnGPU = this;
+    }
+
+    internal void UpdateConstantBuffer(PerModelConstantBuffer constantBuffer)
+    {
         // Map the constant buffer and copy the models model-view matrix into it.
         unsafe
         {
@@ -102,11 +115,7 @@ public sealed class Material
             // Unmap the constant buffer from memory.
             _renderer.Data.DeviceContext.Unmap(_model, 0);
         }
-        #endregion
 
-        // Set input layout, vertex shader, and pixel shader in the device context.
-        // Set the shader resource and sampler in the pixel shader stage of the device context.
-        _renderer.Data.SetupMaterial(_inputLayout, _vertexShader, _pixelShader, _sampler, _resourceView);
         // Set the constant buffer in the vertex shader stage of the device context.
         _renderer.Data.SetConstantBuffer(1, _model);
     }

@@ -1,5 +1,4 @@
 ﻿using ImGuiNET;
-
 using Vortice.Win32;
 
 namespace Engine;
