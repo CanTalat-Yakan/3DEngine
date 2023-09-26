@@ -124,16 +124,3 @@ internal class TransformSystem : SystemBase<Transform> { }
 internal class MeshSystem : SystemBase<Mesh> { }
 public class ScriptSystem : SystemBase<Component> { }
 public class EditorScriptSystem : SystemBase<EditorComponent> { }
-public class CustomScriptSystem
-{
-    public static Dictionary<string, SystemBase<Component>> _customScriptSystems = new();
-
-    public static void Register(string systemName)
-    {
-        //if (_customScriptSystems.ContainsKey(systemName))
-        //    _customScriptSystems.TryGetValue(system);
-        //else
-        //    _customScriptSystems.Add(systemName, new());
-
-    }
-}
