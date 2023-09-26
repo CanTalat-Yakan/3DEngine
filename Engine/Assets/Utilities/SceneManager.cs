@@ -95,14 +95,14 @@ public sealed partial class SceneManager
 {
     public void ProcessSystems()
     {
+        CameraSystem.Sort();
+        MeshSystem.Sort();
+
         CameraSystem.CopyToArray();
         TransformSystem.CopyToArray();
         MeshSystem.CopyToArray();
         EditorScriptSystem.CopyToArray();
         ScriptSystem.CopyToArray();
-
-        CameraSystem.Sort();
-        MeshSystem.Sort();
     }
 
     public void Awake()

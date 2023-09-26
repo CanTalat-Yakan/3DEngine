@@ -57,7 +57,7 @@ public partial class SystemBase<T> where T : Component
 
     public static void Sort() =>
         // Sort components based on the Order value.
-        s_componentsArray = s_componentsArray.OrderBy(Component => Component.Order).ToArray();
+        s_components = s_components.OrderBy(Component => Component.Order).ToList();
 
     internal static void CopyToArray() =>
         s_componentsArray = s_components.ToArray();
