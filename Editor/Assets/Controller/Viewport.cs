@@ -83,7 +83,7 @@ internal partial class Viewport(ModelView.Viewport viewport, Grid content)
                             .WrapInGridVertical("Movement Speed"))),
                 CreateAppBarSeperator(),
                 CreateComboBox(new[] { "Perspective", "Orthogonal" }),
-                CreateComboBox(new[] { "Lit", "Unlit", "Wireframe", "Shaded Wireframe" })
+                CreateComboBox(new[] { "Shaded", "Wireframe", "Shaded + Wireframe" })
         };
 
         // Initialize an array of UI elements to be positioned in the top-right corner of the main content.
