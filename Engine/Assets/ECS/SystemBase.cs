@@ -5,7 +5,8 @@ namespace Engine.ECS;
 
 public partial class SystemBase<T> where T : Component
 {
-    public static T[] Components => s_components.ToArray();
+    public static T[] Components => s_componentsArray;
+
     private static List<T> s_components = new();
     private static T[] s_componentsArray;
 
