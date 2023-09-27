@@ -24,9 +24,7 @@ public sealed class Mesh : Component
     internal ID3D11Buffer IndexBuffer;
 
     internal int VertexCount => _meshInfo.Vertices.Length;
-    internal int VertexStride => Unsafe.SizeOf<Vertex>();
     internal int IndexCount => _meshInfo.Indices.Length;
-    internal int IndexStride => Unsafe.SizeOf<int>();
 
     private Renderer _renderer => Renderer.Instance;
 
@@ -59,8 +57,10 @@ public sealed class Mesh : Component
         if (Equals(Material.CurrentMaterialOnGPU, _material)
             && Equals(Mesh.CurrentMeshOnGPU, _meshInfo))
         {
+            // Update the PerModelConstantBuffer only.
             _material.UpdateConstantBuffer(Entity.Transform.GetConstantBuffer());
 
+            // Draw the mesh directly without resetting the RenderState.
             _renderer.DrawDirect(IndexCount);
         }
         else
@@ -70,7 +70,7 @@ public sealed class Mesh : Component
 
             // Draw the mesh with trianglelist.
             _renderer.Data.SetPrimitiveTopology(PrimitiveTopology.TriangleList);
-            _renderer.Draw(VertexBuffer, IndexBuffer, IndexCount, VertexStride, 0, 0);
+            _renderer.Draw(VertexBuffer, IndexBuffer, IndexCount, 0, 0);
 
             // Assign meshInfo to the static variable.
             CurrentMeshOnGPU = _meshInfo;

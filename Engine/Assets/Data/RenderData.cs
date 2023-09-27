@@ -3,11 +3,14 @@ using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
 using System.Drawing;
+using System.Runtime.CompilerServices;
 
 namespace Engine.Data;
 
 public struct RenderData
 {
+    public RenderData() { }
+
     public ID3D11DeviceContext DeviceContext;
 
     public SwapChainDescription1 SwapChainDescription;
@@ -44,26 +47,29 @@ public struct RenderData
 
     public PrimitiveTopology PrimitiveTopology;
 
+    public int VertexStride = Unsafe.SizeOf<Vertex>();
+    public int IndexStride = Unsafe.SizeOf<int>();
+
     public bool VSync;
     public bool SuperSample;
 
-    public void SetVsync(bool b) => 
+    public void SetVsync(bool b) =>
         VSync = b;
 
-    public void SetSuperSample(bool b) => 
+    public void SetSuperSample(bool b) =>
         SuperSample = b;
 
-    public void SetRasterizerDescFillModeWireframe() => 
-        SetRasterizerDescFillMode(FillMode.Wireframe); 
+    public void SetRasterizerDescFillModeWireframe() =>
+        SetRasterizerDescFillMode(FillMode.Wireframe);
 
-    public void SetRasterizerDescFillMode(FillMode fillmode = FillMode.Solid) 
+    public void SetRasterizerDescFillMode(FillMode fillmode = FillMode.Solid)
     {
         RasterizerDescription.FillMode = fillmode;
         RasterizerDescription.CullMode = fillmode == FillMode.Solid ? CullMode.Back : CullMode.None;
         RasterizerDescription.FrontCounterClockwise = true;
     }
 
-    public void SetPrimitiveTopology(PrimitiveTopology primitiveTopology) => 
+    public void SetPrimitiveTopology(PrimitiveTopology primitiveTopology) =>
         PrimitiveTopology = primitiveTopology;
 
     public void SetConstantBuffer(int slot, ID3D11Buffer constantBuffer) =>
@@ -72,10 +78,10 @@ public struct RenderData
     public void SetViewport(Size size) =>
         DeviceContext.RSSetViewport(new Viewport(0, 0, size.Width, size.Height, 0.0f, 1.0f));
 
-    public void SetupRenderState(int vertexStride, int vertexOffset, Format indexFormat = Format.R16_UInt, int indexOffset = 0)
+    public void SetupRenderState(Format indexFormat = Format.R16_UInt, int vertexOffset = 0, int indexOffset = 0)
     {
         DeviceContext.IASetInputLayout(InputLayout);
-        DeviceContext.IASetVertexBuffer(0, VertexBuffer, vertexStride, vertexOffset);
+        DeviceContext.IASetVertexBuffer(0, VertexBuffer, VertexStride, vertexOffset);
         DeviceContext.IASetIndexBuffer(IndexBuffer, indexFormat, indexOffset);
         DeviceContext.IASetPrimitiveTopology(PrimitiveTopology);
         DeviceContext.VSSetShader(VertexShader);

@@ -28,8 +28,10 @@ public sealed class Transform : Component, IHide
     public Vector3 Scale => Parent is null ? LocalScale : LocalScale * Parent.Scale;
     public Vector3 LocalScale = Vector3.One;
 
-    private PerModelConstantBuffer _modelConstantBuffer;
+    public Matrix4x4 WorldMatrix => _worldMatrix;
     private Matrix4x4 _worldMatrix;
+
+    private PerModelConstantBuffer _modelConstantBuffer;
 
     public override void OnRegister() =>
         // Register the component with the TransformSystem.
