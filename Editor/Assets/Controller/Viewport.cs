@@ -2,10 +2,10 @@
 using Microsoft.UI.Xaml;
 using SharpGen.Runtime;
 using System;
-using WinUIEx;
 
 using Engine.Editor;
 using Engine.Utilities;
+using WinUIEx;
 
 using static Editor.Controller.Helper;
 
@@ -72,13 +72,11 @@ internal partial class Viewport(ModelView.Viewport viewport, Grid content)
                 CreateFlyoutButton(
                     CreateIcon(Symbol.Video),
                     StackInGridVertical(
-                        CreateSlider(
-                            ViewportController.Instance?.Entity.ID,
+                        CreateSlider(null,
                             ViewportController.Camera, "FOV",
                             90, 40, 110)
                             .WrapInGridVertical("Field Of View"),
-                        CreateNumberInput(
-                            ViewportController.Instance?.Entity.ID,
+                        CreateNumberInput(null,
                             ViewportController.Instance, "_movementSpeed",
                             1, 100)
                             .WrapInGridVertical("Movement Speed"))),
@@ -101,15 +99,13 @@ internal partial class Viewport(ModelView.Viewport viewport, Grid content)
 
                 CreateFlyoutButtonWithValue(
                     CreateIcon("\xE80A"), 10,
-                    CreateNumberInput(
-                        ViewportController.Instance?.Entity.ID,
+                    CreateNumberInput(null,
                         ViewportController.Instance, "_movementSpeed",
                         10, 1, 100)
                         .WrapInGridVertical("Grid Snap")),
                 CreateFlyoutButtonWithValue(
                     CreateIcon(Symbol.Rotate), 15,
-                    CreateNumberInput(
-                        ViewportController.Instance?.Entity.ID,
+                    CreateNumberInput(null,
                         ViewportController.Instance, "_rotationSpeed",
                         15, 1, 90)
                         .WrapInGridVertical("Rotation Snap")),
@@ -136,7 +132,7 @@ internal partial class Viewport
             Spacing = 6,
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Top,
-            Margin = new Thickness(32, 8, 8, 8)
+            Margin = new(32, 8, 8, 8)
         };
 
         foreach (var item in content)
@@ -154,7 +150,7 @@ internal partial class Viewport
             Spacing = 6,
             HorizontalAlignment = HorizontalAlignment.Right,
             VerticalAlignment = VerticalAlignment.Top,
-            Margin = new Thickness(8, 8, 32, 8)
+            Margin = new(8, 8, 32, 8)
         };
 
         foreach (var item in content)
@@ -172,7 +168,7 @@ internal partial class Viewport
             Spacing = 6,
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Bottom,
-            Margin = new Thickness(32, 8, 8, 8)
+            Margin = new(32, 8, 8, 8)
         };
 
         foreach (var item in content)
@@ -190,7 +186,7 @@ internal partial class Viewport
             Spacing = 6,
             HorizontalAlignment = HorizontalAlignment.Right,
             VerticalAlignment = VerticalAlignment.Bottom,
-            Margin = new Thickness(8, 8, 32, 8)
+            Margin = new(8, 8, 32, 8)
         };
 
         foreach (var item in content)

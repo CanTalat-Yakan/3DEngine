@@ -40,7 +40,7 @@ namespace Engine.ECS
         public string Tag;
         public string Layer;
 
-        public Scene Scene { get => _scene is null ? _scene = SceneManager.GetFromEntityID(ID) : _scene; set => _scene = null; }
+        public Scene Scene { get => _scene is not null ? _scene : _scene = SceneManager.GetFromEntityID(ID); set => _scene = null; }
         private Scene _scene;
 
         public Transform Transform => _transform;
@@ -141,9 +141,6 @@ namespace Engine.ECS
 
         public Entity Clone()
         {
-            //var newEntity = (Entity)MemberwiseClone();
-            //newEntity.ID = Guid.NewGuid();
-
             // Create a new Entity object with a new ID and set its properties.
             var newEntity = new Entity()
             {
