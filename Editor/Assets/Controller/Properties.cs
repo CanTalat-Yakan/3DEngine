@@ -169,7 +169,7 @@ internal partial class Properties
                     .AddContentFlyout(CreateDefaultMenuFlyout(entity, component)));
 
                 // Add an event handler to remove the current component from the stack panel when it's destroyed.
-                component._eventOnDestroy += (s, e) => s_stackPanel.Children.Remove(tmp);
+                component.EventOnDestroy += (s, e) => s_stackPanel.Children.Remove(tmp);
             }
 
             // Add an event handler to update the current stackPanel when a new component is added.

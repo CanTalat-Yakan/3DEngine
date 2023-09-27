@@ -6,7 +6,7 @@ public class Component : ICloneable
     [Hide] public byte Order = 0;
     [Hide] public bool IsEnabled;
 
-    [Hide] public event EventHandler _eventOnDestroy;
+    [Hide] public event EventHandler EventOnDestroy;
 
     public Component() =>
         OnRegister();
@@ -29,7 +29,7 @@ public class Component : ICloneable
 
     public void InvokeEventOnDestroy() => 
         // Invoke the Event when the Component is destroyed.
-        _eventOnDestroy(this, null);
+        EventOnDestroy(this, null);
 
     object ICloneable.Clone() =>
         Clone();

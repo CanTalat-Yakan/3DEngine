@@ -11,10 +11,10 @@ public sealed class Camera : Component
     public float FOV = 90;
     public byte CameraID = 0;
 
+    private Renderer _renderer => Renderer.Instance;
+
     private ID3D11Buffer _view;
     private ViewConstantBuffer _viewConstantBuffer;
-
-    private Renderer _renderer => Renderer.Instance;
 
     public override void OnRegister() =>
         // Register the component with the CameraSystem.

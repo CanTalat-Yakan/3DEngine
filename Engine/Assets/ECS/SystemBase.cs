@@ -3,6 +3,13 @@ using System.Linq;
 
 namespace Engine.ECS;
 
+internal class CameraSystem : SystemBase<Camera> { }
+internal class TransformSystem : SystemBase<Transform> { }
+internal class MeshSystem : SystemBase<Mesh> { }
+
+public class ScriptSystem : SystemBase<Component> { }
+public class EditorScriptSystem : SystemBase<EditorComponent> { }
+
 public partial class SystemBase<T> where T : Component
 {
     public static T[] Components => s_componentsArray;
@@ -16,7 +23,7 @@ public partial class SystemBase<T> where T : Component
         s_components.Add(component);
 
         // Register the component's OnDestroy event.
-        component._eventOnDestroy += (s, e) => Destroy(component);
+        component.EventOnDestroy += (s, e) => Destroy(component);
     }
 
     public static void Destroy(T component)
@@ -126,9 +133,3 @@ public partial class SystemBase<T> where T : Component
                 component.OnRender();
     }
 }
-
-internal class CameraSystem : SystemBase<Camera> { }
-internal class TransformSystem : SystemBase<Transform> { }
-internal class MeshSystem : SystemBase<Mesh> { }
-public class ScriptSystem : SystemBase<Component> { }
-public class EditorScriptSystem : SystemBase<EditorComponent> { }
