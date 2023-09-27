@@ -48,7 +48,7 @@
             <ScrollViewer>
                 <StackPanel Spacing="20" Padding="50">
                     <Grid HorizontalAlignment="Stretch" CornerRadius="5">
-                        <Image Height="250" Stretch="UniformToFill" Source="/Assets/Resources/Textures/BG.png" />
+                        <Image Height="450" Stretch="UniformToFill" Source="/Assets/Resources/Textures/BG_2.png" />
 
                         <StackPanel Padding="50">
                             <TextBlock FontSize="28" FontWeight="SemiBold" Foreground="Black" Text="3D Engine"/>
