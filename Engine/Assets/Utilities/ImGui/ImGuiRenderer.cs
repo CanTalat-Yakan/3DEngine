@@ -135,7 +135,8 @@ unsafe public sealed class ImGuiRenderer
 
         #region // Setup Render State
         _data.PrimitiveTopology = PrimitiveTopology.TriangleList;
-        _data.SetupRenderState(sizeof(ImDrawVert), 0, sizeof(ImDrawIdx) == 2 ? Format.R16_UInt : Format.R32_UInt);
+        _data.VertexStride = sizeof(ImDrawVert);
+        _data.SetupRenderState(sizeof(ImDrawIdx) == 2 ? Format.R16_UInt : Format.R32_UInt);
         #endregion
 
         #region // Render command lists
