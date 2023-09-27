@@ -29,8 +29,7 @@ This library supports net8.0 using modern .NET API, see [CHANGELOG](https://gith
 The Entity Component System is an architectural pattern often used in video game development. It facilitates code reusability by separating the data from the behavior. In addition, ECS obeys the "composition over inheritance principle," providing improved flexibility and helping developers identify entities in a game's scene where all the objects are classified as entities. One reason ECS is faster than a game object component system is that you put all the data you need together in the same place in memory. Doing so avoids the performance overhead of having to search around to find it.
 
 # Build
-In order to compile, make sure **no spaces** are present in the solution path otherwise SharpGen will fail to generate bindings.
-Also, you need to install [Visual Studio 2022 Preview](https://visualstudio.microsoft.com/vs/preview/) with the following components:
+In order to compile, you need to install [Visual Studio 2022 Preview](https://visualstudio.microsoft.com/vs/preview/) with the following components:
 
 - [x] [Windows 11 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk)
 - [x] [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)
