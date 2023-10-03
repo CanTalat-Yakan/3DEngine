@@ -89,14 +89,14 @@ internal class Binding
 
         foreach (var component in entity.Components.ToArray())
             foreach (var field in component.GetType().GetFields(AllBindingFlags))
-                EntityBindings.Add(field.Name + component.ToString() + entity.ID, new(component, field.Name));
+                EntityBindings.Add(field.Name + component.GetType().FullName + entity.ID, new(component, field.Name));
     }
 
     /// <summary>
-    /// [Renderer Key = Field.Name + Component.ToString()]   
+    /// [Renderer Key = Field.Name + Component.GetType().FullName]   
     /// [Scene Key = Field.Name + Scene.ID]  
     /// [Entity Key = Field.Name + Entity.ID]    
-    /// [Component Key = Field.Name + Component.ToString() + Entity.ID]  
+    /// [Component Key = Field.Name + Component.GetType().FullName + Entity.ID]  
     /// </summary>
     public static BindEntry Get(string key, Dictionary<string, BindEntry> dictionary = null)
     {
@@ -111,6 +111,25 @@ internal class Binding
 
         return null;
     }
+
+    public static BindEntry GetBinding(string fieldName, object component, object entityID)
+    {
+        return entityID is not null
+            ? GetEntityBinding(fieldName, component, entityID)
+            : GetRendererBinding(fieldName, component);
+    }
+
+    public static BindEntry GetRendererBinding(string fieldName, object component) =>
+        Get(fieldName + component?.GetType().FullName, RendererBindings);
+
+    public static BindEntry GetSceneBinding(string fieldName, object sceneID) =>
+        Get(fieldName + sceneID, SceneBindings);
+
+    public static BindEntry GetEntityBinding(string fieldName, object component, object entityID) =>
+        Get(fieldName + component?.GetType().FullName + entityID, EntityBindings);
+
+    public static BindEntry GetEntityBinding(string fieldName, object entityID) =>
+        Get(fieldName + entityID, EntityBindings);
 
     private static void UpdateSceneBindings()
     {
@@ -141,15 +160,15 @@ internal class Binding
         UpdateBindings(entity, entity.ID, EntityBindings);
 
         foreach (var component in entity.Components.ToArray())
-            UpdateBindings(component, component.ToString() + entity.ID, EntityBindings);
+            UpdateBindings(component, component.GetType().FullName + entity.ID, EntityBindings);
     }
 
-    private static void UpdateBindings(object source, object sufix, Dictionary<string, BindEntry> bindings)
+    private static void UpdateBindings(object source, object keySufix, Dictionary<string, BindEntry> bindings)
     {
         if (source is not null)
             foreach (var field in source.GetType().GetFields(AllBindingFlags))
                 foreach (var bindName in bindings.Keys)
-                    if (string.Equals(field.Name + sufix, bindName)
+                    if (string.Equals(field.Name + keySufix, bindName)
                         && bindings.TryGetValue(bindName, out var bindEntry)
                         && !Equals(field.GetValue(source), bindEntry.Value))
                         ProcessBindEntry(bindEntry, field, source);
@@ -255,11 +274,10 @@ internal class Binding
 
     public static void Remove(Guid? guid)
     {
-        if (SceneBindings is not null)
-            if (guid is not null)
-                foreach (var bind in SceneBindings.ToArray())
-                    if (bind.Key.Contains(guid.ToString()))
-                        SceneBindings.Remove(bind.Key);
+        if (SceneBindings is not null && guid is not null)
+            foreach (var bind in SceneBindings.ToArray())
+                if (bind.Key.Contains(guid.ToString()))
+                    SceneBindings.Remove(bind.Key);
     }
 
     public static void Dispose()

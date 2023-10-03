@@ -185,7 +185,7 @@ internal partial class Helper
     {
         TextBox textBox = new() { Text = placeholder, MaxWidth = 200 };
 
-        Binding.Get(fieldName + source + id)?.Set(textBox, "Text", "TextChanging");
+        Binding.GetBinding(fieldName, source, id)?.Set(textBox, "Text", "TextChanging");
 
         return StackInGrid(textBox);
     }
@@ -195,7 +195,7 @@ internal partial class Helper
         NumberBox numberBox = new() { Value = value, Minimum = min, Maximum = max, MaxWidth = 200 };
         numberBox.SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline;
 
-        Binding.Get(fieldName + source + id)?.Set(numberBox, "Value", "ValueChanged");
+        Binding.GetBinding(fieldName, source, id)?.Set(numberBox, "Value", "ValueChanged");
 
         return StackInGrid(numberBox);
     }
@@ -205,7 +205,7 @@ internal partial class Helper
         NumberBox numberBox = new() { Value = value, Minimum = min, Maximum = max, MaxWidth = 200 };
         numberBox.SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline;
 
-        Binding.Get(fieldName + source + id)?.Set(numberBox, "Value", "ValueChanged");
+        Binding.GetBinding(fieldName, source, id)?.Set(numberBox, "Value", "ValueChanged");
 
         return StackInGrid(numberBox);
     }
@@ -215,9 +215,9 @@ internal partial class Helper
         Slider slider = new() { Value = value, Minimum = min, Maximum = max, Width = 180, Margin = new(0, 0, 0, -5.5) };
         TextBlock numberPreview = new() { Padding = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
 
-        Binding.Get(fieldName + source + id)?.Set(slider, "Value", "ValueChanged");
-        Binding.Get(fieldName + source + id)?.SetEvent((s, e) =>
-            numberPreview.Text = Binding.Get(fieldName + source + id)?.Value.ToString());
+        Binding.GetBinding(fieldName, source, id)?.Set(slider, "Value", "ValueChanged");
+        Binding.GetBinding(fieldName, source, id)?.SetEvent((s, e) =>
+            numberPreview.Text = Binding.GetBinding(fieldName, source, id)?.Value.ToString());
 
         return StackInGrid(slider, numberPreview);
     }
@@ -226,7 +226,7 @@ internal partial class Helper
     {
         NumberBoxVector2 numberBoxVector2 = new() { Value = value };
 
-        Binding.Get(fieldName + source + id)?.Set(numberBoxVector2, "Value", "ValueChanged");
+        Binding.GetBinding(fieldName, source, id)?.Set(numberBoxVector2, "Value", "ValueChanged");
 
         return numberBoxVector2.GetStackInGrid();
     }
@@ -235,7 +235,7 @@ internal partial class Helper
     {
         NumberBoxVector2 numberBoxVector2 = new() { Value = value };
 
-        Binding.Get(fieldName + source + id)?.Set(numberBoxVector2, "Value", "ValueChanged");
+        Binding.GetBinding(fieldName, source, id)?.Set(numberBoxVector2, "Value", "ValueChanged");
 
         return numberBoxVector2.GetStackInGridWithRG();
     }
@@ -244,7 +244,7 @@ internal partial class Helper
     {
         NumberBoxVector3 numberBoxVector3 = new() { Value = value };
 
-        Binding.Get(fieldName + source + id)?.Set(numberBoxVector3, "Value", "ValueChanged");
+        Binding.GetBinding(fieldName, source, id)?.Set(numberBoxVector3, "Value", "ValueChanged");
 
         return numberBoxVector3.GetStackInGrid();
     }
@@ -253,7 +253,7 @@ internal partial class Helper
     {
         NumberBoxVector3 numberBoxVector3 = new() { Value = value };
 
-        Binding.Get(fieldName + source + id)?.Set(numberBoxVector3, "Value", "ValueChanged");
+        Binding.GetBinding(fieldName, source, id)?.Set(numberBoxVector3, "Value", "ValueChanged");
 
         return numberBoxVector3.GetStackInGridWithRGB();
     }
@@ -262,7 +262,7 @@ internal partial class Helper
     {
         CheckBox checkBox = new() { IsChecked = value, Margin = new(0, 0, 0, -5.5) };
 
-        Binding.Get(fieldName + source + id)?.Set(checkBox, "IsChecked", "Click");
+        Binding.GetBinding(fieldName, source, id)?.Set(checkBox, "IsChecked", "Click");
 
         return StackInGrid(checkBox);
     }
@@ -536,16 +536,17 @@ internal static partial class ExtensionMethods
 
         if (bindScene)
         {
-            Binding.Get("IsEnabled" + id, Binding.SceneBindings)?.Set(toggleButton, "IsChecked", "Click");
-            Binding.Get("Name" + id, Binding.SceneBindings)?.Set(toggleButton, "Content");
+            Binding.GetSceneBinding("IsEnabled", id)?.Set(toggleButton, "IsChecked", "Click");
+            Binding.GetSceneBinding("Name", id)?.Set(toggleButton, "Content");
         }
         else
-            Binding.Get("IsEnabled" + source + id)?.Set(toggleButton, "IsChecked", "Click");
+            Binding.GetBinding("IsEnabled", source, id)?.Set(toggleButton, "IsChecked", "Click");
 
         return grid;
     }
 
-    public static Grid WrapInExpanderWithEditableHeader(this Grid content, string text, object id, object source)
+    public static Grid WrapInExpanderWithEditableHeader(this Grid content,
+        object id, string text)
     {
         Grid grid = new();
         Expander expander = new()
@@ -560,7 +561,7 @@ internal static partial class ExtensionMethods
 
         grid.Children.Add(expander);
 
-        Binding.Get("Name" + id, Binding.SceneBindings)?.Set(expander, "Header");
+        Binding.GetEntityBinding("Name", id)?.Set(expander, "Header");
 
         return grid;
     }
@@ -589,8 +590,8 @@ internal static partial class ExtensionMethods
 
         grid.Children.Add(expander);
 
-        Binding.Get("IsEnabled" + id)?.Set(checkBox, "IsChecked", "Click");
-        Binding.Get("Name" + id)?.Set(textBox, "Text", "TextChanging");
+        Binding.GetEntityBinding("IsEnabled", id)?.Set(checkBox, "IsChecked", "Click");
+        Binding.GetEntityBinding("Name", id)?.Set(textBox, "Text", "TextChanging");
 
         return grid;
     }
