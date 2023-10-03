@@ -26,6 +26,8 @@ unsafe public sealed class ImGuiRenderer
 
     private ID3D11Buffer _viewConstantBuffer;
 
+    private ID3D11SamplerState _samplerState;
+    private ID3D11ShaderResourceView _resourceView;
     private Dictionary<IntPtr, ID3D11ShaderResourceView> _textureResources = new();
 
     public ImGuiRenderer()
@@ -135,8 +137,11 @@ unsafe public sealed class ImGuiRenderer
 
         #region // Setup Render State
         _data.PrimitiveTopology = PrimitiveTopology.TriangleList;
-        _data.VertexStride = sizeof(ImDrawVert);
-        _data.SetupRenderState(sizeof(ImDrawIdx) == 2 ? Format.R16_UInt : Format.R32_UInt);
+        _data.SetupRenderState(
+            sizeof(ImDrawIdx) == 2 ? Format.R16_UInt : Format.R32_UInt, 
+            sizeof(ImDrawVert));
+        _data.SetSamplerState(0, _samplerState);
+        _data.SetResourceView(0, _resourceView);
         #endregion
 
         #region // Render command lists
@@ -282,11 +287,11 @@ unsafe public sealed class ImGuiRenderer
             ViewDimension = ShaderResourceViewDimension.Texture2D,
             Texture2D = new Texture2DShaderResourceView { MipLevels = texDesc.MipLevels, MostDetailedMip = 0 }
         };
-        _data.ResourceView = _device.CreateShaderResourceView(texture, resViewDesc);
+        _resourceView = _device.CreateShaderResourceView(texture, resViewDesc);
         texture.Release();
 
-        var id = _data.ResourceView.NativePointer;
-        _textureResources.Add(id, _data.ResourceView);
+        var id = _resourceView.NativePointer;
+        _textureResources.Add(id, _resourceView);
 
         io.Fonts.TexID = id;
 
@@ -301,6 +306,6 @@ unsafe public sealed class ImGuiRenderer
             MinLOD = 0f,
             MaxLOD = 0f
         };
-        _data.SamplerState = _device.CreateSamplerState(samplerDesc);
+        _samplerState = _device.CreateSamplerState(samplerDesc);
     }
 }

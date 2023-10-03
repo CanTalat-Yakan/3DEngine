@@ -61,7 +61,7 @@ public sealed class Mesh : Component
             _material.UpdateConstantBuffer(Entity.Transform.GetConstantBuffer());
 
             // Draw the mesh directly without resetting the RenderState.
-            _renderer.DrawDirect(IndexCount);
+            _renderer.DrawIndexed(IndexCount);
         }
         else
         {

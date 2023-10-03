@@ -19,7 +19,7 @@ public sealed class Material
     private ID3D11InputLayout _inputLayout;
 
     private ID3D11ShaderResourceView _resourceView;
-    private ID3D11SamplerState _sampler;
+    private ID3D11SamplerState _samplerState;
 
     private ID3D11Buffer _model;
 
@@ -87,7 +87,7 @@ public sealed class Material
         };
 
         // Create the sampler state using the sampler state description.
-        _sampler = _renderer.Device.CreateSamplerState(samplerStateDescription);
+        _samplerState = _renderer.Device.CreateSamplerState(samplerStateDescription);
         #endregion
     }
 
@@ -97,7 +97,9 @@ public sealed class Material
 
         // Set input layout, vertex shader, and pixel shader in the device context.
         // Set the shader resource and sampler in the pixel shader stage of the device context.
-        _renderer.Data.SetupMaterial(_inputLayout, _vertexShader, _pixelShader, _sampler, _resourceView);
+        _renderer.Data.SetupMaterial(_inputLayout, _vertexShader, _pixelShader);
+        _renderer.Data.SetSamplerState(0, _samplerState);
+        _renderer.Data.SetResourceView(0, _resourceView);
         
         // Assign material to the static variable.
         CurrentMaterialOnGPU = this;

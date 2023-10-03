@@ -220,7 +220,7 @@ public sealed class Renderer
         Data.DeviceContext.DrawIndexed(indexCount, 0, 0);
     }
 
-    public void DrawDirect(int indexCount) =>
+    public void DrawIndexed(int indexCount, int startIndexLocation = 0, int baseVertexLocation = 0) =>
         Data.DeviceContext.DrawIndexed(indexCount, 0, 0);
 
     public void Clear()
@@ -245,22 +245,7 @@ public sealed class Renderer
     {
         // Dispose all DirectX resources that were created.
         Device?.Dispose();
-        Data.DeviceContext?.Dispose();
-
-        // Dispose of the swap chain.
-        Data.SwapChain?.Dispose();
-
-        // Dispose of the render target texture and view.
-        Data.RenderTargetTexture?.Dispose();
-        Data.RenderTargetView?.Dispose();
-
-        // Dispose of the depth stencil texture and view.
-        Data.DepthStencilTexture?.Dispose();
-        Data.DepthStencilView?.Dispose();
-
-        // Dispose of the blend state.
-        Data.BlendState?.Dispose();
-
+        Data.Dispose();
     }
 
     public void Resize(int newWidth, int newHeight)

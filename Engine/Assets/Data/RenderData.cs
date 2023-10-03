@@ -9,8 +9,6 @@ namespace Engine.Data;
 
 public struct RenderData
 {
-    public RenderData() { }
-
     public ID3D11DeviceContext DeviceContext;
 
     public SwapChainDescription1 SwapChainDescription;
@@ -42,13 +40,7 @@ public struct RenderData
 
     public ID3D11InputLayout InputLayout;
 
-    public ID3D11SamplerState SamplerState;
-    public ID3D11ShaderResourceView ResourceView;
-
     public PrimitiveTopology PrimitiveTopology;
-
-    public int VertexStride = Unsafe.SizeOf<Vertex>();
-    public int IndexStride = Unsafe.SizeOf<int>();
 
     public bool VSync;
     public bool SuperSample;
@@ -75,19 +67,25 @@ public struct RenderData
     public void SetConstantBuffer(int slot, ID3D11Buffer constantBuffer) =>
         DeviceContext.VSSetConstantBuffer(slot, constantBuffer);
 
+    public void SetResourceView(int slot, params ID3D11ShaderResourceView[] resourceViews) =>
+        DeviceContext.PSSetShaderResources(slot, resourceViews);
+
+    public void SetSamplerState(int slot, params ID3D11SamplerState[] samplerStates) =>
+        DeviceContext.PSSetSamplers(slot, samplerStates);
+
     public void SetViewport(Size size) =>
         DeviceContext.RSSetViewport(new Viewport(0, 0, size.Width, size.Height, 0.0f, 1.0f));
 
-    public void SetupRenderState(Format indexFormat = Format.R16_UInt, int vertexOffset = 0, int indexOffset = 0)
+    public void SetupRenderState(Format indexFormat = Format.R16_UInt, int? vertexStride = null, int vertexOffset = 0, int indexOffset = 0)
     {
+        vertexStride = vertexStride is not null ? vertexStride.Value : Unsafe.SizeOf<Vertex>();
+
         DeviceContext.IASetInputLayout(InputLayout);
-        DeviceContext.IASetVertexBuffer(0, VertexBuffer, VertexStride, vertexOffset);
+        DeviceContext.IASetVertexBuffer(0, VertexBuffer, vertexStride.Value, vertexOffset);
         DeviceContext.IASetIndexBuffer(IndexBuffer, indexFormat, indexOffset);
         DeviceContext.IASetPrimitiveTopology(PrimitiveTopology);
         DeviceContext.VSSetShader(VertexShader);
         DeviceContext.PSSetShader(PixelShader);
-        DeviceContext.PSSetSampler(0, SamplerState);
-        DeviceContext.PSSetShaderResource(0, ResourceView);
 
         DeviceContext.OMSetBlendState(BlendState);
         DeviceContext.OMSetDepthStencilState(DepthStencilState);
@@ -97,14 +95,26 @@ public struct RenderData
     public void SetupMaterial(
         ID3D11InputLayout inputLayout,
         ID3D11VertexShader vertexShader,
-        ID3D11PixelShader pixelShader,
-        ID3D11SamplerState sampler,
-        ID3D11ShaderResourceView resourceView)
+        ID3D11PixelShader pixelShader)
     {
         InputLayout = inputLayout;
         VertexShader = vertexShader;
         PixelShader = pixelShader;
-        SamplerState = sampler;
-        ResourceView = resourceView;
+    }
+
+    public void Dispose()
+    {
+        DeviceContext?.Dispose();
+        SwapChain?.Dispose();
+        RenderTargetTexture?.Dispose();
+        RenderTargetView?.Dispose();
+        BlendState?.Dispose();
+        DepthStencilTexture?.Dispose();
+        DepthStencilView?.Dispose();
+        VertexBuffer?.Dispose();
+        IndexBuffer?.Dispose();
+        VertexShader?.Dispose();
+        PixelShader?.Dispose();
+        InputLayout?.Dispose();
     }
 }
