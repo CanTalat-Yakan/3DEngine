@@ -221,7 +221,7 @@ public sealed class Renderer
     }
 
     public void DrawIndexed(int indexCount, int startIndexLocation = 0, int baseVertexLocation = 0) =>
-        Data.DeviceContext.DrawIndexed(indexCount, 0, 0);
+        Data.DeviceContext.DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
 
     public void Clear()
     {
