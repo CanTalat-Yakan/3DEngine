@@ -2,10 +2,10 @@
 using Microsoft.UI.Xaml;
 using SharpGen.Runtime;
 using System;
+using WinRT.Interop;
 
 using Engine.Editor;
 using Engine.Utilities;
-using WinUIEx;
 
 using static Editor.Controller.Helper;
 
@@ -21,8 +21,8 @@ internal partial class Viewport(ModelView.Viewport viewport, Grid content)
 
     public void InitializeEngineCore(Renderer renderer, out Engine.Core engineCore)
     {
-        var hWnd = (Application.Current as App)?.Window.GetWindowHandle();
-        engineCore = new Engine.Core(renderer, hWnd.Value, Files.AssetsPath);
+        var hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
+        engineCore = new Engine.Core(renderer, hwnd, Files.AssetsPath);
 
         engineCore.Renderer.Data.SetVsync(false);
         engineCore.Renderer.Data.SetSuperSample(true);

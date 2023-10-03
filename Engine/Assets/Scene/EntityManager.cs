@@ -38,9 +38,9 @@ namespace Engine.Utilities
         public void Remove(T item, bool invokeEvent = true)
         {
             if (OnRemove is not null)
-            if (invokeEvent)
-                // Raises the OnRemoveEvent event.
-                OnRemove(this, item);
+                if (invokeEvent)
+                    // Raises the OnRemoveEvent event.
+                    OnRemove(this, item);
 
             // Removes an item from the list.
             base.Remove(item);
