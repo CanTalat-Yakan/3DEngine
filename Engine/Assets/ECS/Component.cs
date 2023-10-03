@@ -12,7 +12,6 @@ public partial class Component : ICloneable
         OnRegister();
 
     public void InvokeEventOnDestroy() =>
-        // Invoke the Event when the Component is destroyed.
         EventOnDestroy(this, null);
 
     object ICloneable.Clone() =>
