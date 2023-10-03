@@ -29,7 +29,7 @@ class AppWindow
     public void Render()
     {
         _imGuiRenderer.Update(_imGuiContext, Core.Instance.Renderer.Size);
-        _imGuiInputHandler.Update(Core.Instance.Renderer.Data.SuperSample);
+        _imGuiInputHandler.Update(Core.Instance.Renderer.Config.SuperSample);
 
         ImGui.ShowDemoWindow();
 

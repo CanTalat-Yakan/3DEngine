@@ -24,8 +24,8 @@ internal partial class Viewport(ModelView.Viewport viewport, Grid content)
         var hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
         engineCore = new Engine.Core(renderer, hwnd, Files.AssetsPath);
 
-        engineCore.Renderer.Data.SetVsync(false);
-        engineCore.Renderer.Data.SetSuperSample(true);
+        engineCore.Renderer.Config.SetVsync(false);
+        engineCore.Renderer.Config.SetSuperSample(true);
 
         engineCore.OnInitialize += (s, e) =>
         {
@@ -81,8 +81,10 @@ internal partial class Viewport(ModelView.Viewport viewport, Grid content)
                             1, 100)
                             .WrapInGridVertical("Movement Speed"))),
                 CreateAppBarSeperator(),
-                CreateComboBox(new[] { "Perspective", "Orthogonal" }),
-                CreateComboBox(new[] { "Shaded", "Wireframe", "Shaded + Wireframe" })
+                CreateComboBox<Engine.Data.CameraProjection>(
+                    Engine.Core.Instance.Renderer.Config, "CameraProjection"),
+                CreateComboBox<Engine.Data.RenderMode>(
+                    Engine.Core.Instance.Renderer.Config, "RenderMode")
         };
 
         // Initialize an array of UI elements to be positioned in the top-right corner of the main content.

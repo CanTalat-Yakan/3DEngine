@@ -42,15 +42,6 @@ public struct RenderData
 
     public PrimitiveTopology PrimitiveTopology;
 
-    public bool VSync;
-    public bool SuperSample;
-
-    public void SetVsync(bool b) =>
-        VSync = b;
-
-    public void SetSuperSample(bool b) =>
-        SuperSample = b;
-
     public void SetRasterizerDescFillModeWireframe() =>
         SetRasterizerDescFillMode(FillMode.Wireframe);
 

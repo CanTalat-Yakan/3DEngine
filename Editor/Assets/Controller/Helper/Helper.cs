@@ -56,16 +56,7 @@ internal partial class Helper
 
 internal partial class Helper
 {
-    internal static ComboBox CreateComboBox(params string[] items)
-    {
-        ComboBox comboBox = new() { Height = 33, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
-
-        foreach (var item in items)
-            comboBox.Items.Add(item);
-
-        return comboBox;
-    }
-
+    // TODO: Add Bindings to every method in this partial class, to be moved into the next partial class.
     internal static UIElement CreateToggleButton(Grid icon, bool isChecked = false)
     {
         Viewbox viewbox = new() { Width = 16, Height = 16 };
@@ -181,6 +172,18 @@ internal partial class Helper
 
 internal partial class Helper
 {
+    internal static ComboBox CreateComboBox<T>(object source, string fieldName) where T : Enum
+    {
+        ComboBox comboBox = new() { Height = 33, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
+
+        foreach (var item in Enum.GetNames(typeof(T)))
+            comboBox.Items.Add(item.FormatString());
+
+        Binding.GetRendererBinding(fieldName, source)?.Set(comboBox, "SelectedItem", "SelectionChanged");
+
+        return comboBox;
+    }
+
     internal static Grid CreateTextInput(object id, object source, string fieldName, string placeholder = "Example")
     {
         TextBox textBox = new() { Text = placeholder, MaxWidth = 200 };
@@ -491,10 +494,7 @@ internal static partial class ExtensionMethods
 
         return grid;
     }
-}
 
-internal static partial class ExtensionMethods
-{
     public static Grid WrapInExpander(this Grid content, string text)
     {
         Grid grid = new() { Margin = new(0, 0, 0, 2) };
@@ -513,7 +513,10 @@ internal static partial class ExtensionMethods
 
         return grid;
     }
+}
 
+internal static partial class ExtensionMethods
+{
     public static Grid WrapInExpanderWithToggleButton(this Grid content, ref Grid reference,
         object id, object source, bool bindScene = false)
     {

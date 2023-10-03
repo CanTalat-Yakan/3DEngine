@@ -56,12 +56,15 @@ public sealed class Core
         // Compile all project scripts and add components for the editor's "AddComponent" function.
         RuntimeCompiler.CompileProjectScripts(AssetsPath);
 
-        // Copies the List to the local array once to savely iterate to it.
-        SceneManager.ProcessSystems();
+        OnInitialize += (s, e) =>
+        {
+            // Copies the List to the local array once to savely iterate to it.
+            SceneManager.ProcessSystems();
 
-        // Render Pipeline Init
-        SceneManager.Awake();
-        SceneManager.Start();
+            // Render Pipeline Init
+            SceneManager.Awake();
+            SceneManager.Start();
+        };
 
         Output.Log("Engine Initialized...");
     }
