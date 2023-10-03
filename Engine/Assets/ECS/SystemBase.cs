@@ -3,14 +3,14 @@ using System.Linq;
 
 namespace Engine.ECS;
 
-internal class CameraSystem : SystemBase<Camera> { }
-internal class TransformSystem : SystemBase<Transform> { }
-internal class MeshSystem : SystemBase<Mesh> { }
+internal class CameraSystem : System<Camera> { }
+internal class TransformSystem : System<Transform> { }
+internal class MeshSystem : System<Mesh> { }
 
-public class ScriptSystem : SystemBase<Component> { }
-public class EditorScriptSystem : SystemBase<EditorComponent> { }
+public class ScriptSystem : System<Component> { }
+public class EditorScriptSystem : System<EditorComponent> { }
 
-public partial class SystemBase<T> where T : Component
+public partial class System<T> where T : Component
 {
     public static T[] Components => s_componentsArray;
 
@@ -77,7 +77,7 @@ public partial class SystemBase<T> where T : Component
         component.Entity.ActiveInHierarchy;
 }
 
-public partial class SystemBase<T> where T : Component
+public partial class System<T> where T : Component
 {
     public static void Awake()
     {
