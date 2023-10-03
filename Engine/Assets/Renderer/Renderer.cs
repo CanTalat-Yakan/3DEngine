@@ -208,7 +208,7 @@ public sealed class Renderer
         // Present the final render to the screen.
         Data.SwapChain.Present(Data.VSync ? 1 : 0, PresentFlags.None);
 
-    public void Draw(ID3D11Buffer vertexBuffer, ID3D11Buffer indexBuffer, int indexCount, int vertexOffset = 0, int indexOffset = 0)
+    public void Draw(ID3D11Buffer vertexBuffer, ID3D11Buffer indexBuffer, int indexCount)
     {
         Data.VertexBuffer = vertexBuffer;
         Data.IndexBuffer = indexBuffer;
