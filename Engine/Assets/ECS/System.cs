@@ -3,12 +3,12 @@ using System.Linq;
 
 namespace Engine.ECS;
 
-internal class CameraSystem : System<Camera> { }
-internal class TransformSystem : System<Transform> { }
-internal class MeshSystem : System<Mesh> { }
+internal sealed class CameraSystem : System<Camera> { }
+internal sealed class TransformSystem : System<Transform> { }
+internal sealed class MeshSystem : System<Mesh> { }
 
-public class ScriptSystem : System<Component> { }
-public class EditorScriptSystem : System<EditorComponent> { }
+public sealed class ScriptSystem : System<Component> { }
+public sealed class EditorScriptSystem : System<EditorComponent> { }
 
 public partial class System<T> where T : Component
 {
