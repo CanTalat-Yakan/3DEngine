@@ -70,7 +70,7 @@ public sealed class Mesh : Component
 
             // Draw the mesh with trianglelist.
             _renderer.Data.SetPrimitiveTopology(PrimitiveTopology.TriangleList);
-            _renderer.Draw(VertexBuffer, IndexBuffer, IndexCount, 0, 0);
+            _renderer.Draw(VertexBuffer, IndexBuffer, IndexCount);
 
             // Assign meshInfo to the static variable.
             CurrentMeshOnGPU = _meshInfo;
