@@ -1,6 +1,8 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System;
@@ -9,8 +11,6 @@ using Windows.Foundation;
 using Engine.Editor;
 using Engine.ECS;
 using Engine.Utilities;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using System.Diagnostics;
 
 namespace Editor.Controller;
 
