@@ -73,7 +73,7 @@ public sealed class Camera : Component
 
         /* The coordinate system used in System.Numerics is right-handed,
          * so adjustments need to be made for DirectX's left-handed coordinate system.
-         * The index order must be flipped from 0,1,2 to 0,2,1,
+         * The index order must be flipped from 0,1,2 to 0,2,1.
          * (Renderer:SetRasterizerDesc FrontCounterClockWise = true)
          * and the texture coordinates in DirectX are flipped along the Y-axis,
          * with 0,0 starting in the top-left corner and going down to 0,1.
