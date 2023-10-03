@@ -639,9 +639,6 @@ internal partial class Hierarchy
     /// <summary>
     /// This method returns an Entity object with the specified GUID, optionally searching in a specific SceneEntry.
     /// </summary>
-    /// <param name="guid"></param>
-    /// <param name="sceneEntry"></param>
-    /// <returns></returns>
     public Entity GetEntity(Guid guid, SceneEntry sceneEntry = null)
     {
         Entity entity;
@@ -667,9 +664,6 @@ internal partial class Hierarchy
     /// <summary>
     /// This method returns an Entity object corresponding to the given TreeEntry and optionally searching in a specific SceneEntry.
     /// </summary>
-    /// <param name="entry"></param>
-    /// <param name="sceneEntry"></param>
-    /// <returns></returns>
     public Entity GetEntity(TreeEntry entry, SceneEntry sceneEntry = null)
     {
         // If entry is null, return null.
@@ -684,9 +678,6 @@ internal partial class Hierarchy
     /// This method retrieves an Entity object corresponding to the given TreeEntry and optionally searching in a specific SceneEntry,
     /// and stores it in the out parameter 'entity'.
     /// </summary>
-    /// <param name="entity"></param>
-    /// <param name="entry"></param>
-    /// <param name="sceneEntry"></param>
     public void GetEntity(out Entity entity, TreeEntry entry, SceneEntry sceneEntry = null) =>
         entity = GetEntity(entry.ID, sceneEntry);
 
@@ -694,19 +685,12 @@ internal partial class Hierarchy
     /// This method retrieves an Entity object with the specified GUID, optionally searching in a specific SceneEntry,
     /// and stores it in the out parameter 'entity'.
     /// </summary>
-    /// <param name="entity"></param>
-    /// <param name="guid"></param>
-    /// <param name="sceneEntry"></param>
     public void GetEntity(out Entity entity, Guid guid, SceneEntry sceneEntry = null) =>
         entity = GetEntity(guid, sceneEntry);
 
     /// <summary>
     /// This method retrieves two Scene objects corresponding to the given SceneEntry objects, and stores them in the out parameters 'sourceScene' and 'targetScene'.
     /// </summary>
-    /// <param name="sourceScene"></param>
-    /// <param name="targetScene"></param>
-    /// <param name="sourceSceneEntry"></param>
-    /// <param name="targetSceneEntry"></param>
     public void GetScenes(out Scene sourceScene, out Scene targetScene, SceneEntry sourceSceneEntry, SceneEntry targetSceneEntry)
     {
         sourceScene = null;
@@ -722,8 +706,6 @@ internal partial class Hierarchy
     /// This method sets the parent TreeEntry of the given TreeViewIconNodes to the given newParent,
     /// and updates the parent Entity of each affected Entity accordingly.
     /// </summary>
-    /// <param name="newParent"></param>
-    /// <param name="treeViewIconNodes"></param>
     public void SetNewParentTreeEntry(TreeViewIconNode newParent, params TreeViewIconNode[] treeViewIconNodes)
     {
         // If newParent is null, do nothing.
@@ -741,8 +723,6 @@ internal partial class Hierarchy
     /// <summary>
     /// This method copies the given GUID to the clipboard with the given operation.
     /// </summary>
-    /// <param name="guid"></param>
-    /// <param name="requestedOpertion"></param>
     private void CopyToClipboard(Guid guid, DataPackageOperation requestedOpertion)
     {
         // Create a new DataPackage object and set its text to the given GUID.
@@ -759,8 +739,6 @@ internal partial class Hierarchy
     /// <summary>
     /// This method resets the clipboard to only paste an entity once.
     /// </summary>
-    /// <param name="guid"></param>
-    /// <param name="requestedOpertion"></param>
     private void ResetClipboard()
     {
         // Create a new DataPackage object and set its text to the given GUID.
@@ -776,7 +754,6 @@ internal partial class Hierarchy
     /// <summary>
     /// This method pastes an entity from the clipboard to an Entity with the given Guid.
     /// </summary>
-    /// <param name="guid"></param>
     public async void PasteEntityFromClipboardAsnyc(Guid guid)
     {
         // Get the content from the clipboard.
@@ -798,7 +775,6 @@ internal partial class Hierarchy
     /// <summary>
     /// This method pastes an entity from clipboard to a specific scene.
     /// </summary>
-    /// <param name="sceneEntry"></param>
     public async void PasteEntityFromClipboardAsync(SceneEntry sceneEntry)
     {
         // Get the content from the clipboard.
@@ -820,9 +796,6 @@ internal partial class Hierarchy
     /// <summary>
     /// This method is used to paste an entity into a target entity as a child with a requested operation.
     /// </summary>
-    /// <param name="sourceEntityGuid"></param>
-    /// <param name="targetEntityGuid"></param>
-    /// <param name="requestedOperation"></param>
     public void PasteEntity(Guid sourceEntityGuid, Guid targetEntityGuid, DataPackageOperation requestedOperation)
     {
         // Prevent pasting the entity into itself.
@@ -906,9 +879,6 @@ internal partial class Hierarchy
     /// <summary>
     /// This method is used to paste an entity into a target scene entry with a requested operation.
     /// </summary>
-    /// <param name="sourceEntityGuid"></param>
-    /// <param name="targetSceneEntry"></param>
-    /// <param name="requestedOperation"></param>
     public void PasteEntity(Guid sourceEntityGuid, SceneEntry targetSceneEntry, DataPackageOperation requestedOperation)
     {
         // Get the source tree entry, entity and target tree entry from their respective GUIDs.
@@ -977,10 +947,6 @@ internal partial class Hierarchy
     /// <summary>
     /// This method is used to migrate an icon node to a new parent and scene.
     /// </summary>
-    /// <param name="sourceTreeEntry"></param>
-    /// <param name="sourceSceneEntry"></param>
-    /// <param name="targetTreeEntry"></param>
-    /// <param name="targetSceneEntry"></param>
     public void MigrateIconNodeBetweenTreeEntries(TreeEntry sourceTreeEntry, SceneEntry sourceSceneEntry, TreeEntry targetTreeEntry, SceneEntry targetSceneEntry)
     {
         // Check if the scenes are different, since there is no need to migrate entities if they are in the same scene.
@@ -1017,9 +983,6 @@ internal partial class Hierarchy
     /// This method migrates entities from a source scene to a target scene recursively,
     /// updating the entity lists and the scene of the migrated entities as needed.
     /// </summary>
-    /// <param name="sourceScene"></param>
-    /// <param name="targetScene"></param>
-    /// <param name="treeEntries"></param>
     public void MigrateEntityBetweenScenesRecurisivally(Scene sourceScene, Scene targetScene, params TreeEntry[] treeEntries)
     {
         // Check if the scenes are different, since there is no need to migrate entities if they are in the same scene.

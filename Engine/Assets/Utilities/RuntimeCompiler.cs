@@ -7,191 +7,190 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Engine.Utilities
+namespace Engine.Utilities;
+
+internal sealed class ScriptEntry
 {
-    internal sealed class ScriptEntry
+    public FileInfo FileInfo;
+    public Script<object> Script;
+    public Assembly Assembly;
+}
+
+public sealed class ComponentCollector
+{
+    public List<Type> Components = new();
+
+    public Type GetComponent(string name) =>
+        Components.Find(Type => Type.Name.ToString() == name);
+}
+
+public sealed class RuntimeCompiler
+{
+    public ComponentCollector ComponentCollector = new();
+
+    private Dictionary<string, ScriptEntry> _scriptsCollection = new();
+    private List<Assembly> _ignoreAssemblies = new();
+
+    public void CompileProjectScripts(string assetsPath = null)
     {
-        public FileInfo FileInfo;
-        public Script<object> Script;
-        public Assembly Assembly;
-    }
+        if (assetsPath is null)
+            return;
 
-    public sealed class ComponentCollector
-    {
-        public List<Type> Components = new();
+        string scriptsFolderPath = Path.Combine(assetsPath, "Scripts");
+        if (!Directory.Exists(scriptsFolderPath))
+            return;
 
-        public Type GetComponent(string name) =>
-            Components.Find(Type => Type.Name.ToString() == name);
-    }
+        ScriptOptions scriptOptions = CreateScriptOptions();
 
-    public sealed class RuntimeCompiler
-    {
-        public ComponentCollector ComponentCollector = new();
-
-        private Dictionary<string, ScriptEntry> _scriptsCollection = new();
-        private List<Assembly> _ignoreAssemblies = new();
-
-        public void CompileProjectScripts(string assetsPath = null)
+        foreach (var path in Directory.GetFiles(scriptsFolderPath, "*", SearchOption.AllDirectories))
         {
-            if (assetsPath is null)
-                return;
+            ScriptEntry scriptEntry = GetScriptEntry(path);
 
-            string scriptsFolderPath = Path.Combine(assetsPath, "Scripts");
-            if (!Directory.Exists(scriptsFolderPath))
-                return;
-
-            ScriptOptions scriptOptions = CreateScriptOptions();
-
-            foreach (var path in Directory.GetFiles(scriptsFolderPath, "*", SearchOption.AllDirectories))
-            {
-                ScriptEntry scriptEntry = GetScriptEntry(path);
-
-                if (scriptEntry != null)
-                    CompileScript(scriptEntry, scriptOptions);
-            }
-
-            RemoveObsoleteScripts();
-            CollectComponents();
+            if (scriptEntry != null)
+                CompileScript(scriptEntry, scriptOptions);
         }
 
-        private ScriptOptions CreateScriptOptions() =>
-            ScriptOptions.Default
-                .WithImports("System")
-                .WithReferences(typeof(Core).Assembly)
-                .WithAllowUnsafe(true)
-                .WithCheckOverflow(true);
+        RemoveObsoleteScripts();
+        CollectComponents();
+    }
 
-        private ScriptEntry GetScriptEntry(string path)
+    private ScriptOptions CreateScriptOptions() =>
+        ScriptOptions.Default
+            .WithImports("System")
+            .WithReferences(typeof(Core).Assembly)
+            .WithAllowUnsafe(true)
+            .WithCheckOverflow(true);
+
+    private ScriptEntry GetScriptEntry(string path)
+    {
+        FileInfo fileInfo = new(path);
+
+        if (_scriptsCollection.TryGetValue(fileInfo.FullName, out ScriptEntry scriptEntry))
         {
-            FileInfo fileInfo = new(path);
-
-            if (_scriptsCollection.TryGetValue(fileInfo.FullName, out ScriptEntry scriptEntry))
+            if (fileInfo.LastWriteTime > scriptEntry.FileInfo.LastWriteTime)
             {
-                if (fileInfo.LastWriteTime > scriptEntry.FileInfo.LastWriteTime)
-                {
-                    scriptEntry.FileInfo = fileInfo;
-                    string updatedCode = File.ReadAllText(path);
-                    scriptEntry.Script = CSharpScript.Create(updatedCode, CreateScriptOptions());
+                scriptEntry.FileInfo = fileInfo;
+                string updatedCode = File.ReadAllText(path);
+                scriptEntry.Script = CSharpScript.Create(updatedCode, CreateScriptOptions());
 
-                    Output.Log("Updated file");
-                }
-                else
-                    scriptEntry = null;
+                Output.Log("Updated file");
             }
             else
-            {
-                using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
-                using (StreamReader reader = new StreamReader(fs))
-                {
-                    scriptEntry = new ScriptEntry() { FileInfo = fileInfo };
-                    string code = reader.ReadToEnd();
-                    scriptEntry.Script = CSharpScript.Create(code, CreateScriptOptions());
-                    _scriptsCollection.Add(fileInfo.FullName, scriptEntry);
-
-                    Output.Log("Read new file");
-                }
-            }
-
-            return scriptEntry;
+                scriptEntry = null;
         }
-
-        private void CompileScript(ScriptEntry scriptEntry, ScriptOptions scriptOptions)
+        else
         {
-            try
+            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+            using (StreamReader reader = new StreamReader(fs))
             {
-                Compilation compilation = scriptEntry.Script.GetCompilation();
+                scriptEntry = new ScriptEntry() { FileInfo = fileInfo };
+                string code = reader.ReadToEnd();
+                scriptEntry.Script = CSharpScript.Create(code, CreateScriptOptions());
+                _scriptsCollection.Add(fileInfo.FullName, scriptEntry);
 
-                compilation = compilation.WithOptions(compilation.Options
-                   .WithOptimizationLevel(OptimizationLevel.Debug)
-                   .WithOutputKind(OutputKind.DynamicallyLinkedLibrary));
-
-                using (var assemblyStream = new MemoryStream())
-                using (var symbolStream = new MemoryStream())
-                {
-                    var emitOptions = new EmitOptions(false, DebugInformationFormat.PortablePdb);
-                    var result = compilation.Emit(assemblyStream, symbolStream, options: emitOptions);
-
-                    if (!result.Success)
-                    {
-                        LogCompilationErrors(result, scriptEntry);
-
-                        return;
-                    }
-
-                    if (scriptEntry.Assembly != null)
-                        _ignoreAssemblies.Add(scriptEntry.Assembly);
-
-                    scriptEntry.Assembly = Assembly.Load(assemblyStream.ToArray(), symbolStream.ToArray());
-                    ReplaceComponentTypeReferences(scriptEntry.Assembly);
-
-                    Output.Log("Loaded assembly");
-                }
-            }
-            catch { }
-        }
-
-        private void LogCompilationErrors(EmitResult result, ScriptEntry scriptEntry)
-        {
-            foreach (var error in result.Diagnostics)
-            {
-                Output.Log(
-                    string.Join("\r\n", error),
-                    error.WarningLevel == 0
-                        ? MessageType.Error
-                        : MessageType.Warning,
-                    error.Location.GetLineSpan().StartLinePosition.Line,
-                    null,
-                    scriptEntry.FileInfo.Name);
+                Output.Log("Read new file");
             }
         }
 
-        private void RemoveObsoleteScripts()
+        return scriptEntry;
+    }
+
+    private void CompileScript(ScriptEntry scriptEntry, ScriptOptions scriptOptions)
+    {
+        try
         {
-            foreach (var fullName in _scriptsCollection.Keys.ToArray())
-                if (!_scriptsCollection[fullName].FileInfo.Exists)
+            Compilation compilation = scriptEntry.Script.GetCompilation();
+
+            compilation = compilation.WithOptions(compilation.Options
+               .WithOptimizationLevel(OptimizationLevel.Debug)
+               .WithOutputKind(OutputKind.DynamicallyLinkedLibrary));
+
+            using (var assemblyStream = new MemoryStream())
+            using (var symbolStream = new MemoryStream())
+            {
+                var emitOptions = new EmitOptions(false, DebugInformationFormat.PortablePdb);
+                var result = compilation.Emit(assemblyStream, symbolStream, options: emitOptions);
+
+                if (!result.Success)
                 {
-                    var assembly = _scriptsCollection[fullName].Assembly;
-                    _ignoreAssemblies.Add(assembly);
+                    LogCompilationErrors(result, scriptEntry);
 
-                    DestroyComponentTypeReferences(assembly);
-
-                    _scriptsCollection.Remove(fullName);
-
-                    Output.Log("Removed file");
+                    return;
                 }
-        }
 
-        private void CollectComponents()
+                if (scriptEntry.Assembly != null)
+                    _ignoreAssemblies.Add(scriptEntry.Assembly);
+
+                scriptEntry.Assembly = Assembly.Load(assemblyStream.ToArray(), symbolStream.ToArray());
+                ReplaceComponentTypeReferences(scriptEntry.Assembly);
+
+                Output.Log("Loaded assembly");
+            }
+        }
+        catch { }
+    }
+
+    private void LogCompilationErrors(EmitResult result, ScriptEntry scriptEntry)
+    {
+        foreach (var error in result.Diagnostics)
         {
-            var componentCollection = AppDomain.CurrentDomain.GetAssemblies()
-                .Except(_ignoreAssemblies)
-                .SelectMany(a => a.GetTypes())
-                .Where(t =>
-                    typeof(Component).IsAssignableFrom(t) && !t.Equals(typeof(Component))
-                    && !(typeof(IHide).IsAssignableFrom(t) && !t.IsInterface))
-                .ToArray();
-
-            ComponentCollector.Components.Clear();
-            ComponentCollector.Components.AddRange(componentCollection);
+            Output.Log(
+                string.Join("\r\n", error),
+                error.WarningLevel == 0
+                    ? MessageType.Error
+                    : MessageType.Warning,
+                error.Location.GetLineSpan().StartLinePosition.Line,
+                null,
+                scriptEntry.FileInfo.Name);
         }
+    }
 
-        private void DestroyComponentTypeReferences(Assembly assembly)
-        {
-            foreach (var type in assembly.GetTypes())
-                if (type.IsSubclassOf(typeof(EditorComponent)))
-                    EditorScriptSystem.Destroy(type);
-                else if (type.IsSubclassOf(typeof(Component)))
-                    ScriptSystem.Destroy(type);
-        }
+    private void RemoveObsoleteScripts()
+    {
+        foreach (var fullName in _scriptsCollection.Keys.ToArray())
+            if (!_scriptsCollection[fullName].FileInfo.Exists)
+            {
+                var assembly = _scriptsCollection[fullName].Assembly;
+                _ignoreAssemblies.Add(assembly);
 
-        private void ReplaceComponentTypeReferences(Assembly assembly)
-        {
-            foreach (var type in assembly.GetTypes())
-                if (type.IsSubclassOf(typeof(Component)))
-                    foreach (var ignoreAssembly in _ignoreAssemblies)
-                        foreach (var ignoreType in ignoreAssembly.GetTypes())
-                            if (type.FullName == ignoreType.FullName)
-                                ScriptSystem.Replace(ignoreType, type);
-        }
+                DestroyComponentTypeReferences(assembly);
+
+                _scriptsCollection.Remove(fullName);
+
+                Output.Log("Removed file");
+            }
+    }
+
+    private void CollectComponents()
+    {
+        var componentCollection = AppDomain.CurrentDomain.GetAssemblies()
+            .Except(_ignoreAssemblies)
+            .SelectMany(a => a.GetTypes())
+            .Where(t =>
+                typeof(Component).IsAssignableFrom(t) && !t.Equals(typeof(Component))
+                && !(typeof(IHide).IsAssignableFrom(t) && !t.IsInterface))
+            .ToArray();
+
+        ComponentCollector.Components.Clear();
+        ComponentCollector.Components.AddRange(componentCollection);
+    }
+
+    private void DestroyComponentTypeReferences(Assembly assembly)
+    {
+        foreach (var type in assembly.GetTypes())
+            if (type.IsSubclassOf(typeof(EditorComponent)))
+                EditorScriptSystem.Destroy(type);
+            else if (type.IsSubclassOf(typeof(Component)))
+                ScriptSystem.Destroy(type);
+    }
+
+    private void ReplaceComponentTypeReferences(Assembly assembly)
+    {
+        foreach (var type in assembly.GetTypes())
+            if (type.IsSubclassOf(typeof(Component)))
+                foreach (var ignoreAssembly in _ignoreAssemblies)
+                    foreach (var ignoreType in ignoreAssembly.GetTypes())
+                        if (type.FullName == ignoreType.FullName)
+                            ScriptSystem.Replace(ignoreType, type);
     }
 }

@@ -96,7 +96,9 @@ public partial class App : Application
     }
 
     private Window window;
-    public Window Window => window; 
+    public Window Window => window;
     // USE CASE: var window = (Application.Current as App)?.Window as MainWindow;
     // USE CASE: var hWnd = (Application.Current as App)?.Window.GetWindowHandle();
+    // var hwnd = WinRT.Interop.WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
+
 }

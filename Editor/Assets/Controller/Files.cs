@@ -15,6 +15,7 @@ using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.Storage;
 using Windows.UI;
+using WinRT.Interop;
 
 namespace Editor.Controller;
 
@@ -119,8 +120,8 @@ internal partial class Files
         // Make sure to get the HWND from a Window object,
         // pass a Window reference to GetWindowHandle
         // and initialize picker with handle.
-        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+        var hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
+        InitializeWithWindow.Initialize(picker, hwnd);
 
         // Pick multiple files using the picker and store the result in "files".
         var files = await picker.PickMultipleFilesAsync();
@@ -1230,10 +1231,10 @@ internal partial class Files
 
         dynamic icon;
 
-        if (string.IsNullOrEmpty(_category.Glyph))
-            icon = CreateIcon(_category.Symbol);
-        else
+        if (!string.IsNullOrEmpty(_category.Glyph))
             icon = CreateIcon(_category.Glyph);
+        else
+            icon = CreateIcon(_category.Symbol);
 
         grid.Children.Add(icon);
 
@@ -1244,7 +1245,7 @@ internal partial class Files
     {
         Grid grid = new();
 
-        FontIcon icon = new FontIcon() { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = glyph };
+        FontIcon icon = new() { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = glyph };
 
         grid.Children.Add(icon);
 
