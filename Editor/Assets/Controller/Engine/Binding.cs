@@ -40,12 +40,12 @@ internal class BindEntry(object source, string sourcePath)
 
 internal class Binding
 {
-    // Key = Field + Component.ToString()
+    // Key = Field + Component.GetType().FullName
     public static Dictionary<string, BindEntry> RendererBindings = new();
     // Key = Field + Scene.ID
     public static Dictionary<string, BindEntry> SceneBindings = new();
     // Key = Field + Entity.ID
-    // Key = Field + Component.ToString() + Entity.ID
+    // Key = Field + Component.GetType().FullName + Entity.ID
     public static Dictionary<string, BindEntry> EntityBindings = new();
 
     public static BindingFlags AllBindingFlags =
@@ -67,6 +67,7 @@ internal class Binding
             "FOV" + ViewportController.Camera?.GetType(),
             new(ViewportController.Camera, "FOV"));
     }
+
     public static void SetBindings(Scene scene)
     {
         if (scene is null)
