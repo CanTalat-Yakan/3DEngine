@@ -139,7 +139,7 @@ internal class Binding
 
         foreach (var entry in SceneBindings.Where(kv => kv.Key.Contains("Scene@")))
             if (entry.Value.Source is Scene scene)
-                UpdateBindings(scene, scene.ID, SceneBindings);
+                UpdateBinding(scene, scene.ID, SceneBindings);
     }
 
     private static void UpdateRendererBindings()
@@ -148,7 +148,7 @@ internal class Binding
             return;
 
         foreach (var source in RendererBindings.Select(kv => kv.Value.Source).ToArray())
-            UpdateBindings(source, source, RendererBindings);
+            UpdateBinding(source, source, RendererBindings);
     }
 
     private static void UpdateEntityBindings()
@@ -158,13 +158,13 @@ internal class Binding
 
         Entity entity = EntityBindings.FirstOrDefault().Value.Source as Entity;
 
-        UpdateBindings(entity, entity.ID, EntityBindings);
+        UpdateBinding(entity, entity.ID, EntityBindings);
 
         foreach (var component in entity.Components.ToArray())
-            UpdateBindings(component, component.GetType().FullName + entity.ID, EntityBindings);
+            UpdateBinding(component, component.GetType().FullName + entity.ID, EntityBindings);
     }
 
-    private static void UpdateBindings(object source, object keySufix, Dictionary<string, BindEntry> bindings)
+    private static void UpdateBinding(object source, object keySufix, Dictionary<string, BindEntry> bindings)
     {
         if (source is not null)
             foreach (var field in source.GetType().GetFields(AllBindingFlags))
