@@ -1,12 +1,10 @@
-﻿using System.Runtime.CompilerServices;
-
-using Vortice.Direct3D11;
-
-namespace Engine.Components;
+﻿namespace Engine.Components;
 
 public sealed class Camera : Component
 {
     public static Camera Main { get; private set; }
+
+    public CameraBuffers CameraBuffer { get; private set; } = new();
 
     public CameraProjection Projection = CameraProjection.Perspective;
     [Space]
@@ -18,16 +16,13 @@ public sealed class Camera : Component
 
     private Renderer _renderer => Renderer.Instance;
 
-    private ID3D11Buffer _view;
-    private ViewConstantBuffer _viewConstantBuffer;
-
     public override void OnRegister() =>
         // Register the component with the CameraSystem.
         CameraSystem.Register(this);
 
     public Camera() =>
         //Create View Constant Buffer when Camera is initialized.
-        _view = _renderer.Device.CreateConstantBuffer<ViewConstantBuffer>();
+        CameraBuffer.View = _renderer.Device.CreateConstantBuffer<ViewConstantBuffer>();
 
     public override void OnAwake()
     {
@@ -46,7 +41,6 @@ public sealed class Camera : Component
 
     public void RecreateViewConstants()
     {
-        #region //Set ViewConstantBuffer
         // Calculate the view matrix to use for the camera.
         var view = Matrix4x4.CreateLookAt(
             Entity.Transform.Position,
@@ -71,12 +65,11 @@ public sealed class Camera : Component
         var viewProjection = Matrix4x4.Transpose(view * projection);
 
         // Store the camera's view-projection matrix and position.
-        _viewConstantBuffer = new()
+        CameraBuffer.ViewConstantBuffer = new()
         {
             ViewProjection = viewProjection,
             CameraPosition = Entity.Transform.Position,
         };
-        #endregion
 
         /* The coordinate system used in System.Numerics is right-handed,
          * so adjustments need to be made for DirectX's left-handed coordinate system.
@@ -96,20 +89,7 @@ public sealed class Camera : Component
          * and System.Numerics returns row - major.
          */
 
-        #region //Update constant buffer data
-        // Map the constant buffer and copy the camera's view-projection matrix and position into it.
-        unsafe
-        {
-            // Map the constant buffer to memory for write access.
-            MappedSubresource mappedResource = _renderer.Data.DeviceContext.Map(_view, MapMode.WriteDiscard);
-            // Copy the data from the constant buffer to the mapped resource.
-            Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref _viewConstantBuffer);
-            // Unmap the constant buffer from memory.
-            _renderer.Data.DeviceContext.Unmap(_view, 0);
-        }
-        #endregion
-
-        // Set the constant buffer in the vertex shader stage of the device context.
-        _renderer.Data.SetConstantBuffer(0, _view);
+        //Update constant buffer data
+        CameraBuffer.UpdateConstantBuffer();
     }
 }

@@ -1,9 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
-
-using Vortice.Direct3D11;
-using Vortice.Direct3D;
 
 namespace Engine.Components;
 
@@ -11,20 +7,16 @@ public sealed class Mesh : Component
 {
     public string MeshPath;
 
-    [Hide] public static MeshInfo CurrentMeshOnGPU { get; private set; }
-    [Hide] public static List<MeshInfo> BatchLookup = new();
+    public static MeshInfo CurrentMeshOnGPU { get; private set; }
+    public static List<MeshInfo> BatchLookup { get; private set; } = new();
+
+    public MeshBuffers MeshBuffers { get; private set; } = new(); 
 
     public MeshInfo MeshInfo => _meshInfo;
     [Show] private MeshInfo _meshInfo;
 
     public Material Material => _material;
     [Show] private Material _material;
-
-    internal ID3D11Buffer VertexBuffer;
-    internal ID3D11Buffer IndexBuffer;
-
-    internal int VertexCount => _meshInfo.Vertices.Length;
-    internal int IndexCount => _meshInfo.Indices.Length;
 
     private Renderer _renderer => Renderer.Instance;
 
@@ -54,31 +46,31 @@ public sealed class Mesh : Component
 
     public override void OnRender()
     {
-        if (Equals(Material.CurrentMaterialOnGPU, _material)
-            && Equals(Mesh.CurrentMeshOnGPU, _meshInfo))
+        if (Equals(Material.CurrentMaterialOnGPU, Material)
+            && Equals(Mesh.CurrentMeshOnGPU, MeshInfo))
         {
             // Update the PerModelConstantBuffer only.
-            _material.UpdateConstantBuffer(Entity.Transform.GetConstantBuffer());
+            Material.UpdateConstantBuffer(Entity.Transform.GetConstantBuffer());
 
             // Draw the mesh directly without resetting the RenderState.
-            _renderer.DrawIndexed(IndexCount);
+            _renderer.DrawIndexed(MeshInfo.Indices.Length);
         }
         else
         {
             // Set the material's constant buffer to the entity's transform constant buffer.
-            _material.Set(Entity.Transform.GetConstantBuffer());
+            Material.Set(Entity.Transform.GetConstantBuffer());
 
             // Draw the mesh with trianglelist.
-            _renderer.Data.SetPrimitiveTopology(PrimitiveTopology.TriangleList);
-            _renderer.Draw(VertexBuffer, IndexBuffer, IndexCount);
+            _renderer.Data.SetPrimitiveTopology();
+            _renderer.Draw(MeshBuffers.VertexBuffer, MeshBuffers.IndexBuffer, MeshInfo.Indices.Length);
 
             // Assign meshInfo to the static variable.
-            CurrentMeshOnGPU = _meshInfo;
+            CurrentMeshOnGPU = MeshInfo;
         }
 
         // Increment the vertex, index and draw call count in the profiler.
-        Profiler.Vertices += VertexCount;
-        Profiler.Indices += IndexCount;
+        Profiler.Vertices += MeshInfo.Vertices.Length;
+        Profiler.Indices += MeshInfo.Indices.Length;
         Profiler.DrawCalls++;
     }
 
@@ -101,33 +93,10 @@ public sealed class Mesh : Component
         _meshInfo = meshInfo;
 
         // Call the "CreateBuffer" method to initialize the vertex and index buffer.
-        CreateBuffer();
+        MeshBuffers.CreateBuffer(MeshInfo);
     }
 
     public void SetMaterial(Material material) =>
         // Assign to local variable.
         _material = material;
-
-    public void Dispose()
-    {
-        VertexBuffer?.Dispose();
-        IndexBuffer?.Dispose();
-    }
-
-    private void CreateBuffer()
-    {
-        Dispose();
-
-        //Create a VertexBuffer using the MeshInfo's vertices
-        //and bind it with VertexBuffer flag.
-        VertexBuffer = _renderer.Device.CreateBuffer(
-            _meshInfo.Vertices,
-            BindFlags.VertexBuffer);
-
-        //Create an IndexBuffer using the MeshInfo's indices
-        //and bind it with IndexBuffer flag.
-        IndexBuffer = _renderer.Device.CreateBuffer(
-            _meshInfo.Indices,
-            BindFlags.IndexBuffer);
-    }
 }

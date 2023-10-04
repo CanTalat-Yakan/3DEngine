@@ -52,7 +52,7 @@ public struct RenderData
         RasterizerDescription.FrontCounterClockwise = true;
     }
 
-    public void SetPrimitiveTopology(PrimitiveTopology primitiveTopology) =>
+    public void SetPrimitiveTopology(PrimitiveTopology primitiveTopology = PrimitiveTopology.TriangleList) =>
         PrimitiveTopology = primitiveTopology;
 
     public void SetConstantBuffer(int slot, ID3D11Buffer constantBuffer) =>
