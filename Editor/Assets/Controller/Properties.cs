@@ -295,8 +295,6 @@ internal partial class Properties
         // Initialize a new List of Grid type.
         List<Grid> grid = new();
 
-        string entityIDcomponent = component.ToString() + entity.ID;
-
         var value = fieldInfo.GetValue(component);
         // Get the type of the current field.
         var type = fieldInfo.FieldType;
