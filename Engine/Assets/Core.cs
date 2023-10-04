@@ -117,11 +117,7 @@ public sealed class Core
         // Finishes the state of input processing.
         Input.LateUpdate();
 
-        // Renders the scene twice, once in solid mode and once in wireframe mode.
-        Renderer.Data.SetRasterizerDescFillMode();
-        SceneManager.Render();
-        //Renderer.Data.SetRasterizerDescFillModeWireframe();
-        //SceneManager.Render();
+        SetFillMode(Renderer.Config.RenderMode);
 
         OnRender?.Invoke(null, null);
 
@@ -142,6 +138,29 @@ public sealed class Core
         Renderer?.Dispose();
         Input.Dispose();
         OnDispose?.Invoke(null, null);
+    }
+
+    public void SetFillMode(RenderMode renderMode)
+    {
+        switch (Renderer.Config.RenderMode)
+        {
+            case RenderMode.Shaded:
+                Renderer.Data.SetRasterizerDescFillMode();
+                SceneManager.Render();
+                break;
+            case RenderMode.Wireframe:
+                Renderer.Data.SetRasterizerDescFillModeWireframe();
+                SceneManager.Render();
+                break;
+            case RenderMode.ShadedWireframe:
+                // Renders the scene twice,
+                // once in solid mode and once in wireframe mode.
+                Renderer.Data.SetRasterizerDescFillMode();
+                SceneManager.Render();
+                Renderer.Data.SetRasterizerDescFillModeWireframe();
+                SceneManager.Render();
+                break;
+        }
     }
 
     public void SetPlayMode(bool b) =>
