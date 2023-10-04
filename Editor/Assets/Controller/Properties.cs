@@ -463,11 +463,11 @@ internal partial class Properties
     }
 
     public Grid ReturnProcessedFieldInfo(List<Grid> grid, object[] attributes, FieldInfo fieldInfo, ToolTip toolTip) =>
-        (new Grid[] {
+        new Grid[] {
             // Stack processed attributes in a grid.
             ProcessAttributes(attributes).StackInGrid(),
             // Stack field grid and wrap it with field name.
-            grid.ToArray().StackInGrid().WrapInField(fieldInfo.Name)})
+            grid.ToArray().StackInGrid().WrapInField(fieldInfo.Name)}
         .StackInGrid(0).AddToolTip(toolTip);
 
     public Grid CreateFromEventInfo(EventInfo eventInfo, EventInfo[] nonPublic)
