@@ -1,35 +1,31 @@
 ﻿namespace Engine.Editor;
 
-public sealed class ToolTipAttribute : Attribute
+public sealed class ToolTipAttribute(string toolTip) : Attribute
 {
-    public string ToolTip;
-
-    public ToolTipAttribute(string toolTip)
-    {
-        ToolTip = toolTip;
-    }
+    public string ToolTip = toolTip;
 }
 
-public sealed class HeaderAttribute : Attribute
+public sealed class HeaderAttribute(string header) : Attribute
 {
-    public string CustomHeader;
-
-    public HeaderAttribute(string header)
-    {
-        CustomHeader = header;
-    }
+    public string CustomHeader = header;
 }
 
-public sealed class SliderAttribute : Attribute
+public sealed class SliderAttribute(double min, double max) : Attribute
 {
-    public double CustomMin;
-    public double CustomMax;
+    public double CustomMin = min;
+    public double CustomMax = max;
+}
 
-    public SliderAttribute(double min, double max)
-    {
-        CustomMin = min;
-        CustomMax = max;
-    }
+public sealed class IfAttribute(string fieldName, string value) : Attribute
+{
+    public string FieldName = fieldName;
+    public string Value = value;
+}
+
+public sealed class IfNotAttribute(string fieldName, string value) : Attribute
+{
+    public string FieldName = fieldName;
+    public string Value = value;
 }
 
 public sealed class SpaceAttribute : Attribute { }

@@ -26,6 +26,12 @@ public class Example : Component
     [Slider(1, 100)]
     public float Slider;
     public bool Bool;
+    [If("Bool", "true")]
+    [ShowOnly]
+    public string IfField = "This field is only visible if the bool is true";
+    [IfNot("Bool", "true")]
+    [ShowOnly]
+    public string IfNotField = "This field is only visible if the bool is not true";
     public Color Color;
     public Entity? _Entity;
     [Space]

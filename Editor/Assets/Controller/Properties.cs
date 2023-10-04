@@ -292,6 +292,8 @@ internal partial class Properties
 
     public Grid CreateFromFieldInfo(object component, Entity entity, FieldInfo fieldInfo, FieldInfo[] nonPublic)
     {
+        Grid finalGrid = null;
+
         // Initialize a new List of Grid type.
         List<Grid> grid = new();
 
@@ -322,142 +324,183 @@ internal partial class Properties
         {
             grid.Add(CreateTextWithOpacity(entity.ID, component, fieldInfo.Name, value.ToString()));
 
-            return ReturnProcessedFieldInfo(grid, attributes, fieldInfo, toolTip);
+            finalGrid = ReturnProcessedFieldInfo(grid, attributes, fieldInfo, toolTip);
+        }
+
+        #endregion
+
+        if (finalGrid is null)
+        {
+            #region // Process FieldType
+            // Check the type of the field and add the appropriate element to the `grid` list.
+            // Color
+            if (type == typeof(Color))
+                grid.Add(
+                    CreateColorButton(
+                        ((Color)value).R,
+                        ((Color)value).G,
+                        ((Color)value).B,
+                        ((Color)value).A));
+
+            // Byte
+            else if (type == typeof(byte))
+                // If the field has the `SliderAttribute`, add a slider element.
+                if (attributes.OfType<SliderAttribute>().Any())
+                    grid.Add(
+                        CreateSlider(
+                            entity.ID, component, fieldInfo.Name,
+                            (byte)value,
+                            (byte)attributes.OfType<SliderAttribute>().First().CustomMin,
+                            (byte)attributes.OfType<SliderAttribute>().First().CustomMax));
+                // If the field doesn't have the `SliderAttribute`, add a number input element.
+                else
+                    grid.Add(CreateNumberInput(
+                        entity.ID, component, fieldInfo.Name,
+                        (byte)value,
+                        byte.MinValue,
+                        byte.MaxValue));
+
+            // Int
+            else if (type == typeof(int))
+                // If the field has the `SliderAttribute`, add a slider element.
+                if (attributes.OfType<SliderAttribute>().Any())
+                    grid.Add(
+                        CreateSlider(
+                            entity.ID, component, fieldInfo.Name,
+                            (int)value,
+                            (int)attributes.OfType<SliderAttribute>().First().CustomMin,
+                            (int)attributes.OfType<SliderAttribute>().First().CustomMax));
+                // If the field doesn't have the `SliderAttribute`, add a number input element.
+                else
+                    grid.Add(CreateNumberInput(
+                        entity.ID, component, fieldInfo.Name,
+                        (int)value,
+                        int.MinValue,
+                        int.MaxValue));
+
+            // Float
+            else if (type == typeof(float))
+                // If the field has the `SliderAttribute`, add a slider element.
+                if (attributes.OfType<SliderAttribute>().Any())
+                    grid.Add(
+                        CreateSlider(
+                            entity.ID, component, fieldInfo.Name,
+                            (float)value,
+                            (float)attributes.OfType<SliderAttribute>().First().CustomMin,
+                            (float)attributes.OfType<SliderAttribute>().First().CustomMax));
+                // If the field doesn't have the `SliderAttribute`, add a number input element.
+                else
+                    grid.Add(CreateNumberInput(
+                        entity.ID, component, fieldInfo.Name,
+                        (float)value,
+                        float.MinValue,
+                        float.MaxValue));
+
+            // String
+            else if (type == typeof(string))
+                grid.Add(CreateTextInput(entity.ID, component, fieldInfo.Name, (string)value));
+
+            // Vector 2
+            else if (type == typeof(Vector2))
+                grid.Add(CreateVec2Input(entity.ID, component, fieldInfo.Name, (Vector2)value));
+
+            // Vector 3
+            else if (type == typeof(Vector3))
+                grid.Add(CreateVec3Input(entity.ID, component, fieldInfo.Name, (Vector3)value));
+
+            // Bool
+            else if (type == typeof(bool))
+                grid.Add(CreateBool(entity.ID, component, fieldInfo.Name, (bool)value));
+
+            // Enum
+            else if (type.IsEnum)
+                grid.Add(CreateComboBox(type, entity.ID, component, fieldInfo.Name, value.ToString()));
+
+            // Material
+            else if (type == typeof(Material))
+                grid.Add(CreateTextureSlot("None", "Material"));
+
+            // Texture
+            else if (type == typeof(Texture))
+                grid.Add(CreateTextureSlot("None", "Texture"));
+
+            // Entity
+            else if (type == typeof(Entity))
+                // Check if value is null.
+                if (value is null)
+                    // Add empty reference slot.
+                    grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
+                else
+                    // Add a reference slot with entity name.
+                    grid.Add(CreateReferenceSlot(((Entity)value).Name, type.ToString().FormatString()));
+
+            // Component.
+            else if (type == typeof(Component))
+                // Check if value is null.
+                if (value is null)
+                    // Add empty reference slot.
+                    grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
+                else
+                    // Add a reference slot with component.
+                    grid.Add(CreateReferenceSlot(((Component)value).ToString().FormatString(), type.ToString().FormatString()));
+
+            // Event.
+            else if (type == typeof(EventHandler))
+                // Check if value is null.
+                if (value is null)
+                    // Add empty reference slot.
+                    grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
+                else
+                    // Add a reference slot with event.
+                    grid.Add(CreateReferenceSlot(((EventHandler)value).ToString().SplitLast('.'), type.ToString().FormatString()));
+
+            // Handle default type value.
+            else
+                // Add empty reference slot.
+                grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
+            #endregion
+
+            // Return the final grid by stacking all the processed attributes, type grid and wrapping the field name.
+            finalGrid = ReturnProcessedFieldInfo(grid, attributes, fieldInfo, toolTip);
+        }
+
+        #region // Final Process Attributes
+        if (attributes.OfType<IfAttribute>().Any())
+        {
+            var attribute = attributes.OfType<IfAttribute>().First();
+            var bindEntry = Binding.GetBinding(attribute.FieldName, component, entity.ID);
+
+            bindEntry.Event += (s, e) =>
+            {
+                var result = Equals(
+                     attribute.Value.ToString(),
+                     bindEntry?.Value.ToString());
+
+                finalGrid.Visibility = result
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+            };
+        }
+
+        if (attributes.OfType<IfNotAttribute>().Any())
+        {
+            var attribute = attributes.OfType<IfNotAttribute>().First();
+            var bindEntry = Binding.GetBinding(attribute.FieldName, component, entity.ID);
+
+            bindEntry.Event += (s, e) =>
+            {
+                var result = Equals(
+                     attribute.Value.ToString(),
+                     bindEntry?.Value.ToString());
+
+                finalGrid.Visibility = result
+                    ? Visibility.Collapsed
+                    : Visibility.Visible;
+            };
         }
         #endregion
 
-        #region // Process FieldType
-        // Check the type of the field and add the appropriate element to the `grid` list.
-
-        // Color
-        if (type == typeof(Color))
-            grid.Add(
-                CreateColorButton(
-                    ((Color)value).R,
-                    ((Color)value).G,
-                    ((Color)value).B,
-                    ((Color)value).A));
-
-        // Byte
-        else if (type == typeof(byte))
-            // If the field has the `SliderAttribute`, add a slider element.
-            if (attributes.OfType<SliderAttribute>().Any())
-                grid.Add(
-                    CreateSlider(
-                        entity.ID, component, fieldInfo.Name,
-                        (byte)value,
-                        (byte)attributes.OfType<SliderAttribute>().First().CustomMin,
-                        (byte)attributes.OfType<SliderAttribute>().First().CustomMax));
-            // If the field doesn't have the `SliderAttribute`, add a number input element.
-            else
-                grid.Add(CreateNumberInput(
-                    entity.ID, component, fieldInfo.Name,
-                    (byte)value,
-                    byte.MinValue,
-                    byte.MaxValue));
-
-        // Int
-        else if (type == typeof(int))
-            // If the field has the `SliderAttribute`, add a slider element.
-            if (attributes.OfType<SliderAttribute>().Any())
-                grid.Add(
-                    CreateSlider(
-                        entity.ID, component, fieldInfo.Name,
-                        (int)value,
-                        (int)attributes.OfType<SliderAttribute>().First().CustomMin,
-                        (int)attributes.OfType<SliderAttribute>().First().CustomMax));
-            // If the field doesn't have the `SliderAttribute`, add a number input element.
-            else
-                grid.Add(CreateNumberInput(
-                    entity.ID, component, fieldInfo.Name,
-                    (int)value,
-                    int.MinValue,
-                    int.MaxValue));
-
-        // Float
-        else if (type == typeof(float))
-            // If the field has the `SliderAttribute`, add a slider element.
-            if (attributes.OfType<SliderAttribute>().Any())
-                grid.Add(
-                    CreateSlider(
-                        entity.ID, component, fieldInfo.Name,
-                        (float)value,
-                        (float)attributes.OfType<SliderAttribute>().First().CustomMin,
-                        (float)attributes.OfType<SliderAttribute>().First().CustomMax));
-            // If the field doesn't have the `SliderAttribute`, add a number input element.
-            else
-                grid.Add(CreateNumberInput(
-                    entity.ID, component, fieldInfo.Name,
-                    (float)value,
-                    float.MinValue,
-                    float.MaxValue));
-
-        // String
-        else if (type == typeof(string))
-            grid.Add(CreateTextInput(entity.ID, component, fieldInfo.Name, (string)value));
-
-        // Vector 2
-        else if (type == typeof(Vector2))
-            grid.Add(CreateVec2Input(entity.ID, component, fieldInfo.Name, (Vector2)value));
-
-        // Vector 3
-        else if (type == typeof(Vector3))
-            grid.Add(CreateVec3Input(entity.ID, component, fieldInfo.Name, (Vector3)value));
-
-        // Bool
-        else if (type == typeof(bool))
-            grid.Add(CreateBool(entity.ID, component, fieldInfo.Name, (bool)value));
-
-        // Enum
-        else if (type.IsEnum)
-            grid.Add(CreateComboBox(type, entity.ID, component, fieldInfo.Name, value.ToString()));
-
-        // Material
-        else if (type == typeof(Material))
-            grid.Add(CreateTextureSlot("None", "Material"));
-
-        // Texture
-        else if (type == typeof(Texture))
-            grid.Add(CreateTextureSlot("None", "Texture"));
-
-        // Entity
-        else if (type == typeof(Entity))
-            // Check if value is null.
-            if (value is null)
-                // Add empty reference slot.
-                grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
-            else
-                // Add a reference slot with entity name.
-                grid.Add(CreateReferenceSlot(((Entity)value).Name, type.ToString().FormatString()));
-
-        // Component.
-        else if (type == typeof(Component))
-            // Check if value is null.
-            if (value is null)
-                // Add empty reference slot.
-                grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
-            else
-                // Add a reference slot with component.
-                grid.Add(CreateReferenceSlot(((Component)value).ToString().FormatString(), type.ToString().FormatString()));
-
-        // Event.
-        else if (type == typeof(EventHandler))
-            // Check if value is null.
-            if (value is null)
-                // Add empty reference slot.
-                grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
-            else
-                // Add a reference slot with event.
-                grid.Add(CreateReferenceSlot(((EventHandler)value).ToString().SplitLast('.'), type.ToString().FormatString()));
-
-        // Handle default type value.
-        else
-            // Add empty reference slot.
-            grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
-        #endregion
-
-        // Return the final grid by stacking all the processed attributes, type grid and wrapping the field name.
-        return ReturnProcessedFieldInfo(grid, attributes, fieldInfo, toolTip);
+        return finalGrid;
     }
 
     public Grid ReturnProcessedFieldInfo(List<Grid> grid, object[] attributes, FieldInfo fieldInfo, ToolTip toolTip) =>

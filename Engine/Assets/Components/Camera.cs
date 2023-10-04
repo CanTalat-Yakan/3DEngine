@@ -8,7 +8,9 @@ public sealed class Camera : Component
 
     public CameraProjection Projection = CameraProjection.Perspective;
     [Space]
+    [If("Projection", "Perspective")]
     public float Size = 15;
+    [If("Projection", "Orthographic")]
     public float FOV = 90;
     public Vector2 Clipping = new Vector2(0.1f, 1000f);
     [Space]
