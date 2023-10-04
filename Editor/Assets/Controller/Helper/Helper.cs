@@ -240,7 +240,7 @@ internal partial class Helper
 
     internal static Grid CreateVec2Input(object id, object source, string fieldName, Vector2 value = new())
     {
-        NumberBoxVector2 numberBoxVector2 = new() { Value = value.Round() };
+        NumberBoxVector2 numberBoxVector2 = new() { Value = value };
 
         Binding.GetBinding(fieldName, source, id)?.Set(numberBoxVector2, "Value", "ValueChanged");
 
@@ -249,7 +249,7 @@ internal partial class Helper
 
     internal static Grid CreateVec2InputWithRG(object id, object source, string fieldName, Vector2 value = new())
     {
-        NumberBoxVector2 numberBoxVector2 = new() { Value = value.Round() };
+        NumberBoxVector2 numberBoxVector2 = new() { Value = value };
 
         Binding.GetBinding(fieldName, source, id)?.Set(numberBoxVector2, "Value", "ValueChanged");
 
@@ -258,7 +258,7 @@ internal partial class Helper
 
     internal static Grid CreateVec3Input(object id, object source, string fieldName, Vector3 value = new())
     {
-        NumberBoxVector3 numberBoxVector3 = new() { Value = value.Round() };
+        NumberBoxVector3 numberBoxVector3 = new() { Value = value };
 
         Binding.GetBinding(fieldName, source, id)?.Set(numberBoxVector3, "Value", "ValueChanged");
 
@@ -267,7 +267,7 @@ internal partial class Helper
 
     internal static Grid CreateVec3InputWithRGB(object id, object source, string fieldName, Vector3 value = new())
     {
-        NumberBoxVector3 numberBoxVector3 = new() { Value = value.Round() };
+        NumberBoxVector3 numberBoxVector3 = new() { Value = value };
 
         Binding.GetBinding(fieldName, source, id)?.Set(numberBoxVector3, "Value", "ValueChanged");
 
