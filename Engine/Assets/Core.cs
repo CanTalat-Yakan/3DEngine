@@ -9,6 +9,7 @@ global using Engine.Helper;
 global using Engine.Utilities;
 
 global using Key = Vortice.DirectInput.Key;
+using ImGuiNET;
 
 namespace Engine;
 
@@ -27,6 +28,10 @@ public sealed class Core
     public Renderer Renderer;
     public RuntimeCompiler RuntimeCompiler;
     public SceneManager SceneManager;
+
+    private ImGuiRenderer _imGuiRenderer;
+    private ImGuiInputHandler _imGuiInputHandler;
+    private IntPtr _imGuiContext;
 
     public Core(Renderer renderer, nint hwnd, string assetsPath = null) =>
         Initialize(renderer, hwnd, assetsPath);
@@ -48,16 +53,24 @@ public sealed class Core
         RuntimeCompiler = new();
         SceneManager = new();
 
-        // Creates an entity with the "Boot" editor tag and adds a "SceneBoot" component to it.
-        SceneManager.MainScene.EntityManager
-            .CreateEntity(null, "Boot", EditorTags.SceneBoot.ToString())
-            .AddComponent(new SceneBoot());
+        #region // ImGui
+        _imGuiContext = ImGui.CreateContext();
+        ImGui.SetCurrentContext(_imGuiContext);
 
-        // Compile all project scripts and add components for the editor's "AddComponent" function.
-        RuntimeCompiler.CompileProjectScripts(AssetsPath);
+        _imGuiRenderer = new();
+        _imGuiInputHandler = new(hwnd);
+        #endregion
 
         OnInitialize += (s, e) =>
         {
+            // Creates an entity with the "Boot" editor tag and adds a "SceneBoot" component to it.
+            SceneManager.MainScene.EntityManager
+                .CreateEntity(null, "Boot", EditorTags.SceneBoot.ToString())
+                .AddComponent(new SceneBoot());
+
+            // Compile all project scripts and add components for the editor's "AddComponent" function.
+            RuntimeCompiler.CompileProjectScripts(AssetsPath);
+
             // Copies the List to the local array once to savely iterate to it.
             SceneManager.ProcessSystems();
 
@@ -118,6 +131,16 @@ public sealed class Core
         Input.LateUpdate();
 
         SetFillMode(Renderer.Config.RenderMode);
+
+        #region // ImGui
+        _imGuiRenderer.Update(_imGuiContext, Renderer.Size);
+        _imGuiInputHandler.Update(Renderer.Config.SuperSample);
+
+        //ImGui.ShowDemoWindow();
+
+        ImGui.Render();
+        _imGuiRenderer.Render();
+        #endregion
 
         OnRender?.Invoke(null, null);
 

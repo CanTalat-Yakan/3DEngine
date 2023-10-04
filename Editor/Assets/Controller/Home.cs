@@ -229,7 +229,9 @@ public class Home
                 PrimaryButtonText = "Delete",
                 CloseButtonText = "Cancel",
                 DefaultButton = ContentDialogButton.Close,
-                Content = new TextBlock() { Text = "If you delete this project, you won't be able to recover it. Do you want to delete it?", TextWrapping = TextWrapping.WrapWholeWords },
+                Content = new TextBlock() { 
+                    Text = "If you delete this project, you won't be able to recover it. \nDo you want to proceed?", 
+                    TextWrapping = TextWrapping.WrapWholeWords },
             };
 
             result = await dialog.ShowAsync();

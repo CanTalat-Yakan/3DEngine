@@ -19,8 +19,8 @@ class AppWindow
         _imGuiContext = ImGui.CreateContext();
         ImGui.SetCurrentContext(_imGuiContext);
 
-        _imGuiRenderer = new ImGuiRenderer();
-        _imGuiInputHandler = new ImGuiInputHandler(_win32Window.Handle);
+        _imGuiRenderer = new();
+        _imGuiInputHandler = new(_win32Window.Handle);
     }
 
     public void Show(ShowWindowCommand command = ShowWindowCommand.Normal) =>
