@@ -69,6 +69,9 @@ public sealed class ViewportController : EditorComponent
         _direction = Vector3.Zero;
     }
 
+    public override void OnLateUpdate() =>
+        Camera.Projection = Renderer.Instance.Config.CameraProjection;
+
     public override void OnFixedUpdate()
     {
         // Check if the middle mouse button is pressed. If so, call the ScreenMovement function.

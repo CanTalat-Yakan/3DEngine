@@ -8,7 +8,12 @@ public sealed class Camera : Component
 {
     public static Camera Main { get; private set; }
 
+    public CameraProjection Projection = CameraProjection.Perspective;
+    [Space]
+    public float Size = 15;
     public float FOV = 90;
+    public Vector2 Clipping = new Vector2(0.1f, 1000f);
+    [Space]
     public byte CameraID = 0;
 
     private Renderer _renderer => Renderer.Instance;
@@ -58,7 +63,9 @@ public sealed class Camera : Component
         var hFOV = radHFOV.ToDegrees();
 
         // Calculate the projection matrix for the camera.
-        var projection = Matrix4x4.CreatePerspectiveFieldOfView(radHFOV, aspect, 0.1f, 1000);
+        var projection = Projection == CameraProjection.Perspective
+            ? Matrix4x4.CreatePerspectiveFieldOfView(radHFOV, aspect, Clipping.X, Clipping.Y)
+            : Matrix4x4.CreateOrthographic(Size * aspect, Size, Clipping.X, Clipping.Y);
 
         // Calculate the view-projection matrix for the camera.
         var viewProjection = Matrix4x4.Transpose(view * projection);

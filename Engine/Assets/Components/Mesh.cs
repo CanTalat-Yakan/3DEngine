@@ -11,8 +11,8 @@ public sealed class Mesh : Component
 {
     public string MeshPath;
 
-    public static MeshInfo CurrentMeshOnGPU { get; private set; }
-    public static List<MeshInfo> BatchLookup = new();
+    [Hide] public static MeshInfo CurrentMeshOnGPU { get; private set; }
+    [Hide] public static List<MeshInfo> BatchLookup = new();
 
     public MeshInfo MeshInfo => _meshInfo;
     [Show] private MeshInfo _meshInfo;

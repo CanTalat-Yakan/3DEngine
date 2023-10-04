@@ -56,8 +56,8 @@ public sealed class Renderer
             Instance = this;
 
         NativeSize = new Size(
-            Math.Max(640, sizeX),
-            Math.Max(480, sizeY));
+            Math.Max(64, sizeX),
+            Math.Max(64, sizeY));
 
         var result = Initialize();
         if (result.Failure)
@@ -257,8 +257,8 @@ public sealed class Renderer
         // Resize the buffers, depth stencil texture, render target texture and viewport
         // when the size of the window changes.
         NativeSize = new Size(
-            Math.Max(640, newWidth),
-            Math.Max(480, newHeight));
+            Math.Max(64, newWidth),
+            Math.Max(64, newHeight));
 
         // Dispose the existing render target view, render target texture, depth stencil view, and depth stencil texture.
         Data.RenderTargetView?.Dispose();

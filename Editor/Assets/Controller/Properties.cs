@@ -13,11 +13,14 @@ using Engine.ECS;
 using Engine.Editor;
 using Engine.Utilities;
 
+using static Editor.Controller.Helper;
+
 using Color = System.Drawing.Color;
 using Path = System.IO.Path;
 using Texture = Vortice.Direct3D11.Texture2DArrayShaderResourceView;
-
-using static Editor.Controller.Helper;
+using System.Reflection.Metadata;
+using System.Runtime.Serialization.Formatters;
+using System.Xml.Linq;
 
 namespace Editor.Controller;
 
@@ -311,10 +314,18 @@ internal partial class Properties
                 if (fieldInfo.Equals(info))
                     return null;
 
-        ToolTip toolTip = new();
         // Create a ToolTip if the field has a ToolTipAttribute.
+        ToolTip toolTip = new();
         if (attributes.OfType<ToolTipAttribute>().Any())
             toolTip.Content = (string)attributes.OfType<ToolTipAttribute>().First().ToolTip;
+
+        // Create a Text with Opacity and return early.
+        if (attributes.OfType<ShowOnlyAttribute>().Any())
+        {
+            grid.Add(CreateTextWithOpacity(entity.ID, component, fieldInfo.Name, value.ToString()));
+
+            return ReturnProcessedFieldInfo(grid, attributes, fieldInfo, toolTip);
+        }
         #endregion
 
         #region // Process FieldType
@@ -338,12 +349,11 @@ internal partial class Properties
                         entity.ID, component, fieldInfo.Name,
                         (byte)value,
                         (byte)attributes.OfType<SliderAttribute>().First().CustomMin,
-                        (byte)attributes.OfType<SliderAttribute>().First().CustomMax)
-                    .WrapInGrid());
+                        (byte)attributes.OfType<SliderAttribute>().First().CustomMax));
             // If the field doesn't have the `SliderAttribute`, add a number input element.
             else
                 grid.Add(CreateNumberInput(
-                    entity.ID,component, fieldInfo.Name,
+                    entity.ID, component, fieldInfo.Name,
                     (byte)value,
                     byte.MinValue,
                     byte.MaxValue));
@@ -354,11 +364,10 @@ internal partial class Properties
             if (attributes.OfType<SliderAttribute>().Any())
                 grid.Add(
                     CreateSlider(
-                        entity.ID,component, fieldInfo.Name,
+                        entity.ID, component, fieldInfo.Name,
                         (int)value,
                         (int)attributes.OfType<SliderAttribute>().First().CustomMin,
-                        (int)attributes.OfType<SliderAttribute>().First().CustomMax)
-                    .WrapInGrid());
+                        (int)attributes.OfType<SliderAttribute>().First().CustomMax));
             // If the field doesn't have the `SliderAttribute`, add a number input element.
             else
                 grid.Add(CreateNumberInput(
@@ -376,8 +385,7 @@ internal partial class Properties
                         entity.ID, component, fieldInfo.Name,
                         (float)value,
                         (float)attributes.OfType<SliderAttribute>().First().CustomMin,
-                        (float)attributes.OfType<SliderAttribute>().First().CustomMax)
-                    .WrapInGrid());
+                        (float)attributes.OfType<SliderAttribute>().First().CustomMax));
             // If the field doesn't have the `SliderAttribute`, add a number input element.
             else
                 grid.Add(CreateNumberInput(
@@ -392,7 +400,7 @@ internal partial class Properties
 
         // Vector 2
         else if (type == typeof(Vector2))
-            grid.Add(CreateVec2Input(entity.ID,component, fieldInfo.Name, (Vector2)value));
+            grid.Add(CreateVec2Input(entity.ID, component, fieldInfo.Name, (Vector2)value));
 
         // Vector 3
         else if (type == typeof(Vector3))
@@ -400,7 +408,11 @@ internal partial class Properties
 
         // Bool
         else if (type == typeof(bool))
-            grid.Add(CreateBool(entity.ID, component, fieldInfo.Name, (bool)value).WrapInGrid());
+            grid.Add(CreateBool(entity.ID, component, fieldInfo.Name, (bool)value));
+
+        // Enum
+        else if (type.IsEnum)
+            grid.Add(CreateComboBox(type, entity.ID, component, fieldInfo.Name, value.ToString()));
 
         // Material
         else if (type == typeof(Material))
@@ -447,14 +459,16 @@ internal partial class Properties
         #endregion
 
         // Return the final grid by stacking all the processed attributes, type grid and wrapping the field name.
-        return
-            (new Grid[] { 
-                    // Stack processed attributes in a grid.
-                    ProcessAttributes(attributes).StackInGrid(),
-                    // Stack field grid and wrap it with field name.
-                    grid.ToArray().StackInGrid().WrapInField(fieldInfo.Name)})
-            .StackInGrid(0).AddToolTip(toolTip);
+        return ReturnProcessedFieldInfo(grid, attributes, fieldInfo, toolTip);
     }
+
+    public Grid ReturnProcessedFieldInfo(List<Grid> grid, object[] attributes, FieldInfo fieldInfo, ToolTip toolTip) =>
+        (new Grid[] {
+            // Stack processed attributes in a grid.
+            ProcessAttributes(attributes).StackInGrid(),
+            // Stack field grid and wrap it with field name.
+            grid.ToArray().StackInGrid().WrapInField(fieldInfo.Name)})
+        .StackInGrid(0).AddToolTip(toolTip);
 
     public Grid CreateFromEventInfo(EventInfo eventInfo, EventInfo[] nonPublic)
     {
@@ -500,7 +514,7 @@ internal partial class Properties
                 grid.Add(CreateHeader((string)((HeaderAttribute)attribute).CustomHeader));
 
             // SpacerAttribute
-            if (attribute.GetType().Equals(typeof(SpacerAttribute)))
+            if (attribute.GetType().Equals(typeof(SpaceAttribute)))
                 // Create a spacer and add it to the grid
                 grid.Add(CreateSpacer());
         }

@@ -32,6 +32,7 @@ public sealed class SliderAttribute : Attribute
     }
 }
 
-public sealed class SpacerAttribute : Attribute { }
+public sealed class SpaceAttribute : Attribute { }
 public sealed class ShowAttribute : Attribute { }
+public sealed class ShowOnlyAttribute : Attribute { }
 public sealed class HideAttribute : Attribute { }

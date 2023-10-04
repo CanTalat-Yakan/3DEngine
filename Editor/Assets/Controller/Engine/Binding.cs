@@ -197,7 +197,12 @@ internal class Binding
 
         var propertyFromPath = bindEntry.Target?.GetType().GetProperty(bindEntry.TargetValuePath, AllBindingFlags);
         if (propertyFromPath is not null)
-            propertyFromPath.SetValue(bindEntry.Target, bindEntry.Value);
+        {
+            if (propertyFromPath.PropertyType == typeof(string))
+                propertyFromPath.SetValue(bindEntry.Target, bindEntry.Value.ToString());
+            else
+                propertyFromPath.SetValue(bindEntry.Target, bindEntry.Value);
+        }
 
         if (!string.IsNullOrEmpty(bindEntry.TargetEventPath))
             CheckPathEvent(bindEntry, AllBindingFlags);

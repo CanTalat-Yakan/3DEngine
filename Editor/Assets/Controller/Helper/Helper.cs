@@ -97,14 +97,14 @@ internal partial class Helper
     internal static UIElement CreateSeperator() =>
         new NavigationViewItemSeparator() { Margin = new(10) };
 
+    internal static UIElement CreateTextFull(out TextBlock textBlock) =>
+        textBlock = new();
+
     internal static UIElement CreateText(string placeholder = "Example") =>
         new TextBlock() { Text = placeholder, MaxWidth = 200, TextWrapping = TextWrapping.Wrap };
 
     internal static UIElement CreateTextEqual(string placeholder = "Example") =>
         new TextBlock() { Text = placeholder, MaxWidth = 200 };
-
-    internal static UIElement CreateTextFull(out TextBlock textBlock) =>
-        textBlock = new();
 
     internal static UIElement CreateTextFull(string s = "String") =>
         new TextBlock() { Text = s, TextWrapping = TextWrapping.Wrap };
@@ -172,16 +172,29 @@ internal partial class Helper
 
 internal partial class Helper
 {
-    internal static ComboBox CreateComboBox<T>(object source, string fieldName) where T : Enum
+    internal static Grid CreateTextWithOpacity(object id, object source, string fieldName, string s = "String")
+    {
+        TextBlock textBlock = new() { Text = s, MaxWidth = 200, Opacity = 0.5f, TextWrapping = TextWrapping.Wrap };
+
+        Binding.GetBinding(fieldName, source, id)?.Set(textBlock, "Text");
+
+        return StackInGrid(textBlock);
+    }
+
+    internal static Grid CreateComboBox(Type enumType, object id, object source, string fieldName, string value = null)
     {
         ComboBox comboBox = new() { Height = 33, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
 
-        foreach (var item in Enum.GetNames(typeof(T)))
+        foreach (var item in Enum.GetNames(enumType))
             comboBox.Items.Add(item);
 
-        Binding.GetRendererBinding(fieldName, source)?.Set(comboBox, "SelectedItem", "SelectionChanged");
+        if (!string.IsNullOrEmpty(value))
+            if (Enum.TryParse(enumType, value, out var selectedItem))
+                comboBox.SelectedIndex = Array.IndexOf(Enum.GetValues(enumType), selectedItem);
 
-        return comboBox;
+        Binding.GetBinding(fieldName, source, id)?.Set(comboBox, "SelectedItem", "SelectionChanged");
+
+        return StackInGrid(comboBox);
     }
 
     internal static Grid CreateTextInput(object id, object source, string fieldName, string placeholder = "Example")
@@ -213,7 +226,7 @@ internal partial class Helper
         return StackInGrid(numberBox);
     }
 
-    internal static UIElement CreateSlider(object id, object source, string fieldName, double value = 0, double min = 0, double max = 100)
+    internal static Grid CreateSlider(object id, object source, string fieldName, double value = 0, double min = 0, double max = 100)
     {
         Slider slider = new() { Value = value, Minimum = min, Maximum = max, Width = 180, Margin = new(0, 0, 0, -5.5) };
         TextBlock numberPreview = new() { Padding = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
@@ -227,7 +240,7 @@ internal partial class Helper
 
     internal static Grid CreateVec2Input(object id, object source, string fieldName, Vector2 value = new())
     {
-        NumberBoxVector2 numberBoxVector2 = new() { Value = value };
+        NumberBoxVector2 numberBoxVector2 = new() { Value = value.Round() };
 
         Binding.GetBinding(fieldName, source, id)?.Set(numberBoxVector2, "Value", "ValueChanged");
 
@@ -236,7 +249,7 @@ internal partial class Helper
 
     internal static Grid CreateVec2InputWithRG(object id, object source, string fieldName, Vector2 value = new())
     {
-        NumberBoxVector2 numberBoxVector2 = new() { Value = value };
+        NumberBoxVector2 numberBoxVector2 = new() { Value = value.Round() };
 
         Binding.GetBinding(fieldName, source, id)?.Set(numberBoxVector2, "Value", "ValueChanged");
 
@@ -245,7 +258,7 @@ internal partial class Helper
 
     internal static Grid CreateVec3Input(object id, object source, string fieldName, Vector3 value = new())
     {
-        NumberBoxVector3 numberBoxVector3 = new() { Value = value };
+        NumberBoxVector3 numberBoxVector3 = new() { Value = value.Round() };
 
         Binding.GetBinding(fieldName, source, id)?.Set(numberBoxVector3, "Value", "ValueChanged");
 
@@ -254,7 +267,7 @@ internal partial class Helper
 
     internal static Grid CreateVec3InputWithRGB(object id, object source, string fieldName, Vector3 value = new())
     {
-        NumberBoxVector3 numberBoxVector3 = new() { Value = value };
+        NumberBoxVector3 numberBoxVector3 = new() { Value = value.Round() };
 
         Binding.GetBinding(fieldName, source, id)?.Set(numberBoxVector3, "Value", "ValueChanged");
 
@@ -604,6 +617,20 @@ internal static partial class ExtensionMethods
 {
     public static float Remap(this float value, float sourceMin, float sourceMax, float targetMin, float targetMax) =>
         (value - sourceMin) / (sourceMax - sourceMin) * (targetMax - targetMin) + targetMin;
+
+    public static float Round(this float value, int digits = 2) =>
+        MathF.Round(value, digits);
+
+    public static Vector2 Round(this Vector2 value, int digits = 2) =>
+        new Vector2(
+            MathF.Round(value.X, digits),
+            MathF.Round(value.Y, digits));
+
+    public static Vector3 Round(this Vector3 value, int digits = 2) =>
+        new Vector3(
+            MathF.Round(value.X, digits),
+            MathF.Round(value.Y, digits),
+            MathF.Round(value.Z, digits));
 
     public static string AddSpacesToSentence(this string text, bool preserveAcronyms = true)
     {

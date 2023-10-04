@@ -81,21 +81,21 @@ internal partial class Viewport(ModelView.Viewport viewport, Grid content)
                             1, 100)
                             .WrapInGridVertical("Movement Speed"))),
                 CreateAppBarSeperator(),
-                CreateComboBox<Engine.Data.CameraProjection>(
+                CreateComboBox(typeof(Engine.Data.CameraProjection), null,
                     Engine.Core.Instance.Renderer.Config, "CameraProjection"),
-                CreateComboBox<Engine.Data.RenderMode>(
+                CreateComboBox(typeof(Engine.Data.RenderMode), null,
                     Engine.Core.Instance.Renderer.Config, "RenderMode")
         };
 
         // Initialize an array of UI elements to be positioned in the top-right corner of the main content.
         UIElement[] topRight = new[]
         {
-                CreateFlyoutButton(CreateIcon("\xE946"), CreateTextFull(out _profile).WrapInGrid()),
+                CreateFlyoutButton(CreateIcon("\xE946"), CreateTextFull(out _profile).WrapInGrid()).AddToolTip("Profile"),
 
                 CreateAppBarSeperator(),
 
-                CreateToggleButton(CreateIcon("\xEA80"), true),
-                CreateToggleButton(CreateIcon("\xE81E"), true),
+                CreateToggleButton(CreateIcon("\xEA80"), true).AddToolTip("Snao Rotation"),
+                CreateToggleButton(CreateIcon("\xE81E"), true).AddToolTip("Snap Position"),
 
                 CreateAppBarSeperator(),
 
@@ -104,17 +104,17 @@ internal partial class Viewport(ModelView.Viewport viewport, Grid content)
                     CreateNumberInput(null,
                         ViewportController.Instance, "_movementSpeed",
                         10, 1, 100)
-                        .WrapInGridVertical("Grid Snap")),
+                        .WrapInGridVertical("Grid Snap")).AddToolTip("Grid Snap"),
                 CreateFlyoutButtonWithValue(
                     CreateIcon(Symbol.Rotate), 15,
                     CreateNumberInput(null,
                         ViewportController.Instance, "_rotationSpeed",
                         15, 1, 90)
-                        .WrapInGridVertical("Rotation Snap")),
+                        .WrapInGridVertical("Rotation Snap")).AddToolTip("Rotation Snap"),
 
                 CreateAppBarSeperator(),
 
-                CreateToggleButton(CreateIcon(Symbol.Globe), true)
+                CreateToggleButton(CreateIcon(Symbol.Globe), true).AddToolTip("Show Gizmos")
         };
 
         // Add the top-left and top-right UI elements to the main content.

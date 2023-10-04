@@ -24,7 +24,7 @@ public class Example : Component
     public float Slider;
     public bool Bool;
     public Entity _Entity;
-    [Spacer]
+    [Space]
     [Header("Header")]
     public event EventHandler Event;
 
