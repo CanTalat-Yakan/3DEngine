@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿global using Key = Vortice.DirectInput.Key;
+
+using System.Linq;
 
 using Vortice.DirectInput;
 

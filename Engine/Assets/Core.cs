@@ -8,9 +8,6 @@ global using Engine.Editor;
 global using Engine.Helper;
 global using Engine.Utilities;
 
-global using Key = Vortice.DirectInput.Key;
-using ImGuiNET;
-
 namespace Engine;
 
 public sealed class Core
@@ -54,8 +51,8 @@ public sealed class Core
         SceneManager = new();
 
         #region // ImGui
-        _imGuiContext = ImGui.CreateContext();
-        ImGui.SetCurrentContext(_imGuiContext);
+        _imGuiContext =  ImGuiNET.ImGui.CreateContext();
+        ImGuiNET.ImGui.SetCurrentContext(_imGuiContext);
 
         _imGuiRenderer = new();
         _imGuiInputHandler = new(hwnd);
@@ -138,7 +135,7 @@ public sealed class Core
 
         //ImGui.ShowDemoWindow();
 
-        ImGui.Render();
+        ImGuiNET.ImGui.Render();
         _imGuiRenderer.Render();
         #endregion
 
