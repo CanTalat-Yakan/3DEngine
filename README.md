@@ -39,18 +39,18 @@ In order to compile, you need to install [Visual Studio 2022 Preview](https://vi
 
 *Rolled back to .Net 7 and VS2022 for now, because it lead to errors due to the WinAppSDK and the newest .Net 8 SDK Preview RC that gets installed with the Visual Studio Preview Workload of the .Net Environment!*
 
-# Preview
-![3D Engine Layout](Preview/Layout.png)
-![1](Preview/Screenshot_1.png)
-![2](Preview/Screenshot_2.png)
-![3](Preview/Screenshot_3.png)
-![4](Preview/Screenshot_4.png)
-![5](Preview/Screenshot_5.png)
-![6](Preview/Screenshot_6.png)
-![7](Preview/Screenshot_7.png)
-![8](Preview/Screenshot_8.png)
-![9](Preview/Screenshot_9.png)
-![10](Preview/Screenshot_10.png)
-![11](Preview/Screenshot_11.png)
-![12](Preview/Screenshot_12.png)
-![13](Preview/Screenshot_13.png)
+# Screenshots
+![3D Engine Layout](Screenshots/Layout.png)
+![1](Screenshots/Screenshot_1.png)
+![2](Screenshots/Screenshot_2.png)
+![3](Screenshots/Screenshot_3.png)
+![4](Screenshots/Screenshot_4.png)
+![5](Screenshots/Screenshot_5.png)
+![6](Screenshots/Screenshot_6.png)
+![7](Screenshots/Screenshot_7.png)
+![8](Screenshots/Screenshot_8.png)
+![9](Screenshots/Screenshot_9.png)
+![10](Screenshots/Screenshot_10.png)
+![11](Screenshots/Screenshot_11.png)
+![12](Screenshots/Screenshot_12.png)
+![13](Screenshots/Screenshot_13.png)
