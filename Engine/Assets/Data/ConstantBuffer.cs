@@ -18,7 +18,6 @@ public struct PerModelConstantBuffer
 //    public Vector4 Diffuse;
 //    public Vector4 Ambient;
 //    public float Intensity;
-//    public Vector3 Pad2;
 //}
 
 //public struct PointLightConstantBuffer
@@ -28,5 +27,4 @@ public struct PerModelConstantBuffer
 //    public Vector4 Diffuse;
 //    public float Intensity;
 //    public float Radius;
-//    public Vector2 Pad2;
 //}
