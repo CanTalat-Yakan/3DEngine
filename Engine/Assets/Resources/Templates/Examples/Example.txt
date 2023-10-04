@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Drawing;
 using System.Numerics;
 using System;
 using Engine.Components;
@@ -16,6 +17,8 @@ public class Example : Component
     private string _visibleString = "This field is private";
     [Hide]
     public string HiddenString = "This field is public";
+    [ShowOnly]
+    public string ShowOnlyString = "This string is not editable";
     public int Int;
     public float Float;
     public Vector2 Vector2;
@@ -23,10 +26,11 @@ public class Example : Component
     [Slider(1, 100)]
     public float Slider;
     public bool Bool;
-    public Entity _Entity;
+    public Color Color;
+    public Entity? _Entity;
     [Space]
     [Header("Header")]
-    public event EventHandler Event;
+    public event EventHandler? Event;
 
     public override void OnRegister() =>
         ScriptSystem.Register(this);

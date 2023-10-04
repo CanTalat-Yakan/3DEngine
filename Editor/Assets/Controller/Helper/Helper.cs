@@ -135,8 +135,8 @@ internal partial class Helper
 
     internal static Grid CreateColorButton(byte r = 0, byte g = 0, byte b = 0, byte a = 0)
     {
-        Windows.UI.Color col = new();
-        col.R = r; col.G = g; col.B = b; col.A = a;
+        Windows.UI.Color col = new() { R = r, G = g, B = b, A = a};
+
         ColorPickerButton colbutton = new() { SelectedColor = col };
 
         Style stylee = new() { TargetType = typeof(ColorPicker) };
