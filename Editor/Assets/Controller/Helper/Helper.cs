@@ -177,7 +177,7 @@ internal partial class Helper
         ComboBox comboBox = new() { Height = 33, SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
 
         foreach (var item in Enum.GetNames(typeof(T)))
-            comboBox.Items.Add(item.FormatString());
+            comboBox.Items.Add(item);
 
         Binding.GetRendererBinding(fieldName, source)?.Set(comboBox, "SelectedItem", "SelectionChanged");
 

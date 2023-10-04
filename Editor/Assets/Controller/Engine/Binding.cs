@@ -2,7 +2,6 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System;
@@ -11,6 +10,7 @@ using Windows.Foundation;
 using Engine.Editor;
 using Engine.ECS;
 using Engine.Utilities;
+using Vortice.DirectStorage;
 
 namespace Editor.Controller;
 
@@ -64,8 +64,14 @@ internal class Binding
     public static void SetRendererBindings()
     {
         RendererBindings.Add(
-            "FOV" + ViewportController.Camera?.GetType(),
+            "FOV" + ViewportController.Camera?.GetType().FullName,
             new(ViewportController.Camera, "FOV"));
+        RendererBindings.Add(
+            "CameraProjection" + Engine.Core.Instance.Renderer.Config,
+            new(Engine.Core.Instance.Renderer.Config, "CameraProjection"));
+        RendererBindings.Add(
+            "RenderMode" + Engine.Core.Instance.Renderer.Config,
+            new(Engine.Core.Instance.Renderer.Config, "RenderMode"));
     }
 
     public static void SetBindings(Scene scene)
@@ -166,15 +172,21 @@ internal class Binding
 
     private static void UpdateBinding(object source, object keySufix, Dictionary<string, BindEntry> bindings)
     {
-        if (source is not null)
-            foreach (var field in source.GetType().GetFields(AllBindingFlags))
-                foreach (var bindName in bindings.Keys)
-                    if (string.Equals(field.Name + keySufix, bindName)
-                        && bindings.TryGetValue(bindName, out var bindEntry)
-                        && !Equals(field.GetValue(source), bindEntry.Value))
-                        ProcessBindEntry(bindEntry, field, source);
+        if (source is null)
+            return;
+
+        var fields = source.GetType().GetFields(AllBindingFlags);
+        foreach (var field in fields)
+            foreach (var bindName in bindings.Keys)
+                if (string.Equals(field.Name + keySufix, bindName)
+                    && bindings.TryGetValue(bindName, out var bindEntry)
+                    && !Equals(field.GetValue(source), bindEntry.Value))
+                    ProcessBindEntry(bindEntry, field, source);
     }
 
+    /// <summary>
+    /// Update the new Value from the Engine to the Editor.
+    /// </summary>
     public static void ProcessBindEntry(BindEntry bindEntry, FieldInfo field, object source)
     {
         bindEntry.Value = field.GetValue(source);
@@ -239,20 +251,37 @@ internal class Binding
 
             eventInfo.AddEventHandler(bindEntry.Target, handler);
         }
+        // ComboBox 
+        else if (Equals(
+            eventInfo.EventHandlerType,
+            typeof(SelectionChangedEventHandler)))
+        {
+            SelectionChangedEventHandler handler = (s, e) =>
+                EventLogic(s, bindEntry);
+
+            eventInfo.AddEventHandler(bindEntry.Target, handler);
+        }
         else
-            Trace.WriteLine(
+            throw new Exception(
                 $"{eventInfo.EventHandlerType} was not considered in the Bindings Event Check!");
 
         //Output.Log($"Check Path Event: {eventInfo.Name}");
     }
 
+    /// <summary>
+    /// Update the new Value from the Editor to the Engine.
+    /// </summary>
     public static void EventLogic(object sender, BindEntry bindEntry)
     {
         // Cast the sender object to the type specified by bindEntry.Target.GetType().
-        var targetType = bindEntry.Target.GetType();
-        var castedSender = Convert.ChangeType(sender, targetType);
+        var sourceType = bindEntry.Source.GetType();
+        var sourceField = sourceType.GetField(bindEntry.SourceValuePath, AllBindingFlags);
 
-        var newValue = targetType.GetProperty(bindEntry.TargetValuePath).GetValue(castedSender);
+        var targetType = bindEntry.Target.GetType();
+        var targetField = targetType.GetProperty(bindEntry.TargetValuePath, AllBindingFlags);
+
+        var castedSender = Convert.ChangeType(sender, targetType);
+        var newValue = targetField.GetValue(castedSender);
 
         newValue = bindEntry.Value switch
         {
@@ -262,8 +291,13 @@ internal class Binding
             _ => newValue
         };
 
-        bindEntry.Source.GetType().GetField(bindEntry.SourceValuePath, AllBindingFlags)?
-            .SetValue(bindEntry.Source, newValue);
+        if (sourceField.FieldType.IsEnum)
+            if (Enum.TryParse(sourceField.FieldType, newValue.ToString(), out var enumValue))
+                newValue = enumValue;
+            else
+                throw new ArgumentException("Failed to parse enum value");
+
+        sourceField?.SetValue(bindEntry.Source, newValue);
 
         bindEntry.Value = newValue;
 
