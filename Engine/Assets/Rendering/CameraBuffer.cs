@@ -4,7 +4,7 @@ using Vortice.Direct3D11;
 
 namespace Engine.Utilities;
 
-public sealed class CameraBuffers
+public sealed class CameraBuffer
 {
     public ID3D11Buffer View;
     public ViewConstantBuffer ViewConstantBuffer;
@@ -27,4 +27,7 @@ public sealed class CameraBuffers
         // Set the constant buffer in the vertex shader stage of the device context.
         _renderer.Data.SetConstantBuffer(0, View);
     }
+
+    public void Dispose() =>
+        View?.Dispose();
 }

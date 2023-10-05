@@ -4,7 +4,7 @@ public sealed class Camera : Component
 {
     public static Camera Main { get; private set; }
 
-    public CameraBuffers CameraBuffer { get; private set; } = new();
+    public CameraBuffer CameraBuffer { get; private set; } = new();
 
     public CameraProjection Projection = CameraProjection.Perspective;
     [Space]
@@ -40,6 +40,9 @@ public sealed class Camera : Component
     public override void OnRender() =>
         // Recreates the view constants data to be used by the Camera.
         RecreateViewConstants();
+
+    public override void OnDestroy() =>
+        CameraBuffer.Dispose();
 
     public void RecreateViewConstants()
     {

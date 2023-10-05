@@ -47,7 +47,7 @@ public sealed class Core
         SceneManager = new();
 
         #region // ImGui
-        _imGuiContext =  ImGuiNET.ImGui.CreateContext();
+        _imGuiContext = ImGuiNET.ImGui.CreateContext();
         ImGuiNET.ImGui.SetCurrentContext(_imGuiContext);
 
         _imGuiRenderer = new();
@@ -80,8 +80,9 @@ public sealed class Core
         if (!Renderer.IsRendering)
             return;
 
-        OnInitialize?.Invoke(null, null);
-        OnInitialize = null;
+        try { OnInitialize?.Invoke(null, null); }
+        catch(Exception ex) { throw new Exception(ex.Message); }
+        finally { OnInitialize = null; }
 
         // Clears the render target,
         // discarding the contents and preparing it for the next frame
@@ -152,6 +153,7 @@ public sealed class Core
     public void Dispose()
     {
         Renderer?.Dispose();
+        SceneManager?.Dispose();
         Input.Dispose();
         OnDispose?.Invoke(null, null);
     }

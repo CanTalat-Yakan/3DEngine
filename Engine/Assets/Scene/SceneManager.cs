@@ -9,7 +9,7 @@ public sealed partial class SceneManager
 
     public SceneManager(Scene scene = null) =>
         // Initializes the main scene and creates a new empty list for the subscenes.
-        MainScene = scene is not null ? scene 
+        MainScene = scene is not null ? scene
             : new() { ID = Guid.NewGuid(), Name = "Main", IsEnabled = true, EntityManager = new() };
 
     public static Scene AddSubscene(Guid guid = new(), string name = "Subscene", bool enable = true)
@@ -95,16 +95,21 @@ public sealed partial class SceneManager
 {
     public void ProcessSystems()
     {
+        // Copy TransformSystem to Array.
         TransformSystem.CopyToArray();
+        // Sort and Copy CameraSystem to Array.
         CameraSystem.SortAndCopyToArray();
+        // Sort and Copy MeshSystem to Array if it is Dirty.
         MeshSystem.SortAndCopyToArrayIfDirty();
+        // Copy EditorScriptSystem to Array.
         EditorScriptSystem.CopyToArray();
+        // Copy ScriptSystem to Array.
         ScriptSystem.CopyToArray();
     }
 
     public void Awake()
     {
-        // Update the CameraSystem
+        // Update the CameraSystem.
         CameraSystem.Awake();
 
         if (!EditorState.PlayMode)
@@ -176,5 +181,16 @@ public sealed partial class SceneManager
         CameraSystem.Render();
         // Render the MeshSystem.
         MeshSystem.Render();
+    }
+
+    public void Dispose()
+    {
+        // Dispose all Systems.
+        CameraSystem.Dispose();
+        MeshSystem.Dispose();
+
+        MainScene.EntityManager.Dispose();
+        foreach (var scene in Subscenes)
+            scene.EntityManager.Dispose();
     }
 }

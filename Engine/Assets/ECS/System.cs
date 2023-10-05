@@ -54,6 +54,16 @@ public partial class System<T> where T : Component
         }
     }
 
+    public static void Dispose()
+    {
+        // Remove all components and call OnDestroy().
+        foreach (var component in s_components)
+            component.OnDestroy();
+
+        s_components.Clear();
+        s_componentsArray = null;
+    }
+
     public static void Replace(Type oldComponentType, Type newComponentType)
     {
         // Remove all components of the specified type from the collection of registered components.
