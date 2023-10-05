@@ -56,7 +56,7 @@ internal sealed class SceneBoot : EditorComponent
             // Log message indicating that 10 cubes have been spawned.
             Output.Log("Spawned 100 Cubes");
 
-            // Loop to spawn 10 cubes with random attributes.
+            // Loop to spawn 100 cubes with random attributes.
             for (int i = 0; i < 100; i++)
             {
                 // Create a new cube and add it to the Cubes entity.
