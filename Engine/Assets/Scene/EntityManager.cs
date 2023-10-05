@@ -50,20 +50,14 @@ namespace Engine.Utilities
     public sealed class EntityManager
     {
         public EventList<Entity> EntityList = new();
-        public Entity Sky;
 
         private static Material _materialDefault;
-        private static Material _materialSky;
-        private static Material _materialSkyLight;
 
         //private static readonly string SHADER_LIT = "Lit.hlsl";
         private static readonly string SHADER_SIMPLELIT = "SimpleLit.hlsl";
         private static readonly string SHADER_UNLIT = "Unlit.hlsl";
-        private static readonly string SHADER_SKYBOX = "Skybox.hlsl";
 
         private static readonly string IMAGE_DEFAULT = "Dark.png";
-        private static readonly string IMAGE_SKY = "SkyGradient.png";
-        private static readonly string IMAGE_SKY_LIGHT = "SkyGradient_Light.png";
 
         private static readonly string PRIMITIVES = "Primitives";
 
@@ -72,14 +66,6 @@ namespace Engine.Utilities
             // Create a new material with the default shader and default image.
             if (_materialDefault is null)
                 _materialDefault = new(SHADER_SIMPLELIT, IMAGE_DEFAULT);
-
-            // Create a new material with the unlit shader and sky image.
-            if (_materialSky is null)
-                _materialSky = new(SHADER_SKYBOX, IMAGE_SKY);
-
-            // Create a new material with the unlit shader and a light version of the sky image.
-            if (_materialSkyLight is null)
-                _materialSkyLight = new(SHADER_UNLIT, IMAGE_SKY_LIGHT);
         }
 
         public Entity Duplicate(Entity refEntity, Entity parent = null)
@@ -153,32 +139,6 @@ namespace Engine.Utilities
             return camera;
         }
 
-        public void CreateSky()
-        {
-            // Create new Sky entity.
-            Sky = new Entity()
-            {
-                Name = "Sky", // Set entity name to "Sky".
-                Tag = EditorTags.SceneSky.ToString(), // Set entity tag to SceneSky.
-            };
-            // Set scale of the Sky's transform.
-            Sky.Transform.LocalScale = new Vector3(-100, 100, 100);
-
-            // Add Mesh component to Sky entity.
-            var skyMesh = (Mesh)Sky.AddComponent<Mesh>();
-            skyMesh.SetMeshInfo(Loader.ModelLoader.LoadFile(Path.Combine(PRIMITIVES, PrimitiveTypes.Sphere.ToString()) + ".obj"));
-
-            // Set material of Sky's Mesh component.
-            skyMesh.SetMaterial(_materialSky);
-
-            // Add Sky entity to EntityList.
-            EntityList.Add(Sky);
-        }
-
-        public void SetTheme(bool light) =>
-            // Switch the material of the sky component to either the default or light sky material.
-            Sky.GetComponent<Mesh>().SetMaterial(light ? _materialSkyLight : _materialSky);
-
         public static MeshInfo GetDefaultMeshInfo() =>
             // Set mesh info to a cube from the resources.
             Loader.ModelLoader.LoadFile(Path.Combine(PRIMITIVES, "Cube.obj"));
@@ -223,6 +183,17 @@ namespace Engine.Utilities
             entity.RemoveComponents();
             // Remove the entity from the entity list.
             EntityList.Remove(entity);
+        }
+
+        public void Dispose()
+        {
+            foreach (var entity in EntityList)
+                entity.Components.Clear();
+
+            EntityList.Clear();
+            EntityList = null;
+
+            _materialDefault?.Dispose();
         }
     }
 }

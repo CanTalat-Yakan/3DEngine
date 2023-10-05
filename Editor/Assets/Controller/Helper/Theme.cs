@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
 using System.Runtime.InteropServices;
 using WinRT;
+using Engine.ECS;
 
 namespace Editor.Controller;
 
@@ -100,7 +101,10 @@ internal class Theme
         // Check if the Engine.Core instance is not null.
         if (Engine.Core.Instance is not null)
             // If it's not null, set the theme for entity manager.
-            Engine.Utilities.SceneManager.MainScene.EntityManager.SetTheme(_page.RequestedTheme == ElementTheme.Light);
+            Engine.Utilities.SceneManager.MainScene.EntityManager?
+                .GetFromTag(EditorTags.SceneSky.ToString())?
+                .GetComponent<Engine.Editor.DefaultSky>()?
+                .SetTheme(_page.RequestedTheme == ElementTheme.Light);
     }
 
     private void Window_Activated(object sender, WindowActivatedEventArgs args) =>
