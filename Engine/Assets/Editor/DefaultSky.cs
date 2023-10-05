@@ -1,8 +1,9 @@
 ﻿using System.IO;
+using System.Linq;
 
 namespace Engine.Editor;
 
-public class DefaultSky : Component
+public class DefaultSky : EditorComponent
 {
     private static Material _materialSky;
     private static Material _materialSkyLight;
@@ -14,7 +15,17 @@ public class DefaultSky : Component
 
     private static readonly string PRIMITIVES = "Primitives";
 
-    public void CreateDefaultSky()
+    public override void OnUpdate()
+    {
+        var camera = CameraSystem.Components.Last();
+
+        // Set the skybox position to the rendering camera position.
+        Entity.Transform.LocalPosition = camera.Entity.Transform.Position;
+        // Set the skybox scale to the rendering camera far clipping plane.
+        Entity.Transform.LocalScale = new Vector3(-2, 2, 2) * camera.Clipping.Y;
+    }
+
+    public void Initialize()
     {
         // Create a new material with the unlit shader and sky image.
         _materialSky = new(SHADER_SKYBOX, IMAGE_SKY);

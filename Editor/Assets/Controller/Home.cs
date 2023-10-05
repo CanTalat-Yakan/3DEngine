@@ -162,6 +162,10 @@ public class Home
             if (File.Exists(zipPath))
                 ZipFile.ExtractToDirectory(zipPath, path);
 
+            string dllPath = Path.Combine(AppContext.BaseDirectory, Engine.Paths.TEMPLATES, "3DEngine.dll");
+            if (File.Exists(dllPath))
+                File.Copy(dllPath, path);
+
             PopulateProjectTiles();
         }
     }

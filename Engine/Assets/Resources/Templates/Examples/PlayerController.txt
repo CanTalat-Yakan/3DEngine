@@ -12,10 +12,6 @@ public class PlayerMovement : Component
     private Vector3 _targetDirection;
     private Vector2 _cameraRotation;
 
-    public override void OnRegister() =>
-        // Register the component with the ScriptSystem.
-        ScriptSystem.Register(this);
-
     public override void OnUpdate()
     {
         HandleMovement();

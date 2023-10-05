@@ -38,6 +38,7 @@ public class Example : Component
     [Header("Header")]
     public event EventHandler? Event;
 
+    // This is the Base Function.
     public override void OnRegister() =>
         ScriptSystem.Register(this);
 }

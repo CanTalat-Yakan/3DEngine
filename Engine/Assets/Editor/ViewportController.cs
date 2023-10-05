@@ -21,10 +21,6 @@ public sealed class ViewportController : EditorComponent
 
     private Vector2 _mousePosition;
 
-    public override void OnRegister() =>
-        // Register the component with the EditorScriptSystem.
-        EditorScriptSystem.Register(this);
-
     public override void OnAwake()
     {
         if (Instance is null)

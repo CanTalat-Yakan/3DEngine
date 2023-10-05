@@ -54,23 +54,20 @@ public sealed class Core
         _imGuiInputHandler = new(hwnd);
         #endregion
 
-        OnInitialize += (s, e) =>
-        {
-            // Creates an entity with the "Boot" editor tag and adds a "SceneBoot" component to it.
-            SceneManager.MainScene.EntityManager
-                .CreateEntity(null, "Boot", EditorTags.SceneBoot.ToString())
-                .AddComponent(new SceneBoot());
+        // Creates an entity with the "Boot" editor tag and adds a "SceneBoot" component to it.
+        SceneManager.MainScene.EntityManager
+            .CreateEntity(null, "Boot", EditorTags.SceneBoot.ToString())
+            .AddComponent(new SceneBoot());
 
-            // Compile all project scripts and add components for the editor's "AddComponent" function.
-            RuntimeCompiler.CompileProjectScripts(EditorState.AssetsPath);
+        // Compile all project scripts and add components for the editor's "AddComponent" function.
+        RuntimeCompiler.CompileProjectScripts(EditorState.AssetsPath);
 
-            // Copies the List to the local array once to savely iterate to it.
-            SceneManager.ProcessSystems();
+        // Copies the List to the local array once to savely iterate to it.
+        SceneManager.ProcessSystems();
 
-            // Render Pipeline Init
-            SceneManager.Awake();
-            SceneManager.Start();
-        };
+        // Render Pipeline Init
+        SceneManager.Awake();
+        SceneManager.Start();
 
         Output.Log("Engine Initialized...");
     }
@@ -81,7 +78,7 @@ public sealed class Core
             return;
 
         try { OnInitialize?.Invoke(null, null); }
-        catch(Exception ex) { throw new Exception(ex.Message); }
+        catch (Exception ex) { throw new Exception(ex.Message); }
         finally { OnInitialize = null; }
 
         // Clears the render target,

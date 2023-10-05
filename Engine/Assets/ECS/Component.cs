@@ -23,7 +23,8 @@ public partial class Component : ICloneable
 
 public partial class Component : ICloneable
 {
-    public virtual void OnRegister() { }
+    public virtual void OnRegister() =>
+        ScriptSystem.Register(this);
 
     public virtual void OnAwake() { }
 
@@ -40,6 +41,10 @@ public partial class Component : ICloneable
     public virtual void OnDestroy() { }
 }
 
-public class EditorComponent : Component, IHide { }
+public class EditorComponent : Component, IHide
+{
+    public override void OnRegister() =>
+        EditorScriptSystem.Register(this);
+}
 
 public interface IHide { }

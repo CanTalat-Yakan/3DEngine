@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace Engine.Editor;
+﻿namespace Engine.Editor;
 
 internal sealed class SceneBoot : EditorComponent
 {
@@ -9,10 +7,6 @@ internal sealed class SceneBoot : EditorComponent
     public Entity DefaultSky;
 
     public Entity Cubes;
-
-    public override void OnRegister() =>
-        // Register the component with the EditorScriptSystem.
-        EditorScriptSystem.Register(this);
 
     public override void OnAwake()
     {
@@ -33,7 +27,7 @@ internal sealed class SceneBoot : EditorComponent
         var defaultSky = SceneManager.MainScene.EntityManager
             .CreateEntity()
             .AddComponent<DefaultSky>();
-        defaultSky.CreateDefaultSky();
+        defaultSky.Initialize();
 
         DefaultSky = defaultSky.Entity;
     }
@@ -52,10 +46,6 @@ internal sealed class SceneBoot : EditorComponent
 
     public override void OnUpdate()
     {
-        // Set the skybox's position to the camera's position.
-        DefaultSky.Transform.LocalPosition =
-            CameraSystem.Components.Last().Entity.Transform.Position;
-
         // Reactivate the SceneCamera after OnUpdate is called from the EditorScriptSystem.
         SceneCamera.IsEnabled = true;
 
@@ -86,10 +76,6 @@ internal sealed class SceneBoot : EditorComponent
 internal sealed class DeactivateCameraOnPlay : Component, IHide
 {
     public Camera SceneCamera;
-
-    public override void OnRegister() =>
-        // Register the component with the ScriptSystem.
-        ScriptSystem.Register(this);
 
     public override void OnAwake() =>
         // Get the SceneCamera component from the entity with the tag "SceneCamera".

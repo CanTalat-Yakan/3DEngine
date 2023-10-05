@@ -7,10 +7,6 @@ public class {{FileName}} : Component
     [Show]
     private string _text = "Hello World!";
 
-    // Register the component in the ScriptSystem.
-    public override void OnRegister() =>
-        ScriptSystem.Register(this);
-
     // Use this for initialization.
     public override void OnStart()
     {
