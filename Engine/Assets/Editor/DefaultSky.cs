@@ -22,7 +22,7 @@ public class DefaultSky : EditorComponent
         // Set the skybox position to the rendering camera position.
         Entity.Transform.LocalPosition = camera.Entity.Transform.Position;
         // Set the skybox scale to the rendering camera far clipping plane.
-        Entity.Transform.LocalScale = new Vector3(-2, 2, 2) * camera.Clipping.Y;
+        Entity.Transform.LocalScale = new Vector3(-1, 1, 1) * 1.9f * camera.Clipping.Y;
     }
 
     public void Initialize()
