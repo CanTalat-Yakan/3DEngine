@@ -24,12 +24,9 @@ internal sealed class SceneBoot : EditorComponent
         SceneCamera.Entity.Transform.EulerAngles = new(35, -150, 0);
 
         // Create a sky entity in the scene.
-        var defaultSky = SceneManager.MainScene.EntityManager
+        DefaultSky = SceneManager.MainScene.EntityManager
             .CreateEntity()
-            .AddComponent<DefaultSky>();
-        defaultSky.Initialize();
-
-        DefaultSky = defaultSky.Entity;
+            .AddComponent<DefaultSky>().Entity;
     }
 
     public override void OnStart()
