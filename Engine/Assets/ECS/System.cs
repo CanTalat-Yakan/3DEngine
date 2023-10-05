@@ -17,6 +17,8 @@ public partial class System<T> where T : Component
     private static List<T> s_components = new();
     private static T[] s_componentsArray;
 
+    private static bool s_dirty = true;
+
     public static void Register(T component)
     {
         // Adds the given component to the static list of components.
@@ -24,6 +26,8 @@ public partial class System<T> where T : Component
 
         // Register the component's OnDestroy event.
         component.EventOnDestroy += (s, e) => Destroy(component);
+
+        s_dirty = true;
     }
 
     public static void Destroy(T component)
@@ -33,6 +37,8 @@ public partial class System<T> where T : Component
 
         // Trigger the OnDestroy event for the component.
         component.OnDestroy();
+
+        s_dirty = true;
     }
 
     public static void Destroy(Type componentType)
@@ -68,6 +74,23 @@ public partial class System<T> where T : Component
 
     internal static void CopyToArray() =>
         s_componentsArray = s_components.ToArray();
+
+    internal static void SortAndCopyToArray()
+    {
+        Sort();
+        CopyToArray();
+    }
+
+    internal static void SortAndCopyToArrayIfDirty()
+    {
+        if (s_dirty)
+        {
+            Sort();
+            CopyToArray();
+
+            s_dirty = false;
+        }
+    }
 
     private static bool CheckActive(T component) =>
         // Check if the component is active.

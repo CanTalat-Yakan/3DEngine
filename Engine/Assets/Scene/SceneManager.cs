@@ -95,12 +95,9 @@ public sealed partial class SceneManager
 {
     public void ProcessSystems()
     {
-        CameraSystem.Sort();
-        MeshSystem.Sort();
-
         TransformSystem.CopyToArray();
-        CameraSystem.CopyToArray();
-        MeshSystem.CopyToArray();
+        CameraSystem.SortAndCopyToArray();
+        MeshSystem.SortAndCopyToArrayIfDirty();
         EditorScriptSystem.CopyToArray();
         ScriptSystem.CopyToArray();
     }
