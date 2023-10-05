@@ -39,9 +39,9 @@ internal partial class Viewport(ModelView.Viewport viewport, Grid content)
             Binding.Update();
             Output.Log(Engine.Output.DequeueLog());
 
-            _viewport.EngineCore.SetPlayMode(
+            EditorState.SetPlayMode(
                 Main.Instance.PlayerControl.PlayMode == PlayMode.Playing);
-            _viewport.EngineCore.SetPlayModeStarted(
+            EditorState.SetPlayModeStarted(
                 Main.Instance.PlayerControl.CheckPlayModeStarted());
 
             _profile.Text = Engine.Profiler.GetString();
@@ -82,9 +82,9 @@ internal partial class Viewport(ModelView.Viewport viewport, Grid content)
                             .WrapInGridVertical("Movement Speed"))),
                 CreateAppBarSeperator(),
                 CreateComboBox(typeof(Engine.Data.CameraProjection), null,
-                    Engine.Core.Instance.Renderer.Config, "CameraProjection"),
+                    Renderer.Instance.Config, "CameraProjection"),
                 CreateComboBox(typeof(Engine.Data.RenderMode), null,
-                    Engine.Core.Instance.Renderer.Config, "RenderMode")
+                    Renderer.Instance.Config, "RenderMode")
         };
 
         // Initialize an array of UI elements to be positioned in the top-right corner of the main content.

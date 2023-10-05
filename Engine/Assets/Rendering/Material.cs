@@ -105,6 +105,15 @@ public sealed class Material
         CurrentMaterialOnGPU = this;
     }
 
+    internal void Dispose()
+    {
+        _vertexShader?.Dispose();
+        _pixelShader?.Dispose();
+        _inputLayout?.Dispose();
+        _samplerState?.Dispose();
+        _model?.Dispose();
+    }
+
     internal void UpdateConstantBuffer(PerModelConstantBuffer constantBuffer)
     {
         // Map the constant buffer and copy the models model-view matrix into it.

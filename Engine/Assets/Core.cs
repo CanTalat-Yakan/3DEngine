@@ -14,10 +14,6 @@ public sealed class Core
 {
     public static Core Instance { get; private set; }
 
-    public static string AssetsPath { get; private set; }
-    public static bool PlayMode { get; private set; } = false;
-    public static bool PlayModeStarted { get; private set; } = false;
-
     public event EventHandler OnRender;
     public event EventHandler OnInitialize;
     public event EventHandler OnDispose;
@@ -42,7 +38,7 @@ public sealed class Core
         if (Instance is null)
             Instance = this;
 
-        AssetsPath = assetsPath;
+        EditorState.AssetsPath = assetsPath;
 
         Input.Initialize(hwnd);
 
@@ -66,7 +62,7 @@ public sealed class Core
                 .AddComponent(new SceneBoot());
 
             // Compile all project scripts and add components for the editor's "AddComponent" function.
-            RuntimeCompiler.CompileProjectScripts(AssetsPath);
+            RuntimeCompiler.CompileProjectScripts(EditorState.AssetsPath);
 
             // Copies the List to the local array once to savely iterate to it.
             SceneManager.ProcessSystems();
@@ -105,7 +101,7 @@ public sealed class Core
         SceneManager.ProcessSystems();
 
         // Invokes Awake and Start if play mode has started.
-        if (PlayModeStarted)
+        if (EditorState.PlayModeStarted)
         {
             // Gather Components for the Editor's AddComponent function.
             RuntimeCompiler.CompileProjectScripts();
@@ -182,10 +178,4 @@ public sealed class Core
                 break;
         }
     }
-
-    public void SetPlayMode(bool b) =>
-        PlayMode = b;
-
-    public void SetPlayModeStarted(bool b) =>
-        PlayModeStarted = b;
 }

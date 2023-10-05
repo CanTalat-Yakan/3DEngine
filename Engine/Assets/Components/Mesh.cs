@@ -74,6 +74,12 @@ public sealed class Mesh : Component
         Profiler.DrawCalls++;
     }
 
+    public override void OnDestroy()
+    {
+        MeshBuffers.Dispose();
+        Material.Dispose();
+    }
+
     public void SetMeshInfo(MeshInfo meshInfo)
     {
         // Batch MeshInfo by sorting the List with the Order of the Component

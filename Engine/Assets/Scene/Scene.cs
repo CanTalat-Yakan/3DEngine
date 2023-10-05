@@ -8,6 +8,10 @@ public sealed class Scene : ICloneable
     public string Name = "Scene";
     public bool IsEnabled;
 
+    public void Load() { }
+
+    public void Unload() { }
+
     object ICloneable.Clone() =>
         Clone();
 
@@ -22,8 +26,4 @@ public sealed class Scene : ICloneable
         // Return the cloned scene object.
         return newScene;
     }
-
-    public void Load() { }
-
-    public void Unload() { }
 }

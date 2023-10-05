@@ -91,7 +91,7 @@ internal sealed class DeactivateCameraOnPlay : Component, IHide
     public override void OnUpdate()
     {
         // Check if the play mode is set to "Playing" before deactivating the SceneCamera.
-        if (Core.PlayMode)
+        if (EditorState.PlayMode)
             // Deactivate the SceneCamera after OnUpdate is called from the ScriptSystem.
             SceneCamera.IsEnabled = false;
     }

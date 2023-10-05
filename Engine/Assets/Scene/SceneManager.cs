@@ -110,22 +110,22 @@ public sealed partial class SceneManager
         // Update the CameraSystem
         CameraSystem.Awake();
 
-        if (!Core.PlayMode)
+        if (!EditorState.PlayMode)
             // Awake the EditorScriptSystem.
             EditorScriptSystem.Awake();
 
-        if (Core.PlayMode)
+        if (EditorState.PlayMode)
             // Awake the ScriptSystem.
             ScriptSystem.Awake();
     }
 
     public void Start()
     {
-        if (!Core.PlayMode)
+        if (!EditorState.PlayMode)
             // Start the EditorScriptSystem.
             EditorScriptSystem.Start();
 
-        if (Core.PlayMode)
+        if (EditorState.PlayMode)
             // Start the ScriptSystem.
             ScriptSystem.Start();
     }
@@ -139,33 +139,33 @@ public sealed partial class SceneManager
         // Update the CameraSystem
         CameraSystem.Update();
 
-        if (!Core.PlayMode)
+        if (!EditorState.PlayMode)
             // Update the EditorScriptSystem.
             EditorScriptSystem.Update();
 
-        if (Core.PlayMode)
+        if (EditorState.PlayMode)
             // Update the ScriptSystem.
             ScriptSystem.Update();
     }
 
     public void LateUpdate()
     {
-        if (!Core.PlayMode)
+        if (!EditorState.PlayMode)
             // LateUpdate the EditorScriptSystem.
             EditorScriptSystem.LateUpdate();
 
-        if (Core.PlayMode)
+        if (EditorState.PlayMode)
             // LateUpdate the ScriptSystem.
             ScriptSystem.LateUpdate();
     }
 
     public void FixedUpdate()
     {
-        if (!Core.PlayMode)
+        if (!EditorState.PlayMode)
             // FixedUpdate the EditorScriptSystem.
             EditorScriptSystem.FixedUpdate();
 
-        if (Core.PlayMode)
+        if (EditorState.PlayMode)
             // FixedUpdate the ScriptSystem.
             ScriptSystem.FixedUpdate();
     }
