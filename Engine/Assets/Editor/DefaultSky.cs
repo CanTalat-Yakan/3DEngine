@@ -14,7 +14,7 @@ public class DefaultSky : Component
 
     private static readonly string PRIMITIVES = "Primitives";
 
-    public override void OnAwake()
+    public void CreateDefaultSky()
     {
         // Create a new material with the unlit shader and sky image.
         _materialSky = new(SHADER_SKYBOX, IMAGE_SKY);

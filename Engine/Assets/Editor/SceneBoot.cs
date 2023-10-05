@@ -30,7 +30,12 @@ internal sealed class SceneBoot : EditorComponent
         SceneCamera.Entity.Transform.EulerAngles = new(35, -150, 0);
 
         // Create a sky entity in the scene.
-        //DefaultSky = SceneManager.MainScene.EntityManager.CreateEntity().AddComponent<DefaultSky>().Entity;
+        var defaultSky = SceneManager.MainScene.EntityManager
+            .CreateEntity()
+            .AddComponent<DefaultSky>();
+        defaultSky.CreateDefaultSky();
+
+        DefaultSky = defaultSky.Entity;
     }
 
     public override void OnStart()
@@ -48,8 +53,8 @@ internal sealed class SceneBoot : EditorComponent
     public override void OnUpdate()
     {
         // Set the skybox's position to the camera's position.
-        //DefaultSky.Transform.LocalPosition = 
-        //    CameraSystem.Components.Last().Entity.Transform.Position;
+        DefaultSky.Transform.LocalPosition =
+            CameraSystem.Components.Last().Entity.Transform.Position;
 
         // Reactivate the SceneCamera after OnUpdate is called from the EditorScriptSystem.
         SceneCamera.IsEnabled = true;
