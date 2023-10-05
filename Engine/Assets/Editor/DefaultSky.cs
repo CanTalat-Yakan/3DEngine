@@ -15,17 +15,7 @@ public class DefaultSky : EditorComponent
 
     private static readonly string PRIMITIVES = "Primitives";
 
-    public override void OnUpdate()
-    {
-        var camera = CameraSystem.Components.Last();
-
-        // Set the skybox position to the rendering camera position.
-        Entity.Transform.LocalPosition = camera.Entity.Transform.Position;
-        // Set the skybox scale to the rendering camera far clipping plane.
-        Entity.Transform.LocalScale = new Vector3(-2, 2, 2) * camera.Clipping.Y;
-    }
-
-    public void Initialize()
+    public override void OnAwake()
     {
         // Create a new material with the unlit shader and sky image.
         _materialSky = new(SHADER_SKYBOX, IMAGE_SKY);
@@ -44,6 +34,16 @@ public class DefaultSky : EditorComponent
 
         // Set material of Sky's Mesh component.
         skyMesh.SetMaterial(_materialSky);
+    }
+
+    public override void OnUpdate()
+    {
+        var camera = CameraSystem.Components.Last();
+
+        // Set the skybox position to the rendering camera position.
+        Entity.Transform.LocalPosition = camera.Entity.Transform.Position;
+        // Set the skybox scale to the rendering camera far clipping plane.
+        Entity.Transform.LocalScale = new Vector3(-2, 2, 2) * camera.Clipping.Y;
     }
 
     public void SetTheme(bool light) =>
