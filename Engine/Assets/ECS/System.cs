@@ -83,13 +83,13 @@ public partial class System<T> where T : Component
 
     internal static void SortAndCopyToArrayIfDirty()
     {
-        if (s_dirty)
-        {
-            Sort();
-            CopyToArray();
+        if (!s_dirty)
+            return;
 
-            s_dirty = false;
-        }
+        Sort();
+        CopyToArray();
+
+        s_dirty = false;
     }
 
     private static bool CheckActive(T component) =>
