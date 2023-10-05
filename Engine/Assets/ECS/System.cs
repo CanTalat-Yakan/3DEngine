@@ -3,8 +3,8 @@ using System.Linq;
 
 namespace Engine.ECS;
 
-internal sealed class CameraSystem : System<Camera> { }
 internal sealed class TransformSystem : System<Transform> { }
+internal sealed class CameraSystem : System<Camera> { }
 internal sealed class MeshSystem : System<Mesh> { }
 
 public sealed class ScriptSystem : System<Component> { }

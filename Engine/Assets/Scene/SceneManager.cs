@@ -98,8 +98,8 @@ public sealed partial class SceneManager
         CameraSystem.Sort();
         MeshSystem.Sort();
 
-        CameraSystem.CopyToArray();
         TransformSystem.CopyToArray();
+        CameraSystem.CopyToArray();
         MeshSystem.CopyToArray();
         EditorScriptSystem.CopyToArray();
         ScriptSystem.CopyToArray();
