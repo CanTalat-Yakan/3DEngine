@@ -46,15 +46,15 @@ public sealed class RuntimeCompiler
         {
             ScriptEntry scriptEntry = GetScriptEntry(path);
 
-            if (scriptEntry != null)
-                CompileScript(scriptEntry, scriptOptions);
+            if (scriptEntry is not null)
+                CompileScript(scriptEntry);
         }
 
         RemoveObsoleteScripts();
         CollectComponents();
     }
 
-    private ScriptOptions CreateScriptOptions() =>
+    private static ScriptOptions CreateScriptOptions() =>
         ScriptOptions.Default
             .WithImports("System")
             .WithReferences(typeof(Core).Assembly)
@@ -73,7 +73,7 @@ public sealed class RuntimeCompiler
                 string updatedCode = File.ReadAllText(path);
                 scriptEntry.Script = CSharpScript.Create(updatedCode, CreateScriptOptions());
 
-                Output.Log("Updated file");
+                Output.Log("Updated File");
             }
             else
                 scriptEntry = null;
@@ -85,17 +85,20 @@ public sealed class RuntimeCompiler
             {
                 scriptEntry = new ScriptEntry() { FileInfo = fileInfo };
                 string code = reader.ReadToEnd();
-                scriptEntry.Script = CSharpScript.Create(code, CreateScriptOptions());
+                scriptEntry.Script = CreateScript(code);
                 _scriptsCollection.Add(fileInfo.FullName, scriptEntry);
 
-                Output.Log("Read new file");
+                Output.Log("Read new File");
             }
         }
 
         return scriptEntry;
     }
 
-    private void CompileScript(ScriptEntry scriptEntry, ScriptOptions scriptOptions)
+    internal static Script<object> CreateScript(string code) =>
+        CSharpScript.Create(code, CreateScriptOptions());
+
+    internal void CompileScript(ScriptEntry scriptEntry)
     {
         try
         {
@@ -124,7 +127,7 @@ public sealed class RuntimeCompiler
                 scriptEntry.Assembly = Assembly.Load(assemblyStream.ToArray(), symbolStream.ToArray());
                 ReplaceComponentTypeReferences(scriptEntry.Assembly);
 
-                Output.Log("Loaded assembly");
+                Output.Log("Loaded Assembly");
             }
         }
         catch { }
@@ -157,7 +160,7 @@ public sealed class RuntimeCompiler
 
                 _scriptsCollection.Remove(fullName);
 
-                Output.Log("Removed file");
+                Output.Log("Removed File");
             }
     }
 

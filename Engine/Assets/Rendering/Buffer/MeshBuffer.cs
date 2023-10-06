@@ -2,7 +2,7 @@
 
 namespace Engine.Utilities;
 
-public sealed class MeshBuffers
+public sealed class MeshBuffer
 {
     public ID3D11Buffer VertexBuffer;
     public ID3D11Buffer IndexBuffer;

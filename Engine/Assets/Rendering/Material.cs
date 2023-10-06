@@ -26,12 +26,17 @@ public sealed class Material
     public Material(string shaderFileName, string imageFileName)
     {
         #region //Create VertexShader
+        if (string.IsNullOrEmpty(shaderFileName))
+        {
+            new Exception("ShaderFileName in the Material Constructor was null");
+            return;
+        }
+
         // Compile the vertex shader bytecode from the specified shader file name.
         ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(shaderFileName, "VS", "vs_4_0");
 
         // Create the vertex shader using the compiled bytecode.
         _vertexShader = _renderer.Device.CreateVertexShader(vertexShaderByteCode.Span);
-        // Create the input layout using the specified input elements and vertex shader bytecode.
         #endregion
 
         #region //Create InputLayout
@@ -69,6 +74,9 @@ public sealed class Material
         #endregion
 
         #region //Create Texture and Sampler
+        if (string.IsNullOrEmpty(imageFileName))
+            return;
+
         // Load the texture and create a shader resource view for it.
         var texture = Loader.ImageLoader.LoadTexture(_renderer.Device, imageFileName);
         _resourceView = _renderer.Device.CreateShaderResourceView(texture);
@@ -100,18 +108,9 @@ public sealed class Material
         _renderer.Data.SetupMaterial(_inputLayout, _vertexShader, _pixelShader);
         _renderer.Data.SetSamplerState(0, _samplerState);
         _renderer.Data.SetResourceView(0, _resourceView);
-        
+
         // Assign material to the static variable.
         CurrentMaterialOnGPU = this;
-    }
-
-    internal void Dispose()
-    {
-        _vertexShader?.Dispose();
-        _pixelShader?.Dispose();
-        _inputLayout?.Dispose();
-        _samplerState?.Dispose();
-        _model?.Dispose();
     }
 
     internal void UpdateConstantBuffer(PerModelConstantBuffer constantBuffer)
@@ -131,12 +130,43 @@ public sealed class Material
         _renderer.Data.SetConstantBuffer(1, _model);
     }
 
-    internal static ReadOnlyMemory<byte> CompileBytecode(string shaderPath, string entryPoint, string profile)
+    internal void UpdateVertexShader(string shaderPath)
     {
-        // Combine the base directory and the relative path to the resources directory.
-        string resourcesPath = Path.Combine(AppContext.BaseDirectory, Paths.SHADERS);
-        // Define the full path to the shader file.
-        string shaderFilePath = Path.Combine(resourcesPath, shaderPath);
+        // Compile the vertex shader bytecode from the specified shader file name.
+        ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(shaderPath, "VS", "vs_4_0", false);
+
+        // Create the vertex shader using the compiled bytecode.
+        _vertexShader = _renderer.Device.CreateVertexShader(vertexShaderByteCode.Span);
+    }
+
+    internal void UpdatePixelShader(string shaderPath)
+    {
+        // Compile the vertex shader bytecode from the specified shader file name.
+        ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(shaderPath, "PS", "ps_4_0", false);
+
+        // Create the vertex shader using the compiled bytecode.
+        _vertexShader = _renderer.Device.CreateVertexShader(vertexShaderByteCode.Span);
+    }
+
+    internal void Dispose()
+    {
+        _vertexShader?.Dispose();
+        _pixelShader?.Dispose();
+        _inputLayout?.Dispose();
+        _samplerState?.Dispose();
+        _model?.Dispose();
+    }
+
+    internal static ReadOnlyMemory<byte> CompileBytecode(string shaderPath, string entryPoint, string profile, bool fromResources = true)
+    {
+        string shaderFilePath = shaderPath;
+        if (fromResources)
+        {
+            // Combine the base directory and the relative path to the resources directory.
+            string resourcesPath = Path.Combine(AppContext.BaseDirectory, Paths.SHADERS);
+            // Define the full path to the shader file.
+            shaderFilePath = Path.Combine(resourcesPath, shaderPath);
+        }
 
         // Shader flags to enable strictness and set optimization level or debug mode.
         ShaderFlags shaderFlags = ShaderFlags.EnableStrictness;

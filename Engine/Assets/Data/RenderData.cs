@@ -1,9 +1,10 @@
-﻿using Vortice.Direct3D11;
+﻿using System.Drawing;
+using System.Runtime.CompilerServices;
+
+using Vortice.Direct3D11;
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
-using System.Drawing;
-using System.Runtime.CompilerServices;
 
 namespace Engine.Data;
 

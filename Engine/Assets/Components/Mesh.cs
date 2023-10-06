@@ -10,7 +10,7 @@ public sealed class Mesh : Component
     public static MeshInfo CurrentMeshOnGPU { get; private set; }
     public static List<MeshInfo> BatchLookup { get; private set; } = new();
 
-    public MeshBuffers MeshBuffers { get; private set; } = new(); 
+    public MeshBuffer MeshBuffers { get; private set; } = new(); 
 
     public MeshInfo MeshInfo => _meshInfo;
     [Show] private MeshInfo _meshInfo;

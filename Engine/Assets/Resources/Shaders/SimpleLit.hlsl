@@ -9,6 +9,19 @@ cbuffer PerModelConstantBuffer : register(b1)
     float4x4 World;
 };
 
+cbuffer Properties : register(b10)
+{
+    float Float;
+    int Int;
+    //[Slider(1, 10)]
+    float Slider;
+    float2 Vector2;
+    float3 Vector3;
+    //[Color]
+    float3 Color;
+    bool Bool;
+};
+
 struct appdata
 {
     float3 vertex : POSITION;

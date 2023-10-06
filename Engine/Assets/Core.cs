@@ -19,6 +19,7 @@ public sealed class Core
     public event EventHandler OnDispose;
 
     public Renderer Renderer;
+    public MaterialCompiler MaterialCompiler;
     public RuntimeCompiler RuntimeCompiler;
     public SceneManager SceneManager;
 
@@ -54,12 +55,14 @@ public sealed class Core
         _imGuiInputHandler = new(hwnd);
         #endregion
 
-        // Creates an entity with the "Boot" editor tag and adds a "SceneBoot" component to it.
+        // Creates an entity with the Boot editor tag and adds a SceneBoot component to it.
         SceneManager.MainScene.EntityManager
             .CreateEntity(null, "Boot", EditorTags.SceneBoot.ToString())
             .AddComponent(new SceneBoot());
 
-        // Compile all project scripts and add components for the editor's "AddComponent" function.
+        // Compile all project materials and add them to the collection.
+        MaterialCompiler.CompileProjectMaterials(EditorState.AssetsPath);
+        // Compile all project scripts and add the components to the collection for the AddComponent function.
         RuntimeCompiler.CompileProjectScripts(EditorState.AssetsPath);
 
         // Copies the List to the local array once to savely iterate to it.
@@ -101,8 +104,10 @@ public sealed class Core
         // Invokes Awake and Start if play mode has started.
         if (EditorState.PlayModeStarted)
         {
-            // Gather Components for the Editor's AddComponent function.
-            RuntimeCompiler.CompileProjectScripts();
+            // Gather Materials.
+            MaterialCompiler.CompileProjectMaterials(EditorState.AssetsPath);
+            // Gather Components.
+            RuntimeCompiler.CompileProjectScripts(EditorState.AssetsPath);
 
             // Call Awake for all scenes again.
             SceneManager.Awake();

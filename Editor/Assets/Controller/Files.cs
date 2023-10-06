@@ -244,9 +244,11 @@ internal partial class Files
         // Set the breadcrumb bar with the correct values.
         SetBreadcrumbBar();
 
+        // Compile the project materials.
+        Engine.Core.Instance?.MaterialCompiler.CompileProjectMaterials(AssetsPath);
+
         // Compile the project scripts.
-        if (Engine.Core.Instance is not null)
-            Engine.Core.Instance.RuntimeCompiler.CompileProjectScripts(AssetsPath);
+        Engine.Core.Instance?.RuntimeCompiler.CompileProjectScripts(AssetsPath);
     }
 
     public void ValidateCategoriesExist()
