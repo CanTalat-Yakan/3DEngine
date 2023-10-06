@@ -40,8 +40,6 @@ public sealed class RuntimeCompiler
         if (!Directory.Exists(scriptsFolderPath))
             return;
 
-        ScriptOptions scriptOptions = CreateScriptOptions();
-
         foreach (var path in Directory.GetFiles(scriptsFolderPath, "*", SearchOption.AllDirectories))
         {
             ScriptEntry scriptEntry = GetScriptEntry(path);

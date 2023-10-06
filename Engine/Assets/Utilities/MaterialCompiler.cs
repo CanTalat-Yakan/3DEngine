@@ -9,7 +9,20 @@ public sealed class MaterialEntry
 
     public FileInfo FileInfo;
     public Material Material;
+
+    public FileInfo ShaderFileInfo;
+
+    public object Buffer;
+
     public string Name => FileInfo.Name;
+
+    public void SetShader(string path)
+    {
+        Material.UpdateVertexShader(path);
+        Material.UpdatePixelShader(path);
+
+        // TODO: Update Material XML File
+    }
 }
 
 public sealed class MaterialCollector
@@ -20,15 +33,23 @@ public sealed class MaterialCollector
         Materials.Find(Material => Material.Name == name).Material;
 }
 
+public sealed class ShaderCollector
+{
+    public List<FileInfo> Shaders = new();
+
+    public FileInfo GetShader(string name) =>
+        Shaders.Find(FileInfo => FileInfo.Name == name);
+}
+
 public class MaterialCompiler
 {
     public MaterialCollector MaterialCollector = new();
+    public ShaderCollector ShaderCollector = new();
 
     private Dictionary<string, MaterialEntry> _materialCollection = new();
 
     public void CompileProjectMaterials(string assetsPath = null)
     {
-        return;
         if (assetsPath is null)
             return;
 
@@ -37,6 +58,18 @@ public class MaterialCompiler
             return;
 
         foreach (var path in Directory.GetFiles(shadersFolderPath, "*", SearchOption.AllDirectories))
+        {
+            ShaderCollector.Shaders.Clear();
+            ShaderCollector.Shaders.Add(new(path));
+        }
+
+        ShaderCollector.Shaders.Add(new FileInfo(Path.Combine(Paths.SHADERS, "SimpleLit.hlsl")));
+
+        string materialsFolderPath = Path.Combine(assetsPath, "Materials");
+        if (!Directory.Exists(materialsFolderPath))
+            return;
+
+        foreach (var path in Directory.GetFiles(materialsFolderPath, "*", SearchOption.AllDirectories))
             CheckMaterialEntry(path);
     }
 
@@ -50,10 +83,10 @@ public class MaterialCompiler
             {
                 materialEntry.FileInfo = fileInfo;
 
-                materialEntry.Material.UpdateVertexShader(path);
-                materialEntry.Material.UpdatePixelShader(path);
+                // TODO: Read the material XML File and paste those information into a the Buffer
 
-                UpdateMaterialBuffer(materialEntry, path);
+                // materialEntry.Buffer;
+                // Type PropertyConstantBufferType = CreateMaterialBufferScript(materialEntry, path);
 
                 Output.Log("Updated Material");
             }
@@ -66,11 +99,11 @@ public class MaterialCompiler
             using (StreamReader reader = new StreamReader(fs))
             {
                 materialEntry = new() { FileInfo = fileInfo };
-                materialEntry.Material = new(path, null);
+                //materialEntry.Material = new(path, null);
 
                 _materialCollection.Add(fileInfo.FullName, materialEntry);
 
-                UpdateMaterialBuffer(materialEntry, path);
+                // TODO: Create the Buffer and paste the information of the XML File into that one
 
                 Output.Log("Read new Material");
             }
@@ -79,7 +112,7 @@ public class MaterialCompiler
         return materialEntry;
     }
 
-    private void UpdateMaterialBuffer(MaterialEntry materialEntry, string path)
+    private Type CreateMaterialBufferScript(MaterialEntry materialEntry, string path)
     {
         string updatedCode = File.ReadAllText(path);
         string scriptCode = MaterialBuffer.ConvertHlslToCSharp(updatedCode, materialEntry.ID);
@@ -88,17 +121,17 @@ public class MaterialCompiler
         materialBuffer.Script = RuntimeCompiler.CreateScript(scriptCode);
 
         if (materialBuffer.Script is null)
-            return;
+            return null; // Script Creation Failed
 
         Core.Instance.RuntimeCompiler.CompileScript(materialBuffer);
 
         if (materialBuffer.Assembly is null)
-            return;
+            return null; // Compilation Failed
 
         foreach (var type in materialBuffer.Assembly.GetTypes())
             if (typeof(IMaterialBuffer).IsAssignableFrom(type))
-            {
+                return type; // Successfull
 
-            }
+        return null; // A Script with the Interface IMaterialBuffer was not found
     }
 }

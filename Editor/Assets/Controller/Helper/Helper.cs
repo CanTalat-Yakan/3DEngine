@@ -508,7 +508,7 @@ internal static partial class ExtensionMethods
         return grid;
     }
 
-    public static Grid WrapInExpander(this Grid content, string text)
+    public static Grid WrapInExpander(this Grid content, string text, bool isExpanded = true)
     {
         Grid grid = new() { Margin = new(0, 0, 0, 2) };
         Expander expander = new()
@@ -519,7 +519,7 @@ internal static partial class ExtensionMethods
             HorizontalAlignment = HorizontalAlignment.Stretch,
             HorizontalContentAlignment = HorizontalAlignment.Stretch
         };
-        expander.IsExpanded = true;
+        expander.IsExpanded = isExpanded;
         expander.Content = content;
 
         grid.Children.Add(expander);

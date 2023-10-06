@@ -4,7 +4,7 @@ using System.Xml.Serialization;
 
 using Type = System.Type;
 
-namespace Editor.Controller;
+namespace Engine.Helper;
 
 internal enum EDataType
 {

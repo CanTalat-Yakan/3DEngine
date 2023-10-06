@@ -50,7 +50,7 @@ public sealed class Mesh : Component
             && Equals(Mesh.CurrentMeshOnGPU, MeshInfo))
         {
             // Update the PerModelConstantBuffer only.
-            Material.UpdateConstantBuffer(Entity.Transform.GetConstantBuffer());
+            Material.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
 
             // Draw the mesh directly without resetting the RenderState.
             _renderer.DrawIndexed(MeshInfo.Indices.Length);

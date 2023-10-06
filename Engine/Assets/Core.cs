@@ -44,6 +44,7 @@ public sealed class Core
         Input.Initialize(hwnd);
 
         Renderer = renderer;
+        MaterialCompiler = new();
         RuntimeCompiler = new();
         SceneManager = new();
 

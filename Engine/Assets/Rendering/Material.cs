@@ -23,6 +23,8 @@ public sealed class Material
 
     private ID3D11Buffer _model;
 
+    private ID3D11Buffer _properties;
+
     public Material(string shaderFileName, string imageFileName)
     {
         #region //Create VertexShader
@@ -101,7 +103,7 @@ public sealed class Material
 
     internal void Set(PerModelConstantBuffer constantBuffer)
     {
-        UpdateConstantBuffer(constantBuffer);
+        UpdateModelConstantBuffer(constantBuffer);
 
         // Set input layout, vertex shader, and pixel shader in the device context.
         // Set the shader resource and sampler in the pixel shader stage of the device context.
@@ -113,7 +115,7 @@ public sealed class Material
         CurrentMaterialOnGPU = this;
     }
 
-    internal void UpdateConstantBuffer(PerModelConstantBuffer constantBuffer)
+    internal void UpdateModelConstantBuffer(PerModelConstantBuffer constantBuffer)
     {
         // Map the constant buffer and copy the models model-view matrix into it.
         unsafe
@@ -128,6 +130,25 @@ public sealed class Material
 
         // Set the constant buffer in the vertex shader stage of the device context.
         _renderer.Data.SetConstantBuffer(1, _model);
+    }
+
+    internal void UpdatePropertiesConstantBuffer(object constantBuffer)
+    {
+        // Set up the description for the constant buffer.
+        BufferDescription bufferDescription = new()
+        {
+            BindFlags = BindFlags.ConstantBuffer,
+            CPUAccessFlags = CpuAccessFlags.Write,
+            Usage = ResourceUsage.Dynamic,
+        };
+
+        // Create the constant buffer with the given description.
+        //_properties = _renderer.Device.CreateBuffer(constantBuffer, bufferDescription);
+
+        // TODO: Fix create constantbuffer for properties
+
+        // Set the constant buffer in the vertex shader stage of the device context.
+        _renderer.Data.SetConstantBuffer(10, _properties);
     }
 
     internal void UpdateVertexShader(string shaderPath)

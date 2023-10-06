@@ -516,7 +516,15 @@ internal partial class Files
             VerticalContentAlignment = VerticalAlignment.Stretch,
         };
         button.ContextFlyout = CreateDefaultMenuFlyout(path, true);
-        button.Tapped += (s, e) => Properties.Set(path);
+
+        var file = new FileInfo(path);
+        if (file.Extension == ".mat")
+            button.Tapped += (s, e) => Properties.Set(
+                Engine.Core.Instance.MaterialCompiler.
+                MaterialCollector.GetMaterial(file.Name));
+        else
+            button.Tapped += (s, e) => Properties.Set(path);
+
         button.DoubleTapped += (s, e) =>
         {
             if ((Path.GetExtension(path) == ".cs")

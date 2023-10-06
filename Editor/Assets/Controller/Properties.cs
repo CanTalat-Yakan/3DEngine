@@ -18,9 +18,6 @@ using static Editor.Controller.Helper;
 using Color = System.Drawing.Color;
 using Path = System.IO.Path;
 using Texture = Vortice.Direct3D11.Texture2DArrayShaderResourceView;
-using System.Reflection.Metadata;
-using System.Runtime.Serialization.Formatters;
-using System.Xml.Linq;
 
 namespace Editor.Controller;
 
@@ -39,6 +36,8 @@ internal partial class Properties
             CreateEmptyMessage();
         else if (content.GetType() == typeof(Entity))
             CreateEntityProperties((Entity)content);
+        else if (content.GetType() == typeof(MaterialEntry))
+            CreateMaterialProperties((MaterialEntry)content);
         else if (content.GetType() == typeof(string))
             CreateFilePreviewer((string)content);
     }
@@ -123,7 +122,9 @@ internal partial class Properties
                 "Add Component",
                 (s, e) =>
                 {
-                    entity.AddComponent(Engine.Core.Instance.RuntimeCompiler.ComponentCollector.GetComponent(e.SelectedItem.ToString()));
+                    entity.AddComponent(
+                        Engine.Core.Instance.RuntimeCompiler.ComponentCollector
+                        .GetComponent(e.SelectedItem.ToString()));
 
                     Set(entity);
                 }));
@@ -134,11 +135,13 @@ internal partial class Properties
             // Skip the Transform component of the entity.
             if (component != entity.Transform)
             {
+                BindingFlags allBindingFlags = BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
+
                 // Get the non-public fields and events of the component.
-                var nonPublicFieldInfos = component.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-                var fieldInfos = component.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
-                var nonPublicEventsInfos = component.GetType().GetEvents(BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-                var eventsInfos = component.GetType().GetEvents(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
+                var nonPublicFieldInfos = component.GetType().GetFields(allBindingFlags);
+                var fieldInfos = component.GetType().GetFields(allBindingFlags);
+                var nonPublicEventsInfos = component.GetType().GetEvents(allBindingFlags);
+                var eventsInfos = component.GetType().GetEvents(allBindingFlags);
 
                 // Initialize the collection of fields, events, and scripts.
                 Grid newFieldGrid;
@@ -147,8 +150,8 @@ internal partial class Properties
                 List<Grid> scriptsCollection = new();
 
                 // Add fields to the fields collection.
-                foreach (var info in fieldInfos)
-                    if ((newFieldGrid = CreateFromFieldInfo(component, entity, info, nonPublicFieldInfos)) is not null)
+                foreach (var fieldInfo in fieldInfos)
+                    if ((newFieldGrid = CreateComponentPropertyFromFieldInfo(component, entity, fieldInfo, nonPublicFieldInfos)) is not null)
                         fieldsCollection.Add(newFieldGrid);
 
                 // Add events to the events collection.
@@ -184,6 +187,49 @@ internal partial class Properties
         }
     }
 
+    private void CreateMaterialProperties(MaterialEntry materialEntry)
+    {
+        // Add Bindings for the Material.
+        Binding.SetBindings(materialEntry);
+
+        s_stackPanel.Children.Add(
+            CreateButtonWithAutoSuggesBoxAndShaderCollector(
+                materialEntry.FileInfo.Name,
+                (s, e) =>
+                {
+                    string newShaderName = e.SelectedItem.ToString();
+
+                    FileInfo newShaderFileInfo = Engine.Core.Instance.MaterialCompiler.ShaderCollector
+                        .GetShader(newShaderName);
+
+                    materialEntry.SetShader(newShaderFileInfo.FullName);
+
+                    Set(materialEntry);
+                }));
+
+        s_stackPanel.Children.Add(CreateSeperator());
+
+        // Get the non-public fields and events of the component.
+        var fieldInfos = materialEntry.Buffer.GetType().GetFields(
+            BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
+
+        // Initialize the collection of fields, events, and scripts.
+        Grid newFieldGrid;
+        List<Grid> fieldsCollection = new();
+
+        // Add fields to the fields collection.
+        foreach (var fieldInfo in fieldInfos)
+            if ((newFieldGrid = CreateMaterialPropertyFromFieldInfo(materialEntry, fieldInfo)) is not null)
+                fieldsCollection.Add(newFieldGrid);
+
+        // Initialize the content grid and stack panel.
+        UIElement tmp;
+        Grid content = new Grid();
+        s_stackPanel.Children.Add(tmp = fieldsCollection.ToArray()
+            .StackInGrid()
+            .WrapInExpander("Material Properties"));
+    }
+
     private async void CreateFilePreviewer(string path)
     {
         // Deselect any highlighted Entity from the TreeViews.
@@ -200,9 +246,9 @@ internal partial class Properties
                 CreateTextEqual(fileInfo.CreationTime.ToShortDateString() + "⠀" + fileInfo.CreationTime.ToShortTimeString()).WrapInFieldEqual("Creation time:"),
                 CreateTextEqual(fileInfo.LastAccessTime.ToShortDateString() + "⠀" + fileInfo.LastAccessTime.ToShortTimeString()).WrapInFieldEqual("Last access time:"),
                 CreateTextEqual(fileInfo.LastWriteTime.ToShortDateString() + "⠀" + fileInfo.LastWriteTime.ToShortTimeString()).WrapInFieldEqual("Last update time:")
-            };
+        };
 
-        s_stackPanel.Children.Add(properties.StackInGrid().WrapInExpander(Path.GetFileName(path)));
+        s_stackPanel.Children.Add(properties.StackInGrid().WrapInExpander(Path.GetFileName(path), false));
         s_stackPanel.Children.Add(CreateSeperator());
         s_stackPanel.Children.Add(CreateButton("Open File", (s, e) =>
         {
@@ -257,12 +303,12 @@ internal partial class Properties
 
 internal partial class Properties
 {
-    public Grid CreateButtonWithAutoSuggesBoxAndComponentCollector(string s,
+    public Grid CreateButtonWithAutoSuggesBoxAndComponentCollector(string label,
         TypedEventHandler<AutoSuggestBox, AutoSuggestBoxSuggestionChosenEventArgs> suggestionChosen)
     {
         Grid grid = new();
 
-        Button button = new() { Content = s, HorizontalAlignment = HorizontalAlignment.Center, Margin = new(10) };
+        Button button = new() { Content = label, HorizontalAlignment = HorizontalAlignment.Center, Margin = new(10) };
 
         AutoSuggestBox autoSuggestBox = new() { Width = 200, IsSuggestionListOpen = true };
         autoSuggestBox.TextChanged += (s, e) =>
@@ -271,7 +317,9 @@ internal partial class Properties
             // only listen to changes caused by user entering text.
             if (e.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
-                string[] itemSource = Engine.Core.Instance.RuntimeCompiler.ComponentCollector.Components.ConvertAll<string>(Type => Type.Name).ToArray();
+                string[] itemSource = Engine.Core.Instance.RuntimeCompiler.ComponentCollector
+                    .Components.ConvertAll<string>(Type => Type.Name).ToArray();
+
                 List<string> suitableItems = new();
 
                 foreach (var component in itemSource)
@@ -290,7 +338,42 @@ internal partial class Properties
         return grid;
     }
 
-    public Grid CreateFromFieldInfo(object component, Entity entity, FieldInfo fieldInfo, FieldInfo[] nonPublic)
+    public Grid CreateButtonWithAutoSuggesBoxAndShaderCollector(string label,
+            TypedEventHandler<AutoSuggestBox, AutoSuggestBoxSuggestionChosenEventArgs> suggestionChosen)
+    {
+        Grid grid = new();
+
+        Button button = new() { Content = label, HorizontalAlignment = HorizontalAlignment.Stretch, Margin = new(10) };
+
+        AutoSuggestBox autoSuggestBox = new() { Width = 200, IsSuggestionListOpen = true };
+        autoSuggestBox.TextChanged += (s, e) =>
+        {
+            // Since selecting an item will also change the text,
+            // only listen to changes caused by user entering text.
+            if (e.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                string[] itemSource = Engine.Core.Instance.MaterialCompiler.ShaderCollector
+                    .Shaders.ConvertAll<string>(Type => Type.Name).ToArray();
+
+                List<string> suitableItems = new();
+
+                foreach (var shaders in itemSource)
+                    if (shaders.ToLower().Contains(s.Text.ToLower()))
+                        suitableItems.Add(shaders);
+
+                s.ItemsSource = suitableItems;
+            }
+        };
+        autoSuggestBox.SuggestionChosen += suggestionChosen;
+
+        button.Flyout = new Flyout() { Content = autoSuggestBox };
+
+        grid.Children.Add(button);
+
+        return grid;
+    }
+
+    public Grid CreateComponentPropertyFromFieldInfo(object component, Entity entity, FieldInfo fieldInfo, FieldInfo[] nonPublic)
     {
         Grid finalGrid = null;
 
@@ -326,7 +409,6 @@ internal partial class Properties
 
             finalGrid = ReturnProcessedFieldInfo(grid, attributes, fieldInfo, toolTip);
         }
-
         #endregion
 
         if (finalGrid is null)
@@ -503,13 +585,94 @@ internal partial class Properties
         return finalGrid;
     }
 
-    public Grid ReturnProcessedFieldInfo(List<Grid> grid, object[] attributes, FieldInfo fieldInfo, ToolTip toolTip) =>
-        new Grid[] {
-            // Stack processed attributes in a grid.
-            ProcessAttributes(attributes).StackInGrid(),
-            // Stack field grid and wrap it with field name.
-            grid.ToArray().StackInGrid().WrapInField(fieldInfo.Name)}
-        .StackInGrid(0).AddToolTip(toolTip);
+    public Grid CreateMaterialPropertyFromFieldInfo(MaterialEntry materialEntry, FieldInfo fieldInfo)
+    {
+        Grid finalGrid = null;
+
+        // Initialize a new List of Grid type.
+        List<Grid> grid = new();
+
+        var buffer = materialEntry.Buffer;
+        var value = fieldInfo.GetValue(buffer);
+        // Get the type of the current field.
+        var type = fieldInfo.FieldType;
+        // Get any custom attributes applied to the field.
+        var attributes = fieldInfo.GetCustomAttributes(true);
+
+        if (finalGrid is null)
+        {
+            #region // Process FieldType
+            // Check the type of the field and add the appropriate element to the `grid` list.
+            // Color
+            if (type == typeof(Color))
+                grid.Add(
+                    CreateColorButton(
+                        ((Color)value).R,
+                        ((Color)value).G,
+                        ((Color)value).B,
+                        ((Color)value).A));
+
+            // Int
+            else if (type == typeof(int))
+                // If the field has the `SliderAttribute`, add a slider element.
+                if (attributes.OfType<SliderAttribute>().Any())
+                    grid.Add(
+                    CreateSlider(
+                        materialEntry.ID, buffer, fieldInfo.Name,
+                        (int)value,
+                        (int)attributes.OfType<SliderAttribute>().First().CustomMin,
+                        (int)attributes.OfType<SliderAttribute>().First().CustomMax));
+                // If the field doesn't have the `SliderAttribute`, add a number input element.
+                else
+                    grid.Add(CreateNumberInput(
+                        materialEntry.ID, buffer, fieldInfo.Name,
+                        (int)value,
+                        int.MinValue,
+                        int.MaxValue));
+
+            // Float
+            else if (type == typeof(float))
+                // If the field has the `SliderAttribute`, add a slider element.
+                if (attributes.OfType<SliderAttribute>().Any())
+                    grid.Add(
+                    CreateSlider(
+                        materialEntry.ID, buffer, fieldInfo.Name,
+                        (float)value,
+                        (float)attributes.OfType<SliderAttribute>().First().CustomMin,
+                        (float)attributes.OfType<SliderAttribute>().First().CustomMax));
+                // If the field doesn't have the `SliderAttribute`, add a number input element.
+                else
+                    grid.Add(CreateNumberInput(
+                        materialEntry.ID, buffer, fieldInfo.Name,
+                        (float)value,
+                        float.MinValue,
+                        float.MaxValue));
+
+            // Vector 2
+            else if (type == typeof(Vector2))
+                grid.Add(CreateVec2Input(materialEntry.ID, buffer, fieldInfo.Name, (Vector2)value));
+
+            // Vector 3
+            else if (type == typeof(Vector3))
+                grid.Add(CreateVec3Input(materialEntry.ID, buffer, fieldInfo.Name, (Vector3)value));
+
+            // Bool
+            else if (type == typeof(bool))
+                grid.Add(CreateBool(materialEntry.ID, buffer, fieldInfo.Name, (bool)value));
+            #endregion
+
+            // Return the final grid by stacking all the processed attributes, type grid and wrapping the field name.
+            finalGrid = ReturnProcessedFieldInfo(grid, attributes, fieldInfo, null);
+        }
+
+        Binding.GetBinding(fieldInfo.Name, buffer, materialEntry.ID)?.SetEvent((s, e) =>
+        {
+            //materialEntry.Material.UpdatePropertiesConstantBuffer();
+            // TODO: Update ConstantBuffer of Material when a value changed in the properties
+        });
+
+        return finalGrid;
+    }
 
     public Grid CreateFromEventInfo(EventInfo eventInfo, EventInfo[] nonPublic)
     {
@@ -563,4 +726,12 @@ internal partial class Properties
         // Return the grid as an array
         return grid.ToArray();
     }
+
+    public Grid ReturnProcessedFieldInfo(List<Grid> grid, object[] attributes, FieldInfo fieldInfo, ToolTip toolTip) =>
+        new Grid[] {
+            // Stack processed attributes in a grid.
+            ProcessAttributes(attributes).StackInGrid(),
+            // Stack field grid and wrap it with field name.
+            grid.ToArray().StackInGrid().WrapInField(fieldInfo.Name)}
+        .StackInGrid(0).AddToolTip(toolTip);
 }

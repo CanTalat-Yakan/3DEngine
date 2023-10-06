@@ -99,6 +99,14 @@ internal class Binding
                 EntityBindings.Add(field.Name + component.GetType().FullName + entity.ID, new(component, field.Name));
     }
 
+    public static void SetBindings(MaterialEntry materialEntry)
+    {
+        if (materialEntry is null)
+            return;
+
+        // TODO: Create Binding for material properties
+    }
+
     /// <summary>
     /// [Renderer Key = Field.Name + Component.GetType().FullName]   
     /// [Scene Key = Field.Name + Scene.ID]  

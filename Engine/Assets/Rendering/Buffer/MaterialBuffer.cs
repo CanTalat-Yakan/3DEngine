@@ -25,12 +25,10 @@ internal class MaterialBuffer
 
         foreach (Match match in matches)
         {
-            string bufferName = match.Groups[1].Value;
-            string slotNumber = match.Groups[2].Value;
             string bufferFields = match.Groups[3].Value.Trim();
 
             // Generate the C# class code for the constant buffer
-            string csharpCode = GenerateCSharpClass(bufferName, bufferGuid, slotNumber, bufferFields);
+            string csharpCode = GenerateCSharpClass(bufferGuid, bufferFields);
             csharpCodeList.Add(csharpCode);
         }
 
@@ -40,7 +38,7 @@ internal class MaterialBuffer
         return csharpCodeResult;
     }
 
-    private static string GenerateCSharpClass(string bufferName, Guid bufferGuid, string slotNumber, string bufferFields)
+    private static string GenerateCSharpClass(Guid bufferGuid, string bufferFields)
     {
         // Handle [Color] annotation for float3 fields
         bufferFields = Regex.Replace(bufferFields, @"\/\/\s*\[Color\]\s*(float3\s+\w+)", "Color $1");
@@ -60,42 +58,19 @@ internal class MaterialBuffer
                 return $"[Slider({min}, {max})]{csharpType} {fieldName};";
             });
 
-        // Perform the conversion for float3 to Color and float2 to Vector2
-        bufferFields = Regex.Replace(bufferFields, @"float3\s+(\w+)", "Color $1");
+        // Perform the conversion for float3 to Vector3 and float2 to Vector2
+        bufferFields = Regex.Replace(bufferFields, @"float3\s+(\w+)", "Vector3 $1");
         bufferFields = Regex.Replace(bufferFields, @"float2\s+(\w+)", "Vector2 $1");
 
-
         // Create the C# class code
         string csharpCode = $@"
             using System.Drawing;
             
-            namespace Engine
-            {{
-                public class {bufferName}{bufferGuid:N} : Component, IMaterialBuffer
-                {{
-                    public int Slot => {slotNumber};
-            
-                    {bufferFields}
-                }}
-            }}";
+            namespace Engine;
 
-        return csharpCode;
-    }
-
-    private static string GenerateSimpleCSharpClass(string bufferName, Guid bufferGuid, string slotNumber, string bufferFields)
-    {
-        // Create the C# class code
-        string csharpCode = $@"
-            using System.Drawing;
-            
-            namespace Engine
+            public struct Properties{bufferGuid:N} : IMaterialBuffer
             {{
-                public class {bufferName}{bufferGuid:N} : Component, IMaterialBuffer
-                {{
-                    public int Slot => {slotNumber};
-            
-                    {bufferFields}
-                }}
+                {bufferFields}
             }}";
 
         return csharpCode;
