@@ -11,7 +11,7 @@ namespace Editor.Controller
         Paused,
     }
 
-    internal class Player
+    internal sealed class Player
     {
         public PlayMode PlayMode;
 

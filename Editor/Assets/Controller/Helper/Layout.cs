@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Editor.Controller;
 
-internal class GridDataTemplate
+internal sealed class GridDataTemplate
 {
     public GridLength Length = new(1, GridUnitType.Star);
     public double MinWidth = 1;
@@ -15,7 +15,7 @@ internal class GridDataTemplate
     public UIElement Content;
 }
 
-internal partial class Layout
+internal sealed partial class Layout
 {
     public Grid MainContent;
     public Grid ContentRoot;
@@ -110,7 +110,7 @@ internal partial class Layout
     }
 }
 
-internal partial class Layout
+internal sealed partial class Layout
 {
     private Grid PairVertical(GridDataTemplate top, GridDataTemplate bottom, bool gridSplitter = true, bool separator = false)
     {

@@ -29,7 +29,7 @@ internal struct Category
     public bool Creatable;
 }
 
-internal partial class Files
+internal sealed partial class Files
 {
     public static string AssetsPath { get; private set; }
     public static string TemplatesPath { get; private set; }
@@ -402,7 +402,10 @@ internal partial class Files
             Wrap.Children.Add(FileTile(path, icon, image));
         }
     }
+}
 
+internal sealed partial class Files
+{
     private Grid CategoryTile(Category category, Grid icon)
     {
         Grid grid = new() { Padding = new(-1), CornerRadius = new(10) };
@@ -627,7 +630,10 @@ internal partial class Files
 
         return grid.AddToolTip("Add a file or folder");
     }
+}
 
+internal sealed partial class Files
+{
     private async void ContentDialogCreateNewFileOrFolderAndRefreshAsync(string path = "")
     {
         // Show a content dialog for creating a new file system entry.
@@ -909,7 +915,10 @@ internal partial class Files
             Refresh();
         }
     }
+}
 
+internal sealed partial class Files
+{
     private async Task WriteFileFromTemplatesAsync(string targetPath, string templatesPath = null)
     {
         // Create a file stream to write the new file.
@@ -981,7 +990,7 @@ internal partial class Files
     }
 }
 
-internal partial class Files
+internal sealed partial class Files
 {
     public void OnDragOver(DragEventArgs e)
     {
@@ -1133,7 +1142,10 @@ internal partial class Files
 
         return path;
     }
+}
 
+internal sealed partial class Files
+{
     private MenuFlyout CreateDefaultMenuFlyout(string path, bool hasExtension = false)
     {
         MenuFlyoutItem[] items = new[] {
@@ -1272,7 +1284,10 @@ internal partial class Files
 
         return grid;
     }
+}
 
+internal sealed partial class Files
+{
     private async void PreviewFileToImageAsync(StorageFile file, Image image)
     {
         using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))

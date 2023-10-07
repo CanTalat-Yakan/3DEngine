@@ -9,7 +9,7 @@ using static Editor.Controller.Helper;
 
 namespace Editor.Controller;
 
-public class NumberBoxVector3
+public sealed class NumberBoxVector3
 {
     public event RoutedEventHandler ValueChanged;
     public Vector3 Value
@@ -56,7 +56,7 @@ public class NumberBoxVector3
         StackInGrid(_rectangleR, _numberBoxX, _rectangleG, _numberBoxY, _rectangleB, _numberBoxZ);
 }
 
-public class NumberBoxVector2
+public sealed class NumberBoxVector2
 {
     public event RoutedEventHandler ValueChanged;
     public Vector2 Value

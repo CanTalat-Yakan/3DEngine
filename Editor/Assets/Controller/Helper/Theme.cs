@@ -7,7 +7,7 @@ using WinRT;
 
 namespace Editor.Controller;
 
-internal class Theme
+internal sealed class Theme
 {
     public static Theme Instance { get; private set; }
 
@@ -125,7 +125,7 @@ internal class Theme
     }
 }
 
-internal class WindowsSystemDispatcherQueueHelper
+internal sealed class WindowsSystemDispatcherQueueHelper
 {
     [StructLayout(LayoutKind.Sequential)]
     struct DispatcherQueueOptions

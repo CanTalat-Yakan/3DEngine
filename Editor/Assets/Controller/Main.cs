@@ -2,7 +2,7 @@
 
 namespace Editor.Controller;
 
-internal class Main
+internal sealed class Main
 {
     public static Main Instance { get; private set; }
 

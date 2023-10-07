@@ -12,13 +12,6 @@ using System;
 
 namespace Editor.Controller;
 
-public enum MessageType
-{
-    Message,
-    Warning,
-    Error
-}
-
 internal struct MessageInfo
 {
     public MessageType Type;
@@ -36,6 +29,13 @@ internal struct MessageInfo
 
         return string.Empty;
     }
+}
+
+public enum MessageType
+{
+    Message,
+    Warning,
+    Error
 }
 
 public sealed partial class Output

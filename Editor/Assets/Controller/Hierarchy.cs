@@ -15,7 +15,7 @@ using Engine.SceneSystem;
 
 namespace Editor.Controller;
 
-internal class TreeEntry
+internal sealed class TreeEntry
 {
     public Guid ID;
     public Guid? ParentID;
@@ -24,7 +24,7 @@ internal class TreeEntry
     public TreeViewIconNode IconNode;
 }
 
-internal class SceneEntry
+internal sealed class SceneEntry
 {
     public Guid ID;
     public string Name;
@@ -35,7 +35,7 @@ internal class SceneEntry
     public Grid Content;
 }
 
-internal partial class Hierarchy
+internal sealed partial class Hierarchy
 {
     public SceneEntry SceneEntry;
     public List<SceneEntry> SubsceneEntries;
@@ -53,7 +53,7 @@ internal partial class Hierarchy
         SceneEntry = new() { ID = SceneManager.MainScene.ID, Name = SceneManager.MainScene.Name, Hierarchy = new(), DataSource = new() };
         SubsceneEntries = new();
 
-        CreateHierarchy();
+        CreateDefaultHierarchy();
     }
 
     public void SetProperties(TreeView treeView)
@@ -72,7 +72,7 @@ internal partial class Hierarchy
         Properties.Set(entity);
     }
 
-    private void CreateHierarchy()
+    private void CreateDefaultHierarchy()
     {
         _stackPanel.Children.Add(CreateSceneHierarchy(SceneEntry).StackInGrid().WrapInExpander("Scene").AddContentFlyout(CreateRootMenuFlyout()));
         _stackPanel.Children.Add(Helper.CreateSeperator());
@@ -177,7 +177,10 @@ internal partial class Hierarchy
 
         sceneEntry.Hierarchy.Remove(treeEntry);
     }
+}
 
+internal sealed partial class Hierarchy
+{
     private MenuFlyout CreateDefaultMenuFlyout()
     {
         MenuFlyoutItem[] items = new[] {
@@ -341,7 +344,10 @@ internal partial class Hierarchy
 
         return menuFlyout;
     }
+}
 
+internal sealed partial class Hierarchy
+{
     private async void ContentDialogCreateNewSubscene()
     {
         TextBox subsceneName;
@@ -518,7 +524,10 @@ internal partial class Hierarchy
             sceneEntry.DataSource.Remove(treeEntry.IconNode);
         }
     }
+}
 
+internal sealed partial class Hierarchy
+{
     private TreeEntry GetParent(TreeEntry treeEntry, SceneEntry sceneEntry = null)
     {
         if (treeEntry.ParentID is null)
@@ -616,6 +625,24 @@ internal partial class Hierarchy
                     }
     }
 
+    /// <summary>
+    /// This method sets the parent TreeEntry of the given TreeViewIconNodes to the given newParent,
+    /// and updates the parent Entity of each affected Entity accordingly.
+    /// </summary>
+    public void SetNewParentTreeEntry(TreeViewIconNode newParent, params TreeViewIconNode[] treeViewIconNodes)
+    {
+        // If newParent is null, do nothing.
+        if (newParent is null)
+            return;
+
+        // Iterate over the given TreeViewIconNodes and update their parent TreeEntry and parent Entity.
+        foreach (var node in treeViewIconNodes)
+        {
+            (node.TreeEntry).ParentID = (newParent.TreeEntry).ID;
+            GetEntity(node.TreeEntry).Parent = GetEntity(newParent.TreeEntry);
+        }
+    }
+
     private void GetInvokedItemAndSetContextFlyout(object sender, PointerRoutedEventArgs e)
     {
         var properties = e.GetCurrentPoint((UIElement)sender).Properties;
@@ -631,10 +658,9 @@ internal partial class Hierarchy
             ((TreeView)sender).ContextFlyout.Opened += (s, e) => ((TreeView)sender).ContextFlyout = null;
         }
     }
-
 }
 
-internal partial class Hierarchy
+internal sealed partial class Hierarchy
 {
     /// <summary>
     /// This method returns an Entity object with the specified GUID, optionally searching in a specific SceneEntry.
@@ -701,25 +727,10 @@ internal partial class Hierarchy
         if (targetSceneEntry is not null)
             targetScene = SceneManager.GetFromID(targetSceneEntry.ID);
     }
+}
 
-    /// <summary>
-    /// This method sets the parent TreeEntry of the given TreeViewIconNodes to the given newParent,
-    /// and updates the parent Entity of each affected Entity accordingly.
-    /// </summary>
-    public void SetNewParentTreeEntry(TreeViewIconNode newParent, params TreeViewIconNode[] treeViewIconNodes)
-    {
-        // If newParent is null, do nothing.
-        if (newParent is null)
-            return;
-
-        // Iterate over the given TreeViewIconNodes and update their parent TreeEntry and parent Entity.
-        foreach (var node in treeViewIconNodes)
-        {
-            (node.TreeEntry).ParentID = (newParent.TreeEntry).ID;
-            GetEntity(node.TreeEntry).Parent = GetEntity(newParent.TreeEntry);
-        }
-    }
-
+internal sealed partial class Hierarchy
+{
     /// <summary>
     /// This method copies the given GUID to the clipboard with the given operation.
     /// </summary>
@@ -943,7 +954,10 @@ internal partial class Hierarchy
                 MigrateEntityBetweenScenesRecurisivally(sourceScene, targetScene, newTreeEntry);
             }
     }
+}
 
+internal sealed partial class Hierarchy
+{
     /// <summary>
     /// This method is used to migrate an icon node to a new parent and scene.
     /// </summary>

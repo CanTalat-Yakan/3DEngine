@@ -11,7 +11,7 @@ using Windows.ApplicationModel.DataTransfer;
 
 namespace Editor.Controller;
 
-public class Home
+public sealed partial class Home
 {
     public static string RootPath { get; private set; }
     public static string ProjectPath { get; private set; }
@@ -50,7 +50,10 @@ public class Home
         foreach (var projectPath in Directory.GetDirectories(RootPath))
             _wrap.Children.Add(ProjectTile(projectPath, CreateIcon("\xE74C")));
     }
+}
 
+public sealed partial class Home
+{
     private Grid AddTile(Grid icon)
     {
         Grid grid = new();
@@ -110,6 +113,32 @@ public class Home
         return grid;
     }
 
+    private Grid CreateIcon(string glyph)
+    {
+        Grid grid = new();
+
+        FontIcon icon = new FontIcon() { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = glyph };
+
+        grid.Children.Add(icon);
+
+        return grid;
+    }
+
+    private Grid CreateIcon(Symbol symbol)
+    {
+        Grid grid = new();
+
+        SymbolIcon symbolIcon = new() { Symbol = symbol };
+
+        grid.Children.Add(symbolIcon);
+
+        return grid;
+    }
+
+}
+
+public sealed partial class Home
+{
     private async void ContentDialogCreateNewProjectAsync()
     {
         TextBox fileName;
@@ -233,8 +262,8 @@ public class Home
                 PrimaryButtonText = "Delete",
                 CloseButtonText = "Cancel",
                 DefaultButton = ContentDialogButton.Close,
-                Content = new TextBlock() { 
-                    Text = "If you delete this project, you won't be able to recover it. \nDo you want to proceed?", 
+                Content = new TextBlock() {
+                    Text = "If you delete this project, you won't be able to recover it. \nDo you want to proceed?",
                     TextWrapping = TextWrapping.WrapWholeWords },
             };
 
@@ -281,7 +310,10 @@ public class Home
 
         return menuFlyout;
     }
+}
 
+public sealed partial class Home
+{
     public void OpenFolder(string path)
     {
         if (Directory.Exists(path))
@@ -311,28 +343,6 @@ public class Home
         //_navigationView.SelectedItem = menuItem;
 
         //teachingTip.IsOpen = true;
-    }
-
-    private Grid CreateIcon(string glyph)
-    {
-        Grid grid = new();
-
-        FontIcon icon = new FontIcon() { FontFamily = new FontFamily("Segoe MDL2 Assets"), Glyph = glyph };
-
-        grid.Children.Add(icon);
-
-        return grid;
-    }
-
-    private Grid CreateIcon(Symbol symbol)
-    {
-        Grid grid = new();
-
-        SymbolIcon symbolIcon = new() { Symbol = symbol };
-
-        grid.Children.Add(symbolIcon);
-
-        return grid;
     }
 
     public void DeleteDirectory(string path)

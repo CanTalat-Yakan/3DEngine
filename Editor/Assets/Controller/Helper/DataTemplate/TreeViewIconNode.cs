@@ -68,7 +68,7 @@ internal sealed class TreeViewIconNode : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
 
-class TreeViewIconNodeTemplateSelector : DataTemplateSelector
+internal sealed class TreeViewIconNodeTemplateSelector : DataTemplateSelector
 {
     public DataTemplate IconNodeTemplate { get; set; }
 

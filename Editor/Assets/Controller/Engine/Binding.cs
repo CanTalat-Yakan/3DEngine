@@ -14,7 +14,7 @@ using Engine.SceneSystem;
 
 namespace Editor.Controller;
 
-internal class BindEntry(object source, string sourcePath)
+internal sealed class BindEntry(object source, string sourcePath)
 {
     public object Value;
 
@@ -38,7 +38,7 @@ internal class BindEntry(object source, string sourcePath)
         Event += eventHandler;
 }
 
-internal class Binding
+internal sealed class Binding
 {
     // Key = Field + Component.GetType().FullName
     public static Dictionary<string, BindEntry> RendererBindings = new();

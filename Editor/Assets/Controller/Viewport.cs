@@ -11,7 +11,7 @@ using static Editor.Controller.Helper;
 
 namespace Editor.Controller;
 
-internal partial class Viewport(ModelView.Viewport viewport, Grid content)
+internal sealed partial class Viewport(ModelView.Viewport viewport, Grid content)
 {
     public Grid Content = content;
 
@@ -123,7 +123,7 @@ internal partial class Viewport(ModelView.Viewport viewport, Grid content)
     }
 }
 
-internal partial class Viewport
+internal sealed partial class Viewport
 {
     private StackPanel WrapInStackPanelDockTopLeft(params UIElement[] content)
     {

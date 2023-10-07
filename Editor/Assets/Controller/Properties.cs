@@ -22,7 +22,7 @@ using Texture = Vortice.Direct3D11.Texture2DArrayShaderResourceView;
 
 namespace Editor.Controller;
 
-internal partial class Properties
+internal sealed partial class Properties
 {
     private static StackPanel s_stackPanel = new();
 
@@ -302,7 +302,7 @@ internal partial class Properties
     }
 }
 
-internal partial class Properties
+internal sealed partial class Properties
 {
     public Grid CreateButtonWithAutoSuggesBoxAndComponentCollector(string label,
         TypedEventHandler<AutoSuggestBox, AutoSuggestBoxSuggestionChosenEventArgs> suggestionChosen)
@@ -666,11 +666,11 @@ internal partial class Properties
             finalGrid = ReturnProcessedFieldInfo(grid, attributes, fieldInfo, null);
         }
 
-        //Binding.GetBinding(fieldInfo.Name, buffer, materialEntry.ID)?.SetEvent((s, e) =>
-        //{
-        //    //materialEntry.Material.UpdatePropertiesConstantBuffer();
-        //    // TODO: Update ConstantBuffer of Material when a value changed in the properties
-        //});
+        Binding.GetBinding(fieldInfo.Name, buffer, materialEntry.ID)?.SetEvent((s, e) =>
+        {
+            //materialEntry.Material.UpdatePropertiesConstantBuffer();
+            // TODO: Update ConstantBuffer of Material when a value changed in the properties
+        });
 
         return finalGrid;
     }
