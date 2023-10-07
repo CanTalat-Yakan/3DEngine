@@ -2,6 +2,9 @@
 using System.Drawing;
 
 using ImGuiNET;
+using ImGuizmoNET;
+using ImPlotNET;
+using imnodesNET;
 using Vortice.Direct3D11;
 using Vortice.Direct3D;
 using Vortice.DXGI;
