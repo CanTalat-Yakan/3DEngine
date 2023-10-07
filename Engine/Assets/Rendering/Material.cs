@@ -5,7 +5,7 @@ using Vortice.D3DCompiler;
 using Vortice.Direct3D11;
 using Vortice.DXGI;
 
-namespace Engine.Utilities;
+namespace Engine.Rendering;
 
 public sealed class Material
 {

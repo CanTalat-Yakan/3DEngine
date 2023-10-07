@@ -2,7 +2,7 @@
 
 using Vortice.Direct3D11;
 
-namespace Engine.Utilities;
+namespace Engine.Rendering;
 
 public sealed class CameraBuffer
 {

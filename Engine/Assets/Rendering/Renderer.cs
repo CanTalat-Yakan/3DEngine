@@ -6,7 +6,7 @@ using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
 
-namespace Engine.Utilities;
+namespace Engine.Rendering;
 
 public sealed class Renderer
 {

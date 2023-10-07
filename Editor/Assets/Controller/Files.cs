@@ -248,7 +248,7 @@ internal partial class Files
         Engine.Core.Instance?.MaterialCompiler.CompileProjectMaterials(AssetsPath);
 
         // Compile the project scripts.
-        Engine.Core.Instance?.RuntimeCompiler.CompileProjectScripts(AssetsPath);
+        Engine.Core.Instance?.ScriptCompiler.CompileProjectScripts(AssetsPath);
     }
 
     public void ValidateCategoriesExist()

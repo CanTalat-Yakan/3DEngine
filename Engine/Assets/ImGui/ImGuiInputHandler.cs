@@ -4,7 +4,7 @@ using Vortice.Win32;
 
 using static Vortice.Win32.User32;
 
-namespace Engine.Utilities;
+namespace Engine.Gui;
 
 public sealed class ImGuiInputHandler
 {

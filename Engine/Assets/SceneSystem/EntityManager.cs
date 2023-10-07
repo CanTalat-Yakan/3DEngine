@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Engine.Utilities;
+namespace Engine.SceneSystem;
 
 public enum PrimitiveTypes
 {

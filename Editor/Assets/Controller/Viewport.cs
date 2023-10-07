@@ -5,7 +5,7 @@ using System;
 using WinRT.Interop;
 
 using Engine.Editor;
-using Engine.Utilities;
+using Engine.Rendering;
 
 using static Editor.Controller.Helper;
 

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace Engine.Utilities;
+namespace Engine.RuntimeSystem;
 
 public sealed class MaterialEntry
 {
@@ -118,12 +118,12 @@ public class MaterialCompiler
         string scriptCode = MaterialBuffer.ConvertHlslToCSharp(updatedCode, materialEntry.ID);
 
         ScriptEntry materialBuffer = new();
-        materialBuffer.Script = RuntimeCompiler.CreateScript(scriptCode);
+        materialBuffer.Script = ScriptCompiler.CreateScript(scriptCode);
 
         if (materialBuffer.Script is null)
             return null; // Script Creation Failed
 
-        Core.Instance.RuntimeCompiler.CompileScript(materialBuffer);
+        Core.Instance.ScriptCompiler.CompileScript(materialBuffer);
 
         if (materialBuffer.Assembly is null)
             return null; // Compilation Failed

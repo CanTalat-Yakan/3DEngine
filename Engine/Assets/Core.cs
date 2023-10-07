@@ -6,7 +6,12 @@ global using Engine.Data;
 global using Engine.ECS;
 global using Engine.Editor;
 global using Engine.Helper;
+global using Engine.Rendering;
+global using Engine.SceneSystem;
 global using Engine.Utilities;
+
+using Engine.Gui;
+using Engine.RuntimeSystem;
 
 namespace Engine;
 
@@ -19,9 +24,10 @@ public sealed class Core
     public event EventHandler OnDispose;
 
     public Renderer Renderer;
-    public MaterialCompiler MaterialCompiler;
-    public RuntimeCompiler RuntimeCompiler;
     public SceneManager SceneManager;
+
+    public MaterialCompiler MaterialCompiler;
+    public ScriptCompiler ScriptCompiler;
 
     private ImGuiRenderer _imGuiRenderer;
     private ImGuiInputHandler _imGuiInputHandler;
@@ -45,7 +51,7 @@ public sealed class Core
 
         Renderer = renderer;
         MaterialCompiler = new();
-        RuntimeCompiler = new();
+        ScriptCompiler = new();
         SceneManager = new();
 
         #region // ImGui
@@ -64,7 +70,7 @@ public sealed class Core
         // Compile all project materials and add them to the collection.
         MaterialCompiler.CompileProjectMaterials(EditorState.AssetsPath);
         // Compile all project scripts and add the components to the collection for the AddComponent function.
-        RuntimeCompiler.CompileProjectScripts(EditorState.AssetsPath);
+        ScriptCompiler.CompileProjectScripts(EditorState.AssetsPath);
 
         // Copies the List to the local array once to savely iterate to it.
         SceneManager.ProcessSystems();
@@ -108,7 +114,7 @@ public sealed class Core
             // Gather Materials.
             MaterialCompiler.CompileProjectMaterials(EditorState.AssetsPath);
             // Gather Components.
-            RuntimeCompiler.CompileProjectScripts(EditorState.AssetsPath);
+            ScriptCompiler.CompileProjectScripts(EditorState.AssetsPath);
 
             // Call Awake for all scenes again.
             SceneManager.Awake();

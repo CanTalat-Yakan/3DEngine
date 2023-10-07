@@ -11,7 +11,8 @@ using Windows.Foundation;
 
 using Engine.ECS;
 using Engine.Editor;
-using Engine.Utilities;
+using Engine.Rendering;
+using Engine.RuntimeSystem;
 
 using static Editor.Controller.Helper;
 
@@ -123,7 +124,7 @@ internal partial class Properties
                 (s, e) =>
                 {
                     entity.AddComponent(
-                        Engine.Core.Instance.RuntimeCompiler.ComponentCollector
+                        Engine.Core.Instance.ScriptCompiler.ComponentCollector
                         .GetComponent(e.SelectedItem.ToString()));
 
                     Set(entity);
@@ -137,11 +138,11 @@ internal partial class Properties
             {
                 BindingFlags allBindingFlags = BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
 
-                // Get the non-public fields and events of the component.
+                // Get the public, non-public fields and events of the component.
                 var nonPublicFieldInfos = component.GetType().GetFields(allBindingFlags);
-                var fieldInfos = component.GetType().GetFields(allBindingFlags);
+                var fieldInfos = component.GetType().GetFields(allBindingFlags | BindingFlags.Public);
                 var nonPublicEventsInfos = component.GetType().GetEvents(allBindingFlags);
-                var eventsInfos = component.GetType().GetEvents(allBindingFlags);
+                var eventsInfos = component.GetType().GetEvents(allBindingFlags | BindingFlags.Public);
 
                 // Initialize the collection of fields, events, and scripts.
                 Grid newFieldGrid;
@@ -151,7 +152,7 @@ internal partial class Properties
 
                 // Add fields to the fields collection.
                 foreach (var fieldInfo in fieldInfos)
-                    if ((newFieldGrid = CreateComponentPropertyFromFieldInfo(component, entity, fieldInfo, nonPublicFieldInfos)) is not null)
+                    if ((newFieldGrid = CreateFromComponentFieldInfo(component, entity, fieldInfo, nonPublicFieldInfos)) is not null)
                         fieldsCollection.Add(newFieldGrid);
 
                 // Add events to the events collection.
@@ -219,7 +220,7 @@ internal partial class Properties
 
         // Add fields to the fields collection.
         foreach (var fieldInfo in fieldInfos)
-            if ((newFieldGrid = CreateMaterialPropertyFromFieldInfo(materialEntry, fieldInfo)) is not null)
+            if ((newFieldGrid = CreateFromMaterialFieldInfo(materialEntry, fieldInfo)) is not null)
                 fieldsCollection.Add(newFieldGrid);
 
         // Initialize the content grid and stack panel.
@@ -317,7 +318,7 @@ internal partial class Properties
             // only listen to changes caused by user entering text.
             if (e.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
-                string[] itemSource = Engine.Core.Instance.RuntimeCompiler.ComponentCollector
+                string[] itemSource = Engine.Core.Instance.ScriptCompiler.ComponentCollector
                     .Components.ConvertAll<string>(Type => Type.Name).ToArray();
 
                 List<string> suitableItems = new();
@@ -373,7 +374,7 @@ internal partial class Properties
         return grid;
     }
 
-    public Grid CreateComponentPropertyFromFieldInfo(object component, Entity entity, FieldInfo fieldInfo, FieldInfo[] nonPublic)
+    public Grid CreateFromComponentFieldInfo(object component, Entity entity, FieldInfo fieldInfo, FieldInfo[] nonPublic)
     {
         Grid finalGrid = null;
 
@@ -585,7 +586,7 @@ internal partial class Properties
         return finalGrid;
     }
 
-    public Grid CreateMaterialPropertyFromFieldInfo(MaterialEntry materialEntry, FieldInfo fieldInfo)
+    public Grid CreateFromMaterialFieldInfo(MaterialEntry materialEntry, FieldInfo fieldInfo)
     {
         Grid finalGrid = null;
 
@@ -665,11 +666,11 @@ internal partial class Properties
             finalGrid = ReturnProcessedFieldInfo(grid, attributes, fieldInfo, null);
         }
 
-        Binding.GetBinding(fieldInfo.Name, buffer, materialEntry.ID)?.SetEvent((s, e) =>
-        {
-            //materialEntry.Material.UpdatePropertiesConstantBuffer();
-            // TODO: Update ConstantBuffer of Material when a value changed in the properties
-        });
+        //Binding.GetBinding(fieldInfo.Name, buffer, materialEntry.ID)?.SetEvent((s, e) =>
+        //{
+        //    //materialEntry.Material.UpdatePropertiesConstantBuffer();
+        //    // TODO: Update ConstantBuffer of Material when a value changed in the properties
+        //});
 
         return finalGrid;
     }

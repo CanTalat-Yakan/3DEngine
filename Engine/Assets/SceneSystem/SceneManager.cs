@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Engine.Utilities;
+namespace Engine.SceneSystem;
 
 public sealed partial class SceneManager
 {

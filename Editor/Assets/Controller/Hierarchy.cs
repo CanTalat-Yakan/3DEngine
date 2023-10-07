@@ -9,9 +9,9 @@ using System;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
 
-using Engine.Utilities;
-using Engine.ECS;
 using Engine.Components;
+using Engine.ECS;
+using Engine.SceneSystem;
 
 namespace Editor.Controller;
 

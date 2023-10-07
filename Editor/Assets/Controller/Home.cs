@@ -158,11 +158,11 @@ public class Home
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(Path.Combine(path, Engine.Paths.ASSETS));
 
-            string zipPath = Path.Combine(AppContext.BaseDirectory, Engine.Paths.TEMPLATES, "Project.zip");
+            string zipPath = Path.Combine(AppContext.BaseDirectory, Engine.Paths.TEMPLATES, "Project", "Project.zip");
             if (File.Exists(zipPath))
                 ZipFile.ExtractToDirectory(zipPath, path);
 
-            string dllPath = Path.Combine(AppContext.BaseDirectory, Engine.Paths.TEMPLATES, "Engine.dll");
+            string dllPath = Path.Combine(AppContext.BaseDirectory, Engine.Paths.TEMPLATES, "Project", "Engine.dll");
             if (File.Exists(dllPath))
                 File.Copy(dllPath, Path.Combine(path, "Engine.dll"));
 

@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Engine.Utilities;
+namespace Engine.RuntimeSystem;
 
 internal sealed class ScriptEntry
 {
@@ -24,7 +24,7 @@ public sealed class ComponentCollector
         Components.Find(Type => Type.Name.ToString() == name);
 }
 
-public sealed class RuntimeCompiler
+public sealed class ScriptCompiler
 {
     public ComponentCollector ComponentCollector = new();
 

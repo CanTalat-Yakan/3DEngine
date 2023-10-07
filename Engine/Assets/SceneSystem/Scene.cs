@@ -1,4 +1,4 @@
-﻿namespace Engine.Utilities;
+﻿namespace Engine.SceneSystem;
 
 public sealed class Scene : ICloneable
 {
