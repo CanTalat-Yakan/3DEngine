@@ -2,9 +2,6 @@
 using System.Drawing;
 
 using ImGuiNET;
-using ImGuizmoNET;
-using ImPlotNET;
-using imnodesNET;
 using Vortice.Direct3D11;
 using Vortice.Direct3D;
 using Vortice.DXGI;
@@ -29,8 +26,9 @@ unsafe public sealed class ImGuiRenderer
 
     private ID3D11Buffer _viewConstantBuffer;
 
-    private ID3D11SamplerState _samplerState;
-    private ID3D11ShaderResourceView _resourceView;
+    private ID3D11SamplerState _fontSamplerState;
+    private ID3D11ShaderResourceView _fontResourceView;
+
     private Dictionary<IntPtr, ID3D11ShaderResourceView> _textureResources = new();
 
     public ImGuiRenderer()
@@ -143,8 +141,8 @@ unsafe public sealed class ImGuiRenderer
         _data.SetupRenderState(
             sizeof(ImDrawIdx) == 2 ? Format.R16_UInt : Format.R32_UInt, 
             sizeof(ImDrawVert));
-        _data.SetSamplerState(0, _samplerState);
-        _data.SetResourceView(0, _resourceView);
+        _data.SetSamplerState(0, _fontSamplerState);
+        _data.SetResourceView(0, _fontResourceView);
         #endregion
 
         #region // Render command lists
@@ -290,11 +288,11 @@ unsafe public sealed class ImGuiRenderer
             ViewDimension = ShaderResourceViewDimension.Texture2D,
             Texture2D = new Texture2DShaderResourceView { MipLevels = texDesc.MipLevels, MostDetailedMip = 0 }
         };
-        _resourceView = _device.CreateShaderResourceView(texture, resViewDesc);
+        _fontResourceView = _device.CreateShaderResourceView(texture, resViewDesc);
         texture.Release();
 
-        var id = _resourceView.NativePointer;
-        _textureResources.Add(id, _resourceView);
+        var id = _fontResourceView.NativePointer;
+        _textureResources.Add(id, _fontResourceView);
 
         io.Fonts.TexID = id;
 
@@ -309,6 +307,6 @@ unsafe public sealed class ImGuiRenderer
             MinLOD = 0f,
             MaxLOD = 0f
         };
-        _samplerState = _device.CreateSamplerState(samplerDesc);
+        _fontSamplerState = _device.CreateSamplerState(samplerDesc);
     }
 }

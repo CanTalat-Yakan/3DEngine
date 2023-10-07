@@ -99,7 +99,7 @@ public sealed partial class SceneManager
         TransformSystem.CopyToArray();
         // Sort and Copy CameraSystem to Array.
         CameraSystem.SortAndCopyToArray();
-        // Sort and Copy MeshSystem to Array if it is Dirty.
+        // Sort and Copy MeshSystem to Array if it has changes.
         MeshSystem.SortAndCopyToArrayIfDirty();
         // Copy EditorScriptSystem to Array.
         EditorScriptSystem.CopyToArray();
@@ -109,12 +109,11 @@ public sealed partial class SceneManager
 
     public void Awake()
     {
-        // Update the CameraSystem.
+        // Awake the CameraSystem.
         CameraSystem.Awake();
 
-        if (!EditorState.PlayMode)
-            // Awake the EditorScriptSystem.
-            EditorScriptSystem.Awake();
+        // Awake the EditorScriptSystem.
+        EditorScriptSystem.Awake();
 
         if (EditorState.PlayMode)
             // Awake the ScriptSystem.
@@ -123,9 +122,8 @@ public sealed partial class SceneManager
 
     public void Start()
     {
-        if (!EditorState.PlayMode)
-            // Start the EditorScriptSystem.
-            EditorScriptSystem.Start();
+        // Start the EditorScriptSystem.
+        EditorScriptSystem.Start();
 
         if (EditorState.PlayMode)
             // Start the ScriptSystem.
@@ -134,16 +132,15 @@ public sealed partial class SceneManager
 
     public void Update()
     {
-        // Render the MeshSystem.
-        MeshSystem.Update();
         // Update the TransformSystem
         TransformSystem.Update();
+        // Update the MeshSystem.
+        MeshSystem.Update();
         // Update the CameraSystem
         CameraSystem.Update();
 
-        if (!EditorState.PlayMode)
-            // Update the EditorScriptSystem.
-            EditorScriptSystem.Update();
+        // Update the EditorScriptSystem.
+        EditorScriptSystem.Update();
 
         if (EditorState.PlayMode)
             // Update the ScriptSystem.
@@ -152,9 +149,8 @@ public sealed partial class SceneManager
 
     public void LateUpdate()
     {
-        if (!EditorState.PlayMode)
-            // LateUpdate the EditorScriptSystem.
-            EditorScriptSystem.LateUpdate();
+        // LateUpdate the EditorScriptSystem.
+        EditorScriptSystem.LateUpdate();
 
         if (EditorState.PlayMode)
             // LateUpdate the ScriptSystem.
@@ -163,9 +159,8 @@ public sealed partial class SceneManager
 
     public void FixedUpdate()
     {
-        if (!EditorState.PlayMode)
-            // FixedUpdate the EditorScriptSystem.
-            EditorScriptSystem.FixedUpdate();
+        // FixedUpdate the EditorScriptSystem.
+        EditorScriptSystem.FixedUpdate();
 
         if (EditorState.PlayMode)
             // FixedUpdate the ScriptSystem.
