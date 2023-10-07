@@ -29,6 +29,7 @@ public sealed class ScriptCompiler
     public ComponentCollector ComponentCollector = new();
 
     private Dictionary<string, ScriptEntry> _scriptsCollection = new();
+    private List<Assembly> _allAssemblies = new();
     private List<Assembly> _ignoreAssemblies = new();
 
     public void CompileProjectScripts(string assetsPath = null)
@@ -125,6 +126,8 @@ public sealed class ScriptCompiler
                 scriptEntry.Assembly = Assembly.Load(assemblyStream.ToArray(), symbolStream.ToArray());
                 ReplaceComponentTypeReferences(scriptEntry.Assembly);
 
+                _allAssemblies.Add(scriptEntry.Assembly);
+
                 Output.Log("Loaded Assembly");
             }
         }
@@ -164,7 +167,7 @@ public sealed class ScriptCompiler
 
     private void CollectComponents()
     {
-        var componentCollection = AppDomain.CurrentDomain.GetAssemblies()
+        var componentCollection = _allAssemblies
             .Except(_ignoreAssemblies)
             .SelectMany(a => a.GetTypes())
             .Where(t =>
