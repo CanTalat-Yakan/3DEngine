@@ -144,11 +144,11 @@ internal partial class Properties
                 var nonPublicEventsInfos = component.GetType().GetEvents(allBindingFlags);
                 var eventsInfos = component.GetType().GetEvents(allBindingFlags | BindingFlags.Public);
 
-                // Initialize the collection of fields, events, and scripts.
+                // Initialize the collection of fields, events and the final collection.
                 Grid newFieldGrid;
                 List<Grid> fieldsCollection = new();
                 List<Grid> eventsCollection = new();
-                List<Grid> scriptsCollection = new();
+                List<Grid> finalCollection = new();
 
                 // Add fields to the fields collection.
                 foreach (var fieldInfo in fieldInfos)
@@ -160,14 +160,14 @@ internal partial class Properties
                     if ((newFieldGrid = CreateFromEventInfo(info, nonPublicEventsInfos)) is not null)
                         eventsCollection.Add(newFieldGrid);
 
-                // Add all the fields and events to the scripts collection.
-                scriptsCollection.AddRange(fieldsCollection);
-                scriptsCollection.AddRange(eventsCollection);
+                // Add all the fields and events to the final collection.
+                finalCollection.AddRange(fieldsCollection);
+                finalCollection.AddRange(eventsCollection);
 
                 // Initialize the content grid and stack panel.
                 UIElement tmp;
                 Grid content = new Grid();
-                s_stackPanel.Children.Add(tmp = scriptsCollection.ToArray()
+                s_stackPanel.Children.Add(tmp = finalCollection.ToArray()
                     .StackInGrid()
                     .WrapInExpanderWithToggleButton(
                         ref content,
