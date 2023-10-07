@@ -29,8 +29,6 @@
 		<PackageReference Include="Costura.Fody" Version="5.7.0">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
-		<PackageReference Include="ImGui.NET" Version="1.89.9.2" />
-		<PackageReference Include="ImNodes.NET" Version="0.3.1" />
 		<PackageReference Include="Microsoft.CodeAnalysis" Version="4.7.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.7.0" />
 		<PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
