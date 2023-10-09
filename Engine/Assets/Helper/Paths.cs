@@ -2,7 +2,9 @@
 
 public sealed class Paths
 {
-    public static readonly string ASSETS = @"Assets\";
+    public static readonly string APPDIRECTORY = AppContext.BaseDirectory;
+
+    public static readonly string ASSETS = APPDIRECTORY + @"\Assets\";
 
     public static readonly string RESOURCES =   ASSETS + @"Resources\";
 

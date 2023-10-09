@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 
+using Vortice.D3DCompiler;
 using Vortice.Direct3D11.Shader;
 using Vortice.Direct3D;
 
@@ -25,8 +26,6 @@ public sealed class ShaderCompiler
 {
     public static ShaderCollector ShaderCollector = new();
 
-    private List<MaterialEntry> _toDisposeMaterialEntries = new();
-
     public void CompileProjectShaders(string assetsPath = null)
     {
         if (assetsPath is null)
@@ -39,76 +38,73 @@ public sealed class ShaderCompiler
         ShaderCollector.Shaders.Clear();
         ShaderCollector.Shaders.Add(new()
         {
-            FileInfo = new FileInfo(Path.Combine(Paths.SHADERS, "SimpleLit.hlsl")),
-            ConstantBufferType = CreateMaterialBufferScript(AddToDispose(
-                new MaterialEntry(null)
-                {
-                    Material = new(Path.Combine(Paths.SHADERS, "SimpleLit.hlsl"))
-                }))
+            FileInfo = new FileInfo(Paths.SHADERS + "SimpleLit.hlsl"),
+            ConstantBufferType = CreateMaterialBufferScript(new(Paths.SHADERS + "SimpleLit.hlsl"))
         });
 
-        foreach (var path in Directory.GetFiles(shadersFolderPath, "*", SearchOption.AllDirectories))
+        foreach (var shaderFIlePath in Directory.GetFiles(shadersFolderPath, "*", SearchOption.AllDirectories))
             ShaderCollector.Shaders.Add(new()
             {
-                FileInfo = new(path),
-                ConstantBufferType = CreateMaterialBufferScript(AddToDispose(
-                    new MaterialEntry(null)
-                    {
-                        Material = new(path)
-                    }))
+                FileInfo = new(shaderFIlePath),
+                ConstantBufferType = CreateMaterialBufferScript(new(shaderFIlePath))
             });
-
-        Dispose();
     }
 
-    public void Dispose()
+    private Type CreateMaterialBufferScript(string shaderFilePath)
     {
-        foreach (var materialEntry in _toDisposeMaterialEntries)
-            materialEntry.Material?.Dispose();
-    }
+        if (!File.Exists(shaderFilePath))
+            return null;
 
-    private MaterialEntry AddToDispose(MaterialEntry materialEntry)
-    {
-        _toDisposeMaterialEntries.Add(materialEntry);
+        var readOnlyMemory = Material.CompileBytecode(shaderFilePath, "VS", "vs_5_0");
+        string scriptCode = GenerateCSharpStruct(readOnlyMemory.Span, Guid.NewGuid());
 
-        return materialEntry;
-    }
+        if (scriptCode is null)
+        {
+            Output.Log("Generating the C# Struct from the Shader Failed", MessageType.Error);
+            return null;
+        }
 
-    private Type CreateMaterialBufferScript(MaterialEntry materialEntry)
-    {
-        string scriptCode = GenerateCSharpStruct(new(materialEntry.Material.NativePtr), Guid.NewGuid(), out string structName);
+        ScriptEntry materialConstantBufferScriptEntry = new();
+        materialConstantBufferScriptEntry.Script = ScriptCompiler.CreateScript(scriptCode);
 
-        ScriptEntry materialConstantBuffer = new();
-        materialConstantBuffer.Script = ScriptCompiler.CreateScript(scriptCode);
+        if (materialConstantBufferScriptEntry.Script is null)
+        {
+            Output.Log("Script Creation Failed", MessageType.Error);
+            return null;
+        }
 
-        if (materialConstantBuffer.Script is null)
-            return null; // Script Creation Failed
+        Core.Instance.ScriptCompiler.CompileScript(materialConstantBufferScriptEntry);
 
-        Core.Instance.ScriptCompiler.CompileScript(materialConstantBuffer);
+        if (materialConstantBufferScriptEntry.Assembly is null)
+        {
+            Output.Log("Compilation Failed", MessageType.Error);
+            return null;
+        }
 
-        if (materialConstantBuffer.Assembly is null)
-            return null; // Compilation Failed
-
-        foreach (var type in materialConstantBuffer.Assembly.GetTypes())
+        foreach (var type in materialConstantBufferScriptEntry.Assembly.GetTypes())
             if (typeof(IMaterialBuffer).IsAssignableFrom(type))
-                return type; // Successfull
+                return type; // Successfull.
 
-        return null; // A Script with the Interface IMaterialBuffer was not found
+        Output.Log("A Script with the Interface IMaterialBuffer was not found", MessageType.Error);
+        return null;
     }
 
-    public static string GenerateCSharpStruct(ID3D11ShaderReflection shaderReflection, Guid guid, out string structName)
+    public static string GenerateCSharpStruct(ReadOnlySpan<byte> shaderByteCode, Guid guid)
     {
-        structName = null;
+        var shaderReflection = Compiler.Reflect<ID3D11ShaderReflection>(shaderByteCode);
 
-        ID3D11ShaderReflectionConstantBuffer properties = shaderReflection.GetConstantBufferByName("Properties");
+        ID3D11ShaderReflectionConstantBuffer properties = null;
+
+        foreach (var constantBuffer in shaderReflection.ConstantBuffers)
+            if (constantBuffer.Description.Name.Equals("Properties"))
+                properties = constantBuffer;
+
         if (properties is null)
             return null;
 
-        structName = $"{properties.Description.Name}{guid:N}";
-
         // Start building the C# struct definition.
         StringBuilder structBuilder = new StringBuilder();
-        structBuilder.AppendLine($"struct {structName} : IMaterialBuffer {{");
+        structBuilder.AppendLine($"struct {properties.Description.Name}{guid:N} : IMaterialBuffer {{");
 
         foreach (var variable in properties.Variables)
         {

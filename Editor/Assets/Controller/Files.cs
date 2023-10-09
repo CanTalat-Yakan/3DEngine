@@ -245,8 +245,9 @@ internal sealed partial class Files
         SetBreadcrumbBar();
 
         // Compile the project materials.
+        Engine.Core.Instance?.ShaderCompiler.CompileProjectShaders(AssetsPath);
+        // Compile the project materials.
         Engine.Core.Instance?.MaterialCompiler.CompileProjectMaterials(AssetsPath);
-
         // Compile the project scripts.
         Engine.Core.Instance?.ScriptCompiler.CompileProjectScripts(AssetsPath);
     }

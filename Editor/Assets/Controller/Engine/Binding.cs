@@ -145,6 +145,9 @@ internal sealed class Binding
 
     public static BindEntry GetBinding(string fieldName, object source, object id)
     {
+        if (source is null)
+            return null;
+
         var bindEntry = id is not null
             ? GetEntityBinding(fieldName, source, id)
             : GetRendererBinding(fieldName, source);

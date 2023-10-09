@@ -92,7 +92,7 @@ public sealed class Core
             return;
 
         try { OnInitialize?.Invoke(null, null); }
-        catch (Exception ex) { throw new Exception(ex.Message); }
+        catch (Exception ex) { Output.Log(ex.Message, MessageType.Error); }
         finally { OnInitialize = null; }
 
         // Clears the render target,

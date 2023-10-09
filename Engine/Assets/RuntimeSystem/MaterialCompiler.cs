@@ -23,7 +23,7 @@ public sealed class MaterialEntry(FileInfo fileInfo)
         Material.UpdatePixelShader(ShaderEntry.FileInfo.Name);
 
         Material.MaterialBuffer?.Dispose();
-        MaterialCompiler.SetMaterialBuffer(this, new MaterialBuffer(shaderName));
+        MaterialCompiler.SetMaterialBuffer(this, new MaterialBuffer() { ShaderName = shaderName});
         Serialization.SaveXml(Material.MaterialBuffer, FileInfo.FullName);
     }
 }

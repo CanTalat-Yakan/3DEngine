@@ -106,7 +106,7 @@ public sealed partial class EntityManager
     {
         // Create a new material with the default shader and default image.
         if (_materialDefault is null)
-            _materialDefault = new(SHADER_SIMPLELIT, IMAGE_DEFAULT);
+            _materialDefault = new(Paths.SHADERS + SHADER_SIMPLELIT, IMAGE_DEFAULT);
     }
 
     public Entity CreateEntity(Entity parent = null, string name = "New Entity", string tag = "Untagged")

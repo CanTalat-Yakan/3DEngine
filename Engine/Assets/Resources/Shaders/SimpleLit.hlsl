@@ -9,17 +9,9 @@ cbuffer PerModelConstantBuffer : register(b1)
     float4x4 World;
 };
 
-cbuffer Properties : register(b10)
+cbuffer Properties : register(b2)
 {
-    float Float;
-    int Int;
-    //[Slider(1, 10)]
-    float Slider;
-    float2 Vector2;
-    float3 Vector3;
-    //[Color]
-    float3 Color;
-    bool Bool;
+    float4x4 Test;
 };
 
 struct appdata
@@ -50,6 +42,7 @@ VS_OUTPUT VS(appdata v)
     o.worldPos = mul(float4(v.vertex, 1), World);
     o.cameraPos = Camera;
     o.uv = v.uv;
+    float4x4 t = Test;
 
     return o;
 }

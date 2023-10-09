@@ -179,10 +179,10 @@ unsafe public sealed class ImGuiRenderer
     private void CreateMaterial()
     {
         #region // Create Vertex and Pixel Shader
-        ReadOnlyMemory<byte> vertexShaderByteCode = Material.CompileBytecode("ImGui.hlsl", "VS", "vs_4_0");
+        ReadOnlyMemory<byte> vertexShaderByteCode = Material.CompileBytecode(Paths.SHADERS + "ImGui.hlsl", "VS", "vs_4_0");
         _data.VertexShader = _device.CreateVertexShader(vertexShaderByteCode.Span);
 
-        ReadOnlyMemory<byte> pixelShaderByteCode = Material.CompileBytecode("ImGui.hlsl", "PS", "ps_4_0");
+        ReadOnlyMemory<byte> pixelShaderByteCode = Material.CompileBytecode(Paths.SHADERS + "ImGui.hlsl", "PS", "ps_4_0");
         _data.PixelShader = _device.CreatePixelShader(pixelShaderByteCode.Span);
         #endregion
 

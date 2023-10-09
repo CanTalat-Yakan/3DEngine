@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 using Vortice.D3DCompiler;
 using Vortice.Direct3D11;
@@ -13,8 +12,6 @@ public sealed class Material
 
     public MaterialBuffer MaterialBuffer { get; set; }
 
-    public IntPtr NativePtr => _vertexShader.NativePointer;
-
     private Renderer _renderer => Renderer.Instance;
 
     private ID3D11VertexShader _vertexShader;
@@ -27,18 +24,18 @@ public sealed class Material
 
     private ID3D11Buffer _model;
 
-    public Material(string shaderFileName, string imageFileName = null)
+    public Material(string shaderFilePath, string imageFileName = null)
     {
         #region //Create VertexShader
-        if (string.IsNullOrEmpty(shaderFileName))
+        if (string.IsNullOrEmpty(shaderFilePath))
         {
-            new Exception("ShaderFileName in the Material Constructor was null");
+            new Exception("ShaderFilePath in the Material Constructor was null");
             return;
         }
 
         // Compile the vertex shader bytecode from the specified shader file name.
-        ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(shaderFileName, "VS", "vs_4_0");
-
+        ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(shaderFilePath, "VS", "vs_5_0");
+        
         // Create the vertex shader using the compiled bytecode.
         _vertexShader = _renderer.Device.CreateVertexShader(vertexShaderByteCode.Span);
         #endregion
@@ -55,7 +52,7 @@ public sealed class Material
 
         #region //Create PixelShader 
         // Compile the bytecode for the pixel shader using the specified shader file name and target profile.
-        ReadOnlyMemory<byte> pixelShaderByteCode = CompileBytecode(shaderFileName, "PS", "ps_4_0");
+        ReadOnlyMemory<byte> pixelShaderByteCode = CompileBytecode(shaderFilePath, "PS", "ps_5_0");
 
         // Create the pixel shader using the compiled bytecode.
         _pixelShader = _renderer.Device.CreatePixelShader(pixelShaderByteCode.Span);
@@ -134,19 +131,19 @@ public sealed class Material
         _renderer.Data.SetConstantBuffer(1, _model);
     }
 
-    internal void UpdateVertexShader(string shaderPath)
+    internal void UpdateVertexShader(string shaderFilePath)
     {
         // Compile the vertex shader bytecode from the specified shader file name.
-        ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(shaderPath, "VS", "vs_4_0", false);
+        ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(shaderFilePath, "VS", "vs_4_0");
 
         // Create the vertex shader using the compiled bytecode.
         _vertexShader = _renderer.Device.CreateVertexShader(vertexShaderByteCode.Span);
     }
 
-    internal void UpdatePixelShader(string shaderPath)
+    internal void UpdatePixelShader(string shaderFilePath)
     {
         // Compile the vertex shader bytecode from the specified shader file name.
-        ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(shaderPath, "PS", "ps_4_0", false);
+        ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(shaderFilePath, "PS", "ps_4_0");
 
         // Create the vertex shader using the compiled bytecode.
         _vertexShader = _renderer.Device.CreateVertexShader(vertexShaderByteCode.Span);
@@ -161,17 +158,8 @@ public sealed class Material
         _model?.Dispose();
     }
 
-    internal static ReadOnlyMemory<byte> CompileBytecode(string shaderPath, string entryPoint, string profile, bool fromResources = true)
+    internal static ReadOnlyMemory<byte> CompileBytecode(string shaderFilePath, string entryPoint, string profile)
     {
-        string shaderFilePath = shaderPath;
-        if (fromResources)
-        {
-            // Combine the base directory and the relative path to the resources directory.
-            string resourcesPath = Path.Combine(AppContext.BaseDirectory, Paths.SHADERS);
-            // Define the full path to the shader file.
-            shaderFilePath = Path.Combine(resourcesPath, shaderPath);
-        }
-
         // Shader flags to enable strictness and set optimization level or debug mode.
         ShaderFlags shaderFlags = ShaderFlags.EnableStrictness;
 #if DEBUG
