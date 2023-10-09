@@ -145,7 +145,7 @@ public sealed class ScriptCompiler
                     : MessageType.Warning,
                 error.Location.GetLineSpan().StartLinePosition.Line,
                 null,
-                scriptEntry.FileInfo.Name);
+                scriptEntry?.FileInfo.Name);
         }
     }
 

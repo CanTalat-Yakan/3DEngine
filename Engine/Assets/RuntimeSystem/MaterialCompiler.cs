@@ -23,7 +23,7 @@ public sealed class MaterialEntry(FileInfo fileInfo)
         Material.UpdatePixelShader(ShaderEntry.FileInfo.Name);
 
         Material.MaterialBuffer?.Dispose();
-        MaterialCompiler.SetMaterialBuffer(this, new MaterialBuffer() { ShaderName = shaderName});
+        MaterialCompiler.SetMaterialBuffer(this, new MaterialBuffer() { ShaderName = shaderName });
         Serialization.SaveXml(Material.MaterialBuffer, FileInfo.FullName);
     }
 }
@@ -32,8 +32,8 @@ public sealed class MaterialCollector
 {
     public List<MaterialEntry> Materials = new();
 
-    public Material GetMaterial(string name) =>
-        Materials.Find(Material => Material.FileInfo.Name == name).Material;
+    public MaterialEntry GetMaterial(string name) =>
+        Materials.Find(MaterialEntry => MaterialEntry.FileInfo.Name == name);
 }
 
 public class MaterialCompiler
@@ -53,35 +53,37 @@ public class MaterialCompiler
             CheckMaterialEntry(path);
     }
 
-    private MaterialEntry CheckMaterialEntry(string path)
+    private void CheckMaterialEntry(string path)
     {
         FileInfo fileInfo = new(path);
 
-        MaterialEntry materialEntry = MaterialCollector.Materials.FirstOrDefault(entry => entry.FileInfo == fileInfo);
+        MaterialEntry materialEntry = MaterialCollector.GetMaterial(fileInfo.Name);
         if (materialEntry is not null)
         {
-            if (fileInfo.LastWriteTime > materialEntry.FileInfo.LastWriteTime)
-            {
-                materialEntry.FileInfo = fileInfo;
+            if (fileInfo.LastWriteTime == materialEntry.FileInfo.LastWriteTime)
+                return;
 
-                var materialBuffer = (MaterialBuffer)Serialization.LoadXml(typeof(MaterialBuffer), path);
-                materialBuffer.UpdateConstantBuffer();
+            materialEntry.FileInfo = fileInfo;
 
-                Output.Log("Updated Material");
-            }
-            else
-                materialEntry = null;
+            var materialBuffer = (MaterialBuffer)Serialization.LoadXml(typeof(MaterialBuffer), path);
+            materialBuffer.UpdateConstantBuffer();
+
+            Output.Log("Updated Material");
         }
         else
         {
             var materialBuffer = (MaterialBuffer)Serialization.LoadXml(typeof(MaterialBuffer), path);
 
-            SetMaterialBuffer(new MaterialEntry(fileInfo), materialBuffer);
+            if (string.IsNullOrEmpty(materialBuffer.ShaderName))
+                return;
+
+            materialEntry = new MaterialEntry(fileInfo);
+            SetMaterialBuffer(materialEntry, materialBuffer);
+
+            MaterialCollector.Materials.Add(materialEntry);
 
             Output.Log("Read new Material");
         }
-
-        return materialEntry;
     }
 
     public static void SetMaterialBuffer(MaterialEntry materialEntry, MaterialBuffer materialBuffer)

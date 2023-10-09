@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Text;
 
 using Vortice.D3DCompiler;
 using Vortice.Direct3D11.Shader;
-using Vortice.Direct3D;
+using System.Linq;
 
 namespace Engine.RuntimeSystem;
 
@@ -19,7 +20,9 @@ public sealed class ShaderCollector
     public List<ShaderEntry> Shaders = new();
 
     public ShaderEntry GetShader(string name) =>
-        Shaders.Find(ShaderEntry => ShaderEntry.FileInfo.Name == name);
+        Shaders.Find(ShaderEntry => Equals(
+            ShaderEntry.FileInfo.Name.Split('.').FirstOrDefault(),
+            name));
 }
 
 public sealed class ShaderCompiler
@@ -55,8 +58,7 @@ public sealed class ShaderCompiler
         if (!File.Exists(shaderFilePath))
             return null;
 
-        var readOnlyMemory = Material.CompileBytecode(shaderFilePath, "VS", "vs_5_0");
-        string scriptCode = GenerateCSharpStruct(readOnlyMemory.Span, Guid.NewGuid());
+        string scriptCode = GenerateCSharpStructWithRegex(File.ReadAllText(shaderFilePath), Guid.NewGuid());
 
         if (scriptCode is null)
         {
@@ -64,7 +66,7 @@ public sealed class ShaderCompiler
             return null;
         }
 
-        ScriptEntry materialConstantBufferScriptEntry = new();
+        ScriptEntry materialConstantBufferScriptEntry = new() { FileInfo = new(shaderFilePath) };
         materialConstantBufferScriptEntry.Script = ScriptCompiler.CreateScript(scriptCode);
 
         if (materialConstantBufferScriptEntry.Script is null)
@@ -89,7 +91,28 @@ public sealed class ShaderCompiler
         return null;
     }
 
-    public static string GenerateCSharpStruct(ReadOnlySpan<byte> shaderByteCode, Guid guid)
+    public static string GenerateCSharpStructWithRegex(string shaderCode, Guid guid)
+    {
+        // Start building the C# struct definition.
+        StringBuilder structBuilder = new StringBuilder();
+        structBuilder.AppendLine("using System.Numerics;");
+        structBuilder.AppendLine("using Engine.Rendering;");
+
+        structBuilder.AppendLine($"public struct Properties{guid:N} : IMaterialBuffer");
+        structBuilder.AppendLine("{");
+
+        // TODO: Find all Fields of the cbuffer Properties and Loop through them
+        var propertiesBufferFields = ProcessConstantBufferFields(shaderCode);
+        foreach (var field in propertiesBufferFields)
+            structBuilder.AppendLine($"    public {field};");
+
+        // Close the struct definition.
+        structBuilder.AppendLine("}");
+
+        return structBuilder.ToString();
+    }
+
+    public static string GenerateCSharpStructWithShaderReflection(ReadOnlySpan<byte> shaderByteCode, Guid guid)
     {
         var shaderReflection = Compiler.Reflect<ID3D11ShaderReflection>(shaderByteCode);
 
@@ -104,12 +127,17 @@ public sealed class ShaderCompiler
 
         // Start building the C# struct definition.
         StringBuilder structBuilder = new StringBuilder();
-        structBuilder.AppendLine($"struct {properties.Description.Name}{guid:N} : IMaterialBuffer {{");
+        structBuilder.AppendLine("using System.Numerics;");
+        structBuilder.AppendLine("using Engine.Rendering;");
+
+        structBuilder.AppendLine($"struct {properties.Description.Name}{guid:N} : IMaterialBuffer");
+        structBuilder.AppendLine("{");
 
         foreach (var variable in properties.Variables)
         {
             // Map the HLSL types to C# types.
-            string csDataType = MapHLSLToCSharpType(variable.VariableType);
+            string csDataType = MapHLSLToCSharpType(variable.VariableType.Description.Type.ToString().ToLower());
+
             structBuilder.AppendLine($"    public {csDataType} {variable.Description.Name};");
         }
 
@@ -119,24 +147,53 @@ public sealed class ShaderCompiler
         return structBuilder.ToString();
     }
 
-    private static string MapHLSLToCSharpType(ID3D11ShaderReflectionType typeDescription) =>
-        typeDescription.Description.Type switch
+    public static List<string> ProcessConstantBufferFields(string shaderCode)
+    {
+        List<string> processedFields = new List<string>();
+
+        // Define a regular expression pattern to match constant buffer fields.
+        string pattern = @"cbuffer\s+Properties\s*:\s*register\(b\d+\)\s*{([^}]+)};";
+        Regex regex = new Regex(pattern, RegexOptions.Multiline);
+
+        // Find the first match of the pattern in the shader code.
+        Match match = regex.Match(shaderCode);
+
+        if (match.Success)
         {
-            ShaderVariableType.Int => "int",
-            ShaderVariableType.Float => typeDescription.Description.Class switch
+            string bufferContent = match.Groups[1].Value;
+            string[] lines = bufferContent.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string line in lines)
             {
-                ShaderVariableClass.Scalar => "float",
-                ShaderVariableClass.Vector => typeDescription.Description.RowCount switch
+                // Extract the field type and name using a regular expression.
+                Match fieldMatch = Regex.Match(line, @"\s*(\w+)\s+(\w+);");
+                if (fieldMatch.Success)
                 {
-                    1 => "float",
-                    2 => "Vector2",
-                    3 => "Vector3",
-                    4 => "Vector4",
-                    _ => "float"
-                },
-                _ => "float"
-            },
-            ShaderVariableType.Bool => "bool",
-            _ => null
-        };
+                    string hlslFieldType = fieldMatch.Groups[1].Value;
+                    string hlslFieldName = fieldMatch.Groups[2].Value;
+
+                    hlslFieldType = MapHLSLToCSharpType(hlslFieldType);
+                    if (string.IsNullOrEmpty(hlslFieldType))
+                        continue;
+
+                    // Add the processed field string (field type and name) to the list.
+                    string processedField = $"{hlslFieldType} {hlslFieldName}";
+                    processedFields.Add(processedField);
+                }
+            }
+        }
+
+        return processedFields;
+    }
+
+    private static string MapHLSLToCSharpType(string hlslType) =>
+            hlslType switch
+            {
+                "int" => "int",
+                "float" => "float",
+                "float2" => "Vector2",
+                "float3" => "Vector3",
+                "bool" => "bool",
+                _ => null
+            };
 }
