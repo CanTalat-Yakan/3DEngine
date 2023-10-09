@@ -30,6 +30,7 @@ public sealed class ScriptCompiler
     public static ComponentCollector ComponentCollector = new();
 
     private Dictionary<string, ScriptEntry> _scriptsCollection = new();
+
     private List<Assembly> _allAssemblies = new();
     private List<Assembly> _ignoreAssemblies = new();
 
