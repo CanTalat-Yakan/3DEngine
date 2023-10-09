@@ -1,11 +1,12 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Microsoft.CodeAnalysis.Emit;
-using Microsoft.CodeAnalysis.Scripting;
-using Microsoft.CodeAnalysis;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Emit;
+using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.CodeAnalysis;
 
 namespace Engine.RuntimeSystem;
 
