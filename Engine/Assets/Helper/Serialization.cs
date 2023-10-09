@@ -2,25 +2,23 @@
 using System.Text.Json;
 using System.Xml.Serialization;
 
-using Type = System.Type;
-
 namespace Engine.Helper;
 
-internal enum EDataType
+public enum EDataType
 {
     XML,
     JSON,
 }
 
-static class Serialization
+public static class Serialization
 {
-    internal static void DeleteFile(string path)
+    public static void DeleteFile(string path)
     {
         if (File.Exists(path))
             File.Delete(path);
     }
 
-    internal static void SaveFile<T>(T file, string path, EDataType eDataType = EDataType.XML)
+    public static void SaveFile<T>(T file, string path, EDataType eDataType = EDataType.XML)
     {
         switch (eDataType)
         {
@@ -35,7 +33,7 @@ static class Serialization
         }
     }
 
-    internal static T LoadFile<T>(string path, EDataType eDataType = EDataType.XML)
+    public static T LoadFile<T>(string path, EDataType eDataType = EDataType.XML)
     {
         object obj = null;
 
@@ -54,7 +52,7 @@ static class Serialization
         return (T)obj;
     }
 
-    internal static void SaveXml<T>(T file, string path)
+    public static void SaveXml<T>(T file, string path)
     {
         using (FileStream fs = new(path, File.Exists(path) ? FileMode.Create : FileMode.CreateNew))
         {
@@ -63,7 +61,7 @@ static class Serialization
         }
     }
 
-    internal static void SaveJSON<T>(T file, string path)
+    public static void SaveJSON<T>(T file, string path)
     {
         JsonSerializerOptions options = new();
         options.WriteIndented = true;
@@ -72,7 +70,7 @@ static class Serialization
         File.WriteAllText(path, data);
     }
 
-    internal static object LoadXml(Type type, string path)
+    public static object LoadXml(Type type, string path)
     {
         object obj = null;
 
@@ -85,8 +83,6 @@ static class Serialization
         return obj;
     }
 
-    internal static object LoadJSON(Type type, string path)
-    {
-        return JsonSerializer.Deserialize(File.ReadAllText(path), type);
-    }
+    public static object LoadJSON(Type type, string path) =>
+        JsonSerializer.Deserialize(File.ReadAllText(path), type);
 }

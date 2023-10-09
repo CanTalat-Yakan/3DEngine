@@ -1,14 +1,2 @@
 ﻿<?xml version="1.0"?>
-
-<Shader>
-    <Properties>
-        <FileName>{{FileName}}</FileName>
-        <Color>1,1,1,1</Color>
-        <Albedo>White</Albedo>
-        <Metallic>0.5</Metallic>
-        <Roughness>0.5</Roughness>
-        <Normal>0.5</Normal>
-        <Occlusion>0.5</Occlusion>
-        <Emission>0</Emission>
-  </Properties>
-</Shader>
+<MaterialBuffer ShaderName="SimpleLit" />

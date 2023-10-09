@@ -2,126 +2,125 @@
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI;
 
-namespace Editor.Controller
+namespace Editor.Controller;
+
+internal enum PlayMode
 {
-    internal enum PlayMode
+    None,
+    Playing,
+    Paused,
+}
+
+internal sealed class Player
+{
+    public PlayMode PlayMode;
+
+    private AppBarToggleButton _play;
+    private AppBarToggleButton _pause;
+    private AppBarButton _forward;
+    private TextBlock _status;
+    private Output _output;
+
+    private PlayMode _playMode = PlayMode.None;
+
+    public Player(AppBarToggleButton play, AppBarToggleButton pause, AppBarButton forward)
     {
-        None,
-        Playing,
-        Paused,
+        _play = play;
+        _pause = pause;
+        _forward = forward;
+        _output = Main.Instance.LayoutControl.Output.OutputControl;
+        _status = Main.Instance.Status;
     }
 
-    internal sealed class Player
+    public void Play() 
     {
-        public PlayMode PlayMode;
+        // Check if the current play mode is None.
+        if (PlayMode == PlayMode.None)
+            // If the clear play option is checked, clear the output.
+            if (_output.ClearPlay.IsChecked.Value)
+                _output.ClearOutput();
 
-        private AppBarToggleButton _play;
-        private AppBarToggleButton _pause;
-        private AppBarButton _forward;
-        private TextBlock _status;
-        private Output _output;
+        // Change the border brush, thickness, padding, and margin of the viewport control.
+        Main.Instance.LayoutControl.Viewport.ViewportControl.Content.BorderBrush = new SolidColorBrush(Colors.GreenYellow);
+        Main.Instance.LayoutControl.Viewport.ViewportControl.Content.BorderThickness = new(_play.IsChecked.Value ? 2 : 0);
+        Main.Instance.LayoutControl.Viewport.ViewportControl.Content.Padding = new(_play.IsChecked.Value ? -2 : 0);
+        Main.Instance.LayoutControl.Viewport.ViewportControl.Content.Margin = new(_play.IsChecked.Value ? 2 : 0);
 
-        private PlayMode _playMode = PlayMode.None;
+        // Set the status of the app bar buttons.
+        SetStatusAppBarButtons(_play.IsChecked.Value);
 
-        public Player(AppBarToggleButton play, AppBarToggleButton pause, AppBarButton forward)
-        {
-            _play = play;
-            _pause = pause;
-            _forward = forward;
-            _output = Main.Instance.LayoutControl.Output.OutputControl;
-            _status = Main.Instance.Status;
-        }
+        // Log the current status of the game.
+        Output.Log(_play.IsChecked.Value ? "Now Playing..." : "Stopped PlayMode");
 
-        public void Play() 
-        {
-            // Check if the current play mode is None.
-            if (PlayMode == PlayMode.None)
-                // If the clear play option is checked, clear the output.
-                if (_output.ClearPlay.IsChecked.Value)
-                    _output.ClearOutput();
+        Main.Instance.OpenPane.IsChecked = !_play.IsChecked.Value;
+    }
 
-            // Change the border brush, thickness, padding, and margin of the viewport control.
-            Main.Instance.LayoutControl.Viewport.ViewportControl.Content.BorderBrush = new SolidColorBrush(Colors.GreenYellow);
-            Main.Instance.LayoutControl.Viewport.ViewportControl.Content.BorderThickness = new(_play.IsChecked.Value ? 2 : 0);
-            Main.Instance.LayoutControl.Viewport.ViewportControl.Content.Padding = new(_play.IsChecked.Value ? -2 : 0);
-            Main.Instance.LayoutControl.Viewport.ViewportControl.Content.Margin = new(_play.IsChecked.Value ? 2 : 0);
+    public void Pause()
+    {
+        // Set enum variable play mode value based on the checked state of "_pause".
+        PlayMode = _pause.IsChecked.Value ? PlayMode.Paused : PlayMode.Playing;
+        // Enable the "_forward" Button with the checked state of "_pause".
+        _forward.IsEnabled = _pause.IsChecked.Value;
 
-            // Set the status of the app bar buttons.
-            SetStatusAppBarButtons(_play.IsChecked.Value);
+        // Change the border brush to either Orange or GreenYellow depending on the checked state of "_pause".
+        Main.Instance.LayoutControl.Viewport.ViewportControl.Content.BorderBrush = new SolidColorBrush(_pause.IsChecked.Value ? Colors.Orange : Colors.GreenYellow);
 
-            // Log the current status of the game.
-            Output.Log(_play.IsChecked.Value ? "Now Playing..." : "Stopped PlayMode");
+        // Log the current status of the game.
+        Output.Log(_pause.IsChecked.Value ? "Paused PlayMode" : "Continued Play;ode");
+    }
 
-            Main.Instance.OpenPane.IsChecked = !_play.IsChecked.Value;
-        }
+    public void Forward()
+    {
+        // Check if the current play mode is not paused.
+        if (PlayMode != PlayMode.Paused)
+            return;
 
-        public void Pause()
-        {
-            // Set enum variable play mode value based on the checked state of "_pause".
-            PlayMode = _pause.IsChecked.Value ? PlayMode.Paused : PlayMode.Playing;
-            // Enable the "_forward" Button with the checked state of "_pause".
-            _forward.IsEnabled = _pause.IsChecked.Value;
+        // Advance the game by one frame.
+        Engine.Core.Instance.Frame();
 
-            // Change the border brush to either Orange or GreenYellow depending on the checked state of "_pause".
-            Main.Instance.LayoutControl.Viewport.ViewportControl.Content.BorderBrush = new SolidColorBrush(_pause.IsChecked.Value ? Colors.Orange : Colors.GreenYellow);
+        // Log the current status of the game.
+        Output.Log("Stepped Forward");
+    }
 
-            // Log the current status of the game.
-            Output.Log(_pause.IsChecked.Value ? "Paused PlayMode" : "Continued Play;ode");
-        }
+    public void Kill()
+    {
+        // Uncheck the play button.
+        _play.IsChecked = false;
 
-        public void Forward()
-        {
-            // Check if the current play mode is not paused.
-            if (PlayMode != PlayMode.Paused)
-                return;
+        // Disable all AppBarButtons in the Status bar.
+        SetStatusAppBarButtons(false);
 
-            // Advance the game by one frame.
-            Engine.Core.Instance.Frame();
+        // Log the current status of the game.
+        Output.Log("Killed Process of GameInstance!");
+    }
 
-            // Log the current status of the game.
-            Output.Log("Stepped Forward");
-        }
+    private void SetStatusAppBarButtons(bool b)
+    {
+        // Update the play mode of the game instance.
+        PlayMode = b ? PlayMode.Playing : PlayMode.None;
 
-        public void Kill()
-        {
-            // Uncheck the play button.
-            _play.IsChecked = false;
+        // Enable/disable the pause button based on the play mode.
+        _pause.IsEnabled = b;
+        // Uncheck the pause button if the game is not in playing mode.
+        _pause.IsChecked = false;
+        // Enable/disable the forward button based on the play mode.
+        if (!b) _forward.IsEnabled = b;
 
-            // Disable all AppBarButtons in the Status bar.
-            SetStatusAppBarButtons(false);
+        // Update the label and icon of the play button based on the play mode.
+        _play.Label = b ? "Stop" : "Play";
+        _play.Icon = b ? new SymbolIcon(Symbol.Stop) : new SymbolIcon(Symbol.Play);
+    }
 
-            // Log the current status of the game.
-            Output.Log("Killed Process of GameInstance!");
-        }
+    public bool CheckPlayModeStarted()
+    {
+        bool b = false;
 
-        private void SetStatusAppBarButtons(bool b)
-        {
-            // Update the play mode of the game instance.
-            PlayMode = b ? PlayMode.Playing : PlayMode.None;
+        if (Main.Instance.PlayerControl.PlayMode == PlayMode.Playing)
+            if (_playMode != Main.Instance.PlayerControl.PlayMode)
+                b = true;
 
-            // Enable/disable the pause button based on the play mode.
-            _pause.IsEnabled = b;
-            // Uncheck the pause button if the game is not in playing mode.
-            _pause.IsChecked = false;
-            // Enable/disable the forward button based on the play mode.
-            if (!b) _forward.IsEnabled = b;
+        _playMode = Main.Instance.PlayerControl.PlayMode;
 
-            // Update the label and icon of the play button based on the play mode.
-            _play.Label = b ? "Stop" : "Play";
-            _play.Icon = b ? new SymbolIcon(Symbol.Stop) : new SymbolIcon(Symbol.Play);
-        }
-
-        public bool CheckPlayModeStarted()
-        {
-            bool b = false;
-
-            if (Main.Instance.PlayerControl.PlayMode == PlayMode.Playing)
-                if (_playMode != Main.Instance.PlayerControl.PlayMode)
-                    b = true;
-
-            _playMode = Main.Instance.PlayerControl.PlayMode;
-
-            return b;
-        }
+        return b;
     }
 }

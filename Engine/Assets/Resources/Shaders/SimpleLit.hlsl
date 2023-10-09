@@ -11,11 +11,6 @@ cbuffer PerModelConstantBuffer : register(b1)
 
 cbuffer Properties : register(b10)
 {
-    float Intensity;
-};
-
-cbuffer Properties : register(b10)
-{
     float Float;
     int Int;
     //[Slider(1, 10)]

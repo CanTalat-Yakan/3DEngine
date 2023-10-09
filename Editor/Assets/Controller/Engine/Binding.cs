@@ -11,6 +11,7 @@ using Engine.ECS;
 using Engine.Editor;
 using Engine.RuntimeSystem;
 using Engine.SceneSystem;
+using static Assimp.Metadata;
 
 namespace Editor.Controller;
 
@@ -32,6 +33,9 @@ internal sealed class BindEntry(object source, string sourcePath)
         Target = target;
         TargetValuePath = targetValuePath;
         TargetEventPath = targetEventPath;
+
+        if (!string.IsNullOrEmpty(TargetEventPath))
+            Binding.SetPathEvent(this, Binding.AllBindingFlags);
     }
 
     public void SetEvent(EventHandler eventHandler) =>
@@ -44,9 +48,10 @@ internal sealed class Binding
     public static Dictionary<string, BindEntry> RendererBindings = new();
     // Key = Field + Scene.ID
     public static Dictionary<string, BindEntry> SceneBindings = new();
-    // Key = Field + Entity.ID
-    // Key = Field + Component.GetType().FullName + Entity.ID
+    // Key = Field + Entity.ID | Key = Field + Component.GetType().FullName + Entity.ID
     public static Dictionary<string, BindEntry> EntityBindings = new();
+    // Key = Field + materialPropertiesConstantBuffer.GetType().FullName
+    public static Dictionary<string, BindEntry> MaterialBindings = new();
 
     public static BindingFlags AllBindingFlags =
         BindingFlags.NonPublic |
@@ -59,10 +64,12 @@ internal sealed class Binding
         UpdateRendererBindings();
         UpdateSceneBindings();
         UpdateEntityBindings();
+        UpdateMaterialBindings();
     }
 
     public static void SetRendererBindings()
     {
+        RendererBindings.Clear();
         RendererBindings.Add(
             "FOV" + ViewportController.Camera?.GetType().FullName,
             new(ViewportController.Camera, "FOV"));
@@ -78,7 +85,7 @@ internal sealed class Binding
     {
         if (scene is null)
             return;
-
+        SceneBindings.Clear();
         SceneBindings.Add("Scene@" + scene.ID, new(scene, "Scene@"));
         SceneBindings.Add("Name" + scene.ID, new(scene, "Name"));
         SceneBindings.Add("IsEnabled" + scene.ID, new(scene, "IsEnabled"));
@@ -89,6 +96,7 @@ internal sealed class Binding
         if (entity is null)
             return;
 
+        EntityBindings.Clear();
         EntityBindings.Add("Entity@" + entity.ID, new(entity, "Entity@"));
         EntityBindings.Add("Name" + entity.ID, new(entity, "Name"));
         EntityBindings.Add("IsStatic" + entity.ID, new(entity, "IsStatic"));
@@ -104,7 +112,12 @@ internal sealed class Binding
         if (materialEntry is null)
             return;
 
-        // TODO: Create Binding for material properties
+        MaterialBindings.Clear();
+        var PropertiesConstantBuffer = materialEntry.Material.MaterialBuffer.PropertiesConstantBuffer;
+        foreach (var field in PropertiesConstantBuffer.GetType().GetFields(AllBindingFlags))
+            MaterialBindings.Add(
+                field.Name + PropertiesConstantBuffer.GetType().FullName, 
+                new(PropertiesConstantBuffer, field.Name));
     }
 
     /// <summary>
@@ -112,6 +125,7 @@ internal sealed class Binding
     /// [Scene Key = Field.Name + Scene.ID]  
     /// [Entity Key = Field.Name + Entity.ID]    
     /// [Component Key = Field.Name + Component.GetType().FullName + Entity.ID]  
+    /// [Material Key = Field.Name + materialPropertiesConstantBuffer.GetType().FullName]
     /// </summary>
     public static BindEntry Get(string key, Dictionary<string, BindEntry> dictionary = null)
     {
@@ -123,15 +137,22 @@ internal sealed class Binding
             return EntityBindings[key];
         else if (RendererBindings.Keys.Contains(key))
             return RendererBindings[key];
+        else if (MaterialBindings.Keys.Contains(key))
+            return MaterialBindings[key];
 
         return null;
     }
 
-    public static BindEntry GetBinding(string fieldName, object component, object entityID)
+    public static BindEntry GetBinding(string fieldName, object source, object id)
     {
-        return entityID is not null
-            ? GetEntityBinding(fieldName, component, entityID)
-            : GetRendererBinding(fieldName, component);
+        var bindEntry = id is not null
+            ? GetEntityBinding(fieldName, source, id)
+            : GetRendererBinding(fieldName, source);
+
+        if(bindEntry is null)
+            bindEntry = GetMaterialBinding(fieldName, source);
+
+        return bindEntry;
     }
 
     public static BindEntry GetRendererBinding(string fieldName, object component) =>
@@ -146,6 +167,18 @@ internal sealed class Binding
     public static BindEntry GetEntityBinding(string fieldName, object entityID) =>
         Get(fieldName + entityID, EntityBindings);
 
+    public static BindEntry GetMaterialBinding(string fieldName, object materialPropertiesConstantBuffer) =>
+        Get(fieldName + materialPropertiesConstantBuffer.GetType().FullName, MaterialBindings);
+
+    private static void UpdateRendererBindings()
+    {
+        if (RendererBindings.Count == 0)
+            return;
+
+        foreach (var source in RendererBindings.Select(kv => kv.Value.Source).ToArray())
+            UpdateBinding(source, source.GetType().FullName, RendererBindings);
+    }
+
     private static void UpdateSceneBindings()
     {
         if (SceneBindings.Count == 0)
@@ -154,15 +187,6 @@ internal sealed class Binding
         foreach (var entry in SceneBindings.Where(kv => kv.Key.Contains("Scene@")))
             if (entry.Value.Source is Scene scene)
                 UpdateBinding(scene, scene.ID, SceneBindings);
-    }
-
-    private static void UpdateRendererBindings()
-    {
-        if (RendererBindings.Count == 0)
-            return;
-
-        foreach (var source in RendererBindings.Select(kv => kv.Value.Source).ToArray())
-            UpdateBinding(source, source, RendererBindings);
     }
 
     private static void UpdateEntityBindings()
@@ -176,6 +200,15 @@ internal sealed class Binding
 
         foreach (var component in entity.Components.ToArray())
             UpdateBinding(component, component.GetType().FullName + entity.ID, EntityBindings);
+    }
+
+    private static void UpdateMaterialBindings()
+    {
+        if (MaterialBindings.Count == 0)
+            return;
+
+        foreach (var source in MaterialBindings.Select(kv => kv.Value.Source).ToArray())
+            UpdateBinding(source, source.GetType().FullName, RendererBindings);
     }
 
     private static void UpdateBinding(object source, object keySufix, Dictionary<string, BindEntry> bindings)
@@ -212,13 +245,10 @@ internal sealed class Binding
                 propertyFromPath.SetValue(bindEntry.Target, bindEntry.Value);
         }
 
-        if (!string.IsNullOrEmpty(bindEntry.TargetEventPath))
-            CheckPathEvent(bindEntry, AllBindingFlags);
-
         bindEntry.Event?.Invoke(null, null);
     }
 
-    public static void CheckPathEvent(BindEntry bindEntry, BindingFlags bindingFlags)
+    public static void SetPathEvent(BindEntry bindEntry, BindingFlags bindingFlags)
     {
         var eventInfo = bindEntry.Target.GetType().GetEvent(bindEntry.TargetEventPath, bindingFlags);
 

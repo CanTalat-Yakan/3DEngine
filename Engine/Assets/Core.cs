@@ -26,8 +26,9 @@ public sealed class Core
     public Renderer Renderer;
     public SceneManager SceneManager;
 
-    public MaterialCompiler MaterialCompiler;
     public ScriptCompiler ScriptCompiler;
+    public ShaderCompiler ShaderCompiler;
+    public MaterialCompiler MaterialCompiler;
 
     private ImGuiRenderer _imGuiRenderer;
     private ImGuiInputHandler _imGuiInputHandler;
@@ -50,8 +51,9 @@ public sealed class Core
         Input.Initialize(hwnd);
 
         Renderer = renderer;
-        MaterialCompiler = new();
         ScriptCompiler = new();
+        ShaderCompiler = new();
+        MaterialCompiler = new();
         SceneManager = new();
 
         #region // ImGui
@@ -67,10 +69,12 @@ public sealed class Core
             .CreateEntity(null, "Boot", EditorTags.SceneBoot.ToString())
             .AddComponent(new SceneBoot());
 
-        // Compile all project materials and add them to the collection.
-        MaterialCompiler.CompileProjectMaterials(EditorState.AssetsPath);
         // Compile all project scripts and add the components to the collection for the AddComponent function.
         ScriptCompiler.CompileProjectScripts(EditorState.AssetsPath);
+        // Compile all project shaders and add them to the collection.
+        ShaderCompiler.CompileProjectShaders(EditorState.AssetsPath);
+        // Compile all project materials and add them to the collection.
+        MaterialCompiler.CompileProjectMaterials(EditorState.AssetsPath);
 
         // Copies the List to the local array once to savely iterate to it.
         SceneManager.ProcessSystems();

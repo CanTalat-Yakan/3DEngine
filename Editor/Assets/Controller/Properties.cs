@@ -47,9 +47,6 @@ internal sealed partial class Properties
     {
         s_currentlySet = content;
 
-        // Clear the Binding for the Entity.
-        Binding.EntityBindings?.Clear();
-
         // Clear the children of the PropertiesRoot element in the LayoutControl.
         Main.Instance.LayoutControl.PropertiesRoot.Children.Clear();
         // Set the children of the PropertiesRoot element in the LayoutControl.
@@ -124,7 +121,7 @@ internal sealed partial class Properties
                 (s, e) =>
                 {
                     entity.AddComponent(
-                        Engine.Core.Instance.ScriptCompiler.ComponentCollector
+                        ScriptCompiler.ComponentCollector
                         .GetComponent(e.SelectedItem.ToString()));
 
                     Set(entity);
@@ -200,8 +197,8 @@ internal sealed partial class Properties
                 {
                     string newShaderName = e.SelectedItem.ToString();
 
-                    FileInfo newShaderFileInfo = Engine.Core.Instance.MaterialCompiler.ShaderCollector
-                        .GetShader(newShaderName);
+                    FileInfo newShaderFileInfo = ShaderCompiler.ShaderCollector
+                        .GetShader(newShaderName).FileInfo;
 
                     materialEntry.SetShader(newShaderFileInfo.FullName);
 
@@ -210,9 +207,9 @@ internal sealed partial class Properties
 
         s_stackPanel.Children.Add(CreateSeperator());
 
-        // Get the non-public fields and events of the component.
-        var fieldInfos = materialEntry.Buffer.GetType().GetFields(
-            BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
+        // Get the fields of the properties constantbuffer.
+        var fieldInfos = materialEntry.Material.MaterialBuffer.PropertiesConstantBuffer.GetType()
+            .GetFields(BindingFlags.Public | BindingFlags.Instance);
 
         // Initialize the collection of fields, events, and scripts.
         Grid newFieldGrid;
@@ -318,7 +315,7 @@ internal sealed partial class Properties
             // only listen to changes caused by user entering text.
             if (e.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
-                string[] itemSource = Engine.Core.Instance.ScriptCompiler.ComponentCollector
+                string[] itemSource = ScriptCompiler.ComponentCollector
                     .Components.ConvertAll<string>(Type => Type.Name).ToArray();
 
                 List<string> suitableItems = new();
@@ -353,8 +350,8 @@ internal sealed partial class Properties
             // only listen to changes caused by user entering text.
             if (e.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
-                string[] itemSource = Engine.Core.Instance.MaterialCompiler.ShaderCollector
-                    .Shaders.ConvertAll<string>(Type => Type.Name).ToArray();
+                string[] itemSource = ShaderCompiler.ShaderCollector
+                    .Shaders.ConvertAll<string>(ShaderEntry => ShaderEntry.FileInfo.Name).ToArray();
 
                 List<string> suitableItems = new();
 
@@ -593,8 +590,8 @@ internal sealed partial class Properties
         // Initialize a new List of Grid type.
         List<Grid> grid = new();
 
-        var buffer = materialEntry.Buffer;
-        var value = fieldInfo.GetValue(buffer);
+        var propertiesConstantBuffer = materialEntry.Material.MaterialBuffer.PropertiesConstantBuffer;
+        var value = fieldInfo.GetValue(propertiesConstantBuffer);
         // Get the type of the current field.
         var type = fieldInfo.FieldType;
         // Get any custom attributes applied to the field.
@@ -618,15 +615,15 @@ internal sealed partial class Properties
                 // If the field has the `SliderAttribute`, add a slider element.
                 if (attributes.OfType<SliderAttribute>().Any())
                     grid.Add(
-                    CreateSlider(
-                        materialEntry.ID, buffer, fieldInfo.Name,
+                    CreateSlider(null,
+                        propertiesConstantBuffer, fieldInfo.Name,
                         (int)value,
                         (int)attributes.OfType<SliderAttribute>().First().CustomMin,
                         (int)attributes.OfType<SliderAttribute>().First().CustomMax));
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
-                    grid.Add(CreateNumberInput(
-                        materialEntry.ID, buffer, fieldInfo.Name,
+                    grid.Add(CreateNumberInput(null,
+                        propertiesConstantBuffer, fieldInfo.Name,
                         (int)value,
                         int.MinValue,
                         int.MaxValue));
@@ -636,40 +633,47 @@ internal sealed partial class Properties
                 // If the field has the `SliderAttribute`, add a slider element.
                 if (attributes.OfType<SliderAttribute>().Any())
                     grid.Add(
-                    CreateSlider(
-                        materialEntry.ID, buffer, fieldInfo.Name,
+                    CreateSlider(null,
+                        propertiesConstantBuffer, fieldInfo.Name,
                         (float)value,
                         (float)attributes.OfType<SliderAttribute>().First().CustomMin,
                         (float)attributes.OfType<SliderAttribute>().First().CustomMax));
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
-                    grid.Add(CreateNumberInput(
-                        materialEntry.ID, buffer, fieldInfo.Name,
+                    grid.Add(CreateNumberInput(null,
+                        propertiesConstantBuffer, fieldInfo.Name,
                         (float)value,
                         float.MinValue,
                         float.MaxValue));
 
             // Vector 2
             else if (type == typeof(Vector2))
-                grid.Add(CreateVec2Input(materialEntry.ID, buffer, fieldInfo.Name, (Vector2)value));
+                grid.Add(CreateVec2Input(null,
+                        propertiesConstantBuffer, fieldInfo.Name, 
+                        (Vector2)value));
 
             // Vector 3
             else if (type == typeof(Vector3))
-                grid.Add(CreateVec3Input(materialEntry.ID, buffer, fieldInfo.Name, (Vector3)value));
+                grid.Add(CreateVec3Input(null, 
+                    propertiesConstantBuffer, fieldInfo.Name, 
+                    (Vector3)value));
 
             // Bool
             else if (type == typeof(bool))
-                grid.Add(CreateBool(materialEntry.ID, buffer, fieldInfo.Name, (bool)value));
+                grid.Add(CreateBool(null, 
+                    propertiesConstantBuffer, fieldInfo.Name,
+                    (bool)value));
             #endregion
 
             // Return the final grid by stacking all the processed attributes, type grid and wrapping the field name.
             finalGrid = ReturnProcessedFieldInfo(grid, attributes, fieldInfo, null);
         }
 
-        Binding.GetBinding(fieldInfo.Name, buffer, materialEntry.ID)?.SetEvent((s, e) =>
+        Binding.GetMaterialBinding(fieldInfo.Name, propertiesConstantBuffer)?.SetEvent((s, e) =>
         {
-            //materialEntry.Material.UpdatePropertiesConstantBuffer();
-            // TODO: Update ConstantBuffer of Material when a value changed in the properties
+            Engine.Helper.Serialization.SaveXml(propertiesConstantBuffer, materialEntry.FileInfo.FullName);
+
+            materialEntry.Material.MaterialBuffer.UpdateConstantBuffer();
         });
 
         return finalGrid;

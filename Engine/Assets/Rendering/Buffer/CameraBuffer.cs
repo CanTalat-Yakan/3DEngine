@@ -11,6 +11,10 @@ public sealed class CameraBuffer
 
     private Renderer _renderer => Renderer.Instance;
 
+    public CameraBuffer() =>
+        //Create View Constant Buffer when Camera is initialized.
+        View = _renderer.Device.CreateConstantBuffer<ViewConstantBuffer>();
+
     public void UpdateConstantBuffer()
     {
         // Map the constant buffer and copy the camera's view-projection matrix and position into it.

@@ -26,7 +26,7 @@ public sealed class ComponentCollector
 
 public sealed class ScriptCompiler
 {
-    public ComponentCollector ComponentCollector = new();
+    public static ComponentCollector ComponentCollector = new();
 
     private Dictionary<string, ScriptEntry> _scriptsCollection = new();
     private List<Assembly> _allAssemblies = new();

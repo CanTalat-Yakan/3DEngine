@@ -57,18 +57,19 @@ public sealed class Mesh : Component
         }
         else
         {
-            // Set the material's constant buffer to the entity's transform constant buffer.
-            Material.Set(Entity.Transform.GetConstantBuffer());
+            // Set the material Vertex- and PixelShader and the PerModelConstantBuffer.
+            Material.Set();
+            Material.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
 
-            // Draw the mesh with trianglelist.
+            // Draw the mesh with TriangleList.
             _renderer.Data.SetPrimitiveTopology();
             _renderer.Draw(MeshBuffers.VertexBuffer, MeshBuffers.IndexBuffer, MeshInfo.Indices.Length);
 
-            // Assign meshInfo to the static variable.
+            // Assign MeshInfo to the static variable.
             CurrentMeshOnGPU = MeshInfo;
         }
 
-        // Increment the vertex, index and draw call count in the profiler.
+        // Increment the vertex, index and draw call count in the Profiler.
         Profiler.Vertices += MeshInfo.Vertices.Length;
         Profiler.Indices += MeshInfo.Indices.Length;
         Profiler.DrawCalls++;

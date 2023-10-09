@@ -9,12 +9,6 @@ public sealed class MeshBuffer
 
     private Renderer _renderer => Renderer.Instance;
 
-    public void Dispose()
-    {
-        VertexBuffer?.Dispose();
-        IndexBuffer?.Dispose();
-    }
-
     public void CreateBuffer(MeshInfo meshInfo)
     {
         Dispose();
@@ -30,5 +24,11 @@ public sealed class MeshBuffer
         IndexBuffer = _renderer.Device.CreateBuffer(
             meshInfo.Indices,
             BindFlags.IndexBuffer);
+    }
+
+    public void Dispose()
+    {
+        VertexBuffer?.Dispose();
+        IndexBuffer?.Dispose();
     }
 }

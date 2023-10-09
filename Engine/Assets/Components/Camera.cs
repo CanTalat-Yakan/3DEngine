@@ -22,10 +22,6 @@ public sealed class Camera : Component
         // Register the component with the CameraSystem.
         CameraSystem.Register(this);
 
-    public Camera() =>
-        //Create View Constant Buffer when Camera is initialized.
-        CameraBuffer.View = _renderer.Device.CreateConstantBuffer<ViewConstantBuffer>();
-
     public override void OnAwake()
     {
         // Assign this camera instance as the main camera if it has "MainCamera" tag.
@@ -76,22 +72,23 @@ public sealed class Camera : Component
             CameraPosition = Entity.Transform.Position,
         };
 
-        /* The coordinate system used in System.Numerics is right-handed,
-         * so adjustments need to be made for DirectX's left-handed coordinate system.
-         * The index order must be flipped from 0,1,2 to 0,2,1.
-         * (Renderer:SetRasterizerDesc FrontCounterClockWise = true)
-         * and the texture coordinates in DirectX are flipped along the Y-axis,
-         * with 0,0 starting in the top-left corner and going down to 0,1.
-         * (ModelLoader:LoadFile postProcessSteps = FlipUV)
-         * The X-mouse axis is also used without negation.
+        /* 
+         The coordinate system used in System.Numerics is right-handed,
+         so adjustments need to be made for DirectX's left-handed coordinate system.
+         The index order must be flipped from 0,1,2 to 0,2,1.
+         (Renderer:SetRasterizerDesc FrontCounterClockWise = true)
+         and the texture coordinates in DirectX are flipped along the Y-axis,
+         with 0,0 starting in the top-left corner and going down to 0,1.
+         (ModelLoader:LoadFile postProcessSteps = FlipUV)
+         The X-mouse axis is also used without negation.
 
-         * To match the HLSL calculations, which use column - major matrices,
-         * the transpose of(World * View * Projection) is calculated.
-         * The calculation becomes ProjectionT *ViewT * WorldT,
-         * with World being in the PerModelConstantBuffer.
-         * The transpose of (View * Projection) is also taken
-         * because HLSL calculates matrix multiplication in column - major form
-         * and System.Numerics returns row - major.
+         To match the HLSL calculations, which use column - major matrices,
+         the transpose of(World * View * Projection) is calculated.
+         The calculation becomes ProjectionT *ViewT * WorldT,
+         with World being in the PerModelConstantBuffer.
+         The transpose of (View * Projection) is also taken
+         because HLSL calculates matrix multiplication in column - major form
+         and System.Numerics returns row - major.
          */
 
         //Update constant buffer data

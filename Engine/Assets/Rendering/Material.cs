@@ -11,6 +11,10 @@ public sealed class Material
 {
     public static Material CurrentMaterialOnGPU { get; private set; }
 
+    public MaterialBuffer MaterialBuffer { get; set; }
+
+    public IntPtr NativePtr => _vertexShader.NativePointer;
+
     private Renderer _renderer => Renderer.Instance;
 
     private ID3D11VertexShader _vertexShader;
@@ -23,9 +27,7 @@ public sealed class Material
 
     private ID3D11Buffer _model;
 
-    private ID3D11Buffer _properties;
-
-    public Material(string shaderFileName, string imageFileName)
+    public Material(string shaderFileName, string imageFileName = null)
     {
         #region //Create VertexShader
         if (string.IsNullOrEmpty(shaderFileName))
@@ -101,9 +103,9 @@ public sealed class Material
         #endregion
     }
 
-    internal void Set(PerModelConstantBuffer constantBuffer)
+    internal void Set()
     {
-        UpdateModelConstantBuffer(constantBuffer);
+        MaterialBuffer?.UpdateConstantBuffer();
 
         // Set input layout, vertex shader, and pixel shader in the device context.
         // Set the shader resource and sampler in the pixel shader stage of the device context.
@@ -130,25 +132,6 @@ public sealed class Material
 
         // Set the constant buffer in the vertex shader stage of the device context.
         _renderer.Data.SetConstantBuffer(1, _model);
-    }
-
-    internal void UpdatePropertiesConstantBuffer(object constantBuffer)
-    {
-        // Set up the description for the constant buffer.
-        BufferDescription bufferDescription = new()
-        {
-            BindFlags = BindFlags.ConstantBuffer,
-            CPUAccessFlags = CpuAccessFlags.Write,
-            Usage = ResourceUsage.Dynamic,
-        };
-
-        // Create the constant buffer with the given description.
-        //_properties = _renderer.Device.CreateBuffer(constantBuffer, bufferDescription);
-
-        // TODO: Fix create constantbuffer for properties
-
-        // Set the constant buffer in the vertex shader stage of the device context.
-        _renderer.Data.SetConstantBuffer(10, _properties);
     }
 
     internal void UpdateVertexShader(string shaderPath)

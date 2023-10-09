@@ -1,27 +1,30 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Engine.RuntimeSystem;
 
-public sealed class MaterialEntry
+public sealed class MaterialEntry(FileInfo fileInfo)
 {
-    public Guid ID = Guid.NewGuid();
+    public FileInfo FileInfo = fileInfo;
 
-    public FileInfo FileInfo;
     public Material Material;
 
-    public FileInfo ShaderFileInfo;
+    public ShaderEntry ShaderEntry;
 
-    public object Buffer;
-
-    public string Name => FileInfo.Name;
-
-    public void SetShader(string path)
+    public void SetShader(string shaderName)
     {
-        Material.UpdateVertexShader(path);
-        Material.UpdatePixelShader(path);
+        ShaderEntry = ShaderCompiler.ShaderCollector.GetShader(shaderName);
 
-        // TODO: Update Material XML File
+        if (ShaderEntry is null)
+            return;
+
+        Material.UpdateVertexShader(ShaderEntry.FileInfo.Name);
+        Material.UpdatePixelShader(ShaderEntry.FileInfo.Name);
+
+        Material.MaterialBuffer?.Dispose();
+        MaterialCompiler.SetMaterialBuffer(this, new MaterialBuffer(shaderName));
+        Serialization.SaveXml(Material.MaterialBuffer, FileInfo.FullName);
     }
 }
 
@@ -30,40 +33,17 @@ public sealed class MaterialCollector
     public List<MaterialEntry> Materials = new();
 
     public Material GetMaterial(string name) =>
-        Materials.Find(Material => Material.Name == name).Material;
-}
-
-public sealed class ShaderCollector
-{
-    public List<FileInfo> Shaders = new();
-
-    public FileInfo GetShader(string name) =>
-        Shaders.Find(FileInfo => FileInfo.Name == name);
+        Materials.Find(Material => Material.FileInfo.Name == name).Material;
 }
 
 public class MaterialCompiler
 {
-    public MaterialCollector MaterialCollector = new();
-    public ShaderCollector ShaderCollector = new();
-
-    private Dictionary<string, MaterialEntry> _materialCollection = new();
+    public static MaterialCollector MaterialCollector = new();
 
     public void CompileProjectMaterials(string assetsPath = null)
     {
         if (assetsPath is null)
             return;
-
-        string shadersFolderPath = Path.Combine(assetsPath, "Shaders");
-        if (!Directory.Exists(shadersFolderPath))
-            return;
-
-        foreach (var path in Directory.GetFiles(shadersFolderPath, "*", SearchOption.AllDirectories))
-        {
-            ShaderCollector.Shaders.Clear();
-            ShaderCollector.Shaders.Add(new(path));
-        }
-
-        ShaderCollector.Shaders.Add(new FileInfo(Path.Combine(Paths.SHADERS, "SimpleLit.hlsl")));
 
         string materialsFolderPath = Path.Combine(assetsPath, "Materials");
         if (!Directory.Exists(materialsFolderPath))
@@ -77,16 +57,15 @@ public class MaterialCompiler
     {
         FileInfo fileInfo = new(path);
 
-        if (_materialCollection.TryGetValue(fileInfo.FullName, out MaterialEntry materialEntry))
+        MaterialEntry materialEntry = MaterialCollector.Materials.FirstOrDefault(entry => entry.FileInfo == fileInfo);
+        if (materialEntry is not null)
         {
             if (fileInfo.LastWriteTime > materialEntry.FileInfo.LastWriteTime)
             {
                 materialEntry.FileInfo = fileInfo;
 
-                // TODO: Read the material XML File and paste those information into a the Buffer
-
-                // materialEntry.Buffer;
-                // Type PropertyConstantBufferType = CreateMaterialBufferScript(materialEntry, path);
+                var materialBuffer = (MaterialBuffer)Serialization.LoadXml(typeof(MaterialBuffer), path);
+                materialBuffer.UpdateConstantBuffer();
 
                 Output.Log("Updated Material");
             }
@@ -95,43 +74,25 @@ public class MaterialCompiler
         }
         else
         {
-            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
-            using (StreamReader reader = new StreamReader(fs))
-            {
-                materialEntry = new() { FileInfo = fileInfo };
-                //materialEntry.Material = new(path, null);
+            var materialBuffer = (MaterialBuffer)Serialization.LoadXml(typeof(MaterialBuffer), path);
 
-                _materialCollection.Add(fileInfo.FullName, materialEntry);
+            SetMaterialBuffer(new MaterialEntry(fileInfo), materialBuffer);
 
-                // TODO: Create the Buffer and paste the information of the XML File into that one
-
-                Output.Log("Read new Material");
-            }
+            Output.Log("Read new Material");
         }
 
         return materialEntry;
     }
 
-    private Type CreateMaterialBufferScript(MaterialEntry materialEntry, string path)
+    public static void SetMaterialBuffer(MaterialEntry materialEntry, MaterialBuffer materialBuffer)
     {
-        string updatedCode = File.ReadAllText(path);
-        string scriptCode = MaterialBuffer.ConvertHlslToCSharp(updatedCode, materialEntry.ID);
+        var shaderEntry = ShaderCompiler.ShaderCollector.GetShader(materialBuffer.ShaderName);
 
-        ScriptEntry materialBuffer = new();
-        materialBuffer.Script = ScriptCompiler.CreateScript(scriptCode);
+        materialEntry.ShaderEntry = shaderEntry;
+        materialEntry.Material = new(shaderEntry.FileInfo.FullName);
+        materialEntry.Material.MaterialBuffer = materialBuffer;
 
-        if (materialBuffer.Script is null)
-            return null; // Script Creation Failed
-
-        Core.Instance.ScriptCompiler.CompileScript(materialBuffer);
-
-        if (materialBuffer.Assembly is null)
-            return null; // Compilation Failed
-
-        foreach (var type in materialBuffer.Assembly.GetTypes())
-            if (typeof(IMaterialBuffer).IsAssignableFrom(type))
-                return type; // Successfull
-
-        return null; // A Script with the Interface IMaterialBuffer was not found
+        materialBuffer.PropertiesConstantBuffer = Activator.CreateInstance(shaderEntry.ConstantBufferType);
+        materialBuffer.CreateConstantBuffer(materialEntry.ShaderEntry.ConstantBufferType);
     }
 }

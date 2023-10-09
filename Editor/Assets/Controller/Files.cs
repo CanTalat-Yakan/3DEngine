@@ -523,8 +523,8 @@ internal sealed partial class Files
         var file = new FileInfo(path);
         if (file.Extension == ".mat")
             button.Tapped += (s, e) => Properties.Set(
-                Engine.Core.Instance.MaterialCompiler.
-                MaterialCollector.GetMaterial(file.Name));
+                Engine.RuntimeSystem.MaterialCompiler.MaterialCollector
+                .GetMaterial(file.Name));
         else
             button.Tapped += (s, e) => Properties.Set(path);
 
@@ -882,6 +882,8 @@ internal sealed partial class Files
             //Properties.Clear();
             //// Set the properties to a new instance of ModelView.Properties with the specified path.
             //Properties.Set(new ModelView.Properties(path));
+
+            //TODO: Uncomment this.
         }
     }
 
