@@ -192,7 +192,7 @@ internal sealed partial class Properties
 
         s_stackPanel.Children.Add(
             CreateButtonWithAutoSuggesBoxAndShaderCollector(
-                materialEntry.FileInfo.Name,
+                materialEntry.ShaderEntry.FileInfo.Name,
                 (s, e) =>
                 {
                     string newShaderName = e.SelectedItem.ToString();
