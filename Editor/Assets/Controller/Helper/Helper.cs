@@ -273,6 +273,23 @@ internal partial class Helper
 
         return numberBoxVector3.GetStackInGridWithRGB();
     }
+    internal static Grid CreateVec4Input(object id, object source, string fieldName, Vector4 value = new())
+    {
+        NumberBoxVector4 numberBoxVector4 = new() { Value = value };
+
+        Binding.GetBinding(fieldName, source, id)?.Set(numberBoxVector4, "Value", "ValueChanged");
+
+        return numberBoxVector4.GetStackInGrid();
+    }
+
+    internal static Grid CreateVec4InputWithRGB(object id, object source, string fieldName, Vector4 value = new())
+    {
+        NumberBoxVector4 numberBoxVector4 = new() { Value = value };
+
+        Binding.GetBinding(fieldName, source, id)?.Set(numberBoxVector4, "Value", "ValueChanged");
+
+        return numberBoxVector4.GetStackInGridWithRGB();
+    }
 
     internal static Grid CreateBool(object id, object source, string fieldName, bool value = false)
     {
@@ -289,7 +306,7 @@ internal partial class Helper
     internal static Grid CreateHeader(string s = "Header")
     {
         Grid grid = new();
-        TextBlock header = new() { Text = s, FontSize = 18, FontWeight = FontWeights.Bold, Margin = new(0, 20, 0, 0) };
+        TextBlock header = new() { Text = s, FontSize = 18, FontWeight = FontWeights.Bold, Margin = new(0, 5, 0, 5) };
 
         grid.Children.Add(header);
 
@@ -297,7 +314,7 @@ internal partial class Helper
     }
 
     internal static Grid CreateSpacer() =>
-        new Grid() { Height = 10 };
+        new Grid() { Height = 20 };
 
     internal static Grid CreateButton(string s,
         TappedEventHandler tapped)

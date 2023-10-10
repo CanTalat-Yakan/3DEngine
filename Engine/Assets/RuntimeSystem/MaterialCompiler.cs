@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace Engine.RuntimeSystem;
 
@@ -19,10 +18,11 @@ public sealed class MaterialEntry(FileInfo fileInfo)
         if (ShaderEntry is null)
             return;
 
-        Material.UpdateVertexShader(ShaderEntry.FileInfo.Name);
-        Material.UpdatePixelShader(ShaderEntry.FileInfo.Name);
+        Material.UpdateVertexShader(ShaderEntry.FileInfo.FullName);
+        Material.UpdatePixelShader(ShaderEntry.FileInfo.FullName);
 
         Material.MaterialBuffer?.Dispose();
+
         MaterialCompiler.SetMaterialBuffer(this, new MaterialBuffer() { ShaderName = shaderName });
         Serialization.SaveXml(Material.MaterialBuffer, FileInfo.FullName);
     }
@@ -93,6 +93,14 @@ public class MaterialCompiler
         materialEntry.ShaderEntry = shaderEntry;
         materialEntry.Material = new(shaderEntry.FileInfo.FullName);
         materialEntry.Material.MaterialBuffer = materialBuffer;
+
+        if(shaderEntry.ConstantBufferType is null)
+        {
+            Output.Log(
+                "Could not create the MaterialBuffer PropertiesConstantBuffer, " +
+                "becasue the ShaderEntry ConstantBufferType is null");
+            return;
+        }
 
         materialBuffer.PropertiesConstantBuffer = Activator.CreateInstance(shaderEntry.ConstantBufferType);
         materialBuffer.CreateConstantBuffer(materialEntry.ShaderEntry.ConstantBufferType);

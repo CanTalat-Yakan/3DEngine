@@ -225,7 +225,7 @@ internal sealed partial class Properties
         Grid content = new Grid();
         s_stackPanel.Children.Add(tmp = fieldsCollection.ToArray()
             .StackInGrid()
-            .WrapInExpander("Material Properties"));
+            .WrapInExpander("Properties"));
     }
 
     private async void CreateFilePreviewer(string path)
@@ -488,6 +488,10 @@ internal sealed partial class Properties
             else if (type == typeof(Vector3))
                 grid.Add(CreateVec3Input(entity.ID, component, fieldInfo.Name, (Vector3)value));
 
+            // Vector 3
+            else if (type == typeof(Vector4))
+                grid.Add(CreateVec4Input(entity.ID, component, fieldInfo.Name, (Vector4)value));
+
             // Bool
             else if (type == typeof(bool))
                 grid.Add(CreateBool(entity.ID, component, fieldInfo.Name, (bool)value));
@@ -654,9 +658,15 @@ internal sealed partial class Properties
 
             // Vector 3
             else if (type == typeof(Vector3))
-                grid.Add(CreateVec3Input(null, 
-                    propertiesConstantBuffer, fieldInfo.Name, 
+                grid.Add(CreateVec3Input(null,
+                    propertiesConstantBuffer, fieldInfo.Name,
                     (Vector3)value));
+
+            // Vector 4
+            else if (type == typeof(Vector4))
+                grid.Add(CreateVec4Input(null,
+                    propertiesConstantBuffer, fieldInfo.Name,
+                    (Vector4)value));
 
             // Bool
             else if (type == typeof(bool))

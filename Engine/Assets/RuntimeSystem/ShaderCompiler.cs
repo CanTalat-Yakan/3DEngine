@@ -1,11 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Text;
-
-using Vortice.D3DCompiler;
-using Vortice.Direct3D11.Shader;
-using System.Linq;
 
 namespace Engine.RuntimeSystem;
 
@@ -45,11 +42,11 @@ public sealed class ShaderCompiler
             ConstantBufferType = CreateMaterialBufferScript(new(Paths.SHADERS + "SimpleLit.hlsl"))
         });
 
-        foreach (var shaderFIlePath in Directory.GetFiles(shadersFolderPath, "*", SearchOption.AllDirectories))
+        foreach (var shaderFilePath in Directory.GetFiles(shadersFolderPath, "*", SearchOption.AllDirectories))
             ShaderCollector.Shaders.Add(new()
             {
-                FileInfo = new(shaderFIlePath),
-                ConstantBufferType = CreateMaterialBufferScript(new(shaderFIlePath))
+                FileInfo = new(shaderFilePath),
+                ConstantBufferType = CreateMaterialBufferScript(new(shaderFilePath))
             });
     }
 
@@ -95,51 +92,26 @@ public sealed class ShaderCompiler
     {
         // Start building the C# struct definition.
         StringBuilder structBuilder = new StringBuilder();
-        structBuilder.AppendLine("using System.Numerics;");
-        structBuilder.AppendLine("using Engine.Rendering;");
 
-        structBuilder.AppendLine($"public struct Properties{guid:N} : IMaterialBuffer");
+        structBuilder.Append(
+            $"""
+            using System.Drawing;
+            using System.Numerics;
+
+            using Engine.Editor;
+            using Engine.Rendering;
+
+            public struct Properties{guid:N} : IMaterialBuffer
+
+            """);
+
+        // Start the scope.
         structBuilder.AppendLine("{");
 
         // TODO: Find all Fields of the cbuffer Properties and Loop through them
         var propertiesBufferFields = ProcessConstantBufferFields(shaderCode);
         foreach (var field in propertiesBufferFields)
-            structBuilder.AppendLine($"    public {field};");
-
-        // Close the struct definition.
-        structBuilder.AppendLine("}");
-
-        return structBuilder.ToString();
-    }
-
-    public static string GenerateCSharpStructWithShaderReflection(ReadOnlySpan<byte> shaderByteCode, Guid guid)
-    {
-        var shaderReflection = Compiler.Reflect<ID3D11ShaderReflection>(shaderByteCode);
-
-        ID3D11ShaderReflectionConstantBuffer properties = null;
-
-        foreach (var constantBuffer in shaderReflection.ConstantBuffers)
-            if (constantBuffer.Description.Name.Equals("Properties"))
-                properties = constantBuffer;
-
-        if (properties is null)
-            return null;
-
-        // Start building the C# struct definition.
-        StringBuilder structBuilder = new StringBuilder();
-        structBuilder.AppendLine("using System.Numerics;");
-        structBuilder.AppendLine("using Engine.Rendering;");
-
-        structBuilder.AppendLine($"struct {properties.Description.Name}{guid:N} : IMaterialBuffer");
-        structBuilder.AppendLine("{");
-
-        foreach (var variable in properties.Variables)
-        {
-            // Map the HLSL types to C# types.
-            string csDataType = MapHLSLToCSharpType(variable.VariableType.Description.Type.ToString().ToLower());
-
-            structBuilder.AppendLine($"    public {csDataType} {variable.Description.Name};");
-        }
+            structBuilder.AppendLine(field);
 
         // Close the struct definition.
         structBuilder.AppendLine("}");
@@ -163,24 +135,48 @@ public sealed class ShaderCompiler
             string bufferContent = match.Groups[1].Value;
             string[] lines = bufferContent.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
+            string currentComment = null; // Initialize a variable to store the current comment.
+
             foreach (string line in lines)
-            {
-                // Extract the field type and name using a regular expression.
-                Match fieldMatch = Regex.Match(line, @"\s*(\w+)\s+(\w+);");
-                if (fieldMatch.Success)
+                // Check for comments and store them.
+                if (line.Trim().StartsWith("//"))
+                    currentComment = line.Trim().TrimStart('/');
+                else
                 {
-                    string hlslFieldType = fieldMatch.Groups[1].Value;
-                    string hlslFieldName = fieldMatch.Groups[2].Value;
+                    // Extract the field type and name using a regular expression.
+                    Match fieldMatch = Regex.Match(line, @"\s*(\w+)\s+(\w+);");
+                    if (fieldMatch.Success)
+                    {
+                        string hlslFieldType = fieldMatch.Groups[1].Value;
+                        string hlslFieldName = fieldMatch.Groups[2].Value;
 
-                    hlslFieldType = MapHLSLToCSharpType(hlslFieldType);
-                    if (string.IsNullOrEmpty(hlslFieldType))
-                        continue;
+                        hlslFieldType = MapHLSLToCSharpType(hlslFieldType);
+                        if (string.IsNullOrEmpty(hlslFieldType))
+                            continue;
 
-                    // Add the processed field string (field type and name) to the list.
-                    string processedField = $"{hlslFieldType} {hlslFieldName}";
-                    processedFields.Add(processedField);
+                        string processedField = string.Empty;
+
+                        // Combine the comment (if any) with the processed field string.
+                        if (!string.IsNullOrEmpty(currentComment))
+                        {
+                            currentComment = currentComment.TrimStart();
+
+                            if (currentComment.Contains("Color"))
+                            {
+                                if (hlslFieldType.Equals("Vector4"))
+                                    hlslFieldType = "Color";
+                            }
+                            else
+                                processedField += $"    [{currentComment}]\r\n";
+
+                            currentComment = null; // Reset the comment variable.
+                        }
+
+                        processedField += $"    public {hlslFieldType} {hlslFieldName};";
+
+                        processedFields.Add(processedField);
+                    }
                 }
-            }
         }
 
         return processedFields;
@@ -193,6 +189,7 @@ public sealed class ShaderCompiler
                 "float" => "float",
                 "float2" => "Vector2",
                 "float3" => "Vector3",
+                "float4" => "Vector4",
                 "bool" => "bool",
                 _ => null
             };

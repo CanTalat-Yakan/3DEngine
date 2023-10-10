@@ -25,6 +25,7 @@ public class MaterialBuffer()
         MethodInfo createConstantBufferMethod = _renderer.Device.GetType()
             .GetMethod("CreateConstantBuffer")
             .MakeGenericMethod(constantBufferType);
+
         _properties = (ID3D11Buffer)createConstantBufferMethod.Invoke(_renderer.Device, null);
     }
 
