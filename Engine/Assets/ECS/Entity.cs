@@ -71,6 +71,13 @@ namespace Engine.ECS
             // Enable the component by default.
             component.IsEnabled = true;
 
+            // Check if Component is a subclass of EditorComponent.
+            if (component is EditorComponent)
+            {
+                component.OnAwake();
+                component.OnStart();
+            }
+
             return component;
         }
 

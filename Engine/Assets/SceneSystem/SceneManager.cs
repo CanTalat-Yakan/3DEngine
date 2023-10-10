@@ -112,9 +112,6 @@ public sealed partial class SceneManager
         // Awake the CameraSystem.
         CameraSystem.Awake();
 
-        // Awake the EditorScriptSystem.
-        EditorScriptSystem.Awake();
-
         if (EditorState.PlayMode)
             // Awake the ScriptSystem.
             ScriptSystem.Awake();
@@ -122,9 +119,6 @@ public sealed partial class SceneManager
 
     public void Start()
     {
-        // Start the EditorScriptSystem.
-        EditorScriptSystem.Start();
-
         if (EditorState.PlayMode)
             // Start the ScriptSystem.
             ScriptSystem.Start();

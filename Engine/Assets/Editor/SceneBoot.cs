@@ -16,7 +16,6 @@ internal sealed class SceneBoot : EditorComponent
         SceneCamera.CameraID = byte.MaxValue;
 
         // Add the DeactivateSceneCameraOnPlay and CameraController components to the camera entity.
-        SceneCamera.Entity.AddComponent<DeactivateCameraOnPlay>();
         SceneCamera.Entity.AddComponent<ViewportController>().SetCamera(SceneCamera);
 
         // Set the initial position and rotation of the camera entity.
@@ -46,8 +45,8 @@ internal sealed class SceneBoot : EditorComponent
 
     public override void OnUpdate()
     {
-        // Reactivate the SceneCamera after OnUpdate is called from the EditorScriptSystem.
-        SceneCamera.IsEnabled = true;
+        // Deactivate the SceneCamera when the play mode is active.
+        SceneCamera.IsEnabled = EditorState.PlayMode ? false : true;
 
         // Example.
         // Check for the 'C' key press to trigger cube spawning.
@@ -70,22 +69,5 @@ internal sealed class SceneBoot : EditorComponent
                 newCube.Entity.Transform.LocalScale = new(new Random().Next(1, 3), new Random().Next(1, 3), new Random().Next(1, 3));
             }
         }
-    }
-}
-
-internal sealed class DeactivateCameraOnPlay : Component, IHide
-{
-    public Camera SceneCamera;
-
-    public override void OnAwake() =>
-        // Get the SceneCamera component from the entity with the tag "SceneCamera".
-        SceneCamera = Entity.GetComponent<Camera>();
-
-    public override void OnUpdate()
-    {
-        // Check if the play mode is set to "Playing" before deactivating the SceneCamera.
-        if (EditorState.PlayMode)
-            // Deactivate the SceneCamera after OnUpdate is called from the ScriptSystem.
-            SceneCamera.IsEnabled = false;
     }
 }
