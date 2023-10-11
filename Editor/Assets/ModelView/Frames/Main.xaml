@@ -45,7 +45,7 @@
                     <StackPanel Orientation="Horizontal" Padding="12,0,0,0" VerticalAlignment="Center">
                         <Viewbox x:Name="x_TextBlock_StatusIcon_Content" MaxHeight="16" MaxWidth="16"/>
 
-                        <TextBlock x:Name="x_TextBlock_Status_Content" Text="" Margin="12,14"/>
+                        <TextBlock x:Name="x_TextBlock_Status_Content" Text="" Margin="12,14" TextWrapping = "NoWrap"/>
                     </StackPanel>
                 </CommandBar.Content>
             </CommandBar>

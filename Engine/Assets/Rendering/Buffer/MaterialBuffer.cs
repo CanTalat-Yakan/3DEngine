@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Xml.Serialization;
 using Vortice.Direct3D11;
 
@@ -68,8 +67,8 @@ public class MaterialBuffer()
         }
 
         //Set the constant buffer in the vertex shader stage of the device context.
-        _renderer.Data.SetConstantBufferVS(10, _properties);
-        _renderer.Data.SetConstantBufferPS(10, _properties);
+        _renderer.Data.SetConstantBufferVS(2, _properties);
+        _renderer.Data.SetConstantBufferPS(2, _properties);
     }
 
     public void SafeToSerializableProperties()

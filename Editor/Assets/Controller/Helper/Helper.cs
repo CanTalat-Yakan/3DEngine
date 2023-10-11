@@ -240,9 +240,21 @@ internal partial class Helper
         return StackInGrid(numberBox);
     }
 
+    internal static Grid CreateSliderInt(object id, object source, string fieldName, double value = 0, double min = 0, double max = 100)
+    {
+        Slider slider = new() { Value = value, Minimum = min, Maximum = max, StepFrequency = 1, Width = 180, Margin = new(0, 0, 0, -5.5) };
+        TextBlock numberPreview = new() { Padding = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
+
+        Binding.GetBinding(fieldName, source, id)?.Set(slider, "Value", "ValueChanged");
+        Binding.GetBinding(fieldName, source, id)?.SetEvent((s, e) =>
+            numberPreview.Text = Binding.GetBinding(fieldName, source, id)?.Value.ToString());
+
+        return StackInGrid(slider, numberPreview);
+    }
+
     internal static Grid CreateSlider(object id, object source, string fieldName, double value = 0, double min = 0, double max = 100)
     {
-        Slider slider = new() { Value = value, Minimum = min, Maximum = max, Width = 180, Margin = new(0, 0, 0, -5.5) };
+        Slider slider = new() { Value = value, Minimum = min, Maximum = max, StepFrequency = 0.1f, Width = 180, Margin = new(0, 0, 0, -5.5) };
         TextBlock numberPreview = new() { Padding = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
 
         Binding.GetBinding(fieldName, source, id)?.Set(slider, "Value", "ValueChanged");

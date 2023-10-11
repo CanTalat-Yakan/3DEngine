@@ -9,8 +9,19 @@ cbuffer PerModelConstantBuffer : register(b1)
     float4x4 World;
 };
 
-cbuffer Properties : register(b10)
+cbuffer Properties : register(b2)
 {
+    // Header("This is a Header!")
+    float Float;
+    int Int;
+    // Slider(1, 10)
+    int Slider;
+    // Space
+    float2 Float2;
+    float3 Float3;
+    // Color
+    float4 Float4;
+    // Space
     bool Bool;
 };
 
@@ -51,11 +62,7 @@ float4 PS(VS_OUTPUT i) : SV_TARGET
     float4 col = ObjTexture.Sample(ObjSamplerState, i.uv);
     float3 diffuse = dot(normalize(i.normal), -normalize(float3(0, -1, 0)));
 
-    if (Bool)
-        diffuse = max(diffuse, float3(0.255, 0.295, 0.3255));
-    else
-        diffuse = max(diffuse, float3(0.3255, 0.295, 0.255));
-        
+    diffuse = max(diffuse, float3(0.255, 0.295, 0.3255));
 
     return col * float4(diffuse, 1);
 }

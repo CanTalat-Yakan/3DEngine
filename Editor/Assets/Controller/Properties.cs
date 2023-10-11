@@ -427,7 +427,7 @@ internal sealed partial class Properties
                 // If the field has the `SliderAttribute`, add a slider element.
                 if (attributes.OfType<SliderAttribute>().Any())
                     grid.Add(
-                        CreateSlider(
+                        CreateSliderInt(
                             entity.ID, component, fieldInfo.Name,
                             (byte)value,
                             (byte)attributes.OfType<SliderAttribute>().First().CustomMin,
@@ -445,7 +445,7 @@ internal sealed partial class Properties
                 // If the field has the `SliderAttribute`, add a slider element.
                 if (attributes.OfType<SliderAttribute>().Any())
                     grid.Add(
-                        CreateSlider(
+                        CreateSliderInt(
                             entity.ID, component, fieldInfo.Name,
                             (int)value,
                             (int)attributes.OfType<SliderAttribute>().First().CustomMin,
@@ -615,11 +615,11 @@ internal sealed partial class Properties
                 // If the field has the `SliderAttribute`, add a slider element.
                 if (attributes.OfType<SliderAttribute>().Any())
                     grid.Add(
-                    CreateSlider(null,
-                        propertiesConstantBuffer, fieldInfo.Name,
-                        (int)value,
-                        (int)attributes.OfType<SliderAttribute>().First().CustomMin,
-                        (int)attributes.OfType<SliderAttribute>().First().CustomMax));
+                        CreateSliderInt(null,
+                            propertiesConstantBuffer, fieldInfo.Name,
+                            (int)value,
+                            (int)attributes.OfType<SliderAttribute>().First().CustomMin,
+                            (int)attributes.OfType<SliderAttribute>().First().CustomMax));
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
                     grid.Add(CreateNumberInputInt(null,
@@ -631,11 +631,11 @@ internal sealed partial class Properties
                 // If the field has the `SliderAttribute`, add a slider element.
                 if (attributes.OfType<SliderAttribute>().Any())
                     grid.Add(
-                    CreateSlider(null,
-                        propertiesConstantBuffer, fieldInfo.Name,
-                        (float)value,
-                        (float)attributes.OfType<SliderAttribute>().First().CustomMin,
-                        (float)attributes.OfType<SliderAttribute>().First().CustomMax));
+                        CreateSlider(null,
+                            propertiesConstantBuffer, fieldInfo.Name,
+                            (float)value,
+                            (float)attributes.OfType<SliderAttribute>().First().CustomMin,
+                            (float)attributes.OfType<SliderAttribute>().First().CustomMax));
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
                     grid.Add(CreateNumberInput(null,
@@ -645,8 +645,8 @@ internal sealed partial class Properties
             // Vector 2
             else if (type == typeof(Vector2))
                 grid.Add(CreateVec2Input(null,
-                        propertiesConstantBuffer, fieldInfo.Name, 
-                        (Vector2)value));
+                    propertiesConstantBuffer, fieldInfo.Name, 
+                    (Vector2)value));
 
             // Vector 3
             else if (type == typeof(Vector3))

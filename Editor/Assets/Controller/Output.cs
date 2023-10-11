@@ -128,7 +128,7 @@ public sealed partial class Output
     private static void SetStatus(MessageInfo m)
     {
         if (!string.IsNullOrEmpty(m.Message))
-            s_status.Text = m.Message.Split("\n")[0];
+            s_status.Text = m.Message.Trim().Split('\n')[0];
 
         if (m.Type == MessageType.Warning)
             s_statusIcon.Child = new FontIcon() { Glyph = "\uE7BA" };
