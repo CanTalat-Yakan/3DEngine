@@ -30,12 +30,20 @@ If you are looking for high-performance low level bindings, please visit [Vortic
 
 The Entity Component System is an architectural pattern often used in video game development. It facilitates code reusability by separating the data from the behavior. In addition, ECS obeys the "composition over inheritance principle," providing improved flexibility and helping developers identify entities in a game's scene where all the objects are classified as entities. One reason ECS is faster than a game object component system is that you put all the data you need together in the same place in memory. Doing so avoids the performance overhead of having to search around to find it.
 
+# Upcoming Features and Development Roadmap
+
+* Render Textures,
+* Post-Processing,
+* Asynchronous Reprojection
+* Lumen (Erebus, Aruna)
+* Nanite (Nano Tech).
+
 # Build
 In order to compile, you need to install [Visual Studio 2022 Preview](https://visualstudio.microsoft.com/vs/preview/) with the following components:
 
-- [x] [Windows 11 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk)
-- [x] [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)
-- [x] [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
+*  [Windows 11 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk)
+*  [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)
+*  [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 
 *Rolled back to .Net 7 and VS2022 for now, because it lead to errors due to the WinAppSDK and the newest .Net 8 SDK Preview RC that gets installed with the Visual Studio Preview Workload of the .Net Environment!*
 
