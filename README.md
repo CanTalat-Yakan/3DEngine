@@ -34,6 +34,7 @@ The Entity Component System is an architectural pattern often used in video game
 
 * Render Textures,
 * Post-Processing,
+* Gizmos,
 * Asynchronous Reprojection
 * Lumen (Erebus, Aruna)
 * Nanite (Nano Tech).
