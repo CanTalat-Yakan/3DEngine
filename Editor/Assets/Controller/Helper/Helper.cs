@@ -1,18 +1,13 @@
 ﻿using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Text;
-using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
-using System.IO;
-using System.Linq;
 using System.Numerics;
-using System.Text;
 using System;
-using Windows.ApplicationModel;
 
 using ColorPicker = CommunityToolkit.WinUI.UI.Controls.ColorPicker;
 using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
@@ -20,6 +15,7 @@ using Expander = Microsoft.UI.Xaml.Controls.Expander;
 using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
 using Image = Microsoft.UI.Xaml.Controls.Image;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
+using Windows.Globalization.NumberFormatting;
 
 namespace Editor.Controller;
 
@@ -208,18 +204,36 @@ internal partial class Helper
 
     internal static Grid CreateNumberInput(object id, object source, string fieldName, float value = 0, float min = float.MinValue, float max = float.MaxValue)
     {
-        NumberBox numberBox = new() { Value = value, Minimum = min, Maximum = max, MaxWidth = 200, SmallChange = 0.1f, LargeChange = 1f };
-        numberBox.SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline;
+        IncrementNumberRounder rounder = new();
+        rounder.Increment = 0.0001;
+        rounder.RoundingAlgorithm = RoundingAlgorithm.RoundHalfUp;
+
+        DecimalFormatter formatter = new();
+        formatter.IntegerDigits = 1;
+        formatter.FractionDigits = 2;
+        formatter.NumberRounder = rounder;
+
+        NumberBox numberBox = new() { Value = value, Minimum = min, Maximum = max, MaxWidth = 200, SmallChange = 0.1f, LargeChange = 1f, NumberFormatter = formatter };
+        numberBox.SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Compact;
 
         Binding.GetBinding(fieldName, source, id)?.Set(numberBox, "Value", "ValueChanged");
 
         return StackInGrid(numberBox);
     }
 
-    internal static Grid CreateNumberInputInt(object id, object source, string fieldName, float value = 0, float min = float.MinValue, float max = float.MaxValue)
+    internal static Grid CreateNumberInputInt(object id, object source, string fieldName, float value = 0, float min = int.MinValue, float max = int.MaxValue)
     {
-        NumberBox numberBox = new() { Value = value, Minimum = min, Maximum = max, MaxWidth = 200, SmallChange = 1, LargeChange = 10 };
-        numberBox.SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline;
+        IncrementNumberRounder rounder = new();
+        rounder.Increment = 1;
+        rounder.RoundingAlgorithm = RoundingAlgorithm.RoundHalfUp;
+
+        DecimalFormatter formatter = new();
+        formatter.IntegerDigits = 1;
+        formatter.FractionDigits = 0;
+        formatter.NumberRounder = rounder;
+
+        NumberBox numberBox = new() { Value = value, Minimum = min, Maximum = max, MaxWidth = 200, SmallChange = 1, LargeChange = 10, NumberFormatter = formatter };
+        numberBox.SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Compact;
 
         Binding.GetBinding(fieldName, source, id)?.Set(numberBox, "Value", "ValueChanged");
 
@@ -273,6 +287,7 @@ internal partial class Helper
 
         return numberBoxVector3.GetStackInGridWithRGB();
     }
+
     internal static Grid CreateVec4Input(object id, object source, string fieldName, Vector4 value = new())
     {
         NumberBoxVector4 numberBoxVector4 = new() { Value = value };
@@ -289,6 +304,15 @@ internal partial class Helper
         Binding.GetBinding(fieldName, source, id)?.Set(numberBoxVector4, "Value", "ValueChanged");
 
         return numberBoxVector4.GetStackInGridWithRGB();
+    }
+
+    internal static Grid CreateQuaternionInputWithRGBFromEuler(object id, object source, string fieldName, Quaternion value = new())
+    {
+        NumberBoxQuaternionToEuler numberBoxVector3 = new() { Value = value };
+
+        Binding.GetBinding(fieldName, source, id)?.Set(numberBoxVector3, "Value", "ValueChanged");
+
+        return numberBoxVector3.GetStackInGridWithRGB();
     }
 
     internal static Grid CreateBool(object id, object source, string fieldName, bool value = false)
@@ -365,12 +389,11 @@ internal partial class Helper
 
     internal static string GetAppVersion()
     {
-        Package package = Package.Current;
-        PackageId packageId = package.Id;
-        PackageVersion version = packageId.Version;
+        var package = Windows.ApplicationModel.Package.Current;
+        var packageId = package.Id;
+        var version = packageId.Version;
 
         return "Version " + string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision);
-
     }
 
     internal static string SizeSuffix(Int64 value, int decimalPlaces = 1)
@@ -627,155 +650,5 @@ internal static partial class ExtensionMethods
         Binding.GetEntityBinding("Name", id)?.Set(textBox, "Text", "TextChanging");
 
         return grid;
-    }
-}
-
-internal static partial class ExtensionMethods
-{
-    public static float Remap(this float value, float sourceMin, float sourceMax, float targetMin, float targetMax) =>
-        (value - sourceMin) / (sourceMax - sourceMin) * (targetMax - targetMin) + targetMin;
-
-    public static float Round(this float value, int digits = 2) =>
-        MathF.Round(value, digits);
-
-    public static Vector2 Round(this Vector2 value, int digits = 2) =>
-        new Vector2(
-            MathF.Round(value.X, digits),
-            MathF.Round(value.Y, digits));
-
-    public static Vector3 Round(this Vector3 value, int digits = 2) =>
-        new Vector3(
-            MathF.Round(value.X, digits),
-            MathF.Round(value.Y, digits),
-            MathF.Round(value.Z, digits));
-
-    public static string AddSpacesToSentence(this string text, bool preserveAcronyms = true)
-    {
-        if (string.IsNullOrWhiteSpace(text))
-            return string.Empty;
-        StringBuilder newText = new StringBuilder(text.Length * 2);
-        newText.Append(text[0]);
-        for (int i = 1; i < text.Length; i++)
-        {
-            if (char.IsUpper(text[i]) || char.IsDigit(text[i]))
-                if (!char.IsDigit(text[i - 1]))
-                    if ((text[i - 1] != ' ' && !char.IsUpper(text[i - 1])) ||
-                    (preserveAcronyms && char.IsUpper(text[i - 1]) &&
-                     i < text.Length - 1 && !char.IsUpper(text[i + 1])))
-                        newText.Append(' ');
-            newText.Append(text[i]);
-        }
-
-        return newText.ToString();
-    }
-
-    public static string SplitLast(this string text, char seperator) =>
-        text.Split(seperator).Last();
-
-    public static string FirstCharToUpper(this string input) =>
-        string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1));
-
-    public static string FormatString(this string text) =>
-        text.SplitLast('_').SplitLast('.').SplitLast('+').FirstCharToUpper().AddSpacesToSentence();
-
-    public static string IncrementNameIfExists(this string name, string[] list)
-    {
-        var i = 0;
-        bool nameWithoutIncrement = list.Contains(name);
-
-        foreach (var s in list)
-            if (s == name || s.Contains(name + " ("))
-                i++;
-
-        if (i > 0 && nameWithoutIncrement)
-            name += " (" + (i + 1).ToString() + ")";
-
-        return name;
-    }
-
-    public static string IncrementPathIfExists(this string path, string[] list)
-    {
-        var name = Path.GetFileNameWithoutExtension(path);
-
-        name = name.IncrementNameIfExists(list);
-
-        return Path.Combine(Path.GetDirectoryName(path), name + Path.GetExtension(path));
-    }
-
-    public static bool? IsFileLocked(this string path)
-    {
-        if (!File.Exists(path))
-            return null;
-
-        try
-        {
-            FileInfo file = new FileInfo(path);
-            using (FileStream stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None))
-                stream.Close();
-        }
-        catch (IOException)
-        {
-            //the file is unavailable because it is:
-            //still being written to
-            //or being processed by another thread
-            //or does not exist (has already been processed)
-            return true;
-        }
-
-        //file is not locked
-        return false;
-    }
-}
-
-internal sealed class BooleanToVisibilityConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, string language)
-    {
-        bool bValue = false;
-        if (value is bool)
-            bValue = (bool)value;
-        else if (value is bool?)
-        {
-            bool? tmp = (bool?)value;
-            bValue = tmp.HasValue ? tmp.Value : false;
-        }
-        return (bValue) ? Visibility.Visible : Visibility.Collapsed;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    {
-        if (value is Visibility)
-            return (Visibility)value == Visibility.Visible;
-        else
-            return false;
-    }
-}
-
-internal sealed class BooleanToRowHeightConverter : IValueConverter
-{
-    GridLength _initialValue;
-
-    public BooleanToRowHeightConverter(GridLength initialValue) =>
-        _initialValue = initialValue;
-
-    public object Convert(object value, Type targetType, object parameter, string language)
-    {
-        bool bValue = false;
-        if (value is bool)
-            bValue = (bool)value;
-        else if (value is bool?)
-        {
-            bool? tmp = (bool?)value;
-            bValue = tmp.HasValue ? tmp.Value : false;
-        }
-        return (bValue) ? _initialValue : new(0);
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    {
-        if (value is GridLength)
-            return (GridLength)value == _initialValue;
-        else
-            return false;
     }
 }

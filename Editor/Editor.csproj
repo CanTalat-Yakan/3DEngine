@@ -32,7 +32,9 @@
 		<DefineConstants>$(DefineConstants);EDITOR;TRACE;DEBUG;NET;NET7_0</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup>
+	  <Content Remove="Assets\Controller\Helper\Converter.cs" />
 	  <Content Remove="Assets\Controller\Helper\DataTemplate\NumberBoxes.cs" />
+	  <Content Remove="Assets\Controller\Helper\ExtensionMethods.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

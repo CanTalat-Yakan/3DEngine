@@ -90,10 +90,10 @@ internal sealed partial class Properties
                     entity.Transform, "LocalPosition",
                     entity.Transform.LocalPosition)
                 .WrapInField("Position"),
-                CreateVec3InputWithRGB(
+                CreateQuaternionInputWithRGBFromEuler(
                     entity.ID,
-                    entity.Transform, "_eulerAngles",
-                    entity.Transform.EulerAngles)
+                    entity.Transform, "_localRotation",
+                    entity.Transform.LocalRotation)
                 .WrapInField("Rotation"),
                 CreateVec3InputWithRGB(
                     entity.ID,
@@ -434,7 +434,7 @@ internal sealed partial class Properties
                             (byte)attributes.OfType<SliderAttribute>().First().CustomMax));
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
-                    grid.Add(CreateNumberInput(
+                    grid.Add(CreateNumberInputInt(
                         entity.ID, component, fieldInfo.Name,
                         (byte)value,
                         byte.MinValue,
@@ -452,11 +452,9 @@ internal sealed partial class Properties
                             (int)attributes.OfType<SliderAttribute>().First().CustomMax));
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
-                    grid.Add(CreateNumberInput(
+                    grid.Add(CreateNumberInputInt(
                         entity.ID, component, fieldInfo.Name,
-                        (int)value,
-                        int.MinValue,
-                        int.MaxValue));
+                        (int)value));
 
             // Float
             else if (type == typeof(float))
@@ -472,9 +470,7 @@ internal sealed partial class Properties
                 else
                     grid.Add(CreateNumberInput(
                         entity.ID, component, fieldInfo.Name,
-                        (float)value,
-                        float.MinValue,
-                        float.MaxValue));
+                        (float)value));
 
             // String
             else if (type == typeof(string))
@@ -626,11 +622,9 @@ internal sealed partial class Properties
                         (int)attributes.OfType<SliderAttribute>().First().CustomMax));
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
-                    grid.Add(CreateNumberInput(null,
+                    grid.Add(CreateNumberInputInt(null,
                         propertiesConstantBuffer, fieldInfo.Name,
-                        (int)value,
-                        int.MinValue,
-                        int.MaxValue));
+                        (int)value));
 
             // Float
             else if (type == typeof(float))
@@ -646,9 +640,7 @@ internal sealed partial class Properties
                 else
                     grid.Add(CreateNumberInput(null,
                         propertiesConstantBuffer, fieldInfo.Name,
-                        (float)value,
-                        float.MinValue,
-                        float.MaxValue));
+                        (float)value));
 
             // Vector 2
             else if (type == typeof(Vector2))
