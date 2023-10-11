@@ -11,13 +11,12 @@ using Engine.ECS;
 using Engine.Editor;
 using Engine.RuntimeSystem;
 using Engine.SceneSystem;
-using static Assimp.Metadata;
 
 namespace Editor.Controller;
 
 internal sealed class BindEntry(object source, string sourcePath)
 {
-    public object Value;
+    public object Value { get; set; }
 
     public object Source = source;
     public string SourceValuePath = sourcePath;
@@ -211,7 +210,7 @@ internal sealed class Binding
             return;
 
         foreach (var source in MaterialBindings.Select(kv => kv.Value.Source).ToArray())
-            UpdateBinding(source, source.GetType().FullName, RendererBindings);
+            UpdateBinding(source, source.GetType().FullName, MaterialBindings);
     }
 
     private static void UpdateBinding(object source, object keySufix, Dictionary<string, BindEntry> bindings)
@@ -329,7 +328,7 @@ internal sealed class Binding
         var castedSender = Convert.ChangeType(sender, targetType);
         var newValue = targetField.GetValue(castedSender);
 
-        newValue = bindEntry.Value switch
+        var convertedValue = bindEntry.Value switch
         {
             double => Convert.ToDouble(newValue),
             float => Convert.ToSingle(newValue),
@@ -339,19 +338,19 @@ internal sealed class Binding
         };
 
         if (sourceField.FieldType.IsEnum)
-            if (Enum.TryParse(sourceField.FieldType, newValue.ToString(), out var enumValue))
-                newValue = enumValue;
+            if (Enum.TryParse(sourceField.FieldType, convertedValue.ToString(), out var enumValue))
+                convertedValue = enumValue;
             else
                 throw new ArgumentException("Failed to parse enum value");
 
-        sourceField?.SetValue(bindEntry.Source, newValue);
+        sourceField?.SetValue(bindEntry.Source, convertedValue);
 
-        bindEntry.Value = newValue;
+        bindEntry.Value = convertedValue;
 
         // Invoke the original event handler, if it exists.
         bindEntry.Event?.Invoke(null, null);
 
-        //Output.Log($"Handled Event: Value {newValue}");
+        //Output.Log($"Handled Event: Value {convertedValue}");
     }
 
     public static void Remove(Guid? guid)

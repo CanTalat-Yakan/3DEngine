@@ -11,6 +11,7 @@ cbuffer PerModelConstantBuffer : register(b1)
 
 cbuffer Properties : register(b10)
 {
+    float Intensity;
     // Header("This is a Header!")
     float Float;
     int Int;
@@ -62,7 +63,7 @@ float4 PS(VS_OUTPUT i) : SV_TARGET
     float4 col = ObjTexture.Sample(ObjSamplerState, i.uv);
     float3 diffuse = dot(normalize(i.normal), -normalize(float3(0, -1, 0)));
 
-    diffuse = max(diffuse, Float3);
+    diffuse = max(diffuse, float3(0.255, 0.295, 0.3255));
 
-    return col * float4(diffuse, 1);
+    return col * float4(diffuse + Intensity, 1);
 }

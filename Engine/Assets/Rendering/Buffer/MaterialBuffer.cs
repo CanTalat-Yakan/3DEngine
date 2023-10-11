@@ -69,8 +69,6 @@ public class MaterialBuffer()
         //Set the constant buffer in the vertex shader stage of the device context.
         _renderer.Data.SetConstantBufferVS(10, _properties);
         _renderer.Data.SetConstantBufferPS(10, _properties);
-
-        Output.Log("Updated Properties ConstantBuffer");
     }
 
     public void SafeToSerializableProperties()
