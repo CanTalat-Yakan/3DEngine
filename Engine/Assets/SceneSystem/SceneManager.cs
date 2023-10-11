@@ -170,6 +170,9 @@ public sealed partial class SceneManager
         CameraSystem.Render();
         // Render the MeshSystem.
         MeshSystem.Render();
+
+        Mesh.CurrentMeshOnGPU = null;
+        Material.CurrentMaterialOnGPU = null;
     }
 
     public void Dispose()

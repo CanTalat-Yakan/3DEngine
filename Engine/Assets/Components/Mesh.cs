@@ -1,16 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
+using Engine.RuntimeServices;
+
 namespace Engine.Components;
 
 public sealed class Mesh : Component
 {
     public string MeshPath;
+    public string MaterialPath;
 
-    public static MeshInfo CurrentMeshOnGPU { get; private set; }
+    public static MeshInfo? CurrentMeshOnGPU { get; set; }
     public static List<MeshInfo> BatchLookup { get; private set; } = new();
 
-    public MeshBuffer MeshBuffers { get; private set; } = new(); 
+    public MeshBuffer MeshBuffers { get; private set; } = new();
 
     public MeshInfo MeshInfo => _meshInfo;
     [Show] private MeshInfo _meshInfo;
@@ -34,14 +37,13 @@ public sealed class Mesh : Component
     {
         if (!string.IsNullOrEmpty(MeshPath))
             if (File.Exists(MeshPath))
-                try
-                {
-                    SetMeshInfo(Loader.ModelLoader.LoadFile(MeshPath, false));
-                }
-                finally
-                {
-                    MeshPath = null;
-                }
+                try { SetMeshInfo(Loader.ModelLoader.LoadFile(MeshPath, false)); }
+                finally { MeshPath = null; }
+
+        if (!string.IsNullOrEmpty(MaterialPath))
+            if (File.Exists(MaterialPath))
+                try { Output.Log("Set the Material to the Shader " + (_material = MaterialCompiler.MaterialCollector.GetMaterial(new FileInfo(MaterialPath).Name).Material).MaterialBuffer.ShaderName); }
+                finally { MaterialPath = null; }
     }
 
     public override void OnRender()
@@ -57,10 +59,10 @@ public sealed class Mesh : Component
         }
         else
         {
-            // Set the material Vertex- and PixelShader and the PerModelConstantBuffer.
-            Material.Set();
+            // Setup the Material, the PerModelConstantBuffer and the PropertiesConstantBuffer.
+            Material.Setup();
             Material.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
-            Material.UpdateMaterialConstantBuffer();
+            Material.MaterialBuffer?.UpdateConstantBuffer();
 
             // Draw the mesh with TriangleList.
             _renderer.Data.SetPrimitiveTopology();

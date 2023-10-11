@@ -8,7 +8,7 @@ namespace Engine.Rendering;
 
 public sealed class Material
 {
-    public static Material CurrentMaterialOnGPU { get; private set; }
+    public static Material CurrentMaterialOnGPU { get; set; }
 
     public MaterialBuffer MaterialBuffer { get; set; }
 
@@ -24,7 +24,7 @@ public sealed class Material
 
     private ID3D11Buffer _model;
 
-    public Material(string shaderFilePath, string imageFileName = null)
+    public Material(string shaderFilePath, string imageFileName = "Dark.png")
     {
         #region //Create VertexShader
         if (string.IsNullOrEmpty(shaderFilePath))
@@ -75,9 +75,6 @@ public sealed class Material
         #endregion
 
         #region //Create Texture and Sampler
-        if (string.IsNullOrEmpty(imageFileName))
-            return;
-
         // Load the texture and create a shader resource view for it.
         var texture = Loader.ImageLoader.LoadTexture(_renderer.Device, imageFileName);
         _resourceView = _renderer.Device.CreateShaderResourceView(texture);
@@ -100,7 +97,7 @@ public sealed class Material
         #endregion
     }
 
-    internal void Set()
+    internal void Setup()
     {
         // Set input layout, vertex shader, and pixel shader in the device context.
         // Set the shader resource and sampler in the pixel shader stage of the device context.
@@ -128,9 +125,6 @@ public sealed class Material
         // Set the constant buffer in the vertex shader stage of the device context.
         _renderer.Data.SetConstantBufferVS(1, _model);
     }
-
-    internal void UpdateMaterialConstantBuffer() =>
-        MaterialBuffer?.UpdateConstantBuffer();
 
     internal void UpdateVertexShader(string shaderFilePath)
     {

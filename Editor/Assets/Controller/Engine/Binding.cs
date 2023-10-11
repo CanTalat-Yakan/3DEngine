@@ -9,7 +9,7 @@ using Windows.Foundation;
 
 using Engine.ECS;
 using Engine.Editor;
-using Engine.RuntimeSystem;
+using Engine.RuntimeServices;
 using Engine.SceneSystem;
 
 namespace Editor.Controller;
@@ -242,7 +242,7 @@ internal sealed class Binding
         if (propertyFromPath is not null)
         {
             if (propertyFromPath.PropertyType == typeof(string))
-                propertyFromPath.SetValue(bindEntry.Target, bindEntry.Value.ToString());
+                propertyFromPath.SetValue(bindEntry.Target, bindEntry.Value?.ToString());
             else
                 propertyFromPath.SetValue(bindEntry.Target, bindEntry.Value);
         }

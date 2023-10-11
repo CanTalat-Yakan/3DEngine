@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Xml.Serialization;
 using Vortice.Direct3D11;
 

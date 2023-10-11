@@ -100,13 +100,11 @@ public sealed partial class EntityManager
     private static readonly string SHADER_LIT = "Lit.hlsl";
     private static readonly string SHADER_UNLIT = "Unlit.hlsl";
 
-    private static readonly string IMAGE_DEFAULT = "Dark.png";
-
     public EntityManager()
     {
         // Create a new material with the default shader and default image.
         if (_materialDefault is null)
-            _materialDefault = new(Paths.SHADERS + SHADER_SIMPLELIT, IMAGE_DEFAULT);
+            _materialDefault = new(Paths.SHADERS + SHADER_SIMPLELIT);
     }
 
     public Entity CreateEntity(Entity parent = null, string name = "New Entity", string tag = "Untagged")
