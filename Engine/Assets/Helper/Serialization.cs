@@ -35,7 +35,7 @@ public static class Serialization
 
     public static T LoadFile<T>(string path, EDataType eDataType = EDataType.XML)
     {
-        object obj = null;
+        object obj;
 
         switch (eDataType)
         {
@@ -46,6 +46,7 @@ public static class Serialization
                 obj = LoadJSON(typeof(T), path);
                 break;
             default:
+                obj = null;
                 break;
         }
 
@@ -54,11 +55,15 @@ public static class Serialization
 
     public static void SaveXml<T>(T file, string path)
     {
-        using (FileStream fs = new(path, File.Exists(path) ? FileMode.Create : FileMode.CreateNew))
+        try
         {
-            XmlSerializer serializer = new(file.GetType());
-            serializer.Serialize(fs, file);
+            using MemoryStream tempStream = new MemoryStream();
+
+            new XmlSerializer(typeof(T)).Serialize(tempStream, file);
+            File.WriteAllBytes(path, tempStream.ToArray());
         }
+
+        catch (Exception ex) { throw new Exception(ex.Message); }
     }
 
     public static void SaveJSON<T>(T file, string path)
@@ -72,17 +77,29 @@ public static class Serialization
 
     public static object LoadXml(Type type, string path)
     {
-        object obj = null;
+        object obj;
 
-        using (FileStream fs = new(path, FileMode.Open))
+        try
         {
-            XmlSerializer serializer = new(type);
-            obj = serializer.Deserialize(fs);
+            using FileStream fs = new(path, FileMode.Open);
+
+            obj = new XmlSerializer(type).Deserialize(fs);
         }
+        catch (Exception ex) { throw new Exception(ex.Message); }
 
         return obj;
     }
 
-    public static object LoadJSON(Type type, string path) =>
-        JsonSerializer.Deserialize(File.ReadAllText(path), type);
+    public static object LoadJSON(Type type, string path)
+    {
+        object obj;
+
+        try
+        {
+            obj = JsonSerializer.Deserialize(File.ReadAllText(path), type);
+        }
+        catch (Exception ex) { throw new Exception(ex.Message); }
+
+        return obj;
+    }
 }

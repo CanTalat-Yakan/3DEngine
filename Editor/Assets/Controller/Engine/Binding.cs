@@ -113,7 +113,7 @@ internal sealed class Binding
             return;
 
         MaterialBindings.Clear();
-        var PropertiesConstantBuffer = materialEntry.Material.MaterialBuffer.PropertiesConstantBuffer;
+        var PropertiesConstantBuffer = materialEntry.Material.MaterialBuffer.GetPropertiesConstantBuffer();
         foreach (var field in PropertiesConstantBuffer.GetType().GetFields(AllBindingFlags))
             MaterialBindings.Add(
                 field.Name + PropertiesConstantBuffer.GetType().FullName, 
@@ -331,6 +331,7 @@ internal sealed class Binding
 
         newValue = bindEntry.Value switch
         {
+            double => Convert.ToDouble(newValue),
             float => Convert.ToSingle(newValue),
             int => Convert.ToInt32(newValue),
             byte => Convert.ToByte(newValue),

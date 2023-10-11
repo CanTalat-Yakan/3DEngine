@@ -208,7 +208,7 @@ internal sealed partial class Properties
         s_stackPanel.Children.Add(CreateSeperator());
 
         // Get the fields of the properties constantbuffer.
-        var fieldInfos = materialEntry.Material.MaterialBuffer.PropertiesConstantBuffer.GetType()
+        var fieldInfos = materialEntry.Material.MaterialBuffer.GetPropertiesConstantBuffer().GetType()
             .GetFields(BindingFlags.Public | BindingFlags.Instance);
 
         // Initialize the collection of fields, events, and scripts.
@@ -590,7 +590,7 @@ internal sealed partial class Properties
         // Initialize a new List of Grid type.
         List<Grid> grid = new();
 
-        var propertiesConstantBuffer = materialEntry.Material.MaterialBuffer.PropertiesConstantBuffer;
+        var propertiesConstantBuffer = materialEntry.Material.MaterialBuffer.GetPropertiesConstantBuffer();
         var value = fieldInfo.GetValue(propertiesConstantBuffer);
         // Get the type of the current field.
         var type = fieldInfo.FieldType;
@@ -673,7 +673,9 @@ internal sealed partial class Properties
 
         Binding.GetMaterialBinding(fieldInfo.Name, propertiesConstantBuffer)?.SetEvent((s, e) =>
         {
-            Engine.Helper.Serialization.SaveXml(propertiesConstantBuffer, materialEntry.FileInfo.FullName);
+            materialEntry.Material.MaterialBuffer.SafeToSerializableProperties();
+
+            Engine.Helper.Serialization.SaveXml(materialEntry.Material.MaterialBuffer, materialEntry.FileInfo.FullName);
 
             materialEntry.Material.MaterialBuffer.UpdateConstantBuffer();
         });

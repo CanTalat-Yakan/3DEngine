@@ -66,6 +66,7 @@ public class MaterialCompiler
             materialEntry.FileInfo = fileInfo;
 
             var materialBuffer = (MaterialBuffer)Serialization.LoadXml(typeof(MaterialBuffer), path);
+            materialBuffer.PasteToPropertiesConstantBuffer();
             materialBuffer.UpdateConstantBuffer();
 
             Output.Log("Updated Material");
@@ -79,6 +80,8 @@ public class MaterialCompiler
 
             materialEntry = new MaterialEntry(fileInfo);
             SetMaterialBuffer(materialEntry, materialBuffer);
+
+            materialBuffer.PasteToPropertiesConstantBuffer();
 
             MaterialCollector.Materials.Add(materialEntry);
 

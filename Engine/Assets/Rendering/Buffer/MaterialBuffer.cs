@@ -1,13 +1,18 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-
+using System.Xml.Serialization;
 using Vortice.Direct3D11;
 
 namespace Engine.Rendering;
 
 public interface IMaterialBuffer { }
 
+[XmlInclude(typeof(Vector2))]
+[XmlInclude(typeof(Vector3))]
+[XmlInclude(typeof(Vector4))]
+[XmlInclude(typeof(Color))]
 public class SerializeEntry
 {
     public string FieldName;
@@ -28,12 +33,13 @@ public class MaterialBuffer()
 
     public List<SerializeEntry> SerializableProperties = new();
 
-    public object PropertiesConstantBuffer => _propertiesConstantBuffer;
     private object _propertiesConstantBuffer;
-
     private ID3D11Buffer _properties;
 
     private Renderer _renderer => Renderer.Instance;
+
+    public object GetPropertiesConstantBuffer() =>
+        _propertiesConstantBuffer;
 
     public void CreateInstance(Type constantBufferType) =>
         _propertiesConstantBuffer = Activator.CreateInstance(constantBufferType);
@@ -69,6 +75,8 @@ public class MaterialBuffer()
 
     public void SafeToSerializableProperties()
     {
+        SerializableProperties.Clear();
+
         foreach (var fieldInfo in _propertiesConstantBuffer.GetType().GetFields())
             SerializableProperties.Add(new(fieldInfo.Name, fieldInfo.GetValue(_propertiesConstantBuffer)));
     }
