@@ -47,7 +47,7 @@ public sealed class Program
         _engineCore.Renderer.Config.SetSuperSample(false);
 
         if (withImGui)
-            _engineCore.OnRender += (s, e) => _appWindow.Render();
+            _engineCore.OnImGui += (s, e) => _appWindow.Render();
 
         _appWindow.Show(ShowWindowCommand.Maximize);
         #endregion

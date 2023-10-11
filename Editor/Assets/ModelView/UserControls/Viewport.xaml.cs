@@ -21,7 +21,7 @@ public sealed partial class Viewport : UserControl
     {
         this.InitializeComponent();
 
-        ViewportControl = new Controller.Viewport(this, x_Grid_Overlay);
+        ViewportControl = new Controller.Viewport(x_Grid_Overlay);
         ViewportControl.InitializeRenderer(out Renderer, x_SwapChainPanel_Viewport);
         ViewportControl.InitializeEngineCore(Renderer, out EngineCore);
 

@@ -14,14 +14,12 @@ public sealed class Profiler
 
     public static string GetString() =>
         $"""
-            {(int)(Delta * 1000)} ms
-            {FPS} FPS
-            
-            Resolution: 
-            {SwapChainSizeWidth + ":" + SwapChainSizeHeight}
-            
-            DrawCalls: {DrawCalls}
-            Vertices: {Vertices}
-            Indices: {Indices}
-            """;
+        {FPS} FPS ({(int)(Delta * 1000)}ms)
+        
+        Draw Calls: {DrawCalls}
+        Vertices: {Vertices}
+        Triangles: {Indices / 3}
+
+        Resolution: {SwapChainSizeWidth + "x" + SwapChainSizeHeight}
+        """;
 }

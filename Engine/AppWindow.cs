@@ -35,8 +35,12 @@ class AppWindow
 
         ImGui.ShowDemoWindow();
 
-        ImGui.Render();
-        _imGuiRenderer.Render();        
+        ImGui.SetNextWindowBgAlpha(0.35f);
+        if (ImGui.Begin("Profiler", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize))
+        {
+            ImGui.Text(Profiler.GetString());
+            ImGui.End();
+        }
     }
 
     public void Resize() =>

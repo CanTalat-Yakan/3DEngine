@@ -21,6 +21,7 @@ public sealed class Core
 
     public event EventHandler OnRender;
     public event EventHandler OnInitialize;
+    public event EventHandler OnImGui;
     public event EventHandler OnDispose;
 
     public Renderer Renderer;
@@ -138,18 +139,18 @@ public sealed class Core
         Input.LateUpdate();
 
         SetFillMode(Renderer.Config.RenderMode);
+        
+        OnRender?.Invoke(null, null);
 
         #region // ImGui
         _imGuiRenderer.Update(_imGuiContext, Renderer.Size);
         _imGuiInputHandler.Update(Renderer.Config.SuperSample);
 
-        //ImGui.ShowDemoWindow();
+        OnImGui?.Invoke(null, null);
 
         ImGuiNET.ImGui.Render();
         _imGuiRenderer.Render();
         #endregion
-
-        OnRender?.Invoke(null, null);
 
         // Presents the final rendered image on the screen.
         Renderer.Present();

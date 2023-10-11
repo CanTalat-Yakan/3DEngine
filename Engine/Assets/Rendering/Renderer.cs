@@ -100,7 +100,8 @@ public sealed class Renderer
             Scaling = Scaling.Stretch,
             Stereo = false,
             SwapEffect = SwapEffect.FlipSequential,
-            BufferUsage = Usage.RenderTargetOutput
+            BufferUsage = Usage.RenderTargetOutput,
+            Flags = SwapChainFlags.None
         };
 
         try

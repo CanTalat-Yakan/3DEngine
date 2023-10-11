@@ -19,18 +19,18 @@ public sealed class Time
 
     private static double s_timeScale = 1;
 
-    private static double s_timeStep = 1 / 50;
+    private static double s_timeStep = 1 / 50; // Every 50 frames.
     private static double s_timeStepCounter;
 
     public static void Update()
     {
-        // Calculates the elapsed time by dividing the elapsed milliseconds by 1000.
+        // Calculates the elapsed time.
         s_delta = s_watch.Elapsed.TotalSeconds;
 
         // Adds the elapsed time to the running total time.
         s_timer += s_delta;
 
-        // Muultiply the delta time witht the time scale.
+        // Muultiply the Delta time witht the time scale.
         s_delta *= s_timeScale;
 
         // Increases the temporary frame count by 1.
@@ -44,11 +44,11 @@ public sealed class Time
             s_now = DateTime.Now;
         }
 
-        // Restarts the stopwatch to measure the time for the next frame.
+        // Restarts the Stopwatch to measure the time for the next frame.
         s_watch.Restart();
 
 
-        // Check for FixedUpdate with the timeStepCounter
+        // Check for FixedUpdate with the TimeStepCounter
         if (s_timeStepCounter < s_timeStep)
             s_timeStepCounter += Delta;
         else

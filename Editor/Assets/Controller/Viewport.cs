@@ -4,6 +4,8 @@ using SharpGen.Runtime;
 using System;
 using WinRT.Interop;
 
+using ImGuiNET;
+
 using Engine.Editor;
 using Engine.Rendering;
 
@@ -11,11 +13,9 @@ using static Editor.Controller.Helper;
 
 namespace Editor.Controller;
 
-internal sealed partial class Viewport(ModelView.Viewport viewport, Grid content)
+internal sealed partial class Viewport(Grid content)
 {
     public Grid Content = content;
-
-    private ModelView.Viewport _viewport = viewport;
 
     private TextBlock _profile;
 
@@ -25,7 +25,7 @@ internal sealed partial class Viewport(ModelView.Viewport viewport, Grid content
         engineCore = new Engine.Core(renderer, hwnd, Files.AssetsPath);
 
         engineCore.Renderer.Config.SetVsync(false);
-        engineCore.Renderer.Config.SetSuperSample(true);
+        engineCore.Renderer.Config.SetSuperSample(false);
 
         engineCore.OnInitialize += (s, e) =>
         {
@@ -45,6 +45,18 @@ internal sealed partial class Viewport(ModelView.Viewport viewport, Grid content
                 Main.Instance.PlayerControl.CheckPlayModeStarted());
 
             _profile.Text = Engine.Profiler.GetString();
+        };
+
+        engineCore.OnImGui += (s, e) =>
+        {
+            //ImGui.ShowDemoWindow();
+
+            ImGui.SetNextWindowBgAlpha(0.35f);
+            if (ImGui.Begin("Profiler", ImGuiWindowFlags.AlwaysAutoResize))
+            {
+                ImGui.Text(Engine.Profiler.GetString());
+                ImGui.End();
+            }
         };
 
         engineCore.OnDispose += (s, e) =>
