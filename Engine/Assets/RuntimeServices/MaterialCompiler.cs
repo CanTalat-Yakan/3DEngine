@@ -102,7 +102,7 @@ public class MaterialCompiler
             return;
         }
 
-        materialBuffer.PropertiesConstantBuffer = Activator.CreateInstance(shaderEntry.ConstantBufferType);
+        materialBuffer.CreateInstance(shaderEntry.ConstantBufferType);
         materialBuffer.CreateConstantBuffer(materialEntry.ShaderEntry.ConstantBufferType);
     }
 }

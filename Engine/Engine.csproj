@@ -26,9 +26,12 @@
 
 	<ItemGroup>
 		<PackageReference Include="AssimpNet" Version="4.1.0" />
+		<PackageReference Include="ComputeSharp" Version="2.1.0" />
+		<PackageReference Include="ComputeSharp.Dynamic" Version="2.1.0" />
 		<PackageReference Include="Costura.Fody" Version="5.7.0">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
+		<PackageReference Include="FftSharp" Version="2.1.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis" Version="4.7.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.7.0" />
 		<PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />

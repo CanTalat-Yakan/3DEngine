@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 using Vortice.Direct3D11;
@@ -7,15 +8,35 @@ namespace Engine.Rendering;
 
 public interface IMaterialBuffer { }
 
+public class SerializeEntry
+{
+    public string FieldName;
+    public object Value;
+
+    public SerializeEntry() { } // Parametereless Ctor needed to Serialize.
+
+    public SerializeEntry(string fieldName, object value)
+    {
+        FieldName = fieldName;
+        Value = value;
+    }
+}
+
 public class MaterialBuffer()
 {
     public string ShaderName;
 
-    public object PropertiesConstantBuffer;
+    public List<SerializeEntry> SerializableProperties = new();
+
+    public object PropertiesConstantBuffer => _propertiesConstantBuffer;
+    private object _propertiesConstantBuffer;
 
     private ID3D11Buffer _properties;
 
     private Renderer _renderer => Renderer.Instance;
+
+    public void CreateInstance(Type constantBufferType) =>
+        _propertiesConstantBuffer = Activator.CreateInstance(constantBufferType);
 
     public void CreateConstantBuffer<T>() where T : unmanaged =>
         _properties = _renderer.Device.CreateConstantBuffer<T>();
@@ -37,13 +58,27 @@ public class MaterialBuffer()
             //Map the constant buffer to memory for write access.
             MappedSubresource mappedResource = _renderer.Data.DeviceContext.Map(_properties, MapMode.WriteDiscard);
             // Copy the data from the constant buffer to the mapped resource.
-            Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref PropertiesConstantBuffer);
+            Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref _propertiesConstantBuffer);
             // Unmap the constant buffer from memory.
             _renderer.Data.DeviceContext.Unmap(_properties, 0);
         }
 
         //Set the constant buffer in the vertex shader stage of the device context.
         _renderer.Data.SetConstantBuffer(10, _properties);
+    }
+
+    public void SafeToSerializableProperties()
+    {
+        foreach (var fieldInfo in _propertiesConstantBuffer.GetType().GetFields())
+            SerializableProperties.Add(new(fieldInfo.Name, fieldInfo.GetValue(_propertiesConstantBuffer)));
+    }
+
+    public void PasteToPropertiesConstantBuffer()
+    {
+        foreach (var serializeEntry in SerializableProperties)
+            foreach (var fieldInfo in _propertiesConstantBuffer.GetType().GetFields())
+                if (fieldInfo.Name.Equals(serializeEntry.FieldName))
+                    serializeEntry.Value = fieldInfo.GetValue(_propertiesConstantBuffer);
     }
 
     public void Dispose() =>

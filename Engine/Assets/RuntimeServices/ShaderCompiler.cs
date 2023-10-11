@@ -183,14 +183,14 @@ public sealed class ShaderCompiler
     }
 
     private static string MapHLSLToCSharpType(string hlslType) =>
-            hlslType switch
-            {
-                "int" => "int",
-                "float" => "float",
-                "float2" => "Vector2",
-                "float3" => "Vector3",
-                "float4" => "Vector4",
-                "bool" => "bool",
-                _ => null
-            };
+        hlslType switch
+        {
+            "int" => "int",
+            "float" => "float",
+            "float2" => "Vector2",
+            "float3" => "Vector3",
+            "float4" => "Vector4",
+            "bool" => "bool",
+            _ => null
+        };
 }
