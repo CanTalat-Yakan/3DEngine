@@ -138,7 +138,7 @@ public sealed class Core
         // Finishes the state of input processing.
         Input.LateUpdate();
 
-        SetFillMode(Renderer.Config.RenderMode);
+        Render(Renderer.Config.RenderMode);
         
         OnRender?.Invoke(null, null);
 
@@ -172,7 +172,7 @@ public sealed class Core
         OnDispose?.Invoke(null, null);
     }
 
-    public void SetFillMode(RenderMode renderMode)
+    public void Render(RenderMode renderMode)
     {
         switch (Renderer.Config.RenderMode)
         {
