@@ -208,7 +208,7 @@ internal partial class Helper
 
     internal static Grid CreateNumberInput(object id, object source, string fieldName, float value = 0, float min = float.MinValue, float max = float.MaxValue)
     {
-        NumberBox numberBox = new() { Value = value, Minimum = min, Maximum = max, MaxWidth = 200 };
+        NumberBox numberBox = new() { Value = value, Minimum = min, Maximum = max, MaxWidth = 200, SmallChange = 0.1f, LargeChange = 1f };
         numberBox.SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline;
 
         Binding.GetBinding(fieldName, source, id)?.Set(numberBox, "Value", "ValueChanged");
@@ -218,7 +218,7 @@ internal partial class Helper
 
     internal static Grid CreateNumberInputInt(object id, object source, string fieldName, float value = 0, float min = float.MinValue, float max = float.MaxValue)
     {
-        NumberBox numberBox = new() { Value = value, Minimum = min, Maximum = max, MaxWidth = 200 };
+        NumberBox numberBox = new() { Value = value, Minimum = min, Maximum = max, MaxWidth = 200, SmallChange = 1, LargeChange = 10 };
         numberBox.SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline;
 
         Binding.GetBinding(fieldName, source, id)?.Set(numberBox, "Value", "ValueChanged");
