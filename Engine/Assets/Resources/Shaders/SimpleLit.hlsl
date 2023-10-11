@@ -17,10 +17,11 @@ cbuffer Properties : register(b10)
     // Slider(1, 10)
     float Slider;
     // Space
-    float2 Vector2;
-    float3 Vector3;
+    float2 Float2;
+    float3 Float3;
     // Color
-    float4 Color;
+    float4 Float4;
+    // Space
     bool Bool;
 };
 
@@ -61,7 +62,7 @@ float4 PS(VS_OUTPUT i) : SV_TARGET
     float4 col = ObjTexture.Sample(ObjSamplerState, i.uv);
     float3 diffuse = dot(normalize(i.normal), -normalize(float3(0, -1, 0)));
 
-    diffuse = max(diffuse, float3(0.255, 0.295, 0.3255));
+    diffuse = max(diffuse, Float3);
 
     return col * float4(diffuse, 1);
 }

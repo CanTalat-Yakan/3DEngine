@@ -56,8 +56,11 @@ public struct RenderData
     public void SetPrimitiveTopology(PrimitiveTopology primitiveTopology = PrimitiveTopology.TriangleList) =>
         PrimitiveTopology = primitiveTopology;
 
-    public void SetConstantBuffer(int slot, ID3D11Buffer constantBuffer) =>
+    public void SetConstantBufferVS(int slot, ID3D11Buffer constantBuffer) =>
         DeviceContext.VSSetConstantBuffer(slot, constantBuffer);
+
+    public void SetConstantBufferPS(int slot, ID3D11Buffer constantBuffer) =>
+        DeviceContext.PSSetConstantBuffer(slot, constantBuffer);
 
     public void SetResourceView(int slot, params ID3D11ShaderResourceView[] resourceViews) =>
         DeviceContext.PSSetShaderResources(slot, resourceViews);

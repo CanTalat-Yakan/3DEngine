@@ -133,7 +133,7 @@ unsafe public sealed class ImGuiRenderer
         mvp.CopyTo(span);
         _data.DeviceContext.Unmap(_viewConstantBuffer, 0);
 
-        _data.SetConstantBuffer(0, _viewConstantBuffer);
+        _data.SetConstantBufferVS(0, _viewConstantBuffer);
         #endregion
 
         #region // Setup Render State

@@ -60,6 +60,7 @@ public sealed class Mesh : Component
             // Set the material Vertex- and PixelShader and the PerModelConstantBuffer.
             Material.Set();
             Material.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
+            Material.UpdateMaterialConstantBuffer();
 
             // Draw the mesh with TriangleList.
             _renderer.Data.SetPrimitiveTopology();

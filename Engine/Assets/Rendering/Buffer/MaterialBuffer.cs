@@ -44,9 +44,6 @@ public class MaterialBuffer()
     public void CreateInstance(Type constantBufferType) =>
         _propertiesConstantBuffer = Activator.CreateInstance(constantBufferType);
 
-    public void CreateConstantBuffer<T>() where T : unmanaged =>
-        _properties = _renderer.Device.CreateConstantBuffer<T>();
-
     public void CreateConstantBuffer(Type constantBufferType)
     {
         MethodInfo createConstantBufferMethod = _renderer.Device.GetType()
@@ -70,7 +67,10 @@ public class MaterialBuffer()
         }
 
         //Set the constant buffer in the vertex shader stage of the device context.
-        _renderer.Data.SetConstantBuffer(10, _properties);
+        _renderer.Data.SetConstantBufferVS(10, _properties);
+        _renderer.Data.SetConstantBufferPS(10, _properties);
+
+        Output.Log("Updated Properties ConstantBuffer");
     }
 
     public void SafeToSerializableProperties()

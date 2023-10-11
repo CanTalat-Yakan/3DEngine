@@ -30,7 +30,7 @@ public sealed class CameraBuffer
         }
 
         // Set the constant buffer in the vertex shader stage of the device context.
-        _renderer.Data.SetConstantBuffer(0, _view);
+        _renderer.Data.SetConstantBufferVS(0, _view);
     }
 
     public void Dispose() =>

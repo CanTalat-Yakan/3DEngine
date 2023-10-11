@@ -102,8 +102,6 @@ public sealed class Material
 
     internal void Set()
     {
-        MaterialBuffer?.UpdateConstantBuffer();
-
         // Set input layout, vertex shader, and pixel shader in the device context.
         // Set the shader resource and sampler in the pixel shader stage of the device context.
         _renderer.Data.SetupMaterial(_inputLayout, _vertexShader, _pixelShader);
@@ -128,8 +126,11 @@ public sealed class Material
         }
 
         // Set the constant buffer in the vertex shader stage of the device context.
-        _renderer.Data.SetConstantBuffer(1, _model);
+        _renderer.Data.SetConstantBufferVS(1, _model);
     }
+
+    internal void UpdateMaterialConstantBuffer() =>
+        MaterialBuffer?.UpdateConstantBuffer();
 
     internal void UpdateVertexShader(string shaderFilePath)
     {
