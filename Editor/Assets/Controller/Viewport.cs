@@ -37,14 +37,14 @@ internal sealed partial class Viewport(Grid content)
         engineCore.OnRender += (s, e) =>
         {
             Binding.Update();
-            Output.Log(Engine.Output.DequeueLog());
+            Output.Log(Engine.Utilities.Output.DequeueLog());
 
             EditorState.SetPlayMode(
                 Main.Instance.PlayerControl.PlayMode == PlayMode.Playing);
             EditorState.SetPlayModeStarted(
                 Main.Instance.PlayerControl.CheckPlayModeStarted());
 
-            _profile.Text = Engine.Profiler.GetString();
+            _profile.Text = Engine.Utilities.Profiler.GetString();
         };
 
         engineCore.OnGui += (s, e) =>
@@ -54,7 +54,7 @@ internal sealed partial class Viewport(Grid content)
             ImGui.SetNextWindowBgAlpha(0.35f);
             if (ImGui.Begin("Profiler", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize))
             {
-                ImGui.Text(Engine.Profiler.GetString());
+                ImGui.Text(Engine.Utilities.Profiler.GetString());
                 ImGui.End();
             }
         };

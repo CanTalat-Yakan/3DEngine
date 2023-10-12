@@ -1,5 +1,6 @@
 ﻿using Engine.ECS;
 using Engine.Editor;
+using Engine.Utilities;
 using Engine;
 
 public class {{FileName}} : Component

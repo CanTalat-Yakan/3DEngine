@@ -71,7 +71,7 @@ public sealed partial class Output
         s_statusIcon = Main.Instance.StatusIcon;
     }
 
-    public static void Log(Engine.MessageLog log)
+    public static void Log(Engine.Utilities.MessageLog log)
     {
         if (log is not null)
             Log(log?.o?.ToString(), (MessageType)log?.type, log.line, log?.method, log?.script);
