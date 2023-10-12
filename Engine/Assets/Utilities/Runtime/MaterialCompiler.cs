@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace Engine.RuntimeServices;
+namespace Engine.Runtime;
 
 public sealed class MaterialEntry(FileInfo fileInfo)
 {

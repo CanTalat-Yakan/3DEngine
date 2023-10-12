@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Text;
 
-namespace Engine.RuntimeServices;
+namespace Engine.Runtime;
 
 public sealed class ShaderEntry
 {
