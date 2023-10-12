@@ -45,8 +45,8 @@ internal static partial class ExtensionMethods
         return newText.ToString();
     }
 
-    public static string SplitLast(this string text, char seperator) =>
-        text.Split(seperator).Last();
+    public static string SplitLast(this string text, char separator) =>
+        text.Split(separator).Last();
 
     public static string FirstCharToUpper(this string input) =>
         string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1));

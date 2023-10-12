@@ -63,26 +63,26 @@ public sealed class ShaderCompiler
             return null;
         }
 
-        ScriptEntry materialConstantBufferScriptEntry = new() { FileInfo = new(shaderFilePath) };
-        materialConstantBufferScriptEntry.Script = ScriptCompiler.CreateScript(scriptCode);
+        ScriptEntry propertiesConstantBufferScriptEntry = new() { FileInfo = new(shaderFilePath) };
+        propertiesConstantBufferScriptEntry.Script = ScriptCompiler.CreateScript(scriptCode);
 
-        if (materialConstantBufferScriptEntry.Script is null)
+        if (propertiesConstantBufferScriptEntry.Script is null)
         {
             Output.Log("Script Creation Failed", MessageType.Error);
             return null;
         }
 
-        Core.Instance.ScriptCompiler.CompileScript(materialConstantBufferScriptEntry);
+        Core.Instance.ScriptCompiler.CompileScript(propertiesConstantBufferScriptEntry);
 
-        if (materialConstantBufferScriptEntry.Assembly is null)
+        if (propertiesConstantBufferScriptEntry.Assembly is null)
         {
             Output.Log("Compilation Failed", MessageType.Error);
             return null;
         }
 
-        foreach (var type in materialConstantBufferScriptEntry.Assembly.GetTypes())
+        foreach (var type in propertiesConstantBufferScriptEntry.Assembly.GetTypes())
             if (typeof(IMaterialBuffer).IsAssignableFrom(type))
-                return type; // Successfull.
+                return type; // Successful.
 
         Output.Log("A Script with the Interface IMaterialBuffer was not found", MessageType.Error);
         return null;

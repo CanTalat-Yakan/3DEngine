@@ -175,6 +175,14 @@ public sealed partial class SceneManager
         Material.CurrentMaterialOnGPU = null;
     }
 
+    public void Gui()
+    {
+        // Render the Gui for the EditorScriptSystem.
+        EditorScriptSystem.Gui();
+        // Render the Gui for the ScriptSystem.
+        ScriptSystem.Gui();
+    }
+
     public void Dispose()
     {
         // Dispose all Systems.

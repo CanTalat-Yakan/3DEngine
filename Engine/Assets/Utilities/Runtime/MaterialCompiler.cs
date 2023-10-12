@@ -101,7 +101,7 @@ public class MaterialCompiler
         {
             Output.Log(
                 "Could not create the MaterialBuffer PropertiesConstantBuffer, " +
-                "becasue the ShaderEntry ConstantBufferType is null");
+                "because the ShaderEntry ConstantBufferType is null");
             return;
         }
 

@@ -53,7 +53,7 @@ internal sealed class Theme
         }
     }
 
-    public void SetRequstedTheme(ElementTheme? requestedTheme = null)
+    public void SetRequestedTheme(ElementTheme? requestedTheme = null)
     {
         // Check if requested theme is not null.
         if (requestedTheme is null)

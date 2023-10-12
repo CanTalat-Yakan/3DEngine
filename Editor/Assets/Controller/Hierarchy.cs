@@ -853,7 +853,7 @@ internal sealed partial class Hierarchy
             {
                 // Migrate the icon node and entity recursively to the target scene.
                 MigrateIconNodeBetweenTreeEntries(sourceTreeEntry, sourceSceneEntry, targetTreeEntry, null);
-                MigrateEntityBetweenScenesRecurisivally(sourceScene, targetScene, sourceTreeEntry);
+                MigrateEntityBetweenScenesRecursively(sourceScene, targetScene, sourceTreeEntry);
 
                 // Iterate through each child icon node of the source tree entry.
                 foreach (var childIconNode in sourceTreeEntry.IconNode.Children)
@@ -882,7 +882,7 @@ internal sealed partial class Hierarchy
 
                 // Migrate the icon node and entity recursively to the target scene.
                 MigrateIconNodeBetweenTreeEntries(newTreeEntry, sourceSceneEntry, targetTreeEntry, null);
-                MigrateEntityBetweenScenesRecurisivally(sourceScene, targetScene, newTreeEntry);
+                MigrateEntityBetweenScenesRecursively(sourceScene, targetScene, newTreeEntry);
             }
         }
     }
@@ -921,7 +921,7 @@ internal sealed partial class Hierarchy
             {
                 // Migrate the icon node and entity recursively to the target scene.
                 MigrateIconNodeBetweenTreeEntries(sourceTreeEntry, sourceSceneEntry, null, targetSceneEntry);
-                MigrateEntityBetweenScenesRecurisivally(sourceScene, targetScene, sourceTreeEntry);
+                MigrateEntityBetweenScenesRecursively(sourceScene, targetScene, sourceTreeEntry);
 
                 // Iterate through each child icon node of the source tree entry.
                 foreach (var childIconNode in sourceTreeEntry.IconNode.Children)
@@ -951,7 +951,7 @@ internal sealed partial class Hierarchy
 
                 // Migrate the icon node and entity recursively to the target scene.
                 MigrateIconNodeBetweenTreeEntries(newTreeEntry, sourceSceneEntry, null, targetSceneEntry);
-                MigrateEntityBetweenScenesRecurisivally(sourceScene, targetScene, newTreeEntry);
+                MigrateEntityBetweenScenesRecursively(sourceScene, targetScene, newTreeEntry);
             }
     }
 }
@@ -997,7 +997,7 @@ internal sealed partial class Hierarchy
     /// This method migrates entities from a source scene to a target scene recursively,
     /// updating the entity lists and the scene of the migrated entities as needed.
     /// </summary>
-    public void MigrateEntityBetweenScenesRecurisivally(Scene sourceScene, Scene targetScene, params TreeEntry[] treeEntries)
+    public void MigrateEntityBetweenScenesRecursively(Scene sourceScene, Scene targetScene, params TreeEntry[] treeEntries)
     {
         // Check if the scenes are different, since there is no need to migrate entities if they are in the same scene.
         if (sourceScene.Equals(targetScene))
@@ -1008,7 +1008,7 @@ internal sealed partial class Hierarchy
         {
             // If the current tree entry has children, call this method recursively with the child tree entries.
             if (treeEntry.IconNode.Children.Count != 0)
-                MigrateEntityBetweenScenesRecurisivally(
+                MigrateEntityBetweenScenesRecursively(
                     sourceScene,
                     targetScene,
                     treeEntry.IconNode.Children

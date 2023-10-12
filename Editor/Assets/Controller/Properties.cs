@@ -10,9 +10,9 @@ using System;
 using Windows.Foundation;
 
 using Engine.ECS;
-using Engine.Editor;
 using Engine.Rendering;
 using Engine.Runtime;
+using Engine;
 
 using static Editor.Controller.Helper;
 
@@ -116,7 +116,7 @@ internal sealed partial class Properties
             .WrapInExpander("Transform"));
 
         s_stackPanel.Children.Add(
-            CreateButtonWithAutoSuggesBoxAndComponentCollector(
+            CreateButtonWithAutoSuggestBoxAndComponentCollector(
                 "Add Component",
                 (s, e) =>
                 {
@@ -191,7 +191,7 @@ internal sealed partial class Properties
         Binding.SetBindings(materialEntry);
 
         s_stackPanel.Children.Add(
-            CreateButtonWithAutoSuggesBoxAndShaderCollector(
+            CreateButtonWithAutoSuggestBoxAndShaderCollector(
                 materialEntry.ShaderEntry.FileInfo.Name,
                 (s, e) =>
                 {
@@ -301,7 +301,7 @@ internal sealed partial class Properties
 
 internal sealed partial class Properties
 {
-    public Grid CreateButtonWithAutoSuggesBoxAndComponentCollector(string label,
+    public Grid CreateButtonWithAutoSuggestBoxAndComponentCollector(string label,
         TypedEventHandler<AutoSuggestBox, AutoSuggestBoxSuggestionChosenEventArgs> suggestionChosen)
     {
         Grid grid = new();
@@ -336,7 +336,7 @@ internal sealed partial class Properties
         return grid;
     }
 
-    public Grid CreateButtonWithAutoSuggesBoxAndShaderCollector(string label,
+    public Grid CreateButtonWithAutoSuggestBoxAndShaderCollector(string label,
             TypedEventHandler<AutoSuggestBox, AutoSuggestBoxSuggestionChosenEventArgs> suggestionChosen)
     {
         Grid grid = new();

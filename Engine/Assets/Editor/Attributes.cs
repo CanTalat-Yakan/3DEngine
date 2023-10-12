@@ -1,4 +1,4 @@
-﻿namespace Engine.Editor;
+﻿namespace Engine;
 
 public sealed class SpaceAttribute : Attribute { }
 public sealed class ShowAttribute : Attribute { }

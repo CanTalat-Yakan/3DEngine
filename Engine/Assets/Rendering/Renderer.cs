@@ -84,8 +84,8 @@ public sealed class Renderer
             return result;
 
         // Assign the device to a variable.
-        Device = defaultDevice.QueryInterface<ID3D11Device>(); // Due to unsupported SDK (Idk), switched from ID3D11Device1 to ID3D11Device Interface, Context too.
-                                                               // Get the immediate context of the device.
+        Device = defaultDevice.QueryInterface<ID3D11Device>(); 
+
         Data.DeviceContext = Device.ImmediateContext;
 
         // Initialize the SwapChainDescription structure.

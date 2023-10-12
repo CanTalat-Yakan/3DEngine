@@ -43,11 +43,11 @@ public sealed class Program
         _engineCore = new(win32Window);
         _appWindow = new(win32Window);
 
-        _engineCore.Renderer.Config.SetVsync(false);
+        _engineCore.Renderer.Config.SetVSync(false);
         _engineCore.Renderer.Config.SetSuperSample(false);
 
         if (withImGui)
-            _engineCore.OnImGui += (s, e) => _appWindow.Render();
+            _engineCore.OnGui += (s, e) => _appWindow.Render();
 
         _appWindow.Show(ShowWindowCommand.Maximize);
         #endregion

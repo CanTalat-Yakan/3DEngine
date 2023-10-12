@@ -103,7 +103,7 @@ public sealed class Input
                 s_mouseDelta.X = s_mousePosition.X - currentMouseState.X;
                 s_mouseDelta.Y = s_mousePosition.Y - currentMouseState.Y;
 
-                s_mouseDelta.Y *= -1; // The DirectX Y Coord starts at the top.
+                s_mouseDelta.Y *= -1; // The DirectX Y Coordinate starts at the top.
 
                 // Get the mouse delta clamped to -1 and 1.
                 s_mouseWheel = Math.Clamp(currentMouseState.Z, -1, 1);
@@ -144,7 +144,7 @@ public sealed class Input
                 s_mouseDelta.X = s_mousePosition.X - currentMouseState.X;
                 s_mouseDelta.Y = s_mousePosition.Y - currentMouseState.Y;
 
-                s_mouseDelta.Y *= -1; // The DirectX Y Coord starts at the top.
+                s_mouseDelta.Y *= -1; // The DirectX Y Coordinate starts at the top.
             }
         }
         catch { }

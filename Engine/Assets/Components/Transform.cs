@@ -73,7 +73,7 @@ public sealed class Transform : Component, IHide
         // Set the values for the EulerAngles in degrees.
         _eulerAngles = value;
 
-        // Set the LocalRotation with the new quaternion from the euler in radians.
+        // Set the LocalRotation with the new quaternion from the Euler in radians.
         _localRotation = value.ToRadians().FromEuler();
     }
 
@@ -82,7 +82,7 @@ public sealed class Transform : Component, IHide
         // Set the LocalRotation with the quaternion.
         _localRotation = value;
 
-        // Set the EulerAngles with the new euler from the quaternion.
+        // Set the EulerAngles with the new Euler from the quaternion.
         _eulerAngles = value.ToEuler();
     }
 
