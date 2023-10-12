@@ -26,7 +26,7 @@ internal struct Category
     public string Glyph;
     public string[] FileTypes;
     public bool Thumbnail;
-    public bool Creatable;
+    public bool Template;
 }
 
 internal sealed partial class Files
@@ -70,20 +70,20 @@ internal sealed partial class Files
 
     public void PopulateFilesCategories()
     {
-        // Create a list of categories presented with attrubutes Name, Smybol or Glyph, FileType, Creatable and Thumbnail.
+        // Create a list of categories presented with attributes Name, Symbol or Glyph, FileType, Template and Thumbnail.
         CreateCategoryTiles(
-            new() { Name = "Scenes", Glyph = "\xEA86", FileTypes = new string[] { ".usd", ".usda", ".usdc", ".usdz" }, Creatable = true },
-            new() { Name = "Scripts", Symbol = Symbol.Document, FileTypes = new string[] { ".cs" }, Creatable = true },
+            new() { Name = "Scenes", Glyph = "\xEA86", FileTypes = new string[] { ".usd", ".usda", ".usdc", ".usdz" }, Template = true },
+            new() { Name = "Scripts", Symbol = Symbol.Document, FileTypes = new string[] { ".cs" }, Template = true },
             new() { Name = "Prefabs", Glyph = "\xE734", FileTypes = new string[] { ".prefab" } },
             new() { Name = "Models", Glyph = "\xF158", FileTypes = new string[] { ".fbx", ".obj", ".blend", ".3ds", ".dae" } },
             new() { Name = "Animations", Glyph = "\xE805", FileTypes = new string[] { ".fbx", ".dae" } },
-            new() { Name = "Materials", Glyph = "\xF156", FileTypes = new string[] { ".mat" }, Creatable = true },
+            new() { Name = "Materials", Glyph = "\xF156", FileTypes = new string[] { ".mat" }, Template = true },
             new() { Name = "Textures", Symbol = Symbol.Pictures, FileTypes = new string[] { ".png", ".jpg", ".jpeg", ".tiff", ".tga", ".psd", ".bmp", }, Thumbnail = true },
             new() { Name = "Audios", Symbol = Symbol.Audio, FileTypes = new string[] { ".m4a", ".mp3", ".wav", ".ogg" } },
             new() { Name = "Videos", Symbol = Symbol.Video, FileTypes = new string[] { ".m4v", ".mp4", ".mov", ".avi" }, Thumbnail = false },
             new() { Name = "Fonts", Symbol = Symbol.Font, FileTypes = new string[] { ".ttf", ".otf" } },
-            new() { Name = "Shaders", Glyph = "\xE706", FileTypes = new string[] { ".hlsl" }, Creatable = true },
-            new() { Name = "Documents", Symbol = Symbol.Document, FileTypes = new string[] { ".txt", ".pdf", ".doc", ".docx" }, Creatable = true },
+            new() { Name = "Shaders", Glyph = "\xE706", FileTypes = new string[] { ".hlsl" }, Template = true },
+            new() { Name = "Documents", Symbol = Symbol.Document, FileTypes = new string[] { ".txt", ".pdf", ".doc", ".docx" }, Template = true },
             new() { Name = "Packages", Glyph = "\xE7B8", FileTypes = new string[] { ".zip", ".7zip", ".rar" } });
     }
 
@@ -616,7 +616,7 @@ internal sealed partial class Files
         };
         button.Click += (s, e) =>
         {
-            if (_currentCategory.Value.Creatable)
+            if (_currentCategory.Value.Template)
                 ContentDialogCreateNewFileOrFolderAndRefreshAsync();
             else
                 ContentDialogCreateNewFolderAndRefreshAsync();
@@ -801,7 +801,7 @@ internal sealed partial class Files
             if (string.IsNullOrEmpty(folderName.Text))
                 path = Path.Combine(path, "New folder");
             else if (char.IsDigit(folderName.Text[0]))
-                // Set the path to prefix "_" whe the folder name starts with a digit.
+                // Set the path to prefix "_" when the folder name starts with a digit.
                 path = Path.Combine(path, "_" + folderName.Text);
             else
                 // Set the path to the folder name.

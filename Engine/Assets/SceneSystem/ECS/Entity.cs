@@ -128,6 +128,9 @@ namespace Engine.ECS
             return components.ToArray();
         }
 
+        public Component[] GetComponents() =>
+            _components.ToArray();
+
         public bool CompareTag(params string[] tags)
         {
             // Check if the Entity has a specified tag.
@@ -139,9 +142,6 @@ namespace Engine.ECS
             // Return false if no matching tag is found.
             return false;
         }
-
-        public Component[] GetComponents() =>
-            _components.ToArray();
 
         object ICloneable.Clone() =>
             Clone();

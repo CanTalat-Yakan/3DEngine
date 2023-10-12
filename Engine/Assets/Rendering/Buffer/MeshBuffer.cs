@@ -13,13 +13,13 @@ public sealed class MeshBuffer
     {
         Dispose();
 
-        //Create a VertexBuffer using the MeshInfo's vertices
+        //Create a VertexBuffer using the MeshInfos Vertices
         //and bind it with VertexBuffer flag.
         VertexBuffer = _renderer.Device.CreateBuffer(
             meshInfo.Vertices,
             BindFlags.VertexBuffer);
 
-        //Create an IndexBuffer using the MeshInfo's indices
+        //Create an IndexBuffer using the MeshInfos Indices
         //and bind it with IndexBuffer flag.
         IndexBuffer = _renderer.Device.CreateBuffer(
             meshInfo.Indices,

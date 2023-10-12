@@ -8,7 +8,7 @@ public class Config
     public bool VSync;
     public bool SuperSample;
 
-    public void SetVsync(bool b) =>
+    public void SetVSync(bool b) =>
         VSync = b;
 
     public void SetSuperSample(bool b) =>

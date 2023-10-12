@@ -31,5 +31,5 @@ public sealed partial class Main : Frame
         MainControl.PlayerControl.Kill();
 
     private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) =>
-        Controller.Theme.Instance.SetRequstedTheme();
+        Controller.Theme.Instance.SetRequestedTheme();
 }

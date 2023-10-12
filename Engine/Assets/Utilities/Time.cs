@@ -9,7 +9,7 @@ public sealed class Time
     public static float DeltaF => (float)s_delta;
     public static int FPS => s_fps;
     public static double TimeScale => s_timeScale;
-    public static bool TimeStepEllapsed => s_timeStepCounter == 0;
+    public static bool TimeStepElapsed => s_timeStepCounter == 0;
 
     private static double s_timer, s_delta;
     private static int s_fps, s_tmpFPS;
@@ -30,7 +30,7 @@ public sealed class Time
         // Adds the elapsed time to the running total time.
         s_timer += s_delta;
 
-        // Muultiply the Delta time witht the time scale.
+        // Multiply the Delta time with the time scale.
         s_delta *= s_timeScale;
 
         // Increases the temporary frame count by 1.

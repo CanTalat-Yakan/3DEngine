@@ -12,6 +12,7 @@ public sealed class ViewportController : EditorComponent
 
     public float MovementSpeed { get => _movementSpeed; set => _movementSpeed = value; }
     private float _movementSpeed = 2;
+    private float _movementSpeedScaled = 2;
 
     public float RotationSpeed { get => _rotationSpeed; set => _rotationSpeed = value; }
     private float _rotationSpeed = 5;
@@ -59,7 +60,7 @@ public sealed class ViewportController : EditorComponent
             ScrollMovement();
 
         // Update the entity's position based on the calculated direction and movement speed.
-        Entity.Transform.LocalPosition += _direction * Time.DeltaF * _movementSpeed;
+        Entity.Transform.LocalPosition += _direction * Time.DeltaF * _movementSpeedScaled;
 
         // Reset the direction vector.
         _direction = Vector3.Zero;
@@ -105,6 +106,11 @@ public sealed class ViewportController : EditorComponent
 
         // Clamp the movement speed between 0.1 and 10.
         _movementSpeed = Math.Clamp(_movementSpeed, 0.1f, 10);
+
+        _movementSpeedScaled = _movementSpeed;
+
+        if (Input.GetKey(Key.LeftShift))
+            _movementSpeedScaled *= 3;
     }
 
     private void TransformMovement() =>

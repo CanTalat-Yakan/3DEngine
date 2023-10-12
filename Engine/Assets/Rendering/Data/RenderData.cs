@@ -46,10 +46,10 @@ public struct RenderData
     public void SetRasterizerDescFillModeWireframe() =>
         SetRasterizerDescFillMode(FillMode.Wireframe);
 
-    public void SetRasterizerDescFillMode(FillMode fillmode = FillMode.Solid)
+    public void SetRasterizerDescFillMode(FillMode fillMode = FillMode.Solid)
     {
-        RasterizerDescription.FillMode = fillmode;
-        RasterizerDescription.CullMode = fillmode == FillMode.Solid ? CullMode.Back : CullMode.None;
+        RasterizerDescription.FillMode = fillMode;
+        RasterizerDescription.CullMode = fillMode == FillMode.Solid ? CullMode.Back : CullMode.None;
         RasterizerDescription.FrontCounterClockwise = true;
     }
 

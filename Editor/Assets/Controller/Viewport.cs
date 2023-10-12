@@ -24,7 +24,7 @@ internal sealed partial class Viewport(Grid content)
         var hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
         engineCore = new Engine.Core(renderer, hwnd, Files.AssetsPath);
 
-        engineCore.Renderer.Config.SetVsync(false);
+        engineCore.Renderer.Config.SetVSync(false);
         engineCore.Renderer.Config.SetSuperSample(false);
 
         engineCore.OnInitialize += (s, e) =>
@@ -47,7 +47,7 @@ internal sealed partial class Viewport(Grid content)
             _profile.Text = Engine.Profiler.GetString();
         };
 
-        engineCore.OnImGui += (s, e) =>
+        engineCore.OnGui += (s, e) =>
         {
             //ImGui.ShowDemoWindow();
 
@@ -106,7 +106,7 @@ internal sealed partial class Viewport(Grid content)
 
                 CreateAppBarSeperator(),
 
-                CreateToggleButton(CreateIcon("\xEA80"), true).AddToolTip("Snao Rotation"),
+                CreateToggleButton(CreateIcon("\xEA80"), true).AddToolTip("Snap Rotation"),
                 CreateToggleButton(CreateIcon("\xE81E"), true).AddToolTip("Snap Position"),
 
                 CreateAppBarSeperator(),

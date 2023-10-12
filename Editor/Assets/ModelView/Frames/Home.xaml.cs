@@ -22,7 +22,7 @@ public sealed partial class Home : Frame
     }
 
     private void AppBarToggleButton_Status_Light(object sender, RoutedEventArgs e) =>
-        Theme.Instance.SetRequstedTheme();
+        Theme.Instance.SetRequestedTheme();
 
     private void AppBarButton_Click_OpenFolder(object sender, RoutedEventArgs e) =>
         HomeControl.OpenFolder();

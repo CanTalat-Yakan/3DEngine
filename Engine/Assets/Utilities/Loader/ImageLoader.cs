@@ -109,7 +109,7 @@ internal sealed class ImageLoader
         FormatSupport support = device.CheckFormatSupport(format);
         if (!support.HasFlag(FormatSupport.Texture2D))
         {
-            // Fallback to RGBA 32-bit format which is supported by all devices
+            // Fall back to RGBA 32-bit format which is supported by all devices
             convertGUID = PixelFormat.Format32bppRGBA;
             format = Format.R8G8B8A8_UNorm;
             bpp = 32;

@@ -165,4 +165,13 @@ public partial class System<T> where T : Component
             if (CheckActive(component))
                 component.OnRender();
     }
+
+    public static void Gui()
+    {
+        // Loop through all the components in the static components array
+        // and call OnRender method on the component if it is active.
+        foreach (T component in s_componentsArray)
+            if (CheckActive(component))
+                component.OnGui();
+    }
 }

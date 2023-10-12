@@ -21,7 +21,7 @@ public sealed class Core
 
     public event EventHandler OnRender;
     public event EventHandler OnInitialize;
-    public event EventHandler OnImGui;
+    public event EventHandler OnGui;
     public event EventHandler OnDispose;
 
     public Renderer Renderer;
@@ -77,7 +77,7 @@ public sealed class Core
         // Compile all project materials and add them to the collection.
         MaterialCompiler.CompileProjectMaterials(EditorState.AssetsPath);
 
-        // Copies the List to the local array once to savely iterate to it.
+        // Copies the List to the local array once to safely iterate to it.
         SceneManager.ProcessSystems();
 
         // Render Pipeline Init
@@ -92,14 +92,14 @@ public sealed class Core
         if (!Renderer.IsRendering)
             return;
 
+        // Invoke the OnInitialize Event.
         try { OnInitialize?.Invoke(null, null); }
         catch (Exception ex) { Output.Log(ex.Message, MessageType.Error); }
         finally { OnInitialize = null; }
 
-        // Clears the render target,
-        // discarding the contents and preparing it for the next frame
-        // and sets the viewport size.
+        // Clears the render target and preparing it for the next frame
         Renderer.Clear();
+        // Set the viewport size.
         Renderer.Data.SetViewport(Renderer.Size);
 
         // Updates the time values, such as delta time and time scale,
@@ -110,7 +110,7 @@ public sealed class Core
         Input.Fetch();
         Input.Update();
 
-        // Copies the List to the local array once to savely iterate to it.
+        // Copies the List to the local array once to safely iterate to it.
         SceneManager.ProcessSystems();
 
         // Invokes Awake and Start if play mode has started.
@@ -132,23 +132,34 @@ public sealed class Core
         // Call LateUpdate for all scenes.
         SceneManager.LateUpdate();
 
-        if (Time.TimeStepEllapsed)
+        // Call the FixedFrame when the timeStep elapsed.
+        if (Time.TimeStepElapsed)
             FixedFrame();
 
         // Finishes the state of input processing.
         Input.LateUpdate();
 
+        // Render the Scenes in the given RenderMode.
         Render(Renderer.Config.RenderMode);
         
+        // Invoke the OnRender Event.
         OnRender?.Invoke(null, null);
 
         #region // ImGui
+        // Update the ImGuiRenderer.
         _imGuiRenderer.Update(_imGuiContext, Renderer.Size);
+        // Update the ImGuiInputHandler.
         _imGuiInputHandler.Update(Renderer.Config.SuperSample);
 
-        OnImGui?.Invoke(null, null);
+        // Invoke the OnGui Event.
+        OnGui?.Invoke(null, null);
 
+        // Call the Render Gui for all scenes.
+        SceneManager.Gui();
+
+        // Render the ImGui.
         ImGuiNET.ImGui.Render();
+        // Render the DrawaData from ImGui with the ImGuiRenderer.
         _imGuiRenderer.Render();
         #endregion
 
@@ -174,7 +185,7 @@ public sealed class Core
 
     public void Render(RenderMode renderMode)
     {
-        switch (Renderer.Config.RenderMode)
+        switch (renderMode)
         {
             case RenderMode.Shaded:
                 Renderer.Data.SetRasterizerDescFillMode();

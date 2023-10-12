@@ -39,6 +39,8 @@ public partial class Component : ICloneable
     public virtual void OnRender() { }
 
     public virtual void OnDestroy() { }
+
+    public virtual void OnGui() { }
 }
 
 public interface IHide { }

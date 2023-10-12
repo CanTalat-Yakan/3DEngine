@@ -96,15 +96,11 @@ public sealed partial class EntityManager
 {
     private static Material _materialDefault;
 
-    private static readonly string SHADER_SIMPLELIT = "SimpleLit.hlsl";
-    private static readonly string SHADER_LIT = "Lit.hlsl";
-    private static readonly string SHADER_UNLIT = "Unlit.hlsl";
-
     public EntityManager()
     {
         // Create a new material with the default shader and default image.
         if (_materialDefault is null)
-            _materialDefault = new(Paths.SHADERS + SHADER_SIMPLELIT);
+            _materialDefault = new(Paths.SHADERS + "SimpleLit.hlsl");
     }
 
     public Entity CreateEntity(Entity parent = null, string name = "New Entity", string tag = "Untagged")

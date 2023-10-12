@@ -14,11 +14,11 @@ public sealed partial class Settings : Frame
     }
 
     private void RadioButton_Click_Light(object sender, RoutedEventArgs e) =>
-        Controller.Theme.Instance.SetRequstedTheme(ElementTheme.Light);
+        Controller.Theme.Instance.SetRequestedTheme(ElementTheme.Light);
 
     private void RadioButton_Click_Dark(object sender, RoutedEventArgs e) =>
-        Controller.Theme.Instance.SetRequstedTheme(ElementTheme.Dark);
+        Controller.Theme.Instance.SetRequestedTheme(ElementTheme.Dark);
 
     private void RadioButton_Click_Default(object sender, RoutedEventArgs e) =>
-        Controller.Theme.Instance.SetRequstedTheme(ElementTheme.Default);
+        Controller.Theme.Instance.SetRequestedTheme(ElementTheme.Default);
 }

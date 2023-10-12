@@ -18,7 +18,7 @@ public class SerializeEntry
     public string FieldName;
     public object Value;
 
-    public SerializeEntry() { } // Parametereless Ctor needed to Serialize.
+    public SerializeEntry() { } // Parameterless Ctor needed to Serialize.
 
     public SerializeEntry(string fieldName, object value)
     {
