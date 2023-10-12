@@ -52,7 +52,7 @@ internal sealed partial class Viewport(Grid content)
             //ImGui.ShowDemoWindow();
 
             ImGui.SetNextWindowBgAlpha(0.35f);
-            if (ImGui.Begin("Profiler", ImGuiWindowFlags.AlwaysAutoResize))
+            if (ImGui.Begin("Profiler", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize))
             {
                 ImGui.Text(Engine.Profiler.GetString());
                 ImGui.End();

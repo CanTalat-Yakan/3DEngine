@@ -53,6 +53,25 @@ public sealed class ViewportController : EditorComponent
 
             //User32.SetCursor(User32.LoadCursor(IntPtr.Zero, SystemCursor.IDC_CROSS));
             Vortice.Win32.User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
+
+            _euler.X = Input.GetMouseDelta().Y;
+            _euler.Y = Input.GetMouseDelta().X;
+
+            // Update the entity's rotation based on the calculated rotation and rotation speed.
+            Entity.Transform.EulerAngles -= _euler * Time.FixedDelta * _rotationSpeed;
+
+            // Clamp Vertical Rotation to 90 degrees up and down.
+            var clampedEuler = Entity.Transform.EulerAngles;
+            clampedEuler.X = Math.Clamp(clampedEuler.X, -89, 89);
+            Entity.Transform.EulerAngles = clampedEuler;
+        }
+
+        // Check if the middle mouse button is pressed. If so, call the ScreenMovement function.
+        if (Input.GetButton(MouseButton.Middle) && ViewportFocused)
+        {
+            Vortice.Win32.User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
+
+            ScreenMovement();
         }
 
         if (ViewportFocused)
@@ -71,30 +90,6 @@ public sealed class ViewportController : EditorComponent
 
     public override void OnFixedUpdate()
     {
-        // Check if the middle mouse button is pressed. If so, call the ScreenMovement function.
-        if (Input.GetButton(MouseButton.Middle) && ViewportFocused)
-        {
-            Vortice.Win32.User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
-
-            ScreenMovement();
-        }
-
-        if (Input.GetButton(MouseButton.Right) && ViewportFocused)
-        {
-            //User32.SetCursor(User32.LoadCursor(IntPtr.Zero, SystemCursor.IDC_CROSS));
-            Vortice.Win32.User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
-
-            _euler.X = Input.GetMouseDelta().Y;
-            _euler.Y = Input.GetMouseDelta().X;
-
-            // Update the entity's rotation based on the calculated rotation and rotation speed.
-            Entity.Transform.EulerAngles -= _euler * Time.DeltaF * _rotationSpeed;
-
-            // Clamp Vertical Rotation to 90 degrees up and down.
-            var clampedEuler = Entity.Transform.EulerAngles;
-            clampedEuler.X = Math.Clamp(clampedEuler.X, -89, 89);
-            Entity.Transform.EulerAngles = clampedEuler;
-        }
     }
 
     private void MovementSpeedCalculation()

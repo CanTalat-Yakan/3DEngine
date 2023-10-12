@@ -95,13 +95,14 @@ public sealed class Input
             var currentMouseState = s_mouse?.GetCurrentMouseState();
             if (currentMouseState is not null)
             {
-                // Get the mouse position.
-                s_mousePosition.X = currentMouseState.X;
-                s_mousePosition.Y = currentMouseState.Y;
+                // Get the pointer position from Win32.
+                Vortice.Win32.User32.GetCursorPos( out var pointer);
+                s_mousePosition.X = pointer.X;
+                s_mousePosition.Y = pointer.Y;
 
-                // Calculate mouse axis based on the difference between the current and previous pointer positions.
-                s_mouseDelta.X = s_mousePosition.X - currentMouseState.X;
-                s_mouseDelta.Y = s_mousePosition.Y - currentMouseState.Y;
+                // Get the pointer delta from the mouseState.
+                s_mouseDelta.X = currentMouseState.X;
+                s_mouseDelta.Y = currentMouseState.Y;
 
                 s_mouseDelta.Y *= -1; // The DirectX Y Coordinate starts at the top.
 
@@ -133,23 +134,6 @@ public sealed class Input
         if (GetKey(Key.A)) s_axis.X--;
     }
 
-    public static void FixedUpdate()
-    {
-        try
-        {
-            var currentMouseState = s_mouse?.GetCurrentMouseState();
-            if (currentMouseState is not null)
-            {
-                // Calculate mouse axis based on the difference between the current and previous pointer positions.
-                s_mouseDelta.X = s_mousePosition.X - currentMouseState.X;
-                s_mouseDelta.Y = s_mousePosition.Y - currentMouseState.Y;
-
-                s_mouseDelta.Y *= -1; // The DirectX Y Coordinate starts at the top.
-            }
-        }
-        catch { }
-    }
-
     public static void LateUpdate()
     {
         try
@@ -163,7 +147,7 @@ public sealed class Input
 
     public static bool GetKey(Key key, InputState state = InputState.Pressed)
     {
-        KeyboardState currentKeyboardState = null;
+        KeyboardState currentKeyboardState;
         try { currentKeyboardState = s_keyboard?.GetCurrentKeyboardState(); }
         catch { return false; }
 
@@ -178,7 +162,7 @@ public sealed class Input
 
     public static bool GetButton(MouseButton button, InputState state = InputState.Pressed)
     {
-        MouseState currentMouseState = null;
+        MouseState currentMouseState;
         try { currentMouseState = s_mouse?.GetCurrentMouseState(); }
         catch { return false; }
 

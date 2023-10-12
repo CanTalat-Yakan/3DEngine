@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace Engine;
+namespace Engine.Utilities;
 
 public enum MessageType
 {

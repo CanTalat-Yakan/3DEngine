@@ -126,14 +126,15 @@ public sealed class Core
             SceneManager.Start();
         }
 
+        // Call the FixedFrame when the timeStep elapsed.
+        if (Time.TimeStepElapsed)
+            // Call FixedUpdate for all scenes.
+            SceneManager.FixedUpdate();
+
         // Call Update for all scenes.
         SceneManager.Update();
         // Call LateUpdate for all scenes.
         SceneManager.LateUpdate();
-
-        // Call the FixedFrame when the timeStep elapsed.
-        if (Time.TimeStepElapsed)
-            FixedFrame();
 
         // Finishes the state of input processing.
         Input.LateUpdate();
@@ -164,14 +165,6 @@ public sealed class Core
 
         // Presents the final rendered image on the screen.
         Renderer.Present();
-    }
-
-    public void FixedFrame()
-    {
-        // Call FixedUpdate for input.
-        Input.FixedUpdate();
-        // Call FixedUpdate for all scenes.
-        SceneManager.FixedUpdate();
     }
 
     public void Dispose()

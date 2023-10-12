@@ -1,12 +1,12 @@
-﻿namespace Engine;
+﻿namespace Engine.Utilities;
 
 public sealed class Profiler
 {
     public static int FPS => Time.FPS;
     public static double Delta => Time.Delta;
 
-    public static double SwapChainSizeWidth => Renderer.Instance.Size.Width;
-    public static double SwapChainSizeHeight => Renderer.Instance.Size.Height;
+    public static double ViewportSizeWidth => Renderer.Instance.Size.Width;
+    public static double ViewportSizeHeight => Renderer.Instance.Size.Height;
 
     public static float DrawCalls { get; set; }
     public static float Vertices { get; set; }
@@ -20,6 +20,6 @@ public sealed class Profiler
         Vertices: {Vertices}
         Triangles: {Indices / 3}
 
-        Resolution: {SwapChainSizeWidth + "x" + SwapChainSizeHeight}
+        Resolution: {ViewportSizeWidth + "x" + ViewportSizeHeight}
         """;
 }
