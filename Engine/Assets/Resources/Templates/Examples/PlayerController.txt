@@ -34,8 +34,8 @@ public class PlayerMovement : Component
             return;
 
         var mouseInput = Input.GetMouseDelta();
-        _cameraRotation.Y -= mouseInput.X * RotationSpeed * Time.DeltaF;
-        _cameraRotation.X -= mouseInput.Y * RotationSpeed * Time.DeltaF;
+        _cameraRotation.Y -= mouseInput.X * RotationSpeed * Time.FixedDelta;
+        _cameraRotation.X -= mouseInput.Y * RotationSpeed * Time.FixedDelta;
         _cameraRotation.X = Math.Clamp(_cameraRotation.X, -89f, 89f);
     }
 

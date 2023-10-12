@@ -46,6 +46,7 @@ public sealed class ViewportController : EditorComponent
 
         // Check if the right mouse button is pressed.
         // If so, call the TransformMovement, CameraMovement and HeightTransformMovement functions.
+        // Then update the Rotation of this Entity and clamp its vertical rotation.
         if (Input.GetButton(MouseButton.Right) && ViewportFocused)
         {
             TransformMovement();
@@ -57,7 +58,7 @@ public sealed class ViewportController : EditorComponent
             _euler.X = Input.GetMouseDelta().Y;
             _euler.Y = Input.GetMouseDelta().X;
 
-            // Update the entity's rotation based on the calculated rotation and rotation speed.
+            // Update the entity rotation based on the calculated rotation and rotation speed.
             Entity.Transform.EulerAngles -= _euler * Time.FixedDelta * _rotationSpeed;
 
             // Clamp Vertical Rotation to 90 degrees up and down.
@@ -87,10 +88,6 @@ public sealed class ViewportController : EditorComponent
 
     public override void OnLateUpdate() =>
         Camera.Projection = Renderer.Instance.Config.CameraProjection;
-
-    public override void OnFixedUpdate()
-    {
-    }
 
     private void MovementSpeedCalculation()
     {
