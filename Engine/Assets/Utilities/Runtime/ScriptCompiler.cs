@@ -45,8 +45,7 @@ public sealed class ScriptCompiler
 
         foreach (var path in Directory.GetFiles(scriptsFolderPath, "*", SearchOption.AllDirectories))
         {
-            ScriptEntry scriptEntry = GetScriptEntry(path);
-
+            var scriptEntry = GetScriptEntry(path);
             if (scriptEntry is not null)
                 CompileScript(scriptEntry);
         }
@@ -66,32 +65,28 @@ public sealed class ScriptCompiler
     {
         FileInfo fileInfo = new(path);
 
-        if (_scriptsCollection.TryGetValue(fileInfo.FullName, out ScriptEntry scriptEntry))
+        if (!_scriptsCollection.TryGetValue(fileInfo.FullName, out var scriptEntry))
         {
-            if (fileInfo.LastWriteTime > scriptEntry.FileInfo.LastWriteTime)
-            {
-                scriptEntry.FileInfo = fileInfo;
-                string updatedCode = File.ReadAllText(path);
-                scriptEntry.Script = CSharpScript.Create(updatedCode, CreateScriptOptions());
+            FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read);
+            StreamReader reader = new StreamReader(fs);
 
-                Output.Log("Updated File");
-            }
-            else
-                scriptEntry = null;
+            scriptEntry = new ScriptEntry() { FileInfo = fileInfo };
+            string code = reader.ReadToEnd();
+            scriptEntry.Script = CreateScript(code);
+            _scriptsCollection.Add(fileInfo.FullName, scriptEntry);
+
+            Output.Log("Read new Script");
+        }
+        else if (fileInfo.LastWriteTime > scriptEntry.FileInfo.LastWriteTime)
+        {
+            scriptEntry.FileInfo = fileInfo;
+            string updatedCode = File.ReadAllText(path);
+            scriptEntry.Script = CSharpScript.Create(updatedCode, CreateScriptOptions());
+
+            Output.Log("Updated Script");
         }
         else
-        {
-            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
-            using (StreamReader reader = new StreamReader(fs))
-            {
-                scriptEntry = new ScriptEntry() { FileInfo = fileInfo };
-                string code = reader.ReadToEnd();
-                scriptEntry.Script = CreateScript(code);
-                _scriptsCollection.Add(fileInfo.FullName, scriptEntry);
-
-                Output.Log("Read new File");
-            }
-        }
+            scriptEntry = null;
 
         return scriptEntry;
     }

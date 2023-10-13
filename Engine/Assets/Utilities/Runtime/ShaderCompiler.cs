@@ -18,8 +18,8 @@ public sealed class ShaderCollector
 
     public ShaderEntry GetShader(string shaderName) =>
         Shaders.Find(ShaderEntry => Equals(
-            ShaderEntry.FileInfo.Name.Split('.').FirstOrDefault(),
-            shaderName));
+            ShaderEntry.FileInfo.Name.RemoveExtension(),
+            shaderName.RemoveExtension()));
 }
 
 public sealed class ShaderCompiler
@@ -35,19 +35,34 @@ public sealed class ShaderCompiler
         if (!Directory.Exists(shadersFolderPath))
             return;
 
-        ShaderCollector.Shaders.Clear();
-        ShaderCollector.Shaders.Add(new()
-        {
-            FileInfo = new FileInfo(Paths.SHADERS + "SimpleLit.hlsl"),
-            ConstantBufferType = CreateMaterialBufferScript(new(Paths.SHADERS + "SimpleLit.hlsl"))
-        });
+        CheckShaderEntry(Paths.SHADERS + "SimpleLit.hlsl");
 
         foreach (var shaderFilePath in Directory.GetFiles(shadersFolderPath, "*", SearchOption.AllDirectories))
+            CheckShaderEntry(shaderFilePath);
+    }
+
+    private void CheckShaderEntry(string path)
+    {
+        FileInfo fileInfo = new(path);
+
+        var shaderEntry = ShaderCollector.GetShader(fileInfo.Name);
+        if (shaderEntry is null)
+        {
             ShaderCollector.Shaders.Add(new()
             {
-                FileInfo = new(shaderFilePath),
-                ConstantBufferType = CreateMaterialBufferScript(new(shaderFilePath))
+                FileInfo = fileInfo,
+                ConstantBufferType = CreateMaterialBufferScript(fileInfo.FullName)
             });
+
+            Output.Log("Read new Shader");
+        }
+        else if (fileInfo.LastWriteTime > shaderEntry.FileInfo.LastWriteTime)
+        {
+            shaderEntry.FileInfo = fileInfo;
+            shaderEntry.ConstantBufferType = CreateMaterialBufferScript(fileInfo.FullName);
+
+            Output.Log("Updated Shader");
+        }
     }
 
     private Type CreateMaterialBufferScript(string shaderFilePath)

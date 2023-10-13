@@ -57,21 +57,8 @@ public class MaterialCompiler
     {
         FileInfo fileInfo = new(path);
 
-        MaterialEntry materialEntry = MaterialCollector.GetMaterial(fileInfo.Name);
-        if (materialEntry is not null)
-        {
-            if (fileInfo.LastWriteTime == materialEntry.FileInfo.LastWriteTime)
-                return;
-
-            materialEntry.FileInfo = fileInfo;
-
-            var materialBuffer = (MaterialBuffer)Serialization.LoadXml(typeof(MaterialBuffer), path);
-            materialBuffer.PasteToPropertiesConstantBuffer();
-            materialBuffer.UpdateConstantBuffer();
-
-            Output.Log("Updated Material");
-        }
-        else
+        var materialEntry = MaterialCollector.GetMaterial(fileInfo.Name);
+        if (materialEntry is null)
         {
             var materialBuffer = (MaterialBuffer)Serialization.LoadXml(typeof(MaterialBuffer), path);
 
@@ -87,6 +74,16 @@ public class MaterialCompiler
 
             Output.Log("Read new Material");
         }
+        else if (fileInfo.LastWriteTime > materialEntry.FileInfo.LastWriteTime)
+        {
+            materialEntry.FileInfo = fileInfo;
+
+            var materialBuffer = (MaterialBuffer)Serialization.LoadXml(typeof(MaterialBuffer), path);
+            materialBuffer.PasteToPropertiesConstantBuffer();
+            materialBuffer.UpdateConstantBuffer();
+
+            Output.Log("Updated Material");
+        }
     }
 
     public static void SetMaterialBuffer(MaterialEntry materialEntry, MaterialBuffer materialBuffer)
@@ -97,7 +94,7 @@ public class MaterialCompiler
         materialEntry.Material = new(shaderEntry.FileInfo.FullName);
         materialEntry.Material.MaterialBuffer = materialBuffer;
 
-        if(shaderEntry.ConstantBufferType is null)
+        if (shaderEntry.ConstantBufferType is null)
         {
             Output.Log(
                 "Could not create the MaterialBuffer PropertiesConstantBuffer, " +
