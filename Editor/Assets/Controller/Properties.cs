@@ -197,10 +197,16 @@ internal sealed partial class Properties
                 {
                     string newShaderName = e.SelectedItem.ToString();
 
-                    FileInfo newShaderFileInfo = ShaderCompiler.ShaderCollector
-                        .GetShader(newShaderName).FileInfo;
+                    var newShaderEntry = ShaderCompiler.ShaderCollector
+                        .GetShader(newShaderName);
 
-                    materialEntry.SetShader(newShaderFileInfo.FullName);
+                    if(newShaderEntry is null)
+                    {
+                        Output.Log($"Getting the Shader from the ShaderName {newShaderName} failed", MessageType.Error);
+                        return;
+                    }
+
+                    materialEntry.SetShader(newShaderEntry);
 
                     Set(materialEntry);
                 }));

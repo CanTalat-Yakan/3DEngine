@@ -11,11 +11,9 @@ public sealed class MaterialEntry(FileInfo fileInfo)
 
     public ShaderEntry ShaderEntry;
 
-    public void SetShader(string shaderName)
+    public void SetShader(ShaderEntry shaderEntry)
     {
-        ShaderEntry = ShaderCompiler.ShaderCollector.GetShader(shaderName);
-
-        if (ShaderEntry is null)
+        if (shaderEntry is null)
             return;
 
         Material.UpdateVertexShader(ShaderEntry.FileInfo.FullName);
@@ -23,7 +21,7 @@ public sealed class MaterialEntry(FileInfo fileInfo)
 
         Material.MaterialBuffer?.Dispose();
 
-        MaterialCompiler.SetMaterialBuffer(this, new MaterialBuffer() { ShaderName = shaderName });
+        MaterialCompiler.SetMaterialBuffer(this, new MaterialBuffer() { ShaderName = shaderEntry.FileInfo.Name.RemoveExtension() });
         Serialization.SaveXml(Material.MaterialBuffer, FileInfo.FullName);
     }
 }
@@ -33,7 +31,9 @@ public sealed class MaterialCollector
     public List<MaterialEntry> Materials = new();
 
     public MaterialEntry GetMaterial(string materialName) =>
-        Materials.Find(MaterialEntry => MaterialEntry.FileInfo.Name == materialName);
+        Materials.Find(MaterialEntry => Equals(
+            MaterialEntry.FileInfo.Name.RemoveExtension(),
+            materialName.RemoveExtension()));
 }
 
 public class MaterialCompiler
