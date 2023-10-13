@@ -163,11 +163,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Include="..\3DEngine Logo.png">
+	  <None Include="..\3DEngine Logo.png" Link="Assets\Resources\Textures\3DEngine Logo.png">
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>
-	  <None Include="..\README.md">
+	  <None Include="..\README.md" Link="Assets\Resources\README.md">
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>
