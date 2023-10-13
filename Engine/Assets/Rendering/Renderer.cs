@@ -84,7 +84,7 @@ public sealed class Renderer
             return result;
 
         // Assign the device to a variable.
-        Device = defaultDevice.QueryInterface<ID3D11Device>(); 
+        Device = defaultDevice.QueryInterface<ID3D11Device>();
 
         Data.DeviceContext = Device.ImmediateContext;
 
@@ -117,10 +117,7 @@ public sealed class Renderer
 
             Data.SwapChain = swapChain1.QueryInterface<IDXGISwapChain2>();
         }
-        catch (Exception e)
-        {
-            throw new Exception(e.Message);
-        }
+        catch (Exception ex) { throw new Exception(ex.Message); }
         #endregion
 
         #region //Create render target view, get back buffer texture before

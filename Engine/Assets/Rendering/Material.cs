@@ -28,10 +28,7 @@ public sealed class Material
     {
         #region //Create VertexShader
         if (string.IsNullOrEmpty(shaderFilePath))
-        {
-            new Exception("ShaderFilePath in the Material Constructor was null");
             return;
-        }
 
         // Compile the vertex shader bytecode from the specified shader file name.
         ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(shaderFilePath, "VS", "vs_5_0");
@@ -59,19 +56,8 @@ public sealed class Material
         #endregion
 
         #region //Create ConstantBuffer for Model
-        // Create the constant buffer for model-related data.
-        PerModelConstantBuffer cbModel = new();
-
-        // Set up the description for the constant buffer.
-        BufferDescription bufferDescription = new()
-        {
-            BindFlags = BindFlags.ConstantBuffer,
-            CPUAccessFlags = CpuAccessFlags.Write,
-            Usage = ResourceUsage.Dynamic,
-        };
-
-        // Create the constant buffer with the given description.
-        _model = _renderer.Device.CreateBuffer(cbModel, bufferDescription);
+        // Create the per model constant buffer.
+        _model = _renderer.Device.CreateConstantBuffer<PerModelConstantBuffer>();
         #endregion
 
         #region //Create Texture and Sampler
@@ -115,7 +101,7 @@ public sealed class Material
         unsafe
         {
             // Map the constant buffer to memory for write access.
-            MappedSubresource mappedResource = _renderer.Data.DeviceContext.Map(_model, MapMode.WriteDiscard);
+            var mappedResource = _renderer.Data.DeviceContext.Map(_model, MapMode.WriteDiscard);
             // Copy the data from the constant buffer to the mapped resource.
             Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref constantBuffer);
             // Unmap the constant buffer from memory.

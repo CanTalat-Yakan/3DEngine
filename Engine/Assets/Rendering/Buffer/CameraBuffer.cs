@@ -22,7 +22,7 @@ public sealed class CameraBuffer
         unsafe
         {
             // Map the constant buffer to memory for write access.
-            MappedSubresource mappedResource = _renderer.Data.DeviceContext.Map(_view, MapMode.WriteDiscard);
+            var mappedResource = _renderer.Data.DeviceContext.Map(_view, MapMode.WriteDiscard);
             // Copy the data from the constant buffer to the mapped resource.
             Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref ViewConstantBuffer);
             // Unmap the constant buffer from memory.

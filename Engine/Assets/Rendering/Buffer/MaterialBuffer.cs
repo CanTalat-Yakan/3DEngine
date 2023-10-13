@@ -41,10 +41,10 @@ public class MaterialBuffer()
     public object GetPropertiesConstantBuffer() =>
         _propertiesConstantBuffer;
 
-    public void CreateInstance(Type constantBufferType) =>
+    public void CreatePropertiesInstance(Type constantBufferType) =>
         _propertiesConstantBuffer = Activator.CreateInstance(constantBufferType);
 
-    public void CreateConstantBuffer(Type constantBufferType)
+    public void CreatePropertiesConstantBuffer(Type constantBufferType)
     {
         MethodInfo createConstantBufferMethod = _renderer.Device.GetType()
             .GetMethod("CreateConstantBuffer")
@@ -59,7 +59,7 @@ public class MaterialBuffer()
         unsafe
         {
             //Map the constant buffer to memory for write access.
-            MappedSubresource mappedResource = _renderer.Data.DeviceContext.Map(_properties, MapMode.WriteDiscard);
+            var mappedResource = _renderer.Data.DeviceContext.Map(_properties, MapMode.WriteDiscard);
             // Copy the data from the constant buffer to the mapped resource.
             Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref _propertiesConstantBuffer);
             // Unmap the constant buffer from memory.
@@ -70,7 +70,7 @@ public class MaterialBuffer()
         _renderer.Data.SetConstantBufferVS(2, _properties);
         _renderer.Data.SetConstantBufferPS(2, _properties);
     }
-
+    
     public void SafeToSerializableProperties()
     {
         SerializableProperties.Clear();

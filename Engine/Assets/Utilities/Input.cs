@@ -44,7 +44,7 @@ public sealed class Input
         s_directInput = DInput.DirectInput8Create();
 
         var _mouseGuid = s_directInput.GetDevices(DeviceClass.Pointer, DeviceEnumerationFlags.AttachedOnly).FirstOrDefault()?.InstanceGuid;
-        if (_mouseGuid != null)
+        if (_mouseGuid is not null)
         {
             s_mouse = s_directInput.CreateDevice(_mouseGuid.Value);
             s_mouse.SetCooperativeLevel(windowHandle, CooperativeLevel.Foreground | CooperativeLevel.NonExclusive);
@@ -52,7 +52,7 @@ public sealed class Input
         }
 
         var _keyboardGuid = s_directInput.GetDevices(DeviceClass.Keyboard, DeviceEnumerationFlags.AttachedOnly).FirstOrDefault()?.InstanceGuid;
-        if (_keyboardGuid != null)
+        if (_keyboardGuid is not null)
         {
             s_keyboard = s_directInput.CreateDevice(_keyboardGuid.Value);
             s_keyboard.SetCooperativeLevel(windowHandle, CooperativeLevel.Foreground | CooperativeLevel.NonExclusive);
@@ -60,7 +60,7 @@ public sealed class Input
         }
 
         var joystickGuid = s_directInput.GetDevices(DeviceClass.GameControl, DeviceEnumerationFlags.AttachedOnly).FirstOrDefault()?.InstanceGuid;
-        if (joystickGuid != null)
+        if (joystickGuid is not null)
         {
             s_joystick = s_directInput.CreateDevice(joystickGuid.Value);
             s_joystick.SetCooperativeLevel(windowHandle, CooperativeLevel.Foreground | CooperativeLevel.NonExclusive);
