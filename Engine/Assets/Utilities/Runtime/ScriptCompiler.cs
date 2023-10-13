@@ -21,8 +21,8 @@ public sealed class ComponentCollector
 {
     public List<Type> Components = new();
 
-    public Type GetComponent(string name) =>
-        Components.Find(Type => Type.Name.ToString() == name);
+    public Type GetComponent(string componentName) =>
+        Components.Find(Type => Type.Name.ToString() == componentName);
 }
 
 public sealed class ScriptCompiler

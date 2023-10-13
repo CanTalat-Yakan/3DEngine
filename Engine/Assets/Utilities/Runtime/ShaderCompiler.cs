@@ -16,10 +16,10 @@ public sealed class ShaderCollector
 {
     public List<ShaderEntry> Shaders = new();
 
-    public ShaderEntry GetShader(string name) =>
+    public ShaderEntry GetShader(string shaderName) =>
         Shaders.Find(ShaderEntry => Equals(
             ShaderEntry.FileInfo.Name.Split('.').FirstOrDefault(),
-            name));
+            shaderName));
 }
 
 public sealed class ShaderCompiler

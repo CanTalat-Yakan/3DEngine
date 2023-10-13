@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-using Engine.Runtime;
-
 namespace Engine.Components;
 
 public sealed class Mesh : Component
@@ -42,7 +40,7 @@ public sealed class Mesh : Component
 
         if (!string.IsNullOrEmpty(MaterialPath))
             if (File.Exists(MaterialPath))
-                try { Output.Log("Set the Material to the Shader " + (_material = MaterialCompiler.MaterialCollector.GetMaterial(new FileInfo(MaterialPath).Name).Material).MaterialBuffer.ShaderName); }
+                try { Output.Log("Set the Material to " + SetMaterial(new FileInfo(MaterialPath).Name)); }
                 finally { MaterialPath = null; }
     }
 
@@ -104,6 +102,15 @@ public sealed class Mesh : Component
 
         // Call the "CreateBuffer" method to initialize the vertex and index buffer.
         MeshBuffers.CreateBuffer(MeshInfo);
+    }
+
+    public MaterialEntry SetMaterial(string materialName)
+    {
+        var MaterialEntry = MaterialCompiler.MaterialCollector.GetMaterial(materialName);
+
+        SetMaterial(MaterialEntry.Material);
+
+        return MaterialEntry;
     }
 
     public void SetMaterial(Material material) =>

@@ -32,8 +32,8 @@ public sealed class MaterialCollector
 {
     public List<MaterialEntry> Materials = new();
 
-    public MaterialEntry GetMaterial(string name) =>
-        Materials.Find(MaterialEntry => MaterialEntry.FileInfo.Name == name);
+    public MaterialEntry GetMaterial(string materialName) =>
+        Materials.Find(MaterialEntry => MaterialEntry.FileInfo.Name == materialName);
 }
 
 public class MaterialCompiler
