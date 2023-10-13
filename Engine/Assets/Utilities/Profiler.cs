@@ -14,7 +14,7 @@ public sealed class Profiler
 
     public static string GetString() =>
         $"""
-        {FPS} FPS ({(Delta * 1000).ToString("F1")} ms)
+        {FPS} FPS ({Delta * 1000:F2} ms)
         
         Draw Calls: {DrawCalls}
         Vertices: {Vertices}

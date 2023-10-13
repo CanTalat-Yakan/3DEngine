@@ -8,6 +8,7 @@ using ImGuiNET;
 
 using Engine.Editor;
 using Engine.Rendering;
+using Engine.Utilities;
 
 using static Editor.Controller.Helper;
 
@@ -17,7 +18,7 @@ internal sealed partial class Viewport(Grid content)
 {
     public Grid Content = content;
 
-    private TextBlock _profile;
+    private TextBlock _profiler;
 
     public void InitializeEngineCore(Renderer renderer, out Engine.Core engineCore)
     {
@@ -44,7 +45,8 @@ internal sealed partial class Viewport(Grid content)
             EditorState.SetPlayModeStarted(
                 Main.Instance.PlayerControl.CheckPlayModeStarted());
 
-            _profile.Text = Engine.Utilities.Profiler.GetString();
+            if (Time.TimeStepElapsed)
+                _profiler.Text = Profiler.GetString();
         };
 
         engineCore.OnGui += (s, e) =>
@@ -54,7 +56,7 @@ internal sealed partial class Viewport(Grid content)
             ImGui.SetNextWindowBgAlpha(0.35f);
             if (ImGui.Begin("Profiler", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize))
             {
-                ImGui.Text(Engine.Utilities.Profiler.GetString());
+                ImGui.Text(_profiler.Text);
                 ImGui.End();
             }
         };
@@ -81,52 +83,52 @@ internal sealed partial class Viewport(Grid content)
         // Initialize an array of UI elements to be positioned in the top-left corner of the main content.
         UIElement[] topLeft = new[]
         {
-                CreateFlyoutButton(
-                    CreateIcon(Symbol.Video),
-                    StackInGridVertical(
-                        CreateSlider(null,
-                            ViewportController.Camera, "FOV",
-                            90, 40, 110)
-                            .WrapInGridVertical("Field Of View"),
-                        CreateNumberInput(null,
-                            ViewportController.Instance, "_movementSpeed",
-                            1, 100)
-                            .WrapInGridVertical("Movement Speed"))),
-                CreateAppBarSeperator(),
-                CreateComboBox(typeof(Engine.Data.CameraProjection), null,
-                    Renderer.Instance.Config, "CameraProjection"),
-                CreateComboBox(typeof(Engine.Data.RenderMode), null,
-                    Renderer.Instance.Config, "RenderMode")
+            CreateFlyoutButton(
+                CreateIcon(Symbol.Video),
+                StackInGridVertical(
+                    CreateSlider(null,
+                        ViewportController.Camera, "FOV",
+                        90, 40, 110)
+                        .WrapInGridVertical("Field Of View"),
+                    CreateNumberInput(null,
+                        ViewportController.Instance, "_movementSpeed",
+                        1, 100)
+                        .WrapInGridVertical("Movement Speed"))),
+            CreateAppBarSeperator(),
+            CreateComboBox(typeof(Engine.Data.CameraProjection), null,
+                Renderer.Instance.Config, "CameraProjection"),
+            CreateComboBox(typeof(Engine.Data.RenderMode), null,
+                Renderer.Instance.Config, "RenderMode")
         };
 
         // Initialize an array of UI elements to be positioned in the top-right corner of the main content.
         UIElement[] topRight = new[]
         {
-                CreateFlyoutButton(CreateIcon("\xE946"), CreateTextFull(out _profile).WrapInGrid()).AddToolTip("Profile"),
+            CreateFlyoutButton(CreateIcon("\xE946"), CreateTextFull(out _profiler).WrapInGrid()).AddToolTip("Profile"),
 
-                CreateAppBarSeperator(),
+            CreateAppBarSeperator(),
 
-                CreateToggleButton(CreateIcon("\xEA80"), true).AddToolTip("Snap Rotation"),
-                CreateToggleButton(CreateIcon("\xE81E"), true).AddToolTip("Snap Position"),
+            CreateToggleButton(CreateIcon("\xEA80"), true).AddToolTip("Snap Rotation"),
+            CreateToggleButton(CreateIcon("\xE81E"), true).AddToolTip("Snap Position"),
 
-                CreateAppBarSeperator(),
+            CreateAppBarSeperator(),
 
-                CreateFlyoutButtonWithValue(
-                    CreateIcon("\xE80A"), 10,
-                    CreateNumberInput(null,
-                        ViewportController.Instance, "_movementSpeed",
-                        10, 1, 100)
-                        .WrapInGridVertical("Grid Snap")).AddToolTip("Grid Snap"),
-                CreateFlyoutButtonWithValue(
-                    CreateIcon(Symbol.Rotate), 15,
-                    CreateNumberInput(null,
-                        ViewportController.Instance, "_rotationSpeed",
-                        15, 1, 90)
-                        .WrapInGridVertical("Rotation Snap")).AddToolTip("Rotation Snap"),
+            CreateFlyoutButtonWithValue(
+                CreateIcon("\xE80A"), 10,
+                CreateNumberInput(null,
+                    ViewportController.Instance, "_movementSpeed",
+                    10, 1, 100)
+                    .WrapInGridVertical("Grid Snap")).AddToolTip("Grid Snap"),
+            CreateFlyoutButtonWithValue(
+                CreateIcon(Symbol.Rotate), 15,
+                CreateNumberInput(null,
+                    ViewportController.Instance, "_rotationSpeed",
+                    15, 1, 90)
+                    .WrapInGridVertical("Rotation Snap")).AddToolTip("Rotation Snap"),
 
-                CreateAppBarSeperator(),
+            CreateAppBarSeperator(),
 
-                CreateToggleButton(CreateIcon(Symbol.Globe), true).AddToolTip("Show Gizmos")
+            CreateToggleButton(CreateIcon(Symbol.Globe), true).AddToolTip("Show Gizmos")
         };
 
         // Add the top-left and top-right UI elements to the main content.

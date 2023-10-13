@@ -1,6 +1,4 @@
-﻿using Engine.Gui;
-
-using ImGuiNET;
+﻿using ImGuiNET;
 using Vortice.Win32;
 
 namespace Engine;
@@ -13,6 +11,8 @@ class AppWindow
     private IntPtr _imGuiContext;
 
     private Win32Window _win32Window;
+
+    private string _profiler = "";
 
     public AppWindow(Win32Window win32window)
     {
@@ -27,7 +27,6 @@ class AppWindow
 
     public void Show(ShowWindowCommand command = ShowWindowCommand.Normal) =>
         User32.ShowWindow(_win32Window.Handle, command);
-
     public void Render()
     {
         _imGuiRenderer.Update(_imGuiContext, Core.Instance.Renderer.Size);
@@ -38,7 +37,9 @@ class AppWindow
         ImGui.SetNextWindowBgAlpha(0.35f);
         if (ImGui.Begin("Profiler", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize))
         {
-            ImGui.Text(Profiler.GetString());
+            if (Time.TimeStepElapsed)
+                _profiler = Profiler.GetString();
+            ImGui.Text(_profiler);
             ImGui.End();
         }
     }
