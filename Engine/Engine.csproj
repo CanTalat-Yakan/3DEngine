@@ -7,6 +7,17 @@
 		<!--<PublishAot>true</PublishAot>-->
 		<LangVersion>preview</LangVersion>
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Title>3D Engine</Title>
+		<PackageId>3D$(AssemblyName)</PackageId>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Authors>CanTalat-Yakan</Authors>
+		<Product>3D$(AssemblyName)</Product>
+		<PackageProjectUrl>https://github.com/CanTalat-Yakan/3DEngine</PackageProjectUrl>
+		<PackageIcon>3DEngine Logo.png</PackageIcon>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageTags>3D Game Engine .Net 8 C#12</PackageTags>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -89,9 +100,6 @@
 		<Content Include="Assets\Resources\Models\Primitives\Tree.obj">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-		<Content Include="Assets\Resources\Models\sponza.obj">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
 		<Content Include="Assets\Resources\Shaders\ImGui.hlsl">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
@@ -111,7 +119,7 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Resources\Templates\Project\Engine.dll">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Resources\Templates\Examples\Example.txt">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -140,27 +148,6 @@
 		<Content Include="Assets\Resources\Textures\Default.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-		<Content Include="Assets\Resources\Textures\Sky.png">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Assets\Resources\Textures\Sky2.png">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Assets\Resources\Textures\Sky3.png">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Assets\Resources\Textures\Sky4.png">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Assets\Resources\Textures\Sky4k.hdr">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Assets\Resources\Textures\Sky5.png">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Assets\Resources\Textures\SkyFish.png">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
 		<Content Include="Assets\Resources\Textures\SkyGradient.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
@@ -173,5 +160,16 @@
 		<Content Include="Assets\Resources\Textures\UVMap.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\3DEngine Logo.png">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	  <None Include="..\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
 	</ItemGroup>
 </Project>
