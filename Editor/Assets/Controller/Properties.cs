@@ -10,9 +10,9 @@ using System;
 using Windows.Foundation;
 
 using Engine.ECS;
+using Engine.Editor;
 using Engine.Rendering;
 using Engine.Runtime;
-using Engine;
 
 using static Editor.Controller.Helper;
 
