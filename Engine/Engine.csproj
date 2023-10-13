@@ -9,11 +9,11 @@
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>3D Engine</Title>
-		<PackageId>3D$(AssemblyName)</PackageId>
+		<PackageId>3DEngine</PackageId>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<Authors>CanTalat-Yakan</Authors>
-		<Product>3D$(AssemblyName)</Product>
+		<Product>3DEngine</Product>
 		<PackageProjectUrl>https://github.com/CanTalat-Yakan/3DEngine</PackageProjectUrl>
 		<PackageIcon>3DEngine Logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
