@@ -12,7 +12,7 @@ class AppWindow
 
     private Win32Window _win32Window;
 
-    private string _profiler = "";
+    private string _profiler = string.Empty;
 
     public AppWindow(Win32Window win32window)
     {
@@ -27,6 +27,7 @@ class AppWindow
 
     public void Show(ShowWindowCommand command = ShowWindowCommand.Normal) =>
         User32.ShowWindow(_win32Window.Handle, command);
+
     public void Render()
     {
         _imGuiRenderer.Update(_imGuiContext, Core.Instance.Renderer.Size);
@@ -37,7 +38,7 @@ class AppWindow
         ImGui.SetNextWindowBgAlpha(0.35f);
         if (ImGui.Begin("Profiler", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize))
         {
-            if (Time.TimeStepElapsed)
+            if (Time.OnFixedFrame)
                 _profiler = Profiler.GetString();
             ImGui.Text(_profiler);
             ImGui.End();

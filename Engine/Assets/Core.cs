@@ -127,7 +127,7 @@ public sealed class Core
         }
 
         // Call the FixedFrame when the timeStep elapsed.
-        if (Time.TimeStepElapsed)
+        if (Time.OnFixedFrame)
             // Call FixedUpdate for all scenes.
             SceneManager.FixedUpdate();
 

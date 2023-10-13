@@ -11,7 +11,8 @@ public sealed class Time
     public static float FixedDelta => (float)s_timeStep;
     public static double TimeStep => s_timeStep;
     public static double TimeScale => s_timeScale;
-    public static bool TimeStepElapsed => s_timeStepCounter == 0;
+    public static bool OnFixedFrame => s_timeStepCounter == 0;
+    public static bool OnFrame => s_tmpFPS == 0;
 
     private static double s_timer, s_delta;
     private static int s_fps, s_tmpFPS;

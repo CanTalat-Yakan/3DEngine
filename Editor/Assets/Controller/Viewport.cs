@@ -45,7 +45,7 @@ internal sealed partial class Viewport(Grid content)
             EditorState.SetPlayModeStarted(
                 Main.Instance.PlayerControl.CheckPlayModeStarted());
 
-            if (Time.TimeStepElapsed)
+            if (Time.OnFixedFrame)
                 _profiler.Text = Profiler.GetString();
         };
 
