@@ -19,7 +19,7 @@ public sealed class Program
     private void Loop() =>
         _engineCore.Frame();
 
-    public void Run(bool withImGui = true)
+    public void Run(bool withGui = true)
     {
         #region // Create Window
         WNDCLASSEX wndClass = new()
@@ -46,7 +46,7 @@ public sealed class Program
         _engineCore.Renderer.Config.SetVSync(PresentInterval.Immediate);
         _engineCore.Renderer.Config.SetResolutionScale(2);
 
-        if (withImGui)
+        if (withGui)
             _engineCore.OnGui += (s, e) => _appWindow.Render();
 
         _appWindow.Show(ShowWindowCommand.Maximize);
