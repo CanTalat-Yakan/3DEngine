@@ -10,7 +10,7 @@ public sealed class Material
 {
     public static Material CurrentMaterialOnGPU { get; set; }
 
-    public MaterialBuffer MaterialBuffer { get; set; }
+    public MaterialBuffer MaterialBuffer { get; set; } = new();
 
     private Renderer _renderer => Renderer.Instance;
 
@@ -25,7 +25,6 @@ public sealed class Material
     public Material(string shaderFilePath, string imageFileName = "Default.png")
     {
         #region // Create MaterialBuffer
-        MaterialBuffer = new();
         MaterialBuffer.CreatePerModelConstantBuffer();
         #endregion
 

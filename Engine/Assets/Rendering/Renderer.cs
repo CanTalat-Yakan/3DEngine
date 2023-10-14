@@ -96,7 +96,7 @@ public sealed class Renderer
             Format = Format.R8G8B8A8_UNorm,
             Width = Size.Width,
             Height = Size.Height,
-            SampleDescription = new(1, 0),
+            SampleDescription = new((int)Config.MultiSample, 0),
             Scaling = Scaling.Stretch,
             Stereo = false,
             SwapEffect = SwapEffect.FlipSequential,
@@ -173,7 +173,7 @@ public sealed class Renderer
             MipLevels = 0,
             Width = Size.Width,
             Height = Size.Height,
-            SampleDescription = new SampleDescription(1, 0),
+            SampleDescription = new(1, 0),
             Usage = ResourceUsage.Default,
             BindFlags = BindFlags.DepthStencil,
             CPUAccessFlags = CpuAccessFlags.None,
@@ -205,7 +205,7 @@ public sealed class Renderer
 
     public void Present() =>
         // Present the final render to the screen.
-        Data.SwapChain.Present((int)Config.VSync, PresentFlags.None);
+        Data.SwapChain.Present((int)Config.VSync, PresentFlags.DoNotWait);
 
     public void Draw(ID3D11Buffer vertexBuffer, ID3D11Buffer indexBuffer, int indexCount)
     {

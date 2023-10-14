@@ -44,7 +44,8 @@ public sealed class Program
         _appWindow = new(win32Window);
 
         _engineCore.Renderer.Config.SetVSync(PresentInterval.Immediate);
-        _engineCore.Renderer.Config.SetResolutionScale(2);
+        _engineCore.Renderer.Config.SetMSAA(MultiSample.x16);
+        _engineCore.Renderer.Config.SetResolutionScale(1);
 
         if (withGui)
             _engineCore.OnGui += (s, e) => _appWindow.Render();

@@ -27,6 +27,7 @@ internal sealed partial class Viewport(Grid content)
         engineCore = new Engine.Core(renderer, hwnd, Files.AssetsPath);
 
         engineCore.Renderer.Config.SetVSync(PresentInterval.Immediate);
+        engineCore.Renderer.Config.SetMSAA(MultiSample.x16);
         engineCore.Renderer.Config.SetResolutionScale(2);
 
         engineCore.OnInitialize += (s, e) =>

@@ -66,7 +66,7 @@ unsafe public sealed class ImGuiRenderer
         data.DisplaySize /= (float)Renderer.Instance.Config.ResolutionScale;
         data.DisplayPos /= (float)Renderer.Instance.Config.ResolutionScale;
 
-        //Also scale the cmd.ClipRect in the region Render command lists.
+        //Also scale the cmd.ClipRect in the region Render Command Lists.
         #endregion
 
         #region // Create Vertex and Index Buffer
@@ -152,7 +152,7 @@ unsafe public sealed class ImGuiRenderer
         _data.SetResourceView(0, _fontResourceView);
         #endregion
 
-        #region // Render command lists
+        #region // Render Command Lists
         // (Because we merged all buffers into a single one, we maintain our own offset into them)
         int global_idx_offset = 0;
         int global_vtx_offset = 0;
