@@ -16,7 +16,7 @@ namespace Engine.Gui;
 
 unsafe public sealed class ImGuiRenderer
 {
-    public bool IsRendering { get => _data.RenderTargetView is not null; }
+    public bool IsRendering { get => _data.BackBufferRenderTargetView is not null; }
 
     private ID3D11Device _device;
     private RenderData _data = new();

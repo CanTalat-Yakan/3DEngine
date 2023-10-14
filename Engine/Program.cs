@@ -40,12 +40,13 @@ public sealed class Program
         #endregion
 
         #region // Instance Engine and AppWindow, then show Window
-        _engineCore = new(win32Window);
-        _appWindow = new(win32Window);
+        Config config = new();
+        config.SetVSync(PresentInterval.Immediate);
+        config.SetMSAA(MultiSample.x8);
+        config.SetResolutionScale(1);
 
-        _engineCore.Renderer.Config.SetVSync(PresentInterval.Immediate);
-        _engineCore.Renderer.Config.SetMSAA(MultiSample.x16);
-        _engineCore.Renderer.Config.SetResolutionScale(1);
+        _engineCore = new(new Renderer(win32Window, config), win32Window.Handle);
+        _appWindow = new(win32Window);
 
         if (withGui)
             _engineCore.OnGui += (s, e) => _appWindow.Render();

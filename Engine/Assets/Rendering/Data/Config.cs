@@ -16,7 +16,6 @@ public enum MultiSample
     x2 = 2,
     x4 = 4,
     x8 = 8,
-    x16 = 16
 }
 
 public class Config
@@ -25,6 +24,7 @@ public class Config
     public RenderMode RenderMode;
 
     public MultiSample MultiSample = MultiSample.None;
+    public int SupportedSampleCount;
     public PresentInterval VSync = PresentInterval.Immediate;
     public double ResolutionScale = 1;
 

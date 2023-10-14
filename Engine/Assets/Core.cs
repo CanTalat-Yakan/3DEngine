@@ -37,9 +37,6 @@ public sealed class Core
     public Core(Renderer renderer, nint hwnd, string assetsPath = null) =>
         Initialize(renderer, hwnd, assetsPath);
 
-    public Core(Win32Window win32Window, string assetsPath = null) =>
-        Initialize(new Renderer(win32Window), win32Window.Handle, assetsPath);
-
     public void Initialize(Renderer renderer, nint hwnd, string assetsPath = null)
     {
         // Initializes the singleton instance of the class, if it hasn't been already.
@@ -163,6 +160,7 @@ public sealed class Core
         _imGuiRenderer.Render();
         #endregion
 
+        Renderer.Resolve();
         // Presents the final rendered image on the screen.
         Renderer.Present();
     }

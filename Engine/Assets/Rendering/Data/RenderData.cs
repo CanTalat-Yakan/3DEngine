@@ -15,8 +15,13 @@ public struct RenderData
     public SwapChainDescription1 SwapChainDescription;
     public IDXGISwapChain2 SwapChain;
 
-    public ID3D11Texture2D RenderTargetTexture;
-    public ID3D11RenderTargetView RenderTargetView;
+    public ID3D11Texture2D BackBufferRenderTargetTexture;
+    public ID3D11RenderTargetView BackBufferRenderTargetView;
+
+    public Texture2DDescription MSAATextureDescription;
+    public ID3D11Texture2D MSAARenderTargetTexture;
+    public RenderTargetViewDescription MSAARenderTargetViewDescription;
+    public ID3D11RenderTargetView MSAARenderTargetView;
 
     public RenderTargetBlendDescription RenderTargetBlendDescription;
 
@@ -25,9 +30,9 @@ public struct RenderData
 
     public DepthStencilDescription DepthStencilDescription;
     public ID3D11DepthStencilState DepthStencilState;
-
     public Texture2DDescription DepthStencilTextureDescription;
     public ID3D11Texture2D DepthStencilTexture;
+    public DepthStencilViewDescription DepthStencilViewDescription;
     public ID3D11DepthStencilView DepthStencilView;
 
     public RasterizerDescription RasterizerDescription;
@@ -42,6 +47,8 @@ public struct RenderData
     public ID3D11InputLayout InputLayout;
 
     public PrimitiveTopology PrimitiveTopology;
+
+    public Format Format;
 
     public void SetRasterizerDescFillModeWireframe() =>
         SetRasterizerDescFillMode(FillMode.Wireframe);
@@ -73,7 +80,7 @@ public struct RenderData
 
     public void SetupRenderState(Format indexFormat = Format.R16_UInt, int? vertexStride = null, int vertexOffset = 0, int indexOffset = 0)
     {
-        vertexStride = vertexStride is not null ? vertexStride.Value : Unsafe.SizeOf<Vertex>();
+        vertexStride ??= Unsafe.SizeOf<Vertex>();
 
         DeviceContext.IASetInputLayout(InputLayout);
         DeviceContext.IASetVertexBuffer(0, VertexBuffer, vertexStride.Value, vertexOffset);
@@ -101,8 +108,10 @@ public struct RenderData
     {
         DeviceContext?.Dispose();
         SwapChain?.Dispose();
-        RenderTargetTexture?.Dispose();
-        RenderTargetView?.Dispose();
+        BackBufferRenderTargetTexture?.Dispose();
+        BackBufferRenderTargetView?.Dispose();
+        MSAARenderTargetTexture?.Dispose();
+        MSAARenderTargetView?.Dispose();
         BlendState?.Dispose();
         DepthStencilTexture?.Dispose();
         DepthStencilView?.Dispose();

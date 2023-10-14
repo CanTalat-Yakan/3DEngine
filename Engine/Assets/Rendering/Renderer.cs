@@ -12,7 +12,7 @@ public sealed class Renderer
 {
     public static Renderer Instance { get; private set; }
 
-    public bool IsRendering => Data.RenderTargetView.NativePointer is not 0;
+    public bool IsRendering => Data.BackBufferRenderTargetView?.NativePointer is not 0;
     public IDXGISwapChain2 SwapChain => Data.SwapChain;
 
     public Size Size => NativeSize.Scale(Config.ResolutionScale);
@@ -25,7 +25,7 @@ public sealed class Renderer
 
     private Win32Window _win32Window;
 
-    public Renderer(Win32Window win32Window)
+    public Renderer(Win32Window win32Window, Config config = null)
     {
         // Initializes the singleton instance of the class, if it hasn't been already.
         if (Instance is null)
@@ -35,10 +35,14 @@ public sealed class Renderer
         if (win32Window is not null)
             _win32Window = win32Window;
         else
-            throw new Exception("""
+            throw new Exception(
+                """
                 An invalid or null Win32Window instance was passed to the Renderer. 
                 Please ensure that you provide a valid Win32Window object to the Renderer.
                 """);
+
+        if (config is not null)
+            Config = config;
 
         // Set the size.
         NativeSize = new Size(
@@ -50,10 +54,13 @@ public sealed class Renderer
             throw new Exception(result.Description);
     }
 
-    public Renderer(int sizeX = 640, int sizeY = 480)
+    public Renderer(int sizeX = 640, int sizeY = 480, Config config = null)
     {
         if (Instance is null)
             Instance = this;
+
+        if (config is not null)
+            Config = config;
 
         NativeSize = new Size(
             Math.Max(64, sizeX),
@@ -66,12 +73,12 @@ public sealed class Renderer
 
     public Result Initialize(bool forHwnd = false)
     {
-        #region //Create device, device context & swap chain with result
+        #region // Create device, device context & swap chain with result
         // Create a Direct3D 11 device.
         var result = D3D11.D3D11CreateDevice(
             null,
             DriverType.Hardware,
-            DeviceCreationFlags.BgraSupport,
+            DeviceCreationFlags.None,
             new[]
             {
                 FeatureLevel.Level_11_1,
@@ -93,10 +100,10 @@ public sealed class Renderer
         {
             AlphaMode = AlphaMode.Ignore,
             BufferCount = 2,
-            Format = Format.R8G8B8A8_UNorm,
+            Format = Data.Format = Format.R8G8B8A8_UNorm, // 10 bits = Format.R10G10B10A2_UNorm
             Width = Size.Width,
             Height = Size.Height,
-            SampleDescription = new((int)Config.MultiSample, 0),
+            SampleDescription = new(1, 0),
             Scaling = Scaling.Stretch,
             Stereo = false,
             SwapEffect = SwapEffect.FlipSequential,
@@ -120,18 +127,58 @@ public sealed class Renderer
         catch (Exception ex) { throw new Exception(ex.Message); }
         #endregion
 
-        #region //Create render target view, get back buffer texture before
-        // Get the first buffer of the swap chain as a texture.
-        Data.RenderTargetTexture = Data.SwapChain.GetBuffer<ID3D11Texture2D>(0);
-        // Create a render target view for the render target texture.
-        Data.RenderTargetView = Device.CreateRenderTargetView(Data.RenderTargetTexture);
+        #region // Check MSAA
+        // Note that 4x MSAA is required for Direct3D Feature Level 10.1 or better.
+        //           8x MSAA is required for Direct3D Feature Level 11.0 or better.
+        int sampleCount;
+        for (sampleCount = (int)Config.MultiSample; sampleCount > 1; sampleCount--)
+        {
+            result = Device.CheckMultisampleQualityLevels(Data.Format, sampleCount);
+            if (result.Success)
+                break;
+        }
+
+        if (sampleCount < 2)
+            throw new Exception("MSAA not supported");
+
+        Config.SupportedSampleCount = sampleCount;
         #endregion
 
-        #region //Create Blend State
+        #region // Create MSAA texture and create render target view
+        Data.MSAATextureDescription = new()
+        {
+            Format = Data.Format,
+            Width = Size.Width,
+            Height = Size.Height,
+            ArraySize = 1,
+            MipLevels = 1,
+            SampleDescription = new(Config.SupportedSampleCount, 0),
+            Usage = ResourceUsage.Default,
+            BindFlags = BindFlags.RenderTarget,
+            CPUAccessFlags = CpuAccessFlags.None,
+            MiscFlags = ResourceOptionFlags.None
+        };
+        // Create a multi sample texture .
+        Data.MSAARenderTargetTexture = Device.CreateTexture2D(Data.MSAATextureDescription);
+
+        // Create a render target view description for the multi sampling.
+        Data.MSAARenderTargetViewDescription = new(RenderTargetViewDimension.Texture2DMultisampled, Data.Format);
+        // Create a render target view for the MSAA render target texture.
+        Data.MSAARenderTargetView = Device.CreateRenderTargetView(Data.MSAARenderTargetTexture, Data.MSAARenderTargetViewDescription);
+        #endregion
+
+        #region // Get back buffer and create render target view
+        // Get the back buffer of the swap chain as a texture.
+        Data.BackBufferRenderTargetTexture = Data.SwapChain.GetBuffer<ID3D11Texture2D>(0);
+        // Create a render target view for the back buffer render target texture.
+        //Data.BackBufferRenderTargetView = Device.CreateRenderTargetView(Data.BackBufferRenderTargetTexture);
+        #endregion
+
+        #region // Create Blend State
         // Set up the blend state description.
         Data.BlendStateDescription = new()
         {
-            AlphaToCoverageEnable = false
+            AlphaToCoverageEnable = true
         };
 
         // Render target blend description setup.
@@ -146,14 +193,13 @@ public sealed class Renderer
             BlendOperationAlpha = BlendOperation.Add,
             RenderTargetWriteMask = ColorWriteEnable.All
         };
-
         // Assign the render target blend description to the blend state description.
         Data.BlendStateDescription.RenderTarget[0] = Data.RenderTargetBlendDescription;
         // Create the blend state.
         Data.BlendState = Device.CreateBlendState(Data.BlendStateDescription);
         #endregion
 
-        #region //Create depth stencil view
+        #region // Create depth stencil view
         // Set up depth stencil description.
         Data.DepthStencilDescription = new()
         {
@@ -161,7 +207,6 @@ public sealed class Renderer
             DepthFunc = ComparisonFunction.Less,
             DepthWriteMask = DepthWriteMask.All,
         };
-
         // Create a depth stencil state from the description.
         Data.DepthStencilState = Device.CreateDepthStencilState(Data.DepthStencilDescription);
 
@@ -169,34 +214,35 @@ public sealed class Renderer
         Data.DepthStencilTextureDescription = new()
         {
             Format = Format.D32_Float, // Set format to D32_Float.
-            ArraySize = 1,
-            MipLevels = 0,
             Width = Size.Width,
             Height = Size.Height,
+            ArraySize = 1,
+            MipLevels = 0,
             SampleDescription = new(1, 0),
             Usage = ResourceUsage.Default,
             BindFlags = BindFlags.DepthStencil,
             CPUAccessFlags = CpuAccessFlags.None,
             MiscFlags = ResourceOptionFlags.None
         };
-
         // Create the depth stencil texture and view based on the description.
         Data.DepthStencilTexture = Device.CreateTexture2D(Data.DepthStencilTextureDescription);
-        Data.DepthStencilView = Device.CreateDepthStencilView(Data.DepthStencilTexture);
 
-        // Set the device context's render targets to the created render target view and depth stencil view.
-        Data.DeviceContext.OMSetRenderTargets(Data.RenderTargetView, Data.DepthStencilView);
+        // Create a depth stencil view description for the multi sampling.
+        Data.DepthStencilViewDescription = new(DepthStencilViewDimension.Texture2DMultisampled, Format.D32_Float);
+        Data.DepthStencilView = Device.CreateDepthStencilView(Data.DepthStencilTexture, Data.DepthStencilViewDescription);
         #endregion
 
-        #region //Create rasterizer state
+        #region // Create rasterizer state
         // Create a rasterizer state to fill the triangle using solid fill mode.
         Data.RasterizerDescription = new()
         {
             FillMode = FillMode.Solid,
             CullMode = CullMode.None,
+            AntialiasedLineEnable = true,
+            MultisampleEnable = true
         };
 
-        // Create a rasterizer state based on the description
+        // Create a rasterizer state based on the description.
         Data.RasterizerState = Device.CreateRasterizerState(Data.RasterizerDescription);
         #endregion
 
@@ -206,6 +252,11 @@ public sealed class Renderer
     public void Present() =>
         // Present the final render to the screen.
         Data.SwapChain.Present((int)Config.VSync, PresentFlags.DoNotWait);
+
+    public void Resolve() =>
+        // Copy MSAA render target texture into the back buffer render texture.
+        Data.DeviceContext.ResolveSubresource(Data.BackBufferRenderTargetTexture, 0, Data.BackBufferRenderTargetTexture, 0, Data.Format);
+        //Data.DeviceContext.ResolveSubresource(Data.BackBufferRenderTargetTexture, 0, Data.MSAARenderTargetTexture, 0, Data.Format);
 
     public void Draw(ID3D11Buffer vertexBuffer, ID3D11Buffer indexBuffer, int indexCount)
     {
@@ -228,11 +279,12 @@ public sealed class Renderer
         var col = new Color4(0.15f, 0.15f, 0.15f, 0);
 
         // Clear the render target view and depth stencil view with the set color.
-        Data.DeviceContext.ClearRenderTargetView(Data.RenderTargetView, col);
-        Data.DeviceContext.ClearDepthStencilView(Data.DepthStencilView, DepthStencilClearFlags.Depth, 1.0f, 0);
+        Data.DeviceContext.ClearRenderTargetView(Data.BackBufferRenderTargetView, col);
+        Data.DeviceContext.ClearDepthStencilView(Data.DepthStencilView, DepthStencilClearFlags.Depth | DepthStencilClearFlags.Stencil, 1.0f, 0);
 
         // Set the render target and depth stencil view for the device context.
-        Data.DeviceContext.OMSetRenderTargets(Data.RenderTargetView, Data.DepthStencilView);
+        //Data.DeviceContext.OMSetRenderTargets(Data.MSAARenderTargetView, Data.DepthStencilView);
+        Data.DeviceContext.OMSetRenderTargets(Data.BackBufferRenderTargetView, Data.DepthStencilView);
 
         // Reset the profiler values for vertices, indices, and draw calls.
         Profiler.Vertices = 0;
@@ -259,8 +311,10 @@ public sealed class Renderer
             Math.Max(64, newHeight));
 
         // Dispose the existing render target view, render target texture, depth stencil view, and depth stencil texture.
-        Data.RenderTargetView?.Dispose();
-        Data.RenderTargetTexture?.Dispose();
+        Data.BackBufferRenderTargetTexture?.Dispose();
+        Data.BackBufferRenderTargetView?.Dispose();
+        Data.MSAARenderTargetTexture?.Dispose();
+        Data.MSAARenderTargetView?.Dispose();
         Data.DepthStencilView?.Dispose();
         Data.DepthStencilTexture?.Dispose();
 
@@ -273,14 +327,20 @@ public sealed class Renderer
             Data.SwapChain.Description1.Flags);
 
         // Get the render target texture and create the render target view.
-        Data.RenderTargetTexture = Data.SwapChain.GetBuffer<ID3D11Texture2D>(0);
-        Data.RenderTargetView = Device.CreateRenderTargetView(Data.RenderTargetTexture);
+        Data.BackBufferRenderTargetTexture = Data.SwapChain.GetBuffer<ID3D11Texture2D>(0);
+        Data.BackBufferRenderTargetView = Device.CreateRenderTargetView(Data.BackBufferRenderTargetTexture);
+
+        // Update the MSAA texture description and create the texture and view.
+        Data.MSAATextureDescription.Width = Size.Width;
+        Data.MSAATextureDescription.Height = Size.Height;
+        Data.MSAARenderTargetTexture = Device.CreateTexture2D(Data.MSAATextureDescription);
+        Data.MSAARenderTargetView = Device.CreateRenderTargetView(Data.MSAARenderTargetTexture, Data.MSAARenderTargetViewDescription);
 
         // Update the depth stencil texture description and create the depth stencil texture and view.
         Data.DepthStencilTextureDescription.Width = Size.Width;
         Data.DepthStencilTextureDescription.Height = Size.Height;
         Data.DepthStencilTexture = Device.CreateTexture2D(Data.DepthStencilTextureDescription);
-        Data.DepthStencilView = Device.CreateDepthStencilView(Data.DepthStencilTexture);
+        Data.DepthStencilView = Device.CreateDepthStencilView(Data.DepthStencilTexture, Data.DepthStencilViewDescription);
 
         // Update the size of the source in the swap chain.
         Data.SwapChain.SourceSize = Size;
