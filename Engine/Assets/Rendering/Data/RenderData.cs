@@ -20,11 +20,11 @@ public struct RenderData
     public ID3D11Texture2D MSAARenderTargetTexture;
     public ID3D11RenderTargetView MSAARenderTargetView;
 
-    public ID3D11BlendState BlendState;
-
     public ID3D11DepthStencilState DepthStencilState;
     public ID3D11Texture2D DepthStencilTexture;
     public ID3D11DepthStencilView DepthStencilView;
+
+    public ID3D11BlendState BlendState;
 
     public RasterizerDescription RasterizerDescription;
     public ID3D11RasterizerState RasterizerState;

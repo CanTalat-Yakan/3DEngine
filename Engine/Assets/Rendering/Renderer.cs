@@ -79,8 +79,8 @@ public sealed partial class Renderer
 
         GetBackBufferAndCreateRenderTargetView();
         CreateMSAATextureAndRenderTargetView();
-        CreateBlendState();
         CreateDepthStencilView();
+        CreateBlendState();
         CreateRasterizerState();
 
         return Result.Ok;
@@ -284,32 +284,6 @@ public sealed partial class Renderer
         Data.MSAARenderTargetView = Device.CreateRenderTargetView(Data.MSAARenderTargetTexture, MSAARenderTargetViewDescription);
     }
 
-    private void CreateBlendState()
-    {
-        // Set up the blend state description.
-        BlendDescription blendDescription = new()
-        {
-            AlphaToCoverageEnable = true
-        };
-
-        // Render target blend description setup.
-        RenderTargetBlendDescription renderTargetBlendDescription = new()
-        {
-            BlendEnable = true, // Enable blend.
-            SourceBlend = Blend.SourceAlpha,
-            DestinationBlend = Blend.InverseSourceAlpha,
-            BlendOperation = BlendOperation.Add,
-            SourceBlendAlpha = Blend.One,
-            DestinationBlendAlpha = Blend.Zero,
-            BlendOperationAlpha = BlendOperation.Add,
-            RenderTargetWriteMask = ColorWriteEnable.All
-        };
-        // Assign the render target blend description to the blend state description.
-        blendDescription.RenderTarget[0] = renderTargetBlendDescription;
-        // Create the blend state.
-        Data.BlendState = Device.CreateBlendState(blendDescription);
-    }
-
     private void CreateDepthStencilView()
     {
         // Set up depth stencil description.
@@ -340,8 +314,34 @@ public sealed partial class Renderer
         Data.DepthStencilTexture = Device.CreateTexture2D(depthStencilTextureDescription);
 
         // Create a depth stencil view description for the multi sampling.
-        DepthStencilViewDescription DepthStencilViewDescription = new(DepthStencilViewDimension.Texture2DMultisampled, Format.D32_Float);
-        Data.DepthStencilView = Device.CreateDepthStencilView(Data.DepthStencilTexture, DepthStencilViewDescription);
+        DepthStencilViewDescription depthStencilViewDescription = new(DepthStencilViewDimension.Texture2DMultisampled, Format.D32_Float);
+        Data.DepthStencilView = Device.CreateDepthStencilView(Data.DepthStencilTexture, depthStencilViewDescription);
+    }
+
+    private void CreateBlendState()
+    {
+        // Set up the blend state description.
+        BlendDescription blendDescription = new()
+        {
+            AlphaToCoverageEnable = true
+        };
+
+        // Render target blend description setup.
+        RenderTargetBlendDescription renderTargetBlendDescription = new()
+        {
+            BlendEnable = true, // Enable blend.
+            SourceBlend = Blend.SourceAlpha,
+            DestinationBlend = Blend.InverseSourceAlpha,
+            BlendOperation = BlendOperation.Add,
+            SourceBlendAlpha = Blend.One,
+            DestinationBlendAlpha = Blend.Zero,
+            BlendOperationAlpha = BlendOperation.Add,
+            RenderTargetWriteMask = ColorWriteEnable.All
+        };
+        // Assign the render target blend description to the blend state description.
+        blendDescription.RenderTarget[0] = renderTargetBlendDescription;
+        // Create the blend state.
+        Data.BlendState = Device.CreateBlendState(blendDescription);
     }
 
     private void CreateRasterizerState()
