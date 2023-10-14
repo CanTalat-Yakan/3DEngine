@@ -12,27 +12,18 @@ public struct RenderData
 {
     public ID3D11DeviceContext DeviceContext;
 
-    public SwapChainDescription1 SwapChainDescription;
     public IDXGISwapChain2 SwapChain;
 
     public ID3D11Texture2D BackBufferRenderTargetTexture;
     public ID3D11RenderTargetView BackBufferRenderTargetView;
 
-    public Texture2DDescription MSAATextureDescription;
     public ID3D11Texture2D MSAARenderTargetTexture;
-    public RenderTargetViewDescription MSAARenderTargetViewDescription;
     public ID3D11RenderTargetView MSAARenderTargetView;
 
-    public RenderTargetBlendDescription RenderTargetBlendDescription;
-
-    public BlendDescription BlendStateDescription;
     public ID3D11BlendState BlendState;
 
-    public DepthStencilDescription DepthStencilDescription;
     public ID3D11DepthStencilState DepthStencilState;
-    public Texture2DDescription DepthStencilTextureDescription;
     public ID3D11Texture2D DepthStencilTexture;
-    public DepthStencilViewDescription DepthStencilViewDescription;
     public ID3D11DepthStencilView DepthStencilView;
 
     public RasterizerDescription RasterizerDescription;
@@ -108,17 +99,24 @@ public struct RenderData
     {
         DeviceContext?.Dispose();
         SwapChain?.Dispose();
-        BackBufferRenderTargetTexture?.Dispose();
-        BackBufferRenderTargetView?.Dispose();
-        MSAARenderTargetTexture?.Dispose();
-        MSAARenderTargetView?.Dispose();
+
+        DisposeTexturesAndViews();
+
         BlendState?.Dispose();
-        DepthStencilTexture?.Dispose();
-        DepthStencilView?.Dispose();
         VertexBuffer?.Dispose();
         IndexBuffer?.Dispose();
         VertexShader?.Dispose();
         PixelShader?.Dispose();
         InputLayout?.Dispose();
+    }
+
+    public void DisposeTexturesAndViews()
+    {
+        BackBufferRenderTargetTexture?.Dispose();
+        BackBufferRenderTargetView?.Dispose();
+        MSAARenderTargetTexture?.Dispose();
+        MSAARenderTargetView?.Dispose();
+        DepthStencilTexture?.Dispose();
+        DepthStencilView?.Dispose();
     }
 }
