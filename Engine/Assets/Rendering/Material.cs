@@ -81,7 +81,7 @@ public sealed class Material
         #endregion
     }
 
-    internal void Setup()
+    public void Setup()
     {
         // Set input layout, vertex shader, and pixel shader in the device context.
         // Set the shader resource and sampler in the pixel shader stage of the device context.
@@ -93,7 +93,7 @@ public sealed class Material
         CurrentMaterialOnGPU = this;
     }
 
-    internal void UpdateVertexShader(string shaderFilePath)
+    public void UpdateVertexShader(string shaderFilePath)
     {
         // Compile the vertex shader bytecode from the specified shader file name.
         ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(shaderFilePath, "VS", "vs_4_0");
@@ -102,7 +102,7 @@ public sealed class Material
         _vertexShader = _renderer.Device.CreateVertexShader(vertexShaderByteCode.Span);
     }
 
-    internal void UpdatePixelShader(string shaderFilePath)
+    public void UpdatePixelShader(string shaderFilePath)
     {
         // Compile the vertex shader bytecode from the specified shader file name.
         ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(shaderFilePath, "PS", "ps_4_0");
@@ -111,7 +111,7 @@ public sealed class Material
         _vertexShader = _renderer.Device.CreateVertexShader(vertexShaderByteCode.Span);
     }
 
-    internal void Dispose()
+    public void Dispose()
     {
         MaterialBuffer?.Dispose();
         _vertexShader?.Dispose();
@@ -120,7 +120,7 @@ public sealed class Material
         _samplerState?.Dispose();
     }
 
-    internal static ReadOnlyMemory<byte> CompileBytecode(string shaderFilePath, string entryPoint, string profile)
+    public static ReadOnlyMemory<byte> CompileBytecode(string shaderFilePath, string entryPoint, string profile)
     {
         // Shader flags to enable strictness and set optimization level or debug mode.
         ShaderFlags shaderFlags = ShaderFlags.EnableStrictness;
