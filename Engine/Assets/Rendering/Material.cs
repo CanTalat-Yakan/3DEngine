@@ -22,11 +22,14 @@ public sealed class Material
     private ID3D11ShaderResourceView _resourceView;
     private ID3D11SamplerState _samplerState;
 
-    private ID3D11Buffer _model;
-
-    public Material(string shaderFilePath, string imageFileName = "Dark.png")
+    public Material(string shaderFilePath, string imageFileName = "Default.png")
     {
-        #region //Create VertexShader
+        #region // Create MaterialBuffer
+        MaterialBuffer = new();
+        MaterialBuffer.CreatePerModelConstantBuffer();
+        #endregion
+
+        #region // Create VertexShader
         if (string.IsNullOrEmpty(shaderFilePath))
             return;
 
@@ -37,7 +40,7 @@ public sealed class Material
         _vertexShader = _renderer.Device.CreateVertexShader(vertexShaderByteCode.Span);
         #endregion
 
-        #region //Create InputLayout
+        #region // Create InputLayout
         // Define the input layout for the vertex buffer.
         InputElementDescription[] inputElements = new[] {
                 new InputElementDescription("POSITION", 0, Format.R32G32B32_Float, 0, 0), // Position element.
@@ -47,7 +50,7 @@ public sealed class Material
         _inputLayout = _renderer.Device.CreateInputLayout(inputElements, vertexShaderByteCode.Span);
         #endregion
 
-        #region //Create PixelShader 
+        #region // Create PixelShader 
         // Compile the bytecode for the pixel shader using the specified shader file name and target profile.
         ReadOnlyMemory<byte> pixelShaderByteCode = CompileBytecode(shaderFilePath, "PS", "ps_5_0");
 
@@ -55,12 +58,7 @@ public sealed class Material
         _pixelShader = _renderer.Device.CreatePixelShader(pixelShaderByteCode.Span);
         #endregion
 
-        #region //Create ConstantBuffer for Model
-        // Create the per model constant buffer.
-        _model = _renderer.Device.CreateConstantBuffer<PerModelConstantBuffer>();
-        #endregion
-
-        #region //Create Texture and Sampler
+        #region // Create Texture and Sampler
         // Load the texture and create a shader resource view for it.
         var texture = Loader.ImageLoader.LoadTexture(_renderer.Device, imageFileName);
         _resourceView = _renderer.Device.CreateShaderResourceView(texture);
@@ -95,23 +93,6 @@ public sealed class Material
         CurrentMaterialOnGPU = this;
     }
 
-    internal void UpdateModelConstantBuffer(PerModelConstantBuffer constantBuffer)
-    {
-        // Map the constant buffer and copy the models model-view matrix into it.
-        unsafe
-        {
-            // Map the constant buffer to memory for write access.
-            var mappedResource = _renderer.Data.DeviceContext.Map(_model, MapMode.WriteDiscard);
-            // Copy the data from the constant buffer to the mapped resource.
-            Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref constantBuffer);
-            // Unmap the constant buffer from memory.
-            _renderer.Data.DeviceContext.Unmap(_model, 0);
-        }
-
-        // Set the constant buffer in the vertex shader stage of the device context.
-        _renderer.Data.SetConstantBufferVS(1, _model);
-    }
-
     internal void UpdateVertexShader(string shaderFilePath)
     {
         // Compile the vertex shader bytecode from the specified shader file name.
@@ -132,11 +113,11 @@ public sealed class Material
 
     internal void Dispose()
     {
+        MaterialBuffer?.Dispose();
         _vertexShader?.Dispose();
         _pixelShader?.Dispose();
         _inputLayout?.Dispose();
         _samplerState?.Dispose();
-        _model?.Dispose();
     }
 
     internal static ReadOnlyMemory<byte> CompileBytecode(string shaderFilePath, string entryPoint, string profile)

@@ -35,17 +35,17 @@ public class MaterialBuffer()
 
     private object _propertiesConstantBuffer;
     private ID3D11Buffer _properties;
+    private ID3D11Buffer _model;
 
     private Renderer _renderer => Renderer.Instance;
 
     public object GetPropertiesConstantBuffer() =>
         _propertiesConstantBuffer;
 
-    public void CreatePropertiesInstance(Type constantBufferType) =>
-        _propertiesConstantBuffer = Activator.CreateInstance(constantBufferType);
-
     public void CreatePropertiesConstantBuffer(Type constantBufferType)
     {
+        _propertiesConstantBuffer = Activator.CreateInstance(constantBufferType);
+
         MethodInfo createConstantBufferMethod = _renderer.Device.GetType()
             .GetMethod("CreateConstantBuffer")
             .MakeGenericMethod(constantBufferType);
@@ -53,8 +53,11 @@ public class MaterialBuffer()
         _properties = (ID3D11Buffer)createConstantBufferMethod.Invoke(_renderer.Device, null);
     }
 
-    public void UpdateConstantBuffer()
+    public void UpdatePropertiesConstantBuffer()
     {
+        if (_propertiesConstantBuffer is null)
+            return;
+
         // Map the constant buffer and copy the properties into it.
         unsafe
         {
@@ -70,7 +73,27 @@ public class MaterialBuffer()
         _renderer.Data.SetConstantBufferVS(2, _properties);
         _renderer.Data.SetConstantBufferPS(2, _properties);
     }
-    
+
+    public void CreatePerModelConstantBuffer() =>
+        _model = _renderer.Device.CreateConstantBuffer<PerModelConstantBuffer>();
+
+    public void UpdateModelConstantBuffer(PerModelConstantBuffer constantBuffer)
+    {
+        // Map the constant buffer and copy the models model-view matrix into it.
+        unsafe
+        {
+            // Map the constant buffer to memory for write access.
+            var mappedResource = _renderer.Data.DeviceContext.Map(_model, MapMode.WriteDiscard);
+            // Copy the data from the constant buffer to the mapped resource.
+            Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref constantBuffer);
+            // Unmap the constant buffer from memory.
+            _renderer.Data.DeviceContext.Unmap(_model, 0);
+        }
+
+        // Set the constant buffer in the vertex shader stage of the device context.
+        _renderer.Data.SetConstantBufferVS(1, _model);
+    }
+
     public void SafeToSerializableProperties()
     {
         SerializableProperties.Clear();
@@ -87,6 +110,9 @@ public class MaterialBuffer()
                     serializeEntry.Value = fieldInfo.GetValue(_propertiesConstantBuffer);
     }
 
-    public void Dispose() =>
+    public void Dispose()
+    {
         _properties?.Dispose();
+        _model?.Dispose();
+    }
 }

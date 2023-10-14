@@ -80,7 +80,7 @@ public class MaterialCompiler
 
             var materialBuffer = (MaterialBuffer)Serialization.LoadXml(typeof(MaterialBuffer), path);
             materialBuffer.PasteToPropertiesConstantBuffer();
-            materialBuffer.UpdateConstantBuffer();
+            materialBuffer.UpdatePropertiesConstantBuffer();
 
             Output.Log("Updated Material");
         }
@@ -92,6 +92,7 @@ public class MaterialCompiler
 
         materialEntry.ShaderEntry = shaderEntry;
         materialEntry.Material = new(shaderEntry.FileInfo.FullName);
+        materialEntry.Material.MaterialBuffer?.Dispose();
         materialEntry.Material.MaterialBuffer = materialBuffer;
 
         if (shaderEntry.ConstantBufferType is null)
@@ -102,7 +103,7 @@ public class MaterialCompiler
             return;
         }
 
-        materialBuffer.CreatePropertiesInstance(shaderEntry.ConstantBufferType);
-        materialBuffer.CreatePropertiesConstantBuffer(materialEntry.ShaderEntry.ConstantBufferType);
+        materialBuffer.CreatePerModelConstantBuffer();
+        materialBuffer.CreatePropertiesConstantBuffer(shaderEntry.ConstantBufferType);
     }
 }

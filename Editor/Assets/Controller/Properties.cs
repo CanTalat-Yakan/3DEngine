@@ -683,7 +683,7 @@ internal sealed partial class Properties
 
             Engine.Helper.Serialization.SaveXml(materialEntry.Material.MaterialBuffer, materialEntry.FileInfo.FullName);
 
-            materialEntry.Material.MaterialBuffer.UpdateConstantBuffer();
+            materialEntry.Material.MaterialBuffer.UpdatePropertiesConstantBuffer();
         });
 
         return finalGrid;

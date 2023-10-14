@@ -50,7 +50,7 @@ public sealed class Mesh : Component
             && Equals(Mesh.CurrentMeshOnGPU, MeshInfo))
         {
             // Update the PerModelConstantBuffer only.
-            Material.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
+            Material.MaterialBuffer?.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
 
             // Draw the mesh directly without resetting the RenderState.
             _renderer.DrawIndexed(MeshInfo.Indices.Length);
@@ -59,8 +59,8 @@ public sealed class Mesh : Component
         {
             // Setup the Material, the PerModelConstantBuffer and the PropertiesConstantBuffer.
             Material.Setup();
-            Material.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
-            Material.MaterialBuffer?.UpdateConstantBuffer();
+            Material.MaterialBuffer?.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
+            Material.MaterialBuffer?.UpdatePropertiesConstantBuffer();
 
             // Draw the mesh with TriangleList.
             _renderer.Data.SetPrimitiveTopology();
