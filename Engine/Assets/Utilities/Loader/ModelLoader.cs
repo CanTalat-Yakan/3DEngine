@@ -5,7 +5,7 @@ using Assimp;
 
 namespace Engine.Loader;
 
-internal sealed class ModelLoader
+public sealed class ModelLoader
 {
     private static Dictionary<string, MeshInfo> s_meshInfoStore = new();
 

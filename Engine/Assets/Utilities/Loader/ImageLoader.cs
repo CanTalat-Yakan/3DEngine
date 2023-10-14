@@ -9,7 +9,7 @@ using Vortice.WIC;
 
 namespace Engine.Loader;
 
-internal sealed class ImageLoader
+public sealed class ImageLoader
 {
     private static Dictionary<string, ID3D11Texture2D> s_textureStore = new();
 
