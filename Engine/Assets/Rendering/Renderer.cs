@@ -15,7 +15,7 @@ public sealed class Renderer
     public bool IsRendering => Data.RenderTargetView.NativePointer is not 0;
     public IDXGISwapChain2 SwapChain => Data.SwapChain;
 
-    public Size Size => Config.SuperSample ? NativeSize * 2 : NativeSize;
+    public Size Size => NativeSize.Scale(Config.ResolutionScale);
     public Size NativeSize { get; private set; }
 
     public ID3D11Device Device { get; private set; }
@@ -205,7 +205,7 @@ public sealed class Renderer
 
     public void Present() =>
         // Present the final render to the screen.
-        Data.SwapChain.Present(Config.VSync ? 1 : 0, PresentFlags.None);
+        Data.SwapChain.Present((int)Config.VSync, PresentFlags.None);
 
     public void Draw(ID3D11Buffer vertexBuffer, ID3D11Buffer indexBuffer, int indexCount)
     {

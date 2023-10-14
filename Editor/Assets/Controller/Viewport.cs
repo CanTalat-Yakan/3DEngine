@@ -6,6 +6,7 @@ using WinRT.Interop;
 
 using ImGuiNET;
 
+using Engine.Data;
 using Engine.Editor;
 using Engine.Rendering;
 using Engine.Utilities;
@@ -25,8 +26,8 @@ internal sealed partial class Viewport(Grid content)
         var hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
         engineCore = new Engine.Core(renderer, hwnd, Files.AssetsPath);
 
-        engineCore.Renderer.Config.SetVSync(false);
-        engineCore.Renderer.Config.SetSuperSample(false);
+        engineCore.Renderer.Config.SetVSync(PresentInterval.Immediate);
+        engineCore.Renderer.Config.SetResolutionScale(2);
 
         engineCore.OnInitialize += (s, e) =>
         {

@@ -10,6 +10,9 @@ public sealed class Helper { }
 
 public static class ExtensionMethods
 {
+    public static Size Scale(this Size size, double scale) =>
+        new Size((int)(size.Width * scale), (int)(size.Height * scale));
+
     public static float ToDegrees(this float value) =>
         MathHelper.ToDegrees(value);
 
@@ -30,7 +33,7 @@ public static class ExtensionMethods
 
     public static bool IsNaN(this Vector2 vector) =>
         float.IsNaN(vector.X) || float.IsNaN(vector.Y);
-    
+
     public static bool IsNaN(this Vector3 vector) =>
         float.IsNaN(vector.X) || float.IsNaN(vector.Y) || float.IsNaN(vector.Z);
 

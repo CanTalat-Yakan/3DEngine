@@ -45,10 +45,10 @@ public sealed class ImGuiInputHandler
         io.KeyMap[(int)ImGuiKey.Z] = 'Z';
     }
 
-    public void Update(bool superSample)
+    public void Update()
     {
         UpdateKeyModifiers();
-        UpdateMousePosition(superSample ? 0.5f : 1);
+        UpdateMousePosition();
 
         var mouseCursor = ImGui.GetIO().MouseDrawCursor ? ImGuiMouseCursor.None : ImGui.GetMouseCursor();
         if (mouseCursor != _lastCursor)
@@ -97,13 +97,13 @@ public sealed class ImGuiInputHandler
         return true;
     }
 
-    void UpdateMousePosition(float scale)
+    void UpdateMousePosition()
     {
         var io = ImGui.GetIO();
 
         if (io.WantSetMousePos)
         {
-            var pos = new POINT((int)(io.MousePos.X * scale), (int)(io.MousePos.Y * scale));
+            var pos = new POINT((int)io.MousePos.X, (int)io.MousePos.Y);
             ClientToScreen(_hwnd, ref pos);
             SetCursorPos(pos.X, pos.Y);
         }
@@ -115,7 +115,7 @@ public sealed class ImGuiInputHandler
         {
             POINT pos;
             if (GetCursorPos(out pos) && ScreenToClient(_hwnd, ref pos))
-                io.MousePos = new Vector2(pos.X / scale, pos.Y / scale);
+                io.MousePos = new Vector2(pos.X, pos.Y);
         }
     }
 

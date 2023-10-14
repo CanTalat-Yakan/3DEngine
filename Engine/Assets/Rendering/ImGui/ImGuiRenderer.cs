@@ -58,9 +58,16 @@ unsafe public sealed class ImGuiRenderer
 
     private void Draw(ImDrawDataPtr data)
     {
+        #region // Scale DisplaySize
         // Avoid rendering when minimized
         if (data.DisplaySize.X <= 0.0f || data.DisplaySize.Y <= 0.0f)
             return;
+
+        data.DisplaySize /= (float)Renderer.Instance.Config.ResolutionScale;
+        data.DisplayPos /= (float)Renderer.Instance.Config.ResolutionScale;
+
+        //Also scale the cmd.ClipRect in the region Render command lists.
+        #endregion
 
         #region // Create Vertex and Index Buffer
         if (_data.VertexBuffer == null || _vertexBufferSize < data.TotalVtxCount)
@@ -114,7 +121,7 @@ unsafe public sealed class ImGuiRenderer
         _data.DeviceContext.Unmap(_data.IndexBuffer, 0);
         #endregion
 
-        #region // Set Model View Projection Matrix
+        #region // Set ModelViewProjection Matrix
         // Setup orthographic projection matrix into our constant buffer
         // Our visible imGui space lies from draw_data.DisplayPos (top left) to draw_data.DisplayPos+data_data.DisplaySize (bottom right). DisplayPos is (0,0) for single viewport apps.
         var constResource = _data.DeviceContext.Map(_viewConstantBuffer, 0, MapMode.WriteDiscard, Vortice.Direct3D11.MapFlags.None);
@@ -160,6 +167,8 @@ unsafe public sealed class ImGuiRenderer
                     throw new NotImplementedException("user callbacks not implemented");
                 else
                 {
+                    cmd.ClipRect *= (float)Renderer.Instance.Config.ResolutionScale;
+
                     var rect = new RawRect((int)(cmd.ClipRect.X - clip_off.X), (int)(cmd.ClipRect.Y - clip_off.Y), (int)(cmd.ClipRect.Z - clip_off.X), (int)(cmd.ClipRect.W - clip_off.Y));
                     _data.DeviceContext.RSSetScissorRects(new[] { rect });
 

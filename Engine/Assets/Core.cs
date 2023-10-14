@@ -149,7 +149,7 @@ public sealed class Core
         // Update the ImGuiRenderer.
         _imGuiRenderer.Update(_imGuiContext, Renderer.Size);
         // Update the ImGuiInputHandler.
-        _imGuiInputHandler.Update(Renderer.Config.SuperSample);
+        _imGuiInputHandler.Update();
 
         // Invoke the OnGui Event.
         OnGui?.Invoke(null, null);
