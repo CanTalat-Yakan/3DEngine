@@ -2,13 +2,14 @@
 
 public class Config
 {
-    public CameraProjection CameraProjection;
-    public RenderMode RenderMode;
+    public CameraProjection CameraProjection = CameraProjection.Perspective;
+    public RenderMode RenderMode = RenderMode.Shaded;
 
     public PresentInterval VSync = PresentInterval.Immediate;
     public double ResolutionScale = 1;
     public MultiSample MultiSample = MultiSample.None;
-    public int SupportedSampleCount;
+    public int SupportedSampleCount = 1;
+    public int QualityLevels = 0;
 
     public void SetMSAA(MultiSample multiSample) =>
         MultiSample = multiSample;

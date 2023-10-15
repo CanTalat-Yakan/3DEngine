@@ -5,6 +5,7 @@ using Vortice.Direct3D11;
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
+using Vortice.MediaFoundation;
 
 namespace Engine.Rendering;
 
@@ -94,9 +95,8 @@ public sealed partial class Renderer
         Data.SwapChain.Present((int)Config.VSync, PresentFlags.DoNotWait);
 
     public void Resolve() =>
-        // Copy the MSAA render target texture into the back buffer render texture.
-        Data.DeviceContext.ResolveSubresource(Data.BackBufferRenderTargetTexture, 0, Data.BackBufferRenderTargetTexture, 0, Data.Format);
-    //Data.DeviceContext.ResolveSubresource(Data.BackBufferRenderTargetTexture, 0, Data.MSAARenderTargetTexture, 0, Data.Format);
+    // Copy the MSAA render target texture into the back buffer render texture.
+    Data.DeviceContext.ResolveSubresource(Data.BackBufferRenderTargetTexture, 0, Data.MSAARenderTargetTexture, 0, Data.Format);
 
     public void Draw(ID3D11Buffer vertexBuffer, ID3D11Buffer indexBuffer, int indexCount)
     {
@@ -119,12 +119,11 @@ public sealed partial class Renderer
         var col = new Color4(0.15f, 0.15f, 0.15f, 0);
 
         // Clear the render target view and depth stencil view with the set color.
-        Data.DeviceContext.ClearRenderTargetView(Data.BackBufferRenderTargetView, col);
+        Data.DeviceContext.ClearRenderTargetView(Data.MSAARenderTargetView, col);
         Data.DeviceContext.ClearDepthStencilView(Data.DepthStencilView, DepthStencilClearFlags.Depth | DepthStencilClearFlags.Stencil, 1.0f, 0);
 
         // Set the render target and depth stencil view for the device context.
-        //Data.DeviceContext.OMSetRenderTargets(Data.MSAARenderTargetView, Data.DepthStencilView);
-        Data.DeviceContext.OMSetRenderTargets(Data.BackBufferRenderTargetView, Data.DepthStencilView);
+        Data.DeviceContext.OMSetRenderTargets(Data.MSAARenderTargetView, Data.DepthStencilView);
 
         // Reset the profiler values for vertices, indices, and draw calls.
         Profiler.Vertices = 0;
@@ -241,21 +240,22 @@ public sealed partial class Renderer
 
     private void CheckMSAASupport()
     {
-        Result result;
         // Note that 4x MSAA is required for Direct3D Feature Level 10.1 or better.
         //           8x MSAA is required for Direct3D Feature Level 11.0 or better.
+        int qualityLevels = 0;
         int sampleCount;
-        for (sampleCount = (int)Config.MultiSample; sampleCount > 1; sampleCount--)
+        for (sampleCount = (int)Config.MultiSample; sampleCount > 1; sampleCount /= 2)
         {
-            result = Device.CheckMultisampleQualityLevels(Data.Format, sampleCount);
-            if (result.Success)
+            qualityLevels = Device.CheckMultisampleQualityLevels(Data.Format, sampleCount);
+            if (qualityLevels > 0)
                 break;
         }
 
         if (sampleCount < 2)
-            throw new Exception("MSAA not supported");
+            Output.Log("MSAA not supported");
 
         Config.SupportedSampleCount = sampleCount;
+        Config.QualityLevels = qualityLevels - 1;
     }
 
     private void CreateMSAATextureAndRenderTargetView()
@@ -269,7 +269,7 @@ public sealed partial class Renderer
             Height = Size.Height,
             ArraySize = 1,
             MipLevels = 1,
-            SampleDescription = new(Config.SupportedSampleCount, 0),
+            SampleDescription = new(Config.SupportedSampleCount, Config.QualityLevels),
             Usage = ResourceUsage.Default,
             BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource,
             CPUAccessFlags = CpuAccessFlags.None,
@@ -303,8 +303,8 @@ public sealed partial class Renderer
             Width = Size.Width,
             Height = Size.Height,
             ArraySize = 1,
-            MipLevels = 0,
-            SampleDescription = new(1, 0),
+            MipLevels = 1,
+            SampleDescription = new(Config.SupportedSampleCount, Config.QualityLevels),
             Usage = ResourceUsage.Default,
             BindFlags = BindFlags.DepthStencil,
             CPUAccessFlags = CpuAccessFlags.None,
