@@ -22,7 +22,7 @@ public sealed class Material
 
     public Material(string shaderFilePath, string imageFileName = "Default.png")
     {
-        #region // Create MaterialBuffer
+        #region // Create PerModel ConstantBuffer
         MaterialBuffer.CreatePerModelConstantBuffer();
         #endregion
 
