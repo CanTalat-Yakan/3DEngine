@@ -160,8 +160,9 @@ public sealed class Core
         _imGuiRenderer.Render();
         #endregion
 
+        // Copy the final rendered image into the back buffer.
         Renderer.Resolve();
-        // Presents the final rendered image on the screen.
+        // Presents the back buffer on the screen.
         Renderer.Present();
     }
 
