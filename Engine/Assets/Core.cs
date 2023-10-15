@@ -109,18 +109,7 @@ public sealed class Core
         SceneManager.ProcessSystems();
 
         // Invokes Awake and Start if play mode has started.
-        if (EditorState.PlayModeStarted)
-        {
-            // Gather Materials.
-            MaterialCompiler.CompileProjectMaterials(EditorState.AssetsPath);
-            // Gather Components.
-            ScriptCompiler.CompileProjectScripts(EditorState.AssetsPath);
-
-            // Call Awake for all scenes again.
-            SceneManager.Awake();
-            // Call Start for all scenes again.
-            SceneManager.Start();
-        }
+        OnEditorPlayMode();
 
         // Call the FixedFrame when the timeStep elapsed.
         if (Time.OnFixedFrame)
@@ -141,23 +130,7 @@ public sealed class Core
         // Invoke the OnRender Event.
         OnRender?.Invoke(null, null);
 
-        #region // ImGui
-        // Update the ImGuiRenderer.
-        _imGuiRenderer.Update(_imGuiContext, Renderer.Size);
-        // Update the ImGuiInputHandler.
-        _imGuiInputHandler.Update();
-
-        // Invoke the OnGui Event.
-        OnGui?.Invoke(null, null);
-
-        // Call the Render Gui for all scenes.
-        SceneManager.Gui();
-
-        // Render the ImGui.
-        ImGuiNET.ImGui.Render();
-        // Render the DrawaData from ImGui with the ImGuiRenderer.
-        _imGuiRenderer.Render();
-        #endregion
+        RenderGui();
 
         // Copy the final rendered image into the back buffer.
         Renderer.Resolve();
@@ -193,6 +166,41 @@ public sealed class Core
                 Renderer.Data.SetRasterizerDescFillModeWireframe();
                 SceneManager.Render();
                 break;
+        }
+    }
+
+    public void RenderGui()
+    {
+        // Update the ImGuiRenderer.
+        _imGuiRenderer.Update(_imGuiContext, Renderer.Size);
+        // Update the ImGuiInputHandler.
+        _imGuiInputHandler.Update();
+
+        // Invoke the OnGui Event.
+        OnGui?.Invoke(null, null);
+
+        // Call the Render Gui for all scenes.
+        SceneManager.Gui();
+
+        // Render the ImGui.
+        ImGuiNET.ImGui.Render();
+        // Render the DrawaData from ImGui with the ImGuiRenderer.
+        _imGuiRenderer.Render();
+    }
+
+    public void OnEditorPlayMode()
+    {
+        if (EditorState.PlayModeStarted)
+        {
+            // Gather Materials.
+            MaterialCompiler.CompileProjectMaterials(EditorState.AssetsPath);
+            // Gather Components.
+            ScriptCompiler.CompileProjectScripts(EditorState.AssetsPath);
+
+            // Call Awake for all scenes again.
+            SceneManager.Awake();
+            // Call Start for all scenes again.
+            SceneManager.Start();
         }
     }
 }
