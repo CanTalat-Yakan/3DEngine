@@ -89,9 +89,8 @@ public sealed class Core
             return;
 
         // Invoke the OnInitialize Event.
-        try { OnInitialize?.Invoke(null, null); }
-        catch (Exception ex) { Output.Log(ex.Message, MessageType.Error); }
-        finally { OnInitialize = null; }
+        OnInitialize?.Invoke(null, null);
+        OnInitialize = null;
 
         // Clears the render target and preparing it for the next frame
         Renderer.Clear();
