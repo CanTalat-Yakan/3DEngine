@@ -228,7 +228,7 @@ public sealed partial class Renderer
         }
         catch (Exception ex) { throw new Exception(ex.Message); }
 
-        return result;
+        return Result.Ok;
     }
 
     private void GetBackBufferAndCreateRenderTargetView()
