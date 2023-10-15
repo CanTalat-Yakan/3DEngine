@@ -27,7 +27,7 @@
   <Class Name="Editor.Controller.Helper" Collapsed="true">
     <Position X="11.5" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>kQQAMACBAAAAAQEAABAQDAEIEAAAwABU6IABACCEABA=</HashCode>
+      <HashCode>kQYAMACBAAAAIQEAABAQDAEoEAAAwABU6IIBACCEABA=</HashCode>
       <FileName>Assets\Controller\Helper\Helper.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -48,7 +48,7 @@
   <Class Name="Editor.Controller.Theme" Collapsed="true">
     <Position X="6.25" Y="1.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AACAAAAAAAAAAAAAAAATAAAACAAAIACAQAAAAAAAAAA=</HashCode>
+      <HashCode>AACAAAAAAAAAAAAAAAATAAAACAAAIACAQAAAEAAAAAA=</HashCode>
       <FileName>Assets\Controller\Helper\Theme.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -77,7 +77,7 @@
   <Class Name="Editor.Controller.Hierarchy" Collapsed="true">
     <Position X="9.75" Y="8.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>CCYCAIMQIAACQAAAAAIBEAgAghBQQAQADASIAAc6DEA=</HashCode>
+      <HashCode>ACYCBIMQIAACQAAAAAIBEAgAghBQRAQADASIAAc6BEA=</HashCode>
       <FileName>Assets\Controller\Hierarchy.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -91,7 +91,7 @@
   <Class Name="Editor.Controller.Properties" Collapsed="true">
     <Position X="8" Y="7.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAEAAAAAAAAChACgAAAAAgAAAAAAIBAAAAAIAAgAAAQ=</HashCode>
+      <HashCode>AAAAAAAAAACShACgAAAAEgAQAAAAIAAAABAIAAgAAAQ=</HashCode>
       <FileName>Assets\Controller\Properties.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -156,14 +156,6 @@
   <Class Name="Engine.Utilities.Time" Collapsed="true">
     <Position X="9" Y="10.25" Width="1.5" />
     <TypeIdentifier />
-  </Class>
-  <Class Name="Editor.ModelView.Documentation" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="9.75" Y="2.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Assets\ModelView\Frames\Documentation.xaml.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="Editor.ModelView.Home" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="8" Y="2.75" Width="1.5" />
@@ -322,36 +314,8 @@
     <Position X="6.25" Y="13" Width="1.5" />
     <TypeIdentifier />
   </Class>
-  <Class Name="Engine.Utilities.MouseButton" Collapsed="true">
-    <Position X="3.75" Y="10.5" Width="1.5" />
-    <TypeIdentifier />
-  </Class>
-  <Class Name="Engine.Utilities.InputState" Collapsed="true">
-    <Position X="3.75" Y="10.75" Width="1.5" />
-    <TypeIdentifier />
-  </Class>
   <Class Name="Engine.MessageType" Collapsed="true">
     <Position X="11.25" Y="13.5" Width="1.5" />
-    <TypeIdentifier />
-  </Class>
-  <Class Name="Engine.ECS.EditorTags" Collapsed="true">
-    <Position X="2.25" Y="14.25" Width="1.5" />
-    <TypeIdentifier />
-  </Class>
-  <Class Name="Engine.ECS.Tags" Collapsed="true">
-    <Position X="2.25" Y="14.5" Width="1.5" />
-    <TypeIdentifier />
-  </Class>
-  <Class Name="Engine.ECS.Layers" Collapsed="true">
-    <Position X="2.25" Y="14.75" Width="1.5" />
-    <TypeIdentifier />
-  </Class>
-  <Class Name="Engine.Data.MeshInfo" Collapsed="true">
-    <Position X="10.75" Y="17.5" Width="1.5" />
-    <TypeIdentifier />
-  </Class>
-  <Class Name="Engine.Data.Vertex" Collapsed="true">
-    <Position X="10.75" Y="17.75" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Class Name="Engine.ECS.System&lt;T&gt;" Collapsed="true">
@@ -380,7 +344,7 @@
   <Class Name="Editor.Controller.Viewport" Collapsed="true">
     <Position X="6.25" Y="7.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAEAAAgiAAAAAAAAAgBAAAgAAAAAAABIAAAQAAAA=</HashCode>
+      <HashCode>AAAAAEAAAgiAAAAAAAAAgBAAAgAAAAAAABIAAAAAAAA=</HashCode>
       <FileName>Assets\Controller\Viewport.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -406,7 +370,7 @@
   <Class Name="Editor.Controller.Binding" Collapsed="true">
     <Position X="11.5" Y="5.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>CAQAJAABAGAAAAFAEAAABAAYAUAAAECAEAAiAAAAAAA=</HashCode>
+      <HashCode>SAQApAABAGAIAAFAEAAABAAYAcAAAEAAEAAiAAAAAAA=</HashCode>
       <FileName>Assets\Controller\Engine\Binding.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -422,10 +386,45 @@
     <Position X="2.25" Y="17.5" Width="1.5" />
     <TypeIdentifier />
   </Class>
+  <Class Name="Engine.Utilities.MouseButton" Collapsed="true">
+    <Position X="3.75" Y="10.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Engine.Utilities.InputState" Collapsed="true">
+    <Position X="3.75" Y="10.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Engine.ECS.EditorTags" Collapsed="true">
+    <Position X="2.25" Y="14.25" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Engine.ECS.Tags" Collapsed="true">
+    <Position X="2.25" Y="14.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Engine.ECS.Layers" Collapsed="true">
+    <Position X="2.25" Y="14.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Engine.Data.MeshInfo" Collapsed="true">
+    <Position X="10.75" Y="17.5" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Engine.Data.Vertex" Collapsed="true">
+    <Position X="10.75" Y="17.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Editor.ModelView.Documentation" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="9.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\ModelView\Frames\Documentation.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
   <Struct Name="Editor.Controller.Category" Collapsed="true">
     <Position X="4.5" Y="8" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAgAAAAAAAAAAAAAACAQAAAAAAAAAAAIAAAAACQA=</HashCode>
+      <HashCode>AAAAAgAAAEAAAAAAAAAACAQAAAAAAAAAAAIAAAAACAA=</HashCode>
       <FileName>Assets\Controller\Files.cs</FileName>
     </TypeIdentifier>
   </Struct>

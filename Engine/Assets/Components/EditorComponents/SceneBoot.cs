@@ -53,16 +53,16 @@ internal sealed class SceneBoot : EditorComponent
         if (Input.GetKey(Key.C, InputState.Down) && ViewportController.ViewportFocused)
         {
             // Log message indicating that 10 cubes have been spawned.
-            Output.Log("Spawned 100 Cubes");
+            Output.Log("Spawned 1000 Cubes");
 
-            // Loop to spawn 100 cubes with random attributes.
-            for (int i = 0; i < 100; i++)
+            // Loop to spawn 1000 cubes with random attributes.
+            for (int i = 0; i < 1000; i++)
             {
                 // Create a new cube and add it to the Cubes entity.
                 var newCube = SceneManager.MainScene.EntityManager.CreatePrimitive(PrimitiveTypes.Cube, Cubes);
 
                 // Set the position of the new cube with an offset on the Y axis.
-                newCube.Entity.Transform.LocalPosition.Y -= 3;
+                newCube.Entity.Transform.LocalPosition = new(new Random().Next(-250, 250), new Random().Next(-250, 250), new Random().Next(-250, 250));
                 // Set random rotation values for the new cube.
                 newCube.Entity.Transform.EulerAngles = new(new Random().Next(1, 360), new Random().Next(1, 360), new Random().Next(1, 360));
                 // Set random scale values for the new cube.
