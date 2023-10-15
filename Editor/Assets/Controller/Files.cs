@@ -526,7 +526,7 @@ internal sealed partial class Files
         var fileInfo = new FileInfo(path);
         if (fileInfo.Extension == ".mat")
             button.Tapped += (s, e) => Properties.Set(
-                Engine.Runtime.MaterialCompiler.MaterialCollector.GetMaterial(fileInfo.Name));
+                Engine.Runtime.MaterialCompiler.MaterialLibrary.GetMaterial(fileInfo.Name));
         else
             button.Tapped += (s, e) => Properties.Set(path);
 

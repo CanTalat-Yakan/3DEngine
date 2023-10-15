@@ -102,7 +102,7 @@ public sealed class Mesh : Component
 
     public MaterialEntry SetMaterial(string materialName)
     {
-        var MaterialEntry = MaterialCompiler.MaterialCollector.GetMaterial(materialName);
+        var MaterialEntry = MaterialCompiler.MaterialLibrary.GetMaterial(materialName);
 
         SetMaterial(MaterialEntry.Material);
 

@@ -11,7 +11,7 @@ public sealed class ShaderEntry
     public Type ConstantBufferType;
 }
 
-public sealed class ShaderCollector
+public sealed class ShaderLibrary
 {
     public List<ShaderEntry> Shaders = new();
 
@@ -23,7 +23,7 @@ public sealed class ShaderCollector
 
 public sealed class ShaderCompiler
 {
-    public static ShaderCollector ShaderCollector = new();
+    public static ShaderLibrary ShaderLibrary = new();
 
     public void CompileProjectShaders(string assetsPath = null)
     {
@@ -44,10 +44,10 @@ public sealed class ShaderCompiler
     {
         FileInfo fileInfo = new(path);
 
-        var shaderEntry = ShaderCollector.GetShader(fileInfo.Name);
+        var shaderEntry = ShaderLibrary.GetShader(fileInfo.Name);
         if (shaderEntry is null)
         {
-            ShaderCollector.Shaders.Add(new()
+            ShaderLibrary.Shaders.Add(new()
             {
                 FileInfo = fileInfo,
                 ConstantBufferType = CreateMaterialBufferScript(fileInfo.FullName)

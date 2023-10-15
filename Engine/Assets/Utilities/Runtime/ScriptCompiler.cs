@@ -17,7 +17,7 @@ internal sealed class ScriptEntry
     public Assembly Assembly;
 }
 
-public sealed class ComponentCollector
+public sealed class ComponentLibrary
 {
     public List<Type> Components = new();
 
@@ -27,7 +27,7 @@ public sealed class ComponentCollector
 
 public sealed class ScriptCompiler
 {
-    public static ComponentCollector ComponentCollector = new();
+    public static ComponentLibrary ComponentLibrary = new();
 
     private Dictionary<string, ScriptEntry> _scriptsCollection = new();
 
@@ -172,8 +172,8 @@ public sealed class ScriptCompiler
                 && !(typeof(IHide).IsAssignableFrom(t) && !t.IsInterface))
             .ToArray();
 
-        ComponentCollector.Components.Clear();
-        ComponentCollector.Components.AddRange(componentCollection);
+        ComponentLibrary.Components.Clear();
+        ComponentLibrary.Components.AddRange(componentCollection);
     }
 
     private void DestroyComponentTypeReferences(Assembly assembly)

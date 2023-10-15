@@ -121,7 +121,7 @@ internal sealed partial class Properties
                 (s, e) =>
                 {
                     entity.AddComponent(
-                        ScriptCompiler.ComponentCollector
+                        ScriptCompiler.ComponentLibrary
                         .GetComponent(e.SelectedItem.ToString()));
 
                     Set(entity);
@@ -197,7 +197,7 @@ internal sealed partial class Properties
                 {
                     string newShaderName = e.SelectedItem.ToString();
 
-                    var newShaderEntry = ShaderCompiler.ShaderCollector
+                    var newShaderEntry = ShaderCompiler.ShaderLibrary
                         .GetShader(newShaderName);
 
                     if(newShaderEntry is null)
@@ -321,7 +321,7 @@ internal sealed partial class Properties
             // only listen to changes caused by user entering text.
             if (e.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
-                string[] itemSource = ScriptCompiler.ComponentCollector
+                string[] itemSource = ScriptCompiler.ComponentLibrary
                     .Components.ConvertAll<string>(Type => Type.Name).ToArray();
 
                 List<string> suitableItems = new();
@@ -356,7 +356,7 @@ internal sealed partial class Properties
             // only listen to changes caused by user entering text.
             if (e.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
-                string[] itemSource = ShaderCompiler.ShaderCollector
+                string[] itemSource = ShaderCompiler.ShaderLibrary
                     .Shaders.ConvertAll<string>(ShaderEntry => ShaderEntry.FileInfo.Name).ToArray();
 
                 List<string> suitableItems = new();
