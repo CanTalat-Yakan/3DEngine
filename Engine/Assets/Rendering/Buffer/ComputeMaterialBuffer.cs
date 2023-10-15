@@ -2,7 +2,7 @@
 
 internal class ComputeMaterialBuffer
 {
-    public string ShaderName;
+    public string ComputeShaderName;
 
     private object _propertiesConstantBuffer;
 

@@ -731,7 +731,7 @@ internal sealed partial class Files
             path = IncrementFileIfExists(path);
 
             // Get the path of the template file.
-            string templatesPath = Path.Combine(TemplatesPath, _currentCategory.Value.Name + ".txt");
+            string templatesPath = Path.Combine(TemplatesPath, _currentCategory.Value.Name.RemoveWhiteSpaces() + ".txt");
 
             // Write the file from the templates.
             await WriteFileFromTemplatesAsync(path, templatesPath);
