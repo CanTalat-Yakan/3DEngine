@@ -86,11 +86,7 @@ public sealed class Mesh : Component
     {
         // Batch MeshInfo by sorting the List with the Order of the Component
         if (BatchLookup.Contains(meshInfo))
-        {
-            for (int i = 0; i < BatchLookup.Count; i++)
-                if (Equals(BatchLookup[i], meshInfo))
-                    Order = (byte)i;
-        }
+            Order = (byte)BatchLookup.IndexOf(meshInfo);
         else
         {
             Order = (byte)BatchLookup.Count;
