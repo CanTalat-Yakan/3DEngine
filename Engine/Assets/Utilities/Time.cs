@@ -37,7 +37,7 @@ public sealed class Time
         s_delta *= s_timeScale;
 
         // Increases the temporary frame count by 1.
-        ++s_tmpFPS;
+        s_tmpFPS++;
 
         // Updates the fps value and resets the temporary frame count if a second has passed.
         if (s_now.Second != DateTime.Now.Second)
