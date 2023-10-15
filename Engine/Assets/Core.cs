@@ -138,14 +138,6 @@ public sealed class Core
         Renderer.Present();
     }
 
-    public void Dispose()
-    {
-        Renderer?.Dispose();
-        SceneManager?.Dispose();
-        Input.Dispose();
-        OnDispose?.Invoke(null, null);
-    }
-
     public void Render(RenderMode renderMode)
     {
         switch (renderMode)
@@ -202,5 +194,13 @@ public sealed class Core
             // Call Start for all scenes again.
             SceneManager.Start();
         }
+    }
+
+    public void Dispose()
+    {
+        Renderer?.Dispose();
+        SceneManager?.Dispose();
+        Input.Dispose();
+        OnDispose?.Invoke(null, null);
     }
 }

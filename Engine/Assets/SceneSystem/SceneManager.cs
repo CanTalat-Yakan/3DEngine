@@ -62,11 +62,11 @@ public sealed partial class SceneManager
 
     public static Scene GetFromID(Guid guid)
     {
-        // Check if the main scene's ID matches the provided GUID.
+        // Check if the main scene ID matches the provided GUID.
         if (MainScene.ID == guid)
             return MainScene;
 
-        // Check if any of the subscenes' ID matches the provided GUID.
+        // Check if any of the subscenes ID matches the provided GUID.
         foreach (var subscene in Subscenes)
             if (subscene.ID == guid)
                 return subscene;
