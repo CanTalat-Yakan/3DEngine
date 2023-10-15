@@ -72,7 +72,6 @@ public sealed class Material
             MinLOD = 0,
             MaxLOD = float.MaxValue,
         };
-
         // Create the sampler state using the sampler state description.
         _samplerState = _renderer.Device.CreateSamplerState(samplerStateDescription);
         #endregion

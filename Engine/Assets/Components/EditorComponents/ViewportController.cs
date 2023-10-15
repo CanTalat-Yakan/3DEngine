@@ -102,7 +102,10 @@ public sealed class ViewportController : EditorComponent
         _movementSpeedScaled = _movementSpeed;
 
         if (Input.GetKey(Key.LeftShift))
-            _movementSpeedScaled *= 3;
+            _movementSpeedScaled *= 4;
+
+        if (Input.GetKey(Key.LeftControl))
+            _movementSpeedScaled /= 4;
     }
 
     private void TransformMovement() =>
