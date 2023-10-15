@@ -5,7 +5,6 @@ using Vortice.Direct3D11;
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
-using Vortice.MediaFoundation;
 
 namespace Engine.Rendering;
 
@@ -270,7 +269,7 @@ public sealed partial class Renderer
             SampleDescription = new(Config.SupportedSampleCount, Config.QualityLevels),
             Usage = ResourceUsage.Default,
             BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource,
-            CPUAccessFlags = CpuAccessFlags.None,
+            CPUAccessFlags = CpuAccessFlags.Read,
             MiscFlags = ResourceOptionFlags.None
         };
         // Create the multi sample texture based on the description.
