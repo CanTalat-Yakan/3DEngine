@@ -240,8 +240,6 @@ public sealed partial class Renderer
 
     private void CheckMSAASupport()
     {
-        // Note that 4x MSAA is required for Direct3D Feature Level 10.1 or better.
-        //           8x MSAA is required for Direct3D Feature Level 11.0 or better.
         int qualityLevels = 0;
         int sampleCount;
         for (sampleCount = (int)Config.MultiSample; sampleCount > 1; sampleCount /= 2)
@@ -275,7 +273,7 @@ public sealed partial class Renderer
             CPUAccessFlags = CpuAccessFlags.None,
             MiscFlags = ResourceOptionFlags.None
         };
-        // Create a multi sample texture .
+        // Create the multi sample texture based on the description.
         Data.MSAARenderTargetTexture = Device.CreateTexture2D(MSAATextureDescription);
 
         // Create a render target view description for the multi sampling.
@@ -310,11 +308,12 @@ public sealed partial class Renderer
             CPUAccessFlags = CpuAccessFlags.None,
             MiscFlags = ResourceOptionFlags.None
         };
-        // Create the depth stencil texture and view based on the description.
+        // Create the depth stencil texture based on the description.
         Data.DepthStencilTexture = Device.CreateTexture2D(depthStencilTextureDescription);
 
         // Create a depth stencil view description for the multi sampling.
         DepthStencilViewDescription depthStencilViewDescription = new(DepthStencilViewDimension.Texture2DMultisampled, Format.D32_Float);
+        // Create a depth stencil view for the depth stencil texture.
         Data.DepthStencilView = Device.CreateDepthStencilView(Data.DepthStencilTexture, depthStencilViewDescription);
     }
 
