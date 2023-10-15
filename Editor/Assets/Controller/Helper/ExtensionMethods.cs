@@ -45,6 +45,16 @@ internal static partial class ExtensionMethods
         return newText.ToString();
     }
 
+    public static string RemoveWhiteSpaces(this string text) =>
+        new string(text.ToCharArray()
+            .Where(c => !Char.IsWhiteSpace(c))
+            .ToArray());
+
+    public static string FilterOutChar(this string text, params char[] filterChars) =>
+        new string(text.ToCharArray()
+            .Where(c => !filterChars.Contains(c))
+            .ToArray());
+
     public static string SplitLast(this string text, char separator) =>
         text.Split(separator).Last();
 
@@ -52,7 +62,7 @@ internal static partial class ExtensionMethods
         string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1));
 
     public static string FormatString(this string text) =>
-        text.SplitLast('_').SplitLast('.').SplitLast('+').FirstCharToUpper().AddSpacesToSentence();
+        text.SplitLast('_').SplitLast('.').SplitLast('+').FirstCharToUpper().FilterOutChar('(', ')').AddSpacesToSentence();
 
     public static string IncrementNameIfExists(this string name, string[] list)
     {

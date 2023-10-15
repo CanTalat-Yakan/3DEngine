@@ -78,11 +78,13 @@ internal sealed partial class Files
             new() { Name = "Models", Glyph = "\xF158", FileTypes = new string[] { ".fbx", ".obj", ".blend", ".3ds", ".dae" } },
             new() { Name = "Animations", Glyph = "\xE805", FileTypes = new string[] { ".fbx", ".dae" } },
             new() { Name = "Materials", Glyph = "\xF156", FileTypes = new string[] { ".mat" }, Template = true },
+            new() { Name = "ComputeMaterials", Glyph = "\xF156", FileTypes = new string[] { ".cmat" }, Template = true },
             new() { Name = "Textures", Symbol = Symbol.Pictures, FileTypes = new string[] { ".png", ".jpg", ".jpeg", ".tiff", ".tga", ".psd", ".bmp", }, Thumbnail = true },
             new() { Name = "Audios", Symbol = Symbol.Audio, FileTypes = new string[] { ".m4a", ".mp3", ".wav", ".ogg" } },
             new() { Name = "Videos", Symbol = Symbol.Video, FileTypes = new string[] { ".m4v", ".mp4", ".mov", ".avi" }, Thumbnail = false },
             new() { Name = "Fonts", Symbol = Symbol.Font, FileTypes = new string[] { ".ttf", ".otf" } },
             new() { Name = "Shaders", Glyph = "\xE706", FileTypes = new string[] { ".hlsl" }, Template = true },
+            new() { Name = "ComputeShaders", Glyph = "\xE706", FileTypes = new string[] { ".compute" }, Template = true },
             new() { Name = "Documents", Symbol = Symbol.Document, FileTypes = new string[] { ".txt", ".pdf", ".doc", ".docx" }, Template = true },
             new() { Name = "Packages", Glyph = "\xE7B8", FileTypes = new string[] { ".zip", ".7zip", ".rar" } });
     }
@@ -437,7 +439,7 @@ internal sealed partial class Files
         Grid grid2 = new() { HorizontalAlignment = HorizontalAlignment.Stretch };
 
         Viewbox viewbox = new() { MaxHeight = 24, MaxWidth = 24, HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top };
-        TextBlock label = new() { Text = category.Name, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Bottom };
+        TextBlock label = new() { Text = category.Name.FormatString(), HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Bottom };
 
         viewbox.Child = icon;
         grid2.Children.Add(viewbox);
@@ -445,7 +447,7 @@ internal sealed partial class Files
         button.Content = grid2;
         grid.Children.Add(button);
 
-        grid.AddToolTip(category.Name);
+        grid.AddToolTip(category.Name.FormatString());
 
         Content.ContextFlyout = null;
 
@@ -479,7 +481,7 @@ internal sealed partial class Files
         Viewbox viewbox = new() { MaxHeight = 24, MaxWidth = 24, HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top };
         TextBlock label = new()
         {
-            Text = Path.GetFileName(path),
+            Text = Path.GetFileName(path).FormatString(),
             FontSize = 12,
             MaxWidth = 140,
             HorizontalAlignment = HorizontalAlignment.Left,
@@ -549,7 +551,7 @@ internal sealed partial class Files
 
         TextBlock label = new()
         {
-            Text = Path.GetFileNameWithoutExtension(path),
+            Text = Path.GetFileNameWithoutExtension(path).FormatString(),
             FontSize = 12,
             MaxWidth = 140,
             HorizontalAlignment = HorizontalAlignment.Center
@@ -671,7 +673,7 @@ internal sealed partial class Files
             PrimaryButtonText = "Save",
             CloseButtonText = "Cancel",
             DefaultButton = ContentDialogButton.Primary,
-            Content = fileName = new TextBox() { PlaceholderText = "New " + RemoveLastChar(_currentCategory.Value.Name) },
+            Content = fileName = new TextBox() { PlaceholderText = "New " + RemoveLastChar(_currentCategory.Value.Name.FormatString()) },
         };
 
         // Store the result of the content dialog.
@@ -680,6 +682,9 @@ internal sealed partial class Files
         // Check if the result of the content dialog is Primary.
         if (result == ContentDialogResult.Primary)
         {
+            // Process the file name to have no white spaces.
+            fileName.Text = fileName.Text.RemoveWhiteSpaces();
+
             // Check if the text in the fileName TextBox is not null or empty
             // and if the text does not match the pattern of [0-9a-zA-Z_-.]+
             if (!string.IsNullOrEmpty(fileName.Text)
@@ -714,7 +719,7 @@ internal sealed partial class Files
 
             // Check if the fileName TextBox is null or empty and set the path to the category name, "New", and the file type.
             if (string.IsNullOrEmpty(fileName.Text))
-                path = Path.Combine(path, "New " + RemoveLastChar(_currentCategory.Value.Name) + _currentCategory.Value.FileTypes[0]);
+                path = Path.Combine(path, "New" + RemoveLastChar(_currentCategory.Value.Name.RemoveWhiteSpaces()) + _currentCategory.Value.FileTypes[0]);
             else if (char.IsDigit(fileName.Text[0]))
                 // Set the path to prefix "_" when the file name starts with a digit.
                 path = Path.Combine(path, "_" + fileName.Text + _currentCategory.Value.FileTypes[0]);
@@ -756,7 +761,7 @@ internal sealed partial class Files
             PrimaryButtonText = "Save",
             CloseButtonText = "Cancel",
             DefaultButton = ContentDialogButton.Primary,
-            Content = folderName = new TextBox() { PlaceholderText = "New folder" },
+            Content = folderName = new TextBox() { PlaceholderText = "New Folder" },
         };
 
         // Store the result of the content dialog.
@@ -765,6 +770,9 @@ internal sealed partial class Files
         // Check if the result of the content dialog is Primary.
         if (result == ContentDialogResult.Primary)
         {
+            // Process the folder name to have no white spaces.
+            folderName.Text = folderName.Text.RemoveWhiteSpaces();
+
             // Check if the text in the folderName TextBox is not null or empty
             // and if the text does not match the pattern of [0-9a-zA-Z_-.]+
             if (!string.IsNullOrEmpty(folderName.Text))
@@ -799,7 +807,7 @@ internal sealed partial class Files
 
             // Check if the folderName TextBox is null or empty and set the path to "New folder".
             if (string.IsNullOrEmpty(folderName.Text))
-                path = Path.Combine(path, "New folder");
+                path = Path.Combine(path, "NewFolder");
             else if (char.IsDigit(folderName.Text[0]))
                 // Set the path to prefix "_" when the folder name starts with a digit.
                 path = Path.Combine(path, "_" + folderName.Text);

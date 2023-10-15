@@ -1,6 +1,6 @@
 ﻿namespace Engine.PostProcess;
 
-internal class Volume
+public class Volume
 {
     
 }

@@ -32,8 +32,9 @@ The Entity Component System is an architectural pattern often used in video game
 
 # Upcoming Features and Development Roadmap
 
-* Materials
+* Materials,
 * Render Textures,
+* ComputeShader Materials
 * Post-Processing,
 * Gizmos,
 * Asynchronous Reprojection

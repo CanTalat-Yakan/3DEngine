@@ -20,6 +20,7 @@ public struct RenderData
     public ID3D11Texture2D MSAARenderTargetTexture;
     public ID3D11RenderTargetView MSAARenderTargetView;
 
+
     public ID3D11DepthStencilState DepthStencilState;
     public ID3D11Texture2D DepthStencilTexture;
     public ID3D11DepthStencilView DepthStencilView;
