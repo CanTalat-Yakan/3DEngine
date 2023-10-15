@@ -269,7 +269,7 @@ public sealed partial class Renderer
             SampleDescription = new(Config.SupportedSampleCount, Config.QualityLevels),
             Usage = ResourceUsage.Default,
             BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource,
-            CPUAccessFlags = CpuAccessFlags.Read,
+            CPUAccessFlags = CpuAccessFlags.None,
             MiscFlags = ResourceOptionFlags.None
         };
         // Create the multi sample texture based on the description.
