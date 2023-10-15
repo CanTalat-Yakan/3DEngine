@@ -31,12 +31,7 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm64'">
 		<DefineConstants>$(DefineConstants);EDITOR;TRACE;DEBUG;NET;NET7_0</DefineConstants>
 	</PropertyGroup>
-	<ItemGroup>
-	  <Content Remove="Assets\Controller\Helper\Converter.cs" />
-	  <Content Remove="Assets\Controller\Helper\DataTemplate\NumberBoxes.cs" />
-	  <Content Remove="Assets\Controller\Helper\ExtensionMethods.cs" />
-	</ItemGroup>
-
+	
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.230913002" />

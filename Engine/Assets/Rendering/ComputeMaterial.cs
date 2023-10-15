@@ -23,7 +23,19 @@ public class ComputeMaterial
 
     public void UpdateResource() { }
 
-    public void Dispatch() { }
+    public void SetBuffer() { }
+    public void SetConstantBuffer() { }
+    public void SetFloat(string name, float value) { }
+    public void SetFloats() { }
+    public void SetInt() { }
+    public void SetInts() { }
+    public void SetMatrix() { }
+
+    public void SetTexture(int kernelIndex, int nameID, object Texture, int mipLevel) { }
+
+    public int FindKernel(string kernelName) { return 0; }
+
+    public void Dispatch(int kernelIndex, int threadGroupsX, int threadGroupsY, int threadGroupsZ) { }
 
     public void Result() { }
 

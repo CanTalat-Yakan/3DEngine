@@ -24,7 +24,7 @@
             <NavigationView.MenuItems>
                 <NavigationViewItem Tag="home" Content="Home" Icon="Home" IsSelected="True"/>
 
-                <NavigationViewItem Tag="documentation" Content="Documentation" Icon="Library"/>
+                <NavigationViewItem Tag="wiki" Content="Wiki" Icon="Library"/>
 
                 <NavigationViewItemSeparator/>
 

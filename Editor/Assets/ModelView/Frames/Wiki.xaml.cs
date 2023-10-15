@@ -5,9 +5,9 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Editor.ModelView;
 
-public sealed partial class Documentation : Frame
+public sealed partial class Wiki : Frame
 {
-    public Documentation()
+    public Wiki()
     {
         this.InitializeComponent();
     }

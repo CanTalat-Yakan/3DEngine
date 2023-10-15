@@ -42,8 +42,8 @@ public sealed partial class MainWindow : WindowEx
                     x_Frame_Content.Content = new ModelView.Home(this, x_NavigationView_Main);
                     x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
                     break;
-                case "documentation":
-                    x_Frame_Content.Content = new ModelView.Documentation();
+                case "wiki":
+                    x_Frame_Content.Content = new ModelView.Wiki();
                     x_NavigationView_Main.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftCompact;
                     break;
                 case "engine":
