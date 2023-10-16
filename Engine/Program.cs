@@ -42,7 +42,7 @@ public sealed class Program
         #region // Instance Engine and AppWindow, then show Window
         Config config = new();
         config.SetVSync(PresentInterval.Immediate);
-        config.SetMSAA(MultiSample.None);
+        config.SetMSAA(MultiSample.x8);
         config.SetResolutionScale(1);
 
         _engineCore = new(new Renderer(win32Window, config), win32Window.Handle);

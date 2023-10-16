@@ -248,7 +248,7 @@ public sealed partial class Renderer
                 break;
         }
 
-        if (sampleCount < 2)
+        if (sampleCount < 2 && Config.MultiSample != MultiSample.None)
             Output.Log("MSAA not supported");
 
         Config.SupportedSampleCount = sampleCount;

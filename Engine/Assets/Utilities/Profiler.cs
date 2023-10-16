@@ -23,12 +23,14 @@ public sealed class Profiler
         stopwatch.Start();
     }
 
-    public static void Stop(Stopwatch stopwatch, string name)
+    public static double Stop(Stopwatch stopwatch, string name)
     {
         stopwatch.Stop();
 
-        var delta = stopwatch.Elapsed.TotalSeconds;
+        double delta = stopwatch.Elapsed.TotalSeconds;
         AdditionalProfiling.Append($"{name}: {delta * 1000:F2} ms\n");
+
+        return delta;
     }
 
     public static void Reset() =>
