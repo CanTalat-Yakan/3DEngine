@@ -173,7 +173,7 @@ internal sealed partial class Properties
                     .AddContentFlyout(CreateDefaultMenuFlyout(entity, component)));
 
                 // Add an event handler to remove the current component from the stack panel when it's destroyed.
-                component.EventOnDestroy += (s, e) => s_stackPanel.Children.Remove(tmp);
+                component.EventOnDestroy += () => s_stackPanel.Children.Remove(tmp);
             }
 
             // Add an event handler to update the current stackPanel when a new component is added.
@@ -531,14 +531,14 @@ internal sealed partial class Properties
                     grid.Add(CreateReferenceSlot(((Component)value).ToString().FormatString(), type.ToString().FormatString()));
 
             // Event.
-            else if (type == typeof(EventHandler))
+            else if (type == typeof(Action))
                 // Check if value is null.
                 if (value is null)
                     // Add empty reference slot.
                     grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
                 else
                     // Add a reference slot with event.
-                    grid.Add(CreateReferenceSlot(((EventHandler)value).ToString().SplitLast('.'), type.ToString().FormatString()));
+                    grid.Add(CreateReferenceSlot(((Action)value).ToString().SplitLast('.'), type.ToString().FormatString()));
 
             // Handle default type value.
             else
