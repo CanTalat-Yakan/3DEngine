@@ -556,7 +556,7 @@ internal sealed partial class Properties
             var attribute = attributes.OfType<IfAttribute>().First();
             var bindEntry = Binding.GetBinding(attribute.FieldName, component, entity.ID);
 
-            bindEntry.Event += (s, e) =>
+            bindEntry.Event += () =>
             {
                 var result = Equals(
                      attribute.Value.ToString(),
@@ -573,7 +573,7 @@ internal sealed partial class Properties
             var attribute = attributes.OfType<IfNotAttribute>().First();
             var bindEntry = Binding.GetBinding(attribute.FieldName, component, entity.ID);
 
-            bindEntry.Event += (s, e) =>
+            bindEntry.Event += () =>
             {
                 var result = Equals(
                      attribute.Value.ToString(),
@@ -677,7 +677,7 @@ internal sealed partial class Properties
             finalGrid = ReturnProcessedFieldInfo(grid, attributes, fieldInfo, null);
         }
 
-        Binding.GetMaterialBinding(fieldInfo.Name, propertiesConstantBuffer)?.SetEvent((s, e) =>
+        Binding.GetMaterialBinding(fieldInfo.Name, propertiesConstantBuffer)?.SetEvent(() =>
         {
             materialEntry.Material.MaterialBuffer.SafeToSerializableProperties();
 

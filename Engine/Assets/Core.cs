@@ -18,10 +18,10 @@ public sealed class Core
 {
     public static Core Instance { get; private set; }
 
-    public event EventHandler OnRender;
-    public event EventHandler OnInitialize;
-    public event EventHandler OnGui;
-    public event EventHandler OnDispose;
+    public event Action OnRender;
+    public event Action OnInitialize;
+    public event Action OnGui;
+    public event Action OnDispose;
 
     public Renderer Renderer;
     public SceneManager SceneManager;
@@ -89,7 +89,7 @@ public sealed class Core
             return;
 
         // Invoke the OnInitialize Event.
-        OnInitialize?.Invoke(null, null);
+        OnInitialize?.Invoke();
         OnInitialize = null;
 
         // Clears the render target and preparing it for the next frame
@@ -128,7 +128,7 @@ public sealed class Core
         Render(Renderer.Config.RenderMode);
         
         // Invoke the OnRender Event.
-        OnRender?.Invoke(null, null);
+        OnRender?.Invoke();
 
         RenderGui();
 
@@ -169,7 +169,7 @@ public sealed class Core
         _imGuiInputHandler.Update();
 
         // Invoke the OnGui Event.
-        OnGui?.Invoke(null, null);
+        OnGui?.Invoke();
 
         // Call the Render Gui for all scenes.
         SceneManager.Gui();
@@ -201,6 +201,6 @@ public sealed class Core
         Renderer?.Dispose();
         SceneManager?.Dispose();
         Input.Dispose();
-        OnDispose?.Invoke(null, null);
+        OnDispose?.Invoke();
     }
 }

@@ -30,14 +30,14 @@ internal sealed partial class Viewport(Grid content)
         engineCore.Renderer.Config.SetMSAA(MultiSample.x8);
         engineCore.Renderer.Config.SetResolutionScale(2);
 
-        engineCore.OnInitialize += (s, e) =>
+        engineCore.OnInitialize += () =>
         {
             Binding.SetRendererBindings();
 
             CreateViewportSettings();
         };
 
-        engineCore.OnRender += (s, e) =>
+        engineCore.OnRender += () =>
         {
             Binding.Update();
             Output.Log(Engine.Utilities.Output.DequeueLog());
@@ -51,7 +51,7 @@ internal sealed partial class Viewport(Grid content)
                 _profiler.Text = Profiler.GetString();
         };
 
-        engineCore.OnGui += (s, e) =>
+        engineCore.OnGui += () =>
         {
             //ImGui.ShowDemoWindow();
 
@@ -63,8 +63,7 @@ internal sealed partial class Viewport(Grid content)
             }
         };
 
-        engineCore.OnDispose += (s, e) =>
-            Binding.Dispose();
+        engineCore.OnDispose += Binding.Dispose;
     }
 
     public void InitializeRenderer(out Renderer renderer, SwapChainPanel swapChainPanel)
@@ -97,9 +96,9 @@ internal sealed partial class Viewport(Grid content)
                         1, 100)
                         .WrapInGridVertical("Movement Speed"))),
             CreateAppBarSeperator(),
-            CreateComboBox(typeof(Engine.Data.CameraProjection), null,
+            CreateComboBox(typeof(CameraProjection), null,
                 Renderer.Instance.Config, "CameraProjection"),
-            CreateComboBox(typeof(Engine.Data.RenderMode), null,
+            CreateComboBox(typeof(RenderMode), null,
                 Renderer.Instance.Config, "RenderMode")
         };
 

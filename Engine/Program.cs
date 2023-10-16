@@ -49,7 +49,7 @@ public sealed class Program
         _appWindow = new(win32Window);
 
         if (withGui)
-            _engineCore.OnGui += (s, e) => _appWindow.Render();
+            _engineCore.OnGui += _appWindow.Render;
 
         _appWindow.Show(ShowWindowCommand.Maximize);
         #endregion

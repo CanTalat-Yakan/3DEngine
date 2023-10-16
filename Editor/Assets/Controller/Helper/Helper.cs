@@ -246,7 +246,7 @@ internal partial class Helper
         TextBlock numberPreview = new() { Padding = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
 
         Binding.GetBinding(fieldName, source, id)?.Set(slider, "Value", "ValueChanged");
-        Binding.GetBinding(fieldName, source, id)?.SetEvent((s, e) =>
+        Binding.GetBinding(fieldName, source, id)?.SetEvent(() =>
             numberPreview.Text = Binding.GetBinding(fieldName, source, id)?.Value.ToString());
 
         return StackInGrid(slider, numberPreview);
@@ -258,7 +258,7 @@ internal partial class Helper
         TextBlock numberPreview = new() { Padding = new(4, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
 
         Binding.GetBinding(fieldName, source, id)?.Set(slider, "Value", "ValueChanged");
-        Binding.GetBinding(fieldName, source, id)?.SetEvent((s, e) =>
+        Binding.GetBinding(fieldName, source, id)?.SetEvent(() =>
             numberPreview.Text = Binding.GetBinding(fieldName, source, id)?.Value.ToString());
 
         return StackInGrid(slider, numberPreview);
