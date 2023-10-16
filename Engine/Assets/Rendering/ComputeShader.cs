@@ -3,13 +3,13 @@ using Vortice.D3DCompiler;
 
 namespace Engine.Rendering;
 
-public class ComputeMaterial
+public class ComputeShader
 {
     private Renderer _renderer => Renderer.Instance;
 
     private ID3D11ComputeShader _postProcessComputeShader;
 
-    public ComputeMaterial(string computeShaderFilePath)
+    public ComputeShader(string computeShaderFilePath)
     {
         if (string.IsNullOrEmpty(computeShaderFilePath))
             return;

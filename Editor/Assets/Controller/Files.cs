@@ -78,7 +78,6 @@ internal sealed partial class Files
             new() { Name = "Models", Glyph = "\xF158", FileTypes = new string[] { ".fbx", ".obj", ".blend", ".3ds", ".dae" } },
             new() { Name = "Animations", Glyph = "\xE805", FileTypes = new string[] { ".fbx", ".dae" } },
             new() { Name = "Materials", Glyph = "\xF156", FileTypes = new string[] { ".mat" }, Template = true },
-            new() { Name = "ComputeMaterials", Glyph = "\xF156", FileTypes = new string[] { ".cmat" }, Template = true },
             new() { Name = "Textures", Symbol = Symbol.Pictures, FileTypes = new string[] { ".png", ".jpg", ".jpeg", ".tiff", ".tga", ".psd", ".bmp", }, Thumbnail = true },
             new() { Name = "Audios", Symbol = Symbol.Audio, FileTypes = new string[] { ".m4a", ".mp3", ".wav", ".ogg" } },
             new() { Name = "Videos", Symbol = Symbol.Video, FileTypes = new string[] { ".m4v", ".mp4", ".mov", ".avi" }, Thumbnail = false },
