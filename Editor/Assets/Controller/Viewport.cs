@@ -48,19 +48,11 @@ internal sealed partial class Viewport(Grid content)
                 Main.Instance.PlayerControl.CheckPlayModeStarted());
 
             if (Time.OnFrame)
-                _profiler.Text = Profiler.GetString();
+                _profiler.Text = Profiler.GetAdditionalString();
         };
 
         engineCore.OnGui += () =>
         {
-            //ImGui.ShowDemoWindow();
-
-            ImGui.SetNextWindowBgAlpha(0.35f);
-            if (ImGui.Begin("Profiler", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize))
-            {
-                ImGui.Text(_profiler.Text);
-                ImGui.End();
-            }
         };
 
         engineCore.OnDispose += Binding.Dispose;

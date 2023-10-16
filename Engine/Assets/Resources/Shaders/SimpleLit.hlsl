@@ -60,6 +60,7 @@ VS_OUTPUT VS(appdata v)
 float4 PS(VS_OUTPUT i) : SV_TARGET
 {
     float4 col = ObjTexture.Sample(ObjSamplerState, i.uv);
+
     float3 diffuse = dot(normalize(i.normal), -normalize(float3(0, -1, 0)));
 
     diffuse = max(diffuse, float3(0.255, 0.295, 0.3255));

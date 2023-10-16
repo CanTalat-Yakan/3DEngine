@@ -53,7 +53,6 @@ public sealed class Time
         // Restarts the Stopwatch to measure the time for the next frame.
         s_watch.Restart();
 
-
         // Check for FixedUpdate with the TimeStepCounter
         if (s_timeStepCounter < s_timeStep)
             s_timeStepCounter += Delta;

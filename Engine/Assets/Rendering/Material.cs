@@ -32,7 +32,7 @@ public sealed class Material
 
         // Compile the vertex shader bytecode from the specified shader file name.
         ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(shaderFilePath, "VS", "vs_5_0");
-        
+
         // Create the vertex shader using the compiled bytecode.
         _vertexShader = _renderer.Device.CreateVertexShader(vertexShaderByteCode.Span);
         #endregion
@@ -63,11 +63,11 @@ public sealed class Material
         // Set the properties for the sampler state.
         SamplerDescription samplerStateDescription = new()
         {
-            Filter = Filter.MinMagMipLinear,
-            AddressU = TextureAddressMode.Clamp,
-            AddressV = TextureAddressMode.Clamp,
-            AddressW = TextureAddressMode.Clamp,
-            ComparisonFunc = ComparisonFunction.Always,
+            Filter = Filter.Anisotropic, // Use anisotropic filtering for smoother sampling.
+            AddressU = TextureAddressMode.Mirror,
+            AddressV = TextureAddressMode.Mirror,
+            AddressW = TextureAddressMode.Mirror,
+            ComparisonFunc = ComparisonFunction.Never, // Not needed for standard texture sampling.
             MaxAnisotropy = 16,
             MinLOD = 0,
             MaxLOD = float.MaxValue,

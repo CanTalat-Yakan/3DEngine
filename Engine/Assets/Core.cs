@@ -92,16 +92,15 @@ public sealed class Core
         OnInitialize?.Invoke();
         OnInitialize = null;
 
-        // Clear the StringBuilder for the additional profiling.
-        Profiler.Reset();
-
         // Clears the render target, preparing it for the next frame.
         Renderer.Clear();
         // Set the viewport size.
         Renderer.Data.SetViewport(Renderer.Size);
 
-        // Updates the time values, such as delta time and time scale,
-        // used in the game or application.
+        // Clear the StringBuilder for the additional profiling.
+        Profiler.Reset();
+
+        // Updates the time values, such as delta time and time scale.
         Time.Update();
 
         // Acquire and Poll Mouse and Keyboard and Update the States and the Input.
@@ -129,7 +128,7 @@ public sealed class Core
 
         // Render the Scenes in the current RenderMode.
         Render();
-        
+
         // Render the Gui with ImGui.
         RenderGui();
 
@@ -141,9 +140,6 @@ public sealed class Core
 
     public void Render()
     {
-        // Invoke the OnRender Event.
-        OnRender?.Invoke();
-
         switch (Renderer.Config.RenderMode)
         {
             case RenderMode.Shaded:
@@ -163,6 +159,9 @@ public sealed class Core
                 SceneManager.Render();
                 break;
         }
+
+        // Invoke the OnRender Event.
+        OnRender?.Invoke();
     }
 
     public void RenderGui()
@@ -172,11 +171,11 @@ public sealed class Core
         // Update the ImGuiInputHandler.
         _imGuiInputHandler.Update();
 
-        // Invoke the OnGui Event.
-        OnGui?.Invoke();
-
         // Call the Render Gui for all scenes.
         SceneManager.Gui();
+
+        // Invoke the OnGui Event.
+        OnGui?.Invoke();
 
         // Render the ImGui.
         ImGuiNET.ImGui.Render();

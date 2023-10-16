@@ -94,8 +94,9 @@ public sealed partial class Renderer
         Data.SwapChain.Present((int)Config.VSync, PresentFlags.DoNotWait);
 
     public void Resolve() =>
-    // Copy the MSAA render target texture into the back buffer render texture.
-    Data.DeviceContext.ResolveSubresource(Data.BackBufferRenderTargetTexture, 0, Data.MSAARenderTargetTexture, 0, Data.Format);
+        // Copy the MSAA render target texture into the back buffer render texture.
+        // Use this to Copy: Data.DeviceContext.CopyResource(Data.BackBufferRenderTargetTexture, Data.MSAARenderTargetTexture);
+        Data.DeviceContext.ResolveSubresource(Data.BackBufferRenderTargetTexture, 0, Data.MSAARenderTargetTexture, 0, Data.Format);
 
     public void Draw(ID3D11Buffer vertexBuffer, ID3D11Buffer indexBuffer, int indexCount)
     {
