@@ -92,6 +92,9 @@ public sealed class Core
         OnInitialize?.Invoke();
         OnInitialize = null;
 
+        // Clear the StringBuilder for the additional profiling.
+        Profiler.Reset();
+
         // Clears the render target and preparing it for the next frame
         Renderer.Clear();
         // Set the viewport size.
@@ -124,12 +127,10 @@ public sealed class Core
         // Finishes the state of input processing.
         Input.LateUpdate();
 
-        // Render the Scenes in the given RenderMode.
-        Render(Renderer.Config.RenderMode);
+        // Render the Scenes in the current RenderMode.
+        Render();
         
-        // Invoke the OnRender Event.
-        OnRender?.Invoke();
-
+        // Render the Gui with ImGui.
         RenderGui();
 
         // Copy the final rendered image into the back buffer.
@@ -138,9 +139,12 @@ public sealed class Core
         Renderer.Present();
     }
 
-    public void Render(RenderMode renderMode)
+    public void Render()
     {
-        switch (renderMode)
+        // Invoke the OnRender Event.
+        OnRender?.Invoke();
+
+        switch (Renderer.Config.RenderMode)
         {
             case RenderMode.Shaded:
                 Renderer.Data.SetRasterizerDescFillMode();

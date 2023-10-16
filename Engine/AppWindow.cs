@@ -39,7 +39,7 @@ class AppWindow
         if (ImGui.Begin("Profiler", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize))
         {
             if (Time.OnFixedFrame)
-                _profiler = Profiler.GetString();
+                _profiler = Profiler.GetAdditionalString();
             ImGui.Text(_profiler);
             ImGui.End();
         }
