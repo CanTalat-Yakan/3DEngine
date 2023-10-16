@@ -16,6 +16,7 @@ using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
 using Image = Microsoft.UI.Xaml.Controls.Image;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 using Windows.Globalization.NumberFormatting;
+using System.Linq;
 
 namespace Editor.Controller;
 
@@ -247,7 +248,7 @@ internal partial class Helper
 
         Binding.GetBinding(fieldName, source, id)?.Set(slider, "Value", "ValueChanged");
         Binding.GetBinding(fieldName, source, id)?.SetEvent(() =>
-            numberPreview.Text = Binding.GetBinding(fieldName, source, id)?.Value.ToString());
+            numberPreview.Text = Binding.GetBinding(fieldName, source, id)?.Value.ToString().Split('.').FirstOrDefault());
 
         return StackInGrid(slider, numberPreview);
     }
@@ -259,7 +260,7 @@ internal partial class Helper
 
         Binding.GetBinding(fieldName, source, id)?.Set(slider, "Value", "ValueChanged");
         Binding.GetBinding(fieldName, source, id)?.SetEvent(() =>
-            numberPreview.Text = Binding.GetBinding(fieldName, source, id)?.Value.ToString());
+            numberPreview.Text = Binding.GetBinding(fieldName, source, id)?.Value.ToString().LimitDigits());
 
         return StackInGrid(slider, numberPreview);
     }

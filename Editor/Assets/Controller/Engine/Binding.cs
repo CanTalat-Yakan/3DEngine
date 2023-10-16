@@ -39,6 +39,9 @@ internal sealed class BindEntry(object source, string sourcePath)
 
     public void SetEvent(Action e) =>
         Event += e;
+
+    public void  Invoke() =>
+        Event?.Invoke();
 }
 
 internal sealed class Binding
@@ -247,7 +250,7 @@ internal sealed class Binding
                 propertyFromPath.SetValue(bindEntry.Target, bindEntry.Value);
         }
 
-        bindEntry.Event?.Invoke();
+        bindEntry.Invoke();
     }
 
     public static void SetPathEvent(BindEntry bindEntry, BindingFlags bindingFlags)
@@ -348,7 +351,7 @@ internal sealed class Binding
         bindEntry.Value = convertedValue;
 
         // Invoke the original event handler, if it exists.
-        bindEntry.Event?.Invoke();
+        bindEntry.Invoke();
 
         //Output.Log($"Handled Event: Value {convertedValue}");
     }

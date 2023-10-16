@@ -55,14 +55,23 @@ internal static partial class ExtensionMethods
             .Where(c => !filterChars.Contains(c))
             .ToArray());
 
-    public static string SplitLast(this string text, char separator) =>
-        text.Split(separator).Last();
+    public static string SplitFirst(this string text, params char[] separators) =>
+        text.Split(separators).FirstOrDefault();
+
+    public static string SplitLast(this string text, params char[] separators) =>
+        text.Split(separators).Last();
 
     public static string FirstCharToUpper(this string input) =>
         string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1));
 
     public static string FormatString(this string text) =>
-        text.SplitLast('_').SplitLast('.').SplitLast('+').FirstCharToUpper().FilterOutChar('(', ')').AddSpacesToSentence();
+        text.SplitLast('_', '.', '+').FirstCharToUpper().FilterOutChar('(', ')').AddSpacesToSentence();
+
+    public static string LimitDigits(this string text) =>
+        text.Split('.', ',').FirstOrDefault() + LimitDigitsSecondPart(text);
+
+    private static string LimitDigitsSecondPart(string text) =>
+        text.Contains('.') || text.Contains(',') ? "." + text.Split('.', ',').Last().First() : string.Empty;
 
     public static string IncrementNameIfExists(this string name, string[] list)
     {
