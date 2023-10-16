@@ -25,7 +25,7 @@ internal sealed class BindEntry(object source, string sourcePath)
     public string TargetValuePath;
     public string TargetEventPath;
 
-    public Action Event;
+    public event Action Event;
 
     public void Set(object target, string targetValuePath, string targetEventPath = null)
     {

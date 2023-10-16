@@ -36,7 +36,7 @@ public class Example : Component
     public Entity? _Entity;
     [Space]
     [Header("Header")]
-    public Action Event;
+    public event Action Event;
 
     // This is the base function of OnRegister.
     public override void OnRegister() =>

@@ -112,7 +112,7 @@
 
                 <HyperlinkButton Content="Source code" NavigateUri="https://github.com/CanTalat-Yakan/3DEngine"/>
 
-                <HyperlinkButton Content="Documentation" NavigateUri="https://engine3d.gitbook.io/documentation/"/>
+                <HyperlinkButton Content="Wiki" NavigateUri="https://engine3d.gitbook.io/wiki/"/>
 
                 <HyperlinkButton Content="Website" NavigateUri="https://3DEngine.wiki"/>
             </StackPanel>
@@ -144,8 +144,6 @@
                 <HyperlinkButton Content="Direct3D 11" NavigateUri="https://learn.microsoft.com/en-us/windows/win32/direct3d11/atoc-dx-graphics-direct3d-11"/>
 
                 <HyperlinkButton Content="Universal Scene Description" NavigateUri="https://developer.nvidia.com/usd"/>
-
-                <HyperlinkButton Content="Aspose 3D" NavigateUri="Aspose.3D"/>
             </StackPanel>
 
             <Grid/>

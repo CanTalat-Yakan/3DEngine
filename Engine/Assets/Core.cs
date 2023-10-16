@@ -95,7 +95,7 @@ public sealed class Core
         // Clear the StringBuilder for the additional profiling.
         Profiler.Reset();
 
-        // Clears the render target and preparing it for the next frame
+        // Clears the render target, preparing it for the next frame.
         Renderer.Clear();
         // Set the viewport size.
         Renderer.Data.SetViewport(Renderer.Size);

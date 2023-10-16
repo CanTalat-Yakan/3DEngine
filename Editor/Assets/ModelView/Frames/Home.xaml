@@ -62,7 +62,7 @@
                     <StackPanel Spacing="20" Orientation="Horizontal">
                         <HyperlinkButton NavigateUri="https://3DEngine.wiki">
                             <StackPanel Spacing="10" Orientation="Horizontal">
-                                <TextBlock Text="Gettings Started" FontWeight="Medium"/>
+                                <TextBlock Text="Getting Started" FontWeight="Medium"/>
 
                                 <SymbolIcon Symbol="Link"/>
                             </StackPanel>
@@ -76,9 +76,9 @@
                             </StackPanel>
                         </HyperlinkButton>
 
-                        <HyperlinkButton NavigateUri="https://engine3d.gitbook.io/documentation/">
+                        <HyperlinkButton NavigateUri="https://engine3d.gitbook.io/wiki/">
                             <StackPanel Spacing="10" Orientation="Horizontal">
-                                <TextBlock Text="Documentation" FontWeight="Medium"/>
+                                <TextBlock Text="Wiki" FontWeight="Medium"/>
 
                                 <SymbolIcon Symbol="Link"/>
                             </StackPanel>
