@@ -19,7 +19,7 @@ public sealed class Program
     private void Loop() =>
         _engineCore.Frame();
 
-    public void Run(bool withGui = true)
+    public void Run(bool withGui = true, Config config = null)
     {
         #region // Create Window
         WNDCLASSEX wndClass = new()
@@ -40,10 +40,13 @@ public sealed class Program
         #endregion
 
         #region // Instance Engine and AppWindow, then show Window
-        Config config = new();
-        config.SetVSync(PresentInterval.Immediate);
-        config.SetMSAA(MultiSample.x2);
-        config.SetResolutionScale(1);
+        if (config is null)
+        {
+            config = new();
+            config.SetVSync(PresentInterval.Immediate);
+            config.SetMSAA(MultiSample.x2);
+            config.SetResolutionScale(1);
+        }
 
         _engineCore = new(new Renderer(win32Window, config), win32Window.Handle);
         _appWindow = new(win32Window);
