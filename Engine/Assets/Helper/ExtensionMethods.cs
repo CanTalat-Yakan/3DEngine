@@ -6,8 +6,6 @@ using Vortice.Mathematics;
 
 namespace Engine.Helper;
 
-public sealed class Helper { }
-
 public static class ExtensionMethods
 {
     public static Size Scale(this Size size, double scale) =>
