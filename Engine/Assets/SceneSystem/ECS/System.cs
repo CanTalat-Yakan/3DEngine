@@ -25,7 +25,7 @@ public partial class System<T> where T : Component
         s_components.Add(component);
 
         // Register the component's OnDestroy event.
-        component.EventOnDestroy += (s, e) => Destroy(component);
+        component.EventOnDestroy += () => Destroy(component);
 
         s_dirty = true;
     }

@@ -6,13 +6,13 @@ public partial class Component : ICloneable
     [Hide] public byte Order = 0;
     [Hide] public bool IsEnabled;
 
-    [Hide] public event EventHandler EventOnDestroy;
+    [Hide] public Action EventOnDestroy;
 
     public Component() =>
         OnRegister();
 
     public void InvokeEventOnDestroy() =>
-        EventOnDestroy(this, null);
+        EventOnDestroy();
 
     object ICloneable.Clone() =>
         Clone();
