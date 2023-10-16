@@ -55,8 +55,11 @@ public static class ExtensionMethods
         return newText.ToString();
     }
 
-    public static string SplitLast(this string text, char separator) =>
-        text.Split(separator).Last();
+    public static string SplitFirst(this string text, params char[] separators) =>
+        text.Split(separators).FirstOrDefault();
+
+    public static string SplitLast(this string text, params char[] separators) =>
+        text.Split(separators).Last();
 
     public static string FirstCharToUpper(this string input) =>
         string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1));

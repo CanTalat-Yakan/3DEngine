@@ -15,7 +15,11 @@ public record MessageLog(
     MessageType type, 
     int line, 
     string method, 
-    string script);
+    string script)
+{
+    public string GetString() =>
+        $"{type}: {o}\n{script.SplitLast('\\')}({method}:{line})\n\n"  ;
+}
 
 public class Output
 {

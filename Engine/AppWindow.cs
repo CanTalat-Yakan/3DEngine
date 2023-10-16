@@ -13,6 +13,7 @@ class AppWindow
     private Win32Window _win32Window;
 
     private string _profiler = string.Empty;
+    private string _output = string.Empty;
 
     public AppWindow(Win32Window win32window)
     {
@@ -33,7 +34,7 @@ class AppWindow
         _imGuiRenderer.Update(_imGuiContext, Core.Instance.Renderer.Size);
         _imGuiInputHandler.Update();
 
-        ImGui.ShowDemoWindow();
+        //ImGui.ShowDemoWindow();
 
         ImGui.SetNextWindowBgAlpha(0.35f);
         if (ImGui.Begin("Profiler", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize))
@@ -41,6 +42,15 @@ class AppWindow
             if (Time.OnFixedFrame)
                 _profiler = Profiler.GetAdditionalString();
             ImGui.Text(_profiler);
+            ImGui.End();
+        }
+
+        ImGui.SetNextWindowBgAlpha(0.35f);
+        if (ImGui.Begin("Output", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize))
+        {
+            if (Time.OnFixedFrame)
+                _output += Output.DequeueLog()?.GetString();
+            ImGui.Text(_output);
             ImGui.End();
         }
     }
