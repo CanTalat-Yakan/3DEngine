@@ -6,11 +6,14 @@ public sealed class Time
 {
     public static int FPS => s_fps;
     public static double Timer => s_timer;
+
     public static double Delta => s_delta;
     public static float DeltaF => (float)s_delta;
     public static float FixedDelta => (float)s_timeStep;
+
     public static double TimeStep => s_timeStep;
     public static double TimeScale => s_timeScale;
+
     public static bool OnFixedFrame => s_timeStepCounter == 0;
     public static bool OnFrame => s_tmpFPS == 0;
 
