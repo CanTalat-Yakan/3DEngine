@@ -24,7 +24,7 @@ public partial class System<T> where T : Component
         // Adds the given component to the static list of components.
         s_components.Add(component);
 
-        // Register the component's OnDestroy event.
+        // Register the OnDestroy event of the component.
         component.EventOnDestroy += () => Destroy(component);
 
         s_dirty = true;
