@@ -232,6 +232,9 @@ internal sealed partial class Properties
         s_stackPanel.Children.Add(tmp = fieldsCollection.ToArray()
             .StackInGrid()
             .WrapInExpander("Properties"));
+
+        // Add an event handler to update the current stackPanel when a new component is added.
+        materialEntry.OnShaderUpdate += () => Set(materialEntry);
     }
 
     private async void CreateFilePreviewer(string path)

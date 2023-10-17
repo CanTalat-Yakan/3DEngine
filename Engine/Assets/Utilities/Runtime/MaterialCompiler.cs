@@ -6,10 +6,10 @@ namespace Engine.Runtime;
 public sealed class MaterialEntry(FileInfo fileInfo)
 {
     public FileInfo FileInfo = fileInfo;
-
     public Material Material;
 
     public ShaderEntry ShaderEntry;
+    public Action OnShaderUpdate;
 
     public void SetShader(ShaderEntry shaderEntry)
     {

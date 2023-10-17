@@ -67,6 +67,8 @@ public sealed class ShaderCompiler
 
                     materialEntry.Material.UpdateVertexShader(shaderEntry.FileInfo.FullName);
                     materialEntry.Material.UpdatePixelShader(shaderEntry.FileInfo.FullName);
+
+                    materialEntry.OnShaderUpdate?.Invoke();
                 }
 
             Output.Log("Updated Shader");
