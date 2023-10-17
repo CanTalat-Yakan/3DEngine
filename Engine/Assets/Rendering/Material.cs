@@ -91,20 +91,28 @@ public sealed class Material
 
     public void UpdateVertexShader(string shaderFilePath)
     {
-        // Compile the vertex shader bytecode from the specified shader file name.
-        ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(shaderFilePath, "VS", "vs_4_0");
+        try
+        {
+            // Compile the vertex shader bytecode from the specified shader file name.
+            ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(shaderFilePath, "VS", "vs_4_0");
 
-        // Create the vertex shader using the compiled bytecode.
-        _vertexShader = _renderer.Device.CreateVertexShader(vertexShaderByteCode.Span);
+            // Create the vertex shader using the compiled bytecode.
+            _vertexShader = _renderer.Device.CreateVertexShader(vertexShaderByteCode.Span);
+        }
+        catch (Exception ex) { Output.Log(ex.Message); }
     }
 
     public void UpdatePixelShader(string shaderFilePath)
     {
-        // Compile the vertex shader bytecode from the specified shader file name.
-        ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(shaderFilePath, "PS", "ps_4_0");
+        try
+        {
+            // Compile the vertex shader bytecode from the specified shader file name.
+            ReadOnlyMemory<byte> pixelShaderByteCode = CompileBytecode(shaderFilePath, "PS", "ps_4_0");
 
-        // Create the vertex shader using the compiled bytecode.
-        _vertexShader = _renderer.Device.CreateVertexShader(vertexShaderByteCode.Span);
+            // Create the vertex shader using the compiled bytecode.
+            _pixelShader = _renderer.Device.CreatePixelShader(pixelShaderByteCode.Span);
+        }
+        catch (Exception ex) { Output.Log(ex.Message); }
     }
 
     public void Dispose()

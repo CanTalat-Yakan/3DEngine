@@ -40,7 +40,7 @@ public sealed class Mesh : Component
 
         if (!string.IsNullOrEmpty(MaterialPath))
             if (File.Exists(MaterialPath))
-                try { Output.Log("Set the Material to " + SetMaterial(new FileInfo(MaterialPath).Name)); }
+                try { Output.Log("Set the Material to " + SetMaterial(new FileInfo(MaterialPath).Name).FileInfo.Name); }
                 finally { MaterialPath = null; }
     }
 

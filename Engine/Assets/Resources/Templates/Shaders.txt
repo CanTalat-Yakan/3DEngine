@@ -9,6 +9,22 @@ cbuffer PerModelConstantBuffer : register(b1)
     float4x4 World;
 };
 
+cbuffer Properties : register(b2)
+{
+    // Header("This is a Header!")
+    float Float;
+    int Int;
+    // Slider(1, 10)
+    int Slider;
+    // Space
+    float2 Float2;
+    float3 Float3;
+    // Color
+    float4 Float4;
+    // Space
+    bool Bool;
+};
+
 struct appdata
 {
     float3 vertex : POSITION;

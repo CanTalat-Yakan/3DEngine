@@ -50,7 +50,7 @@ public sealed class ShaderCompiler
             ShaderLibrary.Shaders.Add(new()
             {
                 FileInfo = fileInfo,
-                ConstantBufferType = CreateMaterialBufferScript(fileInfo.FullName)
+                ConstantBufferType = CreateMaterialPropertyBufferStruct(fileInfo.FullName)
             });
 
             Output.Log("Read new Shader");
@@ -58,13 +58,22 @@ public sealed class ShaderCompiler
         else if (fileInfo.LastWriteTime > shaderEntry.FileInfo.LastWriteTime)
         {
             shaderEntry.FileInfo = fileInfo;
-            shaderEntry.ConstantBufferType = CreateMaterialBufferScript(fileInfo.FullName);
+            shaderEntry.ConstantBufferType = CreateMaterialPropertyBufferStruct(fileInfo.FullName);
+
+            foreach (var materialEntry in MaterialCompiler.MaterialLibrary.Materials)
+                if (materialEntry.ShaderEntry.FileInfo == fileInfo)
+                {
+                    materialEntry.Material.MaterialBuffer.CreatePropertiesConstantBuffer(shaderEntry.ConstantBufferType);
+
+                    materialEntry.Material.UpdateVertexShader(shaderEntry.FileInfo.FullName);
+                    materialEntry.Material.UpdatePixelShader(shaderEntry.FileInfo.FullName);
+                }
 
             Output.Log("Updated Shader");
         }
     }
 
-    private Type CreateMaterialBufferScript(string shaderFilePath)
+    private Type CreateMaterialPropertyBufferStruct(string shaderFilePath)
     {
         if (!File.Exists(shaderFilePath))
             return null;
@@ -95,7 +104,7 @@ public sealed class ShaderCompiler
         }
 
         foreach (var type in propertiesConstantBufferScriptEntry.Assembly.GetTypes())
-            if (typeof(IMaterialBuffer).IsAssignableFrom(type))
+            if (type.ToString().Contains("Properties"))
                 return type; // Successful.
 
         Output.Log("A Script with the Interface IMaterialBuffer was not found", MessageType.Error);
@@ -115,7 +124,7 @@ public sealed class ShaderCompiler
             using Engine.Editor;
             using Engine.Rendering;
 
-            public struct Properties{guid:N} : IMaterialBuffer
+            public struct Properties{guid:N}
 
             """);
 

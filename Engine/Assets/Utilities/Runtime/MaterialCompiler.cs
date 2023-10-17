@@ -16,8 +16,10 @@ public sealed class MaterialEntry(FileInfo fileInfo)
         if (shaderEntry is null)
             return;
 
-        Material.UpdateVertexShader(ShaderEntry.FileInfo.FullName);
-        Material.UpdatePixelShader(ShaderEntry.FileInfo.FullName);
+        ShaderEntry = shaderEntry;
+
+        Material.UpdateVertexShader(shaderEntry.FileInfo.FullName);
+        Material.UpdatePixelShader(shaderEntry.FileInfo.FullName);
 
         Material.MaterialBuffer?.Dispose();
 
@@ -79,6 +81,9 @@ public class MaterialCompiler
             materialEntry.FileInfo = fileInfo;
 
             var materialBuffer = (MaterialBuffer)Serialization.LoadXml(typeof(MaterialBuffer), path);
+
+            SetMaterialBuffer(materialEntry, materialBuffer);
+
             materialBuffer.PasteToPropertiesConstantBuffer();
             materialBuffer.UpdatePropertiesConstantBuffer();
 
