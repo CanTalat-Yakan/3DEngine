@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Xml.Serialization;
 
 using Vortice.Direct3D11;
-using WinRT;
 
 namespace Engine.Rendering;
 
@@ -62,46 +60,22 @@ public class MaterialBuffer()
         if (_properties is null)
             return;
 
-        StringBuilder sb = new();
-        foreach (var field in _propertiesConstantBuffer.GetType().GetFields())
-            sb.AppendLine($"{field.Name}: {field.GetValue(_propertiesConstantBuffer)}");
-        Output.Log(sb.ToString());
-
         Type type = ShaderCompiler.ShaderLibrary.GetShader(ShaderName).ConstantBufferType;
-        var o = Convert.ChangeType(_propertiesConstantBuffer, type);
 
         // Map the constant buffer and copy the properties into it.
         unsafe
         {
             //Map the constant buffer to memory for write access.
             var mappedResource = _renderer.Data.DeviceContext.Map(_properties, MapMode.WriteDiscard);
-            // Copy the data from the constant buffer to the mapped resource.
 
-
-            // Get the MethodInfo for Unsafe.Copy with the correct parameter types
-            MethodInfo[] methods = typeof(Unsafe).GetMethods();
-            MethodInfo genericCopyMethod = null;
-            foreach (var method in methods)
-                if (method.Name.Equals("Copy"))
-                {
-                    genericCopyMethod = method;
-                    break; // Stop after finding the first "Copy" method
-                }
-
-            if (genericCopyMethod is not null)
-            {
-                // Create a MethodInfo for Unsafe.Copy with the correct generic type
-                MethodInfo constructedMethod = genericCopyMethod.MakeGenericMethod(type);
-
-                // Get the pointer to your target memory location (assuming you have a valid pointer)
-                IntPtr destination = new IntPtr(mappedResource.DataPointer.ToPointer());
-
-                // Perform the unsafe copy using reflection
-                constructedMethod.Invoke(null, new object[] { destination, o });
-            }
-
-
-            //Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref o);
+            // Create a MethodInfo for Unsafe.Copy with the correct generic type.
+            MethodInfo genericCopyMethod = typeof(Unsafe)
+                .GetMethods().FirstOrDefault(method => method.Name == "Copy")
+                .MakeGenericMethod(type);
+            // Perform the unsafe copy using reflection
+            genericCopyMethod.Invoke(null, new object[] {
+                new IntPtr(mappedResource.DataPointer.ToPointer()),
+                _propertiesConstantBuffer });
 
             // Unmap the constant buffer from memory.
             _renderer.Data.DeviceContext.Unmap(_properties, 0);
