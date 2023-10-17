@@ -39,9 +39,8 @@ public sealed class Core
 
     public void Initialize(Renderer renderer, nint hwnd, string assetsPath = null)
     {
-        // Initializes the singleton instance of the class, if it hasn't been already.
-        if (Instance is null)
-            Instance = this;
+        // Set the singleton instance of the class, if it hasn't been already.
+        Instance ??= this;
 
         EditorState.AssetsPath = assetsPath;
 

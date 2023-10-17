@@ -56,8 +56,8 @@ public sealed partial class Renderer
 
     public Renderer(int sizeX = 640, int sizeY = 480, Config config = null)
     {
-        if (Instance is null)
-            Instance = this;
+        // Set the singleton instance of the class, if it hasn't been already.
+        Instance ??= this;
 
         if (config is not null)
             Config = config;

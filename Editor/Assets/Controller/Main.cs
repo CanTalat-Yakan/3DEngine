@@ -16,9 +16,8 @@ internal sealed class Main
 
     public Main(MainWindow mainWindow, Grid content, TextBlock status, Viewbox icon, AppBarToggleButton openPane)
     {
-        // Initializes the singleton instance of the class, if it hasn't been already.
-        if (Instance is null)
-            Instance = this;
+        // Set the singleton instance of the class, if it hasn't been already.
+        Instance ??= this;
 
         // Assign local variables.
         MainWindow = mainWindow;
