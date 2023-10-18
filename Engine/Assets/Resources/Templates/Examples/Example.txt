@@ -23,6 +23,7 @@ public class Example : Component
     public float Float;
     public Vector2 Vector2;
     public Vector3 Vector3;
+    public Vector4 Vector4;
     [Slider(1, 100)]
     public float Slider;
     public bool Bool;
