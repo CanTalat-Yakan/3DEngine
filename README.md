@@ -69,7 +69,7 @@ Project Setup:
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="3DEngine" Version="1.0.3" />
+		<PackageReference Include="3DEngine" Version="1.0.4" />
 		<PackageReference Include="Costura.Fody" Version="5.7.0">
 		  <PrivateAssets>all</PrivateAssets>
 		</PackageReference>
