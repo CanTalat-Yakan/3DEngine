@@ -46,7 +46,7 @@ public sealed partial class Transform : Component, IHide
         CalculateWorldMatrix();
     }
 
-    public PerModelConstantBuffer GetConstantBuffer()
+    internal PerModelConstantBuffer GetConstantBuffer()
     {
         // Set the transposed ModelView matrix in the ModelConstantBuffer to the WorldMatrix.
         _modelConstantBuffer.ModelView = Matrix4x4.Transpose(_worldMatrix);
@@ -54,7 +54,7 @@ public sealed partial class Transform : Component, IHide
         return _modelConstantBuffer;
     }
 
-    public string GetString() =>
+    public override string ToString() =>
         $"""
         {LocalPosition}
         {EulerAngles}
