@@ -2,34 +2,34 @@
 
 namespace Engine.Components;
 
-public sealed class Transform : Component, IHide
+public sealed partial class Transform : Component, IHide
 {
-    public Transform Parent => Entity.Parent is null ? null : Entity.Parent.Transform;
+    public Transform Parent => Entity.Parent?.Transform;
 
-    public Vector3 Forward => Parent is null ? LocalForward : Vector3.Transform(LocalForward, Parent.Rotation) + Parent.Forward;
+    public Vector3 Forward => TransformVector3(LocalForward, Parent?.Forward);
     public Vector3 LocalForward = Vector3.UnitZ;
 
-    public Vector3 Right => Parent is null ? LocalRight : Vector3.Transform(LocalRight, Parent.Rotation) + Parent.Right;
+    public Vector3 Right => TransformVector3(LocalRight, Parent?.Right);
     public Vector3 LocalRight = Vector3.UnitX;
 
-    public Vector3 Up => Parent is null ? LocalUp : Vector3.Transform(LocalUp, Parent.Rotation) + Parent.Right;
+    public Vector3 Up => TransformVector3(LocalUp, Parent?.Right);
     public Vector3 LocalUp = Vector3.UnitY;
 
-    public Vector3 Position => Parent is null ? LocalPosition : Vector3.Transform(LocalPosition, Parent.Rotation) + Parent.Position;
+    public Vector3 Position => TransformVector3(LocalPosition, Parent?.Position);
     public Vector3 LocalPosition = Vector3.Zero;
 
-    public Quaternion Rotation => Parent is null ? LocalRotation : LocalRotation * Parent.Rotation;
+    public Quaternion Rotation => MultiplyQuaternion(LocalRotation, Parent?.Rotation);
     public Quaternion LocalRotation { get => _localRotation; set => SetQuaternion(value); }
     private Quaternion _localRotation = Quaternion.Identity;
 
     public Vector3 EulerAngles { get => _eulerAngles; set => SetEulerAngles(value); }
     private Vector3 _eulerAngles = Vector3.Zero;
 
-    public Vector3 Scale => Parent is null ? LocalScale : LocalScale * Parent.Scale;
+    public Vector3 Scale => MultiplyVector3(LocalScale, Parent?.Scale);
     public Vector3 LocalScale = Vector3.One;
 
     public Matrix4x4 WorldMatrix => _worldMatrix;
-    private Matrix4x4 _worldMatrix;
+    private Matrix4x4 _worldMatrix = Matrix4x4.Identity;
 
     private PerModelConstantBuffer _modelConstantBuffer;
 
@@ -39,35 +39,90 @@ public sealed class Transform : Component, IHide
 
     public override void OnUpdate()
     {
-        // Calculate the forward direction based on the EulerAngles.
-        LocalForward = Vector3.Normalize(new(
-            MathF.Sin(EulerAngles.Y.ToRadians()) * MathF.Cos(EulerAngles.X.ToRadians()),
-            MathF.Sin(-EulerAngles.X.ToRadians()),
-            MathF.Cos(EulerAngles.X.ToRadians()) * MathF.Cos(EulerAngles.Y.ToRadians())));
-        // Calculate the right direction based on the forward direction.
-        LocalRight = Vector3.Normalize(Vector3.Cross(LocalForward, Vector3.UnitY));
-        // Calculate the local up direction based on the forward and right direction.
-        LocalUp = Vector3.Normalize(Vector3.Cross(LocalRight, LocalForward));
+        // Calculate the Forward, Right and Up direction.
+        CalculateOrientation();
 
-        // Calculate the translation matrix based on the WorldPosition.
-        Matrix4x4 translationMatrix = Matrix4x4.CreateTranslation(Position);
-        // Calculate the rotation matrix based on the WorldRotation.
-        Matrix4x4 rotationMatrix = Matrix4x4.CreateFromQuaternion(Rotation);
-        // Calculate the scale matrix based on the WorldScale.
-        Matrix4x4 scaleMatrix = Matrix4x4.CreateScale(Scale);
-
-        // Calculate the world matrix as a result of the combination of scale, rotation and translation matrices.
-        _worldMatrix = scaleMatrix * rotationMatrix * translationMatrix;
+        // Calculate the world matrix as a result of the local position, rotation and scale.
+        CalculateWorldMatrix();
     }
 
-    internal PerModelConstantBuffer GetConstantBuffer()
+    public PerModelConstantBuffer GetConstantBuffer()
     {
         // Set the transposed ModelView matrix in the ModelConstantBuffer to the WorldMatrix.
         _modelConstantBuffer.ModelView = Matrix4x4.Transpose(_worldMatrix);
 
         return _modelConstantBuffer;
     }
-    
+
+    public string GetString() =>
+        $"""
+        {LocalPosition}
+        {EulerAngles}
+        {LocalScale}
+        """;
+}
+
+public sealed partial class Transform : Component, IHide
+{
+    private void CalculateOrientation()
+    {
+        // Calculate the forward direction based on the EulerAngles.
+        LocalForward = Vector3.Normalize(new(
+            MathF.Sin(EulerAngles.Y.ToRadians()) * MathF.Cos(EulerAngles.X.ToRadians()),
+            MathF.Sin(-EulerAngles.X.ToRadians()),
+            MathF.Cos(EulerAngles.X.ToRadians()) * MathF.Cos(EulerAngles.Y.ToRadians())));
+
+        // Calculate the right direction as a product of the forward and global up direction.
+        LocalRight = Vector3.Normalize(Vector3.Cross(LocalForward, Vector3.UnitY));
+
+        // Calculate the local up direction as a product of the right and forward direction.
+        LocalUp = Vector3.Normalize(Vector3.Cross(LocalRight, LocalForward));
+    }
+
+    private void CalculateWorldMatrix()
+    {
+        // Get the translation matrix based on the local position.
+        Matrix4x4 translationMatrix = Matrix4x4.CreateTranslation(LocalPosition);
+        // Get the rotation matrix based on the local rotation.
+        Matrix4x4 rotationMatrix = Matrix4x4.CreateFromQuaternion(LocalRotation);
+        // Get the scale matrix based on the local scale.
+        Matrix4x4 scaleMatrix = Matrix4x4.CreateScale(LocalScale);
+
+        // Get the world matrix from the multiplication of scale, rotation and translation.
+        _worldMatrix = scaleMatrix * rotationMatrix * translationMatrix;
+
+        // Multiply by the world matrix of the parent if it exists.
+        if (Parent is not null)
+            _worldMatrix *= Parent.WorldMatrix;
+    }
+}
+
+public sealed partial class Transform : Component, IHide
+{
+    private Vector3 TransformVector3(Vector3 local, Vector3? parent)
+    {
+        if (Parent is null)
+            return local;
+
+        return Vector3.Transform(local, Parent.Rotation) + parent.Value;
+    }
+
+    private Vector3 MultiplyVector3(Vector3 local, Vector3? parent)
+    {
+        if (Parent is null)
+            return local;
+
+        return Vector3.Multiply(local, parent.Value);
+    }
+
+    private Quaternion MultiplyQuaternion(Quaternion local, Quaternion? parent)
+    {
+        if (Parent is null)
+            return local;
+
+        return Quaternion.Multiply(local, parent.Value);
+    }
+
     private void SetEulerAngles(Vector3 value)
     {
         // Set the values for the EulerAngles in degrees.
@@ -85,11 +140,4 @@ public sealed class Transform : Component, IHide
         // Set the EulerAngles with the new Euler from the quaternion.
         _eulerAngles = value.ToEuler();
     }
-
-    public string GetString() =>
-        $"""
-            {LocalPosition}
-            {EulerAngles}
-            {LocalScale}
-            """;
 }
