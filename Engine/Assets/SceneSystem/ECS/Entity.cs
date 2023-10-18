@@ -47,8 +47,11 @@ public sealed partial class Entity : ICloneable
 
     public Entity() =>
         // Add the Transform component to the Entity when initialized.
-        AddComponent(_transform = new Transform());
+        AddComponent(_transform = new());
+}
 
+public sealed partial class Entity : ICloneable
+{
     public T AddComponent<T>() where T : Component, new() =>
         (T)AddComponent(new T());
 

@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Linq;
 
 namespace Engine.Editor;
 
@@ -19,10 +18,10 @@ public class DefaultSky : EditorComponent, IHide
 
     public override void OnUpdate()
     {
-        var camera = CameraSystem.Components.Last();
+        var camera = Camera.CurrentRenderingCamera;
 
         // Set the Skybox position to the rendering camera position.
-        Entity.Transform.LocalPosition = camera.Entity.Transform.Position;
+        Entity.Parent = camera.Entity;
         // Set the Skybox scale to the rendering camera far clipping plane.
         Entity.Transform.LocalScale = new Vector3(-1, 1, 1) * 1.9f * camera.Clipping.Y;
     }
