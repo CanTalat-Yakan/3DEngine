@@ -16,9 +16,8 @@ using Engine.Runtime;
 
 using static Editor.Controller.Helper;
 
-using Color = System.Drawing.Color;
 using Path = System.IO.Path;
-using Texture = Vortice.Direct3D11.Texture2DArrayShaderResourceView;
+using Texture = Vortice.Direct3D11.ID3D11Texture2D;
 
 namespace Editor.Controller;
 

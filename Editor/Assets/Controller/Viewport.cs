@@ -4,8 +4,6 @@ using SharpGen.Runtime;
 using System;
 using WinRT.Interop;
 
-using ImGuiNET;
-
 using Engine.Data;
 using Engine.Editor;
 using Engine.Rendering;
