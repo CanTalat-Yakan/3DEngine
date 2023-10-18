@@ -1,22 +1,20 @@
-﻿using CommunityToolkit.WinUI.UI.Controls;
-using Microsoft.UI.Text;
+﻿using Microsoft.UI.Text;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
+using System.Linq;
 using System.Numerics;
 using System;
 
-using ColorPicker = CommunityToolkit.WinUI.UI.Controls.ColorPicker;
 using ExpandDirection = Microsoft.UI.Xaml.Controls.ExpandDirection;
 using Expander = Microsoft.UI.Xaml.Controls.Expander;
 using FontFamily = Microsoft.UI.Xaml.Media.FontFamily;
 using Image = Microsoft.UI.Xaml.Controls.Image;
 using Orientation = Microsoft.UI.Xaml.Controls.Orientation;
 using Windows.Globalization.NumberFormatting;
-using System.Linq;
 
 namespace Editor.Controller;
 
@@ -130,21 +128,6 @@ internal partial class Helper
         return StackInGrid(button);
     }
 
-    internal static Grid CreateColorButton(byte r = 0, byte g = 0, byte b = 0, byte a = 0)
-    {
-        Windows.UI.Color col = new() { R = r, G = g, B = b, A = a };
-
-        ColorPickerButton colbutton = new() { SelectedColor = col };
-
-        Style stylee = new() { TargetType = typeof(ColorPicker) };
-        stylee.Setters.Add(new Setter(ColorPicker.ColorSpectrumShapeProperty, ColorSpectrumShape.Ring));
-        stylee.Setters.Add(new Setter(ColorPicker.IsAlphaEnabledProperty, true));
-        stylee.Setters.Add(new Setter(ColorPicker.IsHexInputVisibleProperty, true));
-        colbutton.ColorPickerStyle = stylee;
-
-        return StackInGrid(colbutton);
-    }
-
     internal static Grid CreateTextureSlot(string s = "None", string type = "type")
     {
         Grid container = new() { Width = 48, Height = 48 };
@@ -169,13 +152,13 @@ internal partial class Helper
 
 internal partial class Helper
 {
-    internal static Grid CreateTextWithOpacity(object id, object source, string fieldName, string s = "String")
+    internal static Grid CreateColorButton(object id, object source, string fieldName, Vector4 color)
     {
-        TextBlock textBlock = new() { Text = s, MaxWidth = 200, Opacity = 0.5f, TextWrapping = TextWrapping.Wrap };
+        ColorButton colorButton = new() { SelectedColor = color };
 
-        Binding.GetBinding(fieldName, source, id)?.Set(textBlock, "Text");
+        Binding.GetBinding(fieldName, source, id)?.Set(colorButton, "SelectedColor", "ValueChanged");
 
-        return StackInGrid(textBlock);
+        return colorButton.GetStackInGrid();
     }
 
     internal static Grid CreateComboBox(Type enumType, object id, object source, string fieldName, string value = null)
@@ -192,6 +175,15 @@ internal partial class Helper
         Binding.GetBinding(fieldName, source, id)?.Set(comboBox, "SelectedItem", "SelectionChanged");
 
         return StackInGrid(comboBox);
+    }
+
+    internal static Grid CreateTextWithOpacity(object id, object source, string fieldName, string s = "String")
+    {
+        TextBlock textBlock = new() { Text = s, MaxWidth = 200, Opacity = 0.5f, TextWrapping = TextWrapping.Wrap };
+
+        Binding.GetBinding(fieldName, source, id)?.Set(textBlock, "Text");
+
+        return StackInGrid(textBlock);
     }
 
     internal static Grid CreateTextInput(object id, object source, string fieldName, string placeholder = "Example")

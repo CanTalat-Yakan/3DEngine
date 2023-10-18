@@ -32,7 +32,8 @@ public class Example : Component
     [IfNot("Bool", "True")]
     [ShowOnly]
     public string IfNotField = "This field is only visible if the bool is not true";
-    public Color Color;
+    [Color]
+    public Vector4 Color;
     public Entity? _Entity;
     [Space]
     [Header("Header")]

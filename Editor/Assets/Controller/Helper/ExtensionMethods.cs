@@ -3,6 +3,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System;
+using Windows.UI;
 
 namespace Editor.Controller;
 
@@ -24,6 +25,18 @@ internal static partial class ExtensionMethods
             MathF.Round(value.X, digits),
             MathF.Round(value.Y, digits),
             MathF.Round(value.Z, digits));
+
+    public static Vector4 ToVector4(this Color value) =>
+        new Vector4(value.R, value.G, value.B, value.A) / 255;
+
+    public static Color ToColor(this Vector4 value) =>
+        new Color()
+        {
+            R = (byte)(Math.Clamp(value.X, 0, 1) * 255),
+            G = (byte)(Math.Clamp(value.Y, 0, 1) * 255),
+            B = (byte)(Math.Clamp(value.Z, 0, 1) * 255),
+            A = (byte)(Math.Clamp(value.W, 0, 1) * 255)
+        };
 
     public static string AddSpacesToSentence(this string text, bool preserveAcronyms = true)
     {

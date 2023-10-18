@@ -120,7 +120,6 @@ public sealed class ShaderCompiler
 
         structBuilder.Append(
             $"""
-            using System.Drawing;
             using System.Numerics;
 
             using Engine.Editor;
@@ -183,19 +182,9 @@ public sealed class ShaderCompiler
 
                         // Combine the comment (if any) with the processed field string.
                         if (!string.IsNullOrEmpty(currentComment))
-                        {
-                            currentComment = currentComment.TrimStart();
+                            processedField += $"    [{currentComment.TrimStart()}]\r\n";
 
-                            if (currentComment.Contains("Color"))
-                            {
-                                if (hlslFieldType.Equals("Vector4"))
-                                    hlslFieldType = "Color";
-                            }
-                            else
-                                processedField += $"    [{currentComment}]\r\n";
-
-                            currentComment = null; // Reset the comment variable.
-                        }
+                        currentComment = null; // Reset the comment variable.
 
                         processedField += $"    public {hlslFieldType} {hlslFieldName};";
 

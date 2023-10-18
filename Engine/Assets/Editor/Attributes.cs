@@ -1,5 +1,6 @@
 ﻿namespace Engine.Editor;
 
+public sealed class ColorAttribute : Attribute { }
 public sealed class SpaceAttribute : Attribute { }
 public sealed class ShowAttribute : Attribute { }
 public sealed class ShowOnlyAttribute : Attribute { }

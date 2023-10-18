@@ -200,7 +200,7 @@ internal sealed partial class Properties
                     var newShaderEntry = ShaderCompiler.ShaderLibrary
                         .GetShader(newShaderName);
 
-                    if(newShaderEntry is null)
+                    if (newShaderEntry is null)
                     {
                         Output.Log($"Getting the Shader from the ShaderName {newShaderName} failed", MessageType.Error);
                         return;
@@ -422,17 +422,8 @@ internal sealed partial class Properties
         {
             #region // Process FieldType
             // Check the type of the field and add the appropriate element to the `grid` list.
-            // Color
-            if (type == typeof(Color))
-                grid.Add(
-                    CreateColorButton(
-                        ((Color)value).R,
-                        ((Color)value).G,
-                        ((Color)value).B,
-                        ((Color)value).A));
-
             // Byte
-            else if (type == typeof(byte))
+            if (type == typeof(byte))
                 // If the field has the `SliderAttribute`, add a slider element.
                 if (attributes.OfType<SliderAttribute>().Any())
                     grid.Add(
@@ -493,9 +484,17 @@ internal sealed partial class Properties
             else if (type == typeof(Vector3))
                 grid.Add(CreateVec3Input(entity.ID, component, fieldInfo.Name, (Vector3)value));
 
-            // Vector 3
+            // Vector 4
             else if (type == typeof(Vector4))
-                grid.Add(CreateVec4Input(entity.ID, component, fieldInfo.Name, (Vector4)value));
+                // If the field has the `ColorAttribute`, add a color button element.
+                if (attributes.OfType<ColorAttribute>().Any())
+                    grid.Add(CreateColorButton(
+                        entity.ID, component, fieldInfo.Name,
+                        (Vector4)value));
+                else
+                    grid.Add(CreateVec4Input(
+                        entity.ID, component, fieldInfo.Name,
+                        (Vector4)value));
 
             // Bool
             else if (type == typeof(bool))
@@ -609,18 +608,8 @@ internal sealed partial class Properties
         if (finalGrid is null)
         {
             #region // Process FieldType
-            // Check the type of the field and add the appropriate element to the `grid` list.
-            // Color
-            if (type == typeof(Color))
-                grid.Add(
-                    CreateColorButton(
-                        ((Color)value).R,
-                        ((Color)value).G,
-                        ((Color)value).B,
-                        ((Color)value).A));
-
             // Int
-            else if (type == typeof(int))
+            if (type == typeof(int))
                 // If the field has the `SliderAttribute`, add a slider element.
                 if (attributes.OfType<SliderAttribute>().Any())
                     grid.Add(
@@ -654,7 +643,7 @@ internal sealed partial class Properties
             // Vector 2
             else if (type == typeof(Vector2))
                 grid.Add(CreateVec2Input(null,
-                    propertiesConstantBuffer, fieldInfo.Name, 
+                    propertiesConstantBuffer, fieldInfo.Name,
                     (Vector2)value));
 
             // Vector 3
@@ -665,13 +654,19 @@ internal sealed partial class Properties
 
             // Vector 4
             else if (type == typeof(Vector4))
-                grid.Add(CreateVec4Input(null,
-                    propertiesConstantBuffer, fieldInfo.Name,
-                    (Vector4)value));
+                // If the field has the `ColorAttribute`, add a color button element.
+                if (attributes.OfType<ColorAttribute>().Any())
+                    grid.Add(CreateColorButton(null,
+                        propertiesConstantBuffer, fieldInfo.Name,
+                        (Vector4)value));
+                else
+                    grid.Add(CreateVec4Input(null,
+                        propertiesConstantBuffer, fieldInfo.Name,
+                        (Vector4)value));
 
             // Bool
             else if (type == typeof(bool))
-                grid.Add(CreateBool(null, 
+                grid.Add(CreateBool(null,
                     propertiesConstantBuffer, fieldInfo.Name,
                     (bool)value));
             #endregion

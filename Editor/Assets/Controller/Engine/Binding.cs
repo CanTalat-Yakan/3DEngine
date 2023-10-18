@@ -11,6 +11,9 @@ using Engine.ECS;
 using Engine.Editor;
 using Engine.Runtime;
 using Engine.SceneSystem;
+using System.Numerics;
+using Windows.UI;
+using Microsoft.UI.Xaml.Input;
 
 namespace Editor.Controller;
 
@@ -40,7 +43,7 @@ internal sealed class BindEntry(object source, string sourcePath)
     public void SetEvent(Action e) =>
         Event += e;
 
-    public void  Invoke() =>
+    public void Invoke() =>
         Event?.Invoke();
 }
 
@@ -118,7 +121,7 @@ internal sealed class Binding
         var PropertiesConstantBuffer = materialEntry.Material.MaterialBuffer.GetPropertiesConstantBuffer();
         foreach (var field in PropertiesConstantBuffer.GetType().GetFields(AllBindingFlags))
             MaterialBindings.Add(
-                field.Name + PropertiesConstantBuffer.GetType().FullName, 
+                field.Name + PropertiesConstantBuffer.GetType().FullName,
                 new(PropertiesConstantBuffer, field.Name));
     }
 
@@ -154,7 +157,7 @@ internal sealed class Binding
             ? GetEntityBinding(fieldName, source, id)
             : GetRendererBinding(fieldName, source);
 
-        if(bindEntry is null)
+        if (bindEntry is null)
             bindEntry = GetMaterialBinding(fieldName, source);
 
         return bindEntry;
@@ -348,7 +351,7 @@ internal sealed class Binding
 
         sourceField?.SetValue(bindEntry.Source, convertedValue);
 
-        bindEntry.Value = convertedValue;
+        bindEntry.Value = newValue;
 
         // Invoke the original event handler, if it exists.
         bindEntry.Invoke();

@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Xml.Serialization;
 
 using Vortice.Direct3D11;
@@ -61,6 +62,11 @@ public class MaterialBuffer()
             return;
 
         Type type = ShaderCompiler.ShaderLibrary.GetShader(ShaderName).ConstantBufferType;
+
+        //StringBuilder sb = new();
+        //foreach (var field in _propertiesConstantBuffer.GetType().GetFields())
+        //    sb.AppendLine($"{field.Name}: {field.GetValue(_propertiesConstantBuffer)}");
+        //Output.Log(sb.ToString());
 
         // Map the constant buffer and copy the properties into it.
         unsafe
