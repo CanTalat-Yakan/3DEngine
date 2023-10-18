@@ -39,7 +39,7 @@ public sealed partial class Transform : Component, IHide
 
     public override void OnUpdate()
     {
-        // Calculate the Forward, Right and Up direction.
+        // Calculate the forward, right and up direction.
         CalculateOrientation();
 
         // Calculate the world matrix as a result of the local position, rotation and scale.

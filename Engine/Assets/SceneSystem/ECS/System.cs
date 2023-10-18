@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Engine.ECS;
 
@@ -116,45 +117,55 @@ public partial class System<T> where T : Component
     {
         // Loop through all the components in the static components array
         // and call OnAwake method on the component if it is active.
-        foreach (T component in s_componentsArray)
+        Parallel.ForEach(s_componentsArray, component =>
+        {
             if (CheckActive(component))
                 component.OnAwake();
+        });
     }
 
     public static void Start()
     {
         // Loop through all the components in the static components array
         // and call OnStart method on the component if it is active.
-        foreach (T component in s_componentsArray)
+        Parallel.ForEach(s_componentsArray, component =>
+        {
             if (CheckActive(component))
                 component.OnStart();
+        });
     }
 
     public static void Update()
     {
         // Loop through all the components in the static components array
         // and call OnUpdate method on the component if it is active.
-        foreach (T component in s_componentsArray)
+        Parallel.ForEach(s_componentsArray, component =>
+        {
             if (CheckActive(component))
                 component.OnUpdate();
+        });
     }
 
     public static void LateUpdate()
     {
         // Loop through all the components in the static components array
         // and call OnLateUpdate method on the component if it is active.
-        foreach (T component in s_componentsArray)
+        Parallel.ForEach(s_componentsArray, component =>
+        {
             if (CheckActive(component))
                 component.OnLateUpdate();
+        });
     }
 
     public static void FixedUpdate()
     {
         // Loop through all the components in the static components array
         // and call OnLateUpdate method on the component if it is active.
-        foreach (T component in s_componentsArray)
+        Parallel.ForEach(s_componentsArray, component =>
+        {
             if (CheckActive(component))
                 component.OnFixedUpdate();
+        });
     }
 
     public static void Render()
@@ -170,8 +181,10 @@ public partial class System<T> where T : Component
     {
         // Loop through all the components in the static components array
         // and call OnRender method on the component if it is active.
-        foreach (T component in s_componentsArray)
+        Parallel.ForEach(s_componentsArray, component =>
+        {
             if (CheckActive(component))
                 component.OnGui();
+        });
     }
 }

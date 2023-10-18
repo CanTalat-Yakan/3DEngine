@@ -165,18 +165,14 @@ public sealed partial class SceneManager
     {
         Profiler.Start(out var stopwatchRenderQueue);
 
-        Profiler.Start(out var stopwatch);
         // Update the TransformSystem.
-        TransformSystem.Update();
-        Profiler.Stop(stopwatch, "Transform Update");
+        Profiler.Benchmark(TransformSystem.Update, "Transform Update");
 
         // Render the Cameras.
         CameraSystem.Render();
 
-        Profiler.Start(out stopwatch);
         // Render the MeshSystem.
-        MeshSystem.Render();
-        Profiler.Stop(stopwatch, "Mesh Render");
+        Profiler.Benchmark(MeshSystem.Render, "Mesh Render");
 
         Mesh.CurrentMeshOnGPU = null;
         Material.CurrentMaterialOnGPU = null;
