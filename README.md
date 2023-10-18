@@ -26,7 +26,7 @@ The Entity Component System is an architectural pattern often used in video game
 You can also only get the Engine with the NuGet Package Manager and create applications using the 3DEngine (w/o Editor) in a new project and implement all features via code.
 If you want the Editor, this is the GitHub Repo for the complete 3DEngine. [3DEngine](https://github.com/CanTalat-Yakan/3DEngine/tree/master)
 
-```batch
+```Batch
 dotnet new console -n Project
 cd Project
 dotnet add package 3DEngine
@@ -49,7 +49,7 @@ Use the Engine Core to get to the Scene System.
 
 Project Setup:
 
-```Marakup
+```XML
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
