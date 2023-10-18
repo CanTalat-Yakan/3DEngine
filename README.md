@@ -69,7 +69,7 @@ Project Setup:
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="3DEngine" Version="1.0.2" />
+		<PackageReference Include="3DEngine" Version="1.0.3" />
 		<PackageReference Include="Costura.Fody" Version="5.7.0">
 		  <PrivateAssets>all</PrivateAssets>
 		</PackageReference>
@@ -96,8 +96,8 @@ You can compile the 3DEngine (Package) for the Editor and the Engine as a standa
 * Post Processing,
 * Gizmos,
 * USD,
-* Asynchronous Reprojection
-* Lumen (Erebus, Aruna)
+* Asynchronous Reprojection,
+* Lumen (Erebus, Aruna),
 * Nanite (Nano Tech).
 
 # Build

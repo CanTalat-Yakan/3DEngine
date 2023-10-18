@@ -41,6 +41,8 @@ internal sealed class SceneBoot : EditorComponent
 
         // Create a cube primitive under the Cubes entity.
         SceneManager.MainScene.EntityManager.CreatePrimitive(PrimitiveTypes.Cube, Cubes);
+
+        Output.Log("Press 'C' to spawn 1000 Cubes");
     }
 
     public override void OnUpdate()
