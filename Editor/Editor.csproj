@@ -37,10 +37,10 @@
 	
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.230913002" />
-		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.25936-preview" />
-		<PackageReference Include="Vortice.WinUI" Version="3.2.0" />
-		<PackageReference Include="WinUIEx" Version="2.3.1" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.231008000" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
+		<PackageReference Include="Vortice.WinUI" Version="3.3.4" />
+		<PackageReference Include="WinUIEx" Version="2.3.2" />
 		<Manifest Include="$(ApplicationManifest)" />
 	</ItemGroup>
 
