@@ -11,15 +11,16 @@ cbuffer PerModelConstantBuffer : register(b1)
 
 cbuffer Properties : register(b2)
 {
+    // Color
+    float4 Color;
     // Header("This is a Header!")
     float Float;
     int Int;
     // Slider(1, 10)
-    int Slider;
+    float Slider;
     // Space
     float2 Float2;
     float3 Float3;
-    // Color
     float4 Float4;
     // Space
     bool Bool;

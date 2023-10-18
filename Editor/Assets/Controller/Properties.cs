@@ -605,6 +605,10 @@ internal sealed partial class Properties
         // Get any custom attributes applied to the field.
         var attributes = fieldInfo.GetCustomAttributes(true);
 
+        // Return null if the field has a HideAttribute applied.
+        if (attributes.OfType<HideAttribute>().Any())
+            return null;
+
         if (finalGrid is null)
         {
             #region // Process FieldType

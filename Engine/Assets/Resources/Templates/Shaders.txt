@@ -11,15 +11,16 @@ cbuffer PerModelConstantBuffer : register(b1)
 
 cbuffer Properties : register(b2)
 {
+    // Color
+    float4 Color;
     // Header("This is a Header!")
     float Float;
     int Int;
     // Slider(1, 10)
-    int Slider;
+    float Slider;
     // Space
     float2 Float2;
     float3 Float3;
-    // Color
     float4 Float4;
     // Space
     bool Bool;
@@ -41,8 +42,8 @@ struct VS_OUTPUT
     float3 normal : NORMAL;
 };
 
-Texture2D texture : register(t0);
-SamplerState samplerState : register(s0);
+// Texture2D texture : register(t0);
+// SamplerState samplerState : register(s0);
 
 VS_OUTPUT VS(appdata v)
 {
@@ -59,7 +60,8 @@ VS_OUTPUT VS(appdata v)
 
 float4 PS(VS_OUTPUT i) : SV_TARGET
 {
-    float4 col = texture.Sample(samplerState, i.uv);
-
+    // float4 col = texture.Sample(samplerState, i.uv);
+    float4 col = float4(Color.rgb, 1);
+    
     return col;
 }
