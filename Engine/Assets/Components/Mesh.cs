@@ -51,7 +51,7 @@ public sealed class Mesh : Component
     public override void OnRender()
     {
         BoundingBox.Transform(BoundingBox, Entity.Transform.WorldMatrix, out var transformedBoundingBox);
-        if(!CameraSystem.Components.Last().BoundingFrustum.Intersects(transformedBoundingBox))
+        if(!Camera.CurrentRenderingCamera.BoundingFrustum.Intersects(transformedBoundingBox))
             return;
 
         if (Equals(Material.CurrentMaterialOnGPU, Material)

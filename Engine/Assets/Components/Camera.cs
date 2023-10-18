@@ -5,6 +5,7 @@ namespace Engine.Components;
 public sealed class Camera : Component
 {
     public static Camera Main { get; private set; }
+    public static Camera CurrentRenderingCamera { get; set; }
 
     public CameraBuffer CameraBuffer { get; private set; } = new();
     public BoundingFrustum BoundingFrustum { get; private set; }
@@ -25,16 +26,21 @@ public sealed class Camera : Component
         // Register the component with the CameraSystem.
         CameraSystem.Register(this);
 
-    public override void OnAwake()
+    public override void OnAwake() =>
+        CurrentRenderingCamera = this;
+
+    public override void OnUpdate()
     {
         // Assign this camera instance as the main camera if it has "MainCamera" tag.
         if (Entity.Tag == Tags.MainCamera.ToString())
             Main = this;
-    }
 
-    public override void OnUpdate() =>
         // Override the Component Order with the local variable.
         Order = CameraID;
+
+        if (Order > CurrentRenderingCamera?.Order)
+            CurrentRenderingCamera = this;
+    }
 
     public override void OnRender() =>
         // Recreates the view constants data to be used by the Camera.
@@ -50,7 +56,7 @@ public sealed class Camera : Component
             Entity.Transform.Position,
             Entity.Transform.Position + Entity.Transform.Forward,
             Vector3.UnitY);
-        
+
         // Get the aspect ratio for the device's screen.
         var aspect = (float)_renderer.Size.Width / (float)_renderer.Size.Height;
         var dAspect = aspect < 1 ? 1 * aspect : 1 / aspect;

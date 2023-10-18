@@ -182,14 +182,16 @@ namespace Engine.ECS
 
         public string GetDebugInformation()
         {
-            var info = $"""
+            var info = 
+                $"""
                 Name: {Name}
                 ID: {ID}
                 Scene: {Scene.Name}
                 """;
 
             if(Parent is not null)
-                info += $"""
+                info += 
+                    $"""
 
                     Parent: {Parent.Name}
                     Parent ID: {Parent.ID}

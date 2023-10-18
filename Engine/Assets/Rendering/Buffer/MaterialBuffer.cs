@@ -75,11 +75,11 @@ public class MaterialBuffer()
             var mappedResource = _renderer.Data.DeviceContext.Map(_properties, MapMode.WriteDiscard);
 
             // Create a MethodInfo for Unsafe.Copy with the correct generic type.
-            MethodInfo genericCopyMethod = typeof(Unsafe)
+            MethodInfo copyMethod = typeof(Unsafe)
                 .GetMethods().FirstOrDefault(method => method.Name == "Copy")
                 .MakeGenericMethod(type);
             // Perform the unsafe copy using reflection
-            genericCopyMethod.Invoke(null, new object[] {
+            copyMethod.Invoke(null, new object[] {
                 new IntPtr(mappedResource.DataPointer.ToPointer()),
                 _propertiesConstantBuffer });
 
