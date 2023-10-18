@@ -1,6 +1,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/CanTalat-Yakan/3DEngine/blob/master/LICENSE) 
 # [3D Engine - Get it in the Microsoft Store-App](https://www.microsoft.com/store/apps/9NFSX6JPV0PS)
-[⠀WIKI⠀](https://3DEngine.Wiki) [⠀DOCS⠀](https://engine3d.gitbook.io/documentation/)
+# [Documentation](https://engine3d.gitbook.io/wiki/) 
 
 # Windows App SDK
 
@@ -34,7 +34,7 @@ The Entity Component System is an architectural pattern often used in video game
 
 * Materials,
 * Render Textures,
-* Compute Shader
+* Compute Shader,
 * Post Processing,
 * Gizmos,
 * USD,
