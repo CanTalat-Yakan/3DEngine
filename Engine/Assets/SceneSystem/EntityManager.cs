@@ -46,12 +46,10 @@ public sealed partial class EntityManager
     {
         // Loop through all entities in the EntityList.
         foreach (var entity in EntityList)
-            // Check if the entity is not null.
-            if (entity is not null)
-                // Check if the entity's ID matches the given ID.
-                if (entity.ID == id)
-                    // Return the entity if its ID matches the given ID.
-                    return entity;
+            // Check if the ID of the entity matches the given ID.
+            if (entity?.ID == id)
+                // Return the entity if its ID matches the given ID.
+                return entity;
 
         // Return null if the entity is not found.
         return null;
@@ -61,12 +59,10 @@ public sealed partial class EntityManager
     {
         // Iterate over all entities in the EntityList.
         foreach (var entity in EntityList)
-            // Check if the current entity is not null.
-            if (entity is not null)
-                // Check if the tag of the current entity matches the given tag.
-                if (entity.Tag.ToString() == tag)
-                    // Return the entity if a match is found.
-                    return entity;
+            // Check if the tag of the current entity matches the given tag.
+            if (entity?.Tag.ToString() == tag)
+                // Return the entity if a match is found.
+                return entity;
 
         // Return null if no matching entity is found.
         return null;
