@@ -61,7 +61,7 @@ internal sealed class SceneBoot : EditorComponent
             for (int i = 0; i < 1000; i++)
             {
                 // Create a new cube and add it to the Cubes entity.
-                var newCube = SceneManager.MainScene.EntityManager.CreatePrimitive(PrimitiveTypes.Cube, Cubes);
+                var newCube = SceneManager.MainScene.EntityManager.CreatePrimitive(PrimitiveTypes.Cube, Cubes, true);
 
                 // Set the position of the new cube with an offset on the Y axis.
                 newCube.Entity.Transform.LocalPosition = new(new Random().Next(-250, 250), new Random().Next(-250, 250), new Random().Next(-250, 250));

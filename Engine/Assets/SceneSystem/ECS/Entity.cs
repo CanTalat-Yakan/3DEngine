@@ -37,6 +37,7 @@ namespace Engine.ECS
         public string Name;
         public bool IsEnabled = true;
         public bool IsStatic = false;
+        [Hide] public bool IsHidden = false;
         public string Tag;
         public string Layer;
 
@@ -154,9 +155,10 @@ namespace Engine.ECS
                 ID = Guid.NewGuid(), // Generate a new ID for the new Entity object.
                 Name = Name,
                 IsEnabled = IsEnabled,
+                IsHidden = IsHidden,
                 IsStatic = IsStatic,
                 Layer = Layer,
-                Tag = Tag,
+                Tag = Tag
             };
 
             // Copy the original Entity object's Transform properties to the new Entity object.

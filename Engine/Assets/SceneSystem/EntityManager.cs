@@ -103,7 +103,7 @@ public sealed partial class EntityManager
             _materialDefault = new(Paths.SHADERS + "SimpleLit.hlsl");
     }
 
-    public Entity CreateEntity(Entity parent = null, string name = "New Entity", string tag = "Untagged")
+    public Entity CreateEntity(Entity parent = null, string name = "New Entity", string tag = "Untagged", bool hide = false)
     {
         // Create a new Entity instance with the specified name, parent, and tag.
         Entity newEntity = new()
@@ -111,6 +111,7 @@ public sealed partial class EntityManager
             Name = name,
             Parent = parent,
             Tag = tag,
+            IsHidden = hide
         };
 
         // Add the new entity to the EntityList.
@@ -120,13 +121,14 @@ public sealed partial class EntityManager
         return newEntity;
     }
 
-    public Mesh CreatePrimitive(PrimitiveTypes type = PrimitiveTypes.Cube, Entity parent = null)
+    public Mesh CreatePrimitive(PrimitiveTypes type = PrimitiveTypes.Cube, Entity parent = null, bool hide = false)
     {
         // Create a new entity with the specified name and parent.
         Entity newEntity = new()
         {
             Name = type.ToString().FormatString(),
             Parent = parent,
+            IsHidden = hide
         };
 
         // Add a mesh component to the entity using the specified primitive type.
@@ -140,7 +142,7 @@ public sealed partial class EntityManager
         return mesh;
     }
 
-    public Camera CreateCamera(string name = "Camera", string tag = "Untagged", Entity parent = null)
+    public Camera CreateCamera(string name = "Camera", string tag = "Untagged", Entity parent = null, bool hide = false)
     {
         // Create a new Entity with the given name, parent, and tag.
         Entity newEntity = new()
@@ -148,6 +150,7 @@ public sealed partial class EntityManager
             Name = name,
             Parent = parent,
             Tag = tag,
+            IsHidden = hide
         };
 
         // Add a Camera component to the Entity.

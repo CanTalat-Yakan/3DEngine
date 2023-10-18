@@ -138,8 +138,12 @@ internal sealed partial class Hierarchy
 
     private TreeEntry AddTreeEntry(SceneEntry sceneEntry, Entity entity)
     {
+        if(entity.IsHidden) 
+            return null;
+
         if (entity.CompareTag(Enum.GetNames(typeof(EditorTags))))
             return null;
+
 
         TreeEntry treeEntry = new() { Name = entity.Name, ID = entity.ID };
         treeEntry.IconNode = new() { Name = treeEntry.Name, TreeEntry = treeEntry, IsExpanded = false };
