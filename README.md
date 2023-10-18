@@ -4,7 +4,7 @@
 
 # Windows App SDK
 
-**Create beautiful, modern apps for Windows 11 that are backwards compatible** to Windows 10 October 2018 Update (build 17763 / version 1809)!
+**Use the [WinAppSDK](https://github.com/microsoft/WindowsAppSDK) to create beautiful, modern apps for Windows 11 that are backwards compatible** to Windows 10 October 2018 Update (build 17763 / version 1809)!
 
 * Use your current installer *(no requirement to use MSIX, but there are [reliability/security benefits to using MSIX](https://docs.microsoft.com/windows/msix/overview#key-features)!)*
 * Additive platform APIs *(only add what you need, leave the rest of your app as-is)*
@@ -23,7 +23,7 @@ If you are looking for high-performance low level bindings, please visit [Vortic
 The Entity Component System is an architectural pattern often used in video game development. It facilitates code reusability by separating the data from the behavior. In addition, ECS obeys the "composition over inheritance principle," providing improved flexibility and helping developers identify entities in a game's scene where all the objects are classified as entities. One reason ECS is faster than a game object component system is that you put all the data you need together in the same place in memory. Doing so avoids the performance overhead of having to search around to find it.
 
 # NuGet Package
-You can also only get the Engine with the NuGet Package Manager and create applications using the 3DEngine (w/o Editor) in a new project and implement all features via code.
+With the [NuGet](https://www.nuget.org/packages/3DEngine/) you can also only get the Engine with the NuGet Package Manager and create applications using the 3DEngine (w/o Editor) in a new project and implement all features via code.
 
 If you want the Editor, this is the GitHub Repo for the complete [3DEngine](https://github.com/CanTalat-Yakan/3DEngine/tree/master).
 
