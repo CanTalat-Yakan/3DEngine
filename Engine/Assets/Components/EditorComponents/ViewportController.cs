@@ -1,6 +1,6 @@
 ﻿namespace Engine.Editor;
 
-public sealed class ViewportController : EditorComponent
+public sealed class ViewportController : EditorComponent, IHide
 {
     public static ViewportController Instance { get; private set; }
 

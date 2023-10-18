@@ -98,7 +98,7 @@ public sealed partial class SceneManager
         // Copy TransformSystem to Array.
         TransformSystem.CopyToArray();
         // Sort and Copy CameraSystem to Array.
-        CameraSystem.SortAndCopyToArray();
+        CameraSystem.CopyToArray();
         // Sort and Copy MeshSystem to Array if it has changes.
         MeshSystem.SortAndCopyToArrayIfDirty();
         // Copy EditorScriptSystem to Array.
@@ -109,6 +109,8 @@ public sealed partial class SceneManager
 
     public void Awake()
     {
+        // Awake the TransformSystem.
+        TransformSystem.Awake();
         // Awake the CameraSystem.
         CameraSystem.Awake();
 
@@ -126,12 +128,12 @@ public sealed partial class SceneManager
 
     public void Update()
     {
-        // Update the TransformSystem
-        TransformSystem.Update();
-        // Update the MeshSystem.
-        MeshSystem.Update();
+        // Update the TransformSystem.
+        Profiler.Benchmark(TransformSystem.Update, "Transform Update");
         // Update the CameraSystem
         CameraSystem.Update();
+        // Update the MeshSystem.
+        MeshSystem.Update();
 
         // Update the EditorScriptSystem.
         EditorScriptSystem.Update();
@@ -149,6 +151,9 @@ public sealed partial class SceneManager
         if (EditorState.PlayMode)
             // LateUpdate the ScriptSystem.
             ScriptSystem.LateUpdate();
+
+        // LateUpdate the TransformSystem.
+        TransformSystem.LateUpdate();
     }
 
     public void FixedUpdate()
@@ -163,21 +168,11 @@ public sealed partial class SceneManager
 
     public void Render()
     {
-        Profiler.Start(out var stopwatchRenderQueue);
-
-        // Update the TransformSystem.
-        Profiler.Benchmark(TransformSystem.Update, "Transform Update");
-
-        // Render the Cameras.
-        CameraSystem.Render();
-
         // Render the MeshSystem.
         Profiler.Benchmark(MeshSystem.Render, "Mesh Render");
 
         Mesh.CurrentMeshOnGPU = null;
         Material.CurrentMaterialOnGPU = null;
-
-        Profiler.Stop(stopwatchRenderQueue, "Render Queue");
     }
 
     public void Gui()

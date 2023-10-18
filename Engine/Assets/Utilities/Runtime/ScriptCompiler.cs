@@ -168,8 +168,11 @@ public sealed class ScriptCompiler
             .Except(_ignoreAssemblies)
             .SelectMany(a => a.GetTypes())
             .Where(t =>
-                typeof(Component).IsAssignableFrom(t) && !t.Equals(typeof(Component))
-                && !(typeof(IHide).IsAssignableFrom(t) && !t.IsInterface))
+                (typeof(Component).IsAssignableFrom(t) || typeof(EditorComponent).IsAssignableFrom(t)) 
+                && !t.Equals(typeof(Component)) 
+                && !t.Equals(typeof(EditorComponent))
+                && !(typeof(IHide).IsAssignableFrom(t) 
+                && !t.IsInterface))
             .ToArray();
 
         ComponentLibrary.Components.Clear();

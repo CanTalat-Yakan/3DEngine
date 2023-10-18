@@ -2,8 +2,10 @@
 
 namespace Engine.Components;
 
-public sealed partial class Transform : Component, IHide
+public sealed partial class Transform : EditorComponent, IHide
 {
+    public bool TransformChanged { get; set; }
+
     public Transform Parent => Entity.Parent?.Transform;
 
     public Vector3 Forward => TransformVector3(LocalForward, Parent?.Forward);
@@ -37,14 +39,25 @@ public sealed partial class Transform : Component, IHide
         // Register the component with the TransformSystem.
         TransformSystem.Register(this);
 
+    public override void OnAwake() =>
+        TransformChanged = true;
+
     public override void OnUpdate()
     {
         // Calculate the forward, right and up direction.
         CalculateOrientation();
 
+        var previousWorldMatrix = WorldMatrix;
+
         // Calculate the world matrix as a result of the local position, rotation and scale.
         CalculateWorldMatrix();
+
+        if (!WorldMatrix.Equals(previousWorldMatrix))
+            TransformChanged = true;
     }
+
+    public override void OnLateUpdate() =>
+        TransformChanged = false;
 
     internal PerModelConstantBuffer GetConstantBuffer()
     {
@@ -62,7 +75,7 @@ public sealed partial class Transform : Component, IHide
         """;
 }
 
-public sealed partial class Transform : Component, IHide
+public sealed partial class Transform : EditorComponent, IHide
 {
     private void CalculateOrientation()
     {
@@ -97,7 +110,7 @@ public sealed partial class Transform : Component, IHide
     }
 }
 
-public sealed partial class Transform : Component, IHide
+public sealed partial class Transform : EditorComponent, IHide
 {
     private Vector3 TransformVector3(Vector3 local, Vector3? parent)
     {

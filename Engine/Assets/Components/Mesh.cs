@@ -6,7 +6,7 @@ using Vortice.Mathematics;
 
 namespace Engine.Components;
 
-public sealed class Mesh : Component
+public sealed partial class Mesh : EditorComponent
 {
     public string MeshPath;
     public string MaterialPath;
@@ -16,6 +16,8 @@ public sealed class Mesh : Component
 
     public MeshBuffer MeshBuffers { get; private set; } = new();
     public BoundingBox BoundingBox { get; private set; }
+    public BoundingBox TransformedBoundingBox { get; private set; }
+    public bool InBounds { get; set; }
 
     public MeshInfo MeshInfo => _meshInfo;
     [Show] private MeshInfo _meshInfo;
@@ -29,7 +31,7 @@ public sealed class Mesh : Component
         // Register the component with the MeshSystem.
         MeshSystem.Register(this);
 
-    public Mesh()
+    public override void OnAwake()
     {
         SetMeshInfo(EntityManager.GetDefaultMeshInfo());
         SetMaterial(EntityManager.GetDefaultMaterial());
@@ -46,12 +48,13 @@ public sealed class Mesh : Component
             if (File.Exists(MaterialPath))
                 try { Output.Log("Set the Material to " + SetMaterial(new FileInfo(MaterialPath).Name).FileInfo.Name); }
                 finally { MaterialPath = null; }
+
+        CheckBounds();
     }
 
     public override void OnRender()
     {
-        BoundingBox.Transform(BoundingBox, Entity.Transform.WorldMatrix, out var transformedBoundingBox);
-        if(!Camera.CurrentRenderingCamera.BoundingFrustum.Intersects(transformedBoundingBox))
+        if (!InBounds)
             return;
 
         if (Equals(Material.CurrentMaterialOnGPU, Material)
@@ -89,7 +92,10 @@ public sealed class Mesh : Component
         MeshBuffers.Dispose();
         Material.Dispose();
     }
+}
 
+public sealed partial class Mesh : EditorComponent
+{
     public void SetMeshInfo(MeshInfo meshInfo)
     {
         // Batch MeshInfo by sorting the List with the Order of the Component
@@ -101,7 +107,7 @@ public sealed class Mesh : Component
             BatchLookup.Add(meshInfo);
         }
 
-        BoundingBox = BoundingBox.CreateFromPoints(meshInfo.Vertices.Select(Vertex => Vertex.Position).ToArray());
+        InstantiateBounds(BoundingBox.CreateFromPoints(meshInfo.Vertices.Select(Vertex => Vertex.Position).ToArray()));
 
         // Assign to local variable.
         _meshInfo = meshInfo;
@@ -122,4 +128,26 @@ public sealed class Mesh : Component
     public void SetMaterial(Material material) =>
         // Assign to local variable.
         _material = material;
+}
+
+public sealed partial class Mesh : EditorComponent
+{
+    private void InstantiateBounds(BoundingBox boundingBox)
+    {
+        BoundingBox = boundingBox;
+        TransformedBoundingBox = BoundingBox.Transform(BoundingBox, Entity.Transform.WorldMatrix);
+    }
+
+    private void CheckBounds()
+    {
+        if ((Camera.CurrentRenderingCamera?.Entity.Transform.TransformChanged ?? false)
+            || Entity.Transform.TransformChanged)
+        {
+            TransformedBoundingBox = BoundingBox.Transform(BoundingBox, Entity.Transform.WorldMatrix);
+
+            var boundingFrustum = Camera.CurrentRenderingCamera.BoundingFrustum;
+            if (boundingFrustum is not null)
+                InBounds = boundingFrustum.Value.Intersects(TransformedBoundingBox);
+        }
+    }
 }

@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Engine.Editor;
 
-public class DefaultSky : EditorComponent
+public class DefaultSky : EditorComponent, IHide
 {
     private static Material _materialSky;
     private static Material _materialSkyLight;
@@ -35,7 +35,8 @@ public class DefaultSky : EditorComponent
         _materialSkyLight = new(SHADER_RESOURCES + SHADER_SKYBOX, IMAGE_SKY_LIGHT);
 
         Entity.Name = "Sky"; // Set entity name to "Sky".
-        Entity.Tag = EditorTags.SceneSky.ToString(); // Set entity tag to SceneSky.
+        Entity.Tag = "DefaultSky"; // Set entity tag to SceneSky.
+        Entity.IsHidden = true;
 
         // Set scale of the Sky's transform.
         Entity.Transform.LocalScale = new Vector3(-100, 100, 100);

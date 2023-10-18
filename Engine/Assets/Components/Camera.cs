@@ -2,13 +2,13 @@
 
 namespace Engine.Components;
 
-public sealed class Camera : Component
+public sealed class Camera : EditorComponent
 {
     public static Camera Main { get; private set; }
     public static Camera CurrentRenderingCamera { get; set; }
 
     public CameraBuffer CameraBuffer { get; private set; } = new();
-    public BoundingFrustum BoundingFrustum { get; private set; }
+    public BoundingFrustum? BoundingFrustum { get; private set; }
 
     public CameraProjection Projection = CameraProjection.Perspective;
     [Space]
@@ -40,11 +40,11 @@ public sealed class Camera : Component
 
         if (Order > CurrentRenderingCamera?.Order)
             CurrentRenderingCamera = this;
-    }
 
-    public override void OnRender() =>
-        // Recreates the view constants data to be used by the Camera.
-        RecreateViewConstants();
+        if (CurrentRenderingCamera == this)
+            // Recreates the view constants data to be used by the Camera.
+            RecreateViewConstants();
+    }
 
     public override void OnDestroy() =>
         CameraBuffer.Dispose();

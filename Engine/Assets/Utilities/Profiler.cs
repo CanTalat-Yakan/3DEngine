@@ -17,7 +17,7 @@ public sealed class Profiler
 
     public static StringBuilder AdditionalProfiling { get; set; } = new();
 
-    public static double Benchmark(Action action, string name)
+    public static double Benchmark(Action action, string name = null)
     {
         Stopwatch stopwatch = new();
         stopwatch.Start();
@@ -27,7 +27,9 @@ public sealed class Profiler
         stopwatch.Stop();
 
         double delta = stopwatch.Elapsed.TotalSeconds;
-        AdditionalProfiling.Append($"{name}: {delta * 1000:F2} ms\n");
+
+        if (!string.IsNullOrEmpty(name))
+            AdditionalProfiling.Append($"{name}: {delta * 1000:F2} ms\n");
 
         return delta;
     }

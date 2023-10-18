@@ -48,7 +48,7 @@ class AppWindow
         ImGui.SetNextWindowBgAlpha(0.35f);
         if (ImGui.Begin("Output", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize))
         {
-            if (Time.OnFixedFrame)
+            if (Output.GetLogs.Count > 0)
                 _output = Output.DequeueLog()?.GetString() + _output;
             ImGui.Text(_output);
             ImGui.End();

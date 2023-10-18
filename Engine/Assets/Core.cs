@@ -61,9 +61,10 @@ public sealed class Core
         #endregion
 
         // Creates an entity with the Boot editor tag and adds a SceneBoot component to it.
-        SceneManager.MainScene.EntityManager
-            .CreateEntity(null, "Boot", EditorTags.SceneBoot.ToString())
+        var boot = SceneManager.MainScene.EntityManager
+            .CreateEntity(null, "Boot")
             .AddComponent(new SceneBoot());
+        boot.Entity.IsHidden = true;
 
         // Compile all project scripts and add the components to the collection for the AddComponent function.
         ScriptCompiler.CompileProjectScripts(EditorState.AssetsPath);

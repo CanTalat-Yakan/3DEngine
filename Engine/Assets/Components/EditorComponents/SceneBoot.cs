@@ -1,17 +1,19 @@
 ﻿namespace Engine.Editor;
 
-internal sealed class SceneBoot : EditorComponent
+internal sealed class SceneBoot : EditorComponent, IHide
 {
     public Camera SceneCamera;
 
     public Entity DefaultSky;
-
     public Entity Cubes;
+
+    public int CubesCount;
 
     public override void OnAwake()
     {
         // Create a camera entity with the name "Camera" and tag "SceneCamera".
-        SceneCamera = SceneManager.MainScene.EntityManager.CreateCamera("Camera", EditorTags.SceneCamera.ToString());
+        SceneCamera = SceneManager.MainScene.EntityManager.CreateCamera("Camera");
+        SceneCamera.Entity.IsHidden = true;
         // Set the camera order to the maximum value.
         SceneCamera.CameraID = byte.MaxValue;
 
@@ -55,7 +57,7 @@ internal sealed class SceneBoot : EditorComponent
         if (Input.GetKey(Key.C, InputState.Down) && ViewportController.ViewportFocused)
         {
             // Log message indicating that 10 cubes have been spawned.
-            Output.Log("Spawned 1000 Cubes");
+            Output.Log($"Spawned {CubesCount += 1000} Cubes");
 
             // Loop to spawn 1000 cubes with random attributes.
             for (int i = 0; i < 1000; i++)
