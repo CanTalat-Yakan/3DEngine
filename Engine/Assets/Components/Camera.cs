@@ -1,10 +1,13 @@
-﻿namespace Engine.Components;
+﻿using Vortice.Mathematics;
+
+namespace Engine.Components;
 
 public sealed class Camera : Component
 {
     public static Camera Main { get; private set; }
 
     public CameraBuffer CameraBuffer { get; private set; } = new();
+    public BoundingFrustum BoundingFrustum { get; private set; }
 
     public CameraProjection Projection = CameraProjection.Perspective;
     [Space]
@@ -64,6 +67,8 @@ public sealed class Camera : Component
 
         // Calculate the view-projection matrix for the camera.
         var viewProjection = Matrix4x4.Transpose(view * projection);
+
+        BoundingFrustum = new BoundingFrustum(view * projection);
 
         // Store the camera's view-projection matrix and position.
         CameraBuffer.ViewConstantBuffer = new()

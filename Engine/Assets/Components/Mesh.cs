@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+
+using Vortice.Mathematics;
 
 namespace Engine.Components;
 
@@ -12,6 +15,7 @@ public sealed class Mesh : Component
     public static List<MeshInfo> BatchLookup { get; private set; } = new();
 
     public MeshBuffer MeshBuffers { get; private set; } = new();
+    public BoundingBox BoundingBox { get; private set; }
 
     public MeshInfo MeshInfo => _meshInfo;
     [Show] private MeshInfo _meshInfo;
@@ -46,6 +50,10 @@ public sealed class Mesh : Component
 
     public override void OnRender()
     {
+        BoundingBox.Transform(BoundingBox, Entity.Transform.WorldMatrix, out var transformedBoundingBox);
+        if(!CameraSystem.Components.Last().BoundingFrustum.Intersects(transformedBoundingBox))
+            return;
+
         if (Equals(Material.CurrentMaterialOnGPU, Material)
             && Equals(Mesh.CurrentMeshOnGPU, MeshInfo))
         {
@@ -92,6 +100,8 @@ public sealed class Mesh : Component
             Order = (byte)BatchLookup.Count;
             BatchLookup.Add(meshInfo);
         }
+
+        BoundingBox = BoundingBox.CreateFromPoints(meshInfo.Vertices.Select(Vertex => Vertex.Position).ToArray());
 
         // Assign to local variable.
         _meshInfo = meshInfo;

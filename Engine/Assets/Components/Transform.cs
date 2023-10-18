@@ -56,14 +56,14 @@ public sealed class Transform : Component, IHide
         // Calculate the scale matrix based on the WorldScale.
         Matrix4x4 scaleMatrix = Matrix4x4.CreateScale(Scale);
 
-        // Calculate the world matrix as the transposed result of the combination of scale, rotation and translation matrices.
-        _worldMatrix = Matrix4x4.Transpose(scaleMatrix * rotationMatrix * translationMatrix);
+        // Calculate the world matrix as a result of the combination of scale, rotation and translation matrices.
+        _worldMatrix = scaleMatrix * rotationMatrix * translationMatrix;
     }
 
     internal PerModelConstantBuffer GetConstantBuffer()
     {
-        // Set the ModelView matrix in the ModelConstantBuffer to the WorldMatrix.
-        _modelConstantBuffer.ModelView = _worldMatrix;
+        // Set the transposed ModelView matrix in the ModelConstantBuffer to the WorldMatrix.
+        _modelConstantBuffer.ModelView = Matrix4x4.Transpose(_worldMatrix);
 
         return _modelConstantBuffer;
     }
