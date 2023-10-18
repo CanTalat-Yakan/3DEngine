@@ -187,11 +187,17 @@ public sealed class ScriptCompiler
 
     private void ReplaceComponentTypeReferences(Assembly assembly)
     {
-        foreach (var type in assembly.GetTypes())
-            if (type.IsSubclassOf(typeof(Component)))
-                foreach (var ignoreAssembly in _ignoreAssemblies)
-                    foreach (var ignoreType in ignoreAssembly.GetTypes())
-                        if (type.FullName == ignoreType.FullName)
+        foreach (var ignoreAssembly in _ignoreAssemblies)
+            foreach (var ignoreType in ignoreAssembly.GetTypes())
+            {
+                foreach (var type in assembly.GetTypes())
+                    if (type.FullName.Equals(ignoreType.FullName))
+                    {
+                        if (type.IsSubclassOf(typeof(Component)))
                             ScriptSystem.Replace(ignoreType, type);
+                        else if (type.IsSubclassOf(typeof(EditorComponent)))
+                            EditorScriptSystem.Replace(ignoreType, type);
+                    }
+            }
     }
 }
