@@ -133,7 +133,7 @@ public sealed partial class Entity : ICloneable
         // Check if the Entity has a specified tag.
         foreach (var tag in tags)
             // If the Entity has the tag, return true.
-            if (Tag == tag)
+            if (Tag.Equals(tag))
                 return true;
 
         // Return false if no matching tag is found.
