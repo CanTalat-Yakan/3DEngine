@@ -45,8 +45,7 @@ sealed class Program
 }
 ```
 
-Use the Engine Core to get to the Scene System.
-### [CORE](https://app.gitbook.com/o/JkBq1pLRTs0PVd8M1Z33/s/FQ0NAsexBZFs3RihmQyK/~/changes/36/engine/core)
+Use the Engine.[CORE](https://engine3d.gitbook.io/wiki/engine/core) to get to the Scene System.
 
 Project Setup:
 
