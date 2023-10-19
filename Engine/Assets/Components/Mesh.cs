@@ -57,8 +57,8 @@ public sealed partial class Mesh : EditorComponent
         if (!InBounds)
             return;
 
-        if (Material.CurrentMaterialOnGPU.Equals(Material)
-            && Mesh.CurrentMeshOnGPU.Equals(MeshInfo))
+        if (Material.Equals(Material.CurrentMaterialOnGPU)
+            && MeshInfo.Equals(Mesh.CurrentMeshOnGPU))
         {
             // Update the PerModelConstantBuffer only.
             Material.MaterialBuffer?.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
