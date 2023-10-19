@@ -59,14 +59,6 @@ public sealed partial class Transform : EditorComponent, IHide
     public override void OnLateUpdate() =>
         TransformChanged = false;
 
-    internal PerModelConstantBuffer GetConstantBuffer()
-    {
-        // Set the transposed ModelView matrix in the ModelConstantBuffer to the WorldMatrix.
-        _modelConstantBuffer.ModelView = Matrix4x4.Transpose(_worldMatrix);
-
-        return _modelConstantBuffer;
-    }
-
     public override string ToString() =>
         $"""
         {LocalPosition}
@@ -77,6 +69,14 @@ public sealed partial class Transform : EditorComponent, IHide
 
 public sealed partial class Transform : EditorComponent, IHide
 {
+    internal PerModelConstantBuffer GetConstantBuffer()
+    {
+        // Set the transposed ModelView matrix in the ModelConstantBuffer to the WorldMatrix.
+        _modelConstantBuffer.ModelView = Matrix4x4.Transpose(_worldMatrix);
+
+        return _modelConstantBuffer;
+    }
+
     private void CalculateOrientation()
     {
         // Calculate the forward direction based on the EulerAngles.
