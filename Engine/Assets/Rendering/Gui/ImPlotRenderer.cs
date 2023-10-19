@@ -1,6 +1,6 @@
 ﻿using ImPlotNET;
 
-namespace Engine.Gui;
+namespace Engine.GUI;
 
 unsafe public sealed class ImPlotRenderer
 {

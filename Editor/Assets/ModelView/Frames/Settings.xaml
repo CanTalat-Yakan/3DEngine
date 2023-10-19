@@ -112,9 +112,7 @@
 
                 <HyperlinkButton Content="Source code" NavigateUri="https://github.com/CanTalat-Yakan/3DEngine"/>
 
-                <HyperlinkButton Content="Wiki" NavigateUri="https://engine3d.gitbook.io/wiki/"/>
-
-                <HyperlinkButton Content="Website" NavigateUri="https://3DEngine.wiki"/>
+                <HyperlinkButton Content="Documentation" NavigateUri="https://engine3d.gitbook.io/wiki/"/>
             </StackPanel>
 
             <Grid/>

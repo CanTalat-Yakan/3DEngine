@@ -12,7 +12,7 @@ using ImDrawIdx = System.UInt16;
 // based on https://github.com/ocornut/imgui/blob/master/examples/imgui_impl_dx11.cpp
 // copied from https://github.com/YaakovDavis/VorticeImGui/blob/master/VorticeImGui/Framework/ImGuiRenderer.cs
 
-namespace Engine.Gui;
+namespace Engine.GUI;
 
 unsafe public sealed class ImGuiRenderer
 {

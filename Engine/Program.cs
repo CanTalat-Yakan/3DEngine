@@ -52,7 +52,7 @@ public sealed class Program
         _appWindow = new(win32Window);
 
         if (withGui)
-            _engineCore.OnGui += _appWindow.Render;
+            _engineCore.OnGUI += _appWindow.Render;
 
         _appWindow.Show(ShowWindowCommand.Maximize);
         #endregion

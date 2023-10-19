@@ -1,6 +1,6 @@
 ﻿using imnodesNET;
 
-namespace Engine.Gui;
+namespace Engine.GUI;
 
 unsafe public sealed class ImNodesRenderer
 {

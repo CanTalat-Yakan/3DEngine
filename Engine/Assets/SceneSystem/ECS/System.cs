@@ -177,14 +177,14 @@ public partial class System<T> where T : Component
                 component.OnRender();
     }
 
-    public static void Gui()
+    public static void GUI()
     {
         // Loop through all the components in the static components array
-        // and call OnRender method on the component if it is active.
+        // and call OnGUI method on the component if it is active.
         Parallel.ForEach(s_componentsArray, component =>
         {
             if (CheckActive(component))
-                component.OnGui();
+                component.OnGUI();
         });
     }
 }

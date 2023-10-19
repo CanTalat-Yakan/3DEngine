@@ -40,7 +40,7 @@ public partial class Component : ICloneable
 
     public virtual void OnDestroy() { }
 
-    public virtual void OnGui() { }
+    public virtual void OnGUI() { }
 }
 
 public interface IHide { }

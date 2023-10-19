@@ -4,7 +4,7 @@ global using System;
 global using Engine.Components;
 global using Engine.Data;
 global using Engine.ECS;
-global using Engine.Gui;
+global using Engine.GUI;
 global using Engine.Editor;
 global using Engine.Helper;
 global using Engine.Rendering;
@@ -20,7 +20,7 @@ public sealed class Core
 
     public event Action OnRender;
     public event Action OnInitialize;
-    public event Action OnGui;
+    public event Action OnGUI;
     public event Action OnDispose;
 
     public Renderer Renderer;
@@ -130,7 +130,7 @@ public sealed class Core
         Render();
 
         // Render the Gui with ImGui.
-        RenderGui();
+        RenderGUI();
 
         // Copy the final rendered image into the back buffer.
         Renderer.Resolve();
@@ -164,18 +164,18 @@ public sealed class Core
         OnRender?.Invoke();
     }
 
-    public void RenderGui()
+    public void RenderGUI()
     {
         // Update the ImGuiRenderer.
         _imGuiRenderer.Update(_imGuiContext, Renderer.Size);
         // Update the ImGuiInputHandler.
         _imGuiInputHandler.Update();
 
-        // Call the Render Gui for all scenes.
-        SceneManager.Gui();
+        // Call the Render the GUI for all scenes.
+        SceneManager.GUI();
 
-        // Invoke the OnGui Event.
-        OnGui?.Invoke();
+        // Invoke the OnGUI Event.
+        OnGUI?.Invoke();
 
         // Render the ImGui.
         ImGuiNET.ImGui.Render();

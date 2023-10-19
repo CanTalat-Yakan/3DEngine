@@ -49,7 +49,7 @@ internal sealed partial class Viewport(Grid content)
                 _profiler.Text = Profiler.GetAdditionalString();
         };
 
-        engineCore.OnGui += () =>
+        engineCore.OnGUI += () =>
         {
         };
 
