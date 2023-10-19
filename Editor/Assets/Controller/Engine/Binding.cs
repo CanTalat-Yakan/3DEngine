@@ -351,7 +351,7 @@ internal sealed class Binding
 
         sourceField?.SetValue(bindEntry.Source, convertedValue);
 
-        bindEntry.Value = newValue;
+        bindEntry.Value = convertedValue;
 
         // Invoke the original event handler, if it exists.
         bindEntry.Invoke();
