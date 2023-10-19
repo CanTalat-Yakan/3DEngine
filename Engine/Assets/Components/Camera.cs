@@ -72,14 +72,14 @@ public sealed class Camera : EditorComponent
             : Matrix4x4.CreateOrthographic(Size * aspect, Size, Clipping.X, Clipping.Y);
 
         // Calculate the view-projection matrix for the camera.
-        var viewProjection = Matrix4x4.Transpose(view * projection);
+        var viewProjection = view * projection;
 
-        BoundingFrustum = new BoundingFrustum(view * projection);
+        BoundingFrustum = new BoundingFrustum(viewProjection);
 
         // Store the camera's view-projection matrix and position.
         CameraBuffer.ViewConstantBuffer = new()
         {
-            ViewProjection = viewProjection,
+            ViewProjection = Matrix4x4.Transpose(viewProjection),
             CameraPosition = Entity.Transform.Position,
         };
 
