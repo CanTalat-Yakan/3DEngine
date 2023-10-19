@@ -11,9 +11,6 @@ using Engine.ECS;
 using Engine.Editor;
 using Engine.Runtime;
 using Engine.SceneSystem;
-using System.Numerics;
-using Windows.UI;
-using Microsoft.UI.Xaml.Input;
 
 namespace Editor.Controller;
 

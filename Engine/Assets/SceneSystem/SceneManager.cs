@@ -168,6 +168,11 @@ public sealed partial class SceneManager
 
     public void Render()
     {
+        // Call the Render in ScriptSystem.
+        ScriptSystem.Render();
+        // Call the Render in EditorScriptSystem.
+        EditorScriptSystem.Render();
+
         // Render the MeshSystem.
         Profiler.Benchmark(MeshSystem.Render, "Mesh Render");
 
