@@ -76,7 +76,7 @@ public sealed class Camera : EditorComponent
 
         BoundingFrustum = new BoundingFrustum(viewProjection);
 
-        // Store the view-projection matrix and position of the camera.
+        // Store the transposed view-projection matrix and the position of the camera.
         CameraBuffer.ViewConstantBuffer = new()
         {
             ViewProjection = Matrix4x4.Transpose(viewProjection),
