@@ -129,7 +129,7 @@ public sealed class Core
         // Render the Scenes in the current RenderMode.
         Render();
 
-        // Render the Gui with ImGui.
+        // Render the GUI with ImGui.
         RenderGUI();
 
         // Copy the final rendered image into the back buffer.
