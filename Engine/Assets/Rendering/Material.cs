@@ -6,7 +6,7 @@ namespace Engine.Rendering;
 
 public sealed class Material
 {
-    public static Material CurrentMaterialOnGPU { get; set; }
+    public static Material? CurrentMaterialOnGPU { get; set; }
 
     public MaterialBuffer MaterialBuffer { get; set; } = new();
 

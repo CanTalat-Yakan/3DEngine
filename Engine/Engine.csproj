@@ -15,7 +15,7 @@
 		<Authors>CanTalat-Yakan</Authors>
 		<Product>3DEngine</Product>
 		<PackageProjectUrl>https://github.com/CanTalat-Yakan/3DEngine</PackageProjectUrl>
-		<PackageIcon>3DEngine Logo.png</PackageIcon>
+		<PackageIcon>3DEngine_Logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>3D Game Engine .Net8 C#12</PackageTags>
 		<Version>1.0.5</Version>
@@ -166,7 +166,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Include="..\3DEngine Logo.png" Link="Assets\Resources\Textures\3DEngine Logo.png">
+	  <None Include="..\3DEngine_Logo.png" Link="Assets\Resources\Textures\3DEngine_Logo.png">
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>

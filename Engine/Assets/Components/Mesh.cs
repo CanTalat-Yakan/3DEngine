@@ -19,7 +19,7 @@ public sealed partial class Mesh : EditorComponent
     public BoundingBox TransformedBoundingBox { get; private set; }
     public bool InBounds { get; set; }
 
-    public MeshInfo MeshInfo => _meshInfo;
+    public MeshInfo? MeshInfo => _meshInfo;
     [Show] private MeshInfo _meshInfo;
 
     public Material Material => _material;
@@ -57,14 +57,17 @@ public sealed partial class Mesh : EditorComponent
         if (!InBounds)
             return;
 
-        if (Equals(Material, Material.CurrentMaterialOnGPU)
-            && Equals(MeshInfo, Mesh.CurrentMeshOnGPU))
+        if (Material is null || MeshInfo is null)
+            return;
+
+        if (Material.Equals(Material.CurrentMaterialOnGPU)
+            && MeshInfo.Equals(Mesh.CurrentMeshOnGPU))
         {
             // Update the PerModelConstantBuffer only.
             Material.MaterialBuffer?.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
 
             // Draw the mesh directly without resetting the RenderState.
-            _renderer.DrawIndexed(MeshInfo.Indices.Length);
+            _renderer.DrawIndexed(MeshInfo.Value.Indices.Length);
         }
         else
         {
@@ -75,15 +78,15 @@ public sealed partial class Mesh : EditorComponent
 
             // Draw the mesh with TriangleList.
             _renderer.Data.SetPrimitiveTopology();
-            _renderer.Draw(MeshBuffers.VertexBuffer, MeshBuffers.IndexBuffer, MeshInfo.Indices.Length);
+            _renderer.Draw(MeshBuffers.VertexBuffer, MeshBuffers.IndexBuffer, MeshInfo.Value.Indices.Length);
 
             // Assign MeshInfo to the static variable.
             CurrentMeshOnGPU = MeshInfo;
         }
 
         // Increment the vertex, index and draw call count in the Profiler.
-        Profiler.Vertices += MeshInfo.Vertices.Length;
-        Profiler.Indices += MeshInfo.Indices.Length;
+        Profiler.Vertices += MeshInfo.Value.Vertices.Length;
+        Profiler.Indices += MeshInfo.Value.Indices.Length;
         Profiler.DrawCalls++;
     }
 
@@ -113,7 +116,7 @@ public sealed partial class Mesh : EditorComponent
         _meshInfo = meshInfo;
 
         // Call the "CreateBuffer" method to initialize the vertex and index buffer.
-        MeshBuffers.CreateBuffer(MeshInfo);
+        MeshBuffers.CreateBuffer(MeshInfo.Value);
     }
 
     public MaterialEntry SetMaterial(string materialName)
