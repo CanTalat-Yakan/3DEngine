@@ -80,10 +80,7 @@ public sealed partial class Transform : EditorComponent, IHide
     private void CalculateOrientation()
     {
         // Calculate the forward direction based on the EulerAngles.
-        LocalForward = Vector3.Normalize(new(
-            MathF.Sin(EulerAngles.Y.ToRadians()) * MathF.Cos(EulerAngles.X.ToRadians()),
-            MathF.Sin(-EulerAngles.X.ToRadians()),
-            MathF.Cos(EulerAngles.X.ToRadians()) * MathF.Cos(EulerAngles.Y.ToRadians())));
+        LocalForward = GetLookAt(EulerAngles, LocalForward);
 
         // Calculate the right direction as a product of the forward and global up direction.
         LocalRight = Vector3.Normalize(Vector3.Cross(LocalForward, Vector3.UnitY));
@@ -112,6 +109,20 @@ public sealed partial class Transform : EditorComponent, IHide
 
 public sealed partial class Transform : EditorComponent, IHide
 {
+    private Vector3 GetLookAt(Vector3 eulerAngles, Vector3 input)
+    {
+        float sinX = MathF.Sin(eulerAngles.X.ToRadians());
+        float cosX = MathF.Cos(eulerAngles.X.ToRadians());
+        float sinY = MathF.Sin(eulerAngles.Y.ToRadians());
+        float cosY = MathF.Cos(eulerAngles.Y.ToRadians());
+
+        input.X = sinY * cosX;
+        input.Y = -sinX;
+        input.Z = cosY * cosX;
+
+        return Vector3.Normalize(input);
+    }
+
     private Vector3 TransformVector3(Vector3 local, Vector3? parent)
     {
         if (Parent is null)
