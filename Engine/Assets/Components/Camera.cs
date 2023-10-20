@@ -38,8 +38,19 @@ public sealed class Camera : EditorComponent
         // Override the Component Order with the local variable.
         Order = CameraID;
 
-        if (Order > CurrentRenderingCamera?.Order)
+        // To check the CurrentRenderingCamera later.
+        var previousRenderingCamera = CurrentRenderingCamera;
+
+        // Set the CurrentRenderingCamera, if it hasn't been already.
+        CurrentRenderingCamera ??= this;
+
+        // When the CurrentRenderingCamera is disabled or the current order is greater.
+        if (!CurrentRenderingCamera.IsEnabled || Order > CurrentRenderingCamera?.Order)
             CurrentRenderingCamera = this;
+
+        // Tell the mesh to recheck bounds.
+        if (previousRenderingCamera != CurrentRenderingCamera)
+            Entity.Transform.TransformChanged = true;
 
         if (CurrentRenderingCamera == this)
             // Recreates the view constants data to be used by the Camera.

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Engine.ECS;
@@ -115,6 +116,7 @@ public partial class System<T> where T : Component
 {
     public static void Awake()
     {
+        ParallelOptions options = new() { MaxDegreeOfParallelism = 30 };
         // Loop through all the components in the static components array
         // and call OnAwake method on the component if it is active.
         Parallel.ForEach(s_componentsArray, component =>
@@ -126,9 +128,10 @@ public partial class System<T> where T : Component
 
     public static void Start()
     {
+        ParallelOptions options = new() { MaxDegreeOfParallelism = 30 };
         // Loop through all the components in the static components array
         // and call OnStart method on the component if it is active.
-        Parallel.ForEach(s_componentsArray, component =>
+        Parallel.ForEach(s_componentsArray, options, component =>
         {
             if (CheckActive(component))
                 component.OnStart();
@@ -137,9 +140,10 @@ public partial class System<T> where T : Component
 
     public static void Update()
     {
+        ParallelOptions options = new() { MaxDegreeOfParallelism = 30 };
         // Loop through all the components in the static components array
         // and call OnUpdate method on the component if it is active.
-        Parallel.ForEach(s_componentsArray, component =>
+        Parallel.ForEach(s_componentsArray, options, component =>
         {
             if (CheckActive(component))
                 component.OnUpdate();
@@ -148,9 +152,10 @@ public partial class System<T> where T : Component
 
     public static void LateUpdate()
     {
+        ParallelOptions options = new() { MaxDegreeOfParallelism = 30 };
         // Loop through all the components in the static components array
         // and call OnLateUpdate method on the component if it is active.
-        Parallel.ForEach(s_componentsArray, component =>
+        Parallel.ForEach(s_componentsArray, options, component =>
         {
             if (CheckActive(component))
                 component.OnLateUpdate();
@@ -159,9 +164,10 @@ public partial class System<T> where T : Component
 
     public static void FixedUpdate()
     {
+        ParallelOptions options = new() { MaxDegreeOfParallelism = 30 };
         // Loop through all the components in the static components array
         // and call OnLateUpdate method on the component if it is active.
-        Parallel.ForEach(s_componentsArray, component =>
+        Parallel.ForEach(s_componentsArray, options, component =>
         {
             if (CheckActive(component))
                 component.OnFixedUpdate();
@@ -181,10 +187,8 @@ public partial class System<T> where T : Component
     {
         // Loop through all the components in the static components array
         // and call OnGUI method on the component if it is active.
-        Parallel.ForEach(s_componentsArray, component =>
-        {
+        foreach (T component in s_componentsArray)
             if (CheckActive(component))
                 component.OnGUI();
-        });
     }
 }
