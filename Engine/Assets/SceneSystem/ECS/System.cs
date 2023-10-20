@@ -118,7 +118,7 @@ public partial class System<T> where T : Component
 {
     public static void Awake()
     {
-        ParallelOptions options = new() { MaxDegreeOfParallelism = 30 };
+        ParallelOptions options = new() { MaxDegreeOfParallelism = 20 };
         try
         {
             // Loop through all the components in the static components array
@@ -134,7 +134,7 @@ public partial class System<T> where T : Component
 
     public static void Start()
     {
-        ParallelOptions options = new() { MaxDegreeOfParallelism = 30 };
+        ParallelOptions options = new() { MaxDegreeOfParallelism = 20 };
         try
         {
             // Loop through all the components in the static components array
@@ -150,7 +150,7 @@ public partial class System<T> where T : Component
 
     public static void Update()
     {
-        ParallelOptions options = new() { MaxDegreeOfParallelism = 30 };
+        ParallelOptions options = new() { MaxDegreeOfParallelism = 20 };
         try
         {
             // Loop through all the components in the static components array
@@ -166,7 +166,7 @@ public partial class System<T> where T : Component
 
     public static void LateUpdate()
     {
-        ParallelOptions options = new() { MaxDegreeOfParallelism = 30 };
+        ParallelOptions options = new() { MaxDegreeOfParallelism = 20 };
         try
         {
             // Loop through all the components in the static components array
@@ -182,7 +182,7 @@ public partial class System<T> where T : Component
 
     public static void FixedUpdate()
     {
-        ParallelOptions options = new() { MaxDegreeOfParallelism = 30 };
+        ParallelOptions options = new() { MaxDegreeOfParallelism = 20 };
         try
         {
             // Loop through all the components in the static components array
