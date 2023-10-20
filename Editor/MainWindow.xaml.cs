@@ -25,7 +25,7 @@ public sealed partial class MainWindow : WindowEx
     }
 
     private void AppBarButton_Help_Click(object sender, RoutedEventArgs e) =>
-        _ = Launcher.LaunchUriAsync(new System.Uri(@"https://engine3d.gitbook.io/wiki/"));
+        _ = Launcher.LaunchUriAsync(new System.Uri(@"https://engine3d.gitbook.io/wiki"));
 
     private void x_NavigationView_Main_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
