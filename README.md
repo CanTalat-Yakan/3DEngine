@@ -1,5 +1,5 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/CanTalat-Yakan/3DEngine/blob/master/LICENSE) 
-# [3D Engine - Get it in the Microsoft Store-App](https://www.microsoft.com/store/apps/9NFSX6JPV0PS)
+# [3D Engine - Get it in the Microsoft Store](https://www.microsoft.com/store/apps/9NFSX6JPV0PS)
 ## [Documentation](https://engine3d.gitbook.io/wiki/) 
 
 # Windows App SDK
