@@ -121,6 +121,4 @@ In order to compile, you need to install [Visual Studio 2022 Preview](https://vi
 ![8](Screenshots/Screenshot_8.png)
 ![9](Screenshots/Screenshot_9.png)
 ![10](Screenshots/Screenshot_10.png)
-![11](Screenshots/Screenshot_Build_1.png)
-![12](Screenshots/Screenshot_Build_2.png)
 ![13](Screenshots/Screenshot_Folder.png)
