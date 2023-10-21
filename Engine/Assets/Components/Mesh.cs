@@ -49,11 +49,11 @@ public sealed partial class Mesh : EditorComponent
                 try { Output.Log("Set the Material to " + SetMaterial(new FileInfo(MaterialPath).Name).FileInfo.Name); }
                 finally { MaterialPath = null; }
 
-        CheckBounds();
     }
 
     public override void OnRender()
     {
+        CheckBounds();
         if (!InBounds)
             return;
 
@@ -143,11 +143,12 @@ public sealed partial class Mesh : EditorComponent
 
     private void CheckBounds()
     {
+        if (Entity.Transform.TransformChanged)
+            TransformedBoundingBox = BoundingBox.Transform(BoundingBox, Entity.Transform.WorldMatrix);
+
         if ((Camera.CurrentRenderingCamera?.Entity.Transform.TransformChanged ?? false)
             || Entity.Transform.TransformChanged)
         {
-            TransformedBoundingBox = BoundingBox.Transform(BoundingBox, Entity.Transform.WorldMatrix);
-
             var boundingFrustum = Camera.CurrentRenderingCamera.BoundingFrustum;
             if (boundingFrustum is not null)
                 InBounds = boundingFrustum.Value.Intersects(TransformedBoundingBox);

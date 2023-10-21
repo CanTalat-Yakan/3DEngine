@@ -70,12 +70,10 @@ public sealed partial class EntityManager
 
     public void Destroy(Entity entity)
     {
-        // Disable the entity.
-        entity.IsEnabled = false;
-        // Remove all components from the entity.
-        entity.RemoveComponents();
         // Remove the entity from the entity list.
         EntityList.Remove(entity);
+        // Call Dispose from IDisposable.
+        entity.Dispose();
     }
 
     public void Dispose()

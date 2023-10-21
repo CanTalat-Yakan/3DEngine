@@ -21,7 +21,7 @@ public enum Layers
     UI
 }
 
-public sealed partial class Entity : ICloneable
+public sealed partial class Entity : ICloneable, IDisposable
 {
     public Guid ID = Guid.NewGuid();
 
@@ -48,6 +48,14 @@ public sealed partial class Entity : ICloneable
     public Entity() =>
         // Add the Transform component to the Entity when initialized.
         AddComponent(_transform = new());
+
+    public void Dispose()
+    {
+        // Disable the entity.
+        IsEnabled = false;
+        // Remove all components from the entity.
+        RemoveComponents();
+    }
 }
 
 public sealed partial class Entity : ICloneable
@@ -91,7 +99,7 @@ public sealed partial class Entity : ICloneable
     {
         // Destroy all components associated with the Entity.
         foreach (var component in _components)
-            component.InvokeEventOnDestroy();
+            component.Dispose();
 
         // Clear list of components associated with the Entity.
         _components.Clear();
@@ -183,15 +191,15 @@ public sealed partial class Entity : ICloneable
 
     public string GetDebugInformation()
     {
-        var info = 
+        var info =
             $"""
             Name: {Name}
             ID: {ID}
             Scene: {Scene.Name}
             """;
 
-        if(Parent is not null)
-            info += 
+        if (Parent is not null)
+            info +=
                 $"""
 
                 Parent: {Parent.Name}
