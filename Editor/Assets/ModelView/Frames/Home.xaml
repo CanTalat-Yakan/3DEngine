@@ -48,13 +48,13 @@
             <ScrollViewer>
                 <StackPanel Spacing="20" Padding="50">
                     <Grid HorizontalAlignment="Stretch" CornerRadius="5">
-                        <Image Height="450" Stretch="UniformToFill" Source="/Assets/Resources/Textures/BG_3.png" />
+                        <Image Height="450" Stretch="UniformToFill" Source="/Assets/Resources/Textures/BG_3_Crop.png" />
 
                         <StackPanel Padding="50">
                             <TextBlock FontSize="28" FontWeight="SemiBold" Foreground="Black" Text="3D Engine"/>
 
                             <TextBlock FontSize="20" FontWeight="SemiBold" Foreground="Black" Text=".Net 8  C# 12  WinUI 3"/>
-                            
+
                             <TextBlock FontSize="20" FontWeight="SemiBold" Foreground="Black" Text="Windows App SDK 1.4"/>
                         </StackPanel>
                     </Grid>
@@ -67,7 +67,7 @@
                                 <SymbolIcon Symbol="Link"/>
                             </StackPanel>
                         </HyperlinkButton>
-                        
+
                         <HyperlinkButton NavigateUri="https://github.com/CanTalat-Yakan/3DEngine">
                             <StackPanel Spacing="10" Orientation="Horizontal">
                                 <TextBlock Text="GitHub" FontWeight="Medium"/>
