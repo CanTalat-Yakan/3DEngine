@@ -56,7 +56,7 @@ public sealed partial class Transform : EditorComponent, IHide
             TransformChanged = true;
     }
 
-    public override void OnLateUpdate() =>
+    public override void OnRender() =>
         TransformChanged = false;
 
     public override string ToString() =>

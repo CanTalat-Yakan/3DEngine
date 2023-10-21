@@ -86,7 +86,7 @@ public sealed class ViewportController : EditorComponent, IHide
         _direction = Vector3.Zero;
     }
 
-    public override void OnLateUpdate() =>
+    public override void OnRender() =>
         Camera.Projection = Renderer.Instance.Config.CameraProjection;
 
     private void MovementSpeedCalculation()

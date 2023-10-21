@@ -151,9 +151,6 @@ public sealed partial class SceneManager
         if (EditorState.PlayMode)
             // LateUpdate the ScriptSystem.
             ScriptSystem.LateUpdate();
-
-        // LateUpdate the TransformSystem.
-        TransformSystem.LateUpdate();
     }
 
     public void FixedUpdate()
@@ -175,6 +172,9 @@ public sealed partial class SceneManager
 
         // Render the MeshSystem.
         Profiler.Benchmark(MeshSystem.Render, "Mesh Render");
+
+        // LateUpdate the TransformSystem.
+        TransformSystem.Render();
 
         Mesh.CurrentMeshOnGPU = null;
         Material.CurrentMaterialOnGPU = null;
