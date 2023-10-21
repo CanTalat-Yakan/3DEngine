@@ -50,7 +50,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
     public override void OnUpdate()
     {
         // Deactivate the SceneCamera when the play mode is active.
-        SceneCamera.IsEnabled = EditorState.PlayMode ? false : true;
+        SceneCamera.IsEnabled = !EditorState.PlayMode;
 
         // Example.
         // Check for the 'C' key press to trigger cube spawning.
