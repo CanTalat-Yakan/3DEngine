@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Drawing;
 using System.Numerics;
 using System;
 using Engine.Components;
@@ -38,7 +37,7 @@ public class Example : Component
     public Entity? _Entity;
     [Space]
     [Header("Header")]
-    public event Action Event;
+    public event Action? Event;
 
     // This is the base function of OnRegister.
     public override void OnRegister() =>
