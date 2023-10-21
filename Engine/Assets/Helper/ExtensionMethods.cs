@@ -18,13 +18,25 @@ public static class ExtensionMethods
         MathHelper.ToRadians(value);
 
     public static Vector3 ToDegrees(this Vector3 vector) =>
-        new(vector.X.ToDegrees(), vector.Y.ToDegrees(), vector.Z.ToDegrees());
+        vector.SetVector(vector.X.ToDegrees(), vector.Y.ToDegrees(), vector.Z.ToDegrees());
 
     public static Vector3 ToRadians(this Vector3 vector) =>
-        new(vector.X.ToRadians(), vector.Y.ToRadians(), vector.Z.ToRadians());
+        vector.SetVector(vector.X.ToRadians(), vector.Y.ToRadians(), vector.Z.ToRadians());
 
     public static Vector2 ToVector2(this Size size) =>
         new Vector2(size.Width, size.Height);
+
+    public static Vector2 SetVector(this Vector2 vector, float x, float y)
+    {
+        vector.X = x; vector.Y = y; 
+        return vector;
+    }
+
+    public static Vector3 SetVector(this Vector3 vector, float x, float y, float z)
+    {
+        vector.X = x; vector.Y = y; vector.Z = z;
+        return vector;
+    }
 
     public static bool IsNaN(this float value) =>
         float.IsNaN(value);

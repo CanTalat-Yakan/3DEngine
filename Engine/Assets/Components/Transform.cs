@@ -116,11 +116,10 @@ public sealed partial class Transform : EditorComponent, IHide
         float sinY = MathF.Sin(eulerAngles.Y.ToRadians());
         float cosY = MathF.Cos(eulerAngles.Y.ToRadians());
 
-        input.X = sinY * cosX;
-        input.Y = -sinX;
-        input.Z = cosY * cosX;
-
-        return Vector3.Normalize(input);
+        return Vector3.Normalize(input.SetVector(
+            sinY * cosX, 
+            -sinX, 
+            cosY * cosX));
     }
 
     private Vector3 TransformVector3(Vector3 local, Vector3? parent)
