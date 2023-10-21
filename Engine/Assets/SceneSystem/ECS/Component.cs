@@ -32,7 +32,7 @@ public partial class Component : ICloneable
 
     public virtual void OnUpdate() { }
 
-    public virtual void OnRender() { }
+    public virtual void OnLateUpdate() { }
 
     public virtual void OnFixedUpdate() { }
 

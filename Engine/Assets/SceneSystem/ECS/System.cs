@@ -116,81 +116,61 @@ public partial class System<T> where T : Component
     public static void Awake()
     {
         ParallelOptions options = new() { MaxDegreeOfParallelism = 20 };
-        try
+        // Loop through all the components in the static components array
+        // and call OnAwake method on the component if it is active.
+        Parallel.ForEach(s_componentsArray, component =>
         {
-            // Loop through all the components in the static components array
-            // and call OnAwake method on the component if it is active.
-            Parallel.ForEach(s_componentsArray, component =>
-            {
-                if (CheckActive(component))
-                    component.OnAwake();
-            });
-        }
-        catch (OperationCanceledException ex) { Output.Log($"Operation canceled: {ex.Message}"); }
+            if (CheckActive(component))
+                component.OnAwake();
+        });
     }
 
     public static void Start()
     {
         ParallelOptions options = new() { MaxDegreeOfParallelism = 20 };
-        try
+        // Loop through all the components in the static components array
+        // and call OnStart method on the component if it is active.
+        Parallel.ForEach(s_componentsArray, options, component =>
         {
-            // Loop through all the components in the static components array
-            // and call OnStart method on the component if it is active.
-            Parallel.ForEach(s_componentsArray, options, component =>
-            {
-                if (CheckActive(component))
-                    component.OnStart();
-            });
-        }
-        catch (OperationCanceledException ex) { Output.Log($"Operation canceled: {ex.Message}"); }
+            if (CheckActive(component))
+                component.OnStart();
+        });
     }
 
     public static void Update()
     {
         ParallelOptions options = new() { MaxDegreeOfParallelism = 20 };
-        try
+        // Loop through all the components in the static components array
+        // and call OnUpdate method on the component if it is active.
+        Parallel.ForEach(s_componentsArray, options, component =>
         {
-            // Loop through all the components in the static components array
-            // and call OnUpdate method on the component if it is active.
-            Parallel.ForEach(s_componentsArray, options, component =>
-            {
-                if (CheckActive(component))
-                    component.OnUpdate();
-            });
-        }
-        catch (OperationCanceledException ex) { Output.Log($"Operation canceled: {ex.Message}"); }
+            if (CheckActive(component))
+                component.OnUpdate();
+        });
     }
 
     public static void LateUpdate()
     {
         ParallelOptions options = new() { MaxDegreeOfParallelism = 20 };
-        try
+        // Loop through all the components in the static components array
+        // and call OnLateUpdate method on the component if it is active.
+        Parallel.ForEach(s_componentsArray, options, component =>
         {
-            // Loop through all the components in the static components array
-            // and call OnLateUpdate method on the component if it is active.
-            Parallel.ForEach(s_componentsArray, options, (Action<T>)(component =>
-            {
-                if (CheckActive(component))
-                    component.OnRender();
-            }));
-        }
-        catch (OperationCanceledException ex) { Output.Log($"Operation canceled: {ex.Message}"); }
+            if (CheckActive(component))
+                component.OnLateUpdate();
+        });
     }
 
     public static void FixedUpdate()
     {
         ParallelOptions options = new() { MaxDegreeOfParallelism = 20 };
-        try
+        // Loop through all the components in the static components array
+        // and call OnLateUpdate method on the component if it is active.
+        Parallel.ForEach(s_componentsArray, options, component =>
         {
-            // Loop through all the components in the static components array
-            // and call OnLateUpdate method on the component if it is active.
-            Parallel.ForEach(s_componentsArray, options, component =>
-            {
-                if (CheckActive(component))
-                    component.OnFixedUpdate();
-            });
-        }
-        catch (OperationCanceledException ex) { Output.Log($"Operation canceled: {ex.Message}"); }
+            if (CheckActive(component))
+                component.OnFixedUpdate();
+        });
     }
 
     public static void Render()

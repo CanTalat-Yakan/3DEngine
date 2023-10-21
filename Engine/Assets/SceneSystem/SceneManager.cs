@@ -173,7 +173,7 @@ public sealed partial class SceneManager
         // Render the MeshSystem.
         Profiler.Benchmark(MeshSystem.Render, "Mesh Render");
 
-        // LateUpdate the TransformSystem.
+        // Call the Render in TransformSystem.
         TransformSystem.Render();
 
         Mesh.CurrentMeshOnGPU = null;
