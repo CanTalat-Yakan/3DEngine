@@ -49,19 +49,22 @@ public sealed partial class Mesh : EditorComponent
                 try { Output.Log("Set the Material to " + SetMaterial(new FileInfo(MaterialPath).Name).FileInfo.Name); }
                 finally { MaterialPath = null; }
 
+        if (!EditorState.EditorBuild)
+            CheckBounds();
     }
 
     public override void OnRender()
     {
-        CheckBounds();
+        // With Parallelism the App can't catch up and breaks.
+        // So check bounds in the same thread as the render call.
+        if (EditorState.EditorBuild)
+            CheckBounds();
+
         if (!InBounds)
             return;
 
-        if (Material is null || MeshInfo is null)
-            return;
-
-        if ((Material.CurrentMaterialOnGPU?.Equals(Material) ?? false)
-            && (Mesh.CurrentMeshOnGPU?.Equals(MeshInfo) ?? false))
+        if (Equals(Material.CurrentMaterialOnGPU, Material)
+             && Equals(Mesh.CurrentMeshOnGPU, MeshInfo))
         {
             // Update the PerModelConstantBuffer only.
             Material.MaterialBuffer?.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());

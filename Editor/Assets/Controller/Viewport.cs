@@ -21,6 +21,8 @@ internal sealed partial class Viewport(Grid content)
 
     public void InitializeEngineCore(Renderer renderer, out Engine.Core engineCore)
     {
+        EditorState.EditorBuild = true;
+
         var hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
         engineCore = new Engine.Core(renderer, hwnd, Files.AssetsPath);
 
