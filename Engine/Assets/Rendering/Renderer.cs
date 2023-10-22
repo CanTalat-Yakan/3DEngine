@@ -5,7 +5,6 @@ using Vortice.Direct3D12;
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
-using System.Threading;
 
 namespace Engine.Rendering;
 
@@ -109,6 +108,16 @@ public sealed partial class Renderer
         Data.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.RenderTarget, ResourceStates.Present);
         Data.CommandList.EndEvent();
         Data.CommandList.Close();
+
+        Data.GraphicsQueue.Signal(Data.FrameFence, ++Data.FrameCount);
+
+        ulong GPUFrameCount = Data.FrameFence.CompletedValue;
+
+        if ((Data.FrameCount - GPUFrameCount) >= RenderData.RenderLatency)
+        {
+            Data.FrameFence.SetEventOnCompletion(GPUFrameCount + 1, Data.FrameFenceEvent);
+            Data.FrameFenceEvent.WaitOne();
+        }
     }
 
     public void EndRenderPass() =>
@@ -121,12 +130,20 @@ public sealed partial class Renderer
         Data.CommandList.DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
     }
 
+    public void WaitIdle()
+    {
+        Data.GraphicsQueue.Signal(Data.FrameFence, ++Data.FrameCount);
+        Data.FrameFence.SetEventOnCompletion(Data.FrameCount, Data.FrameFenceEvent);
+        Data.FrameFenceEvent.WaitOne();
+    }
+
     public void BeginFrame(bool useRenderPass = false)
     {
         // Indicate that the MSAA render target texture will be used as a render target.
         Data.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.Present, ResourceStates.RenderTarget);
 
-        //Data.CommandList.Reset();//_commandAllocators[_frameIndex], _pipelineState);
+        Data.FrameIndex = Data.FrameCount % RenderData.RenderLatency;
+        Data.CommandList.Reset(Data.CommandAllocators[Data.FrameIndex]);
         Data.CommandList.BeginEvent("Frame");
 
         // Set the background color to a dark gray.
@@ -174,7 +191,7 @@ public sealed partial class Renderer
 
         // Create synchronization objects.
         Data.FrameFence = Device.CreateFence(0);
-        Data.FrameFenceEvent = new AutoResetEvent(false);
+        Data.FrameFenceEvent = new System.Threading.AutoResetEvent(false);
     }
 
     private Result CreateDeviceAndSetupSwapChain(bool forHwnd, out Result result)
@@ -205,14 +222,14 @@ public sealed partial class Renderer
             Format = RenderData.RenderTargetFormat,
             BufferUsage = Usage.RenderTargetOutput,
             SwapEffect = SwapEffect.FlipSequential,
-            SampleDescription = new(1, 0)
+            SampleDescription = SampleDescription.Default
         };
 
         try
         {
             bool validation = false; // For Debug;
             // Create the IDXGIFactory4.
-            DXGI.CreateDXGIFactory2<IDXGIFactory4>(validation, out var DXGIFactory);
+            using IDXGIFactory4 DXGIFactory = DXGI.CreateDXGIFactory2<IDXGIFactory4>(validation);
             // Obtain instance of the IDXGIFactory5 interface from the DXGI Factory.
             using IDXGIFactory5 dxgiFactory5 = DXGIFactory.QueryInterfaceOrNull<IDXGIFactory5>();
 
@@ -234,12 +251,17 @@ public sealed partial class Renderer
             DescriptorHeapType.RenderTargetView,
             RenderData.RenderLatency));
 
+        Data.BackBufferIndex = Data.SwapChain.CurrentBackBufferIndex;
+
         // Get the back buffer of the swap chain as a texture.
-        Data.BackBufferRenderTargetTexture = Data.SwapChain.GetBuffer<ID3D12Resource>(0); // Data.SwapChain.CurrentBackBufferIndex
+        Data.BackBufferRenderTargetTexture = Data.SwapChain.GetBuffer<ID3D12Resource>(Data.BackBufferIndex);
         // Create a render target view for the back buffer render target texture.
         Device.CreateRenderTargetView(Data.BackBufferRenderTargetTexture, null, Data.BackBufferRenderTargetView.GetCPUDescriptorHandleForHeapStart());
 
-        Data.BackBufferRenderTargetView.GetCPUDescriptorHandleForHeapStart().Offset(Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.RenderTargetView), 2);
+        // Get other buffers when needed.
+        // We only need the back buffer as the render latency is defaulted to 2.
+
+        Data.BackBufferRenderTargetView.GetCPUDescriptorHandleForHeapStart().Offset(Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.RenderTargetView), RenderData.RenderLatency);
     }
 
     private void CreateCommandAllocatorsAndCommandList()
@@ -320,14 +342,12 @@ public sealed partial class Renderer
             sampleQuality: Config.QualityLevels,
             flags: ResourceFlags.AllowDepthStencil);
 
-        ClearValue depthOptimizedClearValue = new(RenderData.DepthStencilFormat, 1.0f, 0);
-
         // Create the depth stencil texture based on the description.
         Data.DepthStencilTexture = Device.CreateCommittedResource(
             HeapType.Default,
             depthStencilTextureDescription,
             ResourceStates.DepthWrite,
-            depthOptimizedClearValue);
+            new(RenderData.DepthStencilFormat, 1.0f, 0));
         Data.DepthStencilTexture.Name = "DepthStencil Texture";
 
         // Create a depth stencil view description for the multi sampling.

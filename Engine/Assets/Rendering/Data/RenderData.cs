@@ -39,6 +39,11 @@ public struct RenderData
     public const Format DepthStencilFormat = Format.D32_Float;
     public const int RenderLatency = 2;
 
+    public int BackBufferIndex;
+
+    public ulong FrameCount;
+    public ulong FrameIndex;
+
     public void SetRasterizerDescFillModeWireframe() =>
         SetRasterizerDescFillMode(FillMode.Wireframe);
 
@@ -68,8 +73,8 @@ public struct RenderData
 
         CommandList?.Dispose();
         GraphicsQueue?.Dispose();
-        foreach (var allocator in CommandAllocators)
-            allocator.Dispose();
+        foreach (var commandAllocator in CommandAllocators)
+            commandAllocator.Dispose();
 
         FrameFence?.Dispose();
         FrameFenceEvent?.Dispose();
@@ -77,7 +82,6 @@ public struct RenderData
         BackBufferRenderTargetView?.Dispose();
         MSAARenderTargetView?.Dispose();
         DepthStencilView?.Dispose();
-
 
         DisposeTexturesAndViews();
     }
