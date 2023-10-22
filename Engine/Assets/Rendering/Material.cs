@@ -130,7 +130,7 @@ public sealed partial class Material
             RootSignature = _rootSignature,
             VertexShader = vertexShaderByteCode,
             PixelShader = pixelShaderByteCode,
-            InputLayout = new InputLayoutDescription(inputElementDescription),
+            InputLayout = new(inputElementDescription),
             SampleMask = uint.MaxValue,
             PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
             RasterizerState = _renderer.Data.RasterizerState,
