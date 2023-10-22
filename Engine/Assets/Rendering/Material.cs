@@ -1,10 +1,9 @@
-﻿using Vortice.D3DCompiler;
-using Vortice.Direct3D11;
+﻿using Vortice.Direct3D12;
 using Vortice.DXGI;
 
 namespace Engine.Rendering;
 
-public sealed class Material
+public sealed partial class Material
 {
     public static Material CurrentMaterialOnGPU { get; set; }
 
@@ -12,53 +11,47 @@ public sealed class Material
 
     private Renderer _renderer => Renderer.Instance;
 
-    private ID3D11VertexShader _vertexShader;
-    private ID3D11PixelShader _pixelShader;
+    private ID3D12RootSignature _rootSignature;
+    private ID3D12PipelineState _pipelineState;
 
-    private ID3D11InputLayout _inputLayout;
-
-    private ID3D11ShaderResourceView _resourceView;
-    private ID3D11SamplerState _samplerState;
+    private ID3D12DescriptorHeap _resourceView;
+    private ID3D12DescriptorHeap _samplerState;
 
     public Material(string shaderFilePath, string imageFileName = "Default.png")
     {
-        #region // Create PerModel ConstantBuffer
         MaterialBuffer.CreatePerModelConstantBuffer();
-        #endregion
 
-        #region // Create VertexShader
-        if (string.IsNullOrEmpty(shaderFilePath))
-            return;
+        CreateRootSignature();
 
-        // Compile the vertex shader bytecode from the specified shader file name.
-        ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(shaderFilePath, "VS", "vs_5_0");
+        UpdateShader(shaderFilePath);
 
-        // Create the vertex shader using the compiled bytecode.
-        _vertexShader = _renderer.Device.CreateVertexShader(vertexShaderByteCode.Span);
-        #endregion
-
-        #region // Create InputLayout
-        // Define the input layout for the vertex buffer.
-        InputElementDescription[] inputElements = new[] {
-                new InputElementDescription("POSITION", 0, Format.R32G32B32_Float, 0, 0), // Position element.
-                new InputElementDescription("TEXCOORD", 0, Format.R32G32_Float, InputElementDescription.AppendAligned, 0), // Texture coordinate element.
-                new InputElementDescription("NORMAL", 0, Format.R32G32B32_Float, InputElementDescription.AppendAligned, 0)}; // Normal element.
-
-        _inputLayout = _renderer.Device.CreateInputLayout(inputElements, vertexShaderByteCode.Span);
-        #endregion
-
-        #region // Create PixelShader 
-        // Compile the bytecode for the pixel shader using the specified shader file name and target profile.
-        ReadOnlyMemory<byte> pixelShaderByteCode = CompileBytecode(shaderFilePath, "PS", "ps_5_0");
-
-        // Create the pixel shader using the compiled bytecode.
-        _pixelShader = _renderer.Device.CreatePixelShader(pixelShaderByteCode.Span);
-        #endregion
-
-        #region // Create Texture and Sampler
+        #region // Create Texture
         // Load the texture and create a shader resource view for it.
-        var texture = Loader.ImageLoader.LoadTexture(_renderer.Device, imageFileName);
-        _resourceView = _renderer.Device.CreateShaderResourceView(texture);
+        var texture = Loader.ImageLoader.LoadTexture(_renderer.Device, imageFileName); // my own function. What should it return? A ID3D12Resource?
+
+        _resourceView = _renderer.Device.CreateDescriptorHeap(new DescriptorHeapDescription
+        {
+            Type = DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView,
+            DescriptorCount = 1, // The number of descriptors you need
+            Flags = DescriptorHeapFlags.ShaderVisible, // This makes the heap shader visible
+        });
+
+        ShaderResourceViewDescription shaderResourceViewDescription = new()
+        {
+            Format = texture.Description.Format, // The format of the texture.
+            ViewDimension = ShaderResourceViewDimension.Texture2D, // Texture dimension.
+            Texture2D = new Texture2DShaderResourceView { MipLevels = texture.Description.MipLevels }
+        };
+        _renderer.Device.CreateShaderResourceView(texture, shaderResourceViewDescription, _resourceView.GetCPUDescriptorHandleForHeapStart());
+        #endregion
+
+        #region // Create Sampler
+        _samplerState = _renderer.Device.CreateDescriptorHeap(new DescriptorHeapDescription
+        {
+            Type = DescriptorHeapType.Sampler,
+            DescriptorCount = 1, // The number of descriptors you need
+            Flags = DescriptorHeapFlags.ShaderVisible, // This makes the heap shader visible
+        });
 
         // Set the properties for the sampler state.
         SamplerDescription samplerStateDescription = new()
@@ -67,75 +60,106 @@ public sealed class Material
             AddressU = TextureAddressMode.Mirror,
             AddressV = TextureAddressMode.Mirror,
             AddressW = TextureAddressMode.Mirror,
-            ComparisonFunc = ComparisonFunction.Never, // Not needed for standard texture sampling.
+            ComparisonFunction = ComparisonFunction.Never, // Not needed for standard texture sampling.
             MaxAnisotropy = 16,
             MinLOD = 0,
             MaxLOD = float.MaxValue,
         };
-        // Create the sampler state using the sampler state description.
-        _samplerState = _renderer.Device.CreateSamplerState(samplerStateDescription);
+        // Create the sampler state using the sampler description.
+        _renderer.Device.CreateSampler(ref samplerStateDescription, _samplerState.GetCPUDescriptorHandleForHeapStart());
         #endregion
+    }
+
+    public void UpdateShader(string shaderFilePath)
+    {
+        if (string.IsNullOrEmpty(shaderFilePath))
+            return;
+
+        CreateInputLayout(out var inputElementDescription);
+
+        CreateShaderByteCode(shaderFilePath, out var vertexShaderByteCode, out var pixelShaderByteCode);
+
+        _pipelineState = CreateGraphicsPipelineStateDescription(inputElementDescription, vertexShaderByteCode, pixelShaderByteCode);
     }
 
     public void Setup()
     {
+        // Set necessary state.
+        _renderer.Data.CommandList.SetGraphicsRootSignature(_rootSignature);
         // Set input layout, vertex shader, and pixel shader in the device context.
-        // Set the shader resource and sampler in the pixel shader stage of the device context.
-        _renderer.Data.SetupMaterial(_inputLayout, _vertexShader, _pixelShader);
-        _renderer.Data.SetSamplerState(0, _samplerState);
-        _renderer.Data.SetResourceView(0, _resourceView);
+        _renderer.Data.SetupMaterial(_pipelineState);
+
+        // Set the shader resource and sampler.
+        _renderer.Data.CommandList.SetGraphicsRootDescriptorTable(0, _resourceView.GetGPUDescriptorHandleForHeapStart());
+        _renderer.Data.CommandList.SetGraphicsRootDescriptorTable(0, _samplerState.GetGPUDescriptorHandleForHeapStart());
 
         // Assign material to the static variable.
         CurrentMaterialOnGPU = this;
     }
 
-    public void UpdateVertexShader(string shaderFilePath)
-    {
-        try
-        {
-            // Compile the vertex shader bytecode from the specified shader file name.
-            ReadOnlyMemory<byte> vertexShaderByteCode = CompileBytecode(shaderFilePath, "VS", "vs_4_0");
-
-            // Create the vertex shader using the compiled bytecode.
-            _vertexShader = _renderer.Device.CreateVertexShader(vertexShaderByteCode.Span);
-        }
-        catch (Exception ex) { Output.Log(ex.Message); }
-    }
-
-    public void UpdatePixelShader(string shaderFilePath)
-    {
-        try
-        {
-            // Compile the vertex shader bytecode from the specified shader file name.
-            ReadOnlyMemory<byte> pixelShaderByteCode = CompileBytecode(shaderFilePath, "PS", "ps_4_0");
-
-            // Create the vertex shader using the compiled bytecode.
-            _pixelShader = _renderer.Device.CreatePixelShader(pixelShaderByteCode.Span);
-        }
-        catch (Exception ex) { Output.Log(ex.Message); }
-    }
-
     public void Dispose()
     {
         MaterialBuffer?.Dispose();
-        _vertexShader?.Dispose();
-        _pixelShader?.Dispose();
-        _inputLayout?.Dispose();
+
+        _rootSignature?.Dispose();
+        _pipelineState?.Dispose();
+        _resourceView?.Dispose();
         _samplerState?.Dispose();
     }
+}
 
-    public static ReadOnlyMemory<byte> CompileBytecode(string shaderFilePath, string entryPoint, string profile)
+public sealed partial class Material
+{
+    private void CreateRootSignature()
     {
-        // Shader flags to enable strictness and set optimization level or debug mode.
-        ShaderFlags shaderFlags = ShaderFlags.EnableStrictness;
-#if DEBUG
-        shaderFlags |= ShaderFlags.Debug;
-        shaderFlags |= ShaderFlags.SkipValidation;
-#else
-        shaderFlags |= ShaderFlags.OptimizationLevel3;
-#endif
+        RootSignatureFlags rootSignatureFlags = RootSignatureFlags.AllowInputAssemblerInputLayout 
+            | RootSignatureFlags.DenyHullShaderRootAccess
+            | RootSignatureFlags.DenyDomainShaderRootAccess
+            | RootSignatureFlags.DenyGeometryShaderRootAccess
+            | RootSignatureFlags.DenyAmplificationShaderRootAccess
+            | RootSignatureFlags.DenyMeshShaderRootAccess;
 
-        // Compile the shader from the specified file using the specified entry point, profile, and flags.
-        return Compiler.CompileFromFile(shaderFilePath, entryPoint, profile, shaderFlags);
+        RootSignatureDescription1 rootSignatureDesc = new(rootSignatureFlags);
+        _rootSignature = _renderer.Device.CreateRootSignature(rootSignatureDesc);
+    }
+
+    private ID3D12PipelineState CreateGraphicsPipelineStateDescription(InputElementDescription[] inputElementDescription, ReadOnlyMemory<byte> vertexShaderByteCode, ReadOnlyMemory<byte> pixelShaderByteCode)
+    {
+        GraphicsPipelineStateDescription pipelineStateObjectDescription = new()
+        {
+            RootSignature = _rootSignature,
+            VertexShader = vertexShaderByteCode,
+            PixelShader = pixelShaderByteCode,
+            InputLayout = new InputLayoutDescription(inputElementDescription),
+            SampleMask = uint.MaxValue,
+            PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
+            RasterizerState = _renderer.Data.RasterizerState,
+            BlendState = BlendDescription.Opaque,
+            DepthStencilState = DepthStencilDescription.Default,
+            RenderTargetFormats = new[] { RenderData.RenderTargetFormat },
+            DepthStencilFormat = RenderData.DepthStencilFormat,
+            SampleDescription = new(_renderer.Config.SupportedSampleCount, _renderer.Config.QualityLevels)
+        };
+
+        return _renderer.Device.CreateGraphicsPipelineState(pipelineStateObjectDescription);
+    }
+
+    private void CreateInputLayout(out InputElementDescription[] inputElementDescription)
+    {
+        inputElementDescription = new[]
+        {
+            new InputElementDescription("POSITION", 0, Format.R32G32B32_Float, 0, 0), // Position element.
+            new InputElementDescription("TEXCOORD", 0, Format.R32G32_Float, InputElementDescription.AppendAligned, 0), // Texture coordinate element.
+            new InputElementDescription("NORMAL", 0, Format.R32G32B32_Float, InputElementDescription.AppendAligned, 0) // Normal element.
+        };
+    }
+
+    private void CreateShaderByteCode(string shaderFilePath, out ReadOnlyMemory<byte> vertexShaderByteCode, out ReadOnlyMemory<byte> pixelShaderByteCode)
+    {
+        // Compile the vertex shader bytecode from the specified shader file name and target profile.
+        vertexShaderByteCode = RenderData.CompileBytecode(shaderFilePath, "VS", "vs_5_0");
+
+        // Compile the pixel shader bytecode from the specified shader file name and target profile.
+        pixelShaderByteCode = RenderData.CompileBytecode(shaderFilePath, "PS", "ps_5_0");
     }
 }

@@ -18,8 +18,7 @@ public sealed class MaterialEntry(FileInfo fileInfo)
 
         ShaderEntry = shaderEntry;
 
-        Material.UpdateVertexShader(shaderEntry.FileInfo.FullName);
-        Material.UpdatePixelShader(shaderEntry.FileInfo.FullName);
+        Material.UpdateShader(shaderEntry.FileInfo.FullName);
 
         Material.MaterialBuffer?.Dispose();
 

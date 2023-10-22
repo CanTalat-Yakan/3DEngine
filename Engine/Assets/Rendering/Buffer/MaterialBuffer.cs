@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using ComputeSharp;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Xml.Serialization;
 
-using Vortice.Direct3D11;
+using Vortice.Direct3D12;
 
 namespace Engine.Rendering;
 
@@ -37,8 +37,8 @@ public class MaterialBuffer()
     public List<SerializeEntry> SerializableProperties = new();
 
     private object _propertiesConstantBuffer;
-    private ID3D11Buffer _properties;
-    private ID3D11Buffer _model;
+    private ID3D12Resource _properties;
+    private ID3D12Resource _model;
 
     private Renderer _renderer => Renderer.Instance;
 
@@ -53,7 +53,7 @@ public class MaterialBuffer()
             .GetMethod("CreateConstantBuffer")
             .MakeGenericMethod(constantBufferType);
 
-        _properties = (ID3D11Buffer)createConstantBufferMethod.Invoke(_renderer.Device, null);
+        _properties = (ID3D12Resource)createConstantBufferMethod.Invoke(_renderer.Device, null);
     }
 
     public void UpdatePropertiesConstantBuffer()
@@ -63,16 +63,11 @@ public class MaterialBuffer()
 
         Type type = ShaderCompiler.ShaderLibrary.GetShader(ShaderName).ConstantBufferType;
 
-        //StringBuilder sb = new();
-        //foreach (var field in _propertiesConstantBuffer.GetType().GetFields())
-        //    sb.AppendLine($"{field.Name}: {field.GetValue(_propertiesConstantBuffer)}");
-        //Output.Log(sb.ToString());
-
-        // Map the constant buffer and copy the properties into it.
+        // Map the constant buffer and copy the camera's view-projection matrix and position into it.
         unsafe
         {
-            //Map the constant buffer to memory for write access.
-            var mappedResource = _renderer.Data.DeviceContext.Map(_properties, MapMode.WriteDiscard);
+            // Map the constant buffer to memory for write access.
+            _properties.Map(0);
 
             // Create a MethodInfo for Unsafe.Copy with the correct generic type.
             MethodInfo copyMethod = typeof(Unsafe)
@@ -80,36 +75,44 @@ public class MaterialBuffer()
                 .MakeGenericMethod(type);
             // Perform the unsafe copy using reflection
             copyMethod.Invoke(null, new object[] {
-                new IntPtr(mappedResource.DataPointer.ToPointer()),
+                new IntPtr(_properties.NativePointer.ToPointer()),
                 _propertiesConstantBuffer });
 
             // Unmap the constant buffer from memory.
-            _renderer.Data.DeviceContext.Unmap(_properties, 0);
+            _properties.Unmap(0);
         }
 
         //Set the constant buffer in the vertex shader stage of the device context.
-        _renderer.Data.SetConstantBufferVS(2, _properties);
-        _renderer.Data.SetConstantBufferPS(2, _properties);
+        _renderer.Data.CommandList.SetGraphicsRootConstantBufferView(2, _properties.GPUVirtualAddress);
     }
 
-    public void CreatePerModelConstantBuffer() =>
-        _model = _renderer.Device.CreateConstantBuffer<PerModelConstantBuffer>();
+    public void CreatePerModelConstantBuffer()
+    {
+        //Create View Constant Buffer when Camera is initialized.
+        _model = _renderer.Device.CreateCommittedResource(
+            new HeapProperties(HeapType.Upload),
+            HeapFlags.None,
+            ResourceDescription.Buffer(Unsafe.SizeOf<PerModelConstantBuffer>()),
+            ResourceStates.GenericRead); // The resource is in a readable state.
+    }
 
     public void UpdateModelConstantBuffer(PerModelConstantBuffer constantBuffer)
     {
-        // Map the constant buffer and copy the models model-view matrix into it.
+        // Map the constant buffer and copy the camera's view-projection matrix and position into it.
         unsafe
         {
             // Map the constant buffer to memory for write access.
-            var mappedResource = _renderer.Data.DeviceContext.Map(_model, MapMode.WriteDiscard);
+            _model.Map(0);
+
             // Copy the data from the constant buffer to the mapped resource.
-            Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref constantBuffer);
+            Unsafe.Copy(_model.NativePointer.ToPointer(), ref constantBuffer);
+
             // Unmap the constant buffer from memory.
-            _renderer.Data.DeviceContext.Unmap(_model, 0);
+            _model.Unmap(0);
         }
 
         // Set the constant buffer in the vertex shader stage of the device context.
-        _renderer.Data.SetConstantBufferVS(1, _model);
+        _renderer.Data.CommandList.SetGraphicsRootConstantBufferView(1, _model.GPUVirtualAddress);
     }
 
     public void SafeToSerializableProperties()

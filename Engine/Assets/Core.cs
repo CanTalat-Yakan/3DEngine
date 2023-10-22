@@ -93,7 +93,7 @@ public sealed class Core
         OnInitialize = null;
 
         // Clears the render target, preparing it for the next frame.
-        Renderer.Clear();
+        Renderer.BeginFrame();
         // Set the viewport size.
         Renderer.Data.SetViewport(Renderer.Size);
 
@@ -132,6 +132,8 @@ public sealed class Core
         // Render the GUI with ImGui.
         RenderGUI();
 
+        Renderer.EndFrame();
+        Renderer.Execute();
         // Copy the final rendered image into the back buffer.
         Renderer.Resolve();
         // Presents the back buffer on the screen.

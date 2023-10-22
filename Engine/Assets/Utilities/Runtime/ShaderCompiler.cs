@@ -65,8 +65,7 @@ public sealed class ShaderCompiler
                 {
                     materialEntry.Material.MaterialBuffer.CreatePropertiesConstantBuffer(shaderEntry.ConstantBufferType);
 
-                    materialEntry.Material.UpdateVertexShader(shaderEntry.FileInfo.FullName);
-                    materialEntry.Material.UpdatePixelShader(shaderEntry.FileInfo.FullName);
+                    materialEntry.Material.UpdateShader(shaderEntry.FileInfo.FullName);
 
                     materialEntry.OnShaderUpdate?.Invoke();
                 }

@@ -1,10 +1,11 @@
 ﻿using SharpGen.Runtime;
 using System.Drawing;
 
-using Vortice.Direct3D11;
+using Vortice.Direct3D12;
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
+using System.Threading;
 
 namespace Engine.Rendering;
 
@@ -13,12 +14,12 @@ public sealed partial class Renderer
     public static Renderer Instance { get; private set; }
 
     public bool IsRendering => Data.BackBufferRenderTargetView?.NativePointer is not 0;
-    public IDXGISwapChain2 SwapChain => Data.SwapChain;
+    public IDXGISwapChain3 SwapChain => Data.SwapChain;
 
     public Size Size => NativeSize.Scale(Config.ResolutionScale);
     public Size NativeSize { get; private set; }
 
-    public ID3D11Device Device { get; private set; }
+    public ID3D12Device2 Device { get; private set; }
 
     public RenderData Data = new();
     public Config Config = new();
@@ -78,9 +79,9 @@ public sealed partial class Renderer
             return result;
 
         GetBackBufferAndCreateRenderTargetView();
+        CreateCommandAllocatorsAndCommandList();
         CreateMSAATextureAndRenderTargetView();
         CreateDepthStencilView();
-        CreateBlendState();
         CreateRasterizerState();
 
         return Result.Ok;
@@ -96,41 +97,269 @@ public sealed partial class Renderer
     public void Resolve() =>
         // Copy the MSAA render target texture into the back buffer render texture.
         // Use this to Copy: Data.DeviceContext.CopyResource(Data.BackBufferRenderTargetTexture, Data.MSAARenderTargetTexture);
-        Data.DeviceContext.ResolveSubresource(Data.BackBufferRenderTargetTexture, 0, Data.MSAARenderTargetTexture, 0, Data.Format);
+        Data.CommandList.ResolveSubresource(Data.BackBufferRenderTargetTexture, 0, Data.MSAARenderTargetTexture, 0, RenderData.RenderTargetFormat);
 
-    public void Draw(ID3D11Buffer vertexBuffer, ID3D11Buffer indexBuffer, int indexCount)
+    public void Execute() =>
+        // Execute the command list.
+        Data.GraphicsQueue.ExecuteCommandList(Data.CommandList);
+
+    public void EndFrame()
     {
-        Data.VertexBuffer = vertexBuffer;
-        Data.IndexBuffer = indexBuffer;
-
-        Data.RasterizerState = Device.CreateRasterizerState(Data.RasterizerDescription);
-
-        Data.SetupRenderState();
-
-        Data.DeviceContext.DrawIndexed(indexCount, 0, 0);
+        // Indicate that the back buffer will now be used to present.
+        Data.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.RenderTarget, ResourceStates.Present);
+        Data.CommandList.EndEvent();
+        Data.CommandList.Close();
     }
 
-    public void DrawIndexed(int indexCount, int startIndexLocation = 0, int baseVertexLocation = 0) =>
-        Data.DeviceContext.DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
+    public void EndRenderPass() =>
+        Data.CommandList.EndRenderPass();
 
-    public void Clear()
+    public void Draw(int indexCount, IndexBufferView indexBufferViews, params VertexBufferView[] vertexBufferViews)
     {
+        Data.SetupInputAssembler(indexBufferViews, vertexBufferViews);
+
+        Data.CommandList.DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
+    }
+
+    public void BeginFrame(bool useRenderPass = false)
+    {
+        // Indicate that the MSAA render target texture will be used as a render target.
+        Data.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.Present, ResourceStates.RenderTarget);
+
+        //Data.CommandList.Reset();//_commandAllocators[_frameIndex], _pipelineState);
+        Data.CommandList.BeginEvent("Frame");
+
         // Set the background color to a dark gray.
-        var col = new Color4(0.15f, 0.15f, 0.15f, 0);
+        var clearColor = Colors.DarkGray;
 
-        // Clear the render target view and depth stencil view with the set color.
-        Data.DeviceContext.ClearRenderTargetView(Data.MSAARenderTargetView, col);
-        Data.DeviceContext.ClearDepthStencilView(Data.DepthStencilView, DepthStencilClearFlags.Depth | DepthStencilClearFlags.Stencil, 1.0f, 0);
+        if (useRenderPass)
+        {
+            var renderPassDesc = new RenderPassRenderTargetDescription(Data.BackBufferRenderTargetView.GetCPUDescriptorHandleForHeapStart(),
+                new RenderPassBeginningAccess(new ClearValue(RenderData.RenderTargetFormat, clearColor)),
+                new RenderPassEndingAccess(RenderPassEndingAccessType.Preserve));
 
-        // Set the render target and depth stencil view for the device context.
-        Data.DeviceContext.OMSetRenderTargets(Data.MSAARenderTargetView, Data.DepthStencilView);
+            var depthStencil = new RenderPassDepthStencilDescription(
+                Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart(),
+                new RenderPassBeginningAccess(new ClearValue(RenderData.DepthStencilFormat, 1.0f, 0)),
+                new RenderPassEndingAccess(RenderPassEndingAccessType.Discard));
+
+            Data.CommandList.BeginRenderPass(renderPassDesc, depthStencil);
+        }
+        else
+        {
+            // Clear the render target view and depth stencil view with the set color.
+            Data.CommandList.ClearRenderTargetView(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), clearColor);
+            Data.CommandList.ClearDepthStencilView(Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
+
+            // Set the render target and depth stencil view for the device context.
+            Data.CommandList.OMSetRenderTargets(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart());
+        }
 
         // Reset the profiler values for vertices, indices, and draw calls.
         Profiler.Vertices = 0;
         Profiler.Indices = 0;
         Profiler.DrawCalls = 0;
     }
+}
 
+public sealed partial class Renderer
+{
+    public static bool IsSupported() => D3D12.IsSupported(FeatureLevel.Level_12_0);
+
+    private void CreateGraphicsQueueAndFence(ID3D12Device2 device)
+    {
+        // Create Command queue.
+        Data.GraphicsQueue = device.CreateCommandQueue(CommandListType.Direct);
+        Data.GraphicsQueue.Name = "Graphics Queue";
+
+        // Create synchronization objects.
+        Data.FrameFence = Device.CreateFence(0);
+        Data.FrameFenceEvent = new AutoResetEvent(false);
+    }
+
+    private Result CreateDeviceAndSetupSwapChain(bool forHwnd, out Result result)
+    {
+        // Create a Direct3D 11 device.
+        result = D3D12.D3D12CreateDevice(
+            null,
+            //FeatureLevel.Level_11_1,
+            FeatureLevel.Level_11_0,
+            out ID3D12Device2 d3d12Device);
+
+        // Check if creating the device was successful.
+        if (result.Failure)
+            return result;
+
+        // Assign the device to a variable.
+        Device = d3d12Device.QueryInterface<ID3D12Device2>();
+
+        // Pass the Device to create the Graphics Queue.
+        CreateGraphicsQueueAndFence(Device);
+
+        // Initialize the SwapChainDescription structure.
+        SwapChainDescription1 swapChainDescription = new()
+        {
+            BufferCount = RenderData.RenderLatency,
+            Width = Size.Width,
+            Height = Size.Height,
+            Format = RenderData.RenderTargetFormat,
+            BufferUsage = Usage.RenderTargetOutput,
+            SwapEffect = SwapEffect.FlipSequential,
+            SampleDescription = new(1, 0)
+        };
+
+        try
+        {
+            bool validation = false; // For Debug;
+            // Create the IDXGIFactory4.
+            DXGI.CreateDXGIFactory2<IDXGIFactory4>(validation, out var DXGIFactory);
+            // Obtain instance of the IDXGIFactory5 interface from the DXGI Factory.
+            using IDXGIFactory5 dxgiFactory5 = DXGIFactory.QueryInterfaceOrNull<IDXGIFactory5>();
+
+            // Creates a swap chain using the swap chain description.
+            using IDXGISwapChain1 swapChain1 = forHwnd
+                ? dxgiFactory5.CreateSwapChainForHwnd(Data.GraphicsQueue, _win32Window.Handle, swapChainDescription)
+                : dxgiFactory5.CreateSwapChainForComposition(Data.GraphicsQueue, swapChainDescription);
+
+            Data.SwapChain = swapChain1.QueryInterface<IDXGISwapChain3>();
+        }
+        catch (Exception ex) { throw new Exception(ex.Message); }
+
+        return Result.Ok;
+    }
+
+    private void GetBackBufferAndCreateRenderTargetView()
+    {
+        Data.BackBufferRenderTargetView = Device.CreateDescriptorHeap(new DescriptorHeapDescription(
+            DescriptorHeapType.RenderTargetView,
+            RenderData.RenderLatency));
+
+        // Get the back buffer of the swap chain as a texture.
+        Data.BackBufferRenderTargetTexture = Data.SwapChain.GetBuffer<ID3D12Resource>(0); // Data.SwapChain.CurrentBackBufferIndex
+        // Create a render target view for the back buffer render target texture.
+        Device.CreateRenderTargetView(Data.BackBufferRenderTargetTexture, null, Data.BackBufferRenderTargetView.GetCPUDescriptorHandleForHeapStart());
+
+        Data.BackBufferRenderTargetView.GetCPUDescriptorHandleForHeapStart().Offset(Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.RenderTargetView), 2);
+    }
+
+    private void CreateCommandAllocatorsAndCommandList()
+    {
+        Data.CommandAllocators = new ID3D12CommandAllocator[RenderData.RenderLatency];
+        for (int i = 0; i < RenderData.RenderLatency; i++)
+            Data.CommandAllocators[i] = Device.CreateCommandAllocator(CommandListType.Direct);
+
+        Data.CommandList = Device.CreateCommandList<ID3D12GraphicsCommandList4>(
+            CommandListType.Direct,
+            Data.CommandAllocators[0],
+            null);
+    }
+
+    private void CheckMSAASupport()
+    {
+        int qualityLevels = 0;
+        int sampleCount;
+        for (sampleCount = (int)Config.MultiSample; sampleCount > 1; sampleCount /= 2)
+        {
+            qualityLevels = Device.CheckMultisampleQualityLevels(RenderData.RenderTargetFormat, sampleCount);
+            if (qualityLevels > 0)
+                break;
+        }
+
+        if (sampleCount < 2 && Config.MultiSample != MultiSample.None)
+            Output.Log("MSAA not supported");
+
+        Config.SupportedSampleCount = sampleCount;
+        Config.QualityLevels = qualityLevels - 1;
+    }
+
+    private void CreateMSAATextureAndRenderTargetView()
+    {
+        CheckMSAASupport();
+
+        ResourceDescription MSAATextureDescription = ResourceDescription.Texture2D(
+            RenderData.RenderTargetFormat,
+            (uint)Size.Width,
+            (uint)Size.Height,
+            arraySize: 1,
+            mipLevels: 1,
+            sampleCount: Config.SupportedSampleCount,
+            sampleQuality: Config.QualityLevels,
+            flags: ResourceFlags.AllowRenderTarget); // BindFlags.ShaderResource
+
+        // Create the multi sample texture based on the description.
+        Data.MSAARenderTargetTexture = Device.CreateCommittedResource(
+            HeapType.Default,
+            MSAATextureDescription,
+            ResourceStates.AllShaderResource);
+        Data.MSAARenderTargetTexture.Name = "MSAA Render Target Texture";
+
+        // Create a render target view description for the multi sampling.
+        RenderTargetViewDescription MSAARenderTargetViewDescription = new()
+        {
+            Format = RenderData.RenderTargetFormat,
+            ViewDimension = RenderTargetViewDimension.Texture2DMultisampled
+        };
+
+        Data.MSAARenderTargetView = Device.CreateDescriptorHeap(new DescriptorHeapDescription(
+            DescriptorHeapType.RenderTargetView, 1));
+        // Create a render target view for the MSAA render target texture.
+        Device.CreateRenderTargetView(Data.MSAARenderTargetTexture, MSAARenderTargetViewDescription, Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart());
+
+        Data.BackBufferRenderTargetView.GetCPUDescriptorHandleForHeapStart().Offset(Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.RenderTargetView));
+    }
+
+    private void CreateDepthStencilView()
+    {
+        ResourceDescription depthStencilTextureDescription = ResourceDescription.Texture2D(
+            RenderData.DepthStencilFormat,
+            (uint)Size.Width,
+            (uint)Size.Height,
+            arraySize: 1,
+            mipLevels: 1,
+            sampleCount: Config.SupportedSampleCount,
+            sampleQuality: Config.QualityLevels,
+            flags: ResourceFlags.AllowDepthStencil);
+
+        ClearValue depthOptimizedClearValue = new(RenderData.DepthStencilFormat, 1.0f, 0);
+
+        // Create the depth stencil texture based on the description.
+        Data.DepthStencilTexture = Device.CreateCommittedResource(
+            HeapType.Default,
+            depthStencilTextureDescription,
+            ResourceStates.DepthWrite,
+            depthOptimizedClearValue);
+        Data.DepthStencilTexture.Name = "DepthStencil Texture";
+
+        // Create a depth stencil view description for the multi sampling.
+        DepthStencilViewDescription depthStencilViewDescription = new()
+        {
+            Format = RenderData.DepthStencilFormat,
+            ViewDimension = DepthStencilViewDimension.Texture2DMultisampled
+        };
+
+        Data.DepthStencilView = Device.CreateDescriptorHeap(new DescriptorHeapDescription(
+            DescriptorHeapType.DepthStencilView, 1));
+        // Create a depth stencil view for the depth stencil texture.
+        Device.CreateDepthStencilView(Data.DepthStencilTexture, depthStencilViewDescription, Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart());
+
+        Data.BackBufferRenderTargetView.GetCPUDescriptorHandleForHeapStart().Offset(Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.DepthStencilView));
+    }
+
+    private void CreateRasterizerState()
+    {
+        // Create a rasterizer state to fill the triangle using solid fill mode.
+        Data.RasterizerState = new()
+        {
+            FillMode = FillMode.Solid,
+            CullMode = CullMode.None,
+            AntialiasedLineEnable = true,
+            MultisampleEnable = true
+        };
+    }
+}
+
+public sealed partial class Renderer
+{
     public void Dispose()
     {
         // Dispose all DirectX resources that were created.
@@ -168,193 +397,5 @@ public sealed partial class Renderer
         Data.SwapChain.SourceSize = Size;
 
         Core.Instance.Frame();
-    }
-}
-
-public sealed partial class Renderer
-{
-    private Result CreateDeviceAndSetupSwapChain(bool forHwnd, out Result result)
-    {
-        // Create a Direct3D 11 device.
-        result = D3D11.D3D11CreateDevice(
-            null,
-            DriverType.Hardware,
-            DeviceCreationFlags.None,
-            new[]
-            {
-                FeatureLevel.Level_11_1,
-                FeatureLevel.Level_11_0,
-            },
-            out var defaultDevice);
-
-        // Check if creating the device was successful.
-        if (result.Failure)
-            return result;
-
-        // Assign the device to a variable.
-        Device = defaultDevice.QueryInterface<ID3D11Device>();
-
-        Data.DeviceContext = Device.ImmediateContext;
-
-        // Initialize the SwapChainDescription structure.
-        SwapChainDescription1 swapChainDescription = new()
-        {
-            AlphaMode = AlphaMode.Ignore,
-            BufferCount = 2,
-            Format = Data.Format = Format.R8G8B8A8_UNorm, // 10 bits = Format.R10G10B10A2_UNorm
-            Width = Size.Width,
-            Height = Size.Height,
-            SampleDescription = new(1, 0),
-            Scaling = Scaling.Stretch,
-            Stereo = false,
-            SwapEffect = SwapEffect.FlipSequential,
-            BufferUsage = Usage.RenderTargetOutput,
-            Flags = SwapChainFlags.None
-        };
-
-        try
-        {
-            // Obtain instance of the IDXGIDevice3 interface from the Direct3D device.
-            IDXGIDevice3 dxgiDevice3 = Device.QueryInterface<IDXGIDevice3>();
-            // Obtain instance of the IDXGIFactory2 interface from the DXGI device.
-            IDXGIFactory2 dxgiFactory2 = dxgiDevice3.GetAdapter().GetParent<IDXGIFactory2>();
-            // Creates a swap chain using the swap chain description.
-            IDXGISwapChain1 swapChain1 = forHwnd
-                ? dxgiFactory2.CreateSwapChainForHwnd(dxgiDevice3, _win32Window.Handle, swapChainDescription)
-                : dxgiFactory2.CreateSwapChainForComposition(dxgiDevice3, swapChainDescription);
-
-            Data.SwapChain = swapChain1.QueryInterface<IDXGISwapChain2>();
-        }
-        catch (Exception ex) { throw new Exception(ex.Message); }
-
-        return Result.Ok;
-    }
-
-    private void GetBackBufferAndCreateRenderTargetView()
-    {
-        // Get the back buffer of the swap chain as a texture.
-        Data.BackBufferRenderTargetTexture = Data.SwapChain.GetBuffer<ID3D11Texture2D>(0);
-        // Create a render target view for the back buffer render target texture.
-        Data.BackBufferRenderTargetView = Device.CreateRenderTargetView(Data.BackBufferRenderTargetTexture);
-    }
-
-    private void CheckMSAASupport()
-    {
-        int qualityLevels = 0;
-        int sampleCount;
-        for (sampleCount = (int)Config.MultiSample; sampleCount > 1; sampleCount /= 2)
-        {
-            qualityLevels = Device.CheckMultisampleQualityLevels(Data.Format, sampleCount);
-            if (qualityLevels > 0)
-                break;
-        }
-
-        if (sampleCount < 2 && Config.MultiSample != MultiSample.None)
-            Output.Log("MSAA not supported");
-
-        Config.SupportedSampleCount = sampleCount;
-        Config.QualityLevels = qualityLevels - 1;
-    }
-
-    private void CreateMSAATextureAndRenderTargetView()
-    {
-        CheckMSAASupport();
-
-        Texture2DDescription MSAATextureDescription = new()
-        {
-            Format = Data.Format,
-            Width = Size.Width,
-            Height = Size.Height,
-            ArraySize = 1,
-            MipLevels = 1,
-            SampleDescription = new(Config.SupportedSampleCount, Config.QualityLevels),
-            Usage = ResourceUsage.Default,
-            BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource,
-            CPUAccessFlags = CpuAccessFlags.None,
-            MiscFlags = ResourceOptionFlags.None
-        };
-        // Create the multi sample texture based on the description.
-        Data.MSAARenderTargetTexture = Device.CreateTexture2D(MSAATextureDescription);
-
-        // Create a render target view description for the multi sampling.
-        RenderTargetViewDescription MSAARenderTargetViewDescription = new(RenderTargetViewDimension.Texture2DMultisampled, Data.Format);
-        // Create a render target view for the MSAA render target texture.
-        Data.MSAARenderTargetView = Device.CreateRenderTargetView(Data.MSAARenderTargetTexture, MSAARenderTargetViewDescription);
-    }
-
-    private void CreateDepthStencilView()
-    {
-        // Set up depth stencil description.
-        DepthStencilDescription depthStencilDescription = new()
-        {
-            DepthEnable = true,
-            DepthFunc = ComparisonFunction.Less,
-            DepthWriteMask = DepthWriteMask.All,
-        };
-        // Create a depth stencil state from the description.
-        Data.DepthStencilState = Device.CreateDepthStencilState(depthStencilDescription);
-
-        // Create a depth stencil texture description with the specified properties.
-        Texture2DDescription depthStencilTextureDescription = new()
-        {
-            Format = Format.D32_Float, // Set format to D32_Float.
-            Width = Size.Width,
-            Height = Size.Height,
-            ArraySize = 1,
-            MipLevels = 1,
-            SampleDescription = new(Config.SupportedSampleCount, Config.QualityLevels),
-            Usage = ResourceUsage.Default,
-            BindFlags = BindFlags.DepthStencil,
-            CPUAccessFlags = CpuAccessFlags.None,
-            MiscFlags = ResourceOptionFlags.None
-        };
-        // Create the depth stencil texture based on the description.
-        Data.DepthStencilTexture = Device.CreateTexture2D(depthStencilTextureDescription);
-
-        // Create a depth stencil view description for the multi sampling.
-        DepthStencilViewDescription depthStencilViewDescription = new(DepthStencilViewDimension.Texture2DMultisampled, Format.D32_Float);
-        // Create a depth stencil view for the depth stencil texture.
-        Data.DepthStencilView = Device.CreateDepthStencilView(Data.DepthStencilTexture, depthStencilViewDescription);
-    }
-
-    private void CreateBlendState()
-    {
-        // Set up the blend state description.
-        BlendDescription blendDescription = new()
-        {
-            AlphaToCoverageEnable = true
-        };
-
-        // Render target blend description setup.
-        RenderTargetBlendDescription renderTargetBlendDescription = new()
-        {
-            BlendEnable = true, // Enable blend.
-            SourceBlend = Blend.SourceAlpha,
-            DestinationBlend = Blend.InverseSourceAlpha,
-            BlendOperation = BlendOperation.Add,
-            SourceBlendAlpha = Blend.One,
-            DestinationBlendAlpha = Blend.Zero,
-            BlendOperationAlpha = BlendOperation.Add,
-            RenderTargetWriteMask = ColorWriteEnable.All
-        };
-        // Assign the render target blend description to the blend state description.
-        blendDescription.RenderTarget[0] = renderTargetBlendDescription;
-        // Create the blend state.
-        Data.BlendState = Device.CreateBlendState(blendDescription);
-    }
-
-    private void CreateRasterizerState()
-    {
-        // Create a rasterizer state to fill the triangle using solid fill mode.
-        Data.RasterizerDescription = new()
-        {
-            FillMode = FillMode.Solid,
-            CullMode = CullMode.None,
-            AntialiasedLineEnable = true,
-            MultisampleEnable = true
-        };
-
-        // Create a rasterizer state based on the description.
-        Data.RasterizerState = Device.CreateRasterizerState(Data.RasterizerDescription);
     }
 }

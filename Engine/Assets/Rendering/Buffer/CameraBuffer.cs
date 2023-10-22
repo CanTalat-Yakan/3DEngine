@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-using Vortice.Direct3D11;
+using Vortice.Direct3D12;
 
 namespace Engine.Rendering;
 
@@ -8,13 +8,19 @@ public sealed class CameraBuffer
 {
     public ViewConstantBuffer ViewConstantBuffer;
 
-    private ID3D11Buffer _view;
+    private ID3D12Resource _view;
 
     private Renderer _renderer => Renderer.Instance;
 
-    public CameraBuffer() =>
+    public CameraBuffer()
+    {
         //Create View Constant Buffer when Camera is initialized.
-        _view = _renderer.Device.CreateConstantBuffer<ViewConstantBuffer>();
+        _view = _renderer.Device.CreateCommittedResource(
+            new HeapProperties(HeapType.Upload),
+            HeapFlags.None,
+            ResourceDescription.Buffer(Unsafe.SizeOf<ViewConstantBuffer>()),
+            ResourceStates.GenericRead); // The resource is in a readable state.
+    }
 
     public void UpdateConstantBuffer()
     {
@@ -22,15 +28,17 @@ public sealed class CameraBuffer
         unsafe
         {
             // Map the constant buffer to memory for write access.
-            var mappedResource = _renderer.Data.DeviceContext.Map(_view, MapMode.WriteDiscard);
-            // Copy the data from the constant buffer to the mapped resource.
-            Unsafe.Copy(mappedResource.DataPointer.ToPointer(), ref ViewConstantBuffer);
-            // Unmap the constant buffer from memory.
-            _renderer.Data.DeviceContext.Unmap(_view, 0);
-        }
+            _view.Map(0);
 
+            // Copy the data from the constant buffer to the mapped resource.
+            Unsafe.Copy(_view.NativePointer.ToPointer(), ref ViewConstantBuffer);
+
+            // Unmap the constant buffer from memory.
+            _view.Unmap(0);
+        }
+        
         // Set the constant buffer in the vertex shader stage of the device context.
-        _renderer.Data.SetConstantBufferVS(0, _view);
+        _renderer.Data.CommandList.SetGraphicsRootConstantBufferView(0, _view.GPUVirtualAddress);
     }
 
     public void Dispose() =>

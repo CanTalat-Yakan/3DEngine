@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 
-using Vortice.Direct3D11;
+using Vortice.Direct3D12;
 using Vortice.DXGI;
 using Vortice.WIC;
 
@@ -11,9 +11,9 @@ namespace Engine.Loader;
 
 public sealed class ImageLoader
 {
-    private static Dictionary<string, ID3D11Texture2D> s_textureStore = new();
+    private static Dictionary<string, ID3D12Resource> s_textureStore = new();
 
-    public static ID3D11Texture2D LoadTexture(ID3D11Device device, string filePath, bool fromResources = true)
+    public static ID3D12Resource LoadTexture(ID3D12Device device, string filePath, bool fromResources = true)
     {
         if (s_textureStore.ContainsKey(filePath))
             return s_textureStore[filePath];
@@ -94,8 +94,8 @@ public sealed class ImageLoader
         if (format == Format.R32G32B32_Float)
         {
             // Special case test for optional device support for autogen mipchains for R32G32B32_FLOAT
-            FormatSupport fmtSupport = device.CheckFormatSupport(Format.R32G32B32_Float);
-            if (!fmtSupport.HasFlag(FormatSupport.MipAutogen))
+            device.CheckFormatSupport(Format.R32G32B32_Float, out var fmtSupport1, out var fmtSupport2);
+            if (!fmtSupport1.HasFlag(FormatSupport1.Mip))
             {
                 // Use R32G32B32A32_FLOAT instead which is required for Feature Level 10.0 and up
                 convertGUID = PixelFormat.Format128bppRGBAFloat;
@@ -106,8 +106,8 @@ public sealed class ImageLoader
 
         // Verify our target format is supported by the current device
         // (handles WDDM 1.0 or WDDM 1.1 device driver cases as well as DirectX 11.0 Runtime without 16bpp format support)
-        FormatSupport support = device.CheckFormatSupport(format);
-        if (!support.HasFlag(FormatSupport.Texture2D))
+        device.CheckFormatSupport(Format.R32G32B32_Float, out var support1, out var support2);
+        if (!support1.HasFlag(FormatSupport1.Texture2D))
         {
             // Fall back to RGBA 32-bit format which is supported by all devices
             convertGUID = PixelFormat.Format32bppRGBA;
@@ -164,7 +164,21 @@ public sealed class ImageLoader
         }
 
 
-        var texture = device.CreateTexture2D(pixels, format, size.Width, size.Height);
+        ResourceDescription textureDesc = ResourceDescription.Texture2D(
+            format,
+            (uint)size.Width,
+            (uint)size.Height,
+            arraySize: 1,
+            mipLevels: 1,
+            sampleCount: Renderer.Instance.Config.SupportedSampleCount,
+            sampleQuality: Renderer.Instance.Config.QualityLevels,
+            flags: ResourceFlags.None);
+
+        var texture = device.CreateCommittedResource(
+            new HeapProperties(HeapType.Default),
+            HeapFlags.None,
+            textureDesc,
+            ResourceStates.CopyDest);
 
         // Add the Texture into the store with the filePath as key.
         s_textureStore.Add(filePath, texture);

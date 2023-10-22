@@ -1,123 +1,106 @@
 ﻿using System.Drawing;
-using System.Runtime.CompilerServices;
 
-using Vortice.Direct3D11;
+using Vortice.Direct3D12;
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
+using Vortice.D3DCompiler;
+using System.Threading;
 
 namespace Engine.Data;
 
 public struct RenderData
 {
-    public ID3D11DeviceContext DeviceContext;
+    public IDXGISwapChain3 SwapChain;
 
-    public IDXGISwapChain2 SwapChain;
+    public ID3D12GraphicsCommandList4 CommandList;
+    public ID3D12CommandQueue GraphicsQueue;
+    public ID3D12CommandAllocator[] CommandAllocators;
 
-    public ID3D11Texture2D BackBufferRenderTargetTexture;
-    public ID3D11RenderTargetView BackBufferRenderTargetView;
+    public ID3D12Fence FrameFence;
+    public AutoResetEvent FrameFenceEvent;
 
-    public ID3D11Texture2D MSAARenderTargetTexture;
-    public ID3D11RenderTargetView MSAARenderTargetView;
+    public ID3D12Resource BackBufferRenderTargetTexture;
+    public ID3D12DescriptorHeap BackBufferRenderTargetView;
 
+    public ID3D12Resource MSAARenderTargetTexture;
+    public ID3D12DescriptorHeap MSAARenderTargetView;
 
-    public ID3D11DepthStencilState DepthStencilState;
-    public ID3D11Texture2D DepthStencilTexture;
-    public ID3D11DepthStencilView DepthStencilView;
+    public ID3D12Resource DepthStencilTexture;
+    public ID3D12DescriptorHeap DepthStencilView;
 
-    public ID3D11BlendState BlendState;
+    public BlendDescription BlendState;
 
-    public RasterizerDescription RasterizerDescription;
-    public ID3D11RasterizerState RasterizerState;
-
-    public ID3D11Buffer VertexBuffer;
-    public ID3D11Buffer IndexBuffer;
-
-    public ID3D11VertexShader VertexShader;
-    public ID3D11PixelShader PixelShader;
-
-    public ID3D11InputLayout InputLayout;
+    public RasterizerDescription RasterizerState;
 
     public PrimitiveTopology PrimitiveTopology;
 
-    public Format Format;
+    public const Format RenderTargetFormat = Format.R8G8B8A8_UNorm; // 10 bits = Format.R10G10B10A2_UNorm, 16 bits = Format.R16G16B16A16_UNorm
+    public const Format DepthStencilFormat = Format.D32_Float;
+    public const int RenderLatency = 2;
 
     public void SetRasterizerDescFillModeWireframe() =>
         SetRasterizerDescFillMode(FillMode.Wireframe);
 
     public void SetRasterizerDescFillMode(FillMode fillMode = FillMode.Solid)
     {
-        RasterizerDescription.FillMode = fillMode;
-        RasterizerDescription.CullMode = fillMode == FillMode.Solid ? CullMode.Back : CullMode.None;
-        RasterizerDescription.FrontCounterClockwise = true;
+        RasterizerState.FillMode = fillMode;
+        RasterizerState.CullMode = fillMode == FillMode.Solid ? CullMode.Back : CullMode.None;
+        RasterizerState.FrontCounterClockwise = true;
     }
-
-    public void SetPrimitiveTopology(PrimitiveTopology primitiveTopology = PrimitiveTopology.TriangleList) =>
-        PrimitiveTopology = primitiveTopology;
-
-    public void SetConstantBufferVS(int slot, ID3D11Buffer constantBuffer) =>
-        DeviceContext.VSSetConstantBuffer(slot, constantBuffer);
-
-    public void SetConstantBufferPS(int slot, ID3D11Buffer constantBuffer) =>
-        DeviceContext.PSSetConstantBuffer(slot, constantBuffer);
-
-    public void SetResourceView(int slot, params ID3D11ShaderResourceView[] resourceViews) =>
-        DeviceContext.PSSetShaderResources(slot, resourceViews);
-
-    public void SetSamplerState(int slot, params ID3D11SamplerState[] samplerStates) =>
-        DeviceContext.PSSetSamplers(slot, samplerStates);
 
     public void SetViewport(Size size) =>
-        DeviceContext.RSSetViewport(new Viewport(0, 0, size.Width, size.Height, 0.0f, 1.0f));
+        CommandList.RSSetViewport(new Viewport(0, 0, size.Width, size.Height, 0.0f, 1.0f));
 
-    public void SetupRenderState(Format indexFormat = Format.R16_UInt, int? vertexStride = null, int vertexOffset = 0, int indexOffset = 0)
+    public void SetupInputAssembler(IndexBufferView indexBufferView, params VertexBufferView[] vertexBufferViews)
     {
-        vertexStride ??= Unsafe.SizeOf<Vertex>();
-
-        DeviceContext.IASetInputLayout(InputLayout);
-        DeviceContext.IASetVertexBuffer(0, VertexBuffer, vertexStride.Value, vertexOffset);
-        DeviceContext.IASetIndexBuffer(IndexBuffer, indexFormat, indexOffset);
-        DeviceContext.IASetPrimitiveTopology(PrimitiveTopology);
-        DeviceContext.VSSetShader(VertexShader);
-        DeviceContext.PSSetShader(PixelShader);
-
-        DeviceContext.OMSetBlendState(BlendState);
-        DeviceContext.OMSetDepthStencilState(DepthStencilState);
-        DeviceContext.RSSetState(RasterizerState);
+        CommandList.IASetVertexBuffers(0, vertexBufferViews);
+        CommandList.IASetIndexBuffer(indexBufferView);
+        CommandList.IASetPrimitiveTopology(PrimitiveTopology);
     }
 
-    public void SetupMaterial(
-        ID3D11InputLayout inputLayout,
-        ID3D11VertexShader vertexShader,
-        ID3D11PixelShader pixelShader)
-    {
-        InputLayout = inputLayout;
-        VertexShader = vertexShader;
-        PixelShader = pixelShader;
-    }
+    public void SetupMaterial(ID3D12PipelineState pipelineState) =>
+        CommandList.SetPipelineState(pipelineState);
 
     public void Dispose()
     {
-        DeviceContext?.Dispose();
         SwapChain?.Dispose();
 
-        DisposeTexturesAndViews();
+        CommandList?.Dispose();
+        GraphicsQueue?.Dispose();
+        foreach (var allocator in CommandAllocators)
+            allocator.Dispose();
 
-        BlendState?.Dispose();
-        VertexBuffer?.Dispose();
-        IndexBuffer?.Dispose();
-        VertexShader?.Dispose();
-        PixelShader?.Dispose();
-        InputLayout?.Dispose();
+        FrameFence?.Dispose();
+        FrameFenceEvent?.Dispose();
+
+        BackBufferRenderTargetView?.Dispose();
+        MSAARenderTargetView?.Dispose();
+        DepthStencilView?.Dispose();
+
+
+        DisposeTexturesAndViews();
     }
 
     public void DisposeTexturesAndViews()
     {
         BackBufferRenderTargetTexture?.Dispose();
-        BackBufferRenderTargetView?.Dispose();
         MSAARenderTargetTexture?.Dispose();
-        MSAARenderTargetView?.Dispose();
         DepthStencilTexture?.Dispose();
-        DepthStencilView?.Dispose();
+    }
+
+    public static ReadOnlyMemory<byte> CompileBytecode(string filePath, string entryPoint, string profile)
+    {
+        // Shader flags to enable strictness and set optimization level or debug mode.
+        ShaderFlags shaderFlags = ShaderFlags.EnableStrictness;
+#if DEBUG
+        shaderFlags |= ShaderFlags.Debug;
+        shaderFlags |= ShaderFlags.SkipValidation;
+#else
+        shaderFlags |= ShaderFlags.OptimizationLevel3;
+#endif
+
+        // Compile the shader from the specified file using the specified entry point, profile, and flags.
+        return Compiler.CompileFromFile(filePath, entryPoint, profile, shaderFlags);
     }
 }

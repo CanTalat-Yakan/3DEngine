@@ -66,11 +66,9 @@ public sealed partial class Mesh : EditorComponent
         if (Equals(Material.CurrentMaterialOnGPU, Material)
              && Equals(Mesh.CurrentMeshOnGPU, MeshInfo))
         {
-            // Update the PerModelConstantBuffer only.
             Material.MaterialBuffer?.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
 
-            // Draw the mesh directly without resetting the RenderState.
-            _renderer.DrawIndexed(MeshInfo.Value.Indices.Length);
+            _renderer.Draw(MeshInfo.Value.Indices.Length, MeshBuffers.IndexBufferView, MeshBuffers.VertexBufferView);
         }
         else
         {
@@ -79,9 +77,7 @@ public sealed partial class Mesh : EditorComponent
             Material.MaterialBuffer?.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
             Material.MaterialBuffer?.UpdatePropertiesConstantBuffer();
 
-            // Draw the mesh with TriangleList.
-            _renderer.Data.SetPrimitiveTopology();
-            _renderer.Draw(MeshBuffers.VertexBuffer, MeshBuffers.IndexBuffer, MeshInfo.Value.Indices.Length);
+            _renderer.Draw(MeshInfo.Value.Indices.Length, MeshBuffers.IndexBufferView, MeshBuffers.VertexBufferView);
 
             // Assign MeshInfo to the static variable.
             CurrentMeshOnGPU = MeshInfo;
