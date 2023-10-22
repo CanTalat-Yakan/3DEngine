@@ -1,6 +1,6 @@
 ﻿namespace Engine.ECS;
 
-public partial class Component : ICloneable, IDisposable
+public partial class Component
 {
     [Hide] public Entity Entity;
     [Hide] public byte Order = 0;
@@ -13,18 +13,9 @@ public partial class Component : ICloneable, IDisposable
 
     public void InvokeEventOnDestroy() =>
         EventOnDestroy();
-
-    object ICloneable.Clone() =>
-        Clone();
-
-    public Component Clone() =>
-        (Component)MemberwiseClone();
-
-    public void Dispose() =>
-        InvokeEventOnDestroy();
 }
 
-public partial class Component : ICloneable, IDisposable
+public partial class Component : ICloneable
 {
     public virtual void OnRegister() =>
         ScriptSystem.Register(this);
@@ -44,6 +35,18 @@ public partial class Component : ICloneable, IDisposable
     public virtual void OnDestroy() { }
 
     public virtual void OnGUI() { }
+}
+
+public partial class Component : ICloneable, IDisposable
+{
+    object ICloneable.Clone() =>
+        Clone();
+
+    public Component Clone() =>
+        (Component)MemberwiseClone();
+
+    public void Dispose() =>
+        InvokeEventOnDestroy();
 }
 
 public interface IHide { }

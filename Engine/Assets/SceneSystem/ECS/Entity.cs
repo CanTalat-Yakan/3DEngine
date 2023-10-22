@@ -21,7 +21,7 @@ public enum Layers
     UI
 }
 
-public sealed partial class Entity : ICloneable, IDisposable
+public sealed partial class Entity
 {
     public Guid ID = Guid.NewGuid();
 
@@ -49,16 +49,9 @@ public sealed partial class Entity : ICloneable, IDisposable
         // Add the Transform component to the Entity when initialized.
         AddComponent(_transform = new());
 
-    public void Dispose()
-    {
-        // Disable the entity.
-        IsEnabled = false;
-        // Remove all components from the entity.
-        RemoveComponents();
-    }
 }
 
-public sealed partial class Entity : ICloneable
+public sealed partial class Entity
 {
     public T AddComponent<T>() where T : Component, new() =>
         (T)AddComponent(new T());
@@ -147,9 +140,29 @@ public sealed partial class Entity : ICloneable
         // Return false if no matching tag is found.
         return false;
     }
+
+    public string GetDebugInformation()
+    {
+        var info =
+            $"""
+            Name: {Name}
+            ID: {ID}
+            Scene: {Scene.Name}
+            """;
+
+        if (Parent is not null)
+            info +=
+                $"""
+
+                Parent: {Parent.Name}
+                Parent ID: {Parent.ID}
+                """;
+
+        return info;
+    }
 }
 
-public sealed partial class Entity : ICloneable
+public sealed partial class Entity : ICloneable, IDisposable
 {
     object ICloneable.Clone() =>
         Clone();
@@ -189,23 +202,11 @@ public sealed partial class Entity : ICloneable
         return newEntity;
     }
 
-    public string GetDebugInformation()
+    public void Dispose()
     {
-        var info =
-            $"""
-            Name: {Name}
-            ID: {ID}
-            Scene: {Scene.Name}
-            """;
-
-        if (Parent is not null)
-            info +=
-                $"""
-
-                Parent: {Parent.Name}
-                Parent ID: {Parent.ID}
-                """;
-
-        return info;
+        // Disable the entity.
+        IsEnabled = false;
+        // Remove all components from the entity.
+        RemoveComponents();
     }
 }
