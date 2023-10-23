@@ -1,5 +1,6 @@
 ﻿using SharpGen.Runtime;
 using System.IO;
+using System.Runtime.InteropServices;
 
 using Vortice.Direct3D12;
 using Vortice.DXGI;
@@ -39,7 +40,7 @@ public sealed partial class Material
         ShaderResourceViewDescription shaderResourceViewDescription = new()
         {
             Format = texture.Description.Format,
-            ViewDimension = ShaderResourceViewDimension.Texture2D, 
+            ViewDimension = ShaderResourceViewDimension.Texture2D,
             Texture2D = new Texture2DShaderResourceView { MipLevels = texture.Description.MipLevels },
             Shader4ComponentMapping = ShaderComponentMapping.Default
         };
@@ -136,29 +137,6 @@ public sealed partial class Material
         _rootSignature.Name = new FileInfo(shaderFilePath).Name + $"_{_count++}";
     }
 
-    private void CreateGraphicsPipelineStateDescription(InputLayoutDescription inputLayoutDescription, ReadOnlyMemory<byte> vertexShaderByteCode, ReadOnlyMemory<byte> pixelShaderByteCode)
-    {
-        GraphicsPipelineStateDescription pipelineStateObjectDescription = new()
-        {
-            RootSignature = _rootSignature,
-            VertexShader = vertexShaderByteCode,
-            PixelShader = pixelShaderByteCode,
-            InputLayout = inputLayoutDescription,
-            SampleMask = uint.MaxValue,
-            PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
-            RasterizerState = _renderer.Data.RasterizerState,
-            BlendState = BlendDescription.Opaque,
-            DepthStencilState = DepthStencilDescription.Default,
-            RenderTargetFormats = new[] { RenderData.RenderTargetFormat },
-            DepthStencilFormat = RenderData.DepthStencilFormat,
-            SampleDescription = SampleDescription.Default
-        }; 
-
-        Result result = _renderer.Device.CreateGraphicsPipelineState(pipelineStateObjectDescription, out _pipelineState);
-        if (result.Failure)
-            throw new Exception(result.Description);
-    }
-
     private void CreateInputLayout(out InputLayoutDescription inputLayoutDescription)
     {
         inputLayoutDescription = new(
@@ -174,5 +152,72 @@ public sealed partial class Material
 
         // Compile the pixel shader bytecode from the specified shader file name and target profile.
         pixelShaderByteCode = RenderData.CompileBytecode(shaderFilePath, "PS", "ps_5_0");
+    }
+
+    private void CreateGraphicsPipelineStateDescription(InputLayoutDescription inputLayoutDescription, ReadOnlyMemory<byte> vertexShaderByteCode, ReadOnlyMemory<byte> pixelShaderByteCode)
+    {
+        bool usePSOStream = true;
+        if (usePSOStream)
+        {
+            D3D12GraphicsDevice.PipelineStateStream pipelineStateStream = new()
+            {
+                RootSignature = _rootSignature,
+                VertexShader = vertexShaderByteCode.Span,
+                PixelShader = pixelShaderByteCode.Span,
+                InputLayout = inputLayoutDescription,
+                SampleMask = uint.MaxValue,
+                PrimitiveTopology = PrimitiveTopologyType.Triangle,
+                RasterizerState = _renderer.Data.RasterizerState,
+                BlendState = BlendDescription.Opaque,
+                DepthStencilState = DepthStencilDescription.Default,
+                RenderTargetFormats = new[] { RenderData.RenderTargetFormat },
+                DepthStencilFormat = RenderData.DepthStencilFormat,
+                SampleDescription = SampleDescription.Default
+            };
+
+            _pipelineState = _renderer.Device.CreatePipelineState(pipelineStateStream);
+        }
+        else
+        {
+            GraphicsPipelineStateDescription graphicsPipelineStateDescription = new()
+            {
+                RootSignature = _rootSignature,
+                VertexShader = vertexShaderByteCode,
+                PixelShader = pixelShaderByteCode,
+                InputLayout = inputLayoutDescription,
+                SampleMask = uint.MaxValue,
+                PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
+                RasterizerState = _renderer.Data.RasterizerState,
+                BlendState = BlendDescription.Opaque,
+                DepthStencilState = DepthStencilDescription.Default,
+                RenderTargetFormats = new[] { RenderData.RenderTargetFormat },
+                DepthStencilFormat = RenderData.DepthStencilFormat,
+                SampleDescription = SampleDescription.Default
+            };
+
+            Result result = _renderer.Device.CreateGraphicsPipelineState(graphicsPipelineStateDescription, out _pipelineState);
+            if (result.Failure)
+                throw new Exception(result.Description);
+        }
+    }
+}
+
+public sealed partial class D3D12GraphicsDevice
+{
+    [StructLayout(LayoutKind.Sequential)]
+    public struct PipelineStateStream
+    {
+        public PipelineStateSubObjectTypeRootSignature RootSignature;
+        public PipelineStateSubObjectTypeVertexShader VertexShader;
+        public PipelineStateSubObjectTypePixelShader PixelShader;
+        public PipelineStateSubObjectTypeInputLayout InputLayout;
+        public PipelineStateSubObjectTypeSampleMask SampleMask;
+        public PipelineStateSubObjectTypePrimitiveTopology PrimitiveTopology;
+        public PipelineStateSubObjectTypeRasterizer RasterizerState;
+        public PipelineStateSubObjectTypeBlend BlendState;
+        public PipelineStateSubObjectTypeDepthStencil DepthStencilState;
+        public PipelineStateSubObjectTypeRenderTargetFormats RenderTargetFormats;
+        public PipelineStateSubObjectTypeDepthStencilFormat DepthStencilFormat;
+        public PipelineStateSubObjectTypeSampleDescription SampleDescription;
     }
 }
