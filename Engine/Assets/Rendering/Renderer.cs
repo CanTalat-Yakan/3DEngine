@@ -79,10 +79,11 @@ public sealed partial class Renderer
             return result;
 
         CreateGraphicsQueueAndFence(Device);
+        CreateCommandAllocatorsAndCommandList();
+
         SetupSwapChain(forHwnd);
 
         GetBackBufferAndCreateRenderTargetView();
-        CreateCommandAllocatorsAndCommandList();
         CreateMSAATextureAndRenderTargetView();
         CreateDepthStencilView();
         CreateRasterizerState();
@@ -188,7 +189,7 @@ public sealed partial class Renderer
         Data.BackBufferIndex = Data.SwapChain.CurrentBackBufferIndex;
         Data.FrameIndex = Data.FrameCount % RenderData.RenderLatency;
 
-        Data.CommandList.Reset(Data.CommandAllocators[Data.FrameIndex]);
+        //Data.CommandList.Reset(Data.CommandAllocators[Data.FrameIndex]);
         Data.CommandList.BeginEvent("Frame");
 
         // Set the background color to a dark gray.
@@ -233,8 +234,8 @@ public sealed partial class Renderer
         // Create a Direct3D 11 device.
         result = D3D12.D3D12CreateDevice(
             null,
-            //FeatureLevel.Level_11_1,
-            FeatureLevel.Level_11_0,
+            //FeatureLevel.Level_11_0,
+            FeatureLevel.Level_12_2,
             out ID3D12Device2 d3d12Device);
 
         // Check if creating the device was successful.
@@ -290,17 +291,18 @@ public sealed partial class Renderer
 
     private void GetBackBufferAndCreateRenderTargetView()
     {
-        Data.BackBufferRenderTargetView = Device.CreateDescriptorHeap(new DescriptorHeapDescription(
-            DescriptorHeapType.RenderTargetView,
-            RenderData.RenderLatency));
-
-        // Get the back buffer of the swap chain as a texture.
-        Data.BackBufferRenderTargetTexture = Data.SwapChain.GetBuffer<ID3D12Resource>(Data.BackBufferIndex);
-        // Create a render target view for the back buffer render target texture.
-        Device.CreateRenderTargetView(Data.BackBufferRenderTargetTexture, null, Data.BackBufferRenderTargetView.GetCPUDescriptorHandleForHeapStart());
-
         // Get other buffers if needed.
         // We only need the back buffer as the render latency is defaulted to 2.
+        // Get the back buffer of the swap chain as a texture.
+        Data.BackBufferRenderTargetTexture = Data.SwapChain.GetBuffer<ID3D12Resource>(Data.BackBufferIndex);
+
+        Data.BackBufferRenderTargetView = Device.CreateDescriptorHeap(new()
+        {
+            DescriptorCount = RenderData.RenderLatency,
+            Type = DescriptorHeapType.RenderTargetView
+        });
+        // Create a render target view for the back buffer render target texture.
+        Device.CreateRenderTargetView(Data.BackBufferRenderTargetTexture, null, Data.BackBufferRenderTargetView.GetCPUDescriptorHandleForHeapStart());
 
         var size = Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.RenderTargetView);
         Data.BackBufferRenderTargetView.GetCPUDescriptorHandleForHeapStart().Offset(size, RenderData.RenderLatency);
@@ -364,8 +366,11 @@ public sealed partial class Renderer
             ViewDimension = RenderTargetViewDimension.Texture2DMultisampled
         };
 
-        Data.MSAARenderTargetView = Device.CreateDescriptorHeap(new DescriptorHeapDescription(
-            DescriptorHeapType.RenderTargetView, 1));
+        Data.MSAARenderTargetView = Device.CreateDescriptorHeap(new()
+        {
+            DescriptorCount = 1,
+            Type = DescriptorHeapType.RenderTargetView
+        });
         // Create a render target view for the MSAA render target texture.
         Device.CreateRenderTargetView(Data.MSAARenderTargetTexture, MSAARenderTargetViewDescription, Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart());
 
@@ -400,8 +405,11 @@ public sealed partial class Renderer
             ViewDimension = DepthStencilViewDimension.Texture2DMultisampled
         };
 
-        Data.DepthStencilView = Device.CreateDescriptorHeap(new DescriptorHeapDescription(
-            DescriptorHeapType.DepthStencilView, 1));
+        Data.DepthStencilView = Device.CreateDescriptorHeap(new()
+        {
+            DescriptorCount = 1,
+            Type = DescriptorHeapType.DepthStencilView
+        });
         // Create a depth stencil view for the depth stencil texture.
         Device.CreateDepthStencilView(Data.DepthStencilTexture, depthStencilViewDescription, Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart());
 
@@ -419,5 +427,50 @@ public sealed partial class Renderer
             AntialiasedLineEnable = true,
             MultisampleEnable = true
         };
+    }
+}
+
+public sealed partial class Renderer
+{
+    internal void HandleDeviceLost()
+    {
+        Result removedReason = Device.DeviceRemovedReason;
+        ID3D12DeviceRemovedExtendedData1? dred = Device.QueryInterfaceOrNull<ID3D12DeviceRemovedExtendedData1>();
+
+        if (dred != null)
+        {
+            if (dred.GetAutoBreadcrumbsOutput1(out DredAutoBreadcrumbsOutput1? dredAutoBreadcrumbsOutput).Success)
+            {
+                AutoBreadcrumbNode1? currentNode = dredAutoBreadcrumbsOutput.HeadAutoBreadcrumbNode;
+                int index = 0;
+                while (currentNode != null)
+                {
+                    string? cmdListName = currentNode.CommandListDebugName;
+                    string? cmdQueueName = currentNode.CommandQueueDebugName;
+                    int expected = currentNode.BreadcrumbCount;
+                    int actual = currentNode.LastBreadcrumbValue.GetValueOrDefault();
+
+                    bool errorOccurred = actual > 0 && actual < expected;
+
+                    if (actual == 0)
+                    {
+                        // Don't bother logging nodes that don't submit anything
+                        currentNode = currentNode.Next;
+                        ++index;
+                        continue;
+                    }
+
+                    currentNode = currentNode.Next;
+                    ++index;
+                }
+            }
+
+            if (dred.GetPageFaultAllocationOutput1(out DredPageFaultOutput1? pageFaultOutput).Success)
+            {
+
+            }
+
+            dred.Dispose();
+        }
     }
 }

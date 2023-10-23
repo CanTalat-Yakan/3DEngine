@@ -1,6 +1,4 @@
-﻿using ComputeSharp;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -15,13 +13,13 @@ public interface IMaterialBuffer { }
 [XmlInclude(typeof(Vector2))]
 [XmlInclude(typeof(Vector3))]
 [XmlInclude(typeof(Vector4))]
-[XmlInclude(typeof(Color))]
 public class SerializeEntry
 {
     public string FieldName;
     public object Value;
 
-    public SerializeEntry() { } // Parameterless Ctor needed to Serialize.
+    // Parameterless constructor needed to Serialize.
+    public SerializeEntry() { } 
 
     public SerializeEntry(string fieldName, object value)
     {
@@ -30,7 +28,7 @@ public class SerializeEntry
     }
 }
 
-public class MaterialBuffer()
+public unsafe partial class MaterialBuffer
 {
     public string ShaderName;
 
@@ -42,77 +40,10 @@ public class MaterialBuffer()
 
     private Renderer _renderer => Renderer.Instance;
 
-    public object GetPropertiesConstantBuffer() =>
-        _propertiesConstantBuffer;
-
-    public void CreatePropertiesConstantBuffer(Type constantBufferType)
+    public void Dispose()
     {
-        _propertiesConstantBuffer = Activator.CreateInstance(constantBufferType);
-
-        MethodInfo createConstantBufferMethod = _renderer.Device.GetType()
-            .GetMethod("CreateConstantBuffer")
-            .MakeGenericMethod(constantBufferType);
-
-        _properties = (ID3D12Resource)createConstantBufferMethod.Invoke(_renderer.Device, null);
-    }
-
-    public void UpdatePropertiesConstantBuffer()
-    {
-        if (_properties is null)
-            return;
-
-        Type type = ShaderCompiler.ShaderLibrary.GetShader(ShaderName).ConstantBufferType;
-
-        // Map the constant buffer and copy the camera's view-projection matrix and position into it.
-        unsafe
-        {
-            // Map the constant buffer to memory for write access.
-            _properties.Map(0);
-
-            // Create a MethodInfo for Unsafe.Copy with the correct generic type.
-            MethodInfo copyMethod = typeof(Unsafe)
-                .GetMethods().FirstOrDefault(method => method.Name == "Copy")
-                .MakeGenericMethod(type);
-            // Perform the unsafe copy using reflection
-            copyMethod.Invoke(null, new object[] {
-                new IntPtr(_properties.NativePointer.ToPointer()),
-                _propertiesConstantBuffer });
-
-            // Unmap the constant buffer from memory.
-            _properties.Unmap(0);
-        }
-
-        //Set the constant buffer in the vertex shader stage of the device context.
-        _renderer.Data.CommandList.SetGraphicsRootConstantBufferView(2, _properties.GPUVirtualAddress);
-    }
-
-    public void CreatePerModelConstantBuffer()
-    {
-        //Create View Constant Buffer when Camera is initialized.
-        _model = _renderer.Device.CreateCommittedResource(
-            new HeapProperties(HeapType.Upload),
-            HeapFlags.None,
-            ResourceDescription.Buffer(Unsafe.SizeOf<PerModelConstantBuffer>()),
-            ResourceStates.GenericRead); // The resource is in a readable state.
-    }
-
-    public void UpdateModelConstantBuffer(PerModelConstantBuffer constantBuffer)
-    {
-        // Map the constant buffer and copy the camera's view-projection matrix and position into it.
-        unsafe
-        {
-            // Map the constant buffer to memory for write access.
-            _model.Map(0);
-
-            // Copy the data from the constant buffer to the mapped resource.
-            Unsafe.Copy(_model.NativePointer.ToPointer(), ref constantBuffer);
-
-            // Unmap the constant buffer from memory.
-            _model.Unmap(0);
-        }
-
-        // Set the constant buffer in the vertex shader stage of the device context.
-        _renderer.Data.CommandList.SetGraphicsRootConstantBufferView(1, _model.GPUVirtualAddress);
+        _properties?.Dispose();
+        _model?.Dispose();
     }
 
     public void SafeToSerializableProperties()
@@ -130,10 +61,87 @@ public class MaterialBuffer()
                 if (fieldInfo.Name.Equals(serializeEntry.FieldName))
                     serializeEntry.Value = fieldInfo.GetValue(_propertiesConstantBuffer);
     }
+}
 
-    public void Dispose()
+public unsafe partial class MaterialBuffer
+{
+    public void CreatePerModelConstantBuffer()
     {
-        _properties?.Dispose();
-        _model?.Dispose();
+        //Create Per Model Constant Buffer.
+        _model = _renderer.Device.CreateCommittedResource(
+            HeapType.Upload,
+            ResourceDescription.Buffer(sizeof(PerModelConstantBuffer)),
+            ResourceStates.GenericRead);
+    }
+
+    public void UpdateModelConstantBuffer(PerModelConstantBuffer constantBuffer)
+    {
+        // Map the constant buffer and copy the camera's view-projection matrix and position into it.
+        var pointer = _model.Map<PerModelConstantBuffer>(0);
+        // Copy the data from the constant buffer to the mapped resource.
+        Unsafe.Copy(pointer, ref constantBuffer);
+        // Unmap the constant buffer from memory.
+        _model.Unmap(0);
+
+        // Set the constant buffer in the vertex shader stage of the device context.
+        _renderer.Data.CommandList.SetGraphicsRootConstantBufferView(1, _model.GPUVirtualAddress);
+    }
+}
+
+public unsafe partial class MaterialBuffer
+{
+    public object GetPropertiesConstantBuffer() =>
+        _propertiesConstantBuffer;
+
+    public void CreatePropertiesConstantBuffer(Type constantBufferType)
+    {
+        _propertiesConstantBuffer = Activator.CreateInstance(constantBufferType);
+
+        MethodInfo sizeOfMethod = typeof(Unsafe)
+            .GetMethod("SizeOf")
+            .MakeGenericMethod(constantBufferType);
+        var dynamicPropertiesMemoryLength = (int)sizeOfMethod.Invoke(null, null);
+
+        MethodInfo createConstantBufferMethod = _renderer.Device.GetType()
+            .GetMethod("CreateCommittedResource")
+            .MakeGenericMethod(constantBufferType);
+        _properties = (ID3D12Resource)createConstantBufferMethod.Invoke(_renderer.Device, new object[]
+        {
+            HeapType.Upload,
+            ResourceDescription.Buffer(dynamicPropertiesMemoryLength),
+            ResourceStates.GenericRead
+        });
+    }
+
+    public void UpdatePropertiesConstantBuffer()
+    {
+        if (_properties is null)
+            return;
+
+        Type type = ShaderCompiler.ShaderLibrary.GetShader(ShaderName).ConstantBufferType;
+
+        // Map the constant buffer and copy the view-projection matrix and position of the camera into it.
+        MethodInfo mapMethod = typeof(ID3D12Resource)
+            .GetMethod("Map")
+            .MakeGenericMethod(type);
+        // Perform the map using reflection
+        var pointer = mapMethod.Invoke(null, new object[] { 0 });
+
+        // Create a MethodInfo for Unsafe.Copy with the correct generic type.
+        MethodInfo copyMethod = typeof(Unsafe)
+            .GetMethods().FirstOrDefault(method => method.Name == "Copy")
+            .MakeGenericMethod(type);
+        // Perform the unsafe copy using reflection
+        copyMethod.Invoke(null, new object[]
+        {
+            pointer,
+            _propertiesConstantBuffer
+        });
+
+        // Unmap the constant buffer from memory.
+        _properties.Unmap(0);
+
+        //Set the constant buffer in the vertex shader stage of the device context.
+        _renderer.Data.CommandList.SetGraphicsRootConstantBufferView(2, _properties.GPUVirtualAddress);
     }
 }

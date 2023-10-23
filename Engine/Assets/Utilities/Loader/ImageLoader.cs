@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SharpGen.Runtime;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -13,10 +14,11 @@ public sealed class ImageLoader
 {
     private static Dictionary<string, ID3D12Resource> s_textureStore = new();
 
-    public static ID3D12Resource LoadTexture(ID3D12Device device, string filePath, bool fromResources = true)
+    public static void LoadTexture(out ID3D12Resource texture, ID3D12Device device, string filePath, bool fromResources = true)
     {
+        texture = null;
         if (s_textureStore.ContainsKey(filePath))
-            return s_textureStore[filePath];
+            texture = s_textureStore[filePath];
 
         string textureFilePath = filePath;
         if (fromResources)
@@ -144,7 +146,7 @@ public sealed class ImageLoader
 
                 bool canConvert = converter.CanConvert(pixelFormatScaler, convertGUID);
                 if (!canConvert)
-                    return null;
+                    return;
 
                 converter.Initialize(scaler, convertGUID, BitmapDitherType.ErrorDiffusion, null, 0, BitmapPaletteType.MedianCut);
                 converter.CopyPixels(rowPitch, pixels);
@@ -157,33 +159,34 @@ public sealed class ImageLoader
 
             bool canConvert = converter.CanConvert(pixelFormat, convertGUID);
             if (!canConvert)
-                return null;
+                return;
 
             converter.Initialize(frame, convertGUID, BitmapDitherType.ErrorDiffusion, null, 0, BitmapPaletteType.MedianCut);
             converter.CopyPixels(rowPitch, pixels);
         }
 
-
-        ResourceDescription textureDesc = ResourceDescription.Texture2D(
+        ResourceDescription textureDescription = ResourceDescription.Texture2D(
             format,
             (uint)size.Width,
             (uint)size.Height,
             arraySize: 1,
-            mipLevels: 1,
-            sampleCount: Renderer.Instance.Config.SupportedSampleCount,
-            sampleQuality: Renderer.Instance.Config.QualityLevels,
-            flags: ResourceFlags.None);
+            mipLevels: 1);
 
-        var texture = device.CreateCommittedResource(
-            new HeapProperties(HeapType.Default),
+        Result result = device.CreateCommittedResource(
+            HeapProperties.DefaultHeapProperties,
             HeapFlags.None,
-            textureDesc,
-            ResourceStates.CopyDest);
+            textureDescription,
+            ResourceStates.CopyDest,
+            null,
+            out texture);
+
+        if (result.Failure)
+            throw new Exception(result.Description);
+
+        texture.Name = new FileInfo(filePath).Name;
 
         // Add the Texture into the store with the filePath as key.
         s_textureStore.Add(filePath, texture);
-
-        return texture;
     }
 
     internal static readonly Dictionary<Guid, Format> s_WICFormats = new()

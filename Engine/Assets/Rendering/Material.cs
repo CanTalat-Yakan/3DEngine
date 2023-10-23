@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using SharpGen.Runtime;
+using System.IO;
 
 using Vortice.Direct3D12;
 using Vortice.DXGI;
@@ -33,30 +34,35 @@ public sealed partial class Material
 
         #region // Create Texture
         // Load the texture and create a shader resource view for it.
-        var texture = Loader.ImageLoader.LoadTexture(_renderer.Device, imageFileName); // my own function. What should it return? A ID3D12Resource?
-
-        _resourceView = _renderer.Device.CreateDescriptorHeap(new DescriptorHeapDescription
-        {
-            Type = DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView,
-            DescriptorCount = 1, // The number of descriptors you need
-            Flags = DescriptorHeapFlags.ShaderVisible, // This makes the heap shader visible
-        });
+        Loader.ImageLoader.LoadTexture(out var texture, _renderer.Device, imageFileName);
 
         ShaderResourceViewDescription shaderResourceViewDescription = new()
         {
-            Format = texture.Description.Format, // The format of the texture.
-            ViewDimension = ShaderResourceViewDimension.Texture2D, // Texture dimension.
-            Texture2D = new Texture2DShaderResourceView { MipLevels = texture.Description.MipLevels }
+            Format = texture.Description.Format,
+            ViewDimension = ShaderResourceViewDimension.Texture2D, 
+            Texture2D = new Texture2DShaderResourceView { MipLevels = texture.Description.MipLevels },
+            Shader4ComponentMapping = ShaderComponentMapping.Default
         };
+
+        _resourceView = _renderer.Device.CreateDescriptorHeap(new()
+        {
+            DescriptorCount = 1,
+            Type = DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView,
+            Flags = DescriptorHeapFlags.ShaderVisible
+        });
         _renderer.Device.CreateShaderResourceView(texture, shaderResourceViewDescription, _resourceView.GetCPUDescriptorHandleForHeapStart());
         #endregion
 
+        Result result = _renderer.Device.DeviceRemovedReason;
+        if (result.Failure)
+            throw new Exception(result.Description);
+
         #region // Create Sampler
-        _samplerState = _renderer.Device.CreateDescriptorHeap(new DescriptorHeapDescription
+        _samplerState = _renderer.Device.CreateDescriptorHeap(new()
         {
+            DescriptorCount = 1,
             Type = DescriptorHeapType.Sampler,
-            DescriptorCount = 1, // The number of descriptors you need
-            Flags = DescriptorHeapFlags.ShaderVisible, // This makes the heap shader visible
+            Flags = DescriptorHeapFlags.ShaderVisible
         });
 
         // Set the properties for the sampler state.
@@ -82,7 +88,7 @@ public sealed partial class Material
 
         CreateShaderByteCode(shaderFilePath, out var vertexShaderByteCode, out var pixelShaderByteCode);
 
-        _pipelineState = CreateGraphicsPipelineStateDescription(inputLayoutDescription, vertexShaderByteCode, pixelShaderByteCode);
+        CreateGraphicsPipelineStateDescription(inputLayoutDescription, vertexShaderByteCode, pixelShaderByteCode);
     }
 
     public void Setup()
@@ -130,7 +136,7 @@ public sealed partial class Material
         _rootSignature.Name = new FileInfo(shaderFilePath).Name + $"_{_count++}";
     }
 
-    private ID3D12PipelineState CreateGraphicsPipelineStateDescription(InputLayoutDescription inputLayoutDescription, ReadOnlyMemory<byte> vertexShaderByteCode, ReadOnlyMemory<byte> pixelShaderByteCode)
+    private void CreateGraphicsPipelineStateDescription(InputLayoutDescription inputLayoutDescription, ReadOnlyMemory<byte> vertexShaderByteCode, ReadOnlyMemory<byte> pixelShaderByteCode)
     {
         GraphicsPipelineStateDescription pipelineStateObjectDescription = new()
         {
@@ -148,7 +154,8 @@ public sealed partial class Material
             SampleDescription = SampleDescription.Default
         };
 
-        return _renderer.Device.CreateGraphicsPipelineState(pipelineStateObjectDescription);
+        _renderer.Device.CreateGraphicsPipelineState(pipelineStateObjectDescription, out _pipelineState);
+
     }
 
     private void CreateInputLayout(out InputLayoutDescription inputLayoutDescription)
