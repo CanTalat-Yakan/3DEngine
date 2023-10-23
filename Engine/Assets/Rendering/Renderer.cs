@@ -5,7 +5,6 @@ using Vortice.Direct3D12;
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
-using TerraFX.Interop.Windows;
 
 namespace Engine.Rendering;
 
