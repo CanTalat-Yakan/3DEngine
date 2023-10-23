@@ -17,7 +17,7 @@ public sealed unsafe class CameraBuffer
         _view = _renderer.Device.CreateCommittedResource(
             HeapType.Upload,
             ResourceDescription.Buffer(sizeof(ViewConstantBuffer)),
-            ResourceStates.GenericRead);
+            ResourceStates.VertexAndConstantBuffer);
     }
 
     public void UpdateConstantBuffer()

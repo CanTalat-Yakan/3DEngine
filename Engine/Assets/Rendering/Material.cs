@@ -152,10 +152,11 @@ public sealed partial class Material
             RenderTargetFormats = new[] { RenderData.RenderTargetFormat },
             DepthStencilFormat = RenderData.DepthStencilFormat,
             SampleDescription = SampleDescription.Default
-        };
+        }; 
 
-        _renderer.Device.CreateGraphicsPipelineState(pipelineStateObjectDescription, out _pipelineState);
-
+        Result result = _renderer.Device.CreateGraphicsPipelineState(pipelineStateObjectDescription, out _pipelineState);
+        if (result.Failure)
+            throw new Exception(result.Description);
     }
 
     private void CreateInputLayout(out InputLayoutDescription inputLayoutDescription)

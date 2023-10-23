@@ -189,7 +189,7 @@ public sealed partial class Renderer
         Data.BackBufferIndex = Data.SwapChain.CurrentBackBufferIndex;
         Data.FrameIndex = Data.FrameCount % RenderData.RenderLatency;
 
-        //Data.CommandList.Reset(Data.CommandAllocators[Data.FrameIndex]);
+        Data.CommandList.Reset(Data.CommandAllocators[Data.FrameIndex]);
         Data.CommandList.BeginEvent("Frame");
 
         // Set the background color to a dark gray.
