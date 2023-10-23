@@ -1,4 +1,6 @@
-﻿using Vortice.Direct3D12;
+﻿using System.IO;
+
+using Vortice.Direct3D12;
 using Vortice.DXGI;
 
 namespace Engine.Rendering;
@@ -19,9 +21,13 @@ public sealed partial class Material
 
     public Material(string shaderFilePath, string imageFileName = "Default.png")
     {
+        if (!File.Exists(shaderFilePath))
+            return;
+
+
         MaterialBuffer.CreatePerModelConstantBuffer();
 
-        CreateRootSignature();
+        CreateRootSignature(shaderFilePath);
 
         UpdateShader(shaderFilePath);
 
@@ -72,19 +78,16 @@ public sealed partial class Material
 
     public void UpdateShader(string shaderFilePath)
     {
-        if (string.IsNullOrEmpty(shaderFilePath))
-            return;
-
-        CreateInputLayout(out var inputElementDescription);
+        CreateInputLayout(out var inputLayoutDescription);
 
         CreateShaderByteCode(shaderFilePath, out var vertexShaderByteCode, out var pixelShaderByteCode);
 
-        _pipelineState = CreateGraphicsPipelineStateDescription(inputElementDescription, vertexShaderByteCode, pixelShaderByteCode);
+        _pipelineState = CreateGraphicsPipelineStateDescription(inputLayoutDescription, vertexShaderByteCode, pixelShaderByteCode);
     }
 
     public void Setup()
     {
-        // Set necessary state.
+        // Set current material root state.
         _renderer.Data.CommandList.SetGraphicsRootSignature(_rootSignature);
         // Set input layout, vertex shader, and pixel shader in the device context.
         _renderer.Data.SetupMaterial(_pipelineState);
@@ -110,9 +113,11 @@ public sealed partial class Material
 
 public sealed partial class Material
 {
-    private void CreateRootSignature()
+    private static int _count = 0;
+
+    private void CreateRootSignature(string shaderFilePath)
     {
-        RootSignatureFlags rootSignatureFlags = RootSignatureFlags.AllowInputAssemblerInputLayout 
+        RootSignatureFlags rootSignatureFlags = RootSignatureFlags.AllowInputAssemblerInputLayout
             | RootSignatureFlags.DenyHullShaderRootAccess
             | RootSignatureFlags.DenyDomainShaderRootAccess
             | RootSignatureFlags.DenyGeometryShaderRootAccess
@@ -120,17 +125,19 @@ public sealed partial class Material
             | RootSignatureFlags.DenyMeshShaderRootAccess;
 
         RootSignatureDescription1 rootSignatureDesc = new(rootSignatureFlags);
+
         _rootSignature = _renderer.Device.CreateRootSignature(rootSignatureDesc);
+        _rootSignature.Name = new FileInfo(shaderFilePath).Name + $"_{_count++}";
     }
 
-    private ID3D12PipelineState CreateGraphicsPipelineStateDescription(InputElementDescription[] inputElementDescription, ReadOnlyMemory<byte> vertexShaderByteCode, ReadOnlyMemory<byte> pixelShaderByteCode)
+    private ID3D12PipelineState CreateGraphicsPipelineStateDescription(InputLayoutDescription inputLayoutDescription, ReadOnlyMemory<byte> vertexShaderByteCode, ReadOnlyMemory<byte> pixelShaderByteCode)
     {
         GraphicsPipelineStateDescription pipelineStateObjectDescription = new()
         {
             RootSignature = _rootSignature,
             VertexShader = vertexShaderByteCode,
             PixelShader = pixelShaderByteCode,
-            InputLayout = new(inputElementDescription),
+            InputLayout = inputLayoutDescription,
             SampleMask = uint.MaxValue,
             PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
             RasterizerState = _renderer.Data.RasterizerState,
@@ -138,20 +145,18 @@ public sealed partial class Material
             DepthStencilState = DepthStencilDescription.Default,
             RenderTargetFormats = new[] { RenderData.RenderTargetFormat },
             DepthStencilFormat = RenderData.DepthStencilFormat,
-            SampleDescription = new(_renderer.Config.SupportedSampleCount, _renderer.Config.QualityLevels)
+            SampleDescription = SampleDescription.Default
         };
 
         return _renderer.Device.CreateGraphicsPipelineState(pipelineStateObjectDescription);
     }
 
-    private void CreateInputLayout(out InputElementDescription[] inputElementDescription)
+    private void CreateInputLayout(out InputLayoutDescription inputLayoutDescription)
     {
-        inputElementDescription = new[]
-        {
+        inputLayoutDescription = new(
             new InputElementDescription("POSITION", 0, Format.R32G32B32_Float, 0, 0), // Position element.
             new InputElementDescription("TEXCOORD", 0, Format.R32G32_Float, InputElementDescription.AppendAligned, 0), // Texture coordinate element.
-            new InputElementDescription("NORMAL", 0, Format.R32G32B32_Float, InputElementDescription.AppendAligned, 0) // Normal element.
-        };
+            new InputElementDescription("NORMAL", 0, Format.R32G32B32_Float, InputElementDescription.AppendAligned, 0)); // Normal element.
     }
 
     private void CreateShaderByteCode(string shaderFilePath, out ReadOnlyMemory<byte> vertexShaderByteCode, out ReadOnlyMemory<byte> pixelShaderByteCode)

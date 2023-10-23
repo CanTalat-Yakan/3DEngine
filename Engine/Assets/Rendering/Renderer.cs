@@ -5,6 +5,7 @@ using Vortice.Direct3D12;
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
+using TerraFX.Interop.Windows;
 
 namespace Engine.Rendering;
 
@@ -73,9 +74,12 @@ public sealed partial class Renderer
 
     private Result Initialize(bool forHwnd = false)
     {
-        CreateDeviceAndSetupSwapChain(forHwnd, out Result result);
+        CreateDevice(out var result);
         if (result.Failure)
             return result;
+
+        CreateGraphicsQueueAndFence(Device);
+        SetupSwapChain(forHwnd);
 
         GetBackBufferAndCreateRenderTargetView();
         CreateCommandAllocatorsAndCommandList();
@@ -142,7 +146,9 @@ public sealed partial class Renderer
         // Indicate that the MSAA render target texture will be used as a render target.
         Data.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.Present, ResourceStates.RenderTarget);
 
+        Data.BackBufferIndex = Data.SwapChain.CurrentBackBufferIndex;
         Data.FrameIndex = Data.FrameCount % RenderData.RenderLatency;
+
         Data.CommandList.Reset(Data.CommandAllocators[Data.FrameIndex]);
         Data.CommandList.BeginEvent("Frame");
 
@@ -183,18 +189,7 @@ public sealed partial class Renderer
 {
     public static bool IsSupported() => D3D12.IsSupported(FeatureLevel.Level_12_0);
 
-    private void CreateGraphicsQueueAndFence(ID3D12Device2 device)
-    {
-        // Create Command queue.
-        Data.GraphicsQueue = device.CreateCommandQueue(CommandListType.Direct);
-        Data.GraphicsQueue.Name = "Graphics Queue";
-
-        // Create synchronization objects.
-        Data.FrameFence = Device.CreateFence(0);
-        Data.FrameFenceEvent = new System.Threading.AutoResetEvent(false);
-    }
-
-    private Result CreateDeviceAndSetupSwapChain(bool forHwnd, out Result result)
+    private Result CreateDevice(out Result result)
     {
         // Create a Direct3D 11 device.
         result = D3D12.D3D12CreateDevice(
@@ -209,10 +204,24 @@ public sealed partial class Renderer
 
         // Assign the device to a variable.
         Device = d3d12Device.QueryInterface<ID3D12Device2>();
+        Device.Name = "Device";
 
-        // Pass the Device to create the Graphics Queue.
-        CreateGraphicsQueueAndFence(Device);
+        return Result.Ok;
+    }
 
+    private void CreateGraphicsQueueAndFence(ID3D12Device2 device)
+    {
+        // Create Command queue.
+        Data.GraphicsQueue = device.CreateCommandQueue(CommandListType.Direct);
+        Data.GraphicsQueue.Name = "Graphics Queue";
+
+        // Create synchronization objects.
+        Data.FrameFence = Device.CreateFence(0);
+        Data.FrameFenceEvent = new System.Threading.AutoResetEvent(false);
+    }
+
+    private void SetupSwapChain(bool forHwnd)
+    {
         // Initialize the SwapChainDescription structure.
         SwapChainDescription1 swapChainDescription = new()
         {
@@ -227,22 +236,17 @@ public sealed partial class Renderer
 
         try
         {
-            bool validation = false; // For Debug;
+            bool Debug = true;
             // Create the IDXGIFactory4.
-            using IDXGIFactory4 DXGIFactory = DXGI.CreateDXGIFactory2<IDXGIFactory4>(validation);
-            // Obtain instance of the IDXGIFactory5 interface from the DXGI Factory.
-            using IDXGIFactory5 dxgiFactory5 = DXGIFactory.QueryInterfaceOrNull<IDXGIFactory5>();
-
+            using IDXGIFactory4 DXGIFactory = DXGI.CreateDXGIFactory2<IDXGIFactory4>(Debug);
             // Creates a swap chain using the swap chain description.
             using IDXGISwapChain1 swapChain1 = forHwnd
-                ? dxgiFactory5.CreateSwapChainForHwnd(Data.GraphicsQueue, _win32Window.Handle, swapChainDescription)
-                : dxgiFactory5.CreateSwapChainForComposition(Data.GraphicsQueue, swapChainDescription);
+                ? DXGIFactory.CreateSwapChainForHwnd(Data.GraphicsQueue, _win32Window.Handle, swapChainDescription)
+                : DXGIFactory.CreateSwapChainForComposition(Data.GraphicsQueue, swapChainDescription);
 
             Data.SwapChain = swapChain1.QueryInterface<IDXGISwapChain3>();
         }
         catch (Exception ex) { throw new Exception(ex.Message); }
-
-        return Result.Ok;
     }
 
     private void GetBackBufferAndCreateRenderTargetView()
@@ -251,17 +255,16 @@ public sealed partial class Renderer
             DescriptorHeapType.RenderTargetView,
             RenderData.RenderLatency));
 
-        Data.BackBufferIndex = Data.SwapChain.CurrentBackBufferIndex;
-
         // Get the back buffer of the swap chain as a texture.
         Data.BackBufferRenderTargetTexture = Data.SwapChain.GetBuffer<ID3D12Resource>(Data.BackBufferIndex);
         // Create a render target view for the back buffer render target texture.
         Device.CreateRenderTargetView(Data.BackBufferRenderTargetTexture, null, Data.BackBufferRenderTargetView.GetCPUDescriptorHandleForHeapStart());
 
-        // Get other buffers when needed.
+        // Get other buffers if needed.
         // We only need the back buffer as the render latency is defaulted to 2.
 
-        Data.BackBufferRenderTargetView.GetCPUDescriptorHandleForHeapStart().Offset(Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.RenderTargetView), RenderData.RenderLatency);
+        var size = Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.RenderTargetView);
+        Data.BackBufferRenderTargetView.GetCPUDescriptorHandleForHeapStart().Offset(size, RenderData.RenderLatency);
     }
 
     private void CreateCommandAllocatorsAndCommandList()
@@ -327,7 +330,8 @@ public sealed partial class Renderer
         // Create a render target view for the MSAA render target texture.
         Device.CreateRenderTargetView(Data.MSAARenderTargetTexture, MSAARenderTargetViewDescription, Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart());
 
-        Data.BackBufferRenderTargetView.GetCPUDescriptorHandleForHeapStart().Offset(Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.RenderTargetView));
+        var size = Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.RenderTargetView);
+        Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart().Offset(size);
     }
 
     private void CreateDepthStencilView()
@@ -362,7 +366,8 @@ public sealed partial class Renderer
         // Create a depth stencil view for the depth stencil texture.
         Device.CreateDepthStencilView(Data.DepthStencilTexture, depthStencilViewDescription, Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart());
 
-        Data.BackBufferRenderTargetView.GetCPUDescriptorHandleForHeapStart().Offset(Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.DepthStencilView));
+        var size = Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.DepthStencilView);
+        Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart().Offset(size);
     }
 
     private void CreateRasterizerState()
