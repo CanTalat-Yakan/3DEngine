@@ -89,6 +89,45 @@ public sealed partial class Renderer
 
         return Result.Ok;
     }
+
+    public void Dispose()
+    {
+        // Dispose all DirectX resources that were created.
+        Device?.Dispose();
+        Data.Dispose();
+    }
+
+    public void Resize(int newWidth, int newHeight)
+    {
+        if (!IsRendering)
+            return;
+
+        // Resize the buffers, depth stencil texture, render target texture and viewport
+        // when the size of the window changes.
+        NativeSize = new Size(
+            Math.Max(64, newWidth),
+            Math.Max(64, newHeight));
+
+        // Dispose the existing render target views/ textures and depth stencil view/ texture.
+        Data.DisposeTexturesAndViews();
+
+        // Resize the swap chain buffers to match the new window size.
+        Data.SwapChain.ResizeBuffers(
+            Data.SwapChain.Description.BufferCount,
+            Size.Width,
+            Size.Height,
+            Data.SwapChain.Description1.Format,
+            Data.SwapChain.Description1.Flags);
+
+        GetBackBufferAndCreateRenderTargetView();
+        CreateMSAATextureAndRenderTargetView();
+        CreateDepthStencilView();
+
+        // Update the size of the source in the swap chain.
+        Data.SwapChain.SourceSize = Size;
+
+        Core.Instance.Frame();
+    }
 }
 
 public sealed partial class Renderer
@@ -380,47 +419,5 @@ public sealed partial class Renderer
             AntialiasedLineEnable = true,
             MultisampleEnable = true
         };
-    }
-}
-
-public sealed partial class Renderer
-{
-    public void Dispose()
-    {
-        // Dispose all DirectX resources that were created.
-        Device?.Dispose();
-        Data.Dispose();
-    }
-
-    public void Resize(int newWidth, int newHeight)
-    {
-        if (!IsRendering)
-            return;
-
-        // Resize the buffers, depth stencil texture, render target texture and viewport
-        // when the size of the window changes.
-        NativeSize = new Size(
-            Math.Max(64, newWidth),
-            Math.Max(64, newHeight));
-
-        // Dispose the existing render target views/ textures and depth stencil view/ texture.
-        Data.DisposeTexturesAndViews();
-
-        // Resize the swap chain buffers to match the new window size.
-        Data.SwapChain.ResizeBuffers(
-            Data.SwapChain.Description.BufferCount,
-            Size.Width,
-            Size.Height,
-            Data.SwapChain.Description1.Format,
-            Data.SwapChain.Description1.Flags);
-
-        GetBackBufferAndCreateRenderTargetView();
-        CreateMSAATextureAndRenderTargetView();
-        CreateDepthStencilView();
-
-        // Update the size of the source in the swap chain.
-        Data.SwapChain.SourceSize = Size;
-
-        Core.Instance.Frame();
     }
 }
