@@ -28,7 +28,7 @@ public static class ExtensionMethods
 
     public static Vector2 SetVector(this Vector2 vector, float x, float y)
     {
-        vector.X = x; vector.Y = y; 
+        vector.X = x; vector.Y = y;
         return vector;
     }
 
