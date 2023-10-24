@@ -8,7 +8,6 @@ using Vortice.Direct3D;
 using Vortice.Dxc;
 using Vortice.DXGI;
 using Vortice.Mathematics;
-using FftSharp;
 
 namespace Engine.Data;
 
