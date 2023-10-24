@@ -94,8 +94,6 @@ public sealed partial class Material
         CreateShaderByteCode(shaderFilePath, out var vertexShaderByteCode, out var pixelShaderByteCode);
 
         CreateGraphicsPipelineStateDescription(inputLayoutDescription, vertexShaderByteCode, pixelShaderByteCode);
-
-        CreateCommandAllocatorAndCommandList();
     }
 
     public void Setup()
@@ -155,21 +153,6 @@ public sealed partial class Material
         RootSignature.Name = new FileInfo(shaderFilePath).Name + $"_{_count++}";
     }
 
-    private void CreateCommandAllocatorAndCommandList()
-    {
-        CommandAllocator?.Dispose();
-        CommandAllocator = _renderer.Device.CreateCommandAllocator(CommandListType.Direct);
-
-        CommandList?.Dispose();
-        CommandList = _renderer.Device.CreateCommandList<ID3D12GraphicsCommandList4>(
-            CommandListType.Direct,
-            CommandAllocator,
-            default);
-        CommandList.SetPipelineState(PipelineState);
-
-        CommandList.Close();
-    }
-
     private void CreateInputLayout(out InputLayoutDescription inputLayoutDescription)
     {
         inputLayoutDescription = new(
@@ -189,6 +172,8 @@ public sealed partial class Material
 
     private void CreateGraphicsPipelineStateDescription(InputLayoutDescription inputLayoutDescription, ReadOnlyMemory<byte> vertexShaderByteCode, ReadOnlyMemory<byte> pixelShaderByteCode)
     {
+        CreateCommandAllocator();
+
         bool usePSOStream = true;
         if (usePSOStream)
         {
@@ -230,6 +215,21 @@ public sealed partial class Material
 
             PipelineState = _renderer.Device.CreateGraphicsPipelineState(graphicsPipelineStateDescription);
         }
+
+        CreateCommandList();
+    }
+
+    private void CreateCommandAllocator() =>
+        CommandAllocator = _renderer.Device.CreateCommandAllocator(CommandListType.Direct);
+
+    private void CreateCommandList()
+    {
+        CommandList = _renderer.Device.CreateCommandList<ID3D12GraphicsCommandList4>(
+            CommandListType.Direct,
+            CommandAllocator,
+            PipelineState);
+
+        CommandList.Close();
     }
 }
 
