@@ -47,10 +47,26 @@ public static class ExtensionMethods
     public static bool IsNaN(this Vector3 vector) =>
         float.IsNaN(vector.X) || float.IsNaN(vector.Y) || float.IsNaN(vector.Z);
 
+    public static string SplitFirst(this string text, params char[] separators) =>
+        text.Split(separators).FirstOrDefault();
+
+    public static string SplitLast(this string text, params char[] separators) =>
+        text.Split(separators).Last();
+
+    public static string FirstCharToUpper(this string input) =>
+        string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1));
+
+    public static string RemoveExtension(this string text) =>
+        text.Split('.').FirstOrDefault();
+
+    public static string FormatString(this string text) =>
+        text.SplitLast('_').SplitLast('.').SplitLast('+').FirstCharToUpper().AddSpacesToSentence();
+
     public static string AddSpacesToSentence(this string text, bool preserveAcronyms = true)
     {
         if (string.IsNullOrWhiteSpace(text))
             return string.Empty;
+
         StringBuilder newText = new StringBuilder(text.Length * 2);
         newText.Append(text[0]);
         for (int i = 1; i < text.Length; i++)
@@ -66,19 +82,4 @@ public static class ExtensionMethods
 
         return newText.ToString();
     }
-
-    public static string SplitFirst(this string text, params char[] separators) =>
-        text.Split(separators).FirstOrDefault();
-
-    public static string SplitLast(this string text, params char[] separators) =>
-        text.Split(separators).Last();
-
-    public static string FirstCharToUpper(this string input) =>
-        string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1));
-
-    public static string FormatString(this string text) =>
-        text.SplitLast('_').SplitLast('.').SplitLast('+').FirstCharToUpper().AddSpacesToSentence();
-
-    public static string RemoveExtension(this string text) =>
-        text.Split('.').FirstOrDefault();
 }
