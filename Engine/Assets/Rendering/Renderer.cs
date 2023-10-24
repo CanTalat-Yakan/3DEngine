@@ -84,7 +84,7 @@ public sealed partial class Renderer
         GetSwapChainBuffersAndCreateRenderTargetViews();
         CreateMSAATextureAndRenderTargetView();
         CreateDepthStencilView();
-        CreateRasterizerState();
+        CreateRasterizerDescription();
 
         return Result.Ok;
     }
@@ -398,60 +398,17 @@ public sealed partial class Renderer
         Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart().Offset(size);
     }
 
-    private void CreateRasterizerState()
+    private void CreateRasterizerDescription()
     {
-        // Create a rasterizer state to fill the triangle using solid fill mode.
-        Data.RasterizerState = new()
+        // Create a rasterizer description
+        // using solid fill mode, multi sampled and counter clockwise.
+        Data.RasterizerDescription = new()
         {
             FillMode = FillMode.Solid,
             CullMode = CullMode.None,
             AntialiasedLineEnable = true,
-            MultisampleEnable = true
+            MultisampleEnable = true,
+            FrontCounterClockwise = true
         };
-    }
-}
-
-public sealed partial class Renderer
-{
-    internal void HandleDeviceLost()
-    {
-        Result removedReason = Device.DeviceRemovedReason;
-        ID3D12DeviceRemovedExtendedData1? dred = Device.QueryInterfaceOrNull<ID3D12DeviceRemovedExtendedData1>();
-
-        if (dred != null)
-        {
-            if (dred.GetAutoBreadcrumbsOutput1(out DredAutoBreadcrumbsOutput1? dredAutoBreadcrumbsOutput).Success)
-            {
-                AutoBreadcrumbNode1? currentNode = dredAutoBreadcrumbsOutput.HeadAutoBreadcrumbNode;
-                int index = 0;
-                while (currentNode != null)
-                {
-                    string? cmdListName = currentNode.CommandListDebugName;
-                    string? cmdQueueName = currentNode.CommandQueueDebugName;
-                    int expected = currentNode.BreadcrumbCount;
-                    int actual = currentNode.LastBreadcrumbValue.GetValueOrDefault();
-
-                    bool errorOccurred = actual > 0 && actual < expected;
-
-                    if (actual == 0)
-                    {
-                        // Don't bother logging nodes that don't submit anything
-                        currentNode = currentNode.Next;
-                        ++index;
-                        continue;
-                    }
-
-                    currentNode = currentNode.Next;
-                    ++index;
-                }
-            }
-
-            if (dred.GetPageFaultAllocationOutput1(out DredPageFaultOutput1? pageFaultOutput).Success)
-            {
-
-            }
-
-            dred.Dispose();
-        }
     }
 }

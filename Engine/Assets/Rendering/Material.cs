@@ -1,7 +1,7 @@
-﻿using SharpGen.Runtime;
-using System.IO;
+﻿using System.IO;
 using System.Runtime.InteropServices;
 
+using SharpGen.Runtime;
 using Vortice.Direct3D12;
 using Vortice.Dxc;
 using Vortice.DXGI;
@@ -185,7 +185,7 @@ public sealed partial class Material
                 InputLayout = inputLayoutDescription,
                 SampleMask = uint.MaxValue,
                 PrimitiveTopology = PrimitiveTopologyType.Triangle,
-                RasterizerState = _renderer.Data.RasterizerState,
+                RasterizerState = _renderer.Data.RasterizerDescription,
                 BlendState = BlendDescription.Opaque,
                 DepthStencilState = DepthStencilDescription.Default,
                 RenderTargetFormats = new[] { RenderData.RenderTargetFormat },
@@ -205,7 +205,7 @@ public sealed partial class Material
                 InputLayout = inputLayoutDescription,
                 SampleMask = uint.MaxValue,
                 PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
-                RasterizerState = _renderer.Data.RasterizerState,
+                RasterizerState = _renderer.Data.RasterizerDescription,
                 BlendState = BlendDescription.Opaque,
                 DepthStencilState = DepthStencilDescription.Default,
                 RenderTargetFormats = new[] { RenderData.RenderTargetFormat },

@@ -122,15 +122,17 @@ public sealed class Core
         SceneManager.Update();
         // Call LateUpdate for all scenes.
         SceneManager.LateUpdate();
+        // Render the scenes.
+        SceneManager.Render();
 
-        // Finishes the state of input processing.
-        Input.LateUpdate();
-
-        // Render the Scenes in the current RenderMode.
-        Render();
+        // Invoke the OnRender Event.
+        OnRender?.Invoke();
 
         // Render the GUI with ImGui.
         RenderGUI();
+
+        // Finishes the state of input processing.
+        Input.LateUpdate();
 
         // End the frame and prepare for the next.
         Renderer.EndFrame();
@@ -138,32 +140,6 @@ public sealed class Core
         Renderer.Resolve();
         // Presents the back buffer on the screen.
         Renderer.Present();
-    }
-
-    public void Render()
-    {
-        switch (Renderer.Config.RenderMode)
-        {
-            case RenderMode.Shaded:
-                Renderer.Data.SetRasterizerDescFillMode();
-                SceneManager.Render();
-                break;
-            case RenderMode.Wireframe:
-                Renderer.Data.SetRasterizerDescFillModeWireframe();
-                SceneManager.Render();
-                break;
-            case RenderMode.ShadedWireframe:
-                // Renders the scene twice,
-                // once in solid mode and once in wireframe mode.
-                Renderer.Data.SetRasterizerDescFillMode();
-                SceneManager.Render();
-                Renderer.Data.SetRasterizerDescFillModeWireframe();
-                SceneManager.Render();
-                break;
-        }
-
-        // Invoke the OnRender Event.
-        OnRender?.Invoke();
     }
 
     public void RenderGUI()

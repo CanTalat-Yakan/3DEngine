@@ -32,9 +32,7 @@ public struct RenderData
     public ID3D12Resource DepthStencilTexture;
     public ID3D12DescriptorHeap DepthStencilView;
 
-    public BlendDescription BlendState;
-
-    public RasterizerDescription RasterizerState;
+    public RasterizerDescription RasterizerDescription;
 
     public PrimitiveTopology PrimitiveTopology;
 
@@ -45,14 +43,10 @@ public struct RenderData
     public ulong FrameIndex => FrameCount % RenderLatency;
     public ulong FrameCount;
 
-    public void SetRasterizerDescFillModeWireframe() =>
-        SetRasterizerDescFillMode(FillMode.Wireframe);
-
     public void SetRasterizerDescFillMode(FillMode fillMode = FillMode.Solid)
     {
-        RasterizerState.FillMode = fillMode;
-        RasterizerState.CullMode = fillMode == FillMode.Solid ? CullMode.Back : CullMode.None;
-        RasterizerState.FrontCounterClockwise = true;
+        RasterizerDescription.FillMode = fillMode;
+        RasterizerDescription.CullMode = fillMode == FillMode.Solid ? CullMode.Back : CullMode.None;
     }
 
     public void SetViewport(Size size) =>
