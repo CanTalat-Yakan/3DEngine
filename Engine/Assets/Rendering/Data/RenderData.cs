@@ -2,7 +2,6 @@
 using System.IO;
 using System.Threading;
 
-using Vortice.D3DCompiler;
 using Vortice.Direct3D12;
 using Vortice.Direct3D;
 using Vortice.Dxc;
