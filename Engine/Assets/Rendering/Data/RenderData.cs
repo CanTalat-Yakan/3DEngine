@@ -8,6 +8,7 @@ using Vortice.Direct3D;
 using Vortice.Dxc;
 using Vortice.DXGI;
 using Vortice.Mathematics;
+using FftSharp;
 
 namespace Engine.Data;
 
@@ -44,14 +45,11 @@ public struct RenderData
     public ulong FrameIndex => FrameCount % RenderLatency;
     public ulong FrameCount;
 
-    public void SetRasterizerDescFillMode(FillMode fillMode = FillMode.Solid)
+    public void SetViewport(Size size)
     {
-        RasterizerDescription.FillMode = fillMode;
-        RasterizerDescription.CullMode = fillMode == FillMode.Solid ? CullMode.Back : CullMode.None;
+        Material.CommandList.RSSetViewport(new Viewport(size.Width, size.Height));
+        Material.CommandList.RSSetScissorRect(size.Width, size.Height);
     }
-
-    public void SetViewport(Size size) =>
-        Material.CommandList.RSSetViewport(new Viewport(0, 0, size.Width, size.Height, 0.0f, 1.0f));
 
     public void SetupInputAssembler(IndexBufferView indexBufferView, params VertexBufferView[] vertexBufferViews)
     {
