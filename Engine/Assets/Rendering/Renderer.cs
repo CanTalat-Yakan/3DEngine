@@ -141,13 +141,13 @@ public sealed partial class Renderer
 
     public void Resolve() =>
         // Copy the MSAA render target texture into the back buffer render texture.
-        // Use this to Copy: Data.DeviceContext.CopyResource(Data.BackBufferRenderTargetTexture, Data.MSAARenderTargetTexture);
+        // Use this to Copy: .CopyResource(dstResource, srcResource);
         Data.Material.CommandList.ResolveSubresource(Data.BackBufferRenderTargetTexture, 0, Data.MSAARenderTargetTexture, 0, RenderData.RenderTargetFormat);
 
     public void EndFrame()
     {
         // Indicate that the back buffer will now be used to present.
-        Data.Material.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.RenderTarget, ResourceStates.Present);
+        Data.Material.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.RenderTarget, ResourceStates.AllShaderResource);
         Data.Material.CommandList.EndEvent();
         Data.Material.CommandList.Close();
 
@@ -175,7 +175,7 @@ public sealed partial class Renderer
     public void BeginFrame(bool useRenderPass = false)
     {
         // Indicate that the MSAA render target texture will be used as a render target.
-        Data.Material.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.Present, ResourceStates.RenderTarget);
+        Data.Material.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.AllShaderResource, ResourceStates.RenderTarget);
 
         Data.Material.CommandList.BeginEvent("Frame");
 

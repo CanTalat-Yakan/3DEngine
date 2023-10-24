@@ -150,7 +150,7 @@ public sealed partial class Material
         RootSignatureDescription1 rootSignatureDesc = new(rootSignatureFlags);
 
         RootSignature = _renderer.Device.CreateRootSignature(rootSignatureDesc);
-        RootSignature.Name = new FileInfo(shaderFilePath).Name + $"_{_count++}";
+        RootSignature.Name = new FileInfo(shaderFilePath).Name + $"_{++_count}";
     }
 
     private void CreateInputLayout(out InputLayoutDescription inputLayoutDescription)
