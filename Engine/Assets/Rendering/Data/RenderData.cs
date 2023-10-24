@@ -36,7 +36,8 @@ public struct RenderData
 
     public PrimitiveTopology PrimitiveTopology;
 
-    public const Format RenderTargetFormat = Format.R8G8B8A8_UNorm; // 10 bits = Format.R10G10B10A2_UNorm, 16 bits = Format.R16G16B16A16_UNorm
+    // 10 bits = Format.R10G10B10A2_UNorm, 16 bits = Format.R16G16B16A16_UNorm
+    public const Format RenderTargetFormat = Format.R8G8B8A8_UNorm; 
     public const Format DepthStencilFormat = Format.D32_Float;
     public const int RenderLatency = 2;
 
