@@ -14,7 +14,7 @@ public class ComputeShader
             return;
 
         // Compile the compute shader bytecode from the specified compute shader file name.
-        ReadOnlyMemory<byte> vertexShaderByteCode = RenderData.CompileBytecode(computeShaderFilePath, "CS", "cs_5_0");
+        //ReadOnlyMemory<byte> vertexShaderByteCode = RenderData.CompileBytecode(computeShaderFilePath, "CS", "cs_5_0");
 
         // Create the compute shader using the compiled bytecode.
         //_postProcessComputeShader = _renderer.Device.CreateComputeShader(vertexShaderByteCode.Span);

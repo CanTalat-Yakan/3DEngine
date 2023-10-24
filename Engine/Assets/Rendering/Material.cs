@@ -3,6 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 
 using Vortice.Direct3D12;
+using Vortice.Dxc;
 using Vortice.DXGI;
 
 namespace Engine.Rendering;
@@ -148,10 +149,10 @@ public sealed partial class Material
     private void CreateShaderByteCode(string shaderFilePath, out ReadOnlyMemory<byte> vertexShaderByteCode, out ReadOnlyMemory<byte> pixelShaderByteCode)
     {
         // Compile the vertex shader bytecode from the specified shader file name and target profile.
-        vertexShaderByteCode = RenderData.CompileBytecode(shaderFilePath, "VS", "vs_5_0");
+        vertexShaderByteCode = RenderData.CompileBytecode(DxcShaderStage.Vertex, shaderFilePath, "VS");
 
         // Compile the pixel shader bytecode from the specified shader file name and target profile.
-        pixelShaderByteCode = RenderData.CompileBytecode(shaderFilePath, "PS", "ps_5_0");
+        pixelShaderByteCode = RenderData.CompileBytecode(DxcShaderStage.Pixel, shaderFilePath, "PS");
     }
 
     private void CreateGraphicsPipelineStateDescription(InputLayoutDescription inputLayoutDescription, ReadOnlyMemory<byte> vertexShaderByteCode, ReadOnlyMemory<byte> pixelShaderByteCode)

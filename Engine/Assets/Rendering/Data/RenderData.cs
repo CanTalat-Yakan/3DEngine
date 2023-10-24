@@ -6,6 +6,8 @@ using Vortice.DXGI;
 using Vortice.Mathematics;
 using Vortice.D3DCompiler;
 using System.Threading;
+using System.IO;
+using Vortice.Dxc;
 
 namespace Engine.Data;
 
@@ -106,5 +108,20 @@ public struct RenderData
 
         // Compile the shader from the specified file using the specified entry point, profile, and flags.
         return Compiler.CompileFromFile(filePath, entryPoint, profile, shaderFlags);
+    }
+
+    public static ReadOnlyMemory<byte> CompileBytecode(DxcShaderStage stage, string filePath, string entryPoint)
+    {
+        string directory = Path.GetDirectoryName(filePath);
+        string shaderSource = File.ReadAllText(filePath);
+
+        using (ShaderIncludeHandler includeHandler = new(Paths.SHADERS, directory))
+        {
+            using IDxcResult results = DxcCompiler.Compile(stage, shaderSource, entryPoint, includeHandler: includeHandler);
+            if (results.GetStatus().Failure)
+                throw new Exception(results.GetErrors());
+
+            return results.GetObjectBytecodeMemory();
+        }
     }
 }
