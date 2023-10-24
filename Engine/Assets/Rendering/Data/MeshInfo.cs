@@ -1,4 +1,6 @@
-﻿namespace Engine.Data;
+﻿using Vortice.Mathematics;
+
+namespace Engine.Data;
 
 public struct Vertex
 {
@@ -12,4 +14,6 @@ public struct MeshInfo
 {
     public Vertex[] Vertices;
     public ushort[] Indices;
+
+    public BoundingBox BoundingBox;
 }

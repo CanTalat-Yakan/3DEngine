@@ -15,7 +15,6 @@ public sealed partial class Mesh : EditorComponent
     public static List<MeshInfo> BatchLookup { get; private set; } = new();
 
     public MeshBuffer MeshBuffers { get; private set; } = new();
-    public BoundingBox BoundingBox { get; private set; }
     public BoundingBox TransformedBoundingBox { get; private set; }
     public bool InBounds { get; set; }
 
@@ -102,14 +101,20 @@ public sealed partial class Mesh : EditorComponent
     {
         // Batch MeshInfo by sorting the List with the Order of the Component
         if (BatchLookup.Contains(meshInfo))
+        {
             Order = (byte)BatchLookup.IndexOf(meshInfo);
+
+            InstantiateBounds(BoundingBox.CreateFromPoints(
+                meshInfo.Vertices.Select(Vertex => Vertex.Position).ToArray()));
+        }
         else
         {
             Order = (byte)BatchLookup.Count;
+            meshInfo.BoundingBox = BatchLookup[Order - 1].BoundingBox;
+
             BatchLookup.Add(meshInfo);
         }
 
-        InstantiateBounds(BoundingBox.CreateFromPoints(meshInfo.Vertices.Select(Vertex => Vertex.Position).ToArray()));
 
         // Assign to local variable.
         _meshInfo = meshInfo;
@@ -136,17 +141,22 @@ public sealed partial class Mesh : EditorComponent
 {
     private void InstantiateBounds(BoundingBox boundingBox)
     {
-        BoundingBox = boundingBox;
-        TransformedBoundingBox = BoundingBox.Transform(BoundingBox, Entity.Transform.WorldMatrix);
+        _meshInfo.BoundingBox = boundingBox;
+
+        TransformedBoundingBox = BoundingBox.Transform(
+            _meshInfo.BoundingBox, 
+            Entity.Transform.WorldMatrix);
     }
 
     private void CheckBounds()
     {
         if (Entity.Transform.TransformChanged)
-            TransformedBoundingBox = BoundingBox.Transform(BoundingBox, Entity.Transform.WorldMatrix);
+            TransformedBoundingBox = BoundingBox.Transform(
+                _meshInfo.BoundingBox, 
+                Entity.Transform.WorldMatrix);
 
-        if ((Camera.CurrentRenderingCamera?.Entity.Transform.TransformChanged ?? false)
-            || Entity.Transform.TransformChanged)
+        if (Entity.Transform.TransformChanged
+            || (Camera.CurrentRenderingCamera?.Entity.Transform.TransformChanged ?? false))
         {
             var boundingFrustum = Camera.CurrentRenderingCamera.BoundingFrustum;
             if (boundingFrustum is not null)
