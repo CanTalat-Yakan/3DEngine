@@ -196,9 +196,7 @@ public sealed partial class Material
                 SampleDescription = SampleDescription.Default
             };
 
-            Result result = _renderer.Device.CreateGraphicsPipelineState(graphicsPipelineStateDescription, out _pipelineState);
-            if (result.Failure)
-                throw new Exception(result.Description);
+            _pipelineState = _renderer.Device.CreateGraphicsPipelineState(graphicsPipelineStateDescription);
         }
     }
 }

@@ -104,17 +104,16 @@ public sealed partial class Mesh : EditorComponent
         {
             Order = (byte)BatchLookup.IndexOf(meshInfo);
 
-            InstantiateBounds(BoundingBox.CreateFromPoints(
-                meshInfo.Vertices.Select(Vertex => Vertex.Position).ToArray()));
+            meshInfo.BoundingBox = BatchLookup[Order].BoundingBox;
         }
         else
         {
             Order = (byte)BatchLookup.Count;
-            meshInfo.BoundingBox = BatchLookup[Order - 1].BoundingBox;
-
             BatchLookup.Add(meshInfo);
-        }
 
+            InstantiateBounds(BoundingBox.CreateFromPoints(
+                meshInfo.Vertices.Select(Vertex => Vertex.Position).ToArray()));
+        }
 
         // Assign to local variable.
         _meshInfo = meshInfo;

@@ -44,7 +44,7 @@ public sealed class Core
 
         EditorState.AssetsPath = assetsPath;
 
-        Input.Initialize(hwnd);
+        //Input.Initialize(hwnd);
 
         Renderer = renderer;
         ScriptCompiler = new();

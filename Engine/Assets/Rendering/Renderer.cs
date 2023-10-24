@@ -78,7 +78,7 @@ public sealed partial class Renderer
             return result;
 
         CreateGraphicsQueueAndFence(Device);
-        CreateCommandAllocatorsAndCommandList();
+        CreateCommandListAndAllocators();
 
         SetupSwapChain(forHwnd);
 
@@ -92,6 +92,8 @@ public sealed partial class Renderer
 
     public void Dispose()
     {
+        WaitIdle();
+
         // Dispose all DirectX resources that were created.
         Device?.Dispose();
         Data.Dispose();
@@ -173,13 +175,6 @@ public sealed partial class Renderer
         Data.CommandList.DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
     }
 
-    public void WaitIdle()
-    {
-        Data.GraphicsQueue.Signal(Data.FrameFence, ++Data.FrameCount);
-        Data.FrameFence.SetEventOnCompletion(Data.FrameCount, Data.FrameFenceEvent);
-        Data.FrameFenceEvent.WaitOne();
-    }
-
     public void BeginFrame(bool useRenderPass = false)
     {
         // Indicate that the MSAA render target texture will be used as a render target.
@@ -188,6 +183,7 @@ public sealed partial class Renderer
         Data.BackBufferIndex = Data.SwapChain.CurrentBackBufferIndex;
         Data.FrameIndex = Data.FrameCount % RenderData.RenderLatency;
 
+        Data.CommandAllocators[Data.FrameIndex].Reset();
         Data.CommandList.Reset(Data.CommandAllocators[Data.FrameIndex]);
         Data.CommandList.BeginEvent("Frame");
 
@@ -221,6 +217,13 @@ public sealed partial class Renderer
         Profiler.Vertices = 0;
         Profiler.Indices = 0;
         Profiler.DrawCalls = 0;
+    }
+
+    public void WaitIdle()
+    {
+        Data.GraphicsQueue.Signal(Data.FrameFence, ++Data.FrameCount);
+        Data.FrameFence.SetEventOnCompletion(Data.FrameCount, Data.FrameFenceEvent);
+        Data.FrameFenceEvent.WaitOne();
     }
 }
 
@@ -307,7 +310,7 @@ public sealed partial class Renderer
         Data.BackBufferRenderTargetView.GetCPUDescriptorHandleForHeapStart().Offset(size, RenderData.RenderLatency);
     }
 
-    private void CreateCommandAllocatorsAndCommandList()
+    private void CreateCommandListAndAllocators()
     {
         Data.CommandAllocators = new ID3D12CommandAllocator[RenderData.RenderLatency];
         for (int i = 0; i < RenderData.RenderLatency; i++)
