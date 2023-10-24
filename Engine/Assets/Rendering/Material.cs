@@ -124,11 +124,12 @@ public sealed partial class Material
     {
         MaterialBuffer?.Dispose();
 
+        RootSignature?.Dispose();
+
         CommandAllocator?.Dispose();
         CommandList?.Dispose();
-
-        RootSignature?.Dispose();
         PipelineState?.Dispose();
+
         _resourceView?.Dispose();
         _samplerState?.Dispose();
     }
