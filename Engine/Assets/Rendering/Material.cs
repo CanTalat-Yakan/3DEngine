@@ -30,7 +30,6 @@ public sealed partial class Material
         if (!File.Exists(shaderFilePath))
             return;
 
-
         MaterialBuffer.CreatePerModelConstantBuffer();
 
         CreateRootSignature(shaderFilePath);
@@ -151,7 +150,7 @@ public sealed partial class Material
         RootSignatureDescription1 rootSignatureDesc = new(rootSignatureFlags);
 
         RootSignature = _renderer.Device.CreateRootSignature(rootSignatureDesc);
-        RootSignature.Name = new FileInfo(shaderFilePath).Name + $"_{++_count}";
+        RootSignature.Name = new FileInfo(shaderFilePath).Name + $" {++_count}";
     }
 
     private void CreateInputLayout(out InputLayoutDescription inputLayoutDescription)
@@ -159,7 +158,8 @@ public sealed partial class Material
         inputLayoutDescription = new(
             new InputElementDescription("POSITION", 0, Format.R32G32B32_Float, 0, 0), // Position element.
             new InputElementDescription("TEXCOORD", 0, Format.R32G32_Float, InputElementDescription.AppendAligned, 0), // Texture coordinate element.
-            new InputElementDescription("NORMAL", 0, Format.R32G32B32_Float, InputElementDescription.AppendAligned, 0)); // Normal element.
+            new InputElementDescription("NORMAL", 0, Format.R32G32B32_Float, InputElementDescription.AppendAligned, 0), // Normal element.
+            new InputElementDescription("TANGENT", 0, Format.R32G32B32_Float, InputElementDescription.AppendAligned, 0)); // Normal element.
     }
 
     private void CreateShaderByteCode(string shaderFilePath, out ReadOnlyMemory<byte> vertexShaderByteCode, out ReadOnlyMemory<byte> pixelShaderByteCode)
@@ -178,7 +178,7 @@ public sealed partial class Material
         bool usePSOStream = true;
         if (usePSOStream)
         {
-            D3D12GraphicsDevice.PipelineStateStream pipelineStateObjectStream = new()
+            PipelineStateStream pipelineStateObjectStream = new()
             {
                 RootSignature = RootSignature,
                 VertexShader = vertexShaderByteCode.Span,
@@ -234,22 +234,19 @@ public sealed partial class Material
     }
 }
 
-public sealed partial class D3D12GraphicsDevice
+[StructLayout(LayoutKind.Sequential)]
+public struct PipelineStateStream
 {
-    [StructLayout(LayoutKind.Sequential)]
-    public struct PipelineStateStream
-    {
-        public PipelineStateSubObjectTypeRootSignature RootSignature;
-        public PipelineStateSubObjectTypeVertexShader VertexShader;
-        public PipelineStateSubObjectTypePixelShader PixelShader;
-        public PipelineStateSubObjectTypeInputLayout InputLayout;
-        public PipelineStateSubObjectTypeSampleMask SampleMask;
-        public PipelineStateSubObjectTypePrimitiveTopology PrimitiveTopology;
-        public PipelineStateSubObjectTypeRasterizer RasterizerState;
-        public PipelineStateSubObjectTypeBlend BlendState;
-        public PipelineStateSubObjectTypeDepthStencil DepthStencilState;
-        public PipelineStateSubObjectTypeRenderTargetFormats RenderTargetFormats;
-        public PipelineStateSubObjectTypeDepthStencilFormat DepthStencilFormat;
-        public PipelineStateSubObjectTypeSampleDescription SampleDescription;
-    }
+    public PipelineStateSubObjectTypeRootSignature RootSignature;
+    public PipelineStateSubObjectTypeVertexShader VertexShader;
+    public PipelineStateSubObjectTypePixelShader PixelShader;
+    public PipelineStateSubObjectTypeInputLayout InputLayout;
+    public PipelineStateSubObjectTypeSampleMask SampleMask;
+    public PipelineStateSubObjectTypePrimitiveTopology PrimitiveTopology;
+    public PipelineStateSubObjectTypeRasterizer RasterizerState;
+    public PipelineStateSubObjectTypeBlend BlendState;
+    public PipelineStateSubObjectTypeDepthStencil DepthStencilState;
+    public PipelineStateSubObjectTypeRenderTargetFormats RenderTargetFormats;
+    public PipelineStateSubObjectTypeDepthStencilFormat DepthStencilFormat;
+    public PipelineStateSubObjectTypeSampleDescription SampleDescription;
 }

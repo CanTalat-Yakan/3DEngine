@@ -141,8 +141,8 @@ public sealed partial class Renderer
 
     public void Resolve() =>
         // Copy the MSAA render target texture into the back buffer render texture.
-        // Use this to Copy: .CopyResource(dstResource, srcResource);
         Data.Material.CommandList.ResolveSubresource(Data.BackBufferRenderTargetTexture, 0, Data.MSAARenderTargetTexture, 0, RenderData.RenderTargetFormat);
+        // Use this to Copy: .CopyResource(dstResource, srcResource);
 
     public void EndFrame()
     {
@@ -228,8 +228,8 @@ public sealed partial class Renderer
         // Create a Direct3D 11 device.
         result = D3D12.D3D12CreateDevice(
             null,
-            //FeatureLevel.Level_11_0,
-            FeatureLevel.Level_12_2,
+            FeatureLevel.Level_11_0,
+            //FeatureLevel.Level_12_2,
             out ID3D12Device2 d3d12Device);
 
         // Check if creating the device was successful.
@@ -295,6 +295,7 @@ public sealed partial class Renderer
         {
             // Get the buffers of the swap chain as a texture.
             Data.BufferRenderTargetTextures[i] = Data.SwapChain.GetBuffer<ID3D12Resource>(i);
+            Data.BufferRenderTargetTextures[i].Name = $"SpawChain Buffer {i}";
             // Create a render target view for the back buffer render target texture.
             Device.CreateRenderTargetView(Data.BufferRenderTargetTextures[i], null, Data.BufferRenderTargetView.GetCPUDescriptorHandleForHeapStart());
         }
