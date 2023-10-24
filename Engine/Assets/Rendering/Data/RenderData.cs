@@ -84,21 +84,6 @@ public struct RenderData
         DepthStencilView?.Dispose();
     }
 
-    public static ReadOnlyMemory<byte> CompileBytecode(string filePath, string entryPoint, string profile)
-    {
-        // Shader flags to enable strictness and set optimization level or debug mode.
-        ShaderFlags shaderFlags = ShaderFlags.EnableStrictness;
-#if DEBUG
-        shaderFlags |= ShaderFlags.Debug;
-        shaderFlags |= ShaderFlags.SkipValidation;
-#else
-        shaderFlags |= ShaderFlags.OptimizationLevel3;
-#endif
-
-        // Compile the shader from the specified file using the specified entry point, profile, and flags.
-        return Compiler.CompileFromFile(filePath, entryPoint, profile, shaderFlags);
-    }
-
     public static ReadOnlyMemory<byte> CompileBytecode(DxcShaderStage stage, string filePath, string entryPoint)
     {
         string directory = Path.GetDirectoryName(filePath);
