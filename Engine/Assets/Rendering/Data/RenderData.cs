@@ -13,11 +13,11 @@ namespace Engine.Data;
 
 public struct RenderData
 {
+    public Material Material;
+
     public IDXGISwapChain3 SwapChain;
 
     public ID3D12CommandQueue GraphicsQueue;
-
-    public Material Material;
 
     public ID3D12Fence FrameFence;
     public AutoResetEvent FrameFenceEvent;

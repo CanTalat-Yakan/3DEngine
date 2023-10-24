@@ -5,6 +5,7 @@ using Vortice.Direct3D12;
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
+using Engine.Data;
 
 namespace Engine.Rendering;
 
@@ -283,6 +284,7 @@ public sealed partial class Renderer
 
     private void GetSwapChainBuffersAndRenderTargetViews()
     {
+        Data.BufferRenderTargetTextures = new ID3D12Resource[RenderData.RenderLatency];
         Data.BufferRenderTargetView = Device.CreateDescriptorHeap(new()
         {
             DescriptorCount = RenderData.RenderLatency,
