@@ -14,13 +14,16 @@ public sealed partial class Material
 
     public MaterialBuffer MaterialBuffer { get; set; } = new();
 
-    private Renderer _renderer => Renderer.Instance;
+    public ID3D12RootSignature RootSignature;
 
-    private ID3D12RootSignature _rootSignature;
-    private ID3D12PipelineState _pipelineState;
+    public ID3D12CommandAllocator CommandAllocator;
+    public ID3D12GraphicsCommandList4 CommandList;
+    public ID3D12PipelineState PipelineState;
 
     private ID3D12DescriptorHeap _resourceView;
     private ID3D12DescriptorHeap _samplerState;
+
+    private Renderer _renderer => Renderer.Instance;
 
     public Material(string shaderFilePath, string imageFileName = "Default.png")
     {
@@ -91,29 +94,43 @@ public sealed partial class Material
         CreateShaderByteCode(shaderFilePath, out var vertexShaderByteCode, out var pixelShaderByteCode);
 
         CreateGraphicsPipelineStateDescription(inputLayoutDescription, vertexShaderByteCode, pixelShaderByteCode);
+
+        CreateCommandAllocatorAndCommandList();
     }
 
     public void Setup()
     {
-        // Set current material root state.
-        _renderer.Data.CommandList.SetGraphicsRootSignature(_rootSignature);
-        // Set input layout, vertex shader, and pixel shader in the device context.
-        _renderer.Data.SetupMaterial(_pipelineState);
+        _renderer.Data.Material.Reset();
+        _renderer.Data.Material = this;
 
-        // Set the shader resource and sampler.
-        _renderer.Data.CommandList.SetGraphicsRootDescriptorTable(0, _resourceView.GetGPUDescriptorHandleForHeapStart());
-        _renderer.Data.CommandList.SetGraphicsRootDescriptorTable(0, _samplerState.GetGPUDescriptorHandleForHeapStart());
+        // Set root signature.
+        CommandList.SetGraphicsRootSignature(RootSignature);
+        // Set shader resource and sampler.
+        CommandList.SetGraphicsRootDescriptorTable(0, _resourceView.GetGPUDescriptorHandleForHeapStart());
+        CommandList.SetGraphicsRootDescriptorTable(0, _samplerState.GetGPUDescriptorHandleForHeapStart());
+
+        // Set current command list in the graphics queue.
+        _renderer.Data.GraphicsQueue.ExecuteCommandList(CommandList);
 
         // Assign material to the static variable.
         CurrentMaterialOnGPU = this;
+    }
+
+    public void Reset()
+    {
+        CommandAllocator.Reset();
+        CommandList.Reset(CommandAllocator, PipelineState);
     }
 
     public void Dispose()
     {
         MaterialBuffer?.Dispose();
 
-        _rootSignature?.Dispose();
-        _pipelineState?.Dispose();
+        CommandAllocator?.Dispose();
+        CommandList?.Dispose();
+
+        RootSignature?.Dispose();
+        PipelineState?.Dispose();
         _resourceView?.Dispose();
         _samplerState?.Dispose();
     }
@@ -134,8 +151,23 @@ public sealed partial class Material
 
         RootSignatureDescription1 rootSignatureDesc = new(rootSignatureFlags);
 
-        _rootSignature = _renderer.Device.CreateRootSignature(rootSignatureDesc);
-        _rootSignature.Name = new FileInfo(shaderFilePath).Name + $"_{_count++}";
+        RootSignature = _renderer.Device.CreateRootSignature(rootSignatureDesc);
+        RootSignature.Name = new FileInfo(shaderFilePath).Name + $"_{_count++}";
+    }
+
+    private void CreateCommandAllocatorAndCommandList()
+    {
+        CommandAllocator?.Dispose();
+        CommandAllocator = _renderer.Device.CreateCommandAllocator(CommandListType.Direct);
+
+        CommandList?.Dispose();
+        CommandList = _renderer.Device.CreateCommandList<ID3D12GraphicsCommandList4>(
+            CommandListType.Direct,
+            CommandAllocator,
+            default);
+        CommandList.SetPipelineState(PipelineState);
+
+        CommandList.Close();
     }
 
     private void CreateInputLayout(out InputLayoutDescription inputLayoutDescription)
@@ -162,7 +194,7 @@ public sealed partial class Material
         {
             D3D12GraphicsDevice.PipelineStateStream pipelineStateStream = new()
             {
-                RootSignature = _rootSignature,
+                RootSignature = RootSignature,
                 VertexShader = vertexShaderByteCode.Span,
                 PixelShader = pixelShaderByteCode.Span,
                 InputLayout = inputLayoutDescription,
@@ -176,13 +208,13 @@ public sealed partial class Material
                 SampleDescription = SampleDescription.Default
             };
 
-            _pipelineState = _renderer.Device.CreatePipelineState(pipelineStateStream);
+            PipelineState = _renderer.Device.CreatePipelineState(pipelineStateStream);
         }
         else
         {
             GraphicsPipelineStateDescription graphicsPipelineStateDescription = new()
             {
-                RootSignature = _rootSignature,
+                RootSignature = RootSignature,
                 VertexShader = vertexShaderByteCode,
                 PixelShader = pixelShaderByteCode,
                 InputLayout = inputLayoutDescription,
@@ -196,7 +228,7 @@ public sealed partial class Material
                 SampleDescription = SampleDescription.Default
             };
 
-            _pipelineState = _renderer.Device.CreateGraphicsPipelineState(graphicsPipelineStateDescription);
+            PipelineState = _renderer.Device.CreateGraphicsPipelineState(graphicsPipelineStateDescription);
         }
     }
 }

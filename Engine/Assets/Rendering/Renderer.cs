@@ -12,7 +12,7 @@ public sealed partial class Renderer
 {
     public static Renderer Instance { get; private set; }
 
-    public bool IsRendering => Data.BackBufferRenderTargetView?.NativePointer is not 0;
+    public bool IsRendering => Data.BufferRenderTargetView?.NativePointer is not 0;
     public IDXGISwapChain3 SwapChain => Data.SwapChain;
 
     public Size Size => NativeSize.Scale(Config.ResolutionScale);
@@ -78,11 +78,10 @@ public sealed partial class Renderer
             return result;
 
         CreateGraphicsQueueAndFence(Device);
-        CreateCommandListAndAllocators();
 
         SetupSwapChain(forHwnd);
 
-        GetBackBufferAndCreateRenderTargetView();
+        GetSwapChainBuffersAndRenderTargetViews();
         CreateMSAATextureAndRenderTargetView();
         CreateDepthStencilView();
         CreateRasterizerState();
@@ -121,7 +120,7 @@ public sealed partial class Renderer
             Data.SwapChain.Description1.Format,
             Data.SwapChain.Description1.Flags);
 
-        GetBackBufferAndCreateRenderTargetView();
+        GetSwapChainBuffersAndRenderTargetViews();
         CreateMSAATextureAndRenderTargetView();
         CreateDepthStencilView();
 
@@ -141,18 +140,14 @@ public sealed partial class Renderer
     public void Resolve() =>
         // Copy the MSAA render target texture into the back buffer render texture.
         // Use this to Copy: Data.DeviceContext.CopyResource(Data.BackBufferRenderTargetTexture, Data.MSAARenderTargetTexture);
-        Data.CommandList.ResolveSubresource(Data.BackBufferRenderTargetTexture, 0, Data.MSAARenderTargetTexture, 0, RenderData.RenderTargetFormat);
-
-    public void Execute() =>
-        // Execute the command list.
-        Data.GraphicsQueue.ExecuteCommandList(Data.CommandList);
+        Data.Material.CommandList.ResolveSubresource(Data.BackBufferRenderTargetTexture, 0, Data.MSAARenderTargetTexture, 0, RenderData.RenderTargetFormat);
 
     public void EndFrame()
     {
         // Indicate that the back buffer will now be used to present.
-        Data.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.RenderTarget, ResourceStates.Present);
-        Data.CommandList.EndEvent();
-        Data.CommandList.Close();
+        Data.Material.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.RenderTarget, ResourceStates.Present);
+        Data.Material.CommandList.EndEvent();
+        Data.Material.CommandList.Close();
 
         Data.GraphicsQueue.Signal(Data.FrameFence, ++Data.FrameCount);
 
@@ -166,33 +161,28 @@ public sealed partial class Renderer
     }
 
     public void EndRenderPass() =>
-        Data.CommandList.EndRenderPass();
+        Data.Material.CommandList.EndRenderPass();
 
     public void Draw(int indexCount, IndexBufferView indexBufferViews, params VertexBufferView[] vertexBufferViews)
     {
         Data.SetupInputAssembler(indexBufferViews, vertexBufferViews);
 
-        Data.CommandList.DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
+        Data.Material.CommandList.DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
     }
 
     public void BeginFrame(bool useRenderPass = false)
     {
         // Indicate that the MSAA render target texture will be used as a render target.
-        Data.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.Present, ResourceStates.RenderTarget);
+        Data.Material.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.Present, ResourceStates.RenderTarget);
 
-        Data.BackBufferIndex = Data.SwapChain.CurrentBackBufferIndex;
-        Data.FrameIndex = Data.FrameCount % RenderData.RenderLatency;
-
-        Data.CommandAllocators[Data.FrameIndex].Reset();
-        Data.CommandList.Reset(Data.CommandAllocators[Data.FrameIndex]);
-        Data.CommandList.BeginEvent("Frame");
+        Data.Material.CommandList.BeginEvent("Frame");
 
         // Set the background color to a dark gray.
         var clearColor = Colors.DarkGray;
 
         if (useRenderPass)
         {
-            var renderPassDesc = new RenderPassRenderTargetDescription(Data.BackBufferRenderTargetView.GetCPUDescriptorHandleForHeapStart(),
+            var renderPassDesc = new RenderPassRenderTargetDescription(Data.BufferRenderTargetView.GetCPUDescriptorHandleForHeapStart(),
                 new RenderPassBeginningAccess(new ClearValue(RenderData.RenderTargetFormat, clearColor)),
                 new RenderPassEndingAccess(RenderPassEndingAccessType.Preserve));
 
@@ -201,16 +191,16 @@ public sealed partial class Renderer
                 new RenderPassBeginningAccess(new ClearValue(RenderData.DepthStencilFormat, 1.0f, 0)),
                 new RenderPassEndingAccess(RenderPassEndingAccessType.Discard));
 
-            Data.CommandList.BeginRenderPass(renderPassDesc, depthStencil);
+            Data.Material.CommandList.BeginRenderPass(renderPassDesc, depthStencil);
         }
         else
         {
             // Clear the render target view and depth stencil view with the set color.
-            Data.CommandList.ClearRenderTargetView(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), clearColor);
-            Data.CommandList.ClearDepthStencilView(Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
+            Data.Material.CommandList.ClearRenderTargetView(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), clearColor);
+            Data.Material.CommandList.ClearDepthStencilView(Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
 
             // Set the render target and depth stencil view for the device context.
-            Data.CommandList.OMSetRenderTargets(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart());
+            Data.Material.CommandList.OMSetRenderTargets(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart());
         }
 
         // Reset the profiler values for vertices, indices, and draw calls.
@@ -291,35 +281,23 @@ public sealed partial class Renderer
         catch (Exception ex) { throw new Exception(ex.Message); }
     }
 
-    private void GetBackBufferAndCreateRenderTargetView()
+    private void GetSwapChainBuffersAndRenderTargetViews()
     {
-        // Get other buffers if needed.
-        // We only need the back buffer as the render latency is defaulted to 2.
-        // Get the back buffer of the swap chain as a texture.
-        Data.BackBufferRenderTargetTexture = Data.SwapChain.GetBuffer<ID3D12Resource>(Data.BackBufferIndex);
-
-        Data.BackBufferRenderTargetView = Device.CreateDescriptorHeap(new()
+        Data.BufferRenderTargetView = Device.CreateDescriptorHeap(new()
         {
             DescriptorCount = RenderData.RenderLatency,
             Type = DescriptorHeapType.RenderTargetView
         });
-        // Create a render target view for the back buffer render target texture.
-        Device.CreateRenderTargetView(Data.BackBufferRenderTargetTexture, null, Data.BackBufferRenderTargetView.GetCPUDescriptorHandleForHeapStart());
+        for (int i = 0; i < RenderData.RenderLatency; i++)
+        {
+            // Get the buffers of the swap chain as a texture.
+            Data.BufferRenderTargetTextures[i] = Data.SwapChain.GetBuffer<ID3D12Resource>(i);
+            // Create a render target view for the back buffer render target texture.
+            Device.CreateRenderTargetView(Data.BufferRenderTargetTextures[i], null, Data.BufferRenderTargetView.GetCPUDescriptorHandleForHeapStart());
+        }
 
         var size = Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.RenderTargetView);
-        Data.BackBufferRenderTargetView.GetCPUDescriptorHandleForHeapStart().Offset(size, RenderData.RenderLatency);
-    }
-
-    private void CreateCommandListAndAllocators()
-    {
-        Data.CommandAllocators = new ID3D12CommandAllocator[RenderData.RenderLatency];
-        for (int i = 0; i < RenderData.RenderLatency; i++)
-            Data.CommandAllocators[i] = Device.CreateCommandAllocator(CommandListType.Direct);
-
-        Data.CommandList = Device.CreateCommandList<ID3D12GraphicsCommandList4>(
-            CommandListType.Direct,
-            Data.CommandAllocators[0],
-            null);
+        Data.BufferRenderTargetView.GetCPUDescriptorHandleForHeapStart().Offset(size, RenderData.RenderLatency);
     }
 
     private void CheckMSAASupport()

@@ -132,8 +132,8 @@ public sealed class Core
         // Render the GUI with ImGui.
         RenderGUI();
 
+        // End the frame and prepare for the next.
         Renderer.EndFrame();
-        Renderer.Execute();
         // Copy the final rendered image into the back buffer.
         Renderer.Resolve();
         // Presents the back buffer on the screen.

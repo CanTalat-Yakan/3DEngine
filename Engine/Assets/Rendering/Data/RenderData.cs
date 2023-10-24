@@ -15,15 +15,16 @@ public struct RenderData
 {
     public IDXGISwapChain3 SwapChain;
 
-    public ID3D12GraphicsCommandList4 CommandList;
     public ID3D12CommandQueue GraphicsQueue;
-    public ID3D12CommandAllocator[] CommandAllocators;
+
+    public Material Material;
 
     public ID3D12Fence FrameFence;
     public AutoResetEvent FrameFenceEvent;
 
-    public ID3D12Resource BackBufferRenderTargetTexture;
-    public ID3D12DescriptorHeap BackBufferRenderTargetView;
+    public ID3D12Resource BackBufferRenderTargetTexture => BufferRenderTargetTextures[SwapChain.CurrentBackBufferIndex];
+    public ID3D12Resource[] BufferRenderTargetTextures;
+    public ID3D12DescriptorHeap BufferRenderTargetView;
 
     public ID3D12Resource MSAARenderTargetTexture;
     public ID3D12DescriptorHeap MSAARenderTargetView;
@@ -41,10 +42,8 @@ public struct RenderData
     public const Format DepthStencilFormat = Format.D32_Float;
     public const int RenderLatency = 2;
 
-    public int BackBufferIndex;
-
+    public ulong FrameIndex => FrameCount % RenderLatency;
     public ulong FrameCount;
-    public ulong FrameIndex;
 
     public void SetRasterizerDescFillModeWireframe() =>
         SetRasterizerDescFillMode(FillMode.Wireframe);
@@ -57,31 +56,27 @@ public struct RenderData
     }
 
     public void SetViewport(Size size) =>
-        CommandList.RSSetViewport(new Viewport(0, 0, size.Width, size.Height, 0.0f, 1.0f));
+        Material.CommandList.RSSetViewport(new Viewport(0, 0, size.Width, size.Height, 0.0f, 1.0f));
 
     public void SetupInputAssembler(IndexBufferView indexBufferView, params VertexBufferView[] vertexBufferViews)
     {
-        CommandList.IASetVertexBuffers(0, vertexBufferViews);
-        CommandList.IASetIndexBuffer(indexBufferView);
-        CommandList.IASetPrimitiveTopology(PrimitiveTopology);
+        Material.CommandList.IASetVertexBuffers(0, vertexBufferViews);
+        Material.CommandList.IASetIndexBuffer(indexBufferView);
+        Material.CommandList.IASetPrimitiveTopology(PrimitiveTopology);
     }
-
-    public void SetupMaterial(ID3D12PipelineState pipelineState) =>
-        CommandList.SetPipelineState(pipelineState);
 
     public void Dispose()
     {
         SwapChain?.Dispose();
 
-        CommandList?.Dispose();
         GraphicsQueue?.Dispose();
-        foreach (var commandAllocator in CommandAllocators)
-            commandAllocator.Dispose();
+
+        Material?.Dispose();
 
         FrameFence?.Dispose();
         FrameFenceEvent?.Dispose();
 
-        BackBufferRenderTargetView?.Dispose();
+        BufferRenderTargetView?.Dispose();
         MSAARenderTargetView?.Dispose();
         DepthStencilView?.Dispose();
 
@@ -90,7 +85,8 @@ public struct RenderData
 
     public void DisposeTexturesAndViews()
     {
-        BackBufferRenderTargetTexture?.Dispose();
+        foreach (var bufferRenderTargetTextures in BufferRenderTargetTextures)
+            bufferRenderTargetTextures?.Dispose();
         MSAARenderTargetTexture?.Dispose();
         DepthStencilTexture?.Dispose();
     }
