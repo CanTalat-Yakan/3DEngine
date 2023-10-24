@@ -71,7 +71,7 @@ public sealed partial class Mesh : EditorComponent
         }
         else
         {
-            // Setup the Material, the PerModelConstantBuffer and the PropertiesConstantBuffer.
+            // Setup Material, PerModelConstantBuffer and PropertiesConstantBuffer.
             Material.Setup();
             Material.MaterialBuffer?.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
             Material.MaterialBuffer?.UpdatePropertiesConstantBuffer();

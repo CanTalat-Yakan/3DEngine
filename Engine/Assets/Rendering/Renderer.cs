@@ -1,11 +1,10 @@
-﻿using SharpGen.Runtime;
-using System.Drawing;
+﻿using System.Drawing;
 
+using SharpGen.Runtime;
 using Vortice.Direct3D12;
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
-using Engine.Data;
 
 namespace Engine.Rendering;
 
@@ -82,7 +81,7 @@ public sealed partial class Renderer
 
         SetupSwapChain(forHwnd);
 
-        GetSwapChainBuffersAndRenderTargetViews();
+        GetSwapChainBuffersAndCreateRenderTargetViews();
         CreateMSAATextureAndRenderTargetView();
         CreateDepthStencilView();
         CreateRasterizerState();
@@ -121,7 +120,7 @@ public sealed partial class Renderer
             Data.SwapChain.Description1.Format,
             Data.SwapChain.Description1.Flags);
 
-        GetSwapChainBuffersAndRenderTargetViews();
+        GetSwapChainBuffersAndCreateRenderTargetViews();
         CreateMSAATextureAndRenderTargetView();
         CreateDepthStencilView();
 
@@ -282,7 +281,7 @@ public sealed partial class Renderer
         catch (Exception ex) { throw new Exception(ex.Message); }
     }
 
-    private void GetSwapChainBuffersAndRenderTargetViews()
+    private void GetSwapChainBuffersAndCreateRenderTargetViews()
     {
         Data.BufferRenderTargetTextures = new ID3D12Resource[RenderData.RenderLatency];
         Data.BufferRenderTargetView = Device.CreateDescriptorHeap(new()

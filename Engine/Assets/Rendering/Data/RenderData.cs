@@ -1,13 +1,13 @@
 ﻿using System.Drawing;
+using System.IO;
+using System.Threading;
 
+using Vortice.D3DCompiler;
 using Vortice.Direct3D12;
 using Vortice.Direct3D;
+using Vortice.Dxc;
 using Vortice.DXGI;
 using Vortice.Mathematics;
-using Vortice.D3DCompiler;
-using System.Threading;
-using System.IO;
-using Vortice.Dxc;
 
 namespace Engine.Data;
 
@@ -67,18 +67,14 @@ public struct RenderData
 
     public void Dispose()
     {
+        Material?.Dispose();
+
         SwapChain?.Dispose();
 
         GraphicsQueue?.Dispose();
 
-        Material?.Dispose();
-
         FrameFence?.Dispose();
         FrameFenceEvent?.Dispose();
-
-        BufferRenderTargetView?.Dispose();
-        MSAARenderTargetView?.Dispose();
-        DepthStencilView?.Dispose();
 
         DisposeTexturesAndViews();
     }
@@ -87,8 +83,13 @@ public struct RenderData
     {
         foreach (var bufferRenderTargetTextures in BufferRenderTargetTextures)
             bufferRenderTargetTextures?.Dispose();
+        BufferRenderTargetView?.Dispose();
+
+        MSAARenderTargetView?.Dispose();
         MSAARenderTargetTexture?.Dispose();
+
         DepthStencilTexture?.Dispose();
+        DepthStencilView?.Dispose();
     }
 
     public static ReadOnlyMemory<byte> CompileBytecode(string filePath, string entryPoint, string profile)
