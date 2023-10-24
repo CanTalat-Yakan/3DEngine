@@ -177,7 +177,7 @@ public sealed partial class Material
         bool usePSOStream = true;
         if (usePSOStream)
         {
-            D3D12GraphicsDevice.PipelineStateStream pipelineStateStream = new()
+            D3D12GraphicsDevice.PipelineStateStream pipelineStateObjectStream = new()
             {
                 RootSignature = RootSignature,
                 VertexShader = vertexShaderByteCode.Span,
@@ -186,14 +186,14 @@ public sealed partial class Material
                 SampleMask = uint.MaxValue,
                 PrimitiveTopology = PrimitiveTopologyType.Triangle,
                 RasterizerState = _renderer.Data.RasterizerDescription,
-                BlendState = BlendDescription.Opaque,
+                BlendState = _renderer.Data.BlendDescription,
                 DepthStencilState = DepthStencilDescription.Default,
                 RenderTargetFormats = new[] { RenderData.RenderTargetFormat },
                 DepthStencilFormat = RenderData.DepthStencilFormat,
                 SampleDescription = SampleDescription.Default
             };
 
-            PipelineState = _renderer.Device.CreatePipelineState(pipelineStateStream);
+            PipelineState = _renderer.Device.CreatePipelineState(pipelineStateObjectStream);
         }
         else
         {
@@ -206,7 +206,7 @@ public sealed partial class Material
                 SampleMask = uint.MaxValue,
                 PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
                 RasterizerState = _renderer.Data.RasterizerDescription,
-                BlendState = BlendDescription.Opaque,
+                BlendState = _renderer.Data.BlendDescription,
                 DepthStencilState = DepthStencilDescription.Default,
                 RenderTargetFormats = new[] { RenderData.RenderTargetFormat },
                 DepthStencilFormat = RenderData.DepthStencilFormat,

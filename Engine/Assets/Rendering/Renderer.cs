@@ -84,6 +84,8 @@ public sealed partial class Renderer
         GetSwapChainBuffersAndCreateRenderTargetViews();
         CreateMSAATextureAndRenderTargetView();
         CreateDepthStencilView();
+
+        CreateBlendDescription();
         CreateRasterizerDescription();
 
         return Result.Ok;
@@ -396,6 +398,30 @@ public sealed partial class Renderer
 
         var size = Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.DepthStencilView);
         Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart().Offset(size);
+    }
+
+    private void CreateBlendDescription()
+    {
+        // Set up the blend state description.
+        Data.BlendDescription = new()
+        {
+            AlphaToCoverageEnable = true
+        };
+
+        // Render target blend description setup.
+        RenderTargetBlendDescription renderTargetBlendDescription = new()
+        {
+            BlendEnable = true, // Enable blend.
+            SourceBlend = Blend.SourceAlpha,
+            DestinationBlend = Blend.InverseSourceAlpha,
+            BlendOperation = BlendOperation.Add,
+            SourceBlendAlpha = Blend.One,
+            DestinationBlendAlpha = Blend.Zero,
+            BlendOperationAlpha = BlendOperation.Add,
+            RenderTargetWriteMask = ColorWriteEnable.All
+        };
+        // Assign the render target blend description to the blend state description.
+        Data.BlendDescription.RenderTarget[0] = renderTargetBlendDescription;
     }
 
     private void CreateRasterizerDescription()

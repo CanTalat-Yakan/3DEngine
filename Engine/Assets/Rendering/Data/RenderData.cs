@@ -33,6 +33,7 @@ public struct RenderData
     public ID3D12DescriptorHeap DepthStencilView;
 
     public RasterizerDescription RasterizerDescription;
+    public BlendDescription BlendDescription;
 
     public PrimitiveTopology PrimitiveTopology;
 
