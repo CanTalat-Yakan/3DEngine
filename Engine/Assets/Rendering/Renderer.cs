@@ -252,6 +252,7 @@ public sealed partial class Renderer
                 // Don't select the Basic Render Driver adapter.
                 if ((adapter.Description1.Flags & AdapterFlags.Software) is not AdapterFlags.None)
                     adapter.Dispose();
+                else break;
 
             for (int i = 0; i < s_featureLevels.Length; i++)
                 // Create the D3D12 Device with the current adapter and the highest possible Feature level.
