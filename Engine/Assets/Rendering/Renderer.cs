@@ -2,12 +2,11 @@
 
 using SharpGen.Runtime;
 using Vortice.Direct3D12;
+using Vortice.Direct3D12.Debug;
 using Vortice.Direct3D;
 using Vortice.DXGI;
+using Vortice.DXGI.Debug;
 using Vortice.Mathematics;
-using Vortice.Direct3D12.Debug;
-using FftSharp;
-using System.Diagnostics;
 
 namespace Engine.Rendering;
 
@@ -254,8 +253,8 @@ public sealed partial class Renderer
                 if ((adapter.Description1.Flags & AdapterFlags.Software) is not AdapterFlags.None)
                     adapter.Dispose();
 
-            // Create the D3D12 Device with the current adapter and the highest possible Feature level.
             for (int i = 0; i < s_featureLevels.Length; i++)
+                // Create the D3D12 Device with the current adapter and the highest possible Feature level.
                 if (D3D12.D3D12CreateDevice(adapter, s_featureLevels[i], out d3d12Device).Success)
                 {
                     adapter.Dispose();
@@ -301,21 +300,14 @@ public sealed partial class Renderer
             SampleDescription = SampleDescription.Default
         };
 
-        try
-        {
-            // Create the IDXGIFactory4.
-            using IDXGIFactory4 DXGIFactory = DXGI.CreateDXGIFactory2<IDXGIFactory4>(Config.Debug);
-            // Creates a swap chain using the swap chain description.
-            using IDXGISwapChain1 swapChain1 = forHwnd
-                ? DXGIFactory.CreateSwapChainForHwnd(Data.GraphicsQueue, _win32Window.Handle, swapChainDescription)
-                : DXGIFactory.CreateSwapChainForComposition(Data.GraphicsQueue, swapChainDescription);
+        // Create the IDXGIFactory4.
+        using IDXGIFactory4 DXGIFactory = DXGI.CreateDXGIFactory2<IDXGIFactory4>(Config.Debug);
+        // Creates a swap chain using the swap chain description.
+        using IDXGISwapChain1 swapChain1 = forHwnd
+            ? DXGIFactory.CreateSwapChainForHwnd(Data.GraphicsQueue, _win32Window.Handle, swapChainDescription)
+            : DXGIFactory.CreateSwapChainForComposition(Data.GraphicsQueue, swapChainDescription);
 
-            if (forHwnd)
-                DXGIFactory.MakeWindowAssociation(_win32Window.Handle, WindowAssociationFlags.IgnoreAltEnter);
-
-            Data.SwapChain = swapChain1.QueryInterface<IDXGISwapChain3>();
-        }
-        catch (Exception ex) { throw new Exception(ex.Message); }
+        Data.SwapChain = swapChain1.QueryInterface<IDXGISwapChain3>();
     }
 
     private void GetSwapChainBuffersAndCreateRenderTargetViews()
