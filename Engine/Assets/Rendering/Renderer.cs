@@ -161,6 +161,8 @@ public sealed partial class Renderer
             Data.FrameFence.SetEventOnCompletion(GPUFrameCount + 1, Data.FrameFenceEvent);
             Data.FrameFenceEvent.WaitOne();
         }
+
+        WaitIdle();
     }
 
     public void EndRenderPass() =>
@@ -195,7 +197,7 @@ public sealed partial class Renderer
                 new RenderPassBeginningAccess(new ClearValue(RenderData.DepthStencilFormat, 1.0f, 0)),
                 new RenderPassEndingAccess(RenderPassEndingAccessType.Discard));
 
-            Data.Material.CommandList.BeginRenderPass(renderPassDesc, depthStencil);
+            Data.Material?.CommandList.BeginRenderPass(renderPassDesc, depthStencil);
         }
         else
         {
@@ -267,10 +269,12 @@ public sealed partial class Renderer
                 result = Result.Fail;
                 return;
             }
-
-            // Assign the device to a variable.
-            Device = d3d12Device!;
-            Device.Name = "Device";
+            else
+            {
+                // Assign the device to a variable.
+                Device = d3d12Device!;
+                Device.Name = "Device";
+            }
         }
 
         result = Result.Ok;
