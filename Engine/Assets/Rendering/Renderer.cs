@@ -5,7 +5,6 @@ using Vortice.Direct3D12;
 using Vortice.Direct3D12.Debug;
 using Vortice.Direct3D;
 using Vortice.DXGI;
-using Vortice.DXGI.Debug;
 using Vortice.Mathematics;
 
 namespace Engine.Rendering;
