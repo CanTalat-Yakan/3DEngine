@@ -220,7 +220,7 @@ public sealed partial class Material
             SampleDescription = SampleDescription.Default
         };
         PipelineState = _renderer.Device.CreateGraphicsPipelineState(graphicsPipelineStateDescription);
-        PipelineState.Name = "CommandList" + " " + _count;
+        PipelineState.Name = "CommandList " + _count;
 
         CreateCommandList();
     }
@@ -228,7 +228,7 @@ public sealed partial class Material
     private void CreateCommandAllocator()
     {
         CommandAllocator = _renderer.Device.CreateCommandAllocator(CommandListType.Direct);
-        CommandAllocator.Name = "CommandAllocator" + " " + _count;
+        CommandAllocator.Name = "CommandAllocator " + _count;
     }
 
     private void CreateCommandList()
@@ -237,6 +237,6 @@ public sealed partial class Material
             CommandListType.Direct,
             CommandAllocator,
             PipelineState);
-        CommandList.Name = "CommandList" + " " + _count;
+        CommandList.Name = "CommandList " + _count;
     }
 }
