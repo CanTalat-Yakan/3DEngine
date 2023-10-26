@@ -2,7 +2,7 @@
 using System.Drawing;
 
 using ImGuiNET;
-using Vortice.Direct3D11;
+//using Vortice.Direct3D11;
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice;
@@ -14,24 +14,24 @@ using ImDrawIdx = System.UInt16;
 
 namespace Engine.GUI;
 
-unsafe public sealed class ImGuiRenderer
+unsafe public sealed class GuiRenderer
 {
-    public bool IsRendering { get => _data.BufferRenderTargetView is not null; }
+    //public bool IsRendering { get => _data.BufferRenderTargetView is not null; }
 
-    private ID3D11Device _device;
-    private RenderData _data = new();
+    //private ID3D11Device _device;
+    //private RenderData _data = new();
 
-    private int _vertexBufferSize = 5000, _indexBufferSize = 10000;
-    private const int _vertexConstantBufferSize = 16 * 4;
+    //private int _vertexBufferSize = 5000, _indexBufferSize = 10000;
+    //private const int _vertexConstantBufferSize = 16 * 4;
 
-    private ID3D11Buffer _viewConstantBuffer;
+    //private ID3D11Buffer _viewConstantBuffer;
 
-    private ID3D11SamplerState _fontSamplerState;
-    private ID3D11ShaderResourceView _fontResourceView;
+    //private ID3D11SamplerState _fontSamplerState;
+    //private ID3D11ShaderResourceView _fontResourceView;
 
-    private Dictionary<IntPtr, ID3D11ShaderResourceView> _textureResources = new();
+    //private Dictionary<IntPtr, ID3D11ShaderResourceView> _textureResources = new();
 
-    public ImGuiRenderer()
+    public GuiRenderer()
     {
         //var io = ImGui.GetIO();
         //io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;  // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.

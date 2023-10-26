@@ -84,7 +84,7 @@ public unsafe partial class MaterialBuffer
         _model.Unmap(0);
 
         // Set the constant buffer in the vertex shader stage of the device context.
-        _renderer.Data.Material.CommandList.SetGraphicsRootConstantBufferView(1, _model.GPUVirtualAddress);
+        _renderer.Data.Material?.CommandList.SetGraphicsRootConstantBufferView(1, _model.GPUVirtualAddress);
     }
 }
 
@@ -142,6 +142,6 @@ public unsafe partial class MaterialBuffer
         _properties.Unmap(0);
 
         //Set the constant buffer in the vertex shader stage of the device context.
-        _renderer.Data.Material.CommandList.SetGraphicsRootConstantBufferView(10, _properties.GPUVirtualAddress);
+        _renderer.Data.Material?.CommandList.SetGraphicsRootConstantBufferView(10, _properties.GPUVirtualAddress);
     }
 }

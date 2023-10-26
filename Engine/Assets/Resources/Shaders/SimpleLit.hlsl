@@ -20,26 +20,27 @@ cbuffer Properties : register(b10)
 Texture2D ObjTexture : register(t0);
 SamplerState ObjSamplerState : register(s0);
 
-VS_OUTPUT VS(VS_INPUT input)
+PSInput VSMain(VSInput input)
 {
-    VS_OUTPUT output;
+    PSInput output;
 
-    output.pos = mul(float4(input.vertex, 1), mul(World, ViewProjection));
-    output.normal = mul(float4(input.normal, 0), World);
-    output.worldPos = mul(float4(input.vertex, 1), World);
-    output.cameraPos = Camera;
+    output.pos = mul(input.vertex, mul(World, ViewProjection));
+    output.worldpos = mul(input.vertex, World);
+    output.camerapos = Camera;
+    output.normal = mul(input.normal, World);
+    output.tangent = mul(input.tangent, World);
     output.uv = input.uv;
 
     return output;
 }
 
-float4 PS(VS_OUTPUT input) : SV_TARGET
+float4 PSMain(PSInput input) : SV_TARGET
 {
-    float4 col = ObjTexture.Sample(ObjSamplerState, input.uv);
-
+    //float4 col = ObjTexture.Sample(ObjSamplerState, input.uv);
     float3 diffuse = dot(normalize(input.normal), -normalize(float3(0, -1, 0)));
 
     diffuse = max(diffuse, float3(0.255, 0.295, 0.3255));
 
-    return col * float4(diffuse, 1);
+    return float4(diffuse, 1);
+    //return col * float4(diffuse, 1);
 }

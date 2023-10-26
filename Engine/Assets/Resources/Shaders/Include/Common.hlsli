@@ -9,18 +9,20 @@ cbuffer PerModelConstantBuffer : register(b1)
     float4x4 World;
 };
 
-struct VS_INPUT
+struct VSInput
 {
-    float3 vertex : POSITION;
-    float2 uv : TEXCOORD;
-    float3 normal : NORMAL;
+    float4 vertex : POSITION;
+    float4 normal : NORMAL;
+    float4 tangent : TANGENT;
+    float2 uv : UV;
 };
 
-struct VS_OUTPUT
+struct PSInput
 {
     float4 pos : SV_POSITION;
-    float3 worldPos : POSITION;
-    float3 cameraPos : POSITION1;
-    float2 uv : TEXCOORD;
+    float3 worldpos : POSITION;
+    float3 camerapos : POSITION1;
     float3 normal : NORMAL;
+    float3 tangent : TANGENT;
+    float2 uv : UV;
 };

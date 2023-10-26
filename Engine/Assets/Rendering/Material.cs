@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Runtime.InteropServices;
 
 using SharpGen.Runtime;
 using Vortice.Direct3D12;
@@ -54,6 +53,7 @@ public sealed partial class Material
             Type = DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView,
             Flags = DescriptorHeapFlags.ShaderVisible
         });
+        _resourceView.Name = texture.Name;
         _renderer.Device.CreateShaderResourceView(texture, shaderResourceViewDescription, _resourceView.GetCPUDescriptorHandleForHeapStart());
         #endregion
 
@@ -62,13 +62,6 @@ public sealed partial class Material
             throw new Exception(result.Description);
 
         #region // Create Sampler
-        _samplerState = _renderer.Device.CreateDescriptorHeap(new()
-        {
-            DescriptorCount = 1,
-            Type = DescriptorHeapType.Sampler,
-            Flags = DescriptorHeapFlags.ShaderVisible
-        });
-
         // Set the properties for the sampler state.
         SamplerDescription samplerStateDescription = new()
         {
@@ -81,6 +74,14 @@ public sealed partial class Material
             MinLOD = 0,
             MaxLOD = float.MaxValue,
         };
+
+        _samplerState = _renderer.Device.CreateDescriptorHeap(new()
+        {
+            DescriptorCount = 1,
+            Type = DescriptorHeapType.Sampler,
+            Flags = DescriptorHeapFlags.ShaderVisible
+        });
+        _samplerState.Name = texture.Name + " Sampler";
         // Create the sampler state using the sampler description.
         _renderer.Device.CreateSampler(ref samplerStateDescription, _samplerState.GetCPUDescriptorHandleForHeapStart());
         #endregion
@@ -97,7 +98,7 @@ public sealed partial class Material
 
     public void Setup()
     {
-        _renderer.Data.Material.Reset();
+        _renderer.Data.Material?.Reset();
         _renderer.Data.Material = this;
 
         // Set root signature.
@@ -137,85 +138,81 @@ public sealed partial class Material
 public sealed partial class Material
 {
     private static int _count = 0;
-
     private void CreateRootSignature(string shaderFilePath)
     {
-        RootSignatureFlags rootSignatureFlags = RootSignatureFlags.AllowInputAssemblerInputLayout
+        // Create a root signature
+        RootSignatureFlags rootSignatureFlags =
+              RootSignatureFlags.AllowInputAssemblerInputLayout
+            | RootSignatureFlags.ConstantBufferViewShaderResourceViewUnorderedAccessViewHeapDirectlyIndexed
             | RootSignatureFlags.DenyHullShaderRootAccess
             | RootSignatureFlags.DenyDomainShaderRootAccess
             | RootSignatureFlags.DenyGeometryShaderRootAccess
             | RootSignatureFlags.DenyAmplificationShaderRootAccess
             | RootSignatureFlags.DenyMeshShaderRootAccess;
 
-        RootSignatureDescription1 rootSignatureDesc = new(rootSignatureFlags);
+        RootSignatureDescription1 rootSignatureDescription = new(rootSignatureFlags); // RootSignatureFlags.LocalRootSignature
 
-        RootSignature = _renderer.Device.CreateRootSignature(rootSignatureDesc);
+        RootParameter1 texture = new(
+            RootParameterType.ShaderResourceView,
+            new RootDescriptor1(0, 0),
+            ShaderVisibility.All);
+
+        RootParameter1 sampler = new(
+            new RootDescriptorTable1(new DescriptorRange1(
+                DescriptorRangeType.Sampler, 1, 0, 0, 0)),
+            ShaderVisibility.All);
+
+        RootParameter1 constantbuffer = new(
+            new RootDescriptorTable1(new DescriptorRange1(
+                DescriptorRangeType.ConstantBufferView, 3, 0, 0, 0)),
+            ShaderVisibility.All);
+
+        // Define the root parameters
+        RootParameter1[] rootParameters = new[] { texture, sampler, constantbuffer };
+        rootSignatureDescription.Parameters = rootParameters;
+
+        RootSignature = _renderer.Device.CreateRootSignature(rootSignatureDescription);
         RootSignature.Name = new FileInfo(shaderFilePath).Name + $" {++_count}";
     }
 
     private void CreateInputLayout(out InputLayoutDescription inputLayoutDescription)
     {
-        inputLayoutDescription = new(
-            new InputElementDescription("POSITION", 0, Format.R32G32B32_Float, 0, 0), // Position element.
-            new InputElementDescription("TEXCOORD", 0, Format.R32G32_Float, InputElementDescription.AppendAligned, 0), // Texture coordinate element.
-            new InputElementDescription("NORMAL", 0, Format.R32G32B32_Float, InputElementDescription.AppendAligned, 0), // Normal element.
-            new InputElementDescription("TANGENT", 0, Format.R32G32B32_Float, InputElementDescription.AppendAligned, 0)); // Normal element.
+        inputLayoutDescription = new InputLayoutDescription(
+            new InputElementDescription("POSITION", 0, Format.R32G32B32_Float, 0, 0),
+            new InputElementDescription("NORMAL", 0, Format.R32G32B32_Float, 12, 0),
+            new InputElementDescription("TANGENT", 0, Format.R32G32B32_Float, 24, 0),
+            new InputElementDescription("UV", 0, Format.R32G32_Float, 32, 0));
     }
 
     private void CreateShaderByteCode(string shaderFilePath, out ReadOnlyMemory<byte> vertexShaderByteCode, out ReadOnlyMemory<byte> pixelShaderByteCode)
     {
         // Compile the vertex shader bytecode from the specified shader file name and target profile.
-        vertexShaderByteCode = RenderData.CompileBytecode(DxcShaderStage.Vertex, shaderFilePath, "VS");
+        vertexShaderByteCode = RenderData.CompileBytecode(DxcShaderStage.Vertex, shaderFilePath, "VSMain");
 
         // Compile the pixel shader bytecode from the specified shader file name and target profile.
-        pixelShaderByteCode = RenderData.CompileBytecode(DxcShaderStage.Pixel, shaderFilePath, "PS");
+        pixelShaderByteCode = RenderData.CompileBytecode(DxcShaderStage.Pixel, shaderFilePath, "PSMain");
     }
 
     private void CreateGraphicsPipelineStateDescription(InputLayoutDescription inputLayoutDescription, ReadOnlyMemory<byte> vertexShaderByteCode, ReadOnlyMemory<byte> pixelShaderByteCode)
     {
         CreateCommandAllocator();
 
-        bool usePSOStream = true;
-        if (usePSOStream)
+        GraphicsPipelineStateDescription graphicsPipelineStateDescription = new()
         {
-            PipelineStateStream pipelineStateObjectStream = new()
-            {
-                RootSignature = RootSignature,
-                VertexShader = vertexShaderByteCode.Span,
-                PixelShader = pixelShaderByteCode.Span,
-                InputLayout = inputLayoutDescription,
-                SampleMask = uint.MaxValue,
-                PrimitiveTopology = PrimitiveTopologyType.Triangle,
-                RasterizerState = _renderer.Data.RasterizerDescription,
-                BlendState = _renderer.Data.BlendDescription,
-                DepthStencilState = DepthStencilDescription.Default,
-                RenderTargetFormats = new[] { RenderData.RenderTargetFormat },
-                DepthStencilFormat = RenderData.DepthStencilFormat,
-                SampleDescription = SampleDescription.Default
-            };
-
-            PipelineState = _renderer.Device.CreatePipelineState(pipelineStateObjectStream);
-        }
-        else
-        {
-            GraphicsPipelineStateDescription graphicsPipelineStateDescription = new()
-            {
-                RootSignature = RootSignature,
-                VertexShader = vertexShaderByteCode,
-                PixelShader = pixelShaderByteCode,
-                InputLayout = inputLayoutDescription,
-                SampleMask = uint.MaxValue,
-                PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
-                RasterizerState = _renderer.Data.RasterizerDescription,
-                BlendState = _renderer.Data.BlendDescription,
-                DepthStencilState = DepthStencilDescription.Default,
-                RenderTargetFormats = new[] { RenderData.RenderTargetFormat },
-                DepthStencilFormat = RenderData.DepthStencilFormat,
-                SampleDescription = SampleDescription.Default
-            };
-
-            PipelineState = _renderer.Device.CreateGraphicsPipelineState(graphicsPipelineStateDescription);
-        }
+            RootSignature = RootSignature,
+            VertexShader = vertexShaderByteCode,
+            PixelShader = pixelShaderByteCode,
+            InputLayout = inputLayoutDescription,
+            SampleMask = uint.MaxValue,
+            PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
+            RasterizerState = _renderer.Data.RasterizerDescription,
+            BlendState = _renderer.Data.BlendDescription,
+            DepthStencilState = DepthStencilDescription.Default,
+            RenderTargetFormats = new[] { RenderData.RenderTargetFormat },
+            DepthStencilFormat = RenderData.DepthStencilFormat,
+            SampleDescription = SampleDescription.Default
+        };
+        PipelineState = _renderer.Device.CreateGraphicsPipelineState(graphicsPipelineStateDescription);
 
         CreateCommandList();
     }
@@ -232,21 +229,4 @@ public sealed partial class Material
 
         CommandList.Close();
     }
-}
-
-[StructLayout(LayoutKind.Sequential)]
-public struct PipelineStateStream
-{
-    public PipelineStateSubObjectTypeRootSignature RootSignature;
-    public PipelineStateSubObjectTypeVertexShader VertexShader;
-    public PipelineStateSubObjectTypePixelShader PixelShader;
-    public PipelineStateSubObjectTypeInputLayout InputLayout;
-    public PipelineStateSubObjectTypeSampleMask SampleMask;
-    public PipelineStateSubObjectTypePrimitiveTopology PrimitiveTopology;
-    public PipelineStateSubObjectTypeRasterizer RasterizerState;
-    public PipelineStateSubObjectTypeBlend BlendState;
-    public PipelineStateSubObjectTypeDepthStencil DepthStencilState;
-    public PipelineStateSubObjectTypeRenderTargetFormats RenderTargetFormats;
-    public PipelineStateSubObjectTypeDepthStencilFormat DepthStencilFormat;
-    public PipelineStateSubObjectTypeSampleDescription SampleDescription;
 }

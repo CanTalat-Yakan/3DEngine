@@ -25,7 +25,7 @@ public class ShaderIncludeHandler : CallbackBase, IDxcIncludeHandler
         _sourceFiles.Clear();
     }
 
-    public Result LoadSource(string fileName, out IDxcBlob? includeSource)
+    public Result LoadSource(string fileName, out IDxcBlob includeSource)
     {
         if (fileName.StartsWith("./"))
             fileName = fileName.Substring(2);
@@ -39,7 +39,7 @@ public class ShaderIncludeHandler : CallbackBase, IDxcIncludeHandler
             return Result.Fail;
         }
 
-        if (!_sourceFiles.TryGetValue(includeFile, out SourceCodeBlob? sourceCodeBlob))
+        if (!_sourceFiles.TryGetValue(includeFile, out SourceCodeBlob sourceCodeBlob))
         {
             byte[] data = NewMethod(includeFile);
 
@@ -54,7 +54,7 @@ public class ShaderIncludeHandler : CallbackBase, IDxcIncludeHandler
 
     private static byte[] NewMethod(string includeFile) => File.ReadAllBytes(includeFile);
 
-    private string? GetFilePath(string fileName)
+    private string GetFilePath(string fileName)
     {
         for (int i = 0; i < _includeDirectories.Length; i++)
         {
@@ -72,9 +72,9 @@ public class ShaderIncludeHandler : CallbackBase, IDxcIncludeHandler
     {
         private byte[] _data;
         private GCHandle _dataPointer;
-        private IDxcBlobEncoding? _blob;
+        private IDxcBlobEncoding _blob;
 
-        internal IDxcBlob? Blob { get => _blob; }
+        internal IDxcBlob Blob { get => _blob; }
 
         public SourceCodeBlob(byte[] data)
         {

@@ -5,6 +5,9 @@ using Vortice.Direct3D12;
 using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
+using Vortice.Direct3D12.Debug;
+using FftSharp;
+using System.Diagnostics;
 
 namespace Engine.Rendering;
 
@@ -142,14 +145,13 @@ public sealed partial class Renderer
     public void Resolve() =>
         // Copy the MSAA render target texture into the back buffer render texture.
         Data.Material.CommandList.ResolveSubresource(Data.BackBufferRenderTargetTexture, 0, Data.MSAARenderTargetTexture, 0, RenderData.RenderTargetFormat);
-        // Use this to Copy: .CopyResource(dstResource, srcResource);
+    // Use this to Copy: .CopyResource(dstResource, srcResource);
 
     public void EndFrame()
     {
         // Indicate that the back buffer will now be used to present.
-        Data.Material.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.RenderTarget, ResourceStates.AllShaderResource);
-        Data.Material.CommandList.EndEvent();
-        Data.Material.CommandList.Close();
+        Data.Material?.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.RenderTarget, ResourceStates.AllShaderResource);
+        Data.Material?.CommandList.EndEvent();
 
         Data.GraphicsQueue.Signal(Data.FrameFence, ++Data.FrameCount);
 
@@ -167,6 +169,11 @@ public sealed partial class Renderer
 
     public void Draw(int indexCount, IndexBufferView indexBufferViews, params VertexBufferView[] vertexBufferViews)
     {
+        // Indicate that the MSAA render target texture will be used as a render target.
+        Data.Material.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.AllShaderResource, ResourceStates.RenderTarget);
+
+        Data.Material.CommandList.BeginEvent("Frame");
+
         Data.SetupInputAssembler(indexBufferViews, vertexBufferViews);
 
         Data.Material.CommandList.DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
@@ -174,10 +181,6 @@ public sealed partial class Renderer
 
     public void BeginFrame(bool useRenderPass = false)
     {
-        // Indicate that the MSAA render target texture will be used as a render target.
-        Data.Material.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.AllShaderResource, ResourceStates.RenderTarget);
-
-        Data.Material.CommandList.BeginEvent("Frame");
 
         // Set the background color to a dark gray.
         var clearColor = Colors.DarkGray;
@@ -198,11 +201,11 @@ public sealed partial class Renderer
         else
         {
             // Clear the render target view and depth stencil view with the set color.
-            Data.Material.CommandList.ClearRenderTargetView(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), clearColor);
-            Data.Material.CommandList.ClearDepthStencilView(Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
+            Data.Material?.CommandList.ClearRenderTargetView(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), clearColor);
+            Data.Material?.CommandList.ClearDepthStencilView(Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
 
             // Set the render target and depth stencil view for the device context.
-            Data.Material.CommandList.OMSetRenderTargets(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart());
+            Data.Material?.CommandList.OMSetRenderTargets(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart());
         }
 
         // Reset the profiler values for vertices, indices, and draw calls.
@@ -221,26 +224,56 @@ public sealed partial class Renderer
 
 public sealed partial class Renderer
 {
-    public static bool IsSupported() => D3D12.IsSupported(FeatureLevel.Level_12_0);
-
-    private Result CreateDevice(out Result result)
+    private static readonly FeatureLevel[] s_featureLevels = new[]
     {
-        // Create a Direct3D 11 device.
-        result = D3D12.D3D12CreateDevice(
-            null,
-            FeatureLevel.Level_11_0,
-            //FeatureLevel.Level_12_2,
-            out ID3D12Device2 d3d12Device);
+        FeatureLevel.Level_12_2,
+        FeatureLevel.Level_12_1,
+        FeatureLevel.Level_12_0,
+        FeatureLevel.Level_11_1,
+        FeatureLevel.Level_11_0,
+    };
 
-        // Check if creating the device was successful.
-        if (result.Failure)
-            return result;
+    private void CreateDevice(out Result result)
+    {
+        if (Config.Debug
+            && D3D12.D3D12GetDebugInterface(out ID3D12Debug debug).Success)
+        {
+            debug!.EnableDebugLayer();
+            debug!.Dispose();
+        }
+        else
+            Config.Debug = false;
 
-        // Assign the device to a variable.
-        Device = d3d12Device.QueryInterface<ID3D12Device2>();
-        Device.Name = "Device";
+        using (IDXGIFactory4 DXGIFactory = DXGI.CreateDXGIFactory2<IDXGIFactory4>(Config.Debug))
+        {
+            ID3D12Device2 d3d12Device = default;
+            IDXGIAdapter1 adapter = default;
 
-        return Result.Ok;
+            for (int i = 0; DXGIFactory.EnumAdapters1(i, out adapter).Success; i++)
+                // Don't select the Basic Render Driver adapter.
+                if ((adapter.Description1.Flags & AdapterFlags.Software) is not AdapterFlags.None)
+                    adapter.Dispose();
+
+            // Create the D3D12 Device with the current adapter and the highest possible Feature level.
+            for (int i = 0; i < s_featureLevels.Length; i++)
+                if (D3D12.D3D12CreateDevice(adapter, s_featureLevels[i], out d3d12Device).Success)
+                {
+                    adapter.Dispose();
+                    break;
+                }
+
+            if (d3d12Device is null)
+            {
+                result = Result.Fail;
+                return;
+            }
+
+            // Assign the device to a variable.
+            Device = d3d12Device!;
+            Device.Name = "Device";
+        }
+
+        result = Result.Ok;
     }
 
     private void CreateGraphicsQueueAndFence(ID3D12Device2 device)
@@ -270,13 +303,15 @@ public sealed partial class Renderer
 
         try
         {
-            bool Debug = true;
             // Create the IDXGIFactory4.
-            using IDXGIFactory4 DXGIFactory = DXGI.CreateDXGIFactory2<IDXGIFactory4>(Debug);
+            using IDXGIFactory4 DXGIFactory = DXGI.CreateDXGIFactory2<IDXGIFactory4>(Config.Debug);
             // Creates a swap chain using the swap chain description.
             using IDXGISwapChain1 swapChain1 = forHwnd
                 ? DXGIFactory.CreateSwapChainForHwnd(Data.GraphicsQueue, _win32Window.Handle, swapChainDescription)
                 : DXGIFactory.CreateSwapChainForComposition(Data.GraphicsQueue, swapChainDescription);
+
+            if (forHwnd)
+                DXGIFactory.MakeWindowAssociation(_win32Window.Handle, WindowAssociationFlags.IgnoreAltEnter);
 
             Data.SwapChain = swapChain1.QueryInterface<IDXGISwapChain3>();
         }

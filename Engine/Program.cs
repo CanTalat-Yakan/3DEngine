@@ -14,7 +14,7 @@ public sealed class Program
 
     [STAThread]
     private static void Main() =>
-        new Program().Run();
+        new Program().Run(false);
 
     private void Loop() =>
         _engineCore.Frame();
@@ -46,13 +46,14 @@ public sealed class Program
             config.SetVSync(PresentInterval.Immediate);
             config.SetMSAA(MultiSample.x2);
             config.SetResolutionScale(1);
+
         }
+        config.GUI = withGui;
 
         _engineCore = new(new Renderer(win32Window, config), win32Window.Handle);
         _appWindow = new(win32Window);
 
-        if (withGui)
-            _engineCore.OnGUI += _appWindow.Render;
+        _engineCore.OnGUI += _appWindow.Render;
 
         _appWindow.Show(ShowWindowCommand.Maximize);
         #endregion

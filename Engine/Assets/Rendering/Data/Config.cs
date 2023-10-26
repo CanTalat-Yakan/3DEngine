@@ -11,6 +11,9 @@ public class Config
     public int SupportedSampleCount = 1;
     public int QualityLevels = 0;
 
+    public bool Debug = true;
+    public bool GUI = true;
+
     public void SetMSAA(MultiSample multiSample) =>
         MultiSample = multiSample;
 

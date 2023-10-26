@@ -2,6 +2,6 @@
 
 namespace Engine.GUI;
 
-unsafe public sealed class ImGuizmoRenderer
+unsafe public sealed class GuizmoRenderer
 {
 }

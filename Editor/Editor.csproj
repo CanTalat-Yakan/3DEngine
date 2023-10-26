@@ -43,6 +43,10 @@
 		<PackageReference Include="WinUIEx" Version="2.3.2" />
 		<Manifest Include="$(ApplicationManifest)" />
 	</ItemGroup>
+	
+	<ItemGroup>
+	  <None Include="..\.editorconfig" Link=".editorconfig" />
+	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Engine\Engine.csproj" />

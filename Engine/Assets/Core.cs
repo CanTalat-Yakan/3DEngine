@@ -30,8 +30,8 @@ public sealed class Core
     public ShaderCompiler ShaderCompiler;
     public MaterialCompiler MaterialCompiler;
 
-    private ImGuiRenderer _imGuiRenderer;
-    private ImGuiInputHandler _imGuiInputHandler;
+    private GuiRenderer _imGuiRenderer;
+    private GuiInputHandler _imGuiInputHandler;
     private IntPtr _imGuiContext;
 
     public Core(Renderer renderer, nint hwnd, string assetsPath = null) =>
@@ -44,7 +44,7 @@ public sealed class Core
 
         EditorState.AssetsPath = assetsPath;
 
-        //Input.Initialize(hwnd);
+        Input.Initialize(hwnd);
 
         Renderer = renderer;
         ScriptCompiler = new();
@@ -52,13 +52,14 @@ public sealed class Core
         MaterialCompiler = new();
         SceneManager = new();
 
-        #region // ImGui
-        _imGuiContext = ImGuiNET.ImGui.CreateContext();
-        ImGuiNET.ImGui.SetCurrentContext(_imGuiContext);
+        if (Renderer.Config.GUI)
+        {
+            _imGuiContext = ImGuiNET.ImGui.CreateContext();
+            ImGuiNET.ImGui.SetCurrentContext(_imGuiContext);
 
-        _imGuiRenderer = new();
-        _imGuiInputHandler = new(hwnd);
-        #endregion
+            _imGuiRenderer = new();
+            _imGuiInputHandler = new(hwnd);
+        }
 
         // Creates an entity with the Boot editor tag and adds a SceneBoot component to it.
         var boot = SceneManager.MainScene.EntityManager
@@ -129,7 +130,8 @@ public sealed class Core
         OnRender?.Invoke();
 
         // Render the GUI with ImGui.
-        RenderGUI();
+        if (Renderer.Config.GUI)
+            RenderGUI();
 
         // Finishes the state of input processing.
         Input.LateUpdate();

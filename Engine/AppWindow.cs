@@ -5,8 +5,8 @@ namespace Engine;
 
 class AppWindow
 {
-    private ImGuiRenderer _imGuiRenderer;
-    private ImGuiInputHandler _imGuiInputHandler;
+    private GuiRenderer _imGuiRenderer;
+    private GuiInputHandler _imGuiInputHandler;
 
     private IntPtr _imGuiContext;
 

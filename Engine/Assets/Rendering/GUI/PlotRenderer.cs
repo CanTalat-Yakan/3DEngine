@@ -2,6 +2,6 @@
 
 namespace Engine.GUI;
 
-unsafe public sealed class ImPlotRenderer
+unsafe public sealed class PlotRenderer
 {
 }

@@ -1,4 +1,4 @@
-﻿using Vortice.Direct3D11;
+﻿//using Vortice.Direct3D11;
 
 namespace Engine.Rendering;
 
@@ -6,7 +6,7 @@ public class ComputeShader
 {
     private Renderer _renderer => Renderer.Instance;
 
-    private ID3D11ComputeShader _postProcessComputeShader;
+    //private ID3D11ComputeShader _postProcessComputeShader;
 
     public ComputeShader(string computeShaderFilePath)
     {
@@ -20,26 +20,26 @@ public class ComputeShader
         //_postProcessComputeShader = _renderer.Device.CreateComputeShader(vertexShaderByteCode.Span);
     }
 
-    public void UpdateResource() { }
+    //public void UpdateResource() { }
 
-    public void SetBuffer() { }
-    public void SetConstantBuffer() { }
-    public void SetFloat(string name, float value) { }
-    public void SetFloats() { }
-    public void SetInt() { }
-    public void SetInts() { }
-    public void SetMatrix() { }
+    //public void SetBuffer() { }
+    //public void SetConstantBuffer() { }
+    //public void SetFloat(string name, float value) { }
+    //public void SetFloats() { }
+    //public void SetInt() { }
+    //public void SetInts() { }
+    //public void SetMatrix() { }
 
-    public void SetTexture(int kernelIndex, int nameID, object Texture, int mipLevel) { }
+    //public void SetTexture(int kernelIndex, int nameID, object Texture, int mipLevel) { }
 
-    public int FindKernel(string kernelName) { return 0; }
+    //public int FindKernel(string kernelName) { return 0; }
 
-    public void Dispatch(int kernelIndex, int threadGroupsX, int threadGroupsY, int threadGroupsZ) { }
+    //public void Dispatch(int kernelIndex, int threadGroupsX, int threadGroupsY, int threadGroupsZ) { }
 
-    public void Result() { }
+    //public void Result() { }
 
-    public void Dispose()
-    {
-        _postProcessComputeShader?.Dispose();
-    }
+    //public void Dispose()
+    //{
+    //    //_postProcessComputeShader?.Dispose();
+    //}
 }

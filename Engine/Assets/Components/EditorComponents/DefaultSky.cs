@@ -9,7 +9,8 @@ public class DefaultSky : EditorComponent, IHide
 
     private static readonly string SHADER_RESOURCES = Path.Combine(AppContext.BaseDirectory, Paths.SHADERS);
 
-    private static readonly string SHADER_SKYBOX = "Skybox.hlsl";
+    //private static readonly string SHADER_SKYBOX = "Skybox.hlsl";
+    private static readonly string SHADER_SIMPLE_LIT = "SimpleLit.hlsl";
 
     private static readonly string IMAGE_SKY = "SkyGradient.png";
     private static readonly string IMAGE_SKY_LIGHT = "SkyGradient_Light.png";
@@ -29,9 +30,9 @@ public class DefaultSky : EditorComponent, IHide
     public void Initialize()
     {
         // Create a new material with the unlit shader and sky image.
-        _materialSky = new(SHADER_RESOURCES + SHADER_SKYBOX, IMAGE_SKY);
+        _materialSky = new(SHADER_RESOURCES + SHADER_SIMPLE_LIT, IMAGE_SKY);
         // Create a new material with the unlit shader and a light version of the sky image.
-        _materialSkyLight = new(SHADER_RESOURCES + SHADER_SKYBOX, IMAGE_SKY_LIGHT);
+        _materialSkyLight = new(SHADER_RESOURCES + SHADER_SIMPLE_LIT, IMAGE_SKY_LIGHT);
 
         Entity.Name = "Sky"; // Set entity name to "Sky".
         Entity.Tag = "DefaultSky"; // Set entity tag to SceneSky.

@@ -50,8 +50,11 @@ public sealed class Profiler
         return delta;
     }
 
-    public static void Reset() =>
+    public static void Reset()
+    {
+
         AdditionalProfiling.Clear();
+    }
 
     public static string GetString() =>
         $"""

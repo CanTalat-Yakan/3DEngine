@@ -2,6 +2,6 @@
 
 namespace Engine.GUI;
 
-unsafe public sealed class ImNodesRenderer
+unsafe public sealed class NodesRenderer
 {
 }
