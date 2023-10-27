@@ -44,6 +44,7 @@
 		</PackageReference>
 		<PackageReference Include="FftSharp" Version="2.1.0" />
 		<PackageReference Include="Magick.NET-Q16-HDRI-AnyCPU" Version="13.4.0" />
+		<PackageReference Include="MagicPhysX" Version="1.0.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis" Version="4.7.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.7.0" />
 		<PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />

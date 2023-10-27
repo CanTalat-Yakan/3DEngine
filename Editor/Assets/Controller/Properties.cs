@@ -17,7 +17,7 @@ using Engine.Runtime;
 using static Editor.Controller.Helper;
 
 using Path = System.IO.Path;
-using Texture = Vortice.Direct3D11.ID3D11Texture2D;
+//using Texture = Vortice.Direct3D11.ID3D11Texture2D;
 
 namespace Editor.Controller;
 
@@ -507,9 +507,9 @@ internal sealed partial class Properties
             else if (type == typeof(Material))
                 grid.Add(CreateTextureSlot("None", "Material"));
 
-            // Texture
-            else if (type == typeof(Texture))
-                grid.Add(CreateTextureSlot("None", "Texture"));
+            //// Texture
+            //else if (type == typeof(Texture))
+            //    grid.Add(CreateTextureSlot("None", "Texture"));
 
             // Entity
             else if (type == typeof(Entity))
