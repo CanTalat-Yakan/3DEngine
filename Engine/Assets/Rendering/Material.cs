@@ -220,7 +220,7 @@ public sealed partial class Material
             SampleDescription = SampleDescription.Default
         };
         PipelineState = _renderer.Device.CreateGraphicsPipelineState(graphicsPipelineStateDescription);
-        PipelineState.Name = "CommandList " + _count;
+        PipelineState.Name = "GraphicsPipelineStateObject " + _count;
 
         CreateCommandList();
     }
