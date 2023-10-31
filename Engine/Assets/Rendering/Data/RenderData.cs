@@ -18,6 +18,9 @@ public struct RenderData
 
     public ID3D12CommandQueue GraphicsQueue;
 
+    public ID3D12CommandAllocator CommandAllocator;
+    public ID3D12GraphicsCommandList4 CommandList;
+
     public ID3D12Fence FrameFence;
     public AutoResetEvent FrameFenceEvent;
 

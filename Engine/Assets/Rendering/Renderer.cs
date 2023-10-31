@@ -78,7 +78,10 @@ public sealed partial class Renderer
         if (result.Failure)
             return result;
 
-        CreateGraphicsQueueAndFence(Device);
+        CreateCommandAllocator();
+        CreateCommandList();
+
+        CreateGraphicsQueueAndFence();
 
         SetupSwapChain(forHwnd);
 
@@ -148,8 +151,8 @@ public sealed partial class Renderer
     public void EndFrame()
     {
         // Indicate that the back buffer will now be used to present.
-        Data.Material?.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.RenderTarget, ResourceStates.AllShaderResource);
-        Data.Material?.CommandList.EndEvent();
+        Data.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.RenderTarget, ResourceStates.AllShaderResource);
+        Data.CommandList.EndEvent();
 
         Data.GraphicsQueue.Signal(Data.FrameFence, ++Data.FrameCount);
 
@@ -170,13 +173,13 @@ public sealed partial class Renderer
     public void Draw(int indexCount, IndexBufferView indexBufferViews, params VertexBufferView[] vertexBufferViews)
     {
         // Indicate that the MSAA render target texture will be used as a render target.
-        Data.Material.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.AllShaderResource, ResourceStates.RenderTarget);
+        Data.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.AllShaderResource, ResourceStates.RenderTarget);
 
-        Data.Material.CommandList.BeginEvent("Frame");
+        Data.CommandList.BeginEvent("Frame");
 
         Data.SetupInputAssembler(indexBufferViews, vertexBufferViews);
 
-        Data.Material.CommandList.DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
+        Data.CommandList.DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
     }
 
     public void BeginFrame(bool useRenderPass = false)
@@ -196,16 +199,16 @@ public sealed partial class Renderer
                 new RenderPassBeginningAccess(new ClearValue(RenderData.DepthStencilFormat, 1.0f, 0)),
                 new RenderPassEndingAccess(RenderPassEndingAccessType.Discard));
 
-            Data.Material?.CommandList.BeginRenderPass(renderPassDesc, depthStencil);
+            Data.CommandList.BeginRenderPass(renderPassDesc, depthStencil);
         }
         else
         {
             // Clear the render target view and depth stencil view with the set color.
-            Data.Material?.CommandList.ClearRenderTargetView(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), clearColor);
-            Data.Material?.CommandList.ClearDepthStencilView(Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
+            Data.CommandList.ClearRenderTargetView(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), clearColor);
+            Data.CommandList.ClearDepthStencilView(Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
 
             // Set the render target and depth stencil view for the device context.
-            Data.Material?.CommandList.OMSetRenderTargets(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart());
+            Data.CommandList.OMSetRenderTargets(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart());
         }
 
         // Reset the profiler values for vertices, indices, and draw calls.
@@ -279,10 +282,25 @@ public sealed partial class Renderer
         result = Result.Ok;
     }
 
-    private void CreateGraphicsQueueAndFence(ID3D12Device2 device)
+    private void CreateCommandAllocator()
+    {
+        Data.CommandAllocator = Device.CreateCommandAllocator(CommandListType.Direct);
+        Data.CommandAllocator.Name = "CommandAllocator 0";
+    }
+
+    private void CreateCommandList()
+    {
+        Data.CommandList = Device.CreateCommandList<ID3D12GraphicsCommandList4>(
+            CommandListType.Direct,
+            Data.CommandAllocator,
+            null);
+        Data.CommandList.Name = "CommandList 0";
+    }
+
+    private void CreateGraphicsQueueAndFence()
     {
         // Create Command queue.
-        Data.GraphicsQueue = device.CreateCommandQueue(CommandListType.Direct);
+        Data.GraphicsQueue = Device.CreateCommandQueue(CommandListType.Direct);
         Data.GraphicsQueue.Name = "Graphics Queue";
 
         // Create synchronization objects.

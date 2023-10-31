@@ -58,14 +58,15 @@ public sealed partial class Material
         CommandList.SetGraphicsRootDescriptorTable(0, _resourceView.GetGPUDescriptorHandleForHeapStart());
         CommandList.SetGraphicsRootDescriptorTable(0, _samplerState.GetGPUDescriptorHandleForHeapStart());
 
-        CommandList.Close();
-
         // Set current command list in the graphics queue.
         _renderer.Data.GraphicsQueue.ExecuteCommandList(CommandList);
 
         // Assign material to the static variable.
         CurrentMaterialOnGPU = this;
     }
+
+    public void Close() =>
+        CommandList.Close();
 
     public void Reset()
     {
@@ -144,7 +145,7 @@ public sealed partial class Material
 
 public sealed partial class Material
 {
-    private static int _count = 0;
+    private static int _count = 1;
     private void CreateRootSignature(string shaderFilePath)
     {
         // Create a root signature
