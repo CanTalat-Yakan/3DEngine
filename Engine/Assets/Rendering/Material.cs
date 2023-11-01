@@ -75,6 +75,20 @@ public sealed partial class Material
         CommandList.Reset(CommandAllocator, PipelineState);
     }
 
+    public void Dispose()
+    {
+        MaterialBuffer?.Dispose();
+
+        RootSignature?.Dispose();
+
+        CommandAllocator?.Dispose();
+        CommandList?.Dispose();
+        PipelineState?.Dispose();
+
+        _resourceView?.Dispose();
+        _samplerState?.Dispose();
+    }
+
     private void CreateTextureAndSampler(string imageFileName)
     {
         #region // Create Texture
@@ -127,20 +141,6 @@ public sealed partial class Material
         // Create the sampler state using the sampler description.
         Renderer.Device.CreateSampler(ref samplerStateDescription, _samplerState.GetCPUDescriptorHandleForHeapStart());
         #endregion
-    }
-
-    public void Dispose()
-    {
-        MaterialBuffer?.Dispose();
-
-        RootSignature?.Dispose();
-
-        CommandAllocator?.Dispose();
-        CommandList?.Dispose();
-        PipelineState?.Dispose();
-
-        _resourceView?.Dispose();
-        _samplerState?.Dispose();
     }
 }
 
