@@ -173,6 +173,13 @@ public sealed partial class Renderer
         Data.CommandList.BeginRenderPass(renderPassDescription, depthStencil);
     }
 
+    public void WaitIdle()
+    {
+        Data.GraphicsQueue.Signal(Data.FrameFence, ++Data.FrameCount);
+        Data.FrameFence.SetEventOnCompletion(Data.FrameCount, Data.FrameFenceEvent);
+        Data.FrameFenceEvent.WaitOne();
+    }
+
     public void EndFrame()
     {
         // Indicate that the back buffer will now be used to present.
@@ -213,13 +220,6 @@ public sealed partial class Renderer
         Profiler.Vertices = 0;
         Profiler.Indices = 0;
         Profiler.DrawCalls = 0;
-    }
-
-    public void WaitIdle()
-    {
-        Data.GraphicsQueue.Signal(Data.FrameFence, ++Data.FrameCount);
-        Data.FrameFence.SetEventOnCompletion(Data.FrameCount, Data.FrameFenceEvent);
-        Data.FrameFenceEvent.WaitOne();
     }
 }
 
