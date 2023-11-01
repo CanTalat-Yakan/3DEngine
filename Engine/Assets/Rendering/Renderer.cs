@@ -283,7 +283,7 @@ public sealed partial class Renderer
     private void CreateCommandAllocator()
     {
         Data.CommandAllocator = Device.CreateCommandAllocator(CommandListType.Direct);
-        Data.CommandAllocator.Name = "CommandAllocator 0";
+        Data.CommandAllocator.Name = "CommandAllocator";
     }
 
     private void CreateCommandList()
@@ -292,7 +292,7 @@ public sealed partial class Renderer
             CommandListType.Direct,
             Data.CommandAllocator,
             null);
-        Data.CommandList.Name = "CommandList 0";
+        Data.CommandList.Name = "CommandList";
     }
 
     private void CreateGraphicsQueueAndFence()
