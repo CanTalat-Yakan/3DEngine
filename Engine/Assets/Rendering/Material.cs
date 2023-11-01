@@ -22,7 +22,8 @@ public sealed partial class Material
     private ID3D12DescriptorHeap _resourceView;
     private ID3D12DescriptorHeap _samplerState;
 
-    private Renderer _renderer => Renderer.Instance;
+    internal Renderer Renderer => _renderer is not null ? _renderer : _renderer = Renderer.Instance;
+    private Renderer _renderer;
 
     public Material(string shaderFilePath, string imageFileName = "Default.png")
     {
@@ -49,8 +50,8 @@ public sealed partial class Material
 
     public void Setup()
     {
-        _renderer.Data.Material?.Reset();
-        _renderer.Data.Material = this;
+        Renderer.Data.Material?.Reset();
+        Renderer.Data.Material = this;
 
         // Set root signature.
         CommandList.SetGraphicsRootSignature(RootSignature);
@@ -59,7 +60,7 @@ public sealed partial class Material
         CommandList.SetGraphicsRootDescriptorTable(0, _samplerState.GetGPUDescriptorHandleForHeapStart());
 
         // Set current command list in the graphics queue.
-        _renderer.Data.GraphicsQueue.ExecuteCommandList(CommandList);
+        Renderer.Data.GraphicsQueue.ExecuteCommandList(CommandList);
 
         // Assign material to the static variable.
         CurrentMaterialOnGPU = this;
@@ -78,7 +79,7 @@ public sealed partial class Material
     {
         #region // Create Texture
         // Load the texture and create a shader resource view for it.
-        Loader.ImageLoader.LoadTexture(out var texture, _renderer.Device, imageFileName);
+        Loader.ImageLoader.LoadTexture(out var texture, Renderer.Device, imageFileName);
 
         ShaderResourceViewDescription shaderResourceViewDescription = new()
         {
@@ -88,17 +89,17 @@ public sealed partial class Material
             Shader4ComponentMapping = ShaderComponentMapping.Default
         };
 
-        _resourceView = _renderer.Device.CreateDescriptorHeap(new()
+        _resourceView = Renderer.Device.CreateDescriptorHeap(new()
         {
             DescriptorCount = 1,
             Flags = DescriptorHeapFlags.ShaderVisible,
             Type = DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView
         });
         _resourceView.Name = texture.Name;
-        _renderer.Device.CreateShaderResourceView(texture, shaderResourceViewDescription, _resourceView.GetCPUDescriptorHandleForHeapStart());
+        Renderer.Device.CreateShaderResourceView(texture, shaderResourceViewDescription, _resourceView.GetCPUDescriptorHandleForHeapStart());
         #endregion
 
-        Result result = _renderer.Device.DeviceRemovedReason;
+        Result result = Renderer.Device.DeviceRemovedReason;
         if (result.Failure)
             throw new Exception(result.Description);
 
@@ -116,7 +117,7 @@ public sealed partial class Material
             MaxLOD = float.MaxValue,
         };
 
-        _samplerState = _renderer.Device.CreateDescriptorHeap(new()
+        _samplerState = Renderer.Device.CreateDescriptorHeap(new()
         {
             DescriptorCount = 1,
             Flags = DescriptorHeapFlags.ShaderVisible,
@@ -124,7 +125,7 @@ public sealed partial class Material
         });
         _samplerState.Name = texture.Name + " Sampler";
         // Create the sampler state using the sampler description.
-        _renderer.Device.CreateSampler(ref samplerStateDescription, _samplerState.GetCPUDescriptorHandleForHeapStart());
+        Renderer.Device.CreateSampler(ref samplerStateDescription, _samplerState.GetCPUDescriptorHandleForHeapStart());
         #endregion
     }
 
@@ -179,7 +180,7 @@ public sealed partial class Material
         RootParameter1[] rootParameters = new[] { texture, sampler, constantbuffer };
         rootSignatureDescription.Parameters = rootParameters;
 
-        RootSignature = _renderer.Device.CreateRootSignature(rootSignatureDescription);
+        RootSignature = Renderer.Device.CreateRootSignature(rootSignatureDescription);
         RootSignature.Name = new FileInfo(shaderFilePath).Name + " " + _count++;
     }
 
@@ -213,14 +214,14 @@ public sealed partial class Material
             InputLayout = inputLayoutDescription,
             SampleMask = uint.MaxValue,
             PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
-            RasterizerState = _renderer.Data.RasterizerDescription,
-            BlendState = _renderer.Data.BlendDescription,
+            RasterizerState = Renderer.Data.RasterizerDescription,
+            BlendState = Renderer.Data.BlendDescription,
             DepthStencilState = DepthStencilDescription.Default,
             RenderTargetFormats = new[] { RenderData.RenderTargetFormat },
             DepthStencilFormat = RenderData.DepthStencilFormat,
             SampleDescription = SampleDescription.Default
         };
-        PipelineState = _renderer.Device.CreateGraphicsPipelineState(graphicsPipelineStateDescription);
+        PipelineState = Renderer.Device.CreateGraphicsPipelineState(graphicsPipelineStateDescription);
         PipelineState.Name = "GraphicsPipelineStateObject " + _count;
 
         CreateCommandList();
@@ -228,13 +229,13 @@ public sealed partial class Material
 
     private void CreateCommandAllocator()
     {
-        CommandAllocator = _renderer.Device.CreateCommandAllocator(CommandListType.Direct);
+        CommandAllocator = Renderer.Device.CreateCommandAllocator(CommandListType.Direct);
         CommandAllocator.Name = "CommandAllocator " + _count;
     }
 
     private void CreateCommandList()
     {
-        CommandList = _renderer.Device.CreateCommandList<ID3D12GraphicsCommandList4>(
+        CommandList = Renderer.Device.CreateCommandList<ID3D12GraphicsCommandList4>(
             CommandListType.Direct,
             CommandAllocator,
             PipelineState);

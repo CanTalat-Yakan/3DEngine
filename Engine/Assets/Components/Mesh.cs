@@ -24,7 +24,8 @@ public sealed partial class Mesh : EditorComponent
     public Material Material => _material;
     [Show] private Material _material;
 
-    private Renderer _renderer => Renderer.Instance;
+    internal Renderer Renderer => _renderer is not null ? _renderer : _renderer = Renderer.Instance;
+    private Renderer _renderer;
 
     public override void OnRegister() =>
         // Register the component with the MeshSystem.
@@ -68,7 +69,7 @@ public sealed partial class Mesh : EditorComponent
             Material.MaterialBuffer?.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
             Material.Close();
 
-            _renderer.Draw(MeshInfo.Value.Indices.Length, MeshBuffers.IndexBufferView, MeshBuffers.VertexBufferView);
+            Renderer.Draw(MeshInfo.Value.Indices.Length, MeshBuffers.IndexBufferView, MeshBuffers.VertexBufferView);
         }
         else
         {
@@ -78,7 +79,7 @@ public sealed partial class Mesh : EditorComponent
             Material.MaterialBuffer?.UpdatePropertiesConstantBuffer();
             Material.Close();
 
-            _renderer.Draw(MeshInfo.Value.Indices.Length, MeshBuffers.IndexBufferView, MeshBuffers.VertexBufferView);
+            Renderer.Draw(MeshInfo.Value.Indices.Length, MeshBuffers.IndexBufferView, MeshBuffers.VertexBufferView);
 
             // Assign MeshInfo to the static variable.
             CurrentMeshOnGPU = MeshInfo;

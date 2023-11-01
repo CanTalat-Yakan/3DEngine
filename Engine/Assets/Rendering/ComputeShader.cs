@@ -4,7 +4,8 @@ namespace Engine.Rendering;
 
 public class ComputeShader
 {
-    private Renderer _renderer => Renderer.Instance;
+    internal Renderer Renderer => _renderer is not null ? _renderer : _renderer = Renderer.Instance;
+    private Renderer _renderer;
 
     //private ID3D11ComputeShader _postProcessComputeShader;
 

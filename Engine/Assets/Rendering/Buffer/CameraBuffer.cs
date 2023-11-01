@@ -9,12 +9,13 @@ public sealed unsafe class CameraBuffer
 
     private ID3D12Resource _view;
 
-    private Renderer _renderer => Renderer.Instance;
+    internal Renderer Renderer => _renderer is not null ? _renderer : _renderer = Renderer.Instance;
+    private Renderer _renderer;
 
     public CameraBuffer()
     {
         //Create View Constant Buffer.
-        _view = _renderer.Device.CreateCommittedResource(
+        _view = Renderer.Device.CreateCommittedResource(
             HeapType.Upload,
             ResourceDescription.Buffer(sizeof(ViewConstantBuffer)),
             ResourceStates.VertexAndConstantBuffer);
@@ -31,8 +32,8 @@ public sealed unsafe class CameraBuffer
 
         //_renderer.Data.CommandList.Reset(_renderer.Data.CommandAllocator);
         // Set the constant buffer in the vertex shader stage of the device context.
-        _renderer.Data.CommandList.SetGraphicsRootConstantBufferView(0, _view.GPUVirtualAddress);
-        _renderer.Data.CommandList.Close();
+        Renderer.Data.CommandList.SetGraphicsRootConstantBufferView(0, _view.GPUVirtualAddress);
+        Renderer.Data.CommandList.Close();
     }
 
     public void Dispose() =>

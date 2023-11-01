@@ -11,7 +11,8 @@ public sealed class MeshBuffer
     public IndexBufferView IndexBufferView;
     private ID3D12Resource _indexBuffer;
 
-    private Renderer _renderer => Renderer.Instance;
+    internal Renderer Renderer => _renderer is not null ? _renderer : _renderer = Renderer.Instance;
+    private Renderer _renderer;
 
     public void CreateBuffer(MeshInfo meshInfo)
     {
@@ -26,10 +27,9 @@ public sealed class MeshBuffer
         int vertexStride = Unsafe.SizeOf<Vertex>();
         int vertexBufferSize = meshInfo.Vertices.Length * vertexStride;
 
-
         //Create a VertexBuffer using the MeshInfos Vertices
         //and bind it with VertexBuffer flag.
-        _vertexBuffer = _renderer.Device.CreateCommittedResource(
+        _vertexBuffer = Renderer.Device.CreateCommittedResource(
             HeapType.Upload,
             ResourceDescription.Buffer(vertexBufferSize),
             ResourceStates.GenericRead);
@@ -45,7 +45,7 @@ public sealed class MeshBuffer
 
         //Create an IndexBuffer using the MeshInfos Indices
         //and bind it with IndexBuffer flag.
-        _indexBuffer = _renderer.Device.CreateCommittedResource(
+        _indexBuffer = Renderer.Device.CreateCommittedResource(
             HeapType.Upload,
             ResourceDescription.Buffer(indexBufferSize),
             ResourceStates.GenericRead);

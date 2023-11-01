@@ -38,7 +38,8 @@ public unsafe partial class MaterialBuffer
     private ID3D12Resource _properties;
     private ID3D12Resource _model;
 
-    private Renderer _renderer => Renderer.Instance;
+    internal Renderer Renderer => _renderer is not null ? _renderer : _renderer = Renderer.Instance;
+    private Renderer _renderer;
 
     public void Dispose()
     {
@@ -68,7 +69,7 @@ public unsafe partial class MaterialBuffer
     public void CreatePerModelConstantBuffer()
     {
         //Create Per Model Constant Buffer.
-        _model = _renderer.Device.CreateCommittedResource(
+        _model = Renderer.Device.CreateCommittedResource(
             HeapType.Upload,
             ResourceDescription.Buffer(sizeof(PerModelConstantBuffer)),
             ResourceStates.GenericRead);
@@ -84,7 +85,7 @@ public unsafe partial class MaterialBuffer
         _model.Unmap(0);
 
         // Set the constant buffer in the vertex shader stage of the device context.
-        _renderer.Data.Material?.CommandList.SetGraphicsRootConstantBufferView(1, _model.GPUVirtualAddress);
+        Renderer.Data.Material?.CommandList.SetGraphicsRootConstantBufferView(1, _model.GPUVirtualAddress);
     }
 }
 
@@ -102,10 +103,10 @@ public unsafe partial class MaterialBuffer
             .MakeGenericMethod(constantBufferType);
         var dynamicPropertiesMemoryLength = (int)sizeOfMethod.Invoke(null, null);
 
-        MethodInfo createConstantBufferMethod = _renderer.Device.GetType()
+        MethodInfo createConstantBufferMethod = Renderer.Device.GetType()
             .GetMethod("CreateCommittedResource")
             .MakeGenericMethod(constantBufferType);
-        _properties = (ID3D12Resource)createConstantBufferMethod.Invoke(_renderer.Device, new object[]
+        _properties = (ID3D12Resource)createConstantBufferMethod.Invoke(Renderer.Device, new object[]
         {
             HeapType.Upload,
             ResourceDescription.Buffer(dynamicPropertiesMemoryLength),
@@ -142,6 +143,6 @@ public unsafe partial class MaterialBuffer
         _properties.Unmap(0);
 
         //Set the constant buffer in the vertex shader stage of the device context.
-        _renderer.Data.Material?.CommandList.SetGraphicsRootConstantBufferView(10, _properties.GPUVirtualAddress);
+        Renderer.Data.Material?.CommandList.SetGraphicsRootConstantBufferView(10, _properties.GPUVirtualAddress);
     }
 }

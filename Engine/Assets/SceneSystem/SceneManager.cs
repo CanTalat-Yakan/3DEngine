@@ -9,23 +9,21 @@ public sealed partial class SceneManager
 
     public SceneManager(Scene scene = null) =>
         // Initializes the main scene and creates a new empty list for the subscenes.
-        MainScene = scene is not null ? scene
-            : new() { ID = Guid.NewGuid(), Name = "Main", IsEnabled = true, EntityManager = new() };
+        MainScene = scene is not null ? scene : new Scene() { Name = "Main", IsEnabled = true, EntityManager = new() };
 
     public static Scene AddSubscene(Guid guid = new(), string name = "Subscene", bool enable = true)
     {
-        // If the provided GUID is empty, a new one is generated.
-        if (guid.Equals(Guid.Empty))
-            guid = Guid.NewGuid();
-
         // Adds a new scene with the specified parameters to the list of subscenes.
         Scene subscene = new()
         {
-            ID = guid,
             Name = name,
             IsEnabled = enable,
             EntityManager = new()
         };
+        // Set the provided GUID, if not empty.
+        if (!guid.Equals(Guid.Empty))
+            subscene.ID = guid;
+
         Subscenes.Add(subscene);
 
         // Returns the newly added scene.
