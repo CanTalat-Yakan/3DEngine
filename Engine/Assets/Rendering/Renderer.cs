@@ -29,8 +29,7 @@ public sealed partial class Renderer
     public Renderer(Win32Window win32Window, Config config = null)
     {
         // Initializes the singleton instance of the class, if it hasn't been already.
-        if (Instance is null)
-            Instance = this;
+        Instance ??= this;
 
         // Store the instance of Win32Window.
         if (win32Window is not null)
