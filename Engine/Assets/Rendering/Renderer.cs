@@ -148,6 +148,32 @@ public sealed partial class Renderer
         Data.Material.CommandList.ResolveSubresource(Data.BackBufferRenderTargetTexture, 0, Data.MSAARenderTargetTexture, 0, RenderData.RenderTargetFormat);
     // Use this to Copy: .CopyResource(dstResource, srcResource);
 
+    public void Draw(int indexCount, IndexBufferView indexBufferViews, params VertexBufferView[] vertexBufferViews)
+    {
+        Data.SetupInputAssembler(indexBufferViews, vertexBufferViews);
+
+        Data.CommandList.DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
+    }
+
+    public void EndRenderPass() =>
+        Data.Material.CommandList.EndRenderPass();
+
+    public void BeginRenderPass()
+    {
+        Data.CommandList.BeginEvent("Render Pass");
+
+        var renderPassDesc = new RenderPassRenderTargetDescription(Data.BufferRenderTargetView.GetCPUDescriptorHandleForHeapStart(),
+            new RenderPassBeginningAccess(new ClearValue(RenderData.RenderTargetFormat, Colors.DarkGray)),
+            new RenderPassEndingAccess(RenderPassEndingAccessType.Preserve));
+
+        var depthStencil = new RenderPassDepthStencilDescription(
+            Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart(),
+            new RenderPassBeginningAccess(new ClearValue(RenderData.DepthStencilFormat, 1.0f, 0)),
+            new RenderPassEndingAccess(RenderPassEndingAccessType.Discard));
+
+        Data.CommandList.BeginRenderPass(renderPassDesc, depthStencil);
+    }
+
     public void EndFrame()
     {
         // Indicate that the back buffer will now be used to present.
@@ -167,47 +193,22 @@ public sealed partial class Renderer
         WaitIdle();
     }
 
-    public void EndRenderPass() =>
-        Data.Material.CommandList.EndRenderPass();
-
-    public void Draw(int indexCount, IndexBufferView indexBufferViews, params VertexBufferView[] vertexBufferViews)
+    public void BeginFrame()
     {
-        Data.SetupInputAssembler(indexBufferViews, vertexBufferViews);
+        Data.CommandList.BeginEvent("Frame");
 
-        Data.CommandList.DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
-    }
-
-    public void BeginFrame(bool useRenderPass = false)
-    {
         // Indicate that the MSAA render target texture will be used as a render target.
         Data.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.AllShaderResource, ResourceStates.RenderTarget);
 
-        Data.CommandList.BeginEvent("Frame");
-
+        // Update the constant buffer of the camera.
         Data.GraphicsQueue.ExecuteCommandList(Data.CommandList);
 
-        if (useRenderPass)
-        {
-            var renderPassDesc = new RenderPassRenderTargetDescription(Data.BufferRenderTargetView.GetCPUDescriptorHandleForHeapStart(),
-                new RenderPassBeginningAccess(new ClearValue(RenderData.RenderTargetFormat, Colors.DarkGray)),
-                new RenderPassEndingAccess(RenderPassEndingAccessType.Preserve));
+        // Clear the render target view and depth stencil view with the set color.
+        Data.CommandList.ClearRenderTargetView(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), Colors.DarkGray);
+        Data.CommandList.ClearDepthStencilView(Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
 
-            var depthStencil = new RenderPassDepthStencilDescription(
-                Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart(),
-                new RenderPassBeginningAccess(new ClearValue(RenderData.DepthStencilFormat, 1.0f, 0)),
-                new RenderPassEndingAccess(RenderPassEndingAccessType.Discard));
-
-            Data.CommandList.BeginRenderPass(renderPassDesc, depthStencil);
-        }
-        else
-        {
-            // Clear the render target view and depth stencil view with the set color.
-            Data.CommandList.ClearRenderTargetView(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), Colors.DarkGray);
-            Data.CommandList.ClearDepthStencilView(Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
-
-            // Set the render target and depth stencil view for the device context.
-            Data.CommandList.OMSetRenderTargets(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart());
-        }
+        // Set the render target and depth stencil view for the device context.
+        Data.CommandList.OMSetRenderTargets(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart());
 
         // Reset the profiler values for vertices, indices, and draw calls.
         Profiler.Vertices = 0;
