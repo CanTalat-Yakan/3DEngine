@@ -95,7 +95,7 @@ public sealed partial class Material
             Flags = DescriptorHeapFlags.ShaderVisible,
             Type = DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView
         });
-        _resourceView.Name = texture.Name;
+        _resourceView.Name = texture.Name + " Texture";
         Renderer.Device.CreateShaderResourceView(texture, shaderResourceViewDescription, _resourceView.GetCPUDescriptorHandleForHeapStart());
         #endregion
 
