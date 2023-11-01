@@ -162,7 +162,7 @@ public sealed partial class Renderer
     {
         Data.CommandList.BeginEvent("Render Pass");
 
-        var renderPassDesc = new RenderPassRenderTargetDescription(Data.BufferRenderTargetView.GetCPUDescriptorHandleForHeapStart(),
+        var renderPassDescription = new RenderPassRenderTargetDescription(Data.BufferRenderTargetView.GetCPUDescriptorHandleForHeapStart(),
             new RenderPassBeginningAccess(new ClearValue(RenderData.RenderTargetFormat, Colors.DarkGray)),
             new RenderPassEndingAccess(RenderPassEndingAccessType.Preserve));
 
@@ -171,7 +171,7 @@ public sealed partial class Renderer
             new RenderPassBeginningAccess(new ClearValue(RenderData.DepthStencilFormat, 1.0f, 0)),
             new RenderPassEndingAccess(RenderPassEndingAccessType.Discard));
 
-        Data.CommandList.BeginRenderPass(renderPassDesc, depthStencil);
+        Data.CommandList.BeginRenderPass(renderPassDescription, depthStencil);
     }
 
     public void EndFrame()
