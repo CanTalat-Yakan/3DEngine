@@ -172,11 +172,6 @@ public sealed partial class Renderer
 
     public void Draw(int indexCount, IndexBufferView indexBufferViews, params VertexBufferView[] vertexBufferViews)
     {
-        // Indicate that the MSAA render target texture will be used as a render target.
-        Data.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.AllShaderResource, ResourceStates.RenderTarget);
-
-        Data.CommandList.BeginEvent("Frame");
-
         Data.SetupInputAssembler(indexBufferViews, vertexBufferViews);
 
         Data.CommandList.DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
@@ -184,14 +179,17 @@ public sealed partial class Renderer
 
     public void BeginFrame(bool useRenderPass = false)
     {
+        // Indicate that the MSAA render target texture will be used as a render target.
+        Data.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.AllShaderResource, ResourceStates.RenderTarget);
 
-        // Set the background color to a dark gray.
-        var clearColor = Colors.DarkGray;
+        Data.CommandList.BeginEvent("Frame");
+
+        Data.GraphicsQueue.ExecuteCommandList(Data.CommandList);
 
         if (useRenderPass)
         {
             var renderPassDesc = new RenderPassRenderTargetDescription(Data.BufferRenderTargetView.GetCPUDescriptorHandleForHeapStart(),
-                new RenderPassBeginningAccess(new ClearValue(RenderData.RenderTargetFormat, clearColor)),
+                new RenderPassBeginningAccess(new ClearValue(RenderData.RenderTargetFormat, Colors.DarkGray)),
                 new RenderPassEndingAccess(RenderPassEndingAccessType.Preserve));
 
             var depthStencil = new RenderPassDepthStencilDescription(
@@ -204,7 +202,7 @@ public sealed partial class Renderer
         else
         {
             // Clear the render target view and depth stencil view with the set color.
-            Data.CommandList.ClearRenderTargetView(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), clearColor);
+            Data.CommandList.ClearRenderTargetView(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), Colors.DarkGray);
             Data.CommandList.ClearDepthStencilView(Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
 
             // Set the render target and depth stencil view for the device context.

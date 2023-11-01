@@ -27,8 +27,12 @@ public sealed class Camera : EditorComponent
         // Register the component with the CameraSystem.
         CameraSystem.Register(this);
 
-    public override void OnAwake() =>
+    public override void OnAwake()
+    {
         CurrentRenderingCamera = this;
+
+        CameraBuffer.Setup();
+    }
 
     public override void OnUpdate()
     {
@@ -46,7 +50,7 @@ public sealed class Camera : EditorComponent
         CurrentRenderingCamera ??= this;
 
         // When the CurrentRenderingCamera is disabled or the current order is greater.
-        if (!CurrentRenderingCamera.IsEnabled || Order > CurrentRenderingCamera?.Order)
+        if (!CurrentRenderingCamera.IsEnabled || Order > CurrentRenderingCamera.Order)
             CurrentRenderingCamera = this;
 
         // Tell the mesh to recheck bounds.

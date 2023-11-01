@@ -29,8 +29,10 @@ public sealed unsafe class CameraBuffer
         Unsafe.Copy(pointer, ref ViewConstantBuffer);
         // Unmap the constant buffer from memory.
         _view.Unmap(0);
+    }
 
-        //_renderer.Data.CommandList.Reset(_renderer.Data.CommandAllocator);
+    public void Setup()
+    {
         // Set the constant buffer in the vertex shader stage of the device context.
         Renderer.Data.CommandList.SetGraphicsRootConstantBufferView(0, _view.GPUVirtualAddress);
         Renderer.Data.CommandList.Close();
