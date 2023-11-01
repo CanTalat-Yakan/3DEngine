@@ -147,6 +147,7 @@ public sealed partial class Material
 public sealed partial class Material
 {
     private static int _count = 1;
+
     private void CreateRootSignature(string shaderFilePath)
     {
         // Create a root signature
