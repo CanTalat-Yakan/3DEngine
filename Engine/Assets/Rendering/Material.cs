@@ -111,6 +111,9 @@ public sealed partial class Material
         });
         _resourceView.Name = texture.Name + " Texture";
         Renderer.Device.CreateShaderResourceView(texture, shaderResourceViewDescription, _resourceView.GetCPUDescriptorHandleForHeapStart());
+
+        var size = Renderer.Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView);
+        _resourceView.GetCPUDescriptorHandleForHeapStart().Offset(size);
         #endregion
 
         Result result = Renderer.Device.DeviceRemovedReason;
@@ -140,6 +143,9 @@ public sealed partial class Material
         _samplerState.Name = texture.Name + " Sampler";
         // Create the sampler state using the sampler description.
         Renderer.Device.CreateSampler(ref samplerStateDescription, _samplerState.GetCPUDescriptorHandleForHeapStart());
+
+        size = Renderer.Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView);
+        _samplerState.GetCPUDescriptorHandleForHeapStart().Offset(size);
         #endregion
     }
 }
