@@ -80,7 +80,8 @@ public sealed partial class Renderer
         CreateCommandAllocator();
         CreateCommandList();
 
-        CreateGraphicsQueueAndFence();
+        CreateGraphicsQueue(); 
+        CreateFrameFence();
 
         SetupSwapChain(forHwnd);
 
@@ -295,12 +296,15 @@ public sealed partial class Renderer
         Data.CommandList.Name = "CommandList";
     }
 
-    private void CreateGraphicsQueueAndFence()
+    private void CreateGraphicsQueue()
     {
         // Create Command queue.
         Data.GraphicsQueue = Device.CreateCommandQueue(CommandListType.Direct);
         Data.GraphicsQueue.Name = "Graphics Queue";
+    }
 
+    private void CreateFrameFence()
+    {
         // Create synchronization objects.
         Data.FrameFence = Device.CreateFence(0);
         Data.FrameFenceEvent = new System.Threading.AutoResetEvent(false);
