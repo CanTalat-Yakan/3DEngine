@@ -80,7 +80,7 @@ public sealed partial class Renderer
         CreateCommandAllocator();
         CreateCommandList();
 
-        CreateGraphicsQueue(); 
+        CreateGraphicsQueue();
         CreateFrameFence();
 
         SetupSwapChain(forHwnd);
@@ -256,6 +256,9 @@ public sealed partial class Renderer
                 if ((adapter.Description1.Flags & AdapterFlags.Software) is not AdapterFlags.None)
                     adapter.Dispose();
                 else break;
+
+            if (adapter is null)
+                DXGIFactory.EnumAdapters1(0, out adapter);
 
             for (int i = 0; i < s_featureLevels.Length; i++)
                 // Create the D3D12 Device with the current adapter and the highest possible Feature level.

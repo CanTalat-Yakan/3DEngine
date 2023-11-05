@@ -35,6 +35,7 @@ public unsafe partial class MaterialBuffer
     public List<SerializeEntry> SerializableProperties = new();
 
     private object _propertiesConstantBuffer;
+
     private ID3D12Resource _properties;
     private ID3D12Resource _model;
 
