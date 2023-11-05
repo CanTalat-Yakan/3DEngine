@@ -41,7 +41,7 @@ public sealed class ModelLoader
 
         // Create new lists for the "MeshInfo" object.
         var vertices = new List<Vertex>();
-        var indices = new List<ushort>();
+        var indices = new List<int>();
 
         // Iterate over all the meshes in the file.
         foreach (var mesh in file.Meshes)
@@ -60,17 +60,17 @@ public sealed class ModelLoader
             foreach (var face in mesh.Faces)
             {
                 indices.AddRange(new[] {
-                        (ushort)face.Indices[0],
-                        (ushort)face.Indices[1],
-                        (ushort)face.Indices[2]});
+                        face.Indices[0],
+                        face.Indices[1],
+                        face.Indices[2]});
 
                 // Split the face into two triangles,
                 // when the face has four indices. 
                 if (face.IndexCount == 4)
                     indices.AddRange(new[] {
-                        (ushort)face.Indices[0],
-                        (ushort)face.Indices[2],
-                        (ushort)face.Indices[3]});
+                        face.Indices[0],
+                        face.Indices[2],
+                        face.Indices[3]});
             }
         }
 

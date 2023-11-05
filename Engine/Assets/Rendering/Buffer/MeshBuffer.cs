@@ -41,7 +41,8 @@ public sealed class MeshBuffer
 
     private void SetIndexBuffer(MeshInfo meshInfo)
     {
-        int indexStride = Unsafe.SizeOf<ushort>();
+        bool isInt = true;
+        int indexStride = Unsafe.SizeOf<int>();
         int indexBufferSize = meshInfo.Indices.Length * indexStride;
 
         //Create an IndexBuffer using the MeshInfos Indices
@@ -52,7 +53,7 @@ public sealed class MeshBuffer
             ResourceStates.GenericRead);
 
         _indexBuffer.SetData(meshInfo.Indices);
-        IndexBufferView = new(_indexBuffer.GPUVirtualAddress, indexBufferSize, false); // ushort == 16 bits.
+        IndexBufferView = new(_indexBuffer.GPUVirtualAddress, indexBufferSize, isInt); // ushort == 16 bits.
     }
 
     public void Dispose()

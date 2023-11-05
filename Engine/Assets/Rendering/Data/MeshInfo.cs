@@ -13,7 +13,7 @@ public struct Vertex
 public struct MeshInfo
 {
     public Vertex[] Vertices;
-    public ushort[] Indices;
+    public int[] Indices;
 
     public BoundingBox BoundingBox;
 }
