@@ -349,7 +349,7 @@ public sealed partial class Renderer
         {
             // Get the buffers of the swap chain as a texture.
             Data.BufferRenderTargetTextures[i] = Data.SwapChain.GetBuffer<ID3D12Resource>(i);
-            Data.BufferRenderTargetTextures[i].Name = $"SpawChain Buffer {i}";
+            Data.BufferRenderTargetTextures[i].Name = $"SwapChain Buffer {i}";
             // Create a render target view for the back buffer render target texture.
             Device.CreateRenderTargetView(Data.BufferRenderTargetTextures[i], null, Data.BufferRenderTargetView.GetCPUDescriptorHandleForHeapStart());
         }
