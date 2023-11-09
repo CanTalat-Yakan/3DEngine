@@ -8,8 +8,6 @@ using Vortice.Direct3D12;
 
 namespace Engine.Rendering;
 
-public interface IMaterialBuffer { }
-
 [XmlInclude(typeof(Vector2))]
 [XmlInclude(typeof(Vector3))]
 [XmlInclude(typeof(Vector4))]
@@ -27,6 +25,8 @@ public class SerializeEntry
         Value = value;
     }
 }
+
+public interface IMaterialBuffer { }
 
 public unsafe partial class MaterialBuffer
 {
