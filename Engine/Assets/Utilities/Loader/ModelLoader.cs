@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 
 using Assimp;
 
@@ -27,6 +26,7 @@ public sealed class ModelLoader
             PostProcessSteps.CalculateTangentSpace |
             PostProcessPreset.TargetRealTimeQuality;
 
+        // Define the full path to the model file.
         string modelFilePath = fromResources
             ? Paths.MODELS + filePath
             : filePath;
