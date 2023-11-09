@@ -203,10 +203,10 @@ public sealed partial class Material
     private void CreateShaderByteCode(string shaderFilePath, out ReadOnlyMemory<byte> vertexShaderByteCode, out ReadOnlyMemory<byte> pixelShaderByteCode)
     {
         // Compile the vertex shader bytecode from the specified shader file name and target profile.
-        vertexShaderByteCode = RenderData.CompileBytecode(DxcShaderStage.Vertex, shaderFilePath, "VSMain");
+        vertexShaderByteCode = CompileBytecode(DxcShaderStage.Vertex, shaderFilePath, "VSMain");
 
         // Compile the pixel shader bytecode from the specified shader file name and target profile.
-        pixelShaderByteCode = RenderData.CompileBytecode(DxcShaderStage.Pixel, shaderFilePath, "PSMain");
+        pixelShaderByteCode = CompileBytecode(DxcShaderStage.Pixel, shaderFilePath, "PSMain");
     }
 
     private void CreateGraphicsPipelineStateDescription(InputLayoutDescription inputLayoutDescription, ReadOnlyMemory<byte> vertexShaderByteCode, ReadOnlyMemory<byte> pixelShaderByteCode)
@@ -233,7 +233,10 @@ public sealed partial class Material
 
         CreateCommandList();
     }
+}
 
+public sealed partial class Material
+{
     private void CreateCommandAllocator()
     {
         CommandAllocator = Renderer.Device.CreateCommandAllocator(CommandListType.Direct);
@@ -247,5 +250,20 @@ public sealed partial class Material
             CommandAllocator,
             PipelineState);
         CommandList.Name = "CommandList " + _count;
+    }
+
+    private ReadOnlyMemory<byte> CompileBytecode(DxcShaderStage stage, string filePath, string entryPoint)
+    {
+        string directory = Path.GetDirectoryName(filePath);
+        string shaderSource = File.ReadAllText(filePath);
+
+        using (ShaderIncludeHandler includeHandler = new(Paths.SHADERS, directory))
+        {
+            using IDxcResult results = DxcCompiler.Compile(stage, shaderSource, entryPoint, includeHandler: includeHandler);
+            if (results.GetStatus().Failure)
+                throw new Exception(results.GetErrors());
+
+            return results.GetObjectBytecodeMemory();
+        }
     }
 }

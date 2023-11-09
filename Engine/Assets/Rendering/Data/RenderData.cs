@@ -1,10 +1,8 @@
 ﻿using System.Drawing;
-using System.IO;
 using System.Threading;
 
 using Vortice.Direct3D12;
 using Vortice.Direct3D;
-using Vortice.Dxc;
 using Vortice.DXGI;
 using Vortice.Mathematics;
 
@@ -42,6 +40,7 @@ public struct RenderData
     // 10 bits = Format.R10G10B10A2_UNorm, 16 bits = Format.R16G16B16A16_UNorm
     public const Format RenderTargetFormat = Format.R8G8B8A8_UNorm; 
     public const Format DepthStencilFormat = Format.D32_Float;
+
     public const int RenderLatency = 2;
 
     public ulong FrameIndex => FrameCount % RenderLatency;
@@ -85,20 +84,5 @@ public struct RenderData
 
         DepthStencilTexture?.Dispose();
         DepthStencilView?.Dispose();
-    }
-
-    public static ReadOnlyMemory<byte> CompileBytecode(DxcShaderStage stage, string filePath, string entryPoint)
-    {
-        string directory = Path.GetDirectoryName(filePath);
-        string shaderSource = File.ReadAllText(filePath);
-
-        using (ShaderIncludeHandler includeHandler = new(Paths.SHADERS, directory))
-        {
-            using IDxcResult results = DxcCompiler.Compile(stage, shaderSource, entryPoint, includeHandler: includeHandler);
-            if (results.GetStatus().Failure)
-                throw new Exception(results.GetErrors());
-
-            return results.GetObjectBytecodeMemory();
-        }
     }
 }
