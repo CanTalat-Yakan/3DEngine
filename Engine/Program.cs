@@ -7,7 +7,7 @@ using static Vortice.Win32.User32;
 
 namespace Engine;
 
-public sealed class Program
+public sealed partial class Program
 {
     private Core _engineCore;
     private AppWindow _appWindow;
@@ -21,44 +21,11 @@ public sealed class Program
 
     public void Run(bool withGui = true, Config config = null)
     {
-        #region // Create Window
-        WNDCLASSEX wndClass = new()
-        {
-            Size = Unsafe.SizeOf<WNDCLASSEX>(),
-            Styles = WindowClassStyles.CS_HREDRAW | WindowClassStyles.CS_VREDRAW | WindowClassStyles.CS_OWNDC,
-            WindowProc = WndProc,
-            InstanceHandle = GetModuleHandle(null),
-            CursorHandle = LoadCursor(IntPtr.Zero, SystemCursor.IDC_ARROW),
-            BackgroundBrushHandle = IntPtr.Zero,
-            IconHandle = IntPtr.Zero,
-            ClassName = "WndClass",
-        };
+        CreateWindow(out var win32Window);
 
-        RegisterClassEx(ref wndClass);
+        // Instance Engine and AppWindow, then show Window
+        Initialize(win32Window, withGui, config);
 
-        Win32Window win32Window = new(wndClass.ClassName, "3D Engine", 1080, 720);
-        #endregion
-
-        #region // Instance Engine and AppWindow, then show Window
-        if (config is null)
-        {
-            config = new();
-            config.SetVSync(PresentInterval.Immediate);
-            config.SetMSAA(MultiSample.x2);
-            config.SetResolutionScale(1);
-
-        }
-        config.GUI = withGui;
-
-        _engineCore = new(new Renderer(win32Window, config), win32Window.Handle);
-        _appWindow = new(win32Window);
-
-        _engineCore.OnGUI += _appWindow.Render;
-
-        _appWindow.Show(ShowWindowCommand.Maximize);
-        #endregion
-
-        #region // LOOP
         // Create a while loop and break when window requested quit.
         bool quitRequested = false;
         while (!quitRequested)
@@ -80,7 +47,48 @@ public sealed class Program
 
             Loop(); // <-- This is where the loop is handled.
         }
-        #endregion
+    }
+
+    private void Initialize(Win32Window win32Window, bool withGui, Config config)
+    {
+        if (config is null)
+        {
+            config = new();
+            config.SetVSync(PresentInterval.Immediate);
+            config.SetMSAA(MultiSample.x2);
+            config.SetResolutionScale(1);
+
+        }
+        config.GUI = withGui;
+
+        _engineCore = new(new Renderer(win32Window, config), win32Window.Handle);
+        _appWindow = new(win32Window);
+
+        _engineCore.OnGUI += _appWindow.Render;
+
+        _appWindow.Show(ShowWindowCommand.Maximize);
+    }
+}
+
+public sealed partial class Program
+{
+    private void CreateWindow(out Win32Window win32Window)
+    {
+        WNDCLASSEX wndClass = new()
+        {
+            Size = Unsafe.SizeOf<WNDCLASSEX>(),
+            Styles = WindowClassStyles.CS_HREDRAW | WindowClassStyles.CS_VREDRAW | WindowClassStyles.CS_OWNDC,
+            WindowProc = WndProc,
+            InstanceHandle = GetModuleHandle(null),
+            CursorHandle = LoadCursor(IntPtr.Zero, SystemCursor.IDC_ARROW),
+            BackgroundBrushHandle = IntPtr.Zero,
+            IconHandle = IntPtr.Zero,
+            ClassName = "WndClass",
+        };
+
+        RegisterClassEx(ref wndClass);
+
+        win32Window = new(wndClass.ClassName, "3D Engine", 1080, 720);
     }
 
     private IntPtr WndProc(IntPtr hWnd, uint msg, UIntPtr wParam, IntPtr lParam)
