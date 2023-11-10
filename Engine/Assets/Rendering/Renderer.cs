@@ -118,10 +118,6 @@ public sealed partial class Renderer
         // Dispose the existing render target views/ textures and depth stencil view/ texture.
         Data.DisposeTexturesAndViews();
 
-        GetSwapChainBuffersAndCreateRenderTargetViews();
-        CreateMSAATextureAndRenderTargetView();
-        CreateDepthStencilView();
-
         // Resize the swap chain buffers to match the new window size.
         Data.SwapChain.ResizeBuffers(
             Data.SwapChain.Description.BufferCount,
@@ -131,6 +127,10 @@ public sealed partial class Renderer
             Data.SwapChain.Description1.Flags);
         // Update the size of the source in the swap chain.
         Data.SwapChain.SourceSize = Size;
+
+        GetSwapChainBuffersAndCreateRenderTargetViews();
+        CreateMSAATextureAndRenderTargetView();
+        CreateDepthStencilView();
 
         Core.Instance.Frame();
     }
