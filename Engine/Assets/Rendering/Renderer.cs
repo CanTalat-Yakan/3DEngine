@@ -258,6 +258,7 @@ public sealed partial class Renderer
                 else break;
 
             if (adapter is null)
+                // Select the Basic Render Driver adapter, if only it exists.
                 DXGIFactory.EnumAdapters1(0, out adapter);
 
             for (int i = 0; i < s_featureLevels.Length; i++)
