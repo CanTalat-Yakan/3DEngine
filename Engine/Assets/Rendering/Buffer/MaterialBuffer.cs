@@ -16,7 +16,7 @@ public class SerializeEntry
     public string FieldName;
     public object Value;
 
-    // Parameterless constructor needed to Serialize.
+    // Parameterless constructor needed for Serialization.
     public SerializeEntry() { } 
 
     public SerializeEntry(string fieldName, object value)
