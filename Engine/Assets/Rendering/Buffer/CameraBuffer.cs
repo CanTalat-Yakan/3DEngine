@@ -25,7 +25,7 @@ public sealed unsafe class CameraBuffer
 
     public void UpdateConstantBuffer()
     {
-        // Map the constant buffer and copy the camera's view-projection matrix and position into it.
+        // Map the constant buffer and copy the view-projection matrix and position of the camera into it.
         var pointer = _view.Map<ViewConstantBuffer>(0);
         // Copy the data from the constant buffer to the mapped resource.
         Unsafe.Copy(pointer, ref ViewConstantBuffer);

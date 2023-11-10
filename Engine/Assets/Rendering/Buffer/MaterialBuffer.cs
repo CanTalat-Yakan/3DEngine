@@ -79,7 +79,7 @@ public unsafe partial class MaterialBuffer
 
     public void UpdateModelConstantBuffer(PerModelConstantBuffer constantBuffer)
     {
-        // Map the constant buffer and copy the camera's view-projection matrix and position into it.
+        // Map the constant buffer and copy the per-model matrix of the material into it.
         var pointer = _model.Map<PerModelConstantBuffer>(0);
         // Copy the data from the constant buffer to the mapped resource.
         Unsafe.Copy(pointer, ref constantBuffer);
@@ -105,6 +105,7 @@ public unsafe partial class MaterialBuffer
             .MakeGenericMethod(constantBufferType);
         var dynamicPropertiesMemoryLength = (int)sizeOfMethod.Invoke(null, null);
 
+        //Create Properties Constant Buffer.
         MethodInfo createConstantBufferMethod = Renderer.Device.GetType()
             .GetMethod("CreateCommittedResource")
             .MakeGenericMethod(constantBufferType);
@@ -124,7 +125,7 @@ public unsafe partial class MaterialBuffer
 
         Type type = ShaderCompiler.ShaderLibrary.GetShader(ShaderName).ConstantBufferType;
 
-        // Map the constant buffer and copy the view-projection matrix and position of the camera into it.
+        // Map the constant buffer and copy the properties of the material into it.
         MethodInfo mapMethod = typeof(ID3D12Resource)
             .GetMethod("Map")
             .MakeGenericMethod(type);
