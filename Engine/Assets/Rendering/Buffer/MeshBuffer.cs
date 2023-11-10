@@ -34,6 +34,7 @@ public sealed class MeshBuffer
             HeapType.Upload,
             ResourceDescription.Buffer(vertexBufferSize),
             ResourceStates.GenericRead);
+        _vertexBuffer.Name = "VertexBuffer";
 
         _vertexBuffer.SetData(meshInfo.Vertices);
         VertexBufferView = new VertexBufferView(_vertexBuffer.GPUVirtualAddress, vertexBufferSize, vertexStride);
@@ -41,7 +42,6 @@ public sealed class MeshBuffer
 
     private void SetIndexBuffer(MeshInfo meshInfo)
     {
-        bool isInt = true;
         int indexStride = Unsafe.SizeOf<int>();
         int indexBufferSize = meshInfo.Indices.Length * indexStride;
 
@@ -51,9 +51,10 @@ public sealed class MeshBuffer
             HeapType.Upload,
             ResourceDescription.Buffer(indexBufferSize),
             ResourceStates.GenericRead);
+        _indexBuffer.Name = "IndexBuffer";
 
         _indexBuffer.SetData(meshInfo.Indices);
-        IndexBufferView = new(_indexBuffer.GPUVirtualAddress, indexBufferSize, isInt); // ushort == 16 bits.
+        IndexBufferView = new(_indexBuffer.GPUVirtualAddress, indexBufferSize, true); // 32 bit == int, 16 bits == ushort.
     }
 
     public void Dispose()

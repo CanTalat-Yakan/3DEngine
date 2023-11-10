@@ -74,6 +74,7 @@ public unsafe partial class MaterialBuffer
             HeapType.Upload,
             ResourceDescription.Buffer(sizeof(PerModelConstantBuffer)),
             ResourceStates.GenericRead);
+        _model.Name = "PerModel ConstantBuffer";
     }
 
     public void UpdateModelConstantBuffer(PerModelConstantBuffer constantBuffer)
@@ -113,6 +114,7 @@ public unsafe partial class MaterialBuffer
             ResourceDescription.Buffer(dynamicPropertiesMemoryLength),
             ResourceStates.GenericRead
         });
+        _properties.Name = "Properties ConstantBuffer";
     }
 
     public void UpdatePropertiesConstantBuffer()

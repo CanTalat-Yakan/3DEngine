@@ -20,6 +20,7 @@ public sealed unsafe class CameraBuffer
             HeapType.Upload,
             ResourceDescription.Buffer(sizeof(ViewConstantBuffer)),
             ResourceStates.GenericRead);
+        _view.Name = "View ConstantBuffer";
     }
 
     public void UpdateConstantBuffer()
