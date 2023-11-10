@@ -70,11 +70,6 @@ public struct RenderData
         FrameFence?.Dispose();
         FrameFenceEvent?.Dispose();
 
-        DisposeTexturesAndViews();
-    }
-
-    public void DisposeTexturesAndViews()
-    {
         foreach (var bufferRenderTargetTextures in BufferRenderTargetTextures)
             bufferRenderTargetTextures?.Dispose();
         BufferRenderTargetView?.Dispose();
