@@ -42,12 +42,6 @@ public unsafe partial class MaterialBuffer
     internal Renderer Renderer => _renderer ??= Renderer.Instance;
     private Renderer _renderer;
 
-    public void Dispose()
-    {
-        _properties?.Dispose();
-        _model?.Dispose();
-    }
-
     public void SafeToSerializableProperties()
     {
         SerializableProperties.Clear();
@@ -62,6 +56,12 @@ public unsafe partial class MaterialBuffer
             foreach (var fieldInfo in _propertiesConstantBuffer.GetType().GetFields())
                 if (fieldInfo.Name.Equals(serializeEntry.FieldName))
                     serializeEntry.Value = fieldInfo.GetValue(_propertiesConstantBuffer);
+    }
+
+    public void Dispose()
+    {
+        _properties?.Dispose();
+        _model?.Dispose();
     }
 }
 
