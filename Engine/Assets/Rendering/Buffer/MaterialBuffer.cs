@@ -39,7 +39,7 @@ public unsafe partial class MaterialBuffer
     private ID3D12Resource _properties;
     private ID3D12Resource _model;
 
-    internal Renderer Renderer => _renderer is not null ? _renderer : _renderer = Renderer.Instance;
+    internal Renderer Renderer => _renderer ??= Renderer.Instance;
     private Renderer _renderer;
 
     public void Dispose()

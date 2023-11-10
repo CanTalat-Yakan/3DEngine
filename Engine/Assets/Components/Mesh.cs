@@ -24,7 +24,7 @@ public sealed partial class Mesh : EditorComponent
     public Material Material => _material;
     [Show] private Material _material;
 
-    internal Renderer Renderer => _renderer is not null ? _renderer : _renderer = Renderer.Instance;
+    internal Renderer Renderer => _renderer ??= Renderer.Instance;
     private Renderer _renderer;
 
     public override void OnRegister() =>

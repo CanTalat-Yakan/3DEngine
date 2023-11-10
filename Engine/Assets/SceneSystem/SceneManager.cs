@@ -9,7 +9,7 @@ public sealed partial class SceneManager
 
     public SceneManager(Scene scene = null) =>
         // Initializes the main scene and creates a new empty list for the subscenes.
-        MainScene = scene is not null ? scene : new Scene() { Name = "Main", IsEnabled = true, EntityManager = new() };
+        MainScene = scene ?? new Scene() { Name = "Main", IsEnabled = true, EntityManager = new() };
 
     public static Scene AddSubscene(Guid guid = new(), string name = "Subscene", bool enable = true)
     {

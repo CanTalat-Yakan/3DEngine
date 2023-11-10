@@ -34,7 +34,7 @@ public sealed partial class Entity
     public string Tag;
     public string Layer;
 
-    public Scene Scene { get => _scene is not null ? _scene : _scene = SceneManager.GetFromEntityID(ID); set => _scene = null; }
+    public Scene Scene { get => _scene ??= SceneManager.GetFromEntityID(ID); set => _scene = null; }
     private Scene _scene;
 
     public Transform Transform => _transform;
@@ -48,7 +48,6 @@ public sealed partial class Entity
     public Entity() =>
         // Add the Transform component to the Entity when initialized.
         AddComponent(_transform = new());
-
 }
 
 public sealed partial class Entity

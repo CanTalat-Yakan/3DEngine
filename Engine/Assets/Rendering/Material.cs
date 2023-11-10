@@ -22,7 +22,7 @@ public sealed partial class Material
     private ID3D12DescriptorHeap _resourceView;
     private ID3D12DescriptorHeap _samplerState;
 
-    internal Renderer Renderer => _renderer is not null ? _renderer : _renderer = Renderer.Instance;
+    internal Renderer Renderer => _renderer ??= Renderer.Instance;
     private Renderer _renderer;
 
     public Material(string shaderFilePath, string imageFileName = "Default.png")

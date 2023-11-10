@@ -15,7 +15,7 @@ public partial class Component
         EventOnDestroy();
 }
 
-public partial class Component : ICloneable
+public partial class Component
 {
     public virtual void OnRegister() =>
         ScriptSystem.Register(this);

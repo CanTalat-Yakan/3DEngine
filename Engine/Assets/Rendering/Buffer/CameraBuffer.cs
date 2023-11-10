@@ -10,7 +10,7 @@ public sealed unsafe class CameraBuffer
 
     private ID3D12Resource _view;
 
-    internal Renderer Renderer => _renderer is not null ? _renderer : _renderer = Renderer.Instance;
+    internal Renderer Renderer => _renderer ??= Renderer.Instance;
     private Renderer _renderer;
 
     public CameraBuffer()

@@ -42,12 +42,12 @@ public sealed partial class EntityManager
         // Set mesh info to a cube from the resources.
         _materialDefault;
 
-    public Entity GetFromID(Guid id)
+    public Entity GetFromID(Guid guid)
     {
         // Loop through all entities in the EntityList.
         foreach (var entity in EntityList)
             // Check if the ID of the entity matches the given ID.
-            if (entity?.ID == id)
+            if (entity?.ID == guid)
                 // Return the entity if its ID matches the given ID.
                 return entity;
 

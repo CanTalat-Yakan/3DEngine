@@ -20,7 +20,7 @@ public sealed class Camera : EditorComponent
     [Space]
     public byte CameraID = 0;
 
-    internal Renderer Renderer => _renderer is not null ? _renderer : _renderer = Renderer.Instance;
+    internal Renderer Renderer => _renderer ??= Renderer.Instance;
     private Renderer _renderer;
 
     public override void OnRegister() =>

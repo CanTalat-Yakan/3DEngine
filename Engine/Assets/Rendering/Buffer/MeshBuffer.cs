@@ -12,7 +12,7 @@ public sealed class MeshBuffer
     public IndexBufferView IndexBufferView;
     private ID3D12Resource _indexBuffer;
 
-    internal Renderer Renderer => _renderer is not null ? _renderer : _renderer = Renderer.Instance;
+    internal Renderer Renderer => _renderer ??= Renderer.Instance;
     private Renderer _renderer;
 
     public void CreateBuffer(MeshInfo meshInfo)
