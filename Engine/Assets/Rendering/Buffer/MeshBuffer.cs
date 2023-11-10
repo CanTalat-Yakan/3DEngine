@@ -7,9 +7,9 @@ namespace Engine.Rendering;
 public sealed class MeshBuffer
 {
     public VertexBufferView VertexBufferView;
-    private ID3D12Resource _vertexBuffer;
-
     public IndexBufferView IndexBufferView;
+
+    private ID3D12Resource _vertexBuffer;
     private ID3D12Resource _indexBuffer;
 
     internal Renderer Renderer => _renderer ??= Renderer.Instance;
