@@ -146,7 +146,6 @@ public sealed partial class Renderer
     public void Resolve() =>
         // Copy the MSAA render target texture into the back buffer render texture.
         Data.Material.CommandList.ResolveSubresource(Data.BackBufferRenderTargetTexture, 0, Data.MSAARenderTargetTexture, 0, RenderData.RenderTargetFormat);
-    // Use this to Copy: .CopyResource(dstResource, srcResource);
 
     public void Draw(int indexCount, IndexBufferView indexBufferViews, params VertexBufferView[] vertexBufferViews)
     {
