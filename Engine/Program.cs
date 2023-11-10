@@ -72,7 +72,7 @@ public sealed partial class Program
 
 public sealed partial class Program
 {
-    private void CreateWindow(out Win32Window win32Window)
+    private void CreateWindow(out Win32Window win32Window, string title = "3D Engine", int width = 1080, int height = 720)
     {
         WNDCLASSEX wndClass = new()
         {
@@ -88,7 +88,7 @@ public sealed partial class Program
 
         RegisterClassEx(ref wndClass);
 
-        win32Window = new(wndClass.ClassName, "3D Engine", 1080, 720);
+        win32Window = new(wndClass.ClassName, title, width, height);
     }
 
     private IntPtr WndProc(IntPtr hWnd, uint msg, UIntPtr wParam, IntPtr lParam)
