@@ -30,9 +30,9 @@ public interface IMaterialBuffer { }
 
 public unsafe partial class MaterialBuffer
 {
-    public string ShaderName;
+    public List<SerializeEntry> SerializableProperties { get; private set; } = new();
 
-    public List<SerializeEntry> SerializableProperties = new();
+    public string ShaderName;
 
     private object _propertiesConstantBuffer;
 
