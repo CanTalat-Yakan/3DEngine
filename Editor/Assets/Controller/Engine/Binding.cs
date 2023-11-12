@@ -56,10 +56,10 @@ internal sealed partial class Binding
     public static Dictionary<string, BindEntry> MaterialBindings = new();
 
     public static BindingFlags AllBindingFlags =
-        BindingFlags.NonPublic |
-        BindingFlags.Public |
-        BindingFlags.Static |
-        BindingFlags.Instance;
+          BindingFlags.NonPublic
+        | BindingFlags.Public
+        | BindingFlags.Static
+        | BindingFlags.Instance;
 
     public static void Update()
     {
