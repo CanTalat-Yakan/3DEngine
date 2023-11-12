@@ -23,7 +23,7 @@ public sealed partial class Program
     {
         CreateWindow(out var win32Window);
 
-        // Instance Engine and AppWindow, then show Window
+        // Instance Engine and AppWindow, then show Window.
         Initialize(win32Window, withGui, config);
 
         // Create a while loop and break when window requested quit.
@@ -57,7 +57,6 @@ public sealed partial class Program
             config.SetVSync(PresentInterval.Immediate);
             config.SetMSAA(MultiSample.x2);
             config.SetResolutionScale(1);
-
         }
         config.GUI = withGui;
 

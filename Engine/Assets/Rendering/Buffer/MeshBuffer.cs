@@ -54,7 +54,8 @@ public sealed class MeshBuffer
         _indexBuffer.Name = "IndexBuffer";
 
         _indexBuffer.SetData(meshInfo.Indices);
-        IndexBufferView = new(_indexBuffer.GPUVirtualAddress, indexBufferSize, true); // 32 bit == int, 16 bit == ushort.
+        // 32 bit == int, 16 bit == ushort.
+        IndexBufferView = new(_indexBuffer.GPUVirtualAddress, indexBufferSize, is32Bit: true); 
     }
 
     public void Dispose()

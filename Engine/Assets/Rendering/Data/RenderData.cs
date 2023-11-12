@@ -48,15 +48,15 @@ public struct RenderData
 
     public void SetViewport(Size size)
     {
-        Material?.CommandList.RSSetViewport(new Viewport(size.Width, size.Height));
-        Material?.CommandList.RSSetScissorRect(size.Width, size.Height);
+        CommandList.RSSetViewport(new Viewport(size.Width, size.Height));
+        CommandList.RSSetScissorRect(size.Width, size.Height);
     }
 
     public void SetupInputAssembler(IndexBufferView indexBufferView, params VertexBufferView[] vertexBufferViews)
     {
-        Material?.CommandList.IASetVertexBuffers(0, vertexBufferViews);
-        Material?.CommandList.IASetIndexBuffer(indexBufferView);
-        Material?.CommandList.IASetPrimitiveTopology(PrimitiveTopology);
+        CommandList.IASetVertexBuffers(0, vertexBufferViews);
+        CommandList.IASetIndexBuffer(indexBufferView);
+        CommandList.IASetPrimitiveTopology(PrimitiveTopology);
     }
 
     public void Dispose()
