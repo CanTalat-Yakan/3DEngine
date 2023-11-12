@@ -72,7 +72,7 @@ internal sealed partial class Properties
     private void CreateEntityProperties(Entity entity)
     {
         // Add Bindings for the Entity.
-        Binding.SetBindings(entity);
+        Binding.SetEntityBindings(entity);
 
         Grid[] properties = new[]
         {
@@ -187,7 +187,7 @@ internal sealed partial class Properties
     private void CreateMaterialProperties(MaterialEntry materialEntry)
     {
         // Add Bindings for the Material.
-        Binding.SetBindings(materialEntry);
+        Binding.SetMaterialBindings(materialEntry);
 
         s_stackPanel.Children.Add(
             CreateButtonWithAutoSuggestBoxAndShaderCollector(
