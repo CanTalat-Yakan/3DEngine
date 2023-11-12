@@ -255,10 +255,6 @@ public sealed partial class Renderer
                     adapter.Dispose();
                 else break;
 
-            if (adapter is null)
-                // Select the Basic Render Driver adapter, if only it exists.
-                DXGIFactory.EnumAdapters1(0, out adapter);
-
             for (int i = 0; i < s_featureLevels.Length; i++)
                 // Create the D3D12 Device with the current adapter and the highest possible Feature level.
                 if (D3D12.D3D12CreateDevice(adapter, s_featureLevels[i], out d3d12Device).Success)
