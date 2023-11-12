@@ -23,7 +23,7 @@ public sealed class ShaderLibrary
 
 public sealed class ShaderCompiler
 {
-    public static ShaderLibrary ShaderLibrary = new();
+    public static ShaderLibrary Library { get; private set; } = new();
 
     public void CompileProjectShaders(string assetsPath = null)
     {
@@ -44,10 +44,10 @@ public sealed class ShaderCompiler
     {
         FileInfo fileInfo = new(path);
 
-        var shaderEntry = ShaderLibrary.GetShader(fileInfo.Name);
+        var shaderEntry = Library.GetShader(fileInfo.Name);
         if (shaderEntry is null)
         {
-            ShaderLibrary.Shaders.Add(new()
+            Library.Shaders.Add(new()
             {
                 FileInfo = fileInfo,
                 ConstantBufferType = CreateMaterialPropertyBufferStruct(fileInfo.FullName)
@@ -60,7 +60,7 @@ public sealed class ShaderCompiler
             shaderEntry.FileInfo = fileInfo;
             shaderEntry.ConstantBufferType = CreateMaterialPropertyBufferStruct(fileInfo.FullName);
 
-            foreach (var materialEntry in MaterialCompiler.MaterialLibrary.Materials)
+            foreach (var materialEntry in MaterialCompiler.Library.Materials)
                 if (materialEntry.ShaderEntry.FileInfo == fileInfo)
                 {
                     materialEntry.Material.MaterialBuffer.CreatePropertiesConstantBuffer(shaderEntry.ConstantBufferType);

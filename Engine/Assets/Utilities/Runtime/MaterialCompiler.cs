@@ -39,7 +39,7 @@ public sealed class MaterialLibrary
 
 public class MaterialCompiler
 {
-    public static MaterialLibrary MaterialLibrary = new();
+    public static MaterialLibrary Library { get; private set; } = new();
 
     public void CompileProjectMaterials(string assetsPath = null)
     {
@@ -58,7 +58,7 @@ public class MaterialCompiler
     {
         FileInfo fileInfo = new(path);
 
-        var materialEntry = MaterialLibrary.GetMaterial(fileInfo.Name);
+        var materialEntry = Library.GetMaterial(fileInfo.Name);
         if (materialEntry is null)
         {
             var materialBuffer = (MaterialBuffer)Serialization.LoadXml(typeof(MaterialBuffer), path);
@@ -71,7 +71,7 @@ public class MaterialCompiler
 
             materialBuffer.PasteToPropertiesConstantBuffer();
 
-            MaterialLibrary.Materials.Add(materialEntry);
+            Library.Materials.Add(materialEntry);
 
             Output.Log("Read new Material");
         }
@@ -92,7 +92,7 @@ public class MaterialCompiler
 
     public static void SetMaterialBuffer(MaterialEntry materialEntry, MaterialBuffer materialBuffer)
     {
-        var shaderEntry = ShaderCompiler.ShaderLibrary.GetShader(materialBuffer.ShaderName);
+        var shaderEntry = ShaderCompiler.Library.GetShader(materialBuffer.ShaderName);
 
         materialEntry.ShaderEntry = shaderEntry;
         materialEntry.Material = new(shaderEntry.FileInfo.FullName);

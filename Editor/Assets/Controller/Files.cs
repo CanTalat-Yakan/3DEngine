@@ -56,7 +56,7 @@ internal sealed partial class Files
 
         // Assign the ProjectPath value from static property in "Home".
         AssetsPath = Path.Combine(Home.ProjectPath, "Assets");
-        TemplatesPath = Engine.Paths.TEMPLATES;
+        TemplatesPath = Engine.Editor.Paths.TEMPLATES;
 
         // Call the method to initialize and populate the files categories with a DataTemplate.
         PopulateFilesCategories();
@@ -525,7 +525,7 @@ internal sealed partial class Files
         var fileInfo = new FileInfo(path);
         if (fileInfo.Extension == ".mat")
             button.Tapped += (s, e) => Properties.Set(
-                Engine.Runtime.MaterialCompiler.MaterialLibrary.GetMaterial(fileInfo.Name));
+                Engine.Runtime.MaterialCompiler.Library.GetMaterial(fileInfo.Name));
         else
             button.Tapped += (s, e) => Properties.Set(path);
 

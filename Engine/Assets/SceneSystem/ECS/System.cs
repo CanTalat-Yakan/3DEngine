@@ -79,28 +79,20 @@ public partial class System<T> where T : Component
         }
     }
 
-    public static void Sort() =>
-        // Sort components based on the Order value.
-        s_components = s_components.OrderBy(Component => Component.Order).ToList();
-
     internal static void CopyToArray() =>
         s_componentsArray = s_components.ToArray();
 
-    internal static void SortAndCopyToArray()
-    {
-        Sort();
-        CopyToArray();
-    }
+    internal static void SortAndCopyToArray() =>
+        s_componentsArray = s_components.OrderBy(Component => Component.Order).ToArray();
 
     internal static void SortAndCopyToArrayIfDirty()
     {
-        if (!s_dirty)
-            return;
+        if (s_dirty)
+        {
+            SortAndCopyToArray();
 
-        Sort();
-        CopyToArray();
-
-        s_dirty = false;
+            s_dirty = false;
+        }
     }
 
     private static bool CheckActive(T component) =>

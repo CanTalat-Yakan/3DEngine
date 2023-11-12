@@ -123,7 +123,7 @@ public unsafe partial class MaterialBuffer
         if (_properties is null)
             return;
 
-        Type type = ShaderCompiler.ShaderLibrary.GetShader(ShaderName).ConstantBufferType;
+        Type type = ShaderCompiler.Library.GetShader(ShaderName).ConstantBufferType;
 
         // Map the constant buffer and copy the properties of the material into it.
         MethodInfo mapMethod = typeof(ID3D12Resource)

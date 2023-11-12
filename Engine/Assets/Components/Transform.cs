@@ -32,6 +32,7 @@ public sealed partial class Transform : EditorComponent, IHide
 
     public Matrix4x4 WorldMatrix => _worldMatrix;
     private Matrix4x4 _worldMatrix = Matrix4x4.Identity;
+    private Matrix4x4 _previousWorldMatrix = Matrix4x4.Identity;
 
     private PerModelConstantBuffer _modelConstantBuffer;
 
@@ -47,12 +48,12 @@ public sealed partial class Transform : EditorComponent, IHide
         // Calculate the forward, right and up direction.
         CalculateOrientation();
 
-        var previousWorldMatrix = WorldMatrix;
+        _previousWorldMatrix = WorldMatrix;
 
         // Calculate the world matrix as a result of the local position, rotation and scale.
         CalculateWorldMatrix();
 
-        if (!WorldMatrix.Equals(previousWorldMatrix))
+        if (!WorldMatrix.Equals(_previousWorldMatrix))
             TransformChanged = true;
     }
 
@@ -77,18 +78,6 @@ public sealed partial class Transform : EditorComponent, IHide
         return _modelConstantBuffer;
     }
 
-    private void CalculateOrientation()
-    {
-        // Calculate the forward direction based on the EulerAngles.
-        LocalForward = GetLookAt(EulerAngles, LocalForward);
-
-        // Calculate the right direction as a product of the forward and global up direction.
-        LocalRight = Vector3.Normalize(Vector3.Cross(LocalForward, Vector3.UnitY));
-
-        // Calculate the local up direction as a product of the right and forward direction.
-        LocalUp = Vector3.Normalize(Vector3.Cross(LocalRight, LocalForward));
-    }
-
     private void CalculateWorldMatrix()
     {
         // Get the translation matrix based on the local position.
@@ -105,11 +94,20 @@ public sealed partial class Transform : EditorComponent, IHide
         if (Parent is not null)
             _worldMatrix *= Parent.WorldMatrix;
     }
-}
 
-public sealed partial class Transform : EditorComponent, IHide
-{
-    private Vector3 GetLookAt(Vector3 eulerAngles, Vector3 input)
+    private void CalculateOrientation()
+    {
+        // Calculate the forward direction based on the EulerAngles.
+        LocalForward = CalculateForward(EulerAngles, LocalForward);
+
+        // Calculate the right direction as a product of the forward and global up direction.
+        LocalRight = Vector3.Normalize(Vector3.Cross(LocalForward, Vector3.UnitY));
+
+        // Calculate the local up direction as a product of the right and forward direction.
+        LocalUp = Vector3.Normalize(Vector3.Cross(LocalRight, LocalForward));
+    }
+
+    private Vector3 CalculateForward(Vector3 eulerAngles, Vector3 input)
     {
         float sinX = MathF.Sin(eulerAngles.X.ToRadians());
         float cosX = MathF.Cos(eulerAngles.X.ToRadians());
@@ -117,11 +115,14 @@ public sealed partial class Transform : EditorComponent, IHide
         float cosY = MathF.Cos(eulerAngles.Y.ToRadians());
 
         return Vector3.Normalize(input.SetVector(
-            sinY * cosX, 
-            -sinX, 
+            sinY * cosX,
+            -sinX,
             cosY * cosX));
     }
+}
 
+public sealed partial class Transform : EditorComponent, IHide
+{
     private Vector3 TransformVector3(Vector3 local, Vector3? parent)
     {
         if (Parent is null)

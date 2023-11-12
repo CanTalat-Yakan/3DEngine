@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Engine.Runtime;
 
-internal sealed class ScriptEntry
+public sealed class ScriptEntry
 {
     public FileInfo FileInfo;
     public Script<object> Script;
@@ -27,7 +27,7 @@ public sealed class ComponentLibrary
 
 public sealed class ScriptCompiler
 {
-    public static ComponentLibrary ComponentLibrary = new();
+    public static ComponentLibrary Library { get; private set; } = new();
 
     private Dictionary<string, ScriptEntry> _scriptsCollection = new();
 
@@ -175,8 +175,8 @@ public sealed class ScriptCompiler
                 && !t.IsInterface))
             .ToArray();
 
-        ComponentLibrary.Components.Clear();
-        ComponentLibrary.Components.AddRange(componentCollection);
+        Library.Components.Clear();
+        Library.Components.AddRange(componentCollection);
     }
 
     private void DestroyComponentTypeReferences(Assembly assembly)

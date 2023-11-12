@@ -127,7 +127,7 @@ public sealed partial class Mesh : EditorComponent
 
     public MaterialEntry SetMaterial(string materialName)
     {
-        var MaterialEntry = MaterialCompiler.MaterialLibrary.GetMaterial(materialName);
+        var MaterialEntry = MaterialCompiler.Library.GetMaterial(materialName);
 
         SetMaterial(MaterialEntry.Material);
 
