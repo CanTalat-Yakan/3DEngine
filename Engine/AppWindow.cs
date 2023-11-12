@@ -49,7 +49,7 @@ class AppWindow
         if (ImGui.Begin("Output", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize))
         {
             if (Output.GetLogs.Count > 0)
-                _output = Output.DequeueLog()?.GetString() + _output;
+                _output = Output.DequeueLogs() + _output;
             ImGui.Text(_output);
             ImGui.End();
         }

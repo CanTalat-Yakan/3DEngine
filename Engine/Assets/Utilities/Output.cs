@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace Engine.Utilities;
 
@@ -11,19 +12,19 @@ public enum MessageType
 }
 
 public record MessageLog(
-    object o, 
-    MessageType type, 
-    int line, 
-    string method, 
+    object o,
+    MessageType type,
+    int line,
+    string method,
     string script)
 {
     public string GetString() =>
-        $"{type}: {o}\n{script.SplitLast('\\')}({method}:{line})\n\n"  ;
+        $"{type}: {o}\n{script.SplitLast('\\')}({method}:{line})\n\n";
 }
 
 public class Output
 {
-    public static Queue<MessageLog> GetLogs  => _logs;
+    public static Queue<MessageLog> GetLogs => _logs;
     private static Queue<MessageLog> _logs = new();
 
     public static void Log(object o, MessageType type = MessageType.Message, [CallerLineNumber] int line = 0, [CallerMemberName] string method = null, [CallerFilePath] string script = null) =>
@@ -31,9 +32,21 @@ public class Output
 
     public static MessageLog DequeueLog()
     {
-        if( _logs.Count > 0 )
-            return _logs.Dequeue();
-        else 
+        if (_logs.Count == 0)
             return null;
+
+        return _logs.Dequeue();
+    }
+
+    public static string DequeueLogs()
+    {
+        if (_logs.Count == 0)
+            return null;
+
+        StringBuilder stringBuilder = new();
+        while (_logs.Count > 0)
+            stringBuilder.Append(_logs.Dequeue());
+
+        return stringBuilder.ToString();
     }
 }
