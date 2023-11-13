@@ -106,15 +106,10 @@ public unsafe partial class MaterialBuffer
         var dynamicPropertiesMemoryLength = (int)sizeOfMethod.Invoke(null, null);
 
         //Create Properties Constant Buffer.
-        MethodInfo createConstantBufferMethod = Renderer.Device.GetType()
-            .GetMethod("CreateCommittedResource")
-            .MakeGenericMethod(constantBufferType);
-        _properties = (ID3D12Resource)createConstantBufferMethod.Invoke(Renderer.Device, new object[]
-        {
+        _properties = Renderer.Device.CreateCommittedResource(
             HeapType.Upload,
             ResourceDescription.Buffer(dynamicPropertiesMemoryLength),
-            ResourceStates.GenericRead
-        });
+            ResourceStates.GenericRead);
         _properties.Name = "Properties ConstantBuffer";
     }
 
