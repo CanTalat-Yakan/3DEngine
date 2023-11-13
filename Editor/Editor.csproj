@@ -31,9 +31,6 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm64'">
 		<DefineConstants>$(DefineConstants);EDITOR;TRACE;DEBUG;NET;NET7_0</DefineConstants>
 	</PropertyGroup>
-	<ItemGroup>
-	  <Content Remove="Assets\Controller\Helper\DataTemplate\ColorButton.cs" />
-	</ItemGroup>
 	
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
@@ -42,10 +39,6 @@
 		<PackageReference Include="Vortice.WinUI" Version="3.3.4" />
 		<PackageReference Include="WinUIEx" Version="2.3.2" />
 		<Manifest Include="$(ApplicationManifest)" />
-	</ItemGroup>
-	
-	<ItemGroup>
-	  <None Include="..\.editorconfig" Link=".editorconfig" />
 	</ItemGroup>
 
 	<ItemGroup>
