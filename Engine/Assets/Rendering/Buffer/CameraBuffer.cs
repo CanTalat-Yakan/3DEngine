@@ -35,7 +35,7 @@ public sealed unsafe class CameraBuffer
 
     public void Setup()
     {
-        //Renderer.Data.CommandList.ResourceBarrierTransition(_view, ResourceStates.VertexAndConstantBuffer, ResourceStates.Common);
+        //Renderer.Data.CommandList.ResourceBarrierTransition(_view, ResourceStates.GenericRead, ResourceStates.Common);
 
         // Set the constant buffer in the vertex shader stage of the device context.
         Renderer.Data.CommandList.SetGraphicsRootConstantBufferView(0, _view.GPUVirtualAddress);
