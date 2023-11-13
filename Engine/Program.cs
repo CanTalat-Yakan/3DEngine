@@ -21,7 +21,6 @@ public sealed partial class Program
 
     public void Run(bool withGui = true, Config config = null)
     {
-        // Unhandled Exception will be processeded here.
         UnhandledExceptionHandler();
 
         CreateWindow(out var win32Window);
