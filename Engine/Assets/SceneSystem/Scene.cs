@@ -1,4 +1,7 @@
-﻿namespace Engine.SceneSystem;
+﻿using USD.NET;
+using pxr;
+
+namespace Engine.SceneSystem;
 
 public sealed class Scene : ICloneable
 {
