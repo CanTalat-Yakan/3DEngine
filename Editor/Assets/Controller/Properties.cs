@@ -1,6 +1,4 @@
-﻿using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -8,6 +6,9 @@ using System.Numerics;
 using System.Reflection;
 using System;
 using Windows.Foundation;
+
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
 
 using Engine.ECS;
 using Engine.Editor;
@@ -17,7 +18,6 @@ using Engine.Runtime;
 using static Editor.Controller.Helper;
 
 using Path = System.IO.Path;
-//using Texture = Vortice.Direct3D11.ID3D11Texture2D;
 
 namespace Editor.Controller;
 

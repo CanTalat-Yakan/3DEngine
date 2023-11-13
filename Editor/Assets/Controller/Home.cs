@@ -1,13 +1,14 @@
-﻿using CommunityToolkit.WinUI.UI.Controls;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO.Compression;
 using System.IO;
 using System.Text.RegularExpressions;
 using System;
 using Windows.ApplicationModel.DataTransfer;
+
+using CommunityToolkit.WinUI.UI.Controls;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml;
 
 namespace Editor.Controller;
 

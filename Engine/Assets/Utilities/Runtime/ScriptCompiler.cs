@@ -67,11 +67,11 @@ public sealed class ScriptCompiler
 
         if (!_scriptsCollection.TryGetValue(fileInfo.FullName, out var scriptEntry))
         {
-            FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read);
-            StreamReader reader = new StreamReader(fs);
+            using FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
+            using StreamReader streamReader = new StreamReader(fileStream);
 
             scriptEntry = new ScriptEntry() { FileInfo = fileInfo };
-            string code = reader.ReadToEnd();
+            string code = streamReader.ReadToEnd();
             scriptEntry.Script = CreateScript(code);
             _scriptsCollection.Add(fileInfo.FullName, scriptEntry);
 
@@ -134,7 +134,6 @@ public sealed class ScriptCompiler
     private void LogCompilationErrors(EmitResult result, ScriptEntry scriptEntry)
     {
         foreach (var error in result.Diagnostics)
-        {
             Output.Log(
                 string.Join("\r\n", error),
                 error.WarningLevel == 0
@@ -143,7 +142,6 @@ public sealed class ScriptCompiler
                 error.Location.GetLineSpan().StartLinePosition.Line,
                 null,
                 scriptEntry?.FileInfo.Name);
-        }
     }
 
     private void RemoveObsoleteScripts()
@@ -166,13 +164,13 @@ public sealed class ScriptCompiler
     {
         var componentCollection = _allAssemblies
             .Except(_ignoreAssemblies)
-            .SelectMany(a => a.GetTypes())
-            .Where(t =>
-                (typeof(Component).IsAssignableFrom(t) || typeof(EditorComponent).IsAssignableFrom(t)) 
-                && !t.Equals(typeof(Component)) 
-                && !t.Equals(typeof(EditorComponent))
-                && !(typeof(IHide).IsAssignableFrom(t) 
-                && !t.IsInterface))
+            .SelectMany(Assembly => Assembly.GetTypes())
+            .Where(Type =>
+                (typeof(Component).IsAssignableFrom(Type) || typeof(EditorComponent).IsAssignableFrom(Type)) 
+                && !Type.Equals(typeof(Component)) 
+                && !Type.Equals(typeof(EditorComponent))
+                && !(typeof(IHide).IsAssignableFrom(Type) 
+                && !Type.IsInterface))
             .ToArray();
 
         Library.Components.Clear();

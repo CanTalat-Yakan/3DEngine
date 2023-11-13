@@ -1,8 +1,9 @@
-﻿using Microsoft.UI.Xaml;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System;
+
+using Microsoft.UI.Xaml;
 
 using Editor.Controller;
 

@@ -1,8 +1,9 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using System;
+using WinRT.Interop;
+
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 using SharpGen.Runtime;
-using System;
-using WinRT.Interop;
 
 using Engine.Data;
 using Engine.Editor;

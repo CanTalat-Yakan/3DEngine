@@ -1,7 +1,8 @@
-﻿using Microsoft.UI.Xaml;
+﻿using System.Numerics;
+
 using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml.Controls;
-using System.Numerics;
+using Microsoft.UI.Xaml;
 
 using ColorPicker = CommunityToolkit.WinUI.UI.Controls.ColorPicker;
 

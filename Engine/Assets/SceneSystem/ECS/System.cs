@@ -69,7 +69,7 @@ public partial class System<T> where T : Component
     {
         // Remove all components of the specified type from the collection of registered components.
         foreach (var component in s_components
-            .Where(c => c.GetType() == oldComponentType)
+            .Where(Component => Component.GetType() == oldComponentType)
             .ToArray())
         {
             Destroy(component);
@@ -83,7 +83,9 @@ public partial class System<T> where T : Component
         s_componentsArray = s_components.ToArray();
 
     internal static void SortAndCopyToArray() =>
-        s_componentsArray = s_components.OrderBy(Component => Component.Order).ToArray();
+        s_componentsArray = s_components
+        .OrderBy(Component => Component.Order)
+        .ToArray();
 
     internal static void SortAndCopyToArrayIfDirty()
     {
@@ -97,10 +99,10 @@ public partial class System<T> where T : Component
 
     private static bool CheckActive(T component) =>
         // Check if the component is active.
-        component.IsEnabled &&
-        component.Entity.IsEnabled &&
-        component.Entity.Scene.IsEnabled &&
-        component.Entity.ActiveInHierarchy;
+           component.IsEnabled
+        && component.Entity.IsEnabled
+        && component.Entity.Scene.IsEnabled
+        && component.Entity.ActiveInHierarchy;
 }
 
 public partial class System<T> where T : Component
