@@ -21,7 +21,7 @@ public enum Layers
     UI
 }
 
-public sealed partial class Entity
+public sealed partial class Entity : IDisposable
 {
     public Guid ID = Guid.NewGuid();
 
@@ -48,6 +48,15 @@ public sealed partial class Entity
     public Entity() =>
         // Add the Transform component to the Entity when initialized.
         AddComponent(_transform = new());
+
+    public void Dispose()
+    {
+        // Disable the entity.
+        IsEnabled = false;
+
+        // Remove all components from the entity.
+        RemoveComponents();
+    }
 }
 
 public sealed partial class Entity
@@ -161,7 +170,7 @@ public sealed partial class Entity
     }
 }
 
-public sealed partial class Entity : ICloneable, IDisposable
+public sealed partial class Entity : ICloneable
 {
     object ICloneable.Clone() =>
         Clone();
@@ -199,13 +208,5 @@ public sealed partial class Entity : ICloneable, IDisposable
 
         // Return the new Entity object.
         return newEntity;
-    }
-
-    public void Dispose()
-    {
-        // Disable the entity.
-        IsEnabled = false;
-        // Remove all components from the entity.
-        RemoveComponents();
     }
 }
