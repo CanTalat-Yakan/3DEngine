@@ -80,11 +80,10 @@ public sealed partial class Program
 
         ExceptionHandler.CreateTraceLog(rootPath, logFilePath);
 
-        AppDomain.CurrentDomain.UnhandledException += (object s, UnhandledExceptionEventArgs e) =>
+        AppDomain.CurrentDomain.UnhandledException += (s, e) =>
         {
             // This method will be called when an unhandled exception occurs.
-            Exception exception = e.ExceptionObject as Exception;
-
+            var exception = e.ExceptionObject as Exception;
             if (exception is not null)
                 ExceptionHandler.HandleException(exception);
         };
