@@ -21,6 +21,9 @@ public sealed partial class Program
 
     public void Run(bool withGui = true, Config config = null)
     {
+        // Unhandled Exception will be processeded here.
+        UnhandledExceptionHandler();
+
         CreateWindow(out var win32Window);
 
         // Instance Engine and AppWindow, then show Window.
@@ -71,6 +74,23 @@ public sealed partial class Program
 
 public sealed partial class Program
 {
+    private static void UnhandledExceptionHandler()
+    {
+        var rootPath = Paths.DIRECTORY;
+        var logFilePath = rootPath + "Application.log";
+
+        ExceptionHandler.CreateTraceLog(rootPath, logFilePath);
+
+        AppDomain.CurrentDomain.UnhandledException += (object s, UnhandledExceptionEventArgs e) =>
+        {
+            // This method will be called when an unhandled exception occurs.
+            Exception exception = e.ExceptionObject as Exception;
+
+            if (exception is not null)
+                ExceptionHandler.HandleException(exception);
+        };
+    }
+
     private void CreateWindow(out Win32Window win32Window, string title = "3D Engine", int width = 1080, int height = 720)
     {
         WNDCLASSEX wndClass = new()

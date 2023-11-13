@@ -27,7 +27,7 @@ class AppWindow
     }
 
     public void Show(ShowWindowCommand command = ShowWindowCommand.Normal) =>
-        User32.ShowWindow(_win32Window.Handle, command);
+            User32.ShowWindow(_win32Window.Handle, command);
 
     public void Render()
     {
