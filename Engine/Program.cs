@@ -21,7 +21,7 @@ public sealed partial class Program
 
     public void Run(bool withGui = true, Config config = null)
     {
-        ExceptionHandler();
+        HandleException();
 
         CreateWindow(out var win32Window);
 
@@ -70,19 +70,19 @@ public sealed partial class Program
 
 public sealed partial class Program
 {
-    private static void ExceptionHandler()
+    private static void HandleException()
     {
         var rootPath = Paths.DIRECTORY;
         var logFilePath = rootPath + "Application.log";
 
-        Helper.ExceptionHandler.CreateTraceLog(rootPath, logFilePath);
+        ExceptionHandler.CreateTraceLog(rootPath, logFilePath);
 
         AppDomain.CurrentDomain.UnhandledException += (s, e) =>
         {
             // This method will be called when an unhandled exception occurs.
             var exception = e.ExceptionObject as Exception;
             if (exception is not null)
-                Helper.ExceptionHandler.HandleException(exception);
+                ExceptionHandler.HandleException(exception);
         };
     }
 
