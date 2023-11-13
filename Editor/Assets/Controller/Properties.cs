@@ -429,8 +429,8 @@ internal sealed partial class Properties
                         CreateSliderInt(
                             entity.ID, component, fieldInfo.Name,
                             (byte)value,
-                            (byte)attributes.OfType<SliderAttribute>().First().CustomMin,
-                            (byte)attributes.OfType<SliderAttribute>().First().CustomMax));
+                            (byte)attributes.OfType<SliderAttribute>().First().Min,
+                            (byte)attributes.OfType<SliderAttribute>().First().Max));
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
                     grid.Add(CreateNumberInputInt(
@@ -447,8 +447,8 @@ internal sealed partial class Properties
                         CreateSliderInt(
                             entity.ID, component, fieldInfo.Name,
                             (int)value,
-                            (int)attributes.OfType<SliderAttribute>().First().CustomMin,
-                            (int)attributes.OfType<SliderAttribute>().First().CustomMax));
+                            (int)attributes.OfType<SliderAttribute>().First().Min,
+                            (int)attributes.OfType<SliderAttribute>().First().Max));
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
                     grid.Add(CreateNumberInputInt(
@@ -463,8 +463,8 @@ internal sealed partial class Properties
                         CreateSlider(
                             entity.ID, component, fieldInfo.Name,
                             (float)value,
-                            (float)attributes.OfType<SliderAttribute>().First().CustomMin,
-                            (float)attributes.OfType<SliderAttribute>().First().CustomMax));
+                            (float)attributes.OfType<SliderAttribute>().First().Min,
+                            (float)attributes.OfType<SliderAttribute>().First().Max));
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
                     grid.Add(CreateNumberInput(
@@ -619,8 +619,8 @@ internal sealed partial class Properties
                         CreateSliderInt(null,
                             propertiesConstantBuffer, fieldInfo.Name,
                             (int)value,
-                            (int)attributes.OfType<SliderAttribute>().First().CustomMin,
-                            (int)attributes.OfType<SliderAttribute>().First().CustomMax));
+                            (int)attributes.OfType<SliderAttribute>().First().Min,
+                            (int)attributes.OfType<SliderAttribute>().First().Max));
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
                     grid.Add(CreateNumberInputInt(null,
@@ -635,8 +635,8 @@ internal sealed partial class Properties
                         CreateSlider(null,
                             propertiesConstantBuffer, fieldInfo.Name,
                             (float)value,
-                            (float)attributes.OfType<SliderAttribute>().First().CustomMin,
-                            (float)attributes.OfType<SliderAttribute>().First().CustomMax));
+                            (float)attributes.OfType<SliderAttribute>().First().Min,
+                            (float)attributes.OfType<SliderAttribute>().First().Max));
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
                     grid.Add(CreateNumberInput(null,
@@ -731,7 +731,7 @@ internal sealed partial class Properties
             // HeaderAttribute
             if (attribute.GetType().Equals(typeof(HeaderAttribute)))
                 // Create a header with the custom header value and add it to the grid
-                grid.Add(CreateHeader((string)((HeaderAttribute)attribute).CustomHeader));
+                grid.Add(CreateHeader((string)((HeaderAttribute)attribute).Header));
 
             // SpacerAttribute
             if (attribute.GetType().Equals(typeof(SpaceAttribute)))
