@@ -21,7 +21,7 @@ public sealed partial class Program
 
     public void Run(bool withGui = true, Config config = null)
     {
-        UnhandledExceptionHandler();
+        ExceptionHandler();
 
         CreateWindow(out var win32Window);
 
@@ -29,8 +29,7 @@ public sealed partial class Program
         Initialize(win32Window, withGui, config);
 
         // Create a while loop and break when window requested quit.
-        bool quitRequested = false;
-        while (!quitRequested)
+        while (true)
         {
             if (PeekMessage(out var msg, IntPtr.Zero, 0, 0, 1))
             {
@@ -39,8 +38,6 @@ public sealed partial class Program
 
                 if (msg.Value == (uint)WindowMessage.Quit)
                 {
-                    quitRequested = true;
-
                     Core.Instance?.Dispose();
 
                     break;
@@ -73,19 +70,19 @@ public sealed partial class Program
 
 public sealed partial class Program
 {
-    private static void UnhandledExceptionHandler()
+    private static void ExceptionHandler()
     {
         var rootPath = Paths.DIRECTORY;
         var logFilePath = rootPath + "Application.log";
 
-        ExceptionHandler.CreateTraceLog(rootPath, logFilePath);
+        Helper.ExceptionHandler.CreateTraceLog(rootPath, logFilePath);
 
         AppDomain.CurrentDomain.UnhandledException += (s, e) =>
         {
             // This method will be called when an unhandled exception occurs.
             var exception = e.ExceptionObject as Exception;
             if (exception is not null)
-                ExceptionHandler.HandleException(exception);
+                Helper.ExceptionHandler.HandleException(exception);
         };
     }
 
