@@ -292,6 +292,31 @@ public sealed partial class Renderer
             Data.CommandAllocator,
             null);
         Data.CommandList.Name = "CommandList";
+
+        CreateRootSignature(out var rootSignature);
+        Data.CommandList.SetGraphicsRootSignature(rootSignature);
+    }
+
+    private void CreateRootSignature(out ID3D12RootSignature rootSignature)
+    {
+        // Create a root signature
+        RootSignatureFlags rootSignatureFlags =
+              RootSignatureFlags.AllowInputAssemblerInputLayout
+            | RootSignatureFlags.ConstantBufferViewShaderResourceViewUnorderedAccessViewHeapDirectlyIndexed;
+
+        RootSignatureDescription1 rootSignatureDescription = new(rootSignatureFlags);
+
+        RootParameter1 constantbuffer = new(
+            new RootDescriptorTable1(new DescriptorRange1(
+                DescriptorRangeType.ConstantBufferView, 1, 0, 0, 0)),
+            ShaderVisibility.All);
+
+        // Define the root parameters
+        RootParameter1[] rootParameters = new[] { constantbuffer };
+        rootSignatureDescription.Parameters = rootParameters;
+
+        rootSignature = Device.CreateRootSignature(rootSignatureDescription);
+        rootSignature.Name = "Root Signature";
     }
 
     private void CreateGraphicsQueue()

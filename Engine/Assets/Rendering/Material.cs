@@ -180,7 +180,7 @@ public sealed partial class Material
 
         RootParameter1 constantbuffer = new(
             new RootDescriptorTable1(new DescriptorRange1(
-                DescriptorRangeType.ConstantBufferView, 3, 0, 0, 0)),
+                DescriptorRangeType.ConstantBufferView, 2, 0, 0, 0)),
             ShaderVisibility.All);
 
         // Define the root parameters
