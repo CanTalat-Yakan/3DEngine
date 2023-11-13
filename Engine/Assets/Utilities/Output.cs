@@ -19,7 +19,11 @@ public record MessageLog(
     string script)
 {
     public string GetString() =>
-        $"{type}: {o}\n{script.SplitLast('\\')}({method}:{line})\n\n";
+        $"""
+        {type}: {o}
+        {script.SplitLast('\\')}({method}:{line})
+
+        """;
 }
 
 public class Output
