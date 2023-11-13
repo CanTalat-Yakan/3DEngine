@@ -23,7 +23,7 @@ public sealed class MaterialEntry(FileInfo fileInfo)
         Material.MaterialBuffer?.Dispose();
 
         MaterialCompiler.SetMaterialBuffer(this, new MaterialBuffer() { ShaderName = shaderEntry.FileInfo.Name.RemoveExtension() });
-        Serialization.SaveXml(Material.MaterialBuffer, FileInfo.FullName);
+        Serialization.SaveFile(Material.MaterialBuffer, FileInfo.FullName);
     }
 }
 
@@ -61,7 +61,7 @@ public class MaterialCompiler
         var materialEntry = Library.GetMaterial(fileInfo.Name);
         if (materialEntry is null)
         {
-            var materialBuffer = (MaterialBuffer)Serialization.LoadXml(typeof(MaterialBuffer), path);
+            var materialBuffer = Serialization.LoadFile<MaterialBuffer>(path);
 
             if (string.IsNullOrEmpty(materialBuffer.ShaderName))
                 return;
@@ -79,7 +79,7 @@ public class MaterialCompiler
         {
             materialEntry.FileInfo = fileInfo;
 
-            var materialBuffer = (MaterialBuffer)Serialization.LoadXml(typeof(MaterialBuffer), path);
+            var materialBuffer = Serialization.LoadFile<MaterialBuffer>(path);
 
             SetMaterialBuffer(materialEntry, materialBuffer);
 

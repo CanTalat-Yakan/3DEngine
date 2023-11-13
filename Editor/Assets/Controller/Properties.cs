@@ -682,7 +682,7 @@ internal sealed partial class Properties
         {
             materialEntry.Material.MaterialBuffer.SafeToSerializableProperties();
 
-            Engine.Helper.Serialization.SaveXml(materialEntry.Material.MaterialBuffer, materialEntry.FileInfo.FullName);
+            Engine.Helper.Serialization.SaveFile(materialEntry.Material.MaterialBuffer, materialEntry.FileInfo.FullName);
 
             materialEntry.Material.MaterialBuffer.UpdatePropertiesConstantBuffer();
         });
