@@ -21,7 +21,7 @@ public sealed partial class Program
 
     public void Run(bool withGui = true, Config config = null)
     {
-        HandleException();
+        HandleExceptions();
 
         CreateWindow(out var win32Window);
 
@@ -70,7 +70,7 @@ public sealed partial class Program
 
 public sealed partial class Program
 {
-    private static void HandleException()
+    private static void HandleExceptions()
     {
         var rootPath = Paths.DIRECTORY;
         var logFilePath = rootPath + "Application.log";
