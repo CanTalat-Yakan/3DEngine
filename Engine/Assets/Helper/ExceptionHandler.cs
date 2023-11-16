@@ -47,10 +47,10 @@ public class ExceptionHandler
 
         StringBuilder stringBuilder = new();
 
-        stringBuilder.Append($"[{DateTime.Now}]");
+        stringBuilder.Append($"[{DateTime.Now}] [ERR] ");
         if (fileName is not null)
             stringBuilder.Append($"{fileName}:{lineNumber} ({methodName})");
-        stringBuilder.Append(exception + "\n");
+        stringBuilder.AppendLine("\n" + exception);
 
         string OutputMessage = stringBuilder.ToString();
 

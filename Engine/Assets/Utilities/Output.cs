@@ -19,11 +19,26 @@ public record MessageLog(
     string script)
 {
     public string GetString() =>
-        $"""
-        {type}: {o}
-        {script.SplitLast('\\')}({method}:{line})
+        GetDateTime() + GetMessageType() + GetOrigin() + "\n" + GetLog();
 
-        """;
+    public string GetDateTime() =>
+        $"[{DateTime.Now}] ";
+
+    public string GetMessageType() =>
+        type switch
+        {
+            MessageType.Message => "[MSG] ",
+            MessageType.Warning => "[WRN] ",
+            MessageType.Error => "[ERR] ",
+            _ => String.Empty
+        };
+
+    public string GetOrigin() =>
+        $"{script.SplitLast('\\')}({method}:{line})";
+
+    public string GetLog() =>
+      $"{GetDateTime()} [{type}]: {o}";
+
 }
 
 public class Output
@@ -31,8 +46,15 @@ public class Output
     public static Queue<MessageLog> GetLogs => _logs;
     private static Queue<MessageLog> _logs = new();
 
-    public static void Log(object o, MessageType type = MessageType.Message, [CallerLineNumber] int line = 0, [CallerMemberName] string method = null, [CallerFilePath] string script = null) =>
-        _logs.Enqueue(new(o, type, line, method, script));
+    public static MessageLog Log(object o, MessageType type = MessageType.Message, [CallerLineNumber] int line = 0, [CallerMemberName] string method = null, [CallerFilePath] string script = null)
+    {
+        MessageLog log = new(o, type, line, method, script);
+        Console.WriteLine(log.GetLog());
+
+        _logs.Enqueue(log);
+
+        return log;
+    }
 
     public static MessageLog DequeueLog()
     {
