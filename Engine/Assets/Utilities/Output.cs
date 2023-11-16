@@ -45,7 +45,7 @@ public class Output
     public static Queue<MessageLog> GetLogs => _logs;
     private static Queue<MessageLog> _logs = new();
 
-    public static MessageLog Log(
+    public static void Log(
         object o, 
         MessageType type = MessageType.Message, 
         [CallerLineNumber] int line = 0, 
@@ -56,8 +56,6 @@ public class Output
         Console.WriteLine(log.GetLog());
 
         _logs.Enqueue(log);
-
-        return log;
     }
 
     public static MessageLog DequeueLog()
