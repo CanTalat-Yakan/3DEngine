@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Engine.Helper;
 
@@ -36,24 +37,26 @@ public class ExceptionHandler
 
     public static void HandleException(Exception exception)
     {
-        // Write date and time.
-        Debug.WriteLine($"[{DateTime.Now}]");
-
         // Write file name, line number, and method name.
-        StackTrace stackTrace = new StackTrace(exception, true);
+        StackTrace stackTrace = new(exception, true);
         StackFrame stackFrame = stackTrace.GetFrame(0); // Get the top frame (most recent method call).
 
         string fileName = stackFrame.GetFileName();
         int lineNumber = stackFrame.GetFileLineNumber();
         string methodName = stackFrame.GetMethod().Name;
 
-        if (fileName is not null)
-            Debug.WriteLine($"{fileName}:{lineNumber} ({methodName})");
+        StringBuilder stringBuilder = new();
 
-        Debug.WriteLine(exception);
+        stringBuilder.Append($"[{DateTime.Now}]");
+        if (fileName is not null)
+            stringBuilder.Append($"{fileName}:{lineNumber} ({methodName})");
+        stringBuilder.Append(exception + "\n");
+
+        string OutputMessage = stringBuilder.ToString();
+
+        Debug.WriteLine(OutputMessage);
+        Console.WriteLine(OutputMessage);
 
         Output.Log(exception, MessageType.Error, lineNumber, methodName, fileName);
-
-        Debug.WriteLine("\n");
     }
 }

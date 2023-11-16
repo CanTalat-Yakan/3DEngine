@@ -13,10 +13,12 @@ public sealed class Program
     private void Loop() =>
         Core.Instance.Frame();
 
-    public void Run(bool withGui = true, Config config = null)
+    public void Run(bool renderGui = true, Config config = null)
     {
+        HandleExceptions();
+
         // Instantiate AppWindow and Engine, then show Window.
-        Initialize(withGui, config);
+        Initialize(renderGui, config);
 
         // Create a while loop and break when the window requested to quit.
         while (true)
@@ -38,7 +40,7 @@ public sealed class Program
         }
     }
 
-    private void Initialize(bool withGui, Config config)
+    private void Initialize(bool renderGui, Config config)
     {
         AppWindow appWindow = new();
 
@@ -48,11 +50,27 @@ public sealed class Program
             1080, 720));
 
         config ??= Config.GetDefaultConfig();
-        config.GUI = withGui;
+        config.GUI = renderGui;
 
         var engineCore = new Core(new Renderer(appWindow.Win32Window, config), appWindow.Win32Window.Handle);
         engineCore.OnGUI += appWindow.Render;
 
         appWindow.Show(ShowWindowCommand.Maximize);
+    }
+
+    private static void HandleExceptions()
+    {
+        var rootPath = Paths.DIRECTORY;
+        var logFilePath = rootPath + "Application.log";
+
+        ExceptionHandler.CreateTraceLog(rootPath, logFilePath);
+
+        AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+        {
+            // This method will be called when an unhandled exception occurs.
+            var exception = e.ExceptionObject as Exception;
+            if (exception is not null)
+                ExceptionHandler.HandleException(exception);
+        };
     }
 }
