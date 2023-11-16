@@ -46,7 +46,12 @@ public class Output
     public static Queue<MessageLog> GetLogs => _logs;
     private static Queue<MessageLog> _logs = new();
 
-    public static MessageLog Log(object o, MessageType type = MessageType.Message, [CallerLineNumber] int line = 0, [CallerMemberName] string method = null, [CallerFilePath] string script = null)
+    public static MessageLog Log(
+        object o, 
+        MessageType type = MessageType.Message, 
+        [CallerLineNumber] int line = 0, 
+        [CallerMemberName] string method = null, 
+        [CallerFilePath] string script = null)
     {
         MessageLog log = new(o, type, line, method, script);
         Console.WriteLine(log.GetLog());
