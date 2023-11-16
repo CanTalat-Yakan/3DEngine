@@ -38,7 +38,6 @@ public record MessageLog(
 
     public string GetLog() =>
       $"{GetDateTime()} [{type}]: {o}";
-
 }
 
 public class Output
