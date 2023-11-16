@@ -6,14 +6,12 @@ using static Vortice.Win32.User32;
 
 public sealed class Program
 {
-    private Core _engineCore;
-
     [STAThread]
     private static void Main() =>
         new Program().Run(false);
 
     private void Loop() =>
-        _engineCore.Frame();
+        Core.Instance.Frame();
 
     public void Run(bool withGui = true, Config config = null)
     {
@@ -52,8 +50,8 @@ public sealed class Program
         config ??= Config.GetDefaultConfig();
         config.GUI = withGui;
 
-        _engineCore = new Core(new Renderer(appWindow.Win32Window, config), appWindow.Win32Window.Handle);
-        _engineCore.OnGUI += appWindow.Render;
+        var engineCore = new Core(new Renderer(appWindow.Win32Window, config), appWindow.Win32Window.Handle);
+        engineCore.OnGUI += appWindow.Render;
 
         appWindow.Show(ShowWindowCommand.Maximize);
     }
