@@ -1,16 +1,12 @@
-using System.Runtime.CompilerServices;
-
 using Vortice.Win32;
-
-using static Vortice.Win32.Kernel32;
-using static Vortice.Win32.User32;
 
 namespace Engine;
 
-public sealed partial class Program
+using static Vortice.Win32.User32;
+
+public sealed class Program
 {
     private Core _engineCore;
-    private AppWindow _appWindow;
 
     [STAThread]
     private static void Main() =>
@@ -21,14 +17,10 @@ public sealed partial class Program
 
     public void Run(bool withGui = true, Config config = null)
     {
-        HandleExceptions();
+        // Instantiate AppWindow and Engine, then show Window.
+        Initialize(withGui, config);
 
-        CreateWindow(out var win32Window);
-
-        // Instance Engine and AppWindow, then show Window.
-        Initialize(win32Window, withGui, config);
-
-        // Create a while loop and break when window requested quit.
+        // Create a while loop and break when the window requested to quit.
         while (true)
         {
             if (PeekMessage(out var msg, IntPtr.Zero, 0, 0, 1))
@@ -48,75 +40,21 @@ public sealed partial class Program
         }
     }
 
-    private void Initialize(Win32Window win32Window, bool withGui, Config config)
+    private void Initialize(bool withGui, Config config)
     {
-        if (config is null)
-        {
-            config = new();
-            config.SetVSync(PresentInterval.Immediate);
-            config.SetMSAA(MultiSample.x2);
-            config.SetResolutionScale(1);
-        }
+        AppWindow appWindow = new();
+
+        appWindow.CreateWindow(out var wndClass);
+        appWindow.Initialize(new Win32Window(wndClass.ClassName,
+            "3D Engine",
+            1080, 720));
+
+        config ??= Config.GetDefaultConfig();
         config.GUI = withGui;
 
-        _engineCore = new(new Renderer(win32Window, config), win32Window.Handle);
-        _appWindow = new(win32Window);
+        _engineCore = new Core(new Renderer(appWindow.Win32Window, config), appWindow.Win32Window.Handle);
+        _engineCore.OnGUI += appWindow.Render;
 
-        _engineCore.OnGUI += _appWindow.Render;
-
-        _appWindow.Show(ShowWindowCommand.Maximize);
-    }
-}
-
-public sealed partial class Program
-{
-    private static void HandleExceptions()
-    {
-        var rootPath = Paths.DIRECTORY;
-        var logFilePath = rootPath + "Application.log";
-
-        ExceptionHandler.CreateTraceLog(rootPath, logFilePath);
-
-        AppDomain.CurrentDomain.UnhandledException += (s, e) =>
-        {
-            // This method will be called when an unhandled exception occurs.
-            var exception = e.ExceptionObject as Exception;
-            if (exception is not null)
-                ExceptionHandler.HandleException(exception);
-        };
-    }
-
-    private void CreateWindow(out Win32Window win32Window, string title = "3D Engine", int width = 1080, int height = 720)
-    {
-        WNDCLASSEX wndClass = new()
-        {
-            Size = Unsafe.SizeOf<WNDCLASSEX>(),
-            Styles = WindowClassStyles.CS_HREDRAW | WindowClassStyles.CS_VREDRAW | WindowClassStyles.CS_OWNDC,
-            WindowProc = WndProc,
-            InstanceHandle = GetModuleHandle(null),
-            CursorHandle = LoadCursor(IntPtr.Zero, SystemCursor.IDC_ARROW),
-            BackgroundBrushHandle = IntPtr.Zero,
-            IconHandle = IntPtr.Zero,
-            ClassName = "WndClass",
-        };
-
-        RegisterClassEx(ref wndClass);
-
-        win32Window = new(wndClass.ClassName, title, width, height);
-    }
-
-    private IntPtr WndProc(IntPtr hWnd, uint msg, UIntPtr wParam, IntPtr lParam)
-    {
-        if (_appWindow?.ProcessMessage(msg, wParam, lParam) ?? false)
-            return IntPtr.Zero;
-
-        switch ((WindowMessage)msg)
-        {
-            case WindowMessage.Destroy:
-                PostQuitMessage(0);
-                break;
-        }
-
-        return DefWindowProc(hWnd, msg, wParam, lParam);
+        appWindow.Show(ShowWindowCommand.Maximize);
     }
 }

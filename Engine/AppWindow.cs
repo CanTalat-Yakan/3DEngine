@@ -1,33 +1,35 @@
-﻿using ImGuiNET;
+﻿using System.Runtime.CompilerServices;
+
+using ImGuiNET;
 using Vortice.Win32;
+
+using static Vortice.Win32.Kernel32;
+using static Vortice.Win32.User32;
 
 namespace Engine;
 
-class AppWindow
+public sealed partial class AppWindow()
 {
+    public Win32Window Win32Window { get; private set; }
+
     private GuiRenderer _imGuiRenderer;
     private GuiInputHandler _imGuiInputHandler;
 
     private IntPtr _imGuiContext;
 
-    private Win32Window _win32Window;
-
     private string _profiler = string.Empty;
     private string _output = string.Empty;
 
-    public AppWindow(Win32Window win32window)
+    public void Initialize(Win32Window win32Window)
     {
-        _win32Window = win32window;
+        Win32Window = win32Window;
 
         _imGuiContext = ImGui.CreateContext();
         ImGui.SetCurrentContext(_imGuiContext);
 
         _imGuiRenderer = new();
-        _imGuiInputHandler = new(_win32Window.Handle);
+        _imGuiInputHandler = new(Win32Window.Handle);
     }
-
-    public void Show(ShowWindowCommand command = ShowWindowCommand.Normal) =>
-            User32.ShowWindow(_win32Window.Handle, command);
 
     public void Render()
     {
@@ -56,12 +58,53 @@ class AppWindow
     }
 
     public void Resize() =>
-        Core.Instance.Renderer.Resize(_win32Window.Width, _win32Window.Height);
+        Core.Instance.Renderer.Resize(Win32Window.Width, Win32Window.Height);
+
+    public void Show(ShowWindowCommand showWindowCommand = ShowWindowCommand.Normal) =>
+        ShowWindow(Win32Window.Handle, showWindowCommand);
+}
+
+public sealed partial class AppWindow
+{
+    public void CreateWindow(out WNDCLASSEX wndClass)
+    {
+        wndClass = new()
+        {
+            Size = Unsafe.SizeOf<WNDCLASSEX>(),
+            Styles = WindowClassStyles.CS_HREDRAW | WindowClassStyles.CS_VREDRAW | WindowClassStyles.CS_OWNDC,
+            WindowProc = WndProc,
+            InstanceHandle = GetModuleHandle(null),
+            CursorHandle = LoadCursor(IntPtr.Zero, SystemCursor.IDC_ARROW),
+            BackgroundBrushHandle = IntPtr.Zero,
+            IconHandle = IntPtr.Zero,
+            ClassName = "WndClass",
+        };
+
+        RegisterClassEx(ref wndClass);
+    }
+
+    public IntPtr WndProc(IntPtr hWnd, uint msg, UIntPtr wParam, IntPtr lParam)
+    {
+        if (ProcessMessage(msg, wParam, lParam))
+            return IntPtr.Zero;
+
+        switch ((WindowMessage)msg)
+        {
+            case WindowMessage.Destroy:
+                PostQuitMessage(0);
+                break;
+        }
+
+        return DefWindowProc(hWnd, msg, wParam, lParam);
+    }
 
     public bool ProcessMessage(uint msg, UIntPtr wParam, IntPtr lParam)
     {
+        if (Core.Instance is null)
+            return false;
+
         ImGui.SetCurrentContext(_imGuiContext);
-        if (_imGuiInputHandler.ProcessMessage((WindowMessage)msg, wParam, lParam))
+        if (_imGuiInputHandler is not null && _imGuiInputHandler.ProcessMessage((WindowMessage)msg, wParam, lParam))
             return true;
 
         switch ((WindowMessage)msg)
@@ -71,16 +114,16 @@ class AppWindow
                 {
                     case SizeMessage.SIZE_RESTORED:
                     case SizeMessage.SIZE_MAXIMIZED:
-                        _win32Window.IsMinimized = false;
+                        Win32Window.IsMinimized = false;
 
                         var lp = (int)lParam;
-                        _win32Window.Width = Utils.Loword(lp);
-                        _win32Window.Height = Utils.Hiword(lp);
+                        Win32Window.Width = Utils.Loword(lp);
+                        Win32Window.Height = Utils.Hiword(lp);
 
                         Resize(); // <-- This is where resizing is handled.
                         break;
                     case SizeMessage.SIZE_MINIMIZED:
-                        _win32Window.IsMinimized = true;
+                        Win32Window.IsMinimized = true;
                         break;
                     default:
                         break;

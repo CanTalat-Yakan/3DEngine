@@ -14,6 +14,16 @@ public class Config
     public bool Debug = true;
     public bool GUI = true;
 
+    public static Config GetDefaultConfig()
+    {
+        Config config = new();
+        config.SetVSync(PresentInterval.Immediate);
+        config.SetMSAA(MultiSample.x2);
+        config.SetResolutionScale(1);
+
+        return config;
+    }
+
     public void SetMSAA(MultiSample multiSample) =>
         MultiSample = multiSample;
 
@@ -22,6 +32,7 @@ public class Config
 
     public void SetResolutionScale(double scale) =>
         ResolutionScale = scale;
+
 }
 
 public enum CameraProjection
