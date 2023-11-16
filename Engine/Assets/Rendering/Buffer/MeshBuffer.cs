@@ -28,8 +28,8 @@ public sealed class MeshBuffer
         int vertexStride = Unsafe.SizeOf<Vertex>();
         int vertexBufferSize = meshInfo.Vertices.Length * vertexStride;
 
-        //Create a VertexBuffer using the MeshInfos Vertices
-        //and bind it with VertexBuffer flag.
+        // Create a VertexBuffer using the MeshInfos Vertices
+        // and bind it with VertexBuffer flag.
         _vertexBuffer = Renderer.Device.CreateCommittedResource(
             HeapType.Upload,
             ResourceDescription.Buffer(vertexBufferSize),
@@ -45,8 +45,8 @@ public sealed class MeshBuffer
         int indexStride = Unsafe.SizeOf<int>();
         int indexBufferSize = meshInfo.Indices.Length * indexStride;
 
-        //Create an IndexBuffer using the MeshInfos Indices
-        //and bind it with IndexBuffer flag.
+        // Create an IndexBuffer using the MeshInfos Indices
+        // and bind it with IndexBuffer flag.
         _indexBuffer = Renderer.Device.CreateCommittedResource(
             HeapType.Upload,
             ResourceDescription.Buffer(indexBufferSize),
