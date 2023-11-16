@@ -28,7 +28,7 @@ public sealed class Program
 
                 if (msg.Value == (uint)WindowMessage.Quit)
                 {
-                    Core.Instance?.Dispose();
+                    Core.Instance.Dispose();
 
                     break;
                 }
