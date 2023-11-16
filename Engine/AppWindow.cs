@@ -101,7 +101,7 @@ public sealed partial class AppWindow
     public bool ProcessMessage(uint msg, UIntPtr wParam, IntPtr lParam)
     {
         ImGui.SetCurrentContext(_imGuiContext);
-        if (_imGuiInputHandler.ProcessMessage((WindowMessage)msg, wParam, lParam))
+        if (_imGuiInputHandler?.ProcessMessage((WindowMessage)msg, wParam, lParam) ?? false)
             return true;
 
         switch ((WindowMessage)msg)
