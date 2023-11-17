@@ -49,19 +49,19 @@ public static class ExtensionMethods
         float.IsNaN(vector.X) || float.IsNaN(vector.Y) || float.IsNaN(vector.Z);
 
     public static string SplitFirst(this string text, params char[] separators) =>
-        text?.Split(separators).FirstOrDefault();
+        text.Split(separators).FirstOrDefault();
 
     public static string SplitLast(this string text, params char[] separators) =>
-        text?.Split(separators).Last();
+        text.Split(separators).Last();
 
     public static string FirstCharToUpper(this string input) =>
         string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1));
 
     public static string RemoveExtension(this string text) =>
-        text?.Split('.').FirstOrDefault();
+        text.Split('.').FirstOrDefault();
 
     public static string FormatString(this string text) =>
-        text?.SplitLast('_').SplitLast('.').SplitLast('+').FirstCharToUpper().AddSpacesToSentence();
+        text.SplitLast('_').SplitLast('.').SplitLast('+').FirstCharToUpper().AddSpacesToSentence();
 
     public static string AddSpacesToSentence(this string text, bool preserveAcronyms = true)
     {

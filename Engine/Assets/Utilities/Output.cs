@@ -31,12 +31,11 @@ public record MessageLog(
             MessageType.Message => "[MSG] ",
             MessageType.Warning => "[WRN] ",
             MessageType.Error   => "[ERR] ",
-            _ => String.Empty
+            _ => string.Empty
         };
 
     public string GetOrigin() =>
-        $"{script.SplitLast('\\')}({method}:{line})";
-
+        $"{script?.SplitLast('\\')} ({method}:{line})";
 }
 
 public class Output
