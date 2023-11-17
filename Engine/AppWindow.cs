@@ -12,30 +12,16 @@ public sealed partial class AppWindow()
 {
     public Win32Window Win32Window { get; private set; }
 
-    private GuiRenderer _imGuiRenderer;
-    private GuiInputHandler _imGuiInputHandler;
-
-    private IntPtr _imGuiContext;
-
     private string _profiler = string.Empty;
     private string _output = string.Empty;
 
     public void Initialize(Win32Window win32Window)
     {
         Win32Window = win32Window;
-
-        _imGuiContext = ImGui.CreateContext();
-        ImGui.SetCurrentContext(_imGuiContext);
-
-        _imGuiRenderer = new();
-        _imGuiInputHandler = new(Win32Window.Handle);
     }
 
     public void Render()
     {
-        _imGuiRenderer.Update(_imGuiContext, Core.Instance.Renderer.Size);
-        _imGuiInputHandler.Update();
-
         //ImGui.ShowDemoWindow();
 
         ImGui.SetNextWindowBgAlpha(0.35f);
@@ -100,8 +86,7 @@ public sealed partial class AppWindow
 
     public bool ProcessMessage(uint msg, UIntPtr wParam, IntPtr lParam)
     {
-        ImGui.SetCurrentContext(_imGuiContext);
-        if (_imGuiInputHandler?.ProcessMessage((WindowMessage)msg, wParam, lParam) ?? false)
+        if (Core.Instance?.GuiInputHandler?.ProcessMessage((WindowMessage)msg, wParam, lParam) ?? false)
             return true;
 
         switch ((WindowMessage)msg)
