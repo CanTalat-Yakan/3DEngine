@@ -19,8 +19,8 @@ public record MessageLog(
     string method,
     string script)
 {
-    public string GetString() =>
-        GetDateTime() + GetMessageType() + GetOrigin() + $"\n{o}\n\n";
+    public override string ToString() =>
+        GetDateTime() + GetMessageType() + GetOrigin() + $"\n{o}\n";
 
     public string GetDateTime() =>
         $"[{DateTime.Now}] ";
@@ -37,8 +37,6 @@ public record MessageLog(
     public string GetOrigin() =>
         $"{script.SplitLast('\\')}({method}:{line})";
 
-    public string GetLog() =>
-      $"{GetDateTime()} [{type}]: {o}";
 }
 
 public class Output
@@ -55,8 +53,8 @@ public class Output
     {
         MessageLog log = new(o, type, line, method, script);
 
-        Debug.WriteLine(log.GetLog());
-        Console.WriteLine(log.GetLog());
+        Debug.WriteLine(log);
+        Console.WriteLine(log);
 
         _logs.Enqueue(log);
     }
@@ -76,7 +74,7 @@ public class Output
 
         StringBuilder stringBuilder = new();
         while (_logs.Count > 0)
-            stringBuilder.Append(_logs.Dequeue().GetString());
+            stringBuilder.Append(_logs.Dequeue());
 
         return stringBuilder.ToString();
     }
