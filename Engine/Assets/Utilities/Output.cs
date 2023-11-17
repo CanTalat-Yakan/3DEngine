@@ -19,7 +19,7 @@ public record MessageLog(
     string script)
 {
     public string GetString() =>
-        GetDateTime() + GetMessageType() + GetOrigin() + "\n" + GetLog();
+        GetDateTime() + GetMessageType() + GetOrigin() + $"\n{o}\n";
 
     public string GetDateTime() =>
         $"[{DateTime.Now}] ";
@@ -46,10 +46,10 @@ public class Output
     private static Queue<MessageLog> _logs = new();
 
     public static void Log(
-        object o, 
-        MessageType type = MessageType.Message, 
-        [CallerLineNumber] int line = 0, 
-        [CallerMemberName] string method = null, 
+        object o,
+        MessageType type = MessageType.Message,
+        [CallerLineNumber] int line = 0,
+        [CallerMemberName] string method = null,
         [CallerFilePath] string script = null)
     {
         MessageLog log = new(o, type, line, method, script);
