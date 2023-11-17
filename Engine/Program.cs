@@ -55,7 +55,7 @@ public sealed class Program
         var engineCore = new Core(new Renderer(appWindow.Win32Window, config), appWindow.Win32Window.Handle);
         engineCore.OnGUI += appWindow.Render;
 
-        appWindow.Show(ShowWindowCommand.Maximize);
+        appWindow.Show();
     }
 
     private static void HandleExceptions()
