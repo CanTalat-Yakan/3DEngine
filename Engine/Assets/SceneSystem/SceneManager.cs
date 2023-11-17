@@ -163,6 +163,9 @@ public sealed partial class SceneManager
 
     public void Render()
     {
+        // Call the Render in CameraSystem.
+        CameraSystem.Render();
+
         // Call the Render in ScriptSystem.
         ScriptSystem.Render();
         // Call the Render in EditorScriptSystem.
