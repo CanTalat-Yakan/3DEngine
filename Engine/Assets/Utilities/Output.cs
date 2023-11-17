@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -29,7 +30,7 @@ public record MessageLog(
         {
             MessageType.Message => "[MSG] ",
             MessageType.Warning => "[WRN] ",
-            MessageType.Error => "[ERR] ",
+            MessageType.Error   => "[ERR] ",
             _ => String.Empty
         };
 
@@ -53,6 +54,8 @@ public class Output
         [CallerFilePath] string script = null)
     {
         MessageLog log = new(o, type, line, method, script);
+
+        Debug.WriteLine(log.GetLog());
         Console.WriteLine(log.GetLog());
 
         _logs.Enqueue(log);
