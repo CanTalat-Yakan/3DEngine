@@ -20,7 +20,7 @@ public record MessageLog(
     string script)
 {
     public override string ToString() =>
-        GetDateTime() + GetMessageType() + GetOrigin() + $"\n{o}\n";
+        GetDateTime() + GetMessageType() + GetOrigin() + GetString();
 
     public string GetDateTime() =>
         $"[{DateTime.Now}] ";
@@ -36,6 +36,9 @@ public record MessageLog(
 
     public string GetOrigin() =>
         $"{script?.SplitLast('\\')} ({method}:{line})";
+
+    public string GetString() =>
+        $"\n{o}\n";
 }
 
 public class Output
