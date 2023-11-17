@@ -19,7 +19,7 @@ public record MessageLog(
     string script)
 {
     public string GetString() =>
-        GetDateTime() + GetMessageType() + GetOrigin() + $"\n{o}\n";
+        GetDateTime() + GetMessageType() + GetOrigin() + $"\n{o}\n\n";
 
     public string GetDateTime() =>
         $"[{DateTime.Now}] ";
