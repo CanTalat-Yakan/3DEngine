@@ -25,10 +25,10 @@ PSInput VSMain(VSInput input)
     PSInput output;
 
     output.pos = mul(input.vertex, mul(World, ViewProjection));
-    output.worldpos = mul(input.vertex, World);
-    output.camerapos = Camera;
     output.normal = mul(input.normal, World);
     output.tangent = mul(input.tangent, World);
+    output.worldpos = mul(input.vertex, World);
+    output.camerapos = Camera;
     output.uv = input.uv;
 
     return output;
