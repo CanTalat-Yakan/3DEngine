@@ -32,9 +32,8 @@ public sealed class Program
         appWindow = new();
         appWindow.Initialize(config.WindowData);
 
-        engineCore = null;
-        //engineCore = new Core(new Renderer(appWindow.Win32Window, config), appWindow.Win32Window.Handle);
-        //engineCore.OnGUI += appWindow.Render;
+        engineCore = new Core(new Renderer(appWindow.Win32Window, config), appWindow.Win32Window.Handle);
+        engineCore.OnGUI += appWindow.Render;
 
         //appWindow.ResizeEvent += Core.Instance.Renderer.Resize;
 

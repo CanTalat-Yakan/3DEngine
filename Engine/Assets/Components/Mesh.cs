@@ -50,7 +50,7 @@ public sealed partial class Mesh : EditorComponent
                 finally { MaterialPath = null; }
 
         //if (!EditorState.EditorBuild)
-            CheckBounds();
+            //CheckBounds();
     }
 
     public override void OnRender()
@@ -58,10 +58,10 @@ public sealed partial class Mesh : EditorComponent
         // With Parallelism the App can't catch up and breaks.
         // So check bounds in the same thread as the render call.
         //if (EditorState.EditorBuild)
-        //    CheckBounds();
+        //CheckBounds();
 
-        if (!InBounds)
-            return;
+        //if (!InBounds)
+        //    return;
 
         if (Equals(Material.CurrentMaterialOnGPU, Material)
              && Equals(Mesh.CurrentMeshOnGPU, MeshInfo))
