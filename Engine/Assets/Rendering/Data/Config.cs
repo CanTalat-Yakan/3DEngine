@@ -2,6 +2,8 @@
 
 public class Config
 {
+    public WindowData WindowData;
+
     public CameraProjection CameraProjection = CameraProjection.Perspective;
     public RenderMode RenderMode = RenderMode.Shaded;
 
@@ -24,6 +26,8 @@ public class Config
         return config;
     }
 
+    public void SetWindowData(string title, int width, int height) => WindowData = new() { Title = title, Width = width, Height = height };
+
     public void SetMSAA(MultiSample multiSample) =>
         MultiSample = multiSample;
 
@@ -33,6 +37,13 @@ public class Config
     public void SetResolutionScale(double scale) =>
         ResolutionScale = scale;
 
+}
+
+public struct WindowData
+{
+    public string Title;
+    public int Width;
+    public int Height;
 }
 
 public enum CameraProjection

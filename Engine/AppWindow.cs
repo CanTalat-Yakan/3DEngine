@@ -18,8 +18,16 @@ public sealed partial class AppWindow()
     private string _profiler = string.Empty;
     private string _output = string.Empty;
 
-    public void Initialize(Win32Window win32Window) =>
-        Win32Window = win32Window;
+    public void Initialize(WindowData windowData)
+    {
+        CreateWindow(out var windowClass);
+
+        Win32Window = new Win32Window(
+            windowClass.ClassName,
+            windowData.Title, 
+            windowData.Width, 
+            windowData.Height);
+    }
 
     public void Render()
     {

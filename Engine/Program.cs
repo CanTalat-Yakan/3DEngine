@@ -27,12 +27,10 @@ public sealed class Program
     {
         config ??= Config.GetDefaultConfig();
         config.GUI = gui;
+        config.SetWindowData("3D Engine", 1080, 720);
 
         appWindow = new();
-        appWindow.CreateWindow(out var wndClass);
-        appWindow.Initialize(new Win32Window(wndClass.ClassName,
-            "3D Engine",
-            1080, 720));
+        appWindow.Initialize(config.WindowData);
 
         engineCore = new Core(new Renderer(appWindow.Win32Window, config), appWindow.Win32Window.Handle);
         engineCore.OnGUI += appWindow.Render;
