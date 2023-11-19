@@ -26,7 +26,8 @@ public class Config
         return config;
     }
 
-    public void SetWindowData(string title, int width, int height) => WindowData = new() { Title = title, Width = width, Height = height };
+    public void SetWindowData(string title, int width, int height) => 
+        WindowData = new() { Title = title, Width = width, Height = height };
 
     public void SetMSAA(MultiSample multiSample) =>
         MultiSample = multiSample;
