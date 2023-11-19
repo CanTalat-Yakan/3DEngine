@@ -1,8 +1,4 @@
-using Vortice.Win32;
-
 namespace Engine;
-
-using static Vortice.Win32.User32;
 
 public sealed class Program
 {
@@ -10,50 +6,38 @@ public sealed class Program
     private static void Main() =>
         new Program().Run(false);
 
-    private void Loop() =>
-        Core.Instance.Frame();
-
-    public void Run(bool renderGui = true, Config config = null)
+    public void Run(bool gui = true, Config config = null)
     {
         HandleExceptions();
 
         // Instantiate AppWindow and Engine, then show Window.
-        Initialize(renderGui, config);
+        Initialize(gui, config, 
+            out var appWindow, 
+            out var engineCore);
 
-        // Create a while loop and break when the window requested to quit.
-        while (true)
-        {
-            if (PeekMessage(out var msg, IntPtr.Zero, 0, 0, 1))
-            {
-                TranslateMessage(ref msg);
-                DispatchMessage(ref msg);
+        // Create a while loop for the game logic
+        // and break when the window requested to quit.
+        while (appWindow.IsAvailable())
+            engineCore.Frame();
 
-                if (msg.Value == (uint)WindowMessage.Quit)
-                {
-                    Core.Instance.Dispose();
-
-                    break;
-                }
-            }
-
-            Loop(); // <-- This is where the loop is handled.
-        }
+        engineCore.Dispose();
     }
 
-    private void Initialize(bool renderGui, Config config)
+    private void Initialize(bool gui, Config config, out AppWindow appWindow, out Core engineCore)
     {
-        AppWindow appWindow = new();
+        config ??= Config.GetDefaultConfig();
+        config.GUI = gui;
 
+        appWindow = new();
         appWindow.CreateWindow(out var wndClass);
         appWindow.Initialize(new Win32Window(wndClass.ClassName,
             "3D Engine",
             1080, 720));
 
-        config ??= Config.GetDefaultConfig();
-        config.GUI = renderGui;
-
-        var engineCore = new Core(new Renderer(appWindow.Win32Window, config), appWindow.Win32Window.Handle);
+        engineCore = new Core(new Renderer(appWindow.Win32Window, config), appWindow.Win32Window.Handle);
         engineCore.OnGUI += appWindow.Render;
+
+        appWindow.ResizeEvent += Core.Instance.Renderer.Resize;
 
         appWindow.Show();
     }

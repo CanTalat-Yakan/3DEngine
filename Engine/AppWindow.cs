@@ -12,6 +12,9 @@ public sealed partial class AppWindow()
 {
     public Win32Window Win32Window { get; private set; }
 
+    public delegate void ResizeEventHandler(int width, int height);
+    public event ResizeEventHandler ResizeEvent;
+
     private string _profiler = string.Empty;
     private string _output = string.Empty;
 
@@ -41,15 +44,27 @@ public sealed partial class AppWindow()
         }
     }
 
-    public void Resize() =>
-        Core.Instance.Renderer.Resize(Win32Window.Width, Win32Window.Height);
-
     public void Show(ShowWindowCommand showWindowCommand = ShowWindowCommand.Normal) =>
         ShowWindow(Win32Window.Handle, showWindowCommand);
 }
 
 public sealed partial class AppWindow
 {
+    public bool IsAvailable()
+    {
+        // Create a while loop and break when the window requested to quit.
+        if (PeekMessage(out var msg, IntPtr.Zero, 0, 0, 1))
+        {
+            TranslateMessage(ref msg);
+            DispatchMessage(ref msg);
+
+            if (msg.Value == (uint)WindowMessage.Quit)
+                return false;
+        }
+
+        return true;
+    }
+
     public void CreateWindow(out WNDCLASSEX wndClass)
     {
         wndClass = new()
@@ -100,7 +115,8 @@ public sealed partial class AppWindow
                         Win32Window.Width = Utils.Loword(lp);
                         Win32Window.Height = Utils.Hiword(lp);
 
-                        Resize(); // <-- This is where resizing is handled.
+                        // Invoke the event, passing the parameters
+                        ResizeEvent.Invoke(Win32Window.Width, Win32Window.Height);
                         break;
                     case SizeMessage.SIZE_MINIMIZED:
                         Win32Window.IsMinimized = true;
