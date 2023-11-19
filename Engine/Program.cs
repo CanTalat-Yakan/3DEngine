@@ -26,8 +26,8 @@ public sealed class Program
     private void Initialize(bool gui, Config config, out AppWindow appWindow, out Core engineCore)
     {
         config ??= Config.GetDefaultConfig();
-        config.GUI = gui;
         config.SetWindowData("3D Engine", 1080, 720);
+        config.GUI = gui;
 
         appWindow = new();
         appWindow.Initialize(config.WindowData);
