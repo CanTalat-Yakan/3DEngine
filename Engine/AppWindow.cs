@@ -123,7 +123,7 @@ public sealed partial class AppWindow
                         Win32Window.Height = Utils.Hiword(lp);
 
                         // Invoke the event, passing the parameters
-                        ResizeEvent.Invoke(Win32Window.Width, Win32Window.Height);
+                        ResizeEvent?.Invoke(Win32Window.Width, Win32Window.Height);
                         break;
                     case SizeMessage.SIZE_MINIMIZED:
                         Win32Window.IsMinimized = true;

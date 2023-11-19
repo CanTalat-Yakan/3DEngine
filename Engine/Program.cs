@@ -18,9 +18,9 @@ public sealed class Program
         // Create a while loop for the game logic
         // and break when the window requested to quit.
         while (appWindow.IsAvailable())
-            engineCore.Frame();
+            engineCore?.Frame();
 
-        engineCore.Dispose();
+        engineCore?.Dispose();
     }
 
     private void Initialize(bool gui, Config config, out AppWindow appWindow, out Core engineCore)
@@ -32,10 +32,11 @@ public sealed class Program
         appWindow = new();
         appWindow.Initialize(config.WindowData);
 
-        engineCore = new Core(new Renderer(appWindow.Win32Window, config), appWindow.Win32Window.Handle);
-        engineCore.OnGUI += appWindow.Render;
+        engineCore = null;
+        //engineCore = new Core(new Renderer(appWindow.Win32Window, config), appWindow.Win32Window.Handle);
+        //engineCore.OnGUI += appWindow.Render;
 
-        appWindow.ResizeEvent += Core.Instance.Renderer.Resize;
+        //appWindow.ResizeEvent += Core.Instance.Renderer.Resize;
 
         appWindow.Show();
     }
