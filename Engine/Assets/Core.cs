@@ -30,9 +30,9 @@ public sealed class Core
     public ShaderCompiler ShaderCompiler;
     public MaterialCompiler MaterialCompiler;
 
-    public GuiRenderer GuiRenderer;
-    public GuiInputHandler GuiInputHandler;
-    private IntPtr _guiContext;
+    public GUIRenderer GUIRenderer;
+    public GUIInputHandler GUIInputHandler;
+    private IntPtr _imguiContext;
 
     public Core(Renderer renderer, nint hwnd, string assetsPath = null) =>
         Initialize(renderer, hwnd, assetsPath);
@@ -54,11 +54,11 @@ public sealed class Core
 
         if (Renderer.Config.GUI)
         {
-            _guiContext = ImGuiNET.ImGui.CreateContext();
-            ImGuiNET.ImGui.SetCurrentContext(_guiContext);
+            _imguiContext = ImGuiNET.ImGui.CreateContext();
+            ImGuiNET.ImGui.SetCurrentContext(_imguiContext);
 
-            GuiRenderer = new();
-            GuiInputHandler = new(hwnd);
+            GUIRenderer = new();
+            GUIInputHandler = new(hwnd);
         }
 
         // Creates an entity with the Boot editor tag and adds a SceneBoot component to it.
@@ -147,9 +147,9 @@ public sealed class Core
     public void RenderGUI()
     {
         // Update the ImGuiRenderer.
-        GuiRenderer.Update(_guiContext, Renderer.Size);
+        GUIRenderer.Update(_imguiContext, Renderer.Size);
         // Update the ImGuiInputHandler.
-        GuiInputHandler.Update();
+        GUIInputHandler.Update();
 
         // Call the Render the GUI for all scenes.
         SceneManager.GUI();
@@ -160,7 +160,7 @@ public sealed class Core
         // Render the ImGui.
         ImGuiNET.ImGui.Render();
         // Render the DrawaData from ImGui with the ImGuiRenderer.
-        GuiRenderer.Render();
+        GUIRenderer.Render();
     }
 
     public void OnEditorPlayMode()

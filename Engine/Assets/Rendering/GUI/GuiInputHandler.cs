@@ -6,12 +6,12 @@ using static Vortice.Win32.User32;
 
 namespace Engine.GUI;
 
-public sealed class GuiInputHandler
+public sealed class GUIInputHandler
 {
     private IntPtr _hwnd;
     private ImGuiMouseCursor _lastCursor;
 
-    public GuiInputHandler(IntPtr hWnd)
+    public GUIInputHandler(IntPtr hWnd)
     {
         this._hwnd = hWnd;
         InitKeyMap();

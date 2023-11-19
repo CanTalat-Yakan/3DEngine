@@ -99,7 +99,7 @@ public sealed partial class AppWindow
 
     public bool ProcessMessage(uint msg, UIntPtr wParam, IntPtr lParam)
     {
-        if (Core.Instance?.GuiInputHandler?.ProcessMessage((WindowMessage)msg, wParam, lParam) ?? false)
+        if (Core.Instance?.GUIInputHandler?.ProcessMessage((WindowMessage)msg, wParam, lParam) ?? false)
             return true;
 
         switch ((WindowMessage)msg)

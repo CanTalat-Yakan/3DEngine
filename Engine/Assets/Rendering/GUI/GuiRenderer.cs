@@ -14,7 +14,7 @@ using ImDrawIdx = System.UInt16;
 
 namespace Engine.GUI;
 
-unsafe public sealed class GuiRenderer
+unsafe public sealed class GUIRenderer
 {
     //public bool IsRendering { get => _data.BufferRenderTargetView is not null; }
 
@@ -31,7 +31,7 @@ unsafe public sealed class GuiRenderer
 
     //private Dictionary<IntPtr, ID3D11ShaderResourceView> _textureResources = new();
 
-    public GuiRenderer()
+    public GUIRenderer()
     {
         //var io = ImGui.GetIO();
         //io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;  // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
