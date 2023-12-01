@@ -1,12 +1,12 @@
 ﻿namespace Engine.Data;
 
-public struct ViewConstantBuffer
+public readonly struct ViewConstantBuffer(Matrix4x4 viewProjection, Vector3 cameraPosition)
 {
-    public Matrix4x4 ViewProjection;
-    public Vector3 CameraPosition;
+    public readonly Matrix4x4 ViewProjection = viewProjection;
+    public readonly Vector3 CameraPosition = cameraPosition;
 }
 
-public struct PerModelConstantBuffer
+public readonly struct PerModelConstantBuffer(Matrix4x4 modelView)
 {
-    public Matrix4x4 ModelView;
+    public readonly Matrix4x4 ModelView = modelView;
 }

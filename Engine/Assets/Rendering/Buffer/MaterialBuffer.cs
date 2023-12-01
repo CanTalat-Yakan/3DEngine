@@ -80,9 +80,9 @@ public unsafe partial class MaterialBuffer
     public void UpdateModelConstantBuffer(PerModelConstantBuffer constantBuffer)
     {
         // Map the constant buffer and copy the per-model matrix of the material into it.
-        var pointer = _model.Map<PerModelConstantBuffer>(0);
+        PerModelConstantBuffer* pointer = _model.Map<PerModelConstantBuffer>(0);
         // Copy the data from the constant buffer to the mapped resource.
-        Unsafe.Copy(pointer, ref constantBuffer);
+        *pointer = constantBuffer;
         // Unmap the constant buffer from memory.
         _model.Unmap(0);
 

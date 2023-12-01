@@ -54,6 +54,14 @@ public sealed partial class AppWindow()
 
     public void Show(ShowWindowCommand showWindowCommand = ShowWindowCommand.Normal) =>
         ShowWindow(Win32Window.Handle, showWindowCommand);
+
+    public void Loop(Action frame, Action dispose)
+    {
+        while (true)
+            frame();
+
+        dispose();
+    }
 }
 
 public sealed partial class AppWindow
@@ -62,15 +70,18 @@ public sealed partial class AppWindow
 
     public bool IsAvailable()
     {
-        // Create a while loop and break when the window requested to quit.
-        if (PeekMessage(out var msg, IntPtr.Zero, 0, 0, PM_REMOVE))
+        try
         {
-            TranslateMessage(ref msg);
-            DispatchMessage(ref msg);
+            if (PeekMessage(out var msg, IntPtr.Zero, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(ref msg);
+                DispatchMessage(ref msg);
 
-            if (msg.Value == (uint)WindowMessage.Quit)
-                return false;
+                if (msg.Value == (uint)WindowMessage.Quit)
+                    return false;
+            }
         }
+        catch (Exception) { }
 
         return true;
     }

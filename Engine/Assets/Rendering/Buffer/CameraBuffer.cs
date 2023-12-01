@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.ComponentModel.Design.Serialization;
+using System.Runtime.InteropServices;
 
 using Vortice.Direct3D12;
 
@@ -26,9 +27,9 @@ public sealed unsafe class CameraBuffer
     public void UpdateConstantBuffer()
     {
         // Map the constant buffer and copy the view-projection matrix and position of the camera into it.
-        var pointer = _view.Map<ViewConstantBuffer>(0);
+        ViewConstantBuffer* pointer = _view.Map<ViewConstantBuffer>(0);
         // Copy the data from the constant buffer to the mapped resource.
-        Unsafe.Copy(pointer, ref ViewConstantBuffer);
+        *pointer = ViewConstantBuffer;
         // Unmap the constant buffer from memory.
         _view.Unmap(0);
     }

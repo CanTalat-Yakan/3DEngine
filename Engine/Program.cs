@@ -1,5 +1,8 @@
+using Vortice.Win32;
+
 namespace Engine;
 
+using static Vortice.Win32.User32;
 public sealed class Program
 {
     [STAThread]
@@ -15,11 +18,10 @@ public sealed class Program
         InitializeEngine(config, appWindow, out var engineCore);
 
         // Create a while loop for the game logic
-        // and break when the window requested to quit.
-        while (appWindow.IsAvailable())
-            engineCore?.Frame();
-
-        engineCore?.Dispose();
+        // and dispose on window quit requested.
+        appWindow.Loop(
+            engineCore.Frame,
+            engineCore.Dispose);
     }
 
     private void InitializeWindow(Config config, bool gui, out AppWindow appWindow)
@@ -35,11 +37,10 @@ public sealed class Program
 
     private void InitializeEngine(Config config, AppWindow appWindow, out Core engineCore)
     {
-        engineCore = null;
-        //engineCore = new Core(new Renderer(appWindow.Win32Window, config), appWindow.Win32Window.Handle);
-        //engineCore.OnGUI += appWindow.Render;
+        engineCore = new Core(new Renderer(appWindow.Win32Window, config), appWindow.Win32Window.Handle);
+        engineCore.OnGUI += appWindow.Render;
 
-        //appWindow.ResizeEvent += Core.Instance.Renderer.Resize;
+        appWindow.ResizeEvent += Core.Instance.Renderer.Resize;
     }
 
     private static void HandleExceptions()

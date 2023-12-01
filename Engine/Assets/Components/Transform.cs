@@ -73,7 +73,8 @@ public sealed partial class Transform : EditorComponent, IHide
     internal PerModelConstantBuffer GetConstantBuffer()
     {
         // Set the transposed ModelView matrix in the ModelConstantBuffer to the WorldMatrix.
-        _modelConstantBuffer.ModelView = Matrix4x4.Transpose(_worldMatrix);
+        _modelConstantBuffer = new(
+            Matrix4x4.Transpose(_worldMatrix));
 
         return _modelConstantBuffer;
     }

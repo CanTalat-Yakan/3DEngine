@@ -93,11 +93,9 @@ public sealed class Camera : EditorComponent
         BoundingFrustum = new BoundingFrustum(viewProjection);
 
         // Store the transposed view-projection matrix and the position of the camera.
-        CameraBuffer.ViewConstantBuffer = new()
-        {
-            ViewProjection = Matrix4x4.Transpose(viewProjection),
-            CameraPosition = Entity.Transform.Position,
-        };
+        CameraBuffer.ViewConstantBuffer = new(
+            Matrix4x4.Transpose(viewProjection), 
+            Entity.Transform.Position);
 
         /* 
          The coordinate system used in System.Numerics is right-handed,
