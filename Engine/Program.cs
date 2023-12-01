@@ -10,10 +10,9 @@ public sealed class Program
     {
         HandleExceptions();
 
-        // Instantiate AppWindow and Engine, then show Window.
-        Initialize(gui, config, 
-            out var appWindow, 
-            out var engineCore);
+        // Instantiate Window and Engine.
+        InitializeWindow(config, gui, out var appWindow);
+        InitializeEngine(config, appWindow, out var engineCore);
 
         // Create a while loop for the game logic
         // and break when the window requested to quit.
@@ -23,7 +22,7 @@ public sealed class Program
         engineCore?.Dispose();
     }
 
-    private void Initialize(bool gui, Config config, out AppWindow appWindow, out Core engineCore)
+    private void InitializeWindow(Config config, bool gui, out AppWindow appWindow)
     {
         config ??= Config.GetDefaultConfig();
         config.SetWindowData("3D Engine", 1080, 720);
@@ -31,14 +30,16 @@ public sealed class Program
 
         appWindow = new();
         appWindow.Initialize(config.WindowData);
+        appWindow.Show();
+    }
 
+    private void InitializeEngine(Config config, AppWindow appWindow, out Core engineCore)
+    {
         engineCore = null;
         //engineCore = new Core(new Renderer(appWindow.Win32Window, config), appWindow.Win32Window.Handle);
         //engineCore.OnGUI += appWindow.Render;
 
         //appWindow.ResizeEvent += Core.Instance.Renderer.Resize;
-
-        appWindow.Show();
     }
 
     private static void HandleExceptions()

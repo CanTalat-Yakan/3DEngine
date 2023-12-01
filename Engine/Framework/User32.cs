@@ -3,6 +3,7 @@
 
 using System.Drawing;
 using System.Runtime.InteropServices;
+using Win32.Numerics;
 
 namespace Vortice.Win32;
 
@@ -486,11 +487,11 @@ internal static class User32
 
     [return: MarshalAs(UnmanagedType.U1)]
     [DllImport(LibraryName, ExactSpelling = true)]
-    public static extern bool AdjustWindowRect([In] [Out] ref RawRect lpRect, WindowStyles dwStyle, bool hasMenu);
+    public static extern bool AdjustWindowRect([In][Out] ref Rect lpRect, WindowStyles dwStyle, bool hasMenu);
 
     [return: MarshalAs(UnmanagedType.U1)]
     [DllImport(LibraryName, ExactSpelling = true)]
-    public static extern bool AdjustWindowRectEx([In] [Out] ref RawRect lpRect, WindowStyles dwStyle, bool bMenu, WindowExStyles exStyle);
+    public static extern bool AdjustWindowRectEx([In][Out] ref Rect lpRect, WindowStyles dwStyle, bool bMenu, WindowExStyles exStyle);
 
     [DllImport(LibraryName, CharSet = CharSet.Unicode)]
     public static extern IntPtr CreateWindowEx(
@@ -1263,7 +1264,7 @@ public enum SizeMessage
 {
     SIZE_RESTORED = 0,
     SIZE_MINIMIZED = 1,
-    SIZE_MAXIMIZED = 2, 
+    SIZE_MAXIMIZED = 2,
     SIZE_MAXSHOW = 3,
     SIZE_MAXHIDE = 4,
 }

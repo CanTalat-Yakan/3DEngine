@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<LangVersion>preview</LangVersion>
 		<!--<PublishAot>true</PublishAot>-->
@@ -45,8 +45,8 @@
 		<PackageReference Include="FftSharp" Version="2.1.0" />
 		<PackageReference Include="Magick.NET-Q16-HDRI-AnyCPU" Version="13.4.0" />
 		<PackageReference Include="MagicPhysX" Version="1.0.0" />
-		<PackageReference Include="Microsoft.CodeAnalysis" Version="4.7.0" />
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.7.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis" Version="4.8.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.8.0" />
 		<PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
 		<PackageReference Include="Twizzle.ImGui.NET" Version="1.89.4" />
 		<PackageReference Include="Twizzle.ImGuizmo.NET" Version="1.89.4.1" />
