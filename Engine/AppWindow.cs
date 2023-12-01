@@ -24,8 +24,8 @@ public sealed partial class AppWindow()
 
         Win32Window = new Win32Window(
             windowClass.ClassName,
-            windowData.Title, 
-            windowData.Width, 
+            windowData.Title,
+            windowData.Width,
             windowData.Height);
     }
 
@@ -60,15 +60,19 @@ public sealed partial class AppWindow
 {
     public bool IsAvailable()
     {
-        // Create a while loop and break when the window requested to quit.
-        if (PeekMessage(out var msg, IntPtr.Zero, 0, 0, 1))
+        try
         {
-            TranslateMessage(ref msg);
-            DispatchMessage(ref msg);
+            // Create a while loop and break when the window requested to quit.
+            if (PeekMessage(out var msg, IntPtr.Zero, 0, 0, 1))
+            {
+                TranslateMessage(ref msg);
+                DispatchMessage(ref msg);
 
-            if (msg.Value == (uint)WindowMessage.Quit)
-                return false;
+                if (msg.Value == (uint)WindowMessage.Quit)
+                    return false;
+            }
         }
+        catch { }
 
         return true;
     }
