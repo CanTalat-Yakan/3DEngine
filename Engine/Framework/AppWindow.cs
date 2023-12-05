@@ -66,14 +66,13 @@ public sealed partial class AppWindow()
 
 public sealed partial class AppWindow
 {
-    private const uint PM_REMOVE = 1;
-
     public bool IsAvailable()
     {
         return true;
 
         try
         {
+            uint PM_REMOVE = 1;
             if (PeekMessage(out var msg, IntPtr.Zero, 0, 0, PM_REMOVE))
             {
                 TranslateMessage(ref msg);
