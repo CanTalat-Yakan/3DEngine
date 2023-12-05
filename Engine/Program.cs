@@ -17,7 +17,7 @@ public sealed class Program
         // Create a while loop for the game logic
         // and dispose on window quit requested.
         appWindow.Loop(
-            engineCore.Frame,
+            engineCore.Frame, 
             engineCore.Dispose);
     }
 
@@ -37,7 +37,7 @@ public sealed class Program
         engineCore = new Core(new Renderer(appWindow.Win32Window, config), appWindow.Win32Window.Handle);
         engineCore.OnGUI += appWindow.Render;
 
-        appWindow.ResizeEvent += Core.Instance.Renderer.Resize;
+        appWindow.ResizeEvent += engineCore.Renderer.Resize;
     }
 
     private static void HandleExceptions()

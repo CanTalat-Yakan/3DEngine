@@ -58,9 +58,9 @@ public sealed partial class AppWindow()
     public void Loop(Action frame, Action dispose)
     {
         while (IsAvailable())
-            frame();
+            frame?.Invoke();
 
-        dispose();
+        dispose?.Invoke();
     }
 }
 
