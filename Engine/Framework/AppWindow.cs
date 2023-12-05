@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-using ImGuiNET;
+﻿using ImGuiNET;
 using Vortice.Win32;
 
 using static Vortice.Win32.Kernel32;
@@ -8,7 +6,7 @@ using static Vortice.Win32.User32;
 
 namespace Engine;
 
-public sealed partial class AppWindow()
+public sealed partial class AppWindow
 {
     public Win32Window Win32Window { get; private set; }
 
@@ -68,21 +66,17 @@ public sealed partial class AppWindow
 {
     public bool IsAvailable()
     {
-        return true;
+        return true; // TODO: Fix SystemEngineException with PeekMessage.
 
-        try
+        uint PM_REMOVE = 1;
+        if (PeekMessage(out var msg, IntPtr.Zero, 0, 0, PM_REMOVE))
         {
-            uint PM_REMOVE = 1;
-            if (PeekMessage(out var msg, IntPtr.Zero, 0, 0, PM_REMOVE))
-            {
-                TranslateMessage(ref msg);
-                DispatchMessage(ref msg);
+            TranslateMessage(ref msg);
+            DispatchMessage(ref msg);
 
-                if (msg.Value == (uint)WindowMessage.Quit)
-                    return false;
-            }
+            if (msg.Value == (uint)WindowMessage.Quit)
+                return false;
         }
-        catch (Exception) { }
 
         return true;
     }
@@ -91,7 +85,7 @@ public sealed partial class AppWindow
     {
         wndClass = new()
         {
-            Size = Unsafe.SizeOf<WNDCLASSEX>(),
+            Size = System.Runtime.CompilerServices.Unsafe.SizeOf<WNDCLASSEX>(),
             Styles = WindowClassStyles.CS_HREDRAW | WindowClassStyles.CS_VREDRAW | WindowClassStyles.CS_OWNDC,
             WindowProc = WndProc,
             InstanceHandle = GetModuleHandle(null),
