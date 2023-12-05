@@ -99,7 +99,19 @@ You can compile the 3DEngine (Package) for the Editor and the Engine as a standa
 * USD,
 * Asynchronous Reprojection,
 * Lumen (Erebus, Aruna),
-* Nanite (Nano Tech).
+* Nanite (Nano Tech),
+* Networking.
+
+As a Unity Developer, I've gathered a collection of top-notch assets from the Unity Asset Store. I plan to incorporate my favorite ones into this game engine when the time is right for implementing them in the creation of various games. Here's a list of plugins that I'll be integrating into the engine:
+
+* [KWS Water System](https://assetstore.unity.com/packages/tools/particles-effects/kws-water-system-hdrp-rendering-205007),
+* [Acerola's Water System](https://github.com/GarrettGunnell/Water),
+* [Expanse](https://assetstore.unity.com/packages/tools/particles-effects/expanse-volumetric-skies-clouds-and-atmospheres-in-hdrp-192456),
+* [Atlas](https://assetstore.unity.com/packages/tools/terrain/atlas-terrain-editor-207568),
+* [Ray Fire](https://assetstore.unity.com/packages/tools/game-toolkits/rayfire-for-unity-148690),
+* [Puppet Master](https://assetstore.unity.com/packages/tools/physics/puppetmaster-48977),
+* [Final IK](https://assetstore.unity.com/packages/tools/animation/final-ik-14290),
+* [A* Pathfinding Project Pro](https://assetstore.unity.com/packages/tools/behavior-ai/a-pathfinding-project-pro-87744).
 
 # Build
 In order to compile, you need to install [Visual Studio 2022 Preview](https://visualstudio.microsoft.com/vs/preview/) with the following components:
