@@ -1,8 +1,5 @@
-using Vortice.Win32;
-
 namespace Engine;
 
-using static Vortice.Win32.User32;
 public sealed class Program
 {
     [STAThread]

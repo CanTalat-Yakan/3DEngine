@@ -57,7 +57,7 @@ public sealed partial class AppWindow()
 
     public void Loop(Action frame, Action dispose)
     {
-        while (true)
+        while (IsAvailable())
             frame();
 
         dispose();
@@ -70,6 +70,8 @@ public sealed partial class AppWindow
 
     public bool IsAvailable()
     {
+        return true;
+
         try
         {
             if (PeekMessage(out var msg, IntPtr.Zero, 0, 0, PM_REMOVE))

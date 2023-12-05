@@ -206,7 +206,8 @@ public sealed partial class Renderer
         Data.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.AllShaderResource, ResourceStates.RenderTarget);
 
         // Update the constant buffer of the camera.
-        Data.GraphicsQueue.ExecuteCommandList(Data.CommandList);
+        //Data.GraphicsQueue.ExecuteCommandList(Data.CommandList);
+        // TODO: This lead to the removal of the device and problems. Research how to D3D12!!!
 
         // Clear the render target view and depth stencil view with the set color.
         Data.CommandList.ClearRenderTargetView(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), Colors.DarkGray);
@@ -235,10 +236,10 @@ public sealed partial class Renderer
 
     private void CreateDevice(out Result result)
     {
-        if (Config.Debug
-            && D3D12.D3D12GetDebugInterface(out ID3D12Debug debug).Success)
+        if (Config.Debug && D3D12.D3D12GetDebugInterface(out ID3D12Debug1 debug).Success)
         {
             debug!.EnableDebugLayer();
+            debug!.SetEnableGPUBasedValidation(true);
             debug!.Dispose();
         }
         else
