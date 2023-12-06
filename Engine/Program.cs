@@ -6,33 +6,33 @@ public sealed class Program
     private static void Main() =>
         new Program().Run(false);
 
-    public void Run(bool gui = true, Config config = null)
+    public void Run(bool renderGUI = true, Config config = null)
     {
         HandleExceptions();
 
         // Instantiate Window and Engine.
-        InitializeWindow(config, gui, out var appWindow);
-        InitializeEngine(config, appWindow, out var engineCore);
+        InitializeWindow(renderGUI, ref config, out var appWindow);
+        InitializeEngine(appWindow, ref config, out var engineCore);
 
         // Create a while loop for the game logic
         // and dispose on window quit requested.
         appWindow.Loop(
-            engineCore.Frame, 
+            engineCore.Frame,
             engineCore.Dispose);
     }
 
-    private void InitializeWindow(Config config, bool gui, out AppWindow appWindow)
+    private void InitializeWindow(bool renderGUI, ref Config config, out AppWindow appWindow)
     {
         config ??= Config.GetDefaultConfig();
         config.SetWindowData("3D Engine", 1080, 720);
-        config.GUI = gui;
+        config.GUI = renderGUI;
 
         appWindow = new();
         appWindow.Initialize(config.WindowData);
         appWindow.Show();
     }
 
-    private void InitializeEngine(Config config, AppWindow appWindow, out Core engineCore)
+    private void InitializeEngine(AppWindow appWindow, ref Config config, out Core engineCore)
     {
         engineCore = new Core(new Renderer(appWindow.Win32Window, config), appWindow.Win32Window.Handle);
         engineCore.OnGUI += appWindow.Render;

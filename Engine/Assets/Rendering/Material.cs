@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 
 using SharpGen.Runtime;
 using Vortice.Direct3D12;
@@ -55,9 +56,14 @@ public sealed partial class Material
 
         // Set root signature.
         CommandList.SetGraphicsRootSignature(RootSignature);
+
+        if (Renderer.Device.DeviceRemovedReason != 0)
+            Output.Log(Renderer.Device.DeviceRemovedReason.Description);
         // Set shader resource and sampler.
         CommandList.SetGraphicsRootDescriptorTable(0, _resourceView.GetGPUDescriptorHandleForHeapStart());
         CommandList.SetGraphicsRootDescriptorTable(0, _samplerState.GetGPUDescriptorHandleForHeapStart());
+        if (Renderer.Device.DeviceRemovedReason != 0)
+            Output.Log(Renderer.Device.DeviceRemovedReason.Description);
 
         // Set current command list in the graphics queue.
         Renderer.Data.GraphicsQueue.ExecuteCommandList(CommandList);
@@ -152,44 +158,7 @@ public sealed partial class Material
 
 public sealed partial class Material
 {
-    private static int _count = 1;
-
-    private void CreateRootSignature(string shaderFilePath)
-    {
-        // Create a root signature
-        RootSignatureFlags rootSignatureFlags =
-              RootSignatureFlags.AllowInputAssemblerInputLayout
-            | RootSignatureFlags.ConstantBufferViewShaderResourceViewUnorderedAccessViewHeapDirectlyIndexed
-            | RootSignatureFlags.DenyHullShaderRootAccess
-            | RootSignatureFlags.DenyDomainShaderRootAccess
-            | RootSignatureFlags.DenyGeometryShaderRootAccess
-            | RootSignatureFlags.DenyAmplificationShaderRootAccess
-            | RootSignatureFlags.DenyMeshShaderRootAccess;
-
-        RootSignatureDescription1 rootSignatureDescription = new(rootSignatureFlags);
-
-        RootParameter1 texture = new(
-            RootParameterType.ShaderResourceView,
-            new RootDescriptor1(0, 0),
-            ShaderVisibility.All);
-
-        RootParameter1 sampler = new(
-            new RootDescriptorTable1(new DescriptorRange1(
-                DescriptorRangeType.Sampler, 1, 0, 0, 0)),
-            ShaderVisibility.All);
-
-        RootParameter1 constantbuffer = new(
-            new RootDescriptorTable1(new DescriptorRange1(
-                DescriptorRangeType.ConstantBufferView, 2, 0, 0, 0)),
-            ShaderVisibility.All);
-
-        // Define the root parameters
-        RootParameter1[] rootParameters = new[] { texture, sampler, constantbuffer };
-        rootSignatureDescription.Parameters = rootParameters;
-
-        RootSignature = Renderer.Device.CreateRootSignature(rootSignatureDescription);
-        RootSignature.Name = new FileInfo(shaderFilePath).Name + " " + _count++;
-    }
+    private static int _count { get; set; } = 1;
 
     private void CreateInputLayout(out InputLayoutDescription inputLayoutDescription)
     {
@@ -237,6 +206,43 @@ public sealed partial class Material
 
 public sealed partial class Material
 {
+    private void CreateRootSignature(string shaderFilePath)
+    {
+        // Create a root signature
+        RootSignatureFlags rootSignatureFlags =
+              RootSignatureFlags.AllowInputAssemblerInputLayout
+            | RootSignatureFlags.ConstantBufferViewShaderResourceViewUnorderedAccessViewHeapDirectlyIndexed
+            | RootSignatureFlags.DenyHullShaderRootAccess
+            | RootSignatureFlags.DenyDomainShaderRootAccess
+            | RootSignatureFlags.DenyGeometryShaderRootAccess
+            | RootSignatureFlags.DenyAmplificationShaderRootAccess
+            | RootSignatureFlags.DenyMeshShaderRootAccess;
+
+        RootSignatureDescription1 rootSignatureDescription = new(rootSignatureFlags);
+
+        RootParameter1 texture = new(
+            RootParameterType.ShaderResourceView,
+            new RootDescriptor1(0, 0),
+            ShaderVisibility.All);
+
+        RootParameter1 sampler = new(
+            new RootDescriptorTable1(new DescriptorRange1(
+                DescriptorRangeType.Sampler, 1, 0, 0, 0)),
+            ShaderVisibility.All);
+
+        RootParameter1 constantbuffer = new(
+            new RootDescriptorTable1(new DescriptorRange1(
+                DescriptorRangeType.ConstantBufferView, 2, 0, 0, 0)),
+            ShaderVisibility.All);
+
+        // Define the root parameters
+        RootParameter1[] rootParameters = new[] { texture, sampler, constantbuffer };
+        rootSignatureDescription.Parameters = rootParameters;
+
+        RootSignature = Renderer.Device.CreateRootSignature(rootSignatureDescription);
+        RootSignature.Name = new FileInfo(shaderFilePath).Name + " " + _count++;
+    }
+
     private void CreateCommandAllocator()
     {
         CommandAllocator = Renderer.Device.CreateCommandAllocator(CommandListType.Direct);

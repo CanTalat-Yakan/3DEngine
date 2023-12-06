@@ -95,15 +95,6 @@ public sealed partial class Renderer
         return Result.Ok;
     }
 
-    public void Dispose()
-    {
-        WaitIdle();
-
-        // Dispose all DirectX resources that were created.
-        Device?.Dispose();
-        Data.Dispose();
-    }
-
     public void Resize(int newWidth, int newHeight)
     {
         if (!IsRendering)
@@ -133,6 +124,15 @@ public sealed partial class Renderer
         CreateDepthStencilView();
 
         Core.Instance.Frame();
+    }
+
+    public void Dispose()
+    {
+        WaitIdle();
+
+        // Dispose all DirectX resources that were created.
+        Device?.Dispose();
+        Data.Dispose();
     }
 }
 
