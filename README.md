@@ -103,7 +103,7 @@ You can compile the 3DEngine (Package) for the Editor and the Engine as a standa
 * Networking,
 * Spatial Audio.
 
-As a Unity Developer, I've gathered a collection of top-notch assets from the Unity Asset Store. I plan to incorporate my favorite ones into this game engine when the time is right for implementing them in the creation of various games. Here's a list of plugins that I'll be integrating into the engine:
+As a Unity Developer, I've gathered a collection of top-notch assets from the Unity Asset Store. I plan to incorporate my favorite ones into this game engine when the time is right for implementing them in the creation of various games. Here's a list of some plugins that I'll be integrating into the engine:
 
 * [KWS Water System](https://assetstore.unity.com/packages/tools/particles-effects/kws-water-system-hdrp-rendering-205007),
 * [Acerola's Water System](https://github.com/GarrettGunnell/Water),
