@@ -108,11 +108,7 @@ As a Unity Developer, I've gathered a collection of top-notch assets from the Un
 * [KWS Water System](https://assetstore.unity.com/packages/tools/particles-effects/kws-water-system-hdrp-rendering-205007),
 * [Acerola's Water System](https://github.com/GarrettGunnell/Water),
 * [Expanse](https://assetstore.unity.com/packages/tools/particles-effects/expanse-volumetric-skies-clouds-and-atmospheres-in-hdrp-192456),
-* [Atlas](https://assetstore.unity.com/packages/tools/terrain/atlas-terrain-editor-207568),
-* [Ray Fire](https://assetstore.unity.com/packages/tools/game-toolkits/rayfire-for-unity-148690),
-* [Puppet Master](https://assetstore.unity.com/packages/tools/physics/puppetmaster-48977),
-* [Final IK](https://assetstore.unity.com/packages/tools/animation/final-ik-14290),
-* [A* Pathfinding Project Pro](https://assetstore.unity.com/packages/tools/behavior-ai/a-pathfinding-project-pro-87744).
+* [Atlas](https://assetstore.unity.com/packages/tools/terrain/atlas-terrain-editor-207568).
 
 # Build
 In order to compile, you need to install [Visual Studio 2022 Preview](https://visualstudio.microsoft.com/vs/preview/) with the following components:
