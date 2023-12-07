@@ -122,9 +122,8 @@ public sealed partial class Material
         _resourceView.GetCPUDescriptorHandleForHeapStart().Offset(size);
         #endregion
 
-        Result result = Renderer.Device.DeviceRemovedReason;
-        if (result.Failure)
-            throw new Exception(result.Description);
+        if (Renderer.Device.DeviceRemovedReason != 0)
+            Output.Log(Renderer.Device.DeviceRemovedReason.Description);
 
         #region // Create Sampler
         // Set the properties for the sampler state.
