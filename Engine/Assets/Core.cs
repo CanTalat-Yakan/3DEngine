@@ -11,7 +11,6 @@ global using Engine.Rendering;
 global using Engine.Runtime;
 global using Engine.SceneSystem;
 global using Engine.Utilities;
-using ImGuiNET;
 
 namespace Engine;
 
@@ -185,7 +184,7 @@ public sealed class Core
         Renderer?.Dispose();
         SceneManager?.Dispose();
 
-        ImGui.DestroyContext();
+        ImGuiNET.ImGui.DestroyContext();
         Input.Dispose();
 
         OnDispose?.Invoke();
