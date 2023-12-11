@@ -225,6 +225,12 @@ public sealed partial class Renderer
         Profiler.Indices = 0;
         Profiler.DrawCalls = 0;
     }
+    
+    public void CheckDeviceRemoved()
+    {
+        if (Device.DeviceRemovedReason != Result.Ok)
+            Output.Log(Device.DeviceRemovedReason.Description);
+    }
 }
 
 public sealed partial class Renderer

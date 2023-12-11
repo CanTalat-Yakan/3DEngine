@@ -60,21 +60,17 @@ public sealed partial class Material
 
         //// Set texture by transitioning state.
         //CommandList.ResourceBarrierTransition(Texture, ResourceStates.CopyDest, ResourceStates.UnorderedAccess);
-        //CommandList.SetGraphicsRootDescriptorTable(0, _resourceView.GetGPUDescriptorHandleForHeapStart());
+        //CommandList.SetGraphicsRootDescriptorTable(0, _textureView.GetGPUDescriptorHandleForHeapStart());
         //CommandList.ResourceBarrierTransition(Texture, ResourceStates.UnorderedAccess, ResourceStates.CopyDest);
 
         //// Set sampler description.
         //CommandList.SetGraphicsRootDescriptorTable(0, _samplerState.GetGPUDescriptorHandleForHeapStart());
 
-        if (Renderer.Device.DeviceRemovedReason != 0)
-            Output.Log(Renderer.Device.DeviceRemovedReason.Description);
+        Renderer.CheckDeviceRemoved();
 
         // Set current command list in the graphics queue.
         CommandList.Close();
         Renderer.Data.GraphicsQueue.ExecuteCommandList(CommandList);
-
-        if (Renderer.Device.DeviceRemovedReason != 0)
-            Output.Log(Renderer.Device.DeviceRemovedReason.Description);
 
         // Assign material to the static variable.
         CurrentMaterialOnGPU = this;
