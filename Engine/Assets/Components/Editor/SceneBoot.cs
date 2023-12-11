@@ -11,13 +11,13 @@ internal sealed class SceneBoot : EditorComponent, IHide
 
     public override void OnAwake()
     {
-        // Create a camera entity with the name "Camera" and tag "SceneCamera".
+        // Create a camera entity with the name "Camera".
         SceneCamera = SceneManager.MainScene.EntityManager.CreateCamera("Camera");
         SceneCamera.Entity.IsHidden = true;
         // Set the camera order to the maximum value.
         SceneCamera.CameraID = byte.MaxValue;
 
-        // Add the DeactivateSceneCameraOnPlay and CameraController components to the camera entity.
+        // Add the ViewportController components to the camera entity.
         SceneCamera.Entity.AddComponent<ViewportController>().SetCamera(SceneCamera);
 
         // Set the initial position and rotation of the camera entity.
@@ -35,7 +35,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
 
     public override void OnStart()
     {
-        // Create a camera entity with the name "Camera" and the tag ETags.MainCamera.
+        // Create a camera entity with the name "Camera" and the tag "MainCamera".
         SceneManager.MainScene.EntityManager.CreateCamera("Camera", Tags.MainCamera.ToString());
 
         // Create a parent entity for all cube entities with the name "Cubes".
