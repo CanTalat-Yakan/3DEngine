@@ -16,7 +16,7 @@ public class Config
     public bool Debug = true;
     public bool GUI = true;
 
-    public static Config GetDefaultConfig()
+    public static Config GetDefault()
     {
         Config config = new();
         config.SetVSync(PresentInterval.Immediate);
