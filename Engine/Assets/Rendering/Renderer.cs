@@ -172,7 +172,7 @@ public sealed partial class Renderer
     {
         Data.SetupInputAssembler(indexBufferViews, vertexBufferViews);
 
-        Data.CommandList.DrawIndexedInstanced(indexCount, Math.Max(1, instanceCount), 0, 0, 0);
+        Data.CommandList.DrawIndexedInstanced(indexCount, instanceCount, 0, 0, 0);
     }
 
     public void EndRenderPass() =>
