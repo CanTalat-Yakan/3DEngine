@@ -24,7 +24,6 @@ public sealed class Program
     private void InitializeWindow(bool renderGUI, ref Config config, out AppWindow appWindow)
     {
         config ??= Config.GetDefault();
-        config.SetWindowData("3D Engine", 1080, 720);
         config.GUI = renderGUI;
 
         appWindow = new();
