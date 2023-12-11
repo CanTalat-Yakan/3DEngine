@@ -21,7 +21,7 @@ public class Config
     public static Config GetDefault(
         PresentInterval presentInterval = PresentInterval.Immediate,
         MultiSample multiSample = MultiSample.x2,
-        int resolutionScale = 1,
+        double resolutionScale = 1,
         string title = "3D Engine", 
         int width = 1080, 
         int height = 720)
