@@ -137,6 +137,14 @@ public sealed partial class Renderer
 
 public sealed partial class Renderer
 {
+    public void WaitIdle()
+    {
+        Data.GraphicsQueue.Signal(Data.FrameFence, ++Data.FrameCount);
+
+        Data.FrameFence.SetEventOnCompletion(Data.FrameCount, Data.FrameFenceEvent);
+        Data.FrameFenceEvent.WaitOne();
+    }
+
     public void Present()
     {
         // Present the final render to the screen.
@@ -186,18 +194,11 @@ public sealed partial class Renderer
         Data.CommandList.BeginRenderPass(renderPassDescription, depthStencil);
     }
 
-    public void WaitIdle()
-    {
-        Data.GraphicsQueue.Signal(Data.FrameFence, ++Data.FrameCount);
-
-        Data.FrameFence.SetEventOnCompletion(Data.FrameCount, Data.FrameFenceEvent);
-        Data.FrameFenceEvent.WaitOne();
-    }
 
     public void EndFrame()
     {
         // Indicate that the back buffer will now be used to present.
-        Data.CommandList.ResourceBarrierTransition(Data.OutputRenderTargetTexture, ResourceStates.CopySource, ResourceStates.UnorderedAccess);
+        Data.CommandList.ResourceBarrierTransition(Data.OutputRenderTargetTexture, ResourceStates.UnorderedAccess, ResourceStates.CopySource);
         Data.CommandList.EndEvent();
     }
 

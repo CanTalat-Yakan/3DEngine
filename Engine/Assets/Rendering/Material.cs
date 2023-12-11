@@ -20,6 +20,7 @@ public sealed partial class Material
     public ID3D12GraphicsCommandList4 CommandList;
     public ID3D12PipelineState PipelineState;
 
+    public ID3D12Resource Texture;
     private ID3D12DescriptorHeap _resourceView;
     private ID3D12DescriptorHeap _samplerState;
 
@@ -57,9 +58,16 @@ public sealed partial class Material
         // Set root signature.
         CommandList.SetGraphicsRootSignature(RootSignature);
 
-        // Set shader resource and sampler.
+        //// Set texture by transitioning state.
+        //CommandList.ResourceBarrierTransition(Texture, ResourceStates.CopyDest, ResourceStates.UnorderedAccess);
         //CommandList.SetGraphicsRootDescriptorTable(0, _resourceView.GetGPUDescriptorHandleForHeapStart());
+        //CommandList.ResourceBarrierTransition(Texture, ResourceStates.UnorderedAccess, ResourceStates.CopyDest);
+
+        //// Set sampler description.
         //CommandList.SetGraphicsRootDescriptorTable(0, _samplerState.GetGPUDescriptorHandleForHeapStart());
+
+        if (Renderer.Device.DeviceRemovedReason != 0)
+            Output.Log(Renderer.Device.DeviceRemovedReason.Description);
 
         // Set current command list in the graphics queue.
         CommandList.Close();
@@ -96,13 +104,13 @@ public sealed partial class Material
     {
         #region // Create Texture
         // Load the texture and create a shader resource view for it.
-        Loader.ImageLoader.LoadTexture(out var texture, Renderer.Device, imageFileName);
+        Loader.ImageLoader.LoadTexture(out Texture, Renderer.Device, imageFileName);
 
         ShaderResourceViewDescription shaderResourceViewDescription = new()
         {
-            Format = texture.Description.Format,
+            Format = Texture.Description.Format,
             ViewDimension = ShaderResourceViewDimension.Texture2D,
-            Texture2D = new Texture2DShaderResourceView { MipLevels = texture.Description.MipLevels },
+            Texture2D = new Texture2DShaderResourceView { MipLevels = Texture.Description.MipLevels },
             Shader4ComponentMapping = ShaderComponentMapping.Default
         };
 
@@ -112,8 +120,8 @@ public sealed partial class Material
             Flags = DescriptorHeapFlags.ShaderVisible,
             Type = DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView
         });
-        _resourceView.Name = texture.Name + " Texture";
-        Renderer.Device.CreateShaderResourceView(texture, shaderResourceViewDescription, _resourceView.GetCPUDescriptorHandleForHeapStart());
+        _resourceView.Name = Texture.Name + " Texture";
+        Renderer.Device.CreateShaderResourceView(Texture, shaderResourceViewDescription, _resourceView.GetCPUDescriptorHandleForHeapStart());
 
         var size = Renderer.Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView);
         _resourceView.GetCPUDescriptorHandleForHeapStart().Offset(size);
@@ -124,7 +132,7 @@ public sealed partial class Material
 
         #region // Create Sampler
         // Set the properties for the sampler state.
-        SamplerDescription samplerStateDescription = new()
+        SamplerDescription samplerDescription = new()
         {
             Filter = Filter.Anisotropic, // Use anisotropic filtering for smoother sampling.
             AddressU = TextureAddressMode.Mirror,
@@ -142,9 +150,9 @@ public sealed partial class Material
             Flags = DescriptorHeapFlags.ShaderVisible,
             Type = DescriptorHeapType.Sampler
         });
-        _samplerState.Name = texture.Name + " Sampler";
+        _samplerState.Name = Texture.Name + " Sampler";
         // Create the sampler state using the sampler description.
-        Renderer.Device.CreateSampler(ref samplerStateDescription, _samplerState.GetCPUDescriptorHandleForHeapStart());
+        Renderer.Device.CreateSampler(ref samplerDescription, _samplerState.GetCPUDescriptorHandleForHeapStart());
 
         size = Renderer.Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView);
         _samplerState.GetCPUDescriptorHandleForHeapStart().Offset(size);
