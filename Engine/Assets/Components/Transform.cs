@@ -99,7 +99,7 @@ public sealed partial class Transform : EditorComponent, IHide
     private void CalculateOrientation()
     {
         // Calculate the forward direction based on the EulerAngles.
-        LocalForward = CalculateForward(EulerAngles, LocalForward);
+        LocalForward = CalculateForward(LocalForward, EulerAngles);
 
         // Calculate the right direction as a product of the forward and global up direction.
         LocalRight = Vector3.Normalize(Vector3.Cross(LocalForward, Vector3.UnitY));
@@ -108,7 +108,7 @@ public sealed partial class Transform : EditorComponent, IHide
         LocalUp = Vector3.Normalize(Vector3.Cross(LocalRight, LocalForward));
     }
 
-    private Vector3 CalculateForward(Vector3 eulerAngles, Vector3 input)
+    private Vector3 CalculateForward(Vector3 input, Vector3 eulerAngles)
     {
         float sinX = MathF.Sin(eulerAngles.X.ToRadians());
         float cosX = MathF.Cos(eulerAngles.X.ToRadians());
