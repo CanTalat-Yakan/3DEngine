@@ -53,12 +53,10 @@ public sealed partial class AppWindow
     public void Show(ShowWindowCommand showWindowCommand = ShowWindowCommand.Normal) =>
         ShowWindow(Win32Window.Handle, showWindowCommand);
 
-    public void Loop(Action frame, Action dispose)
+    public void Loop(Action frame)
     {
         while (IsAvailable())
             frame?.Invoke();
-
-        dispose?.Invoke();
     }
 }
 
