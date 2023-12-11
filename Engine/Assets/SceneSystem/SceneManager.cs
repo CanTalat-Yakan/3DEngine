@@ -195,8 +195,8 @@ public sealed partial class SceneManager
     public void Dispose()
     {
         // Dispose all Systems.
-        CameraSystem.Dispose();
-        MeshSystem.Dispose();
+        CameraSystem.Destroy();
+        MeshSystem.Destroy();
 
         MainScene.EntityManager.Dispose();
         foreach (var scene in Subscenes)

@@ -55,7 +55,7 @@ public partial class System<T> where T : Component
         }
     }
 
-    public static void Dispose()
+    public static void Destroy()
     {
         // Remove all components and call OnDestroy().
         foreach (var component in s_components)
