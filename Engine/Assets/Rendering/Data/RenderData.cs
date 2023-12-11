@@ -60,7 +60,8 @@ public struct RenderData
 
     public void Dispose()
     {
-        Material?.Dispose();
+        MaterialCompiler.Library.Materials.ForEach(materialEntry => 
+            materialEntry.Material.Dispose());
 
         SwapChain?.Dispose();
 
