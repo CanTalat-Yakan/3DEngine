@@ -22,7 +22,7 @@ public sealed partial class ImageLoader
             return;
         }
 
-        ProcessWIC(out var format, out var size, device, filePath, fromResources);
+        ProcessWIC(device, filePath, fromResources, out var format, out var size);
 
         ResourceDescription textureDescription = ResourceDescription.Texture2D(
             format,
@@ -48,7 +48,7 @@ public sealed partial class ImageLoader
         s_textureStore.Add(filePath, texture);
     }
 
-    private static void ProcessWIC(out Format format, out Size size, ID3D12Device device, string filePath, bool fromResources = true)
+    private static void ProcessWIC(ID3D12Device device, string filePath, bool fromResources, out Format format, out Size size)
     {
         // Define the full path to the texture file.
         string textureFilePath = fromResources

@@ -30,7 +30,7 @@ public record MessageLog(
         {
             MessageType.Message => "[MSG] ",
             MessageType.Warning => "[WRN] ",
-            MessageType.Error   => "[ERR] ",
+            MessageType.Error => "[ERR] ",
             _ => string.Empty
         };
 
@@ -51,12 +51,16 @@ public class Output
         MessageType type = MessageType.Message,
         [CallerLineNumber] int line = 0,
         [CallerMemberName] string method = null,
-        [CallerFilePath] string script = null)
+        [CallerFilePath] string script = null,
+        bool writeLineDebugConsole = true)
     {
         MessageLog log = new(o, type, line, method, script);
 
-        Debug.WriteLine(log);
-        Console.WriteLine(log);
+        if (writeLineDebugConsole)
+        {
+            Debug.WriteLine(log);
+            Console.WriteLine(log);
+        }
 
         _logs.Enqueue(log);
     }

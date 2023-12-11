@@ -57,6 +57,6 @@ public class ExceptionHandler
         Debug.WriteLine(OutputMessage);
         Console.WriteLine(OutputMessage);
 
-        Output.Log(exception, MessageType.Error, lineNumber, methodName, fileName);
+        Output.Log(exception, MessageType.Error, lineNumber, methodName, fileName, false);
     }
 }
