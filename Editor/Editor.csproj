@@ -11,6 +11,7 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<LangVersion>preview</LangVersion>
 		<ApplicationIcon>Assets\Resources\Textures\App.ico</ApplicationIcon>
+		<UseRidGraph>true</UseRidGraph>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
@@ -31,7 +32,7 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm64'">
 		<DefineConstants>$(DefineConstants);EDITOR;TRACE;DEBUG;NET;NET7_0</DefineConstants>
 	</PropertyGroup>
-	
+
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.231115000" />
@@ -42,7 +43,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Engine\Engine.csproj" />
+		<ProjectReference Include="..\Engine\Engine.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

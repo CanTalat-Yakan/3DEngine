@@ -66,7 +66,7 @@ internal sealed partial class Viewport(Grid content)
         // Gets the native object for the SwapChainPanel control.
         using (var nativeObject = ComObject.As<Vortice.WinUI.ISwapChainPanelNative2>(swapChainPanel))
         {
-            var result = nativeObject.SetSwapChain(renderer.SwapChain);
+            var result = nativeObject.SetSwapChain(renderer.Data.SwapChain);
             if (result.Failure)
                 throw new Exception(result.Description);
         }

@@ -8,6 +8,7 @@
 		<LangVersion>preview</LangVersion>
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<UseRidGraph>true</UseRidGraph>
 		<Title>3D Engine</Title>
 		<PackageId>3DEngine</PackageId>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
@@ -110,13 +111,13 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Resources\Shaders\Include\Common.hlsli">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Resources\Shaders\SimpleLit.hlsl">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Resources\Templates\ComputeShader.txt">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Resources\Templates\Project\Engine.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -160,13 +161,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Include="..\3DEngine_Logo.png" Link="Assets\Resources\Textures\3DEngine_Logo.png">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
-	  <None Include="..\README.md" Link="Assets\Resources\README.md">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
+		<None Include="..\3DEngine_Logo.png" Link="Assets\Resources\Textures\3DEngine_Logo.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="..\README.md" Link="Assets\Resources\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
 	</ItemGroup>
 </Project>
