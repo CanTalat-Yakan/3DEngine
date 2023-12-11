@@ -1,6 +1,4 @@
-﻿using ImGuiNET;
-
-using Vortice.Win32;
+﻿using Vortice.Win32;
 
 using static Vortice.Win32.User32;
 

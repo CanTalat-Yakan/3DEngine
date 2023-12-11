@@ -1,6 +1,8 @@
 ﻿global using System.Numerics;
 global using System;
 
+global using ImGuiNET;
+
 global using Engine.Components;
 global using Engine.Data;
 global using Engine.ECS;
@@ -54,8 +56,8 @@ public sealed class Core
 
         if (Renderer.Config.GUI)
         {
-            _imguiContext = ImGuiNET.ImGui.CreateContext();
-            ImGuiNET.ImGui.SetCurrentContext(_imguiContext);
+            _imguiContext = ImGui.CreateContext();
+            ImGui.SetCurrentContext(_imguiContext);
 
             GUIRenderer = new();
             GUIInputHandler = new(hwnd);
@@ -158,7 +160,7 @@ public sealed class Core
         OnGUI?.Invoke();
 
         // Render the ImGui.
-        ImGuiNET.ImGui.Render();
+        ImGui.Render();
         // Render the DrawaData from ImGui with the ImGuiRenderer.
         GUIRenderer.Render();
     }
@@ -184,7 +186,7 @@ public sealed class Core
         Renderer?.Dispose();
         SceneManager?.Dispose();
 
-        ImGuiNET.ImGui.DestroyContext();
+        ImGui.DestroyContext();
         Input.Dispose();
 
         OnDispose?.Invoke();
