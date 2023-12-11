@@ -21,7 +21,7 @@ public sealed partial class Material
     public ID3D12PipelineState PipelineState;
 
     public ID3D12Resource Texture;
-    private ID3D12DescriptorHeap _resourceView;
+    private ID3D12DescriptorHeap _textureView;
     private ID3D12DescriptorHeap _samplerState;
 
     internal Renderer Renderer => _renderer ??= Renderer.Instance;
@@ -96,7 +96,7 @@ public sealed partial class Material
         CommandList?.Dispose();
         PipelineState?.Dispose();
 
-        _resourceView?.Dispose();
+        _textureView?.Dispose();
         _samplerState?.Dispose();
     }
 
@@ -114,21 +114,18 @@ public sealed partial class Material
             Shader4ComponentMapping = ShaderComponentMapping.Default
         };
 
-        _resourceView = Renderer.Device.CreateDescriptorHeap(new()
+        _textureView = Renderer.Device.CreateDescriptorHeap(new()
         {
             DescriptorCount = 1,
             Flags = DescriptorHeapFlags.ShaderVisible,
             Type = DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView
         });
-        _resourceView.Name = Texture.Name + " Texture";
-        Renderer.Device.CreateShaderResourceView(Texture, shaderResourceViewDescription, _resourceView.GetCPUDescriptorHandleForHeapStart());
+        _textureView.Name = Texture.Name + " Texture";
+        Renderer.Device.CreateShaderResourceView(Texture, shaderResourceViewDescription, _textureView.GetCPUDescriptorHandleForHeapStart());
 
         var size = Renderer.Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView);
-        _resourceView.GetCPUDescriptorHandleForHeapStart().Offset(size);
+        _textureView.GetCPUDescriptorHandleForHeapStart().Offset(size);
         #endregion
-
-        if (Renderer.Device.DeviceRemovedReason != 0)
-            Output.Log(Renderer.Device.DeviceRemovedReason.Description);
 
         #region // Create Sampler
         // Set the properties for the sampler state.
