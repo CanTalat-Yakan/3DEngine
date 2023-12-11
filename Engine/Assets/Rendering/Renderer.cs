@@ -137,20 +137,20 @@ public sealed partial class Renderer
 
 public sealed partial class Renderer
 {
-    public void WaitIdle()
-    {
-        Data.GraphicsQueue.Signal(Data.FrameFence, ++Data.FrameCount);
-
-        Data.FrameFence.SetEventOnCompletion(Data.FrameCount, Data.FrameFenceEvent);
-        Data.FrameFenceEvent.WaitOne();
-    }
-
     public void Present()
     {
         // Present the final render to the screen.
         Data.SwapChain.Present((int)Config.VSync, PresentFlags.DoNotWait);
 
         WaitIdle();
+    }
+
+    public void WaitIdle()
+    {
+        Data.GraphicsQueue.Signal(Data.FrameFence, ++Data.FrameCount);
+
+        Data.FrameFence.SetEventOnCompletion(Data.FrameCount, Data.FrameFenceEvent);
+        Data.FrameFenceEvent.WaitOne();
     }
 
     public void Resolve()
