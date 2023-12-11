@@ -57,7 +57,10 @@ public sealed partial class SceneManager
         // Removes the scene from the list of subscenes.
         Subscenes.Remove(scene);
     }
+}
 
+public sealed partial class SceneManager
+{
     public static Scene GetFromID(Guid guid)
     {
         // Check if the main scene ID matches the provided GUID.
