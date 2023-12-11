@@ -34,7 +34,7 @@ public sealed partial class Renderer
         if (win32Window is not null)
             _win32Window = win32Window;
         else
-            throw new Exception(
+            throw new NullReferenceException(
                 """
                 An invalid or null Win32Window instance was passed to the Renderer. 
                 Please ensure that you provide a valid Win32Window object to the Renderer.
