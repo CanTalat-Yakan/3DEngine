@@ -15,7 +15,7 @@ public sealed class Program
         InitializeEngine(appWindow, ref config, out var engineCore);
 
         // Create a while loop for the game logic
-        // and dispose on window quit requested.
+        // and dispose on window quit request.
         appWindow.Looping(engineCore.Frame);
         appWindow.Dispose(engineCore.Dispose);
     }
