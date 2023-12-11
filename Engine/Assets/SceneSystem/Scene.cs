@@ -3,7 +3,7 @@ using pxr;
 
 namespace Engine.SceneSystem;
 
-public sealed class Scene : ICloneable
+public sealed partial class Scene
 {
     public Guid ID = Guid.NewGuid();
     public EntityManager EntityManager = new();
@@ -14,7 +14,10 @@ public sealed class Scene : ICloneable
     public void Load() { }
 
     public void Unload() { }
+}
 
+public sealed partial class Scene : ICloneable
+{
     object ICloneable.Clone() =>
         Clone();
 
