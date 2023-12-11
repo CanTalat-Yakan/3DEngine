@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 using SharpGen.Runtime;
@@ -39,6 +40,8 @@ public sealed partial class Material
         UpdateShader(shaderFilePath);
 
         CreateTextureAndSampler(imageFileName);
+
+        Core.Instance.OnDispose += Dispose;
     }
 
     public void UpdateShader(string shaderFilePath)

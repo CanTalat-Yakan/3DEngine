@@ -60,6 +60,7 @@ public sealed class ShaderCompiler
             shaderEntry.FileInfo = fileInfo;
             shaderEntry.ConstantBufferType = CreateMaterialPropertyBufferStruct(fileInfo.FullName);
 
+            // Update already existing materials with the latest shader bytecode and properties constantbuffer.
             foreach (var materialEntry in MaterialCompiler.Library.Materials)
                 if (materialEntry.ShaderEntry.FileInfo == fileInfo)
                 {

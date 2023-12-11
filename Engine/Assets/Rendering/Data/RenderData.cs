@@ -60,8 +60,8 @@ public struct RenderData
 
     public void Dispose()
     {
-        MaterialCompiler.Library.Materials.ForEach(materialEntry => 
-            materialEntry.Material.Dispose());
+        foreach (var materialEntry in MaterialCompiler.Library.Materials)
+            materialEntry.Material.Dispose();
 
         SwapChain?.Dispose();
 
@@ -75,8 +75,8 @@ public struct RenderData
 
     public void DisposeTexturesAndViews()
     {
-        foreach (var bufferRenderTargetTextures in BufferRenderTargetTextures)
-            bufferRenderTargetTextures?.Dispose();
+        foreach (var bufferRenderTargetTexture in BufferRenderTargetTextures)
+            bufferRenderTargetTexture?.Dispose();
         BufferRenderTargetView?.Dispose();
 
         OutputRenderTargetView?.Dispose();
