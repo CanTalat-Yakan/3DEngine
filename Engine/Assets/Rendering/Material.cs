@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 
-using SharpGen.Runtime;
 using Vortice.Direct3D12;
 using Vortice.Dxc;
 using Vortice.DXGI;
