@@ -79,6 +79,9 @@ public unsafe partial class MaterialBuffer
 
     public void UpdateModelConstantBuffer(PerModelConstantBuffer constantBuffer)
     {
+        if (Renderer.Device.DeviceRemovedReason != 0)
+            Output.Log(Renderer.Device.DeviceRemovedReason.Description);
+
         // Map the constant buffer and copy the per-model matrix of the material into it.
         PerModelConstantBuffer* pointer = _model.Map<PerModelConstantBuffer>(0);
         // Copy the data from the constant buffer to the mapped resource.

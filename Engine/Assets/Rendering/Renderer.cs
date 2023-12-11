@@ -175,6 +175,7 @@ public sealed partial class Renderer
     public void WaitIdle()
     {
         Data.GraphicsQueue.Signal(Data.FrameFence, ++Data.FrameCount);
+
         Data.FrameFence.SetEventOnCompletion(Data.FrameCount, Data.FrameFenceEvent);
         Data.FrameFenceEvent.WaitOne();
     }
@@ -184,16 +185,6 @@ public sealed partial class Renderer
         // Indicate that the back buffer will now be used to present.
         Data.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.RenderTarget, ResourceStates.AllShaderResource);
         Data.CommandList.EndEvent();
-
-        Data.GraphicsQueue.Signal(Data.FrameFence, ++Data.FrameCount);
-
-        ulong GPUFrameCount = Data.FrameFence.CompletedValue;
-
-        if ((Data.FrameCount - GPUFrameCount) >= RenderData.RenderLatency)
-        {
-            Data.FrameFence.SetEventOnCompletion(GPUFrameCount + 1, Data.FrameFenceEvent);
-            Data.FrameFenceEvent.WaitOne();
-        }
 
         WaitIdle();
     }

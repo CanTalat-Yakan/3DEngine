@@ -57,23 +57,20 @@ public sealed partial class Material
         // Set root signature.
         CommandList.SetGraphicsRootSignature(RootSignature);
 
-        if (Renderer.Device.DeviceRemovedReason != 0)
-            Output.Log(Renderer.Device.DeviceRemovedReason.Description);
         // Set shader resource and sampler.
-        CommandList.SetGraphicsRootDescriptorTable(0, _resourceView.GetGPUDescriptorHandleForHeapStart());
-        CommandList.SetGraphicsRootDescriptorTable(0, _samplerState.GetGPUDescriptorHandleForHeapStart());
-        if (Renderer.Device.DeviceRemovedReason != 0)
-            Output.Log(Renderer.Device.DeviceRemovedReason.Description);
+        //CommandList.SetGraphicsRootDescriptorTable(0, _resourceView.GetGPUDescriptorHandleForHeapStart());
+        //CommandList.SetGraphicsRootDescriptorTable(0, _samplerState.GetGPUDescriptorHandleForHeapStart());
 
         // Set current command list in the graphics queue.
+        CommandList.Close();
         Renderer.Data.GraphicsQueue.ExecuteCommandList(CommandList);
+
+        if (Renderer.Device.DeviceRemovedReason != 0)
+            Output.Log(Renderer.Device.DeviceRemovedReason.Description);
 
         // Assign material to the static variable.
         CurrentMaterialOnGPU = this;
     }
-
-    public void Close() =>
-        CommandList.Close();
 
     public void Reset()
     {
