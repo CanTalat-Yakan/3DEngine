@@ -168,11 +168,11 @@ public sealed partial class Renderer
         Data.CommandList.ResourceBarrierTransition(Data.OutputRenderTargetTexture, ResourceStates.CopyDest, ResourceStates.Present);
     }
 
-    public void Draw(int indexCount, IndexBufferView indexBufferViews, params VertexBufferView[] vertexBufferViews)
+    public void Draw(int indexCount, IndexBufferView indexBufferViews, int instanceCount, params VertexBufferView[] vertexBufferViews)
     {
         Data.SetupInputAssembler(indexBufferViews, vertexBufferViews);
 
-        Data.CommandList.DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
+        Data.CommandList.DrawIndexedInstanced(indexCount, Math.Max(1, instanceCount), 0, 0, 0);
     }
 
     public void EndRenderPass() =>
