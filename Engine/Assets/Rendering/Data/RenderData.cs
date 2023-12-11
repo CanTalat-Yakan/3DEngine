@@ -22,12 +22,11 @@ public struct RenderData
     public ID3D12Fence FrameFence;
     public AutoResetEvent FrameFenceEvent;
 
-    public ID3D12Resource BackBufferRenderTargetTexture => BufferRenderTargetTextures[SwapChain.CurrentBackBufferIndex];
     public ID3D12Resource[] BufferRenderTargetTextures;
     public ID3D12DescriptorHeap BufferRenderTargetView;
 
-    public ID3D12Resource MSAARenderTargetTexture;
-    public ID3D12DescriptorHeap MSAARenderTargetView;
+    public ID3D12Resource OutputRenderTargetTexture;
+    public ID3D12DescriptorHeap OutputRenderTargetView;
 
     public ID3D12Resource DepthStencilTexture;
     public ID3D12DescriptorHeap DepthStencilView;
@@ -79,8 +78,8 @@ public struct RenderData
             bufferRenderTargetTextures?.Dispose();
         BufferRenderTargetView?.Dispose();
 
-        MSAARenderTargetView?.Dispose();
-        MSAARenderTargetTexture?.Dispose();
+        OutputRenderTargetView?.Dispose();
+        OutputRenderTargetTexture?.Dispose();
 
         DepthStencilTexture?.Dispose();
         DepthStencilView?.Dispose();

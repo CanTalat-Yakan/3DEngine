@@ -14,7 +14,6 @@ public sealed partial class Renderer
     public static Renderer Instance { get; private set; }
 
     public bool IsRendering => Data.BufferRenderTargetView?.NativePointer is not 0;
-    public IDXGISwapChain3 SwapChain => Data.SwapChain;
 
     public Size Size => NativeSize.Scale(Config.ResolutionScale);
     public Size NativeSize { get; private set; }
@@ -86,7 +85,7 @@ public sealed partial class Renderer
         SetupSwapChain(forHwnd);
 
         GetSwapChainBuffersAndCreateRenderTargetViews();
-        CreateMSAATextureAndRenderTargetView();
+        CreateOutputTextureAndRenderTargetView();
         CreateDepthStencilView();
 
         CreateBlendDescription();
@@ -120,7 +119,7 @@ public sealed partial class Renderer
         Data.SwapChain.SourceSize = Size;
 
         GetSwapChainBuffersAndCreateRenderTargetViews();
-        CreateMSAATextureAndRenderTargetView();
+        CreateOutputTextureAndRenderTargetView();
         CreateDepthStencilView();
 
         Core.Instance.Frame();
@@ -138,13 +137,28 @@ public sealed partial class Renderer
 
 public sealed partial class Renderer
 {
-    public void Present() =>
+    public void Present()
+    {
         // Present the final render to the screen.
         Data.SwapChain.Present((int)Config.VSync, PresentFlags.DoNotWait);
 
-    public void Resolve() =>
-        // Copy the MSAA render target texture into the back buffer render texture.
-        Data.CommandList.ResolveSubresource(Data.BackBufferRenderTargetTexture, 0, Data.MSAARenderTargetTexture, 0, RenderData.RenderTargetFormat);
+        WaitIdle();
+    }
+
+    public void Resolve()
+    {
+        // Copy the output buffer to the back buffer.
+        Data.CommandList.ResourceBarrierTransition(Data.OutputRenderTargetTexture, ResourceStates.Present, ResourceStates.CopyDest);
+
+        // Copy the output render target texture into the back buffer render texture.
+        Data.CommandList.ResolveSubresource(
+            Data.BufferRenderTargetTextures[Data.SwapChain.CurrentBackBufferIndex], 0, 
+            Data.OutputRenderTargetTexture, 0, 
+            RenderData.RenderTargetFormat);
+
+        // Indicate that the back buffer will now be used to present.
+        Data.CommandList.ResourceBarrierTransition(Data.OutputRenderTargetTexture, ResourceStates.CopyDest, ResourceStates.Present);
+    }
 
     public void Draw(int indexCount, IndexBufferView indexBufferViews, params VertexBufferView[] vertexBufferViews)
     {
@@ -183,10 +197,8 @@ public sealed partial class Renderer
     public void EndFrame()
     {
         // Indicate that the back buffer will now be used to present.
-        Data.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.RenderTarget, ResourceStates.AllShaderResource);
+        Data.CommandList.ResourceBarrierTransition(Data.OutputRenderTargetTexture, ResourceStates.CopySource, ResourceStates.UnorderedAccess);
         Data.CommandList.EndEvent();
-
-        WaitIdle();
     }
 
     public void BeginFrame()
@@ -194,18 +206,18 @@ public sealed partial class Renderer
         Data.CommandList.BeginEvent("Frame");
 
         // Indicate that the MSAA render target texture will be used as a render target.
-        Data.CommandList.ResourceBarrierTransition(Data.MSAARenderTargetTexture, ResourceStates.AllShaderResource, ResourceStates.RenderTarget);
+        Data.CommandList.ResourceBarrierTransition(Data.OutputRenderTargetTexture, ResourceStates.CopySource, ResourceStates.UnorderedAccess);
 
         // Update the constant buffer of the camera.
         //Data.GraphicsQueue.ExecuteCommandList(Data.CommandList);
         // TODO: This lead to the removal of the device and problems. Research how to D3D12!!!
 
         // Clear the render target view and depth stencil view with the set color.
-        Data.CommandList.ClearRenderTargetView(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), Colors.DarkGray);
+        Data.CommandList.ClearRenderTargetView(Data.OutputRenderTargetView.GetCPUDescriptorHandleForHeapStart(), Colors.DarkGray);
         Data.CommandList.ClearDepthStencilView(Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
 
         // Set the render target and depth stencil view for the device context.
-        Data.CommandList.OMSetRenderTargets(Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart(), Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart());
+        Data.CommandList.OMSetRenderTargets(Data.OutputRenderTargetView.GetCPUDescriptorHandleForHeapStart(), Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart());
 
         // Reset the profiler values for vertices, indices, and draw calls.
         Profiler.Vertices = 0;
@@ -388,7 +400,7 @@ public sealed partial class Renderer
         Config.QualityLevels = qualityLevels - 1;
     }
 
-    private void CreateMSAATextureAndRenderTargetView()
+    private void CreateOutputTextureAndRenderTargetView()
     {
         CheckMSAASupport();
 
@@ -403,11 +415,11 @@ public sealed partial class Renderer
             flags: ResourceFlags.AllowRenderTarget); // BindFlags.ShaderResource
 
         // Create the multi sample texture based on the description.
-        Data.MSAARenderTargetTexture = Device.CreateCommittedResource(
+        Data.OutputRenderTargetTexture = Device.CreateCommittedResource(
             HeapType.Default,
             MSAATextureDescription,
             ResourceStates.AllShaderResource);
-        Data.MSAARenderTargetTexture.Name = "MSAA Render Target Texture";
+        Data.OutputRenderTargetTexture.Name = "MSAA Output Render Target Texture";
 
         // Create a render target view description for the multi sampling.
         RenderTargetViewDescription MSAARenderTargetViewDescription = new()
@@ -416,16 +428,16 @@ public sealed partial class Renderer
             ViewDimension = RenderTargetViewDimension.Texture2DMultisampled
         };
 
-        Data.MSAARenderTargetView = Device.CreateDescriptorHeap(new()
+        Data.OutputRenderTargetView = Device.CreateDescriptorHeap(new()
         {
             DescriptorCount = 1,
             Type = DescriptorHeapType.RenderTargetView
         });
         // Create a render target view for the MSAA render target texture.
-        Device.CreateRenderTargetView(Data.MSAARenderTargetTexture, MSAARenderTargetViewDescription, Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart());
+        Device.CreateRenderTargetView(Data.OutputRenderTargetTexture, MSAARenderTargetViewDescription, Data.OutputRenderTargetView.GetCPUDescriptorHandleForHeapStart());
 
         var size = Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.RenderTargetView);
-        Data.MSAARenderTargetView.GetCPUDescriptorHandleForHeapStart().Offset(size);
+        Data.OutputRenderTargetView.GetCPUDescriptorHandleForHeapStart().Offset(size);
     }
 
     private void CreateDepthStencilView()
