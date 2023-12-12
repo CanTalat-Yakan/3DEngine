@@ -137,13 +137,9 @@ public sealed partial class Renderer
 
 public sealed partial class Renderer
 {
-    public void Present()
-    {
+    public void Present() =>
         // Present the final render to the screen.
         Data.SwapChain.Present((int)Config.VSync, PresentFlags.DoNotWait);
-
-        WaitIdle();
-    }
 
     public void WaitIdle()
     {
@@ -151,6 +147,15 @@ public sealed partial class Renderer
 
         Data.FrameFence.SetEventOnCompletion(Data.FrameCount, Data.FrameFenceEvent);
         Data.FrameFenceEvent.WaitOne();
+    }
+
+    public void Execute()
+    {
+        //Data.CommandList.Close();
+        //Data.GraphicsQueue.ExecuteCommandList(Data.CommandList);
+
+        //Data.CommandAllocator.Reset();
+        //Data.CommandList.Reset(Data.CommandAllocator, null);
     }
 
     public void Resolve()
@@ -207,10 +212,6 @@ public sealed partial class Renderer
 
         // Indicate that the MSAA render target texture will be used as a render target.
         Data.CommandList.ResourceBarrierTransition(Data.OutputRenderTargetTexture, ResourceStates.CopySource, ResourceStates.UnorderedAccess);
-
-        // Update the constant buffer of the camera.
-        //Data.GraphicsQueue.ExecuteCommandList(Data.CommandList);
-        // TODO: This lead to the removal of the device and problems. Research how to D3D12!!!
 
         // Clear the render target view and depth stencil view with the set color.
         Data.CommandList.ClearRenderTargetView(Data.OutputRenderTargetView.GetCPUDescriptorHandleForHeapStart(), Colors.DarkGray);

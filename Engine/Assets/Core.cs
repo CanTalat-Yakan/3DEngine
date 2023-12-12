@@ -142,6 +142,10 @@ public sealed class Core
         Renderer.EndFrame();
         // Copy the final rendered image into the back buffer.
         Renderer.Resolve();
+
+        Renderer.Execute();
+        Renderer.WaitIdle();
+
         // Presents the back buffer on the screen.
         Renderer.Present();
     }
