@@ -1,4 +1,5 @@
-﻿using ImGuiNET;
+﻿using System.Runtime.CompilerServices;
+
 using Vortice.Win32;
 
 using static Vortice.Win32.Kernel32;
@@ -8,24 +9,39 @@ namespace Engine;
 
 public sealed partial class AppWindow
 {
-    public Win32Window Win32Window { get; private set; }
+    public static Win32Window Win32Window { get; set; }
 
     public delegate void ResizeEventHandler(int width, int height);
-    public event ResizeEventHandler ResizeEvent;
+    public static event ResizeEventHandler ResizeEvent;
 
     private string _profiler = string.Empty;
     private string _output = string.Empty;
 
-    public void Initialize(WindowData windowData)
+    public AppWindow(WindowData windowData)
     {
-        CreateWindow(out var windowClass);
+        WNDCLASSEX windowClass = new()
+        {
+            Size = Unsafe.SizeOf<WNDCLASSEX>(),
+            Styles = WindowClassStyles.CS_HREDRAW | WindowClassStyles.CS_VREDRAW | WindowClassStyles.CS_OWNDC,
+            WindowProc = WndProc,
+            InstanceHandle = GetModuleHandle(null),
+            CursorHandle = LoadCursor(IntPtr.Zero, SystemCursor.IDC_ARROW),
+            BackgroundBrushHandle = IntPtr.Zero,
+            IconHandle = IntPtr.Zero,
+            ClassName = "WndClass",
+        };
 
-        Win32Window = new Win32Window(
+        RegisterClassEx(ref windowClass);
+
+        Win32Window = new(
             windowClass.ClassName,
             windowData.Title,
             windowData.Width,
             windowData.Height);
     }
+
+    public void Show(ShowWindowCommand command = ShowWindowCommand.Normal) =>
+        ShowWindow(Win32Window.Handle, command);
 
     public void Render()
     {
@@ -36,6 +52,7 @@ public sealed partial class AppWindow
         {
             if (Time.OnFixedFrame)
                 _profiler = Profiler.GetAdditionalString();
+
             ImGui.Text(_profiler);
             ImGui.End();
         }
@@ -43,15 +60,12 @@ public sealed partial class AppWindow
         ImGui.SetNextWindowBgAlpha(0.35f);
         if (ImGui.Begin("Output", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize))
         {
-            if (Output.GetLogs.Count > 0)
-                _output = Output.DequeueLogs() + _output;
+            _output = Output.DequeueLogs() + _output;
+
             ImGui.Text(_output);
             ImGui.End();
         }
     }
-
-    public void Show(ShowWindowCommand showWindowCommand = ShowWindowCommand.Normal) =>
-        ShowWindow(Win32Window.Handle, showWindowCommand);
 
     public void Looping(Action onFrame)
     {
@@ -71,10 +85,7 @@ public sealed partial class AppWindow
 {
     public bool IsAvailable()
     {
-        return true; // TODO: Fix SystemEngineException with PeekMessage.
-
-        uint PM_REMOVE = 1;
-        if (PeekMessage(out var msg, IntPtr.Zero, 0, 0, PM_REMOVE))
+        if (PeekMessage(out var msg, IntPtr.Zero, 0, 0, 1))
         {
             TranslateMessage(ref msg);
             DispatchMessage(ref msg);
@@ -86,24 +97,7 @@ public sealed partial class AppWindow
         return true;
     }
 
-    public void CreateWindow(out WNDCLASSEX wndClass)
-    {
-        wndClass = new()
-        {
-            Size = System.Runtime.CompilerServices.Unsafe.SizeOf<WNDCLASSEX>(),
-            Styles = WindowClassStyles.CS_HREDRAW | WindowClassStyles.CS_VREDRAW | WindowClassStyles.CS_OWNDC,
-            WindowProc = WndProc,
-            InstanceHandle = GetModuleHandle(null),
-            CursorHandle = LoadCursor(IntPtr.Zero, SystemCursor.IDC_ARROW),
-            BackgroundBrushHandle = IntPtr.Zero,
-            IconHandle = IntPtr.Zero,
-            ClassName = "WndClass",
-        };
-
-        RegisterClassEx(ref wndClass);
-    }
-
-    public IntPtr WndProc(IntPtr hWnd, uint msg, UIntPtr wParam, IntPtr lParam)
+    private static IntPtr WndProc(IntPtr hWnd, uint msg, UIntPtr wParam, IntPtr lParam)
     {
         if (ProcessMessage(msg, wParam, lParam))
             return IntPtr.Zero;
@@ -118,9 +112,10 @@ public sealed partial class AppWindow
         return DefWindowProc(hWnd, msg, wParam, lParam);
     }
 
-    public bool ProcessMessage(uint msg, UIntPtr wParam, IntPtr lParam)
+    public static bool ProcessMessage(uint msg, UIntPtr wParam, IntPtr lParam)
     {
-        Core.Instance?.GUIInputHandler?.ProcessMessage((WindowMessage)msg, wParam, lParam);
+        if (Core.Instance?.GUIInputHandler?.ProcessMessage((WindowMessage)msg, wParam, lParam) ?? false)
+            return true;
 
         switch ((WindowMessage)msg)
         {
@@ -135,8 +130,7 @@ public sealed partial class AppWindow
                         Win32Window.Width = Utils.Loword(lp);
                         Win32Window.Height = Utils.Hiword(lp);
 
-                        // Invoke the event, passing the parameters
-                        ResizeEvent?.Invoke(Win32Window.Width, Win32Window.Height);
+                        ResizeEvent?.Invoke(Win32Window.Width, Win32Window.Height); // <-- This is where resizing is handled.
                         break;
                     case SizeMessage.SIZE_MINIMIZED:
                         Win32Window.IsMinimized = true;

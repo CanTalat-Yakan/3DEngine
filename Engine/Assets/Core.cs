@@ -186,7 +186,6 @@ public sealed class Core
         Renderer?.Dispose();
         SceneManager?.Dispose();
 
-        ImGui.DestroyContext();
         Input.Dispose();
 
         OnDispose?.Invoke();

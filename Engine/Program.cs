@@ -11,8 +11,9 @@ public sealed class Program
         HandleExceptions();
 
         // Instantiate Window and Engine.
-        InitializeWindow(renderGUI, ref config, out var appWindow);
-        InitializeEngine(appWindow, ref config, out var engineCore);
+        Initialize(renderGUI, ref config, 
+            out var appWindow, 
+            out var engineCore);
 
         // Create a while loop for the game logic
         // and dispose on window quit request.
@@ -20,22 +21,18 @@ public sealed class Program
         appWindow.Dispose(engineCore.Dispose);
     }
 
-    private void InitializeWindow(bool renderGUI, ref Config config, out AppWindow appWindow)
+    private void Initialize(bool renderGUI, ref Config config, out AppWindow appWindow, out Core engineCore)
     {
         config ??= Config.GetDefault();
         config.GUI = renderGUI;
 
-        appWindow = new();
-        appWindow.Initialize(config.WindowData);
+        appWindow = new(config.WindowData);
         appWindow.Show();
-    }
 
-    private void InitializeEngine(AppWindow appWindow, ref Config config, out Core engineCore)
-    {
-        engineCore = new Core(new Renderer(appWindow.Win32Window, config), appWindow.Win32Window.Handle);
+        engineCore = new Core(new Renderer(AppWindow.Win32Window, config), AppWindow.Win32Window.Handle);
         engineCore.OnGUI += appWindow.Render;
 
-        appWindow.ResizeEvent += engineCore.Renderer.Resize;
+        AppWindow.ResizeEvent += engineCore.Renderer.Resize;
     }
 
     private static void HandleExceptions()
