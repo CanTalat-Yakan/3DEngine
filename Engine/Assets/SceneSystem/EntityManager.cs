@@ -82,14 +82,15 @@ public sealed partial class EntityManager
 
 public sealed partial class EntityManager
 {
-    public static MeshInfo GetDefaultMeshInfo() =>
-        // Set mesh info to a cube from the resources.
-        Loader.ModelLoader.LoadFile(Path.Combine("Primitives", "Cube.obj"));
-
     private static Material _materialDefault;
+
     public static Material GetDefaultMaterial() =>
         // Create a new material with the default shader and default image.
         _materialDefault ??= new(Paths.SHADERS + "SimpleLit.hlsl");
+
+    public static MeshInfo GetDefaultMeshInfo() =>
+        // Set mesh info to a cube from the resources.
+        Loader.ModelLoader.LoadFile(Path.Combine("Primitives", "Cube.obj"));
 
     public Entity CreateEntity(Entity parent = null, string name = "New Entity", string tag = "Untagged", bool hide = false)
     {
