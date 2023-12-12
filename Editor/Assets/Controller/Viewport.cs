@@ -30,6 +30,7 @@ internal sealed partial class Viewport(Grid content)
         engineCore.Renderer.Config.SetVSync(PresentInterval.Immediate);
         engineCore.Renderer.Config.SetMSAA(MultiSample.x2);
         engineCore.Renderer.Config.SetResolutionScale(2);
+        engineCore.Renderer.Config.GUI = false;
 
         engineCore.OnInitialize += () =>
         {
@@ -54,6 +55,7 @@ internal sealed partial class Viewport(Grid content)
 
         engineCore.OnGUI += () =>
         {
+
         };
 
         engineCore.OnDispose += Binding.Dispose;
