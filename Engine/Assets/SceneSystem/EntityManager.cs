@@ -38,9 +38,10 @@ public sealed partial class EntityManager
         // Set mesh info to a cube from the resources.
         Loader.ModelLoader.LoadFile(Path.Combine("Primitives", "Cube.obj"));
 
+    private static Material _materialDefault;
     public static Material GetDefaultMaterial() =>
-        // Set mesh info to a cube from the resources.
-        _materialDefault;
+        // Create a new material with the default shader and default image.
+        _materialDefault ??= new(Paths.SHADERS + "SimpleLit.hlsl");
 
     public Entity GetFromID(Guid guid)
     {
@@ -90,15 +91,6 @@ public sealed partial class EntityManager
 
 public sealed partial class EntityManager
 {
-    private static Material _materialDefault;
-
-    public EntityManager()
-    {
-        // Create a new material with the default shader and default image.
-        if (_materialDefault is null)
-            _materialDefault = new(Paths.SHADERS + "SimpleLit.hlsl");
-    }
-
     public Entity CreateEntity(Entity parent = null, string name = "New Entity", string tag = "Untagged", bool hide = false)
     {
         // Create a new Entity instance with the specified name, parent, and tag.
