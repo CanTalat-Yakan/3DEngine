@@ -19,19 +19,7 @@ public sealed partial class AppWindow
 
     public AppWindow(WindowData windowData)
     {
-        WNDCLASSEX windowClass = new()
-        {
-            Size = Unsafe.SizeOf<WNDCLASSEX>(),
-            Styles = WindowClassStyles.CS_HREDRAW | WindowClassStyles.CS_VREDRAW | WindowClassStyles.CS_OWNDC,
-            WindowProc = WndProc,
-            InstanceHandle = GetModuleHandle(null),
-            CursorHandle = LoadCursor(IntPtr.Zero, SystemCursor.IDC_ARROW),
-            BackgroundBrushHandle = IntPtr.Zero,
-            IconHandle = IntPtr.Zero,
-            ClassName = "WndClass",
-        };
-
-        RegisterClassEx(ref windowClass);
+        CreateWindowClass(out var windowClass);
 
         Win32Window = new(
             windowClass.ClassName,
@@ -42,6 +30,19 @@ public sealed partial class AppWindow
 
     public void Show(ShowWindowCommand command = ShowWindowCommand.Normal) =>
         ShowWindow(Win32Window.Handle, command);
+
+    public void Looping(Action onFrame)
+    {
+        while (IsAvailable())
+            onFrame?.Invoke();
+    }
+
+    public void Dispose(Action onDispose)
+    {
+        Win32Window.Destroy();
+
+        onDispose?.Invoke();
+    }
 
     public void Render()
     {
@@ -66,23 +67,27 @@ public sealed partial class AppWindow
             ImGui.End();
         }
     }
-
-    public void Looping(Action onFrame)
-    {
-        while (IsAvailable())
-            onFrame?.Invoke();
-    }
-
-    public void Dispose(Action onDispose)
-    {
-        Win32Window.Destroy();
-
-        onDispose?.Invoke();
-    }
 }
 
 public sealed partial class AppWindow
 {
+    public void CreateWindowClass(out WNDCLASSEX windowClass)
+    {
+        windowClass = new()
+        {
+            Size = Unsafe.SizeOf<WNDCLASSEX>(),
+            Styles = WindowClassStyles.CS_HREDRAW | WindowClassStyles.CS_VREDRAW | WindowClassStyles.CS_OWNDC,
+            WindowProc = WndProc,
+            InstanceHandle = GetModuleHandle(null),
+            CursorHandle = LoadCursor(IntPtr.Zero, SystemCursor.IDC_ARROW),
+            BackgroundBrushHandle = IntPtr.Zero,
+            IconHandle = IntPtr.Zero,
+            ClassName = "WndClass",
+        };
+
+        RegisterClassEx(ref windowClass);
+    }
+
     public bool IsAvailable()
     {
         if (PeekMessage(out var msg, IntPtr.Zero, 0, 0, 1))
@@ -96,7 +101,10 @@ public sealed partial class AppWindow
 
         return true;
     }
+}
 
+public sealed partial class AppWindow
+{
     private static IntPtr WndProc(IntPtr hWnd, uint msg, UIntPtr wParam, IntPtr lParam)
     {
         if (ProcessMessage(msg, wParam, lParam))
