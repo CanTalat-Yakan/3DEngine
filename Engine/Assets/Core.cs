@@ -144,7 +144,7 @@ public sealed class Core
 
         // Present the back buffer on the screen.
         Renderer.Present();
-        // Wait for the GPU to finish processing commands (Renderer.WaitIdle).
+        // Wait for the GPU to finish processing commands.
         Renderer.WaitIdle();
     }
 
