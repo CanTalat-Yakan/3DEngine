@@ -100,42 +100,39 @@ public sealed class Core
         // Set the viewport size.
         Renderer.Data.SetViewport(Renderer.Size);
 
-        // Clear the StringBuilder for the additional profiling.
+        // Clear the StringBuilder for additional profiling.
         Profiler.Reset();
 
-        // Updates the time values, such as delta time and time scale.
+        // Updates time values, such as delta time and time scale.
         Time.Update();
 
         // Acquire and Poll Mouse and Keyboard and Update the States and the Input.
         Input.Fetch();
         Input.Update();
 
-        // Copies the List to the local array once to safely iterate to it.
+        // Copies the List to the local array once for safe iteration.
         SceneManager.ProcessSystems();
 
         // Invokes Awake and Start if play mode has started.
         OnEditorPlayMode();
 
-        // Call the FixedFrame when the timeStep elapsed.
+        // Call FixedUpdate for all scenes when the timeStep has elapsed.
         if (Time.OnFixedFrame)
-            // Call FixedUpdate for all scenes.
             SceneManager.FixedUpdate();
 
-        // Call Update for all scenes.
+        // Call Update, LateUpdate, and Render for all scenes.
         SceneManager.Update();
-        // Call LateUpdate for all scenes.
         SceneManager.LateUpdate();
-        // Render the scenes.
         SceneManager.Render();
 
         // Invoke the OnRender Event.
         OnRender?.Invoke();
 
-        // Render the GUI with ImGui.
+        // Render the GUI with ImGui if enabled in the configuration.
         if (Renderer.Config.GUI)
             RenderGUI();
 
-        // Finishes the state of input processing.
+        // Finish the state of input processing.
         Input.LateUpdate();
 
         // End the frame and prepare for the next.
@@ -146,7 +143,7 @@ public sealed class Core
         Renderer.Execute();
         Renderer.WaitIdle();
 
-        // Presents the back buffer on the screen.
+        // Present the back buffer on the screen.
         Renderer.Present();
     }
 

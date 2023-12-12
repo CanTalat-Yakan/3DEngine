@@ -160,16 +160,16 @@ public sealed partial class Renderer
 
     public void Resolve()
     {
-        // Copy the output buffer to the back buffer.
+        // Transition the output buffer to CopyDest state.
         Data.CommandList.ResourceBarrierTransition(Data.OutputRenderTargetTexture, ResourceStates.Present, ResourceStates.CopyDest);
 
-        // Copy the output render target texture into the back buffer render texture.
+        // Resolve the output render target texture to the back buffer.
         Data.CommandList.ResolveSubresource(
-            Data.BufferRenderTargetTextures[Data.SwapChain.CurrentBackBufferIndex], 0, 
-            Data.OutputRenderTargetTexture, 0, 
+            Data.BufferRenderTargetTextures[Data.SwapChain.CurrentBackBufferIndex], 0,
+            Data.OutputRenderTargetTexture, 0,
             RenderData.RenderTargetFormat);
 
-        // Indicate that the back buffer will now be used to present.
+        // Transition back buffer to Present state.
         Data.CommandList.ResourceBarrierTransition(Data.OutputRenderTargetTexture, ResourceStates.CopyDest, ResourceStates.Present);
     }
 
@@ -201,7 +201,7 @@ public sealed partial class Renderer
 
     public void EndFrame()
     {
-        // Indicate that the back buffer will now be used to present.
+        // Transition back buffer to CopySource state.
         Data.CommandList.ResourceBarrierTransition(Data.OutputRenderTargetTexture, ResourceStates.UnorderedAccess, ResourceStates.CopySource);
         Data.CommandList.EndEvent();
     }
@@ -210,26 +210,32 @@ public sealed partial class Renderer
     {
         Data.CommandList.BeginEvent("Frame");
 
-        // Indicate that the MSAA render target texture will be used as a render target.
+        // Transition MSAA render target texture to UnorderedAccess state.
         Data.CommandList.ResourceBarrierTransition(Data.OutputRenderTargetTexture, ResourceStates.CopySource, ResourceStates.UnorderedAccess);
 
-        // Clear the render target view and depth stencil view with the set color.
+        // Clear render target view and depth stencil view.
         Data.CommandList.ClearRenderTargetView(Data.OutputRenderTargetView.GetCPUDescriptorHandleForHeapStart(), Colors.DarkGray);
         Data.CommandList.ClearDepthStencilView(Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
 
-        // Set the render target and depth stencil view for the device context.
+        // Set render target and depth stencil view for the device context.
         Data.CommandList.OMSetRenderTargets(Data.OutputRenderTargetView.GetCPUDescriptorHandleForHeapStart(), Data.DepthStencilView.GetCPUDescriptorHandleForHeapStart());
 
-        // Reset the profiler values for vertices, indices, and draw calls.
+        // Reset profiler values for vertices, indices, and draw calls.
         Profiler.Vertices = 0;
         Profiler.Indices = 0;
         Profiler.DrawCalls = 0;
     }
-    
-    public void CheckDeviceRemoved()
+
+    public bool CheckDeviceRemoved()
     {
         if (Device.DeviceRemovedReason != Result.Ok)
+        {
             Output.Log(Device.DeviceRemovedReason.Description);
+
+            return true;
+        }
+
+        return false;
     }
 }
 
