@@ -11,6 +11,8 @@ public sealed partial class Scene
     public string Name = "Scene";
     public bool IsEnabled;
 
+    public void Save() { }
+
     public void Load() { }
 
     public void Unload() { }
