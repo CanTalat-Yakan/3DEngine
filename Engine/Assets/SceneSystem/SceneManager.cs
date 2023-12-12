@@ -130,9 +130,8 @@ public sealed partial class SceneManager
     public void Update()
     {
         // Update the TransformSystem.
-        Profiler.Benchmark(TransformSystem.Update, "Transform Update");
-        // Update the CameraSystem
-        CameraSystem.Update();
+        Profiler.Benchmark("Transform Update",
+            TransformSystem.Update);
         // Update the MeshSystem.
         MeshSystem.Update();
 
@@ -175,7 +174,8 @@ public sealed partial class SceneManager
         EditorScriptSystem.Render();
 
         // Render the MeshSystem.
-        Profiler.Benchmark(MeshSystem.Render, "Mesh Render");
+        Profiler.Benchmark("Mesh Render",
+            MeshSystem.Render);
 
         // Call the Render in TransformSystem.
         TransformSystem.Render();

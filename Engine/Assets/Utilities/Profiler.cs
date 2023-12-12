@@ -17,12 +17,12 @@ public sealed class Profiler
 
     public static StringBuilder AdditionalProfiling { get; set; } = new();
 
-    public static double Benchmark(Action action, string name = null)
+    public static double Benchmark(string name = null, Action action = null)
     {
         Stopwatch stopwatch = new();
         stopwatch.Start();
 
-        action.Invoke();
+        action?.Invoke();
 
         stopwatch.Stop();
 
