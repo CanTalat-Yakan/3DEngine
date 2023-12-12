@@ -132,7 +132,7 @@ public sealed class ShaderCompiler
         // Start the scope.
         structBuilder.AppendLine("{");
 
-        // TODO: Find all Fields of the cbuffer Properties and Loop through them
+        // Find all fields of the constant buffer Properties and loop through them.
         var propertiesBufferFields = ProcessConstantBufferFields(shaderCode);
         foreach (var field in propertiesBufferFields)
             structBuilder.AppendLine(field);
