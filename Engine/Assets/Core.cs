@@ -141,10 +141,11 @@ public sealed class Core
         Renderer.Resolve();
 
         Renderer.Execute();
-        Renderer.WaitIdle();
 
         // Present the back buffer on the screen.
         Renderer.Present();
+
+        Renderer.WaitIdle();
     }
 
     public void RenderGUI()

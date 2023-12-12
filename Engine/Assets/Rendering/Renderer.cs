@@ -151,11 +151,11 @@ public sealed partial class Renderer
 
     public void Execute()
     {
-        //Data.CommandList.Close();
-        //Data.GraphicsQueue.ExecuteCommandList(Data.CommandList);
+        Data.CommandList.Close();
+        Data.GraphicsQueue.ExecuteCommandList(Data.CommandList);
 
-        //Data.CommandAllocator.Reset();
-        //Data.CommandList.Reset(Data.CommandAllocator, null);
+        Data.CommandAllocator.Reset();
+        Data.CommandList.Reset(Data.CommandAllocator, null);
     }
 
     public void Resolve()
@@ -228,9 +228,13 @@ public sealed partial class Renderer
 
     public bool CheckDeviceRemoved()
     {
-        if (Device.DeviceRemovedReason != Result.Ok)
+        if (Device.DeviceRemovedReason.Failure)
         {
-            Output.Log(Device.DeviceRemovedReason.Description);
+            Output.Log(
+                $"""
+                Device RemovedReason: {Device.DeviceRemovedReason}
+                {Device.DeviceRemovedReason.Description}
+                """);
 
             return true;
         }
