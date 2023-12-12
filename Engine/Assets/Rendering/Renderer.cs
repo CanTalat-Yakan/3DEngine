@@ -143,9 +143,12 @@ public sealed partial class Renderer
 
     public void WaitIdle()
     {
+        // Signal the frame fence, incrementing the frame count.
         Data.GraphicsQueue.Signal(Data.FrameFence, ++Data.FrameCount);
 
+        // Set an event to be signaled when the frame fence reaches the specified frame count.
         Data.FrameFence.SetEventOnCompletion(Data.FrameCount, Data.FrameFenceEvent);
+        // Wait for the event to be signaled, indicating the completion of the specified frame.
         Data.FrameFenceEvent.WaitOne();
     }
 

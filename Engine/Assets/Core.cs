@@ -140,11 +140,11 @@ public sealed class Core
         // Copy the final rendered image into the back buffer.
         Renderer.Resolve();
 
-        Renderer.Execute();
+        //Renderer.Execute();
 
         // Present the back buffer on the screen.
         Renderer.Present();
-
+        // Wait for the GPU to finish processing commands (Renderer.WaitIdle).
         Renderer.WaitIdle();
     }
 
