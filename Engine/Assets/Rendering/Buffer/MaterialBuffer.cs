@@ -17,7 +17,7 @@ public class SerializeEntry
     public object Value;
 
     // Parameterless constructor needed for Serialization.
-    public SerializeEntry() { } 
+    public SerializeEntry() { }
 
     public SerializeEntry(string fieldName, object value)
     {
@@ -79,8 +79,7 @@ public unsafe partial class MaterialBuffer
 
     public void UpdateModelConstantBuffer(PerModelConstantBuffer constantBuffer)
     {
-        if (Renderer.CheckDeviceRemoved())
-            return;
+        if (Renderer.CheckDeviceRemoved()) return;
 
         // Map the constant buffer and copy the per-model matrix of the material into it.
         PerModelConstantBuffer* pointer = _model.Map<PerModelConstantBuffer>(0);

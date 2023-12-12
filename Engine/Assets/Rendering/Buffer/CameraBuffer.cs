@@ -23,8 +23,7 @@ public sealed unsafe class CameraBuffer
 
     public void UpdateConstantBuffer()
     {
-        if (Renderer.CheckDeviceRemoved())
-            return;
+        if (Renderer.CheckDeviceRemoved()) return;
 
         // Map the constant buffer and copy the view-projection matrix and position of the camera into it.
         ViewConstantBuffer* pointer = _view.Map<ViewConstantBuffer>(0);
