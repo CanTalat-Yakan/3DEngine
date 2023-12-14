@@ -214,10 +214,10 @@ unsafe public sealed partial class GUIRenderer
         float T = data.DisplayPos.Y;
         float B = data.DisplayPos.Y + data.DisplaySize.Y;
         Matrix4x4 mvp = new(
-            2.0f / (R - L), 0.0f, 0.0f, 0.0f,
-            0.0f, 2.0f / (T - B), 0.0f, 0.0f,
-            0.0f, 0.0f, 0.5f, 0.0f,
-            (R + L) / (L - R), (T + B) / (B - T), 0.5f, 1.0f);
+            2.0f/(R-L),     0.0f,           0.0f,   0.0f,
+            0.0f,           2.0f/(T-B),     0.0f,   0.0f,
+            0.0f,           0.0f,           0.5f,   0.0f,
+            (R+L)/(L-R),    (T+B)/(B-T),    0.5f,   1.0f);
 
         // Map the buffer and store the pointer for later use
         var viewConstantBufferPointer = _viewConstantBuffer.Map<ViewConstantBuffer>(0);
