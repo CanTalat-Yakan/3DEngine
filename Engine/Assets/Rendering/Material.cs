@@ -20,7 +20,7 @@ public sealed partial class Material
 
     public ID3D12Resource Texture;
     private ID3D12DescriptorHeap _textureView;
-    private ID3D12DescriptorHeap _samplerState;
+    private ID3D12DescriptorHeap _sampler;
 
     internal Renderer Renderer => _renderer ??= Renderer.Instance;
     private Renderer _renderer;
@@ -93,7 +93,7 @@ public sealed partial class Material
         PipelineState?.Dispose();
 
         _textureView?.Dispose();
-        _samplerState?.Dispose();
+        _sampler?.Dispose();
     }
 
     private void CreateTextureAndSampler(string imageFileName)
@@ -137,18 +137,18 @@ public sealed partial class Material
             MaxLOD = float.MaxValue,
         };
 
-        _samplerState = Renderer.Device.CreateDescriptorHeap(new()
+        _sampler = Renderer.Device.CreateDescriptorHeap(new()
         {
             DescriptorCount = 1,
             Flags = DescriptorHeapFlags.ShaderVisible,
             Type = DescriptorHeapType.Sampler
         });
-        _samplerState.Name = Texture.Name + " Sampler";
+        _sampler.Name = Texture.Name + " Sampler";
         // Create the sampler state using the sampler description.
-        Renderer.Device.CreateSampler(ref samplerDescription, _samplerState.GetCPUDescriptorHandleForHeapStart());
+        Renderer.Device.CreateSampler(ref samplerDescription, _sampler.GetCPUDescriptorHandleForHeapStart());
 
         size = Renderer.Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView);
-        _samplerState.GetCPUDescriptorHandleForHeapStart().Offset(size);
+        _sampler.GetCPUDescriptorHandleForHeapStart().Offset(size);
         #endregion
     }
 }
@@ -163,7 +163,7 @@ public sealed partial class Material
             new InputElementDescription("POSITION", 0, Format.R32G32B32_Float, 0, 0),
             new InputElementDescription("NORMAL", 0, Format.R32G32B32_Float, 12, 0),
             new InputElementDescription("TANGENT", 0, Format.R32G32B32_Float, 24, 0),
-            new InputElementDescription("UV", 0, Format.R32G32_Float, 32, 0));
+            new InputElementDescription("TEXCOORD", 0, Format.R32G32_Float, 32, 0));
     }
 
     private void CreateShaderByteCode(string shaderFilePath, out ReadOnlyMemory<byte> vertexShaderByteCode, out ReadOnlyMemory<byte> pixelShaderByteCode)

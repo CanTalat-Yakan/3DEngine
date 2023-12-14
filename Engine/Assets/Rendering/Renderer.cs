@@ -205,7 +205,7 @@ public sealed partial class Renderer
     public void EndFrame()
     {
         // Transition back buffer to CopySource state.
-        Data.CommandList.ResourceBarrierTransition(Data.OutputRenderTargetTexture, ResourceStates.UnorderedAccess, ResourceStates.CopySource);
+        Data.CommandList.ResourceBarrierTransition(Data.OutputRenderTargetTexture, ResourceStates.RenderTarget, ResourceStates.CopySource);
         Data.CommandList.EndEvent();
     }
 
@@ -213,8 +213,8 @@ public sealed partial class Renderer
     {
         Data.CommandList.BeginEvent("Frame");
 
-        // Transition MSAA render target texture to UnorderedAccess state.
-        Data.CommandList.ResourceBarrierTransition(Data.OutputRenderTargetTexture, ResourceStates.CopySource, ResourceStates.UnorderedAccess);
+        // Transition MSAA render target texture to RenderTarget state.
+        Data.CommandList.ResourceBarrierTransition(Data.OutputRenderTargetTexture, ResourceStates.CopySource, ResourceStates.RenderTarget);
 
         // Clear render target view and depth stencil view.
         Data.CommandList.ClearRenderTargetView(Data.OutputRenderTargetView.GetCPUDescriptorHandleForHeapStart(), Colors.DarkGray);

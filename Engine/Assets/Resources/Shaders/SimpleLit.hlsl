@@ -17,8 +17,8 @@ cbuffer Properties : register(b10)
     bool Bool;
 };
 
-Texture2D ObjTexture : register(t0);
-SamplerState ObjSamplerState : register(s0);
+Texture2D texture : register(t0);
+sampler sampler0 : register(s0);
 
 PSInput VSMain(VSInput input)
 {
@@ -29,14 +29,14 @@ PSInput VSMain(VSInput input)
     output.tangent = mul(input.tangent, World);
     output.worldpos = mul(input.vertex, World);
     output.camerapos = Camera;
-    output.uv = input.uv;
+    output.uv = input.texcoord;
 
     return output;
 }
 
 float4 PSMain(PSInput input) : SV_TARGET
 {
-    //float4 col = ObjTexture.Sample(ObjSamplerState, input.uv);
+    //float4 col = texture0.Sample(sampler0, input.uv);
     float3 diffuse = dot(normalize(input.normal), -normalize(float3(0, -1, 0)));
 
     diffuse = max(diffuse, float3(0.255, 0.295, 0.3255));

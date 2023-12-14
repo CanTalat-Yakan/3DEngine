@@ -14,7 +14,7 @@ struct VSInput
     float4 vertex : POSITION;
     float4 normal : NORMAL;
     float4 tangent : TANGENT;
-    float2 uv : UV;
+    float2 texcoord : TEXCOORD0;
 };
 
 struct PSInput
@@ -24,5 +24,19 @@ struct PSInput
     float3 camerapos : POSITION1;
     float3 normal : NORMAL;
     float3 tangent : TANGENT;
-    float2 uv : UV;
+    float2 uv : TEXCOORD0;
+};
+
+struct VSInputUI
+{
+    float2 vertex : POSITION;
+    float2 texcoord : TEXCOORD0;
+    float3 color : COLOR0;
+};
+
+struct PSInputUI
+{
+    float4 pos : SV_POSITION;
+    float3 col : COLOR0;
+    float2 uv : TEXCOORD0;
 };
