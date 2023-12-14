@@ -66,7 +66,7 @@ public sealed class Core
         // Creates an entity with the Boot editor tag and adds a SceneBoot component to it.
         var boot = SceneManager.MainScene.EntityManager
             .CreateEntity(null, "Boot")
-            .AddComponent(new SceneBoot());
+            .AddComponent<SceneBoot>();
         boot.Entity.IsHidden = true;
 
         // Compile all project scripts and add the components to the collection for the AddComponent function.
