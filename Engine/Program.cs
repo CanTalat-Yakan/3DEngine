@@ -4,7 +4,7 @@ public sealed class Program
 {
     [STAThread]
     private static void Main() =>
-        new Program().Run(false);
+        new Program().Run();
 
     public void Run(bool renderGUI = true, Config config = null)
     {

@@ -14,11 +14,9 @@ unsafe public sealed partial class GUIRenderer
 {
     private ID3D12GraphicsCommandList _commandList;
     private ID3D12CommandAllocator _commandAllocator;
-    private ID3D12CommandQueue _commandQueue;
 
     private List<ID3D12Resource> _vertexBuffers = new List<ID3D12Resource>();
     private List<ID3D12Resource> _indexBuffers = new List<ID3D12Resource>();
-    private ID3D12DescriptorHeap _srvHeap;
 
     private ID3D12RootSignature _rootSignature;
     private ID3D12PipelineState _pipelineState;
@@ -34,12 +32,8 @@ unsafe public sealed partial class GUIRenderer
         var io = ImGui.GetIO();
         io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;  // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
 
-        _commandQueue = Renderer.Device.CreateCommandQueue(new CommandQueueDescription(CommandListType.Direct));
         _commandAllocator = Renderer.Device.CreateCommandAllocator(CommandListType.Direct);
         _commandList = Renderer.Device.CreateCommandList<ID3D12GraphicsCommandList>(0, CommandListType.Direct, _commandAllocator, null);
-
-        // Create descriptor heap for shader resource views (SRVs)
-        _srvHeap = Renderer.Device.CreateDescriptorHeap(new DescriptorHeapDescription(DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView, 1));
 
         CreateRootSignature();
         CreatePipelineState();
@@ -83,7 +77,7 @@ unsafe public sealed partial class GUIRenderer
 
         // Close and execute the command list
         _commandList.Close();
-        _commandQueue.ExecuteCommandList(_commandList);
+        Renderer.Data.GraphicsQueue.ExecuteCommandList(_commandList);
     }
 
     private void RenderImDrawData(ImDrawDataPtr data)
@@ -117,7 +111,7 @@ unsafe public sealed partial class GUIRenderer
                 ImDrawCmdPtr cmd = cmdList.CmdBuffer[cmdIndex];
 
                 // Set render target
-                _commandList.OMSetRenderTargets(Renderer.Data.BufferRenderTargetView.GetCPUDescriptorHandleForHeapStart(), _srvHeap.GetCPUDescriptorHandleForHeapStart());
+                _commandList.OMSetRenderTargets(Renderer.Data.BufferRenderTargetView.GetCPUDescriptorHandleForHeapStart(), null);
 
                 // Render the command
                 _commandList.DrawIndexedInstanced((int)cmd.ElemCount, 1, (int)cmd.IdxOffset, (int)cmd.VtxOffset, 0);
@@ -155,7 +149,7 @@ unsafe public sealed partial class GUIRenderer
         rootSignatureDescription.Parameters = rootParameters;
 
         _rootSignature = Renderer.Device.CreateRootSignature(rootSignatureDescription);
-        _rootSignature.Name = "ImGui RootSignature";
+        _rootSignature.Name = "ImGui Root Signature";
     }
 
     private void CreatePipelineState()
@@ -189,25 +183,17 @@ unsafe public sealed partial class GUIRenderer
         };
 
         _pipelineState = Renderer.Device.CreateGraphicsPipelineState(psoDesc);
+        _pipelineState.Name = "ImGui Pipeline State Object";
     }
 
     private void CreateViewConstantBuffer(ImDrawDataPtr data)
     {
-        // Create a constant buffer for the view matrix
-        var bufferDesc = new ResourceDescription
-        {
-            Dimension = ResourceDimension.Buffer,
-            Width = 256, // Adjust the size as needed
-            Height = 1,
-            DepthOrArraySize = 1,
-            MipLevels = 1,
-            Format = Format.Unknown,
-            SampleDescription = new SampleDescription(1, 0),
-            Layout = TextureLayout.RowMajor,
-            Flags = ResourceFlags.None
-        };
-
-        _viewConstantBuffer = Renderer.Device.CreateCommittedResource(new HeapProperties(HeapType.Upload), HeapFlags.None, bufferDesc, ResourceStates.GenericRead);
+        //Create View Constant Buffer.
+        _viewConstantBuffer = Renderer.Device.CreateCommittedResource(
+            HeapType.Upload,
+            ResourceDescription.Buffer(sizeof(ViewConstantBuffer)),
+            ResourceStates.GenericRead);
+        _viewConstantBuffer.Name = "ImGui View ConstantBuffer";
 
         float L = data.DisplayPos.X;
         float R = data.DisplayPos.X + data.DisplaySize.X;
