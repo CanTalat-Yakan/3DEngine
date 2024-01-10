@@ -102,6 +102,7 @@ You can compile the 3DEngine (Package) for the Editor and the Engine as a standa
 * Nanite (Nano Tech),
 * Networking,
 * Spatial Audio,
+* PhsyX 5,
 * Export to UWP for Xbox Platform.
 
 As a Unity Developer, I've gathered a collection of top-notch assets from the Unity Asset Store. I plan to incorporate my favorite ones into this game engine when the time is right for implementing them in the creation of various games. Here's a list of some plugins that I'll be integrating into the engine:
