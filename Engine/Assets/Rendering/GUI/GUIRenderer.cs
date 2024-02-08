@@ -32,11 +32,10 @@ unsafe public sealed partial class GUIRenderer
         var io = ImGui.GetIO();
         io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;  // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
 
-        _commandAllocator = Renderer.Device.CreateCommandAllocator(CommandListType.Direct);
-        _commandList = Renderer.Device.CreateCommandList<ID3D12GraphicsCommandList>(0, CommandListType.Direct, _commandAllocator, null);
-
         CreateRootSignature();
         CreatePipelineState();
+        CreateCommandAllocator();
+        CreateCommandList();
     }
 
     public void Update(IntPtr imGuiContext, Size newSize)
@@ -122,6 +121,21 @@ unsafe public sealed partial class GUIRenderer
 
 unsafe public sealed partial class GUIRenderer
 {
+    private void CreateCommandAllocator()
+    {
+        _commandAllocator = Renderer.Device.CreateCommandAllocator(CommandListType.Direct);
+        _commandAllocator.Name = "ImGui CommandAllocator";
+    }
+
+    private void CreateCommandList()
+    {
+        _commandList = Renderer.Device.CreateCommandList<ID3D12GraphicsCommandList4>(
+            CommandListType.Direct,
+            _commandAllocator,
+            _pipelineState);
+        _commandList.Name = "ImGui CommandList";
+    }
+
     private void CreateRootSignature()
     {
         // Create a root signature
@@ -149,7 +163,7 @@ unsafe public sealed partial class GUIRenderer
         rootSignatureDescription.Parameters = rootParameters;
 
         _rootSignature = Renderer.Device.CreateRootSignature(rootSignatureDescription);
-        _rootSignature.Name = "ImGui Root Signature";
+        _rootSignature.Name = "ImGui RootSignature";
     }
 
     private void CreatePipelineState()
@@ -183,7 +197,7 @@ unsafe public sealed partial class GUIRenderer
         };
 
         _pipelineState = Renderer.Device.CreateGraphicsPipelineState(psoDesc);
-        _pipelineState.Name = "ImGui Pipeline State Object";
+        _pipelineState.Name = "ImGui GraphicsPipelineStateObject";
     }
 
     private void CreateViewConstantBuffer(ImDrawDataPtr data)
