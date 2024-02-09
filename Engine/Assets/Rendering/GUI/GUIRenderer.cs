@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using SharpGen.Runtime;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 
 using Vortice.Direct3D12;
 using Vortice.Dxc;
 using Vortice.DXGI;
-
 using ImDrawIdx = System.UInt16;
 
 namespace Engine.GUI;
@@ -24,18 +24,21 @@ unsafe public sealed partial class GUIRenderer
     private ID3D12Resource _viewConstantBuffer;
     private IntPtr _viewConstantBufferPointer;
 
+    private ID3D12DescriptorHeap _textureView;
+    private ID3D12DescriptorHeap _sampler;
+
     public Renderer Renderer => _renderer ??= Renderer.Instance;
     private Renderer _renderer;
 
     public GUIRenderer()
     {
-        var io = ImGui.GetIO();
-        io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;  // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
+        ImGui.GetIO().BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;  // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
 
         CreateRootSignature();
         CreatePipelineState();
         CreateCommandAllocator();
         CreateCommandList();
+        //CreateFontTexture();
     }
 
     public void Update(IntPtr imGuiContext, Size newSize)
@@ -200,6 +203,93 @@ unsafe public sealed partial class GUIRenderer
         _pipelineState.Name = "ImGui GraphicsPipelineStateObject";
     }
 
+    private void CreateFontTexture()
+    {
+        ImGui.GetIO().Fonts.GetTexDataAsRGBA32(
+            out byte* pixels, 
+            out int width, 
+            out int height);
+
+
+        #region // Create Texture
+        ResourceDescription textureDescription = ResourceDescription.Texture2D(
+            Format.R8G8B8A8_UNorm,
+            (uint)width,
+            (uint)height,
+            arraySize: 1,
+            mipLevels: 1);
+
+        Result result = Renderer.Device.CreateCommittedResource(
+            HeapProperties.DefaultHeapProperties,
+            HeapFlags.None,
+            textureDescription,
+            ResourceStates.CopyDest,
+            null,
+            out var texture);
+
+        if (result.Failure)
+            throw new Exception(result.Description);
+
+        texture.Name = "ImGui FontTexture";
+
+        SubresourceData subResource = new()
+        {
+            Data = (IntPtr)pixels,
+            RowPitch = (nint)textureDescription.Width * 4,
+            SlicePitch = 0
+        };
+
+        ShaderResourceViewDescription shaderResourceViewDescription = new()
+        {
+            Format = texture.Description.Format,
+            ViewDimension = ShaderResourceViewDimension.Texture2D,
+            Texture2D = new Texture2DShaderResourceView { MipLevels = texture.Description.MipLevels },
+            Shader4ComponentMapping = ShaderComponentMapping.Default
+        };
+
+        _textureView = Renderer.Device.CreateDescriptorHeap(new()
+        {
+            DescriptorCount = 1,
+            Flags = DescriptorHeapFlags.ShaderVisible,
+            Type = DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView
+        });
+        _textureView.Name = texture.Name + " Texture View";
+        Renderer.Device.CreateShaderResourceView(texture, shaderResourceViewDescription, _textureView.GetCPUDescriptorHandleForHeapStart());
+
+        var size = Renderer.Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView);
+        _textureView.GetCPUDescriptorHandleForHeapStart().Offset(size);
+        #endregion
+
+
+        #region // Create Sampler
+        // Set the properties for the sampler state.
+        SamplerDescription samplerDescription = new()
+        {
+            Filter = Filter.Anisotropic, // Use anisotropic filtering for smoother sampling.
+            AddressU = TextureAddressMode.Mirror,
+            AddressV = TextureAddressMode.Mirror,
+            AddressW = TextureAddressMode.Mirror,
+            ComparisonFunction = ComparisonFunction.Never, // Not needed for standard texture sampling.
+            MaxAnisotropy = 16,
+            MinLOD = 0,
+            MaxLOD = float.MaxValue,
+        };
+
+        _sampler = Renderer.Device.CreateDescriptorHeap(new()
+        {
+            DescriptorCount = 1,
+            Flags = DescriptorHeapFlags.ShaderVisible,
+            Type = DescriptorHeapType.Sampler
+        });
+        _sampler.Name = texture.Name + " Sampler";
+        // Create the sampler state using the sampler description.
+        Renderer.Device.CreateSampler(ref samplerDescription, _sampler.GetCPUDescriptorHandleForHeapStart());
+
+        size = Renderer.Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView);
+        _sampler.GetCPUDescriptorHandleForHeapStart().Offset(size);
+        #endregion
+    }
+
     private void CreateViewConstantBuffer(ImDrawDataPtr data)
     {
         //Create View Constant Buffer.
@@ -214,10 +304,10 @@ unsafe public sealed partial class GUIRenderer
         float T = data.DisplayPos.Y;
         float B = data.DisplayPos.Y + data.DisplaySize.Y;
         Matrix4x4 mvp = new(
-            2.0f/(R-L),     0.0f,           0.0f,   0.0f,
-            0.0f,           2.0f/(T-B),     0.0f,   0.0f,
-            0.0f,           0.0f,           0.5f,   0.0f,
-            (R+L)/(L-R),    (T+B)/(B-T),    0.5f,   1.0f);
+            2.0f / (R - L), 0.0f, 0.0f, 0.0f,
+            0.0f, 2.0f / (T - B), 0.0f, 0.0f,
+            0.0f, 0.0f, 0.5f, 0.0f,
+            (R + L) / (L - R), (T + B) / (B - T), 0.5f, 1.0f);
 
         // Map the buffer and store the pointer for later use
         var viewConstantBufferPointer = _viewConstantBuffer.Map<ViewConstantBuffer>(0);
