@@ -212,10 +212,8 @@ public sealed partial class Material
 
     private void CreateShaderByteCode(string shaderFilePath, out ReadOnlyMemory<byte> vertexShaderByteCode, out ReadOnlyMemory<byte> pixelShaderByteCode)
     {
-        // Compile the vertex shader bytecode from the specified shader file name and target profile.
         vertexShaderByteCode = CompileBytecode(DxcShaderStage.Vertex, shaderFilePath, "VSMain");
 
-        // Compile the pixel shader bytecode from the specified shader file name and target profile.
         pixelShaderByteCode = CompileBytecode(DxcShaderStage.Pixel, shaderFilePath, "PSMain");
     }
 

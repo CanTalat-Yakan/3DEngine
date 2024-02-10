@@ -301,9 +301,8 @@ unsafe public sealed partial class GUIRenderer
 
     private void CreateShaderByteCode(string shaderFilePath, out ReadOnlyMemory<byte> vertexShaderByteCode, out ReadOnlyMemory<byte> pixelShaderByteCode)
     {
-        // Compile the vertex shader bytecode from the specified shader file name and target profile.
         vertexShaderByteCode = CompileBytecode(DxcShaderStage.Vertex, Paths.SHADERS + shaderFilePath, "VSMain");
-        // Compile the pixel shader bytecode from the specified shader file name and target profile.
+
         pixelShaderByteCode = CompileBytecode(DxcShaderStage.Pixel, Paths.SHADERS + shaderFilePath, "PSMain");
     }
 
