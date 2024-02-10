@@ -28,7 +28,6 @@ public sealed partial class Mesh : EditorComponent
     private Renderer _renderer;
 
     public override void OnRegister() =>
-        // Register the component with the MeshSystem.
         MeshSystem.Register(this);
 
     public override void OnAwake()

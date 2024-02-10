@@ -24,7 +24,6 @@ public sealed class Camera : EditorComponent
     private Renderer _renderer;
 
     public override void OnRegister() =>
-        // Register the component with the CameraSystem.
         CameraSystem.Register(this);
 
     public override void OnAwake()

@@ -37,7 +37,6 @@ public sealed partial class Transform : EditorComponent, IHide
     private PerModelConstantBuffer _modelConstantBuffer;
 
     public override void OnRegister() =>
-        // Register the component with the TransformSystem.
         TransformSystem.Register(this);
 
     public override void OnAwake() =>
