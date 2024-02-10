@@ -143,8 +143,9 @@ public sealed class Core
     {
         if (EditorState.PlayModeStarted)
         {
-            MaterialCompiler.CompileProjectMaterials(EditorState.AssetsPath);
             ScriptCompiler.CompileProjectScripts(EditorState.AssetsPath);
+            ShaderCompiler.CompileProjectShaders(EditorState.AssetsPath);
+            MaterialCompiler.CompileProjectMaterials(EditorState.AssetsPath);
 
             SceneManager.Awake();
             SceneManager.Start();
