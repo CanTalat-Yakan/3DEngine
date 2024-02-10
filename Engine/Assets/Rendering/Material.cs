@@ -8,7 +8,7 @@ namespace Engine.Rendering;
 
 public sealed partial class Material
 {
-    public static Material CurrentMaterialOnGPU { get; set; }
+    public static Material OnGPU { get; set; }
 
     public MaterialBuffer MaterialBuffer { get; set; } = new();
 
@@ -73,7 +73,7 @@ public sealed partial class Material
         Renderer.Data.GraphicsQueue.ExecuteCommandList(CommandList);
 
         // Assign material to the static variable.
-        CurrentMaterialOnGPU = this;
+        OnGPU = this;
     }
 
     public void Reset()

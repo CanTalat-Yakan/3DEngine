@@ -11,7 +11,7 @@ public sealed partial class Mesh : EditorComponent
     public string MeshPath;
     public string MaterialPath;
 
-    public static MeshInfo? CurrentMeshOnGPU { get; set; }
+    public static MeshInfo? OnGPU { get; set; }
     public static List<MeshInfo> BatchLookup { get; private set; } = new();
 
     public MeshBuffer MeshBuffers { get; private set; } = new();
@@ -63,8 +63,8 @@ public sealed partial class Mesh : EditorComponent
         if (!InBounds)
             return;
 
-        if (Equals(Material.CurrentMaterialOnGPU, Material)
-            && Equals(Mesh.CurrentMeshOnGPU, MeshInfo))
+        if (Equals(Material.OnGPU, Material)
+            && Equals(Mesh.OnGPU, MeshInfo))
         {
             Material.MaterialBuffer?.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
 
@@ -80,7 +80,7 @@ public sealed partial class Mesh : EditorComponent
             Renderer.Draw(MeshInfo.Value.Indices.Length, MeshBuffers.IndexBufferView, 1, MeshBuffers.VertexBufferView);
 
             // Assign MeshInfo to the static variable.
-            CurrentMeshOnGPU = MeshInfo;
+            OnGPU = MeshInfo;
         }
 
         // Increment the vertex, index and draw call count in the Profiler.
