@@ -96,88 +96,66 @@ public sealed partial class SceneManager
 {
     public void ProcessSystems()
     {
-        // Copy TransformSystem to Array.
         TransformSystem.CopyToArray();
-        // Sort and Copy CameraSystem to Array.
         CameraSystem.CopyToArray();
-        // Sort and Copy MeshSystem to Array if it has changes.
         MeshSystem.SortAndCopyToArrayIfDirty();
-        // Copy EditorScriptSystem to Array.
         EditorScriptSystem.CopyToArray();
-        // Copy ScriptSystem to Array.
         ScriptSystem.CopyToArray();
     }
 
     public void Awake()
     {
-        // Awake the TransformSystem.
         TransformSystem.Awake();
-        // Awake the CameraSystem.
         CameraSystem.Awake();
 
         if (EditorState.PlayMode)
-            // Awake the ScriptSystem.
             ScriptSystem.Awake();
     }
 
     public void Start()
     {
         if (EditorState.PlayMode)
-            // Start the ScriptSystem.
             ScriptSystem.Start();
     }
 
     public void Update()
     {
-        // Update the TransformSystem.
         Profiler.Benchmark("Transform Update",
             TransformSystem.Update);
-        // Update the MeshSystem.
         MeshSystem.Update();
 
-        // Update the EditorScriptSystem.
         EditorScriptSystem.Update();
 
         if (EditorState.PlayMode)
-            // Update the ScriptSystem.
             ScriptSystem.Update();
     }
 
     public void LateUpdate()
     {
-        // LateUpdate the EditorScriptSystem.
         EditorScriptSystem.LateUpdate();
 
         if (EditorState.PlayMode)
-            // LateUpdate the ScriptSystem.
             ScriptSystem.LateUpdate();
     }
 
     public void FixedUpdate()
     {
-        // FixedUpdate the EditorScriptSystem.
         EditorScriptSystem.FixedUpdate();
 
         if (EditorState.PlayMode)
-            // FixedUpdate the ScriptSystem.
             ScriptSystem.FixedUpdate();
     }
 
     public void Render()
     {
-        // Call the Render in CameraSystem.
         CameraSystem.Render();
 
-        // Call the Render in ScriptSystem.
         ScriptSystem.Render();
-        // Call the Render in EditorScriptSystem.
         EditorScriptSystem.Render();
 
-        // Render the MeshSystem.
         Profiler.Benchmark("Mesh Render",
             MeshSystem.Render);
 
-        // Call the Render in TransformSystem.
         TransformSystem.Render();
 
         Mesh.CurrentMeshOnGPU = null;
@@ -186,15 +164,12 @@ public sealed partial class SceneManager
 
     public void GUI()
     {
-        // Render the GUI for the EditorScriptSystem.
         EditorScriptSystem.GUI();
-        // Render the GUI for the ScriptSystem.
         ScriptSystem.GUI();
     }
 
     public void Dispose()
     {
-        // Dispose all Systems.
         CameraSystem.Destroy();
         MeshSystem.Destroy();
 

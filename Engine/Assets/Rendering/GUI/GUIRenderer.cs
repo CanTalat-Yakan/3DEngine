@@ -206,8 +206,8 @@ unsafe public sealed partial class GUIRenderer
     private void CreateFontTexture()
     {
         ImGui.GetIO().Fonts.GetTexDataAsRGBA32(
-            out byte* pixels, 
-            out int width, 
+            out byte* pixels,
+            out int width,
             out int height);
 
 
