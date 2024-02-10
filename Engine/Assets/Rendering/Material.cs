@@ -47,7 +47,11 @@ public sealed partial class Material
 
         CreateShaderByteCode(shaderFilePath, out var vertexShaderByteCode, out var pixelShaderByteCode);
 
-        CreateGraphicsPipelineStateDescription(inputLayoutDescription, vertexShaderByteCode, pixelShaderByteCode);
+        CreateGraphicsPipelineState(inputLayoutDescription, vertexShaderByteCode, pixelShaderByteCode);
+
+        CreateCommandAllocator();
+
+        CreateCommandList();
     }
 
     public void Setup()
@@ -157,52 +161,6 @@ public sealed partial class Material
 {
     private static int _count { get; set; } = 1;
 
-    private void CreateInputLayout(out InputLayoutDescription inputLayoutDescription)
-    {
-        inputLayoutDescription = new InputLayoutDescription(
-            new InputElementDescription("POSITION", 0, Format.R32G32B32_Float, 0, 0),
-            new InputElementDescription("NORMAL", 0, Format.R32G32B32_Float, 12, 0),
-            new InputElementDescription("TANGENT", 0, Format.R32G32B32_Float, 24, 0),
-            new InputElementDescription("TEXCOORD", 0, Format.R32G32_Float, 32, 0));
-    }
-
-    private void CreateShaderByteCode(string shaderFilePath, out ReadOnlyMemory<byte> vertexShaderByteCode, out ReadOnlyMemory<byte> pixelShaderByteCode)
-    {
-        // Compile the vertex shader bytecode from the specified shader file name and target profile.
-        vertexShaderByteCode = CompileBytecode(DxcShaderStage.Vertex, shaderFilePath, "VSMain");
-
-        // Compile the pixel shader bytecode from the specified shader file name and target profile.
-        pixelShaderByteCode = CompileBytecode(DxcShaderStage.Pixel, shaderFilePath, "PSMain");
-    }
-
-    private void CreateGraphicsPipelineStateDescription(InputLayoutDescription inputLayoutDescription, ReadOnlyMemory<byte> vertexShaderByteCode, ReadOnlyMemory<byte> pixelShaderByteCode)
-    {
-        CreateCommandAllocator();
-
-        GraphicsPipelineStateDescription graphicsPipelineStateDescription = new()
-        {
-            RootSignature = RootSignature,
-            VertexShader = vertexShaderByteCode,
-            PixelShader = pixelShaderByteCode,
-            InputLayout = inputLayoutDescription,
-            SampleMask = uint.MaxValue,
-            PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
-            RasterizerState = Renderer.Data.RasterizerDescription,
-            BlendState = Renderer.Data.BlendDescription,
-            DepthStencilState = DepthStencilDescription.Default,
-            RenderTargetFormats = new[] { RenderData.RenderTargetFormat },
-            DepthStencilFormat = RenderData.DepthStencilFormat,
-            SampleDescription = SampleDescription.Default
-        };
-        PipelineState = Renderer.Device.CreateGraphicsPipelineState(graphicsPipelineStateDescription);
-        PipelineState.Name = "GraphicsPipelineStateObject " + _count;
-
-        CreateCommandList();
-    }
-}
-
-public sealed partial class Material
-{
     private void CreateRootSignature(string shaderFilePath)
     {
         // Create a root signature
@@ -238,6 +196,45 @@ public sealed partial class Material
 
         RootSignature = Renderer.Device.CreateRootSignature(rootSignatureDescription);
         RootSignature.Name = new FileInfo(shaderFilePath).Name + " " + _count++;
+    }
+
+    private void CreateInputLayout(out InputLayoutDescription inputLayoutDescription)
+    {
+        inputLayoutDescription = new InputLayoutDescription(
+            new InputElementDescription("POSITION", 0, Format.R32G32B32_Float, 0, 0),
+            new InputElementDescription("NORMAL", 0, Format.R32G32B32_Float, 12, 0),
+            new InputElementDescription("TANGENT", 0, Format.R32G32B32_Float, 24, 0),
+            new InputElementDescription("TEXCOORD", 0, Format.R32G32_Float, 32, 0));
+    }
+
+    private void CreateShaderByteCode(string shaderFilePath, out ReadOnlyMemory<byte> vertexShaderByteCode, out ReadOnlyMemory<byte> pixelShaderByteCode)
+    {
+        // Compile the vertex shader bytecode from the specified shader file name and target profile.
+        vertexShaderByteCode = CompileBytecode(DxcShaderStage.Vertex, shaderFilePath, "VSMain");
+
+        // Compile the pixel shader bytecode from the specified shader file name and target profile.
+        pixelShaderByteCode = CompileBytecode(DxcShaderStage.Pixel, shaderFilePath, "PSMain");
+    }
+
+    private void CreateGraphicsPipelineState(InputLayoutDescription inputLayoutDescription, ReadOnlyMemory<byte> vertexShaderByteCode, ReadOnlyMemory<byte> pixelShaderByteCode)
+    {
+        GraphicsPipelineStateDescription graphicsPipelineStateDescription = new()
+        {
+            RootSignature = RootSignature,
+            VertexShader = vertexShaderByteCode,
+            PixelShader = pixelShaderByteCode,
+            InputLayout = inputLayoutDescription,
+            SampleMask = uint.MaxValue,
+            PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
+            RasterizerState = Renderer.Data.RasterizerDescription,
+            BlendState = Renderer.Data.BlendDescription,
+            DepthStencilState = DepthStencilDescription.Default,
+            DepthStencilFormat = RenderData.DepthStencilFormat,
+            RenderTargetFormats = new[] { RenderData.RenderTargetFormat },
+            SampleDescription = SampleDescription.Default
+        };
+        PipelineState = Renderer.Device.CreateGraphicsPipelineState(graphicsPipelineStateDescription);
+        PipelineState.Name = "GraphicsPipelineStateObject " + _count;
     }
 
     private void CreateCommandAllocator()
