@@ -48,7 +48,7 @@ unsafe public sealed partial class GUIRenderer
 
         CreateCommandList();
 
-        //CreateFontTexture();
+        //CreateFontTextureAndSampler();
     }
 
     public void Update(IntPtr imGuiContext, Size newSize)
