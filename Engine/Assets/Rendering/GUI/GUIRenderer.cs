@@ -23,8 +23,7 @@ unsafe public sealed partial class GUIRenderer
     private ID3D12DescriptorHeap _textureView;
     private ID3D12DescriptorHeap _sampler;
 
-    private ID3D12Resource _viewConstantBuffer;
-    private IntPtr _viewConstantBufferPointer;
+    private ID3D12Resource _view;
 
     private List<ID3D12Resource> _vertexBuffers = new List<ID3D12Resource>();
     private List<ID3D12Resource> _indexBuffers = new List<ID3D12Resource>();
@@ -94,7 +93,7 @@ unsafe public sealed partial class GUIRenderer
         CommandList.SetGraphicsRootSignature(RootSignature);
 
         // Set view constant buffer.
-        CommandList.SetGraphicsRootConstantBufferView(0, _viewConstantBuffer.GPUVirtualAddress);
+        CommandList.SetGraphicsRootConstantBufferView(0, _view.GPUVirtualAddress);
 
         // Render ImGui draw data.
         RenderImDrawData(data);
@@ -146,11 +145,11 @@ unsafe public sealed partial class GUIRenderer
     private void CreateViewConstantBuffer(ImDrawDataPtr data)
     {
         //Create View Constant Buffer.
-        _viewConstantBuffer = Renderer.Device.CreateCommittedResource(
+        _view = Renderer.Device.CreateCommittedResource(
             HeapType.Upload,
             ResourceDescription.Buffer(sizeof(ViewConstantBuffer)),
             ResourceStates.GenericRead);
-        _viewConstantBuffer.Name = "ImGui View ConstantBuffer";
+        _view.Name = "ImGui View ConstantBuffer";
 
         float L = data.DisplayPos.X;
         float R = data.DisplayPos.X + data.DisplaySize.X;
@@ -162,10 +161,12 @@ unsafe public sealed partial class GUIRenderer
             0.0f, 0.0f, 0.5f, 0.0f,
             (R + L) / (L - R), (T + B) / (B - T), 0.5f, 1.0f);
 
-        // Map the buffer and store the pointer for later use.
-        var viewConstantBufferPointer = _viewConstantBuffer.Map<ViewConstantBuffer>(0);
-        *viewConstantBufferPointer = new ViewConstantBuffer(mvp, Vector3.Zero);
-        _viewConstantBuffer.Unmap(0);
+        // Map the constant buffer and copy the view-projection matrix and position of the camera into it.
+        ViewConstantBuffer* pointer = _view.Map<ViewConstantBuffer>(0);
+        // Copy the data from the new constant buffer to the mapped resource.
+        *pointer = new ViewConstantBuffer(mvp, Vector3.Zero);
+        // Unmap the constant buffer from memory.
+        _view.Unmap(0);
     }
 
     private void CreateFontTextureAndSampler()
