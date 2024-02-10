@@ -99,7 +99,10 @@ public sealed partial class Material
         _textureView?.Dispose();
         _sampler?.Dispose();
     }
+}
 
+public sealed partial class Material
+{
     private void CreateTextureAndSampler(string imageFileName)
     {
         #region // Create Texture

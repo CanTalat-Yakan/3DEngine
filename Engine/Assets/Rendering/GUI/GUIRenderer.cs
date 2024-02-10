@@ -76,7 +76,10 @@ unsafe public sealed partial class GUIRenderer
         _textureView?.Dispose();
         _sampler?.Dispose();
     }
+}
 
+unsafe public sealed partial class GUIRenderer
+{
     private void Draw(ImDrawDataPtr data)
     {
         // Record rendering commands into a DirectX 12 command list
