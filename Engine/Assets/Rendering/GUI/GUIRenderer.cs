@@ -79,65 +79,65 @@ unsafe public sealed partial class GUIRenderer
 {
     private void Draw(ImDrawDataPtr data)
     {
-        // Record rendering commands into a DirectX 12 command list
+        // Record rendering commands into a DirectX 12 command list.
         CommandAllocator.Reset();
-        CommandList.Reset(CommandAllocator, PipelineState); // Use the pipeline state
+        CommandList.Reset(CommandAllocator, PipelineState); // Use the pipeline state.
 
-        // Avoid rendering when minimized
+        // Avoid rendering when minimized.
         if (data.DisplaySize.X <= 0.0f || data.DisplaySize.Y <= 0.0f)
             return;
 
-        // Create and initialize view constant buffer
+        // Create and initialize view constant buffer.
         CreateViewConstantBuffer(data);
 
-        // Set root signature
+        // Set root signature.
         CommandList.SetGraphicsRootSignature(RootSignature);
 
-        // Set view constant buffer
+        // Set view constant buffer.
         CommandList.SetGraphicsRootConstantBufferView(0, _viewConstantBuffer.GPUVirtualAddress);
 
-        // Render ImGui draw data
+        // Render ImGui draw data.
         RenderImDrawData(data);
 
-        // Close and execute the command list
+        // Close and execute the command list.
         CommandList.Close();
         Renderer.Data.GraphicsQueue.ExecuteCommandList(CommandList);
     }
 
     private void RenderImDrawData(ImDrawDataPtr data)
     {
-        // Record ImGui draw commands
+        // Record ImGui draw commands.
         for (int n = 0; n < data.CmdListsCount; n++)
         {
             ImDrawListPtr cmdList = data.CmdListsRange[n];
             int vtxBufferSize = cmdList.VtxBuffer.Size * sizeof(ImDrawVert);
             int idxBufferSize = cmdList.IdxBuffer.Size * sizeof(ImDrawIdx);
 
-            // Update vertex buffer
+            // Update vertex buffer.
             ID3D12Resource vertexBuffer = _vertexBuffers[n];
             ImDrawVert* vertexData = vertexBuffer.Map<ImDrawVert>(0);
             Buffer.MemoryCopy((void*)cmdList.VtxBuffer.Data, vertexData, vtxBufferSize, vtxBufferSize);
             vertexBuffer.Unmap(0);
 
-            // Update index buffer
+            // Update index buffer.
             ID3D12Resource indexBuffer = _indexBuffers[n];
             ImDrawIdx* indexData = indexBuffer.Map<ImDrawIdx>(0);
             Buffer.MemoryCopy((void*)cmdList.IdxBuffer.Data, indexData, idxBufferSize, idxBufferSize);
             indexBuffer.Unmap(0);
 
-            // Set vertex and index buffer
+            // Set vertex and index buffer.
             CommandList.IASetVertexBuffers(0, new VertexBufferView(vertexBuffer.GPUVirtualAddress, vtxBufferSize, sizeof(ImDrawVert)));
             CommandList.IASetIndexBuffer(new IndexBufferView(indexBuffer.GPUVirtualAddress, idxBufferSize, sizeof(ImDrawIdx) == 2));
 
-            // Render command lists
+            // Render command lists.
             for (int cmdIndex = 0; cmdIndex < cmdList.CmdBuffer.Size; cmdIndex++)
             {
                 ImDrawCmdPtr cmd = cmdList.CmdBuffer[cmdIndex];
 
-                // Set render target
+                // Set render target.
                 CommandList.OMSetRenderTargets(Renderer.Data.BufferRenderTargetView.GetCPUDescriptorHandleForHeapStart(), null);
 
-                // Render the command
+                // Render the command.
                 CommandList.DrawIndexedInstanced((int)cmd.ElemCount, 1, (int)cmd.IdxOffset, (int)cmd.VtxOffset, 0);
             }
         }
@@ -162,7 +162,7 @@ unsafe public sealed partial class GUIRenderer
             0.0f, 0.0f, 0.5f, 0.0f,
             (R + L) / (L - R), (T + B) / (B - T), 0.5f, 1.0f);
 
-        // Map the buffer and store the pointer for later use
+        // Map the buffer and store the pointer for later use.
         var viewConstantBufferPointer = _viewConstantBuffer.Map<ViewConstantBuffer>(0);
         *viewConstantBufferPointer = new ViewConstantBuffer(mvp, Vector3.Zero);
         _viewConstantBuffer.Unmap(0);
