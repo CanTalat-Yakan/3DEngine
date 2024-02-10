@@ -248,13 +248,6 @@ public sealed partial class Renderer
 
 public sealed partial class Renderer
 {
-    private static readonly FeatureLevel[] s_featureLevels = [
-        FeatureLevel.Level_12_2,
-        FeatureLevel.Level_12_1,
-        FeatureLevel.Level_12_0,
-        FeatureLevel.Level_11_1,
-        FeatureLevel.Level_11_0];
-
     private void CreateDevice(out Result result)
     {
         if (Config.Debug && D3D12.D3D12GetDebugInterface(out ID3D12Debug1 debug).Success)
@@ -265,6 +258,13 @@ public sealed partial class Renderer
         }
         else
             Config.Debug = false;
+
+        FeatureLevel[] s_featureLevels = [
+            FeatureLevel.Level_12_2,
+            FeatureLevel.Level_12_1,
+            FeatureLevel.Level_12_0,
+            FeatureLevel.Level_11_1,
+            FeatureLevel.Level_11_0];
 
         using (IDXGIFactory4 DXGIFactory = DXGI.CreateDXGIFactory2<IDXGIFactory4>(Config.Debug))
         {
