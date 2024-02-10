@@ -44,13 +44,10 @@ public sealed partial class Material
     public void UpdateShader(string shaderFilePath)
     {
         CreateInputLayout(out var inputLayoutDescription);
-
         CreateShaderByteCode(shaderFilePath, out var vertexShaderByteCode, out var pixelShaderByteCode);
-
         CreateGraphicsPipelineState(inputLayoutDescription, vertexShaderByteCode, pixelShaderByteCode);
 
         CreateCommandAllocator();
-
         CreateCommandList();
     }
 

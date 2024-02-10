@@ -39,13 +39,10 @@ unsafe public sealed partial class GUIRenderer
         CreateRootSignature();
 
         CreateInputLayout(out var inputLayoutDescription);
-
         CreateShaderByteCode("ImGui.hlsl", out var vertexShaderByteCode, out var pixelShaderByteCode);
-
         CreateGraphicsPipelineState(inputLayoutDescription, vertexShaderByteCode, pixelShaderByteCode);
 
         CreateCommandAllocator();
-
         CreateCommandList();
 
         //CreateFontTextureAndSampler();
