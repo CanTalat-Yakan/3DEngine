@@ -58,7 +58,6 @@ public sealed partial class EntityManager
 {
     public Entity CreateEntity(Entity parent = null, string name = "New Entity", string tag = "Untagged", bool hide = false)
     {
-        // Create a new Entity instance with the specified name, parent, and tag.
         Entity newEntity = new()
         {
             Name = name,
@@ -67,10 +66,8 @@ public sealed partial class EntityManager
             IsHidden = hide
         };
 
-        // Add the new entity to the EntityList.
         EntityList.Add(newEntity);
 
-        // Return the new entity.
         return newEntity;
     }
 

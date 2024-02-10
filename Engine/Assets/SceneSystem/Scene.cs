@@ -31,7 +31,6 @@ public sealed partial class Scene : ICloneable
         // Assign a new Guid to the cloned scene object.
         newScene.ID = Guid.NewGuid();
 
-        // Return the cloned scene object.
         return newScene;
     }
 }

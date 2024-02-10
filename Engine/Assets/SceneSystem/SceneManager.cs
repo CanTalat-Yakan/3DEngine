@@ -13,35 +13,31 @@ public sealed partial class SceneManager
 
     public static Scene AddSubscene(Guid guid = new(), string name = "Subscene", bool enable = true)
     {
-        // Adds a new scene with the specified parameters to the list of subscenes.
-        Scene subscene = new()
+        Scene newSubscene = new()
         {
             Name = name,
             IsEnabled = enable,
             EntityManager = new()
         };
+
         // Set the provided GUID, if not empty.
         if (!guid.Equals(Guid.Empty))
-            subscene.ID = guid;
+            newSubscene.ID = guid;
 
-        Subscenes.Add(subscene);
+        Subscenes.Add(newSubscene);
 
-        // Returns the newly added scene.
-        return subscene;
+        return newSubscene;
     }
 
     public static void LoadSubscene(Scene subscene)
     {
-        // Calls the load method on the specified subscene.
         subscene.Load();
 
-        // Adds the loaded subscene to the list of subscenes.
         Subscenes.Add(subscene);
     }
 
     public static void UnloadSubscene(Scene subscene)
     {
-        // Calls the unload method on the specified subscene.
         subscene.Unload();
     }
 
@@ -54,7 +50,6 @@ public sealed partial class SceneManager
         foreach (var entity in scene.EntityManager.EntityList.ToArray())
             scene.EntityManager.Destroy(entity);
 
-        // Removes the scene from the list of subscenes.
         Subscenes.Remove(scene);
     }
 }
