@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-using SharpGen.Runtime;
+﻿using SharpGen.Runtime;
 using Vortice.Direct3D12.Debug;
 using Vortice.Direct3D12;
 using Vortice.Direct3D;
@@ -15,8 +13,8 @@ public sealed partial class Renderer
 
     public bool IsRendering => Data.BufferRenderTargetView?.NativePointer is not 0;
 
-    public Size Size => NativeSize.Scale(Config.ResolutionScale);
-    public Size NativeSize { get; private set; }
+    public SizeI Size => NativeSize.Scale(Config.ResolutionScale);
+    public SizeI NativeSize { get; private set; }
 
     public ID3D12Device2 Device { get; private set; }
 
@@ -44,7 +42,7 @@ public sealed partial class Renderer
             Config = config;
 
         // Set the size.
-        NativeSize = new Size(
+        NativeSize = new(
             _win32Window.Width,
             _win32Window.Height);
 
@@ -61,7 +59,7 @@ public sealed partial class Renderer
         if (config is not null)
             Config = config;
 
-        NativeSize = new Size(
+        NativeSize = new(
             Math.Max(64, sizeX),
             Math.Max(64, sizeY));
 
@@ -101,7 +99,7 @@ public sealed partial class Renderer
 
         // Resize the buffers, depth stencil texture, render target texture and viewport
         // when the size of the window changes.
-        NativeSize = new Size(
+        NativeSize = new(
             Math.Max(64, newWidth),
             Math.Max(64, newHeight));
 
@@ -111,8 +109,8 @@ public sealed partial class Renderer
         // Resize the swap chain buffers to match the new window size.
         Data.SwapChain.ResizeBuffers(
             Data.SwapChain.Description.BufferCount,
-            Size.Width,
-            Size.Height,
+            (int)Size.Width,
+            (int)Size.Height,
             Data.SwapChain.Description1.Format,
             Data.SwapChain.Description1.Flags);
         // Update the size of the source in the swap chain.

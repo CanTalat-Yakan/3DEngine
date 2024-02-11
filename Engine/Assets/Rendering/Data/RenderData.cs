@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Threading;
+﻿using System.Threading;
 
 using Vortice.Direct3D12;
 using Vortice.Direct3D;
@@ -45,7 +44,7 @@ public struct RenderData
     public ulong FrameIndex => FrameCount % RenderLatency;
     public ulong FrameCount;
 
-    public void SetViewport(Size size)
+    public void SetViewport(SizeI size)
     {
         CommandList.RSSetViewport(new Viewport(size.Width, size.Height));
         CommandList.RSSetScissorRect(size.Width, size.Height);

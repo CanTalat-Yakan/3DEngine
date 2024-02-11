@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 
 using SharpGen.Runtime;
 using Vortice.Direct3D12;
 using Vortice.DXGI;
 using Vortice.WIC;
+using Vortice.Mathematics;
 
 namespace Engine.Loader;
 
@@ -48,7 +48,7 @@ public sealed partial class ImageLoader
         s_textureStore.Add(filePath, texture);
     }
 
-    private static void ProcessWIC(ID3D12Device device, string filePath, bool fromResources, out Format format, out Size size)
+    private static void ProcessWIC(ID3D12Device device, string filePath, bool fromResources, out Format format, out SizeI size)
     {
         // Define the full path to the texture file.
         string textureFilePath = fromResources

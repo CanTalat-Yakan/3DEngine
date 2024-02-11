@@ -1,11 +1,12 @@
 ﻿using SharpGen.Runtime;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 
 using Vortice.Direct3D12;
 using Vortice.Dxc;
 using Vortice.DXGI;
+using Vortice.Mathematics;
+
 using ImDrawIdx = System.UInt16;
 
 namespace Engine.GUI;
@@ -47,7 +48,7 @@ unsafe public sealed partial class GUIRenderer
         //CreateFontTextureAndSampler();
     }
 
-    public void Update(IntPtr imGuiContext, Size newSize)
+    public void Update(IntPtr imGuiContext, SizeI newSize)
     {
         ImGui.SetCurrentContext(imGuiContext);
         var io = ImGui.GetIO();

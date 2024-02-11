@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -9,8 +8,8 @@ namespace Engine.Helper;
 
 public static class ExtensionMethods
 {
-    public static Size Scale(this Size size, double scale) =>
-        new Size((int)(size.Width * scale), (int)(size.Height * scale));
+    public static SizeI Scale(this SizeI size, double scale) =>
+        new SizeI((int)(size.Width * scale), (int)(size.Height * scale));
 
     public static float ToDegrees(this float value) =>
         MathHelper.ToDegrees(value);
@@ -24,7 +23,7 @@ public static class ExtensionMethods
     public static Vector3 ToRadians(this Vector3 vector) =>
         vector.SetVector(vector.X.ToRadians(), vector.Y.ToRadians(), vector.Z.ToRadians());
 
-    public static Vector2 ToVector2(this Size size) =>
+    public static Vector2 ToVector2(this SizeI size) =>
         new Vector2(size.Width, size.Height);
 
     public static Vector2 SetVector(this Vector2 vector, float x, float y)
