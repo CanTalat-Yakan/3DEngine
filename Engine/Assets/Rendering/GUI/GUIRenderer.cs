@@ -1,6 +1,8 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 
 using SharpGen.Runtime;
+using Vortice;
 using Vortice.Direct3D12;
 using Vortice.Dxc;
 using Vortice.DXGI;
@@ -18,7 +20,7 @@ unsafe public sealed partial class GUIRenderer
     public ID3D12GraphicsCommandList CommandList;
     public ID3D12CommandAllocator CommandAllocator;
 
-    public ID3D12Resource Texture;
+    private Dictionary<IntPtr, ID3D12Resource> _textureResources = new();
 
     private ID3D12DescriptorHeap _textureView;
     private ID3D12DescriptorHeap _sampler;
@@ -88,10 +90,6 @@ unsafe public sealed partial class GUIRenderer
         // Avoid rendering when minimized.
         if (data.DisplaySize.X <= 0.0f || data.DisplaySize.Y <= 0.0f)
             return;
-        
-        // Create and update vertex and index buffer.
-        CreateBuffers(data);
-        UpdateBuffers(data);
 
         // Create and initialize view constant buffer.
         CreateViewConstantBuffer(data);
@@ -101,6 +99,10 @@ unsafe public sealed partial class GUIRenderer
 
         // Set view constant buffer.
         CommandList.SetGraphicsRootConstantBufferView(0, _view.GPUVirtualAddress);
+
+        // Create and update vertex and index buffer.
+        CreateBuffers(data);
+        UpdateBuffers(data);
 
         // Render ImGui draw data.
         RenderImDrawData(data);
@@ -112,41 +114,56 @@ unsafe public sealed partial class GUIRenderer
 
     private void RenderImDrawData(ImDrawDataPtr data)
     {
-        // Record ImGui draw commands.
+        //// Record ImGui draw commands.
+        //for (int n = 0; n < data.CmdListsCount; n++)
+        //{
+        //    ImDrawListPtr cmdList = data.CmdListsRange[n];
+
+        //    // Render command lists.
+        //    for (int cmdIndex = 0; cmdIndex < cmdList.CmdBuffer.Size; cmdIndex++)
+        //    {
+        //        ImDrawCmdPtr cmd = cmdList.CmdBuffer[cmdIndex];
+
+        //        // Set render target.
+        //        CommandList.OMSetRenderTargets(Renderer.Data.BufferRenderTargetView.GetCPUDescriptorHandleForHeapStart(), null);
+
+        //        // Render the command.
+        //        CommandList.DrawIndexedInstanced((int)cmd.ElemCount, 1, (int)cmd.IdxOffset, (int)cmd.VtxOffset, 0);
+        //    }
+        //}
+
+        // (Because we merged all buffers into a single one, we maintain our own offset into them)
+        int global_idx_offset = 0;
+        int global_vtx_offset = 0;
+        Vector2 clip_off = data.DisplayPos;
         for (int n = 0; n < data.CmdListsCount; n++)
         {
             ImDrawListPtr cmdList = data.CmdListsRange[n];
-            int vtxBufferSize = cmdList.VtxBuffer.Size * sizeof(ImDrawVert);
-            int idxBufferSize = cmdList.IdxBuffer.Size * sizeof(ImDrawIdx);
-
-            // Update vertex buffer.
-            ID3D12Resource vertexBuffer = _vertexBuffer;
-            ImDrawVert* vertexData = vertexBuffer.Map<ImDrawVert>(0);
-            Buffer.MemoryCopy((void*)cmdList.VtxBuffer.Data, vertexData, vtxBufferSize, vtxBufferSize);
-            vertexBuffer.Unmap(0);
-
-            // Update index buffer.
-            ID3D12Resource indexBuffer = _indexBuffer;
-            ImDrawIdx* indexData = indexBuffer.Map<ImDrawIdx>(0);
-            Buffer.MemoryCopy((void*)cmdList.IdxBuffer.Data, indexData, idxBufferSize, idxBufferSize);
-            indexBuffer.Unmap(0);
-
-            // Set vertex and index buffer.
-            CommandList.IASetVertexBuffers(0, new VertexBufferView(vertexBuffer.GPUVirtualAddress, vtxBufferSize, sizeof(ImDrawVert)));
-            CommandList.IASetIndexBuffer(new IndexBufferView(indexBuffer.GPUVirtualAddress, idxBufferSize, sizeof(ImDrawIdx) == 2));
-
-            // Render command lists.
-            for (int cmdIndex = 0; cmdIndex < cmdList.CmdBuffer.Size; cmdIndex++)
+            for (int i = 0; i < cmdList.CmdBuffer.Size; i++)
             {
-                ImDrawCmdPtr cmd = cmdList.CmdBuffer[cmdIndex];
+                ImDrawCmdPtr cmd = cmdList.CmdBuffer[i];
 
-                // Set render target.
-                CommandList.OMSetRenderTargets(Renderer.Data.BufferRenderTargetView.GetCPUDescriptorHandleForHeapStart(), null);
+                if (cmd.UserCallback != IntPtr.Zero)
+                    throw new NotImplementedException("user callbacks not implemented");
+                else
+                {
+                    cmd.ClipRect *= (float)Renderer.Instance.Config.ResolutionScale;
 
-                // Render the command.
-                CommandList.DrawIndexedInstanced((int)cmd.ElemCount, 1, (int)cmd.IdxOffset, (int)cmd.VtxOffset, 0);
+                    var rect = new RawRect((int)(cmd.ClipRect.X - clip_off.X), (int)(cmd.ClipRect.Y - clip_off.Y), (int)(cmd.ClipRect.Z - clip_off.X), (int)(cmd.ClipRect.W - clip_off.Y));
+                    CommandList.RSSetScissorRects(new[] { rect });
+
+                    _textureResources.TryGetValue(cmd.TextureId, out var texture);
+                    //if (texture != null)
+                        //CommandList.SetGraphicsRootShaderResourceView(0, new[] { texture });
+
+                    CommandList.DrawIndexedInstanced((int)cmd.ElemCount, 0, (int)(cmd.IdxOffset + global_idx_offset), (int)(cmd.VtxOffset + global_vtx_offset), 0);
+                }
             }
         }
+
+        // Set vertex and index buffer.
+        CommandList.IASetVertexBuffers(0, new VertexBufferView(_vertexBuffer.GPUVirtualAddress, _vertexBufferSize, sizeof(ImDrawVert)));
+        CommandList.IASetIndexBuffer(new IndexBufferView(_indexBuffer.GPUVirtualAddress, _indexBufferSize, sizeof(ImDrawIdx) == 2));
     }
 
     private void CreateViewConstantBuffer(ImDrawDataPtr data)
@@ -198,25 +215,19 @@ unsafe public sealed partial class GUIRenderer
             textureDescription,
             ResourceStates.CopyDest,
             null,
-            out Texture);
+            out var texture);
 
         if (result.Failure)
             throw new Exception(result.Description);
 
-        Texture.Name = "ImGui FontTexture";
+        texture.Name = "ImGui FontTexture";
 
-        SubresourceData subResource = new()
-        {
-            Data = (IntPtr)pixels,
-            RowPitch = (nint)textureDescription.Width * 4,
-            SlicePitch = 0
-        };
 
         ShaderResourceViewDescription shaderResourceViewDescription = new()
         {
-            Format = Texture.Description.Format,
+            Format = texture.Description.Format,
             ViewDimension = ShaderResourceViewDimension.Texture2D,
-            Texture2D = new Texture2DShaderResourceView { MipLevels = Texture.Description.MipLevels },
+            Texture2D = new Texture2DShaderResourceView { MipLevels = texture.Description.MipLevels },
             Shader4ComponentMapping = ShaderComponentMapping.Default
         };
 
@@ -226,11 +237,24 @@ unsafe public sealed partial class GUIRenderer
             Flags = DescriptorHeapFlags.ShaderVisible,
             Type = DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView
         });
-        _textureView.Name = Texture.Name + " Texture View";
-        Renderer.Device.CreateShaderResourceView(Texture, shaderResourceViewDescription, _textureView.GetCPUDescriptorHandleForHeapStart());
+        _textureView.Name = texture.Name + " Texture View";
+        Renderer.Device.CreateShaderResourceView(texture, shaderResourceViewDescription, _textureView.GetCPUDescriptorHandleForHeapStart());
 
         var size = Renderer.Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView);
         _textureView.GetCPUDescriptorHandleForHeapStart().Offset(size);
+
+        var id = texture.NativePointer;
+        _textureResources.Add(id, texture);
+
+
+
+
+        SubresourceData subResource = new()
+        {
+            Data = (IntPtr)pixels,
+            RowPitch = (nint)textureDescription.Width * 4,
+            SlicePitch = 0
+        };
         #endregion
 
 
@@ -254,7 +278,7 @@ unsafe public sealed partial class GUIRenderer
             Flags = DescriptorHeapFlags.ShaderVisible,
             Type = DescriptorHeapType.Sampler
         });
-        _sampler.Name = Texture.Name + " Sampler";
+        _sampler.Name = texture.Name + " Sampler";
         // Create the sampler state using the sampler description.
         Renderer.Device.CreateSampler(ref samplerDescription, _sampler.GetCPUDescriptorHandleForHeapStart());
 
