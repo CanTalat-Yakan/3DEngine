@@ -81,10 +81,11 @@ public unsafe partial class MaterialBuffer
     {
         if (Renderer.CheckDeviceRemoved()) return;
 
-        // Map the constant buffer and copy the per-model matrix of the material into it.
-        PerModelConstantBuffer* pointer = _model.Map<PerModelConstantBuffer>(0);
+        // Map the constant buffer and copy the view-projection matrix and position of the camera into it.
+        void* pointer;
+        _model.Map(0, &pointer);
         // Copy the data from the constant buffer to the mapped resource.
-        *pointer = constantBuffer;
+        Unsafe.Copy(pointer, ref constantBuffer);
         // Unmap the constant buffer from memory.
         _model.Unmap(0);
 

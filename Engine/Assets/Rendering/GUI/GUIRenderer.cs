@@ -1,7 +1,6 @@
-﻿using SharpGen.Runtime;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 
+using SharpGen.Runtime;
 using Vortice.Direct3D12;
 using Vortice.Dxc;
 using Vortice.DXGI;
@@ -26,8 +25,11 @@ unsafe public sealed partial class GUIRenderer
 
     private ID3D12Resource _view;
 
-    private List<ID3D12Resource> _vertexBuffers = new List<ID3D12Resource>();
-    private List<ID3D12Resource> _indexBuffers = new List<ID3D12Resource>();
+    private ID3D12Resource _vertexBuffer;
+    private ID3D12Resource _indexBuffer;
+
+    private int _vertexBufferSize = 5000, _indexBufferSize = 10000;
+    private const int _vertexConstantBufferSize = 16 * 4;
 
     public Renderer Renderer => _renderer ??= Renderer.Instance;
     private Renderer _renderer;
@@ -86,6 +88,10 @@ unsafe public sealed partial class GUIRenderer
         // Avoid rendering when minimized.
         if (data.DisplaySize.X <= 0.0f || data.DisplaySize.Y <= 0.0f)
             return;
+        
+        // Create and update vertex and index buffer.
+        CreateBuffers(data);
+        UpdateBuffers(data);
 
         // Create and initialize view constant buffer.
         CreateViewConstantBuffer(data);
@@ -114,13 +120,13 @@ unsafe public sealed partial class GUIRenderer
             int idxBufferSize = cmdList.IdxBuffer.Size * sizeof(ImDrawIdx);
 
             // Update vertex buffer.
-            ID3D12Resource vertexBuffer = _vertexBuffers[n];
+            ID3D12Resource vertexBuffer = _vertexBuffer;
             ImDrawVert* vertexData = vertexBuffer.Map<ImDrawVert>(0);
             Buffer.MemoryCopy((void*)cmdList.VtxBuffer.Data, vertexData, vtxBufferSize, vtxBufferSize);
             vertexBuffer.Unmap(0);
 
             // Update index buffer.
-            ID3D12Resource indexBuffer = _indexBuffers[n];
+            ID3D12Resource indexBuffer = _indexBuffer;
             ImDrawIdx* indexData = indexBuffer.Map<ImDrawIdx>(0);
             Buffer.MemoryCopy((void*)cmdList.IdxBuffer.Data, indexData, idxBufferSize, idxBufferSize);
             indexBuffer.Unmap(0);
@@ -255,6 +261,67 @@ unsafe public sealed partial class GUIRenderer
         size = Renderer.Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView);
         _sampler.GetCPUDescriptorHandleForHeapStart().Offset(size);
         #endregion
+    }
+}
+
+unsafe public sealed partial class GUIRenderer
+{
+    private void CreateBuffers(ImDrawDataPtr data)
+    {
+        if (_vertexBuffer == null || _vertexBufferSize < data.TotalVtxCount)
+        {
+            _vertexBuffer?.Release();
+
+            _vertexBufferSize = data.TotalVtxCount + 5000;
+
+            _vertexBuffer = Renderer.Device.CreateCommittedResource(
+                HeapType.Upload,
+                ResourceDescription.Buffer(_vertexBufferSize * sizeof(ImDrawVert)),
+                ResourceStates.GenericRead);
+            _vertexBuffer.Name = "ImGui VertexBuffer";
+        }
+
+        if (_indexBuffer == null || _indexBufferSize < data.TotalIdxCount)
+        {
+            _indexBuffer?.Release();
+
+            _indexBufferSize = data.TotalIdxCount + 10000;
+
+            _vertexBuffer = Renderer.Device.CreateCommittedResource(
+                HeapType.Upload,
+                ResourceDescription.Buffer(_vertexBufferSize * sizeof(ImDrawIdx)),
+                ResourceStates.GenericRead);
+            _vertexBuffer.Name = "ImGui IndexBuffer";
+        }
+    }
+
+    private void UpdateBuffers(ImDrawDataPtr data)
+    {
+        void* pointer;
+        _vertexBuffer.Map(0, &pointer);
+        var vertexResourcePointer = (ImDrawVert*)new nint(pointer);
+
+        void* pointer2;
+        _indexBuffer.Map(0, &pointer2);
+        var indexResourcePointer = (ImDrawIdx*)new nint(pointer2);
+
+        // Upload vertex/index data into a single contiguous GPU buffer
+        for (int n = 0; n < data.CmdListsCount; n++)
+        {
+            var cmdlList = data.CmdListsRange[n];
+
+            var vertBytes = cmdlList.VtxBuffer.Size * sizeof(ImDrawVert);
+            Buffer.MemoryCopy((void*)cmdlList.VtxBuffer.Data, vertexResourcePointer, vertBytes, vertBytes);
+
+            var idxBytes = cmdlList.IdxBuffer.Size * sizeof(ImDrawIdx);
+            Buffer.MemoryCopy((void*)cmdlList.IdxBuffer.Data, indexResourcePointer, idxBytes, idxBytes);
+
+            vertexResourcePointer += cmdlList.VtxBuffer.Size;
+            indexResourcePointer += cmdlList.IdxBuffer.Size;
+        }
+
+        _vertexBuffer.Unmap(0);
+        _indexBuffer.Unmap(0);
     }
 }
 
