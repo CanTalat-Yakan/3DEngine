@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-
+using System.Runtime.CompilerServices;
 using SharpGen.Runtime;
 using Vortice;
 using Vortice.Direct3D12;
@@ -20,7 +20,7 @@ unsafe public sealed partial class GUIRenderer
     public ID3D12GraphicsCommandList CommandList;
     public ID3D12CommandAllocator CommandAllocator;
 
-    private Dictionary<IntPtr, ID3D12Resource> _textureResources = new();
+    private ID3D12Resource _textureResource;
 
     private ID3D12DescriptorHeap _textureView;
     private ID3D12DescriptorHeap _sampler;
@@ -114,25 +114,7 @@ unsafe public sealed partial class GUIRenderer
 
     private void RenderImDrawData(ImDrawDataPtr data)
     {
-        //// Record ImGui draw commands.
-        //for (int n = 0; n < data.CmdListsCount; n++)
-        //{
-        //    ImDrawListPtr cmdList = data.CmdListsRange[n];
-
-        //    // Render command lists.
-        //    for (int cmdIndex = 0; cmdIndex < cmdList.CmdBuffer.Size; cmdIndex++)
-        //    {
-        //        ImDrawCmdPtr cmd = cmdList.CmdBuffer[cmdIndex];
-
-        //        // Set render target.
-        //        CommandList.OMSetRenderTargets(Renderer.Data.BufferRenderTargetView.GetCPUDescriptorHandleForHeapStart(), null);
-
-        //        // Render the command.
-        //        CommandList.DrawIndexedInstanced((int)cmd.ElemCount, 1, (int)cmd.IdxOffset, (int)cmd.VtxOffset, 0);
-        //    }
-        //}
-
-        // (Because we merged all buffers into a single one, we maintain our own offset into them)
+        // Because we merged all buffers into a single one, we maintain our own offset into them.
         int global_idx_offset = 0;
         int global_vtx_offset = 0;
         Vector2 clip_off = data.DisplayPos;
@@ -149,12 +131,11 @@ unsafe public sealed partial class GUIRenderer
                 {
                     cmd.ClipRect *= (float)Renderer.Instance.Config.ResolutionScale;
 
-                    var rect = new RawRect((int)(cmd.ClipRect.X - clip_off.X), (int)(cmd.ClipRect.Y - clip_off.Y), (int)(cmd.ClipRect.Z - clip_off.X), (int)(cmd.ClipRect.W - clip_off.Y));
+                    RawRect rect = new((int)(cmd.ClipRect.X - clip_off.X), (int)(cmd.ClipRect.Y - clip_off.Y), (int)(cmd.ClipRect.Z - clip_off.X), (int)(cmd.ClipRect.W - clip_off.Y));
                     CommandList.RSSetScissorRects(new[] { rect });
 
-                    _textureResources.TryGetValue(cmd.TextureId, out var texture);
                     //if (texture != null)
-                        //CommandList.SetGraphicsRootShaderResourceView(0, new[] { texture });
+                    //    CommandList.SetGraphicsRootShaderResourceView(0, texture.GPUVirtualAddress());
 
                     CommandList.DrawIndexedInstanced((int)cmd.ElemCount, 0, (int)(cmd.IdxOffset + global_idx_offset), (int)(cmd.VtxOffset + global_vtx_offset), 0);
                 }
@@ -179,16 +160,20 @@ unsafe public sealed partial class GUIRenderer
         float R = data.DisplayPos.X + data.DisplaySize.X;
         float T = data.DisplayPos.Y;
         float B = data.DisplayPos.Y + data.DisplaySize.Y;
-        Matrix4x4 mvp = new(
-            2.0f / (R - L), 0.0f, 0.0f, 0.0f,
-            0.0f, 2.0f / (T - B), 0.0f, 0.0f,
-            0.0f, 0.0f, 0.5f, 0.0f,
-            (R + L) / (L - R), (T + B) / (B - T), 0.5f, 1.0f);
+        float[] mvp =
+        {
+            2.0f/(R-L),     0.0f,           0.0f,           0.0f,
+            0.0f,           2.0f/(T-B),     0.0f,           0.0f,
+            0.0f,           0.0f,           0.5f,           0.0f,
+            (R+L)/(L-R),    (T+B)/(B-T),    0.5f,           1.0f,
+        };
+        ViewConstantBuffer viewConstantBuffer = new(mvp.ToMatrix4x4(), Vector3.Zero);
 
         // Map the constant buffer and copy the view-projection matrix and position of the camera into it.
-        ViewConstantBuffer* pointer = _view.Map<ViewConstantBuffer>(0);
+        void* pointer;
+        _view.Map(0, &pointer);
         // Copy the data from the new constant buffer to the mapped resource.
-        *pointer = new ViewConstantBuffer(mvp, Vector3.Zero);
+        Unsafe.Copy(pointer, ref viewConstantBuffer);
         // Unmap the constant buffer from memory.
         _view.Unmap(0);
     }
@@ -243,8 +228,7 @@ unsafe public sealed partial class GUIRenderer
         var size = Renderer.Device.GetDescriptorHandleIncrementSize(DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView);
         _textureView.GetCPUDescriptorHandleForHeapStart().Offset(size);
 
-        var id = texture.NativePointer;
-        _textureResources.Add(id, texture);
+        _textureResource = texture;
 
 
 
@@ -332,12 +316,12 @@ unsafe public sealed partial class GUIRenderer
         // Upload vertex/index data into a single contiguous GPU buffer
         for (int n = 0; n < data.CmdListsCount; n++)
         {
-            var cmdlList = data.CmdListsRange[n];
+            ImDrawListPtr cmdlList = data.CmdListsRange[n];
 
-            var vertBytes = cmdlList.VtxBuffer.Size * sizeof(ImDrawVert);
+            int vertBytes = cmdlList.VtxBuffer.Size * sizeof(ImDrawVert);
             Buffer.MemoryCopy((void*)cmdlList.VtxBuffer.Data, vertexResourcePointer, vertBytes, vertBytes);
 
-            var idxBytes = cmdlList.IdxBuffer.Size * sizeof(ImDrawIdx);
+            int idxBytes = cmdlList.IdxBuffer.Size * sizeof(ImDrawIdx);
             Buffer.MemoryCopy((void*)cmdlList.IdxBuffer.Data, indexResourcePointer, idxBytes, idxBytes);
 
             vertexResourcePointer += cmdlList.VtxBuffer.Size;

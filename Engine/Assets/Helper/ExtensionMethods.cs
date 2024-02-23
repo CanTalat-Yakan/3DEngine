@@ -130,4 +130,30 @@ public static class ExtensionMethods
         //file is not locked
         return false;
     }
+
+    public static Matrix4x4 ToMatrix4x4(this float[] array)
+    {
+        if (array.Length != 16)
+            throw new ArgumentException("Input array must have exactly 16 elements for a 4x4 matrix.");
+
+        Matrix4x4 matrix = new Matrix4x4();
+        matrix.M11 = array[0];
+        matrix.M12 = array[1];
+        matrix.M13 = array[2];
+        matrix.M14 = array[3];
+        matrix.M21 = array[4];
+        matrix.M22 = array[5];
+        matrix.M23 = array[6];
+        matrix.M24 = array[7];
+        matrix.M31 = array[8];
+        matrix.M32 = array[9];
+        matrix.M33 = array[10];
+        matrix.M34 = array[11];
+        matrix.M41 = array[12];
+        matrix.M42 = array[13];
+        matrix.M43 = array[14];
+        matrix.M44 = array[15];
+
+        return matrix;
+    }
 }
