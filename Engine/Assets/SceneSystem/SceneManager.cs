@@ -4,14 +4,14 @@ namespace Engine.SceneSystem;
 
 public sealed partial class SceneManager
 {
-    public static Scene MainScene;
-    public static List<Scene> Subscenes = new();
+    public Scene MainScene;
+    public List<Scene> Subscenes = new();
 
     public SceneManager(Scene scene = null) =>
         // Initializes the main scene and creates a new empty list for the subscenes.
         MainScene = scene ?? new Scene() { Name = "Main", IsEnabled = true, EntityManager = new() };
 
-    public static Scene AddSubscene(Guid guid = new(), string name = "Subscene", bool enable = true)
+    public Scene AddSubscene(Guid guid = new(), string name = "Subscene", bool enable = true)
     {
         Scene newSubscene = new()
         {
@@ -29,19 +29,19 @@ public sealed partial class SceneManager
         return newSubscene;
     }
 
-    public static void LoadSubscene(Scene subscene)
+    public void LoadSubscene(Scene subscene)
     {
         subscene.Load();
 
         Subscenes.Add(subscene);
     }
 
-    public static void UnloadSubscene(Scene subscene)
+    public void UnloadSubscene(Scene subscene)
     {
         subscene.Unload();
     }
 
-    public static void RemoveSubscene(Guid guid)
+    public void RemoveSubscene(Guid guid)
     {
         // Retrieves the scene with the specified GUID from the list of subscenes.
         Scene scene = GetFromID(guid);
@@ -56,7 +56,7 @@ public sealed partial class SceneManager
 
 public sealed partial class SceneManager
 {
-    public static Scene GetFromID(Guid guid)
+    public Scene GetFromID(Guid guid)
     {
         // Check if the main scene ID matches the provided GUID.
         if (MainScene.ID == guid)
@@ -71,7 +71,7 @@ public sealed partial class SceneManager
         return null;
     }
 
-    public static Scene GetFromEntityID(Guid guid)
+    public Scene GetFromEntityID(Guid guid)
     {
         // Check if the main scene contains the entity with an ID that matches the provided GUID.
         if (MainScene.EntityManager.GetFromID(guid) is not null)

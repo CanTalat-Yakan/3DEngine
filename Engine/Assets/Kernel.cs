@@ -46,8 +46,9 @@ public sealed class Kernel
 
     public void Initialize(IntPtr hwnd, Vortice.Mathematics.SizeI size, bool win32Window, string assetsPath = null)
     {
-        // Set the singleton instance of the class, if it hasn't been already.
         Instance ??= this;
+
+        EditorState.AssetsPath = assetsPath;
 
         Context.GraphicsDevice.Initialize(size, win32Window);
         Context.UploadBuffer.Initialize(Context.GraphicsDevice, 67108864); // 64 MB.
@@ -66,20 +67,16 @@ public sealed class Kernel
             OnGUI += GUIRenderer.ProfileWindows;
         }
 
-        EditorState.AssetsPath = assetsPath;
-
         Input.Initialize(hwnd);
+
+        SceneManager = new();
+        var boot = SceneManager.MainScene.EntityManager
+            .CreateEntity(null, "Boot", hide: true)
+            .AddComponent<SceneBoot>();
 
         ScriptCompiler = new();
         ShaderCompiler = new();
         MaterialCompiler = new();
-        SceneManager = new();
-
-       // Creates an entity with the Boot editor tag and adds a SceneBoot component to it.
-       var boot = SceneManager.MainScene.EntityManager
-           .CreateEntity(null, "Boot")
-           .AddComponent<SceneBoot>();
-        boot.Entity.IsHidden = true;
 
         ScriptCompiler.CompileProjectScripts(EditorState.AssetsPath);
         ShaderCompiler.CompileProjectShaders(EditorState.AssetsPath);
@@ -87,7 +84,6 @@ public sealed class Kernel
 
         SceneManager.ProcessSystems();
 
-        // Render Pipeline Initialization
         SceneManager.Awake();
         SceneManager.Start();
 
@@ -148,6 +144,8 @@ public sealed class Kernel
     {
         GUIRenderer.Update(GUIContext);
         GUIInputHandler.Update();
+
+        SceneManager.GUI();
 
         OnGUI?.Invoke();
 
