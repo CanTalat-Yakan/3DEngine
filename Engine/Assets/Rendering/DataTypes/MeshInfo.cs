@@ -6,10 +6,25 @@ using Vortice.Mathematics;
 
 namespace Engine.DataTypes;
 
+public sealed class VertexBuffer : IDisposable
+{
+    public ID3D12Resource Resource;
+
+    public int Offset;
+    public int SizeInByte;
+    public int Stride;
+
+    public void Dispose()
+    {
+        if (Offset == 0)
+            Resource.Dispose();
+    }
+}
+
 public sealed class MeshInfo : IDisposable
 {
-    public ID3D12Resource Vertex;
-    public ID3D12Resource Index;
+    public ID3D12Resource VertexBufferResource;
+    public ID3D12Resource IndexBufferResource;
 
     public InputLayoutDescription InputLayoutDescription;
 
@@ -25,30 +40,15 @@ public sealed class MeshInfo : IDisposable
 
     public void Dispose()
     {
-        Index?.Dispose();
-        Index = null;
+        IndexBufferResource?.Dispose();
+        IndexBufferResource = null;
 
-        Vertex?.Dispose();
-        Vertex = null;
+        VertexBufferResource?.Dispose();
+        VertexBufferResource = null;
 
         if (Vertices is not null)
             foreach (var pair in Vertices)
                 pair.Value.Dispose();
         Vertices?.Clear();
-    }
-}
-
-public sealed class VertexBuffer : IDisposable
-{
-    public ID3D12Resource Resource;
-
-    public int Offset;
-    public int SizeInByte;
-    public int Stride;
-
-    public void Dispose()
-    {
-        if (Offset == 0)
-            Resource.Dispose();
     }
 }

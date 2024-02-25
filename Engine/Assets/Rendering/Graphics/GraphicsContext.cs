@@ -208,8 +208,8 @@ public sealed partial class GraphicsContext : IDisposable
                 previousInputSlot = inputElementDescription.Slot;
             }
 
-        if (mesh.Index is not null)
-            CommandList.IASetIndexBuffer(new IndexBufferView(mesh.Index.GPUVirtualAddress, mesh.IndexSizeInByte, mesh.IndexFormat));
+        if (mesh.IndexBufferResource is not null)
+            CommandList.IASetIndexBuffer(new IndexBufferView(mesh.IndexBufferResource.GPUVirtualAddress, mesh.IndexSizeInByte, mesh.IndexFormat));
 
         InputLayoutDescription = mesh.InputLayoutDescription;
     }

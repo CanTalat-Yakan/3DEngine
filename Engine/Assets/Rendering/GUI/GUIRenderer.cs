@@ -145,11 +145,11 @@ public unsafe sealed partial class GUIRenderer
             var indexBytes = commandList.IdxBuffer.Size * sizeof(ImDrawIdx);
 
             Context.UploadBuffer.UploadMeshIndex(graphicsContext, GUIMesh, new Span<byte>(commandList.IdxBuffer.Data.ToPointer(), indexBytes), Format.R16_UInt);
-            Context.UploadBuffer.UploadVertexBuffer(graphicsContext, ref GUIMesh.Vertex, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), vertexBytes));
+            Context.UploadBuffer.UploadVertexBuffer(graphicsContext, ref GUIMesh.VertexBufferResource, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), vertexBytes));
 
-            GUIMesh.Vertices["POSITION"] = new VertexBuffer() { Offset = 0, Resource = GUIMesh.Vertex, SizeInByte = vertexBytes, Stride = sizeof(ImDrawVert) };
-            GUIMesh.Vertices["TEXCOORD"] = new VertexBuffer() { Offset = 8, Resource = GUIMesh.Vertex, SizeInByte = vertexBytes, Stride = sizeof(ImDrawVert) };
-            GUIMesh.Vertices["COLOR"] = new VertexBuffer() { Offset = 16, Resource = GUIMesh.Vertex, SizeInByte = vertexBytes, Stride = sizeof(ImDrawVert) };
+            GUIMesh.Vertices["POSITION"] = new VertexBuffer() { Offset = 0, Resource = GUIMesh.VertexBufferResource, SizeInByte = vertexBytes, Stride = sizeof(ImDrawVert) };
+            GUIMesh.Vertices["TEXCOORD"] = new VertexBuffer() { Offset = 8, Resource = GUIMesh.VertexBufferResource, SizeInByte = vertexBytes, Stride = sizeof(ImDrawVert) };
+            GUIMesh.Vertices["COLOR"] = new VertexBuffer() { Offset = 16, Resource = GUIMesh.VertexBufferResource, SizeInByte = vertexBytes, Stride = sizeof(ImDrawVert) };
 
             graphicsContext.SetMesh(GUIMesh);
 

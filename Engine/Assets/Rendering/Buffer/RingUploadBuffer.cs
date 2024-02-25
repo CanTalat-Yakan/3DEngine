@@ -56,7 +56,6 @@ public unsafe sealed class RingUploadBuffer : UploadBuffer
 
     public void UploadMeshIndex(GraphicsContext context, MeshInfo mesh, Span<byte> index, Format indexFormat)
     {
-        var graphicsDevice = context.GraphicsDevice;
         var commandList = context.CommandList;
 
         int uploadOffset = Upload(index);
@@ -68,28 +67,27 @@ public unsafe sealed class RingUploadBuffer : UploadBuffer
             mesh.IndexCount = index.Length / (indexFormat == Format.R32_UInt ? 4 : 2);
             mesh.IndexSizeInByte = index.Length;
 
-            graphicsDevice.DestroyResource(mesh.Index);
+            context.GraphicsDevice.DestroyResource(mesh.IndexBufferResource);
 
-            mesh.Index = graphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
+            mesh.IndexBufferResource = context.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
                 HeapProperties.DefaultHeapProperties,
                 HeapFlags.None,
                 ResourceDescription.Buffer((ulong)index.Length),
                 ResourceStates.CopyDest);
         }
         else
-            commandList.ResourceBarrierTransition(mesh.Index, ResourceStates.GenericRead, ResourceStates.CopyDest);
+            commandList.ResourceBarrierTransition(mesh.IndexBufferResource, ResourceStates.GenericRead, ResourceStates.CopyDest);
 
-        commandList.CopyBufferRegion(mesh.Index, 0, Resource, (ulong)uploadOffset, (ulong)index.Length);
-        commandList.ResourceBarrierTransition(mesh.Index, ResourceStates.CopyDest, ResourceStates.GenericRead);
+        commandList.CopyBufferRegion(mesh.IndexBufferResource, 0, Resource, (ulong)uploadOffset, (ulong)index.Length);
+        commandList.ResourceBarrierTransition(mesh.IndexBufferResource, ResourceStates.CopyDest, ResourceStates.GenericRead);
     }
 
     public void UploadVertexBuffer(GraphicsContext context, ref ID3D12Resource resource, Span<byte> vertex)
     {
-        var graphicsDevice = context.GraphicsDevice;
         var commandList = context.CommandList;
 
-        graphicsDevice.DestroyResource(resource);
-        resource = graphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
+        context.GraphicsDevice.DestroyResource(resource);
+        resource = context.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
             HeapProperties.DefaultHeapProperties,
             HeapFlags.None,
             ResourceDescription.Buffer((ulong)vertex.Length),
