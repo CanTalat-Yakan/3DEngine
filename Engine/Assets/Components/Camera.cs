@@ -7,7 +7,6 @@ public sealed class Camera : EditorComponent
     public static Camera Main { get; private set; }
     public static Camera CurrentRenderingCamera { get; set; }
 
-    public CameraBuffer CameraBuffer { get; private set; } = new();
     public BoundingFrustum? BoundingFrustum { get; private set; }
 
     public CameraProjection Projection = CameraProjection.Perspective;
@@ -29,8 +28,6 @@ public sealed class Camera : EditorComponent
     public override void OnAwake()
     {
         CurrentRenderingCamera = this;
-
-        CameraBuffer.Setup();
     }
 
     public override void OnRender()
@@ -61,9 +58,6 @@ public sealed class Camera : EditorComponent
             RecreateViewConstants();
     }
 
-    public override void OnDestroy() =>
-        CameraBuffer.Dispose();
-
     public void RecreateViewConstants()
     {
         // Calculate the view matrix to use for the camera.
@@ -92,9 +86,9 @@ public sealed class Camera : EditorComponent
         BoundingFrustum = new BoundingFrustum(viewProjection);
 
         // Store the transposed view-projection matrix and the position of the camera.
-        CameraBuffer.ViewConstantBuffer = new(
-            Matrix4x4.Transpose(viewProjection), 
-            Entity.Transform.Position);
+        //CameraBuffer.ViewConstantBuffer = new(
+        //    Matrix4x4.Transpose(viewProjection), 
+        //    Entity.Transform.Position);
 
         /* 
          The coordinate system used in System.Numerics is right-handed,
@@ -116,6 +110,6 @@ public sealed class Camera : EditorComponent
          */
 
         //Update constant buffer data
-        CameraBuffer.UpdateConstantBuffer();
+        //CameraBuffer.UpdateConstantBuffer();
     }
 }

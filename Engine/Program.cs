@@ -13,11 +13,8 @@ public sealed class Program
     {
         HandleExceptions();
 
-        // Instantiate Window and Engine.
         Initialize(renderGUI, ref config);
 
-        // Create a while loop for the game logic
-        // and dispose on window quit request.
         AppWindow.Looping(Kernel.Frame);
         AppWindow.Dispose(Kernel.Dispose);
     }
@@ -45,7 +42,6 @@ public sealed class Program
 
         AppDomain.CurrentDomain.UnhandledException += (s, e) =>
         {
-            // This method will be called when an unhandled exception occurs.
             var exception = e.ExceptionObject as Exception;
             if (exception is not null)
                 ExceptionHandler.HandleException(exception);

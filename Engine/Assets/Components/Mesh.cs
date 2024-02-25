@@ -14,7 +14,6 @@ public sealed partial class Mesh : EditorComponent
     public static MeshInfo_OLD? OnGPU { get; set; }
     public static List<MeshInfo_OLD> BatchLookup { get; private set; } = new();
 
-    public MeshBuffer MeshBuffers { get; private set; } = new();
     public BoundingBox TransformedBoundingBox { get; private set; }
     public bool InBounds { get; set; }
 
@@ -63,7 +62,7 @@ public sealed partial class Mesh : EditorComponent
             return;
 
         if (Equals(Material.OnGPU, Material)
-            && Equals(Mesh.OnGPU, MeshInfo))
+         && Equals(Mesh.OnGPU, MeshInfo))
         {
             Material.MaterialBuffer?.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
 
@@ -90,7 +89,6 @@ public sealed partial class Mesh : EditorComponent
 
     public override void OnDestroy()
     {
-        MeshBuffers.Dispose();
         Material.Dispose();
     }
 }
@@ -119,7 +117,7 @@ public sealed partial class Mesh : EditorComponent
         _meshInfo = meshInfo;
 
         // Call the "CreateBuffer" method to initialize the vertex and index buffer.
-        MeshBuffers.CreateBuffer(MeshInfo.Value);
+        //MeshBuffers.CreateBuffer(MeshInfo.Value);
     }
 
     public MaterialEntry SetMaterial(string materialName)

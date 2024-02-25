@@ -101,7 +101,6 @@ public sealed class Kernel
         OnInitialize = null;
 
         Context.GraphicsDevice.Begin();
-
         Context.GraphicsContext.BeginCommand();
 
         Context.GPUUploadData(Context.GraphicsContext);
