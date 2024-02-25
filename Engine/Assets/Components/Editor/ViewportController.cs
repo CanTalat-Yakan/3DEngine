@@ -22,11 +22,8 @@ public sealed class ViewportController : EditorComponent, IHide
 
     private Vector2 _mousePosition;
 
-    public override void OnAwake()
-    {
-        if (Instance is null)
-            Instance = this;
-    }
+    public override void OnAwake() =>
+        Instance ??= this;
 
     public void SetCamera(Camera camera) =>
         s_camera = camera;

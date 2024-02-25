@@ -24,8 +24,8 @@ public sealed partial class Mesh : EditorComponent
     public Material Material => _material;
     [Show] private Material _material;
 
-    internal Renderer Renderer => _renderer ??= Renderer.Instance;
-    private Renderer _renderer;
+    internal GraphicsContext GraphicsContext => _graphicsContext ??= Kernel.Instance.Context.GraphicsContext;
+    private GraphicsContext _graphicsContext;
 
     public override void OnRegister() =>
         MeshSystem.Register(this);
@@ -67,7 +67,7 @@ public sealed partial class Mesh : EditorComponent
         {
             Material.MaterialBuffer?.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
 
-            Renderer.Draw(MeshInfo.Value.Indices.Length, MeshBuffers.IndexBufferView, 1, MeshBuffers.VertexBufferView);
+            //GraphicsContext.DrawIndexedInstanced(MeshInfo.Value.Indices.Length, MeshBuffers.IndexBufferView, 1, MeshBuffers.VertexBufferView);
         }
         else
         {
@@ -76,7 +76,7 @@ public sealed partial class Mesh : EditorComponent
             Material.MaterialBuffer?.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
             Material.MaterialBuffer?.UpdatePropertiesConstantBuffer();
 
-            Renderer.Draw(MeshInfo.Value.Indices.Length, MeshBuffers.IndexBufferView, 1, MeshBuffers.VertexBufferView);
+            //GraphicsContext.DrawIndexedInstanced(MeshInfo.Value.Indices.Length, MeshBuffers.IndexBufferView, 1, MeshBuffers.VertexBufferView);
 
             // Assign MeshInfo to the static variable.
             OnGPU = MeshInfo;

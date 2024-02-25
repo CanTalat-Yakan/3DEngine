@@ -110,29 +110,16 @@ public sealed partial class CommonContext : IDisposable
         for (int i = 0; i < s.Length; i++)
         {
             char c = s[i];
-            switch (c)
+            description[i] = c switch
             {
-                case 'C':
-                    description[i] = RootSignatureParameters.ConstantBufferView;
-                    break;
-                case 'c':
-                    description[i] = RootSignatureParameters.ConstantBufferViewTable;
-                    break;
-                case 'S':
-                    description[i] = RootSignatureParameters.ShaderResourceView;
-                    break;
-                case 's':
-                    description[i] = RootSignatureParameters.ShaderResourceViewTable;
-                    break;
-                case 'U':
-                    description[i] = RootSignatureParameters.UnorderedAccessView;
-                    break;
-                case 'u':
-                    description[i] = RootSignatureParameters.UnorderedAccessViewTable;
-                    break;
-                default:
-                    throw new NotImplementedException("error root signature desc.");
-            }
+                'C' => RootSignatureParameters.ConstantBufferView,
+                'c' => RootSignatureParameters.ConstantBufferViewTable,
+                'S' => RootSignatureParameters.ShaderResourceView,
+                's' => RootSignatureParameters.ShaderResourceViewTable,
+                'U' => RootSignatureParameters.UnorderedAccessView,
+                'u' => RootSignatureParameters.UnorderedAccessViewTable,
+                _ => throw new NotImplementedException("error root signature desc."),
+            };
         }
 
         GraphicsDevice.CreateRootSignature(rootSignature, description);
