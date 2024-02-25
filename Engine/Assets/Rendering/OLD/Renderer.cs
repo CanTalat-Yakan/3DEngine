@@ -109,8 +109,8 @@ public sealed partial class Renderer
         // Resize the swap chain buffers to match the new window size.
         Data.SwapChain.ResizeBuffers(
             Data.SwapChain.Description.BufferCount,
-            (int)Size.Width,
-            (int)Size.Height,
+            Size.Width,
+            Size.Height,
             Data.SwapChain.Description1.Format,
             Data.SwapChain.Description1.Flags);
         // Update the size of the source in the swap chain.

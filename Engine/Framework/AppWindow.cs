@@ -1,11 +1,11 @@
 ﻿using System.Runtime.CompilerServices;
 
-using Vortice.Win32;
+using Engine.Interoperation;
 
-using static Vortice.Win32.Kernel32;
-using static Vortice.Win32.User32;
+using static Engine.Interoperation.Kernel32;
+using static Engine.Interoperation.User32;
 
-namespace Engine;
+namespace Engine.Framework;
 
 public sealed partial class AppWindow
 {
@@ -13,9 +13,6 @@ public sealed partial class AppWindow
 
     public delegate void ResizeEventHandler(int width, int height);
     public static event ResizeEventHandler ResizeEvent;
-
-    private string _profiler = string.Empty;
-    private string _output = string.Empty;
 
     public AppWindow(WindowData windowData)
     {
@@ -42,30 +39,6 @@ public sealed partial class AppWindow
         Win32Window.Destroy();
 
         onDispose?.Invoke();
-    }
-
-    public void Render()
-    {
-        //ImGui.ShowDemoWindow();
-
-        ImGui.SetNextWindowBgAlpha(0.35f);
-        if (ImGui.Begin("Profiler", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize))
-        {
-            if (Time.OnFixedFrame)
-                _profiler = Profiler.GetAdditionalString();
-
-            ImGui.Text(_profiler);
-            ImGui.End();
-        }
-
-        ImGui.SetNextWindowBgAlpha(0.35f);
-        if (ImGui.Begin("Output", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize))
-        {
-            _output = Output.DequeueLogs() + _output;
-
-            ImGui.Text(_output);
-            ImGui.End();
-        }
     }
 }
 
@@ -122,7 +95,7 @@ public sealed partial class AppWindow
 
     public static bool ProcessMessage(uint msg, UIntPtr wParam, IntPtr lParam)
     {
-        if (Core.Instance?.GUIInputHandler?.ProcessMessage((WindowMessage)msg, wParam, lParam) ?? false)
+        if (GUIInputHandler.Instance?.ProcessMessage((WindowMessage)msg, wParam, lParam) ?? false)
             return true;
 
         switch ((WindowMessage)msg)

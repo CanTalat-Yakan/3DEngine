@@ -1,31 +1,32 @@
-﻿global using System.Numerics;
-global using System;
+﻿global using System;
+global using System.Numerics;
 
 global using ImGuiNET;
 
-global using Engine.Components;
+global using Engine.Buffer;
 global using Engine.Data;
-global using Engine.ECS;
-global using Engine.Editor;
+global using Engine.DataTypes;
+global using Engine.Framework;
+global using Engine.Graphics;
 global using Engine.GUI;
 global using Engine.Helper;
-global using Engine.Rendering;
-global using Engine.Runtime;
-global using Engine.SceneSystem;
 global using Engine.Utilities;
 
 namespace Engine;
 
-public sealed class Core
+public sealed class Kernel
 {
-    public static Core Instance { get; private set; }
+    public static Kernel Instance { get; private set; }
 
     public event Action OnRender;
     public event Action OnInitialize;
     public event Action OnGUI;
     public event Action OnDispose;
 
-    public Renderer Renderer;
+    public CommonContext Context;
+
+    public Config Config;
+
     public SceneManager SceneManager;
 
     public ScriptCompiler ScriptCompiler;
@@ -34,41 +35,52 @@ public sealed class Core
 
     public GUIRenderer GUIRenderer;
     public GUIInputHandler GUIInputHandler;
+    public IntPtr GUIContext;
 
-    private IntPtr _imguiContext;
+    public Kernel(Config config)
+    {
+        Config = config;
 
-    public Core(Renderer renderer, nint hwnd, string assetsPath = null) =>
-        Initialize(renderer, hwnd, assetsPath);
+        Context = new CommonContext(this);
+    }
 
-    public void Initialize(Renderer renderer, nint hwnd, string assetsPath = null)
+    public void Initialize(IntPtr hwnd, Vortice.Mathematics.SizeI size, bool win32Window, string assetsPath = null)
     {
         // Set the singleton instance of the class, if it hasn't been already.
         Instance ??= this;
 
         EditorState.AssetsPath = assetsPath;
 
+        Context.GraphicsDevice.Initialize(size, win32Window);
+        Context.UploadBuffer.Initialize(Context.GraphicsDevice, 67108864); // 64 MB.
+
+        if (Config.GUI)
+        {
+            GUIRenderer = new();
+            GUIRenderer.Context = Context;
+
+            GUIRenderer.LoadDefaultResource();
+            GUIRenderer.Initialize();
+
+            GUIInputHandler = new(hwnd);
+        }
+
+        Context.GraphicsContext.Initialize(Context.GraphicsDevice);
+
+        EditorState.AssetsPath = assetsPath;
+
         Input.Initialize(hwnd);
 
-        Renderer = renderer;
         ScriptCompiler = new();
         ShaderCompiler = new();
         MaterialCompiler = new();
         SceneManager = new();
 
-        if (Renderer.Config.GUI)
-        {
-            _imguiContext = ImGui.CreateContext();
-            ImGui.SetCurrentContext(_imguiContext);
-
-            GUIRenderer = new();
-            GUIInputHandler = new(hwnd);
-        }
-
         // Creates an entity with the Boot editor tag and adds a SceneBoot component to it.
-        var boot = SceneManager.MainScene.EntityManager
-            .CreateEntity(null, "Boot")
-            .AddComponent<SceneBoot>();
-        boot.Entity.IsHidden = true;
+        //var boot = SceneManager.MainScene.EntityManager
+        //    .CreateEntity(null, "Boot")
+        //    .AddComponent<SceneBoot>();
+        //boot.Entity.IsHidden = true;
 
         ScriptCompiler.CompileProjectScripts(EditorState.AssetsPath);
         ShaderCompiler.CompileProjectShaders(EditorState.AssetsPath);
@@ -85,14 +97,22 @@ public sealed class Core
 
     public void Frame()
     {
-        if (!Renderer.IsRendering)
+        if (!Context.IsRendering)
             return;
 
         OnInitialize?.Invoke();
         OnInitialize = null;
 
-        Renderer.BeginFrame();
-        Renderer.Data.SetViewport(Renderer.Size);
+        Context.GraphicsDevice.Begin();
+
+        Context.GraphicsContext.BeginCommand();
+
+        Context.GPUUploadData(Context.GraphicsContext);
+
+        Context.GraphicsContext.SetDescriptorHeapDefault();
+        Context.GraphicsContext.ScreenBeginRender();
+        Context.GraphicsContext.SetRenderTargetScreen();
+        Context.GraphicsContext.ClearRenderTargetScreen();
 
         Profiler.Reset();
 
@@ -114,28 +134,25 @@ public sealed class Core
 
         OnRender?.Invoke();
 
-        if (Renderer.Config.GUI)
+        if (Config.GUI)
             RenderGUI();
 
         Input.LateUpdate();
 
-        Renderer.EndFrame();
-        Renderer.Resolve();
+        Context.GraphicsContext.ScreenEndRender();
+        Context.GraphicsContext.EndCommand();
+        Context.GraphicsContext.Execute();
 
-        Renderer.Present();
-        Renderer.WaitIdle();
+        Context.GraphicsDevice.Present((int)Config.VSync);
     }
 
     public void RenderGUI()
     {
-        GUIRenderer.Update(_imguiContext);
+        GUIRenderer.Update(GUIContext);
         GUIInputHandler.Update();
-
-        SceneManager.GUI();
 
         OnGUI?.Invoke();
 
-        ImGui.Render();
         GUIRenderer.Render();
     }
 
@@ -154,10 +171,7 @@ public sealed class Core
 
     public void Dispose()
     {
-        Renderer?.Dispose();
-        SceneManager?.Dispose();
-
-        Input.Dispose();
+        Context?.Dispose();
 
         OnDispose?.Invoke();
     }

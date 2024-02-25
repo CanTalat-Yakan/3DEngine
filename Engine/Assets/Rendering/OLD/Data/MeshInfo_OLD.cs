@@ -10,7 +10,7 @@ public struct Vertex
     public Vector2 TextureCoordinate;
 }
 
-public struct MeshInfo
+public struct MeshInfo_OLD
 {
     public Vertex[] Vertices;
     public int[] Indices;

@@ -1,9 +1,6 @@
-﻿// Copyright (c) Amer Koleci and contributors.
-// Distributed under the MIT license. See the LICENSE file in the project root for more information.
+﻿using System.Runtime.InteropServices;
 
-using System.Runtime.InteropServices;
-
-namespace Vortice.Win32;
+namespace Engine.Interoperation;
 
 internal static class Kernel32
 {

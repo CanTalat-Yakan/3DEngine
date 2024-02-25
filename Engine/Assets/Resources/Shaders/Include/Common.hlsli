@@ -1,14 +1,3 @@
-cbuffer ViewConstantsBuffer : register(b0)
-{
-    float4x4 ViewProjection;
-    float3 Camera;
-};
-
-cbuffer PerModelConstantBuffer : register(b1)
-{
-    float4x4 World;
-};
-
 struct VSInput
 {
     float4 vertex : POSITION;
@@ -27,16 +16,32 @@ struct PSInput
     float2 uv : TEXCOORD0;
 };
 
-struct VSInputUI
+cbuffer ViewConstantsBuffer : register(b0)
 {
-    float2 vertex : POSITION;
-    float2 texcoord : TEXCOORD0;
-    float3 color : COLOR0;
+    float4x4 ViewProjection;
+    float3 Camera;
 };
 
-struct PSInputUI
+cbuffer PerModelConstantBuffer : register(b1)
+{
+    float4x4 World;
+};
+
+struct PS_INPUT_UI
 {
     float4 pos : SV_POSITION;
-    float3 col : COLOR0;
+    float4 col : COLOR0;
     float2 uv : TEXCOORD0;
+};
+
+struct VS_INPUT_UI
+{
+    float2 pos : POSITION;
+    float4 col : COLOR0;
+    float2 uv : TEXCOORD0;
+};
+
+cbuffer VertexBuffer : register(b0)
+{
+    float4x4 ProjectionMatrix;
 };

@@ -75,7 +75,7 @@ public sealed partial class Output
     public static void Log(Engine.Utilities.MessageLog log)
     {
         if (log is not null)
-            Log(log?.o?.ToString(), (MessageType)log?.type, log.line, log?.method, log?.script);
+            Log(log?.obj?.ToString(), (MessageType)log?.type, log.line, log?.method, log?.script);
     }
 
     public static void Log(object o, MessageType type = MessageType.Message, [CallerLineNumber] int line = 0, [CallerMemberName] string method = null, [CallerFilePath] string script = null)

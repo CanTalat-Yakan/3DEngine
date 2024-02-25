@@ -8,8 +8,8 @@ public sealed class Profiler
     public static int FPS => Time.FPS;
     public static double Delta => Time.Delta;
 
-    public static double ViewportSizeWidth => Renderer.Instance.Size.Width;
-    public static double ViewportSizeHeight => Renderer.Instance.Size.Height;
+    public static double ViewportSizeWidth => Kernel.Instance.Context.GraphicsDevice.Size.Width;
+    public static double ViewportSizeHeight => Kernel.Instance.Context.GraphicsDevice.Size.Height;
 
     public static float DrawCalls { get; set; }
     public static float Vertices { get; set; }

@@ -13,7 +13,7 @@ public enum MessageType
 }
 
 public record MessageLog(
-    object o,
+    object obj,
     MessageType type,
     int line,
     string method,
@@ -38,7 +38,7 @@ public record MessageLog(
         $"{script?.SplitLast('\\')} ({method}:{line})";
 
     public string GetString() =>
-        $"\n{o}\n";
+        $"\n{obj}\n";
 }
 
 public class Output
@@ -47,14 +47,14 @@ public class Output
     private static Queue<MessageLog> _logs = new();
 
     public static void Log(
-        object o,
+        object obj,
         MessageType type = MessageType.Message,
         [CallerLineNumber] int line = 0,
         [CallerMemberName] string method = null,
         [CallerFilePath] string script = null,
         bool writeLineDebugConsole = true)
     {
-        MessageLog log = new(o, type, line, method, script);
+        MessageLog log = new(obj, type, line, method, script);
 
         if (writeLineDebugConsole)
         {

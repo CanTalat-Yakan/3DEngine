@@ -11,15 +11,15 @@ public sealed partial class Mesh : EditorComponent
     public string MeshPath;
     public string MaterialPath;
 
-    public static MeshInfo? OnGPU { get; set; }
-    public static List<MeshInfo> BatchLookup { get; private set; } = new();
+    public static MeshInfo_OLD? OnGPU { get; set; }
+    public static List<MeshInfo_OLD> BatchLookup { get; private set; } = new();
 
     public MeshBuffer MeshBuffers { get; private set; } = new();
     public BoundingBox TransformedBoundingBox { get; private set; }
     public bool InBounds { get; set; }
 
-    public MeshInfo? MeshInfo => _meshInfo;
-    [Show] private MeshInfo _meshInfo;
+    public MeshInfo_OLD? MeshInfo => _meshInfo;
+    [Show] private MeshInfo_OLD _meshInfo;
 
     public Material Material => _material;
     [Show] private Material _material;
@@ -97,7 +97,7 @@ public sealed partial class Mesh : EditorComponent
 
 public sealed partial class Mesh : EditorComponent
 {
-    public void SetMeshInfo(MeshInfo meshInfo)
+    public void SetMeshInfo(MeshInfo_OLD meshInfo)
     {
         // Batch MeshInfo by sorting the List with the Order of the Component
         if (BatchLookup.Contains(meshInfo))

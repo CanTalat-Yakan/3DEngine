@@ -1,17 +1,21 @@
-﻿using Vortice.Win32;
-
-using static Vortice.Win32.User32;
+﻿using Engine.Interoperation;
 
 namespace Engine.GUI;
 
 public sealed class GUIInputHandler
 {
-    private IntPtr _hwnd;
+    public static GUIInputHandler Instance { get; private set; }
+
+    public IntPtr WindowHandle;
+
     private ImGuiMouseCursor _lastCursor;
 
-    public GUIInputHandler(IntPtr hWnd)
+    public GUIInputHandler(IntPtr hwnd)
     {
-        this._hwnd = hWnd;
+        Instance = this;
+
+        WindowHandle = hwnd;
+
         InitKeyMap();
     }
 
@@ -59,9 +63,9 @@ public sealed class GUIInputHandler
     void UpdateKeyModifiers()
     {
         var io = ImGui.GetIO();
-        io.KeyCtrl = (GetKeyState(VK.CONTROL) & 0x8000) != 0;
-        io.KeyShift = (GetKeyState(VK.SHIFT) & 0x8000) != 0;
-        io.KeyAlt = (GetKeyState(VK.MENU) & 0x8000) != 0;
+        io.KeyCtrl = (User32.GetKeyState(VK.CONTROL) & 0x8000) != 0;
+        io.KeyShift = (User32.GetKeyState(VK.SHIFT) & 0x8000) != 0;
+        io.KeyAlt = (User32.GetKeyState(VK.MENU) & 0x8000) != 0;
         io.KeySuper = false;
     }
 
@@ -71,13 +75,13 @@ public sealed class GUIInputHandler
         if ((io.ConfigFlags & ImGuiConfigFlags.NoMouseCursorChange) != 0)
             return false;
 
-        var requestedCursor = ImGui.GetMouseCursor();
-        if (requestedCursor == ImGuiMouseCursor.None || io.MouseDrawCursor)
-            SetCursor(IntPtr.Zero);
+        var requestedcursor = ImGui.GetMouseCursor();
+        if (requestedcursor == ImGuiMouseCursor.None || io.MouseDrawCursor)
+            User32.SetCursor(IntPtr.Zero);
         else
         {
             var cursor = SystemCursor.IDC_ARROW;
-            switch (requestedCursor)
+            switch (requestedcursor)
             {
                 case ImGuiMouseCursor.Arrow: cursor = SystemCursor.IDC_ARROW; break;
                 case ImGuiMouseCursor.TextInput: cursor = SystemCursor.IDC_IBEAM; break;
@@ -89,7 +93,7 @@ public sealed class GUIInputHandler
                 case ImGuiMouseCursor.Hand: cursor = SystemCursor.IDC_HAND; break;
                 case ImGuiMouseCursor.NotAllowed: cursor = SystemCursor.IDC_NO; break;
             }
-            SetCursor(LoadCursor(IntPtr.Zero, cursor));
+            User32.SetCursor(User32.LoadCursor(IntPtr.Zero, cursor));
         }
 
         return true;
@@ -102,24 +106,24 @@ public sealed class GUIInputHandler
         if (io.WantSetMousePos)
         {
             var pos = new POINT((int)io.MousePos.X, (int)io.MousePos.Y);
-            ClientToScreen(_hwnd, ref pos);
-            SetCursorPos(pos.X, pos.Y);
+            User32.ClientToScreen(WindowHandle, ref pos);
+            User32.SetCursorPos(pos.X, pos.Y);
         }
 
         //io.MousePos = new System.Numerics.Vector2(-FLT_MAX, -FLT_MAX);
 
-        var foregroundWindow = GetForegroundWindow();
-        if (foregroundWindow == _hwnd || IsChild(foregroundWindow, _hwnd))
+        var foregroundWindow = User32.GetForegroundWindow();
+        if (foregroundWindow == WindowHandle || User32.IsChild(foregroundWindow, WindowHandle))
         {
             POINT pos;
-            if (GetCursorPos(out pos) && ScreenToClient(_hwnd, ref pos))
-                io.MousePos = new Vector2(pos.X, pos.Y);
+            if (User32.GetCursorPos(out pos) && User32.ScreenToClient(WindowHandle, ref pos))
+                io.MousePos = new System.Numerics.Vector2(pos.X, pos.Y);
         }
     }
 
     public bool ProcessMessage(WindowMessage msg, UIntPtr wParam, IntPtr lParam)
     {
-        if (ImGui.GetCurrentContext() == nint.Zero)
+        if (ImGui.GetCurrentContext() == IntPtr.Zero)
             return false;
 
         var io = ImGui.GetIO();
@@ -139,8 +143,8 @@ public sealed class GUIInputHandler
                     if (msg == WindowMessage.RButtonDown || msg == WindowMessage.RButtonDoubleClick) { button = 1; }
                     if (msg == WindowMessage.MButtonDown || msg == WindowMessage.MButtonDoubleClick) { button = 2; }
                     if (msg == WindowMessage.XButtonDown || msg == WindowMessage.XButtonDoubleClick) { button = (GET_XBUTTON_WPARAM(wParam) == 1) ? 3 : 4; }
-                    if (!ImGui.IsAnyMouseDown() && GetCapture() == nint.Zero)
-                        SetCapture(_hwnd);
+                    if (!ImGui.IsAnyMouseDown() && User32.GetCapture() == IntPtr.Zero)
+                        User32.SetCapture(WindowHandle);
                     io.MouseDown[button] = true;
                     return false;
                 }
@@ -155,8 +159,8 @@ public sealed class GUIInputHandler
                     if (msg == WindowMessage.MButtonUp) { button = 2; }
                     if (msg == WindowMessage.XButtonUp) { button = (GET_XBUTTON_WPARAM(wParam) == 1) ? 3 : 4; }
                     io.MouseDown[button] = false;
-                    if (!ImGui.IsAnyMouseDown() && GetCapture() == _hwnd)
-                        ReleaseCapture();
+                    if (!ImGui.IsAnyMouseDown() && User32.GetCapture() == WindowHandle)
+                        User32.ReleaseCapture();
                     return false;
                 }
             case WindowMessage.MouseWheel:
@@ -167,13 +171,9 @@ public sealed class GUIInputHandler
                 return false;
             case WindowMessage.KeyDown:
             case WindowMessage.SysKeyDown:
-                if ((ulong)wParam < 256)
-                    io.KeysDown[(int)wParam] = true;
                 return false;
             case WindowMessage.KeyUp:
             case WindowMessage.SysKeyUp:
-                if ((ulong)wParam < 256)
-                    io.KeysDown[(int)wParam] = false;
                 return false;
             case WindowMessage.Char:
                 io.AddInputCharacter((uint)wParam);
@@ -187,6 +187,8 @@ public sealed class GUIInputHandler
     }
 
     static int WHEEL_DELTA = 120;
-    static int GET_WHEEL_DELTA_WPARAM(UIntPtr wParam) => Utils.Hiword((int)wParam);
-    static int GET_XBUTTON_WPARAM(UIntPtr wParam) => Utils.Hiword((int)wParam);
+    static int GET_WHEEL_DELTA_WPARAM(IntPtr wParam) => Utils.Hiword((int)(long)wParam);
+    static int GET_XBUTTON_WPARAM(IntPtr wParam) => Utils.Hiword((int)(long)wParam);
+    static int GET_WHEEL_DELTA_WPARAM(UIntPtr wParam) => Utils.Hiword((int)(long)wParam);
+    static int GET_XBUTTON_WPARAM(UIntPtr wParam) => Utils.Hiword((int)(long)wParam);
 }

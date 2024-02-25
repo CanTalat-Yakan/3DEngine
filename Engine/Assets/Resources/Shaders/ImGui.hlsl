@@ -1,21 +1,23 @@
 #include "Include\Common.hlsli"
 
-Texture2D texture0 : register(t0);
-sampler sampler0 : register(s0);
+sampler sampler0;
+Texture2D texture0;
 
-PSInputUI VSMain(VSInputUI input)
+PS_INPUT_UI VS(VS_INPUT_UI input)
 {
-    PSInputUI output;
-    output.pos = mul(ViewProjection, float4(input.vertex.xy, 0.f, 1.f));
-    output.col = input.color;
-    output.uv = input.texcoord;
+    PS_INPUT_UI output;
+
+    output.pos = mul(ProjectionMatrix, float4(input.pos.xy, 0.f, 1.f));
+    output.col = input.col;
+    output.uv = input.uv;
 
     return output;
 }
 
-float4 PSMain(PSInputUI input) : SV_Target
+float4 PS(PS_INPUT_UI input) : SV_Target
 {
-    //float4 out_col = input.col * texture0.Sample(sampler0, i.uv);
+    float4 output = input.col * texture0.Sample(sampler0, input.uv);
+    clip(output.a - 0.1);
 
-    return float4(1,0,0,1);
+    return output;
 }

@@ -6,9 +6,9 @@ namespace Engine.Loader;
 
 public sealed class ModelLoader
 {
-    private static Dictionary<string, MeshInfo> s_meshInfoStore = new();
+    private static Dictionary<string, MeshInfo_OLD> s_meshInfoStore = new();
 
-    public static MeshInfo LoadFile(string filePath, bool fromResources = true)
+    public static MeshInfo_OLD LoadFile(string filePath, bool fromResources = true)
     {
         if (s_meshInfoStore.ContainsKey(filePath))
             return s_meshInfoStore[filePath];
@@ -69,7 +69,7 @@ public sealed class ModelLoader
             }
         }
 
-        MeshInfo meshInfo = new()
+        MeshInfo_OLD meshInfo = new()
         {
             Vertices = vertices.ToArray(),
             Indices = indices.ToArray()

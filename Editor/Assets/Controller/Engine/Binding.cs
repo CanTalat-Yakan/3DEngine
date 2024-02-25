@@ -95,11 +95,11 @@ internal sealed partial class Binding
             "FOV" + ViewportController.Camera?.GetType().FullName,
             new(ViewportController.Camera, "FOV"));
         RendererBindings.Add(
-            "CameraProjection" + Engine.Core.Instance.Renderer.Config,
-            new(Engine.Core.Instance.Renderer.Config, "CameraProjection"));
+            "CameraProjection" + Engine.Kernel.Instance.Config,
+            new(Engine.Kernel.Instance.Config, "CameraProjection"));
         RendererBindings.Add(
-            "RenderMode" + Engine.Core.Instance.Renderer.Config,
-            new(Engine.Core.Instance.Renderer.Config, "RenderMode"));
+            "RenderMode" + Engine.Kernel.Instance.Config,
+            new(Engine.Kernel.Instance.Config, "RenderMode"));
     }
 
     public static void SetSceneBindings(Scene scene)
@@ -206,7 +206,8 @@ internal sealed partial class Binding
             return;
 
         foreach (var source in RendererBindings.Select(kv => kv.Value.Source).ToArray())
-            UpdateBinding(source, source.GetType().FullName, RendererBindings);
+            if (source is not null)
+                UpdateBinding(source, source.GetType().FullName, RendererBindings);
     }
 
     private static void UpdateSceneBindings()

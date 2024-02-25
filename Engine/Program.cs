@@ -1,7 +1,12 @@
+using ImageMagick;
+
 namespace Engine;
 
 public sealed class Program
 {
+    public AppWindow AppWindow { get; private set; }
+    public Kernel Kernel { get; private set; }
+
     [STAThread]
     private static void Main() =>
         new Program().Run();
@@ -11,33 +16,31 @@ public sealed class Program
         HandleExceptions();
 
         // Instantiate Window and Engine.
-        Initialize(renderGUI, ref config, 
-            out var appWindow, 
-            out var engineCore);
+        Initialize(renderGUI, ref config);
 
         // Create a while loop for the game logic
         // and dispose on window quit request.
-        appWindow.Looping(engineCore.Frame);
-        appWindow.Dispose(engineCore.Dispose);
+        AppWindow.Looping(Kernel.Frame);
+        AppWindow.Dispose(Kernel.Dispose);
     }
 
-    private void Initialize(bool renderGUI, ref Config config, out AppWindow appWindow, out Core engineCore)
+    private void Initialize(bool renderGUI, ref Config config)
     {
         config ??= Config.GetDefault();
         config.GUI = renderGUI;
 
-        appWindow = new(config.WindowData);
-        appWindow.Show();
+        AppWindow = new(config.WindowData);
+        AppWindow.Show();
 
-        engineCore = new Core(new Renderer(AppWindow.Win32Window, config), AppWindow.Win32Window.Handle);
-        engineCore.OnGUI += appWindow.Render;
+        Kernel = new(config);
+        Kernel.Initialize(AppWindow.Win32Window.Handle, AppWindow.Win32Window.Size, win32Window: true);
 
-        AppWindow.ResizeEvent += engineCore.Renderer.Resize;
+        AppWindow.ResizeEvent += Kernel.Context.GraphicsDevice.Resize;
     }
 
     private static void HandleExceptions()
     {
-        var rootPath = Paths.DIRECTORY;
+        var rootPath = AppContext.BaseDirectory;
         var logFilePath = rootPath + "Application.log";
 
         ExceptionHandler.CreateTraceLog(rootPath, logFilePath);

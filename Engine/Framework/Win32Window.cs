@@ -1,16 +1,15 @@
-﻿// Copyright (c) Amer Koleci and contributors.
-// Distributed under the MIT license. See the LICENSE file in the project root for more information.
+﻿using Win32.Numerics;
 
-using Win32.Numerics;
+using Engine.Interoperation;
 
-using Vortice.Win32;
+using static Engine.Interoperation.User32;
 
-using static Vortice.Win32.User32;
-
-namespace Engine;
+namespace Engine.Framework;
 
 public class Win32Window
 {
+    public Vortice.Mathematics.SizeI Size => new(Width, Height);
+
     public string Title;
     public int Width;
     public int Height;

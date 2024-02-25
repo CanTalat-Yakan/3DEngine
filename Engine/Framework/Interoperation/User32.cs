@@ -1,11 +1,9 @@
-﻿// Copyright (c) Amer Koleci and contributors.
-// Distributed under the MIT license. See the LICENSE file in the project root for more information.
-
-using System.Drawing;
+﻿using System.Drawing;
 using System.Runtime.InteropServices;
+
 using Win32.Numerics;
 
-namespace Vortice.Win32;
+namespace Engine.Interoperation;
 
 #region Enums
 [Flags]
@@ -189,7 +187,7 @@ public enum ShowWindowCommand
 
     /// <summary>
     /// Displays a window in its most recent size and position. This value
-    /// is similar to <see cref="ShowWindowCommand.Normal"/>, except
+    /// is similar to <see cref="Normal"/>, except
     /// the window is not activated.
     /// </summary>
     ShowNoActivate = 4,

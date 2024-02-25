@@ -15,7 +15,7 @@ public sealed class MeshBuffer
     internal Renderer Renderer => _renderer ??= Renderer.Instance;
     private Renderer _renderer;
 
-    public void CreateBuffer(MeshInfo meshInfo)
+    public void CreateBuffer(MeshInfo_OLD meshInfo)
     {
         Dispose();
 
@@ -23,7 +23,7 @@ public sealed class MeshBuffer
         SetIndexBuffer(meshInfo);
     }
 
-    private void SetVertexBuffer(MeshInfo meshInfo)
+    private void SetVertexBuffer(MeshInfo_OLD meshInfo)
     {
         int vertexStride = Unsafe.SizeOf<Vertex>();
         int vertexBufferSize = meshInfo.Vertices.Length * vertexStride;
@@ -40,7 +40,7 @@ public sealed class MeshBuffer
         VertexBufferView = new VertexBufferView(_vertexBuffer.GPUVirtualAddress, vertexBufferSize, vertexStride);
     }
 
-    private void SetIndexBuffer(MeshInfo meshInfo)
+    private void SetIndexBuffer(MeshInfo_OLD meshInfo)
     {
         int indexStride = Unsafe.SizeOf<int>();
         int indexBufferSize = meshInfo.Indices.Length * indexStride;

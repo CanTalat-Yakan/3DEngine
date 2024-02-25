@@ -39,7 +39,7 @@ public sealed class ViewportController : EditorComponent, IHide
         if (Input.GetButton(MouseButton.Right, InputState.Down)
             || Input.GetButton(MouseButton.Middle, InputState.Down))
         {
-            Vortice.Win32.User32.GetCursorPos(out var point);
+            Interoperation.User32.GetCursorPos(out var point);
             _mousePosition.X = point.X;
             _mousePosition.Y = point.Y;
         }
@@ -53,7 +53,7 @@ public sealed class ViewportController : EditorComponent, IHide
             HeightTransformMovement();
 
             //User32.SetCursor(User32.LoadCursor(IntPtr.Zero, SystemCursor.IDC_CROSS));
-            Vortice.Win32.User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
+            Interoperation.User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
 
             _euler.X = Input.GetMouseDelta().Y;
             _euler.Y = Input.GetMouseDelta().X;
@@ -70,7 +70,7 @@ public sealed class ViewportController : EditorComponent, IHide
         // Check if the middle mouse button is pressed. If so, call the ScreenMovement function.
         if (Input.GetButton(MouseButton.Middle) && ViewportFocused)
         {
-            Vortice.Win32.User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
+            Interoperation.User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
 
             ScreenMovement();
         }
