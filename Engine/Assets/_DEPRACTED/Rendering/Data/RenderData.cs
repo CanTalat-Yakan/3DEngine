@@ -9,7 +9,7 @@ namespace Engine.Data;
 
 public struct RenderData
 {
-    public Material Material { get; set; }
+    public Material_OLD Material { get; set; }
 
     public IDXGISwapChain3 SwapChain;
 

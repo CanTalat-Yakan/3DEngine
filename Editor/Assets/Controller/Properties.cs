@@ -504,7 +504,7 @@ internal sealed partial class Properties
                 grid.Add(CreateComboBox(type, entity.ID, component, fieldInfo.Name, value.ToString()));
 
             // Material
-            else if (type == typeof(Material))
+            else if (type == typeof(Material_OLD))
                 grid.Add(CreateTextureSlot("None", "Material"));
 
             //// Texture

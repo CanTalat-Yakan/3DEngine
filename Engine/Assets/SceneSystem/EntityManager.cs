@@ -116,9 +116,9 @@ public sealed partial class EntityManager
 
 public sealed partial class EntityManager
 {
-    private static Material _materialDefault;
+    private static Material_OLD _materialDefault;
 
-    public static Material GetDefaultMaterial() =>
+    public static Material_OLD GetDefaultMaterial() =>
         // Create a new material with the default shader and default image.
         _materialDefault ??= new(Paths.SHADERS + "SimpleLit.hlsl");
 

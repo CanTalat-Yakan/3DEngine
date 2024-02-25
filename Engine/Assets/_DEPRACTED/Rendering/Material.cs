@@ -6,9 +6,9 @@ using Vortice.DXGI;
 
 namespace Engine.Rendering;
 
-public sealed partial class Material
+public sealed partial class Material_OLD
 {
-    public static Material OnGPU { get; set; }
+    public static Material_OLD OnGPU { get; set; }
 
     public MaterialBuffer MaterialBuffer { get; set; } = new();
 
@@ -25,7 +25,7 @@ public sealed partial class Material
     internal Renderer Renderer => _renderer ??= Renderer.Instance;
     private Renderer _renderer;
 
-    public Material(string shaderFilePath, string imageFileName = "Default.png")
+    public Material_OLD(string shaderFilePath, string imageFileName = "Default.png")
     {
         if (!File.Exists(shaderFilePath))
             return;
@@ -98,7 +98,7 @@ public sealed partial class Material
     }
 }
 
-public sealed partial class Material
+public sealed partial class Material_OLD
 {
     private void CreateTextureAndSampler(string imageFileName)
     {
@@ -157,7 +157,7 @@ public sealed partial class Material
     }
 }
 
-public sealed partial class Material
+public sealed partial class Material_OLD
 {
     private static int _count { get; set; } = 1;
 

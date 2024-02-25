@@ -73,11 +73,11 @@ public sealed class Kernel
         MaterialCompiler = new();
         SceneManager = new();
 
-        // Creates an entity with the Boot editor tag and adds a SceneBoot component to it.
-        //var boot = SceneManager.MainScene.EntityManager
-        //    .CreateEntity(null, "Boot")
-        //    .AddComponent<SceneBoot>();
-        //boot.Entity.IsHidden = true;
+       // Creates an entity with the Boot editor tag and adds a SceneBoot component to it.
+       var boot = SceneManager.MainScene.EntityManager
+           .CreateEntity(null, "Boot")
+           .AddComponent<SceneBoot>();
+        boot.Entity.IsHidden = true;
 
         ScriptCompiler.CompileProjectScripts(EditorState.AssetsPath);
         ShaderCompiler.CompileProjectShaders(EditorState.AssetsPath);

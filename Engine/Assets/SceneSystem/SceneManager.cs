@@ -154,7 +154,7 @@ public sealed partial class SceneManager
         TransformSystem.Render();
 
         Mesh.OnGPU = null;
-        Material.OnGPU = null;
+        Material_OLD.OnGPU = null;
     }
 
     public void GUI()

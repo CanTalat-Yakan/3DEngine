@@ -84,7 +84,7 @@ public sealed class ViewportController : EditorComponent, IHide
     }
 
     public override void OnLateUpdate() =>
-        Camera.Projection = Renderer.Instance.Config.CameraProjection;
+        Camera.Projection = Kernel.Instance.Config.CameraProjection;
 
     private void MovementSpeedCalculation()
     {

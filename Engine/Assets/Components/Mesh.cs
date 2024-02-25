@@ -20,8 +20,8 @@ public sealed partial class Mesh : EditorComponent
     public MeshInfo_OLD? MeshInfo => _meshInfo;
     [Show] private MeshInfo_OLD _meshInfo;
 
-    public Material Material => _material;
-    [Show] private Material _material;
+    public Material_OLD Material => _material;
+    [Show] private Material_OLD _material;
 
     internal GraphicsContext GraphicsContext => _graphicsContext ??= Kernel.Instance.Context.GraphicsContext;
     private GraphicsContext _graphicsContext;
@@ -31,8 +31,8 @@ public sealed partial class Mesh : EditorComponent
 
     public override void OnAwake()
     {
-        SetMeshInfo(EntityManager.GetDefaultMeshInfo());
-        SetMaterial(EntityManager.GetDefaultMaterial());
+        //SetMeshInfo(EntityManager.GetDefaultMeshInfo());
+        //SetMaterial(EntityManager.GetDefaultMaterial());
     }
 
     public override void OnUpdate()
@@ -61,19 +61,19 @@ public sealed partial class Mesh : EditorComponent
         if (!InBounds)
             return;
 
-        if (Equals(Material.OnGPU, Material)
+        if (Equals(Material_OLD.OnGPU, Material)
          && Equals(Mesh.OnGPU, MeshInfo))
         {
-            Material.MaterialBuffer?.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
+            //Material.MaterialBuffer?.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
 
             //GraphicsContext.DrawIndexedInstanced(MeshInfo.Value.Indices.Length, MeshBuffers.IndexBufferView, 1, MeshBuffers.VertexBufferView);
         }
         else
         {
             // Setup Material, PerModel and Properties constant buffer.
-            Material.Setup();
-            Material.MaterialBuffer?.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
-            Material.MaterialBuffer?.UpdatePropertiesConstantBuffer();
+            //Material.Setup();
+            //Material.MaterialBuffer?.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
+            //Material.MaterialBuffer?.UpdatePropertiesConstantBuffer();
 
             //GraphicsContext.DrawIndexedInstanced(MeshInfo.Value.Indices.Length, MeshBuffers.IndexBufferView, 1, MeshBuffers.VertexBufferView);
 
@@ -129,7 +129,7 @@ public sealed partial class Mesh : EditorComponent
         return MaterialEntry;
     }
 
-    public void SetMaterial(Material material) =>
+    public void SetMaterial(Material_OLD material) =>
         // Assign to local variable.
         _material = material;
 }
