@@ -113,13 +113,11 @@ As a Unity Developer, I've gathered a collection of top-notch assets from the Un
 * [Atlas](https://assetstore.unity.com/packages/tools/terrain/atlas-terrain-editor-207568).
 
 # Build
-In order to compile, you need to install [Visual Studio 2022 Preview](https://visualstudio.microsoft.com/vs/preview/) with the following components:
+In order to compile, you need to install [Visual Studio 2022 Preview](https://visualstudio.microsoft.com/vs) with the following components:
 
 *  [Windows 11 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk)
 *  [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)
 *  [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
-
-*Rolled back to .Net 7 and VS2022 for now, because it lead to errors due to the WinAppSDK and the newest .Net 8 SDK Preview RC that gets installed with the Visual Studio Preview Workload of the .Net Environment!*
 
 # Screenshots
 ![3D Engine Layout](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/Screenshots/Layout.png)
