@@ -11,24 +11,23 @@ public sealed partial class Mesh : EditorComponent
     public string MeshPath;
     public string MaterialPath;
 
-    public static MeshInfo? CurrentMeshOnGPU { get; set; }
-    public static List<MeshInfo> BatchLookup { get; private set; } = new();
+    public static MeshInfo_OLD? OnGPU { get; set; }
+    public static List<MeshInfo_OLD> BatchLookup { get; private set; } = new();
 
     public MeshBuffer MeshBuffers { get; private set; } = new();
-    public BoundingBox BoundingBox { get; private set; }
     public BoundingBox TransformedBoundingBox { get; private set; }
     public bool InBounds { get; set; }
 
-    public MeshInfo? MeshInfo => _meshInfo;
-    [Show] private MeshInfo _meshInfo;
+    public MeshInfo_OLD? MeshInfo => _meshInfo;
+    [Show] private MeshInfo_OLD _meshInfo;
 
     public Material Material => _material;
     [Show] private Material _material;
 
-    private Renderer _renderer => Renderer.Instance;
+    internal Renderer Renderer => _renderer ??= Renderer.Instance;
+    private Renderer _renderer;
 
     public override void OnRegister() =>
-        // Register the component with the MeshSystem.
         MeshSystem.Register(this);
 
     public override void OnAwake()
@@ -63,28 +62,24 @@ public sealed partial class Mesh : EditorComponent
         if (!InBounds)
             return;
 
-        if (Equals(Material.CurrentMaterialOnGPU, Material)
-             && Equals(Mesh.CurrentMeshOnGPU, MeshInfo))
+        if (Equals(Material.OnGPU, Material)
+            && Equals(Mesh.OnGPU, MeshInfo))
         {
-            // Update the PerModelConstantBuffer only.
             Material.MaterialBuffer?.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
 
-            // Draw the mesh directly without resetting the RenderState.
-            _renderer.DrawIndexed(MeshInfo.Value.Indices.Length);
+            Renderer.Draw(MeshInfo.Value.Indices.Length, MeshBuffers.IndexBufferView, 1, MeshBuffers.VertexBufferView);
         }
         else
         {
-            // Setup the Material, the PerModelConstantBuffer and the PropertiesConstantBuffer.
+            // Setup Material, PerModel and Properties constant buffer.
             Material.Setup();
             Material.MaterialBuffer?.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
             Material.MaterialBuffer?.UpdatePropertiesConstantBuffer();
 
-            // Draw the mesh with TriangleList.
-            _renderer.Data.SetPrimitiveTopology();
-            _renderer.Draw(MeshBuffers.VertexBuffer, MeshBuffers.IndexBuffer, MeshInfo.Value.Indices.Length);
+            Renderer.Draw(MeshInfo.Value.Indices.Length, MeshBuffers.IndexBufferView, 1, MeshBuffers.VertexBufferView);
 
             // Assign MeshInfo to the static variable.
-            CurrentMeshOnGPU = MeshInfo;
+            OnGPU = MeshInfo;
         }
 
         // Increment the vertex, index and draw call count in the Profiler.
@@ -102,18 +97,23 @@ public sealed partial class Mesh : EditorComponent
 
 public sealed partial class Mesh : EditorComponent
 {
-    public void SetMeshInfo(MeshInfo meshInfo)
+    public void SetMeshInfo(MeshInfo_OLD meshInfo)
     {
         // Batch MeshInfo by sorting the List with the Order of the Component
         if (BatchLookup.Contains(meshInfo))
+        {
             Order = (byte)BatchLookup.IndexOf(meshInfo);
+
+            meshInfo.BoundingBox = BatchLookup[Order].BoundingBox;
+        }
         else
         {
             Order = (byte)BatchLookup.Count;
             BatchLookup.Add(meshInfo);
-        }
 
-        InstantiateBounds(BoundingBox.CreateFromPoints(meshInfo.Vertices.Select(Vertex => Vertex.Position).ToArray()));
+            InstantiateBounds(BoundingBox.CreateFromPoints(
+                meshInfo.Vertices.Select(Vertex => Vertex.Position).ToArray()));
+        }
 
         // Assign to local variable.
         _meshInfo = meshInfo;
@@ -124,7 +124,7 @@ public sealed partial class Mesh : EditorComponent
 
     public MaterialEntry SetMaterial(string materialName)
     {
-        var MaterialEntry = MaterialCompiler.MaterialLibrary.GetMaterial(materialName);
+        var MaterialEntry = MaterialCompiler.Library.GetMaterial(materialName);
 
         SetMaterial(MaterialEntry.Material);
 
@@ -140,17 +140,22 @@ public sealed partial class Mesh : EditorComponent
 {
     private void InstantiateBounds(BoundingBox boundingBox)
     {
-        BoundingBox = boundingBox;
-        TransformedBoundingBox = BoundingBox.Transform(BoundingBox, Entity.Transform.WorldMatrix);
+        _meshInfo.BoundingBox = boundingBox;
+
+        TransformedBoundingBox = BoundingBox.Transform(
+            _meshInfo.BoundingBox, 
+            Entity.Transform.WorldMatrix);
     }
 
     private void CheckBounds()
     {
         if (Entity.Transform.TransformChanged)
-            TransformedBoundingBox = BoundingBox.Transform(BoundingBox, Entity.Transform.WorldMatrix);
+            TransformedBoundingBox = BoundingBox.Transform(
+                _meshInfo.BoundingBox, 
+                Entity.Transform.WorldMatrix);
 
-        if ((Camera.CurrentRenderingCamera?.Entity.Transform.TransformChanged ?? false)
-            || Entity.Transform.TransformChanged)
+        if (Entity.Transform.TransformChanged
+            || (Camera.CurrentRenderingCamera?.Entity.Transform.TransformChanged ?? false))
         {
             var boundingFrustum = Camera.CurrentRenderingCamera.BoundingFrustum;
             if (boundingFrustum is not null)

@@ -1,15 +1,6 @@
-cbuffer ViewConstantsBuffer : register(b0)
-{
-    float4x4 ViewProjection;
-    float3 Camera;
-};
+#include "Include\Common.hlsli"
 
-cbuffer PerModelConstantBuffer : register(b1)
-{
-    float4x4 World;
-};
-
-cbuffer Properties : register(b2)
+cbuffer Properties : register(b10)
 {
     // Color
     float4 Color;
@@ -26,45 +17,30 @@ cbuffer Properties : register(b2)
     bool Bool;
 };
 
-struct appdata
+Texture2D texture0 : register(t0);
+sampler sampler0 : register(s0);
+
+PSInput VSMain(VSInput input)
 {
-    float3 vertex : POSITION;
-    float2 uv : TEXCOORD;
-    float3 normal : NORMAL;
-};
+    PSInput output;
 
-struct VS_OUTPUT
-{
-    float4 pos : SV_POSITION;
-    float3 worldPos : POSITION;
-    float3 cameraPos : POSITION1;
-    float2 uv : TEXCOORD;
-    float3 normal : NORMAL;
-};
+    output.pos = mul(input.vertex, mul(World, ViewProjection));
+    output.normal = mul(input.normal, World);
+    output.tangent = mul(input.tangent, World);
+    output.worldpos = mul(input.vertex, World);
+    output.camerapos = Camera;
+    output.uv = input.texcoord;
 
-Texture2D ObjTexture : register(t0);
-SamplerState ObjSamplerState : register(s0);
-
-VS_OUTPUT VS(appdata v)
-{
-    VS_OUTPUT o;
-    
-    o.pos = mul(float4(v.vertex, 1), mul(World, ViewProjection));
-    o.normal = mul(float4(v.normal, 0), World);
-    o.worldPos = mul(float4(v.vertex, 1), World);
-    o.cameraPos = Camera;
-    o.uv = v.uv;
-
-    return o;
+    return output;
 }
 
-float4 PS(VS_OUTPUT i) : SV_TARGET
+float4 PSMain(PSInput input) : SV_TARGET
 {
-    float4 col = ObjTexture.Sample(ObjSamplerState, i.uv);
-
-    float3 diffuse = dot(normalize(i.normal), -normalize(float3(0, -1, 0)));
+    //float4 col = texture0.Sample(sampler0, input.uv);
+    float3 diffuse = dot(normalize(input.normal), -normalize(float3(0, -1, 0)));
 
     diffuse = max(diffuse, float3(0.255, 0.295, 0.3255));
 
-    return col * float4(diffuse, 1);
+    return float4(diffuse, 1);
+    //return col * float4(diffuse, 1);
 }

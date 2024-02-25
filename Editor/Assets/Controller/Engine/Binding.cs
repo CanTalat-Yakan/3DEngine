@@ -1,11 +1,12 @@
-﻿using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System;
 using Windows.Foundation;
+
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
 
 using Engine.ECS;
 using Engine.Editor;
@@ -44,7 +45,7 @@ internal sealed class BindEntry(object source, string sourcePath)
         Event?.Invoke();
 }
 
-internal sealed class Binding
+internal sealed partial class Binding
 {
     // Key = Field + Component.GetType().FullName
     public static Dictionary<string, BindEntry> RendererBindings = new();
@@ -56,10 +57,10 @@ internal sealed class Binding
     public static Dictionary<string, BindEntry> MaterialBindings = new();
 
     public static BindingFlags AllBindingFlags =
-        BindingFlags.NonPublic |
-        BindingFlags.Public |
-        BindingFlags.Static |
-        BindingFlags.Instance;
+          BindingFlags.NonPublic
+        | BindingFlags.Public
+        | BindingFlags.Static
+        | BindingFlags.Instance;
 
     public static void Update()
     {
@@ -69,6 +70,24 @@ internal sealed class Binding
         UpdateMaterialBindings();
     }
 
+    public static void Remove(Guid? guid)
+    {
+        if (SceneBindings is not null && guid is not null)
+            foreach (var bind in SceneBindings.ToArray())
+                if (bind.Key.Contains(guid.ToString()))
+                    SceneBindings.Remove(bind.Key);
+    }
+
+    public static void Dispose()
+    {
+        RendererBindings?.Clear();
+        SceneBindings?.Clear();
+        EntityBindings?.Clear();
+    }
+}
+
+internal sealed partial class Binding
+{
     public static void SetRendererBindings()
     {
         RendererBindings.Clear();
@@ -76,14 +95,14 @@ internal sealed class Binding
             "FOV" + ViewportController.Camera?.GetType().FullName,
             new(ViewportController.Camera, "FOV"));
         RendererBindings.Add(
-            "CameraProjection" + Engine.Core.Instance.Renderer.Config,
-            new(Engine.Core.Instance.Renderer.Config, "CameraProjection"));
+            "CameraProjection" + Engine.Kernel.Instance.Config,
+            new(Engine.Kernel.Instance.Config, "CameraProjection"));
         RendererBindings.Add(
-            "RenderMode" + Engine.Core.Instance.Renderer.Config,
-            new(Engine.Core.Instance.Renderer.Config, "RenderMode"));
+            "RenderMode" + Engine.Kernel.Instance.Config,
+            new(Engine.Kernel.Instance.Config, "RenderMode"));
     }
 
-    public static void SetBindings(Scene scene)
+    public static void SetSceneBindings(Scene scene)
     {
         if (scene is null)
             return;
@@ -93,7 +112,7 @@ internal sealed class Binding
         SceneBindings.Add("IsEnabled" + scene.ID, new(scene, "IsEnabled"));
     }
 
-    public static void SetBindings(Entity entity)
+    public static void SetEntityBindings(Entity entity)
     {
         if (entity is null)
             return;
@@ -109,7 +128,7 @@ internal sealed class Binding
                 EntityBindings.Add(field.Name + component.GetType().FullName + entity.ID, new(component, field.Name));
     }
 
-    public static void SetBindings(MaterialEntry materialEntry)
+    public static void SetMaterialBindings(MaterialEntry materialEntry)
     {
         if (materialEntry is null)
             return;
@@ -121,7 +140,10 @@ internal sealed class Binding
                 field.Name + PropertiesConstantBuffer.GetType().FullName,
                 new(PropertiesConstantBuffer, field.Name));
     }
+}
 
+internal sealed partial class Binding
+{
     /// <summary>
     /// [Renderer Key = Field.Name + Component.GetType().FullName]   
     /// [Scene Key = Field.Name + Scene.ID]  
@@ -174,14 +196,18 @@ internal sealed class Binding
 
     public static BindEntry GetMaterialBinding(string fieldName, object materialPropertiesConstantBuffer) =>
         Get(fieldName + materialPropertiesConstantBuffer.GetType().FullName, MaterialBindings);
+}
 
+internal sealed partial class Binding
+{
     private static void UpdateRendererBindings()
     {
         if (RendererBindings.Count == 0)
             return;
 
         foreach (var source in RendererBindings.Select(kv => kv.Value.Source).ToArray())
-            UpdateBinding(source, source.GetType().FullName, RendererBindings);
+            if (source is not null)
+                UpdateBinding(source, source.GetType().FullName, RendererBindings);
     }
 
     private static void UpdateSceneBindings()
@@ -229,7 +255,10 @@ internal sealed class Binding
                     && !Equals(field.GetValue(source), bindEntry.Value))
                     ProcessBindEntry(bindEntry, field, source);
     }
+}
 
+internal sealed partial class Binding
+{
     /// <summary>
     /// Update the new Value from the Engine to the Editor.
     /// </summary>
@@ -354,20 +383,5 @@ internal sealed class Binding
         bindEntry.Invoke();
 
         //Output.Log($"Handled Event: Value {convertedValue}");
-    }
-
-    public static void Remove(Guid? guid)
-    {
-        if (SceneBindings is not null && guid is not null)
-            foreach (var bind in SceneBindings.ToArray())
-                if (bind.Key.Contains(guid.ToString()))
-                    SceneBindings.Remove(bind.Key);
-    }
-
-    public static void Dispose()
-    {
-        RendererBindings?.Clear();
-        SceneBindings?.Clear();
-        EntityBindings?.Clear();
     }
 }

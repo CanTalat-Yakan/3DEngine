@@ -1,13 +1,14 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using System.Numerics;
+using Windows.Globalization.NumberFormatting;
+
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Shapes;
 using Microsoft.UI.Xaml;
-using System.Numerics;
-using Windows.Globalization.NumberFormatting;
-
-using Engine.Helper;
 
 using Vortice.Mathematics;
+
+using Engine.Helper;
 
 using Colors = Microsoft.UI.Colors;
 

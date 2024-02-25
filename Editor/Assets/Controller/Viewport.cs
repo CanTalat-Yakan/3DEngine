@@ -1,12 +1,13 @@
-﻿using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml;
-using SharpGen.Runtime;
-using System;
+﻿using System;
 using WinRT.Interop;
+
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
+
+using SharpGen.Runtime;
 
 using Engine.Data;
 using Engine.Editor;
-using Engine.Rendering;
 using Engine.Utilities;
 
 using static Editor.Controller.Helper;
@@ -19,25 +20,37 @@ internal sealed partial class Viewport(Grid content)
 
     private TextBlock _profiler;
 
-    public void InitializeEngineCore(Renderer renderer, out Engine.Core engineCore)
+    public void Initialize(out Engine.Kernel engineKernel, SwapChainPanel swapChainPanel)
     {
         EditorState.EditorBuild = true;
 
         var hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
-        engineCore = new Engine.Core(renderer, hwnd, Files.AssetsPath);
+        var config = Config.GetDefault();
 
-        engineCore.Renderer.Config.SetVSync(PresentInterval.Immediate);
-        engineCore.Renderer.Config.SetMSAA(MultiSample.x2);
-        engineCore.Renderer.Config.SetResolutionScale(2);
+        config.SetVSync(PresentInterval.Immediate);
+        config.SetMSAA(MultiSample.x2);
+        config.SetResolutionScale(2);
+        config.GUI = false;
 
-        engineCore.OnInitialize += () =>
+        engineKernel = new(config);
+        engineKernel.Initialize(hwnd, new(64, 64), win32Window: false, assetsPath: Files.AssetsPath);
+
+        // Gets the native object for the SwapChainPanel control.
+        using (var nativeObject = ComObject.As<Vortice.WinUI.ISwapChainPanelNative2>(swapChainPanel))
+        {
+            var result = nativeObject.SetSwapChain(engineKernel.Context.GraphicsDevice.SwapChain);
+            if (result.Failure)
+                throw new Exception(result.Description);
+        }
+
+        engineKernel.OnInitialize += () =>
         {
             Binding.SetRendererBindings();
 
             CreateViewportSettings();
         };
 
-        engineCore.OnRender += () =>
+        engineKernel.OnRender += () =>
         {
             Binding.Update();
             Output.Log(Engine.Utilities.Output.DequeueLog());
@@ -51,25 +64,14 @@ internal sealed partial class Viewport(Grid content)
                 _profiler.Text = Profiler.GetAdditionalString();
         };
 
-        engineCore.OnGUI += () =>
+        engineKernel.OnGUI += () =>
         {
+
         };
 
-        engineCore.OnDispose += Binding.Dispose;
+        engineKernel.OnDispose += Binding.Dispose;
     }
 
-    public void InitializeRenderer(out Renderer renderer, SwapChainPanel swapChainPanel)
-    {
-        renderer = new();
-
-        // Gets the native object for the SwapChainPanel control.
-        using (var nativeObject = ComObject.As<Vortice.WinUI.ISwapChainPanelNative2>(swapChainPanel))
-        {
-            var result = nativeObject.SetSwapChain(renderer.SwapChain);
-            if (result.Failure)
-                throw new Exception(result.Description);
-        }
-    }
 
     public void CreateViewportSettings()
     {
@@ -89,9 +91,9 @@ internal sealed partial class Viewport(Grid content)
                         .WrapInGridVertical("Movement Speed"))),
             CreateAppBarSeperator(),
             CreateComboBox(typeof(CameraProjection), null,
-                Renderer.Instance.Config, "CameraProjection"),
+                Engine.Kernel.Instance.Config, "CameraProjection"),
             CreateComboBox(typeof(RenderMode), null,
-                Renderer.Instance.Config, "RenderMode")
+                Engine.Kernel.Instance.Config, "RenderMode")
         };
 
         // Initialize an array of UI elements to be positioned in the top-right corner of the main content.

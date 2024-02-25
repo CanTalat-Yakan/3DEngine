@@ -1,6 +1,7 @@
-﻿using Microsoft.UI.Xaml.Data;
+﻿using System;
+
+using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml;
-using System;
 
 namespace Editor.Controller;
 

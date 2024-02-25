@@ -96,7 +96,7 @@ public sealed class Input
             if (currentMouseState is not null)
             {
                 // Get the pointer position from Win32.
-                Vortice.Win32.User32.GetCursorPos( out var pointer);
+                Interoperation.User32.GetCursorPos(out var pointer);
                 s_mousePosition.X = pointer.X;
                 s_mousePosition.Y = pointer.Y;
 
@@ -123,7 +123,7 @@ public sealed class Input
         catch { }
 
         if (s_lockMouse)
-            Vortice.Win32.User32.SetCursorPos(0, 0);
+            Interoperation.User32.SetCursorPos(0, 0);
 
         // Reset axis vector.
         s_axis = Vector2.Zero;

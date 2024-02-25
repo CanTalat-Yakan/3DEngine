@@ -23,7 +23,7 @@ public sealed class ShaderLibrary
 
 public sealed class ShaderCompiler
 {
-    public static ShaderLibrary ShaderLibrary = new();
+    public static ShaderLibrary Library { get; private set; } = new();
 
     public void CompileProjectShaders(string assetsPath = null)
     {
@@ -44,10 +44,10 @@ public sealed class ShaderCompiler
     {
         FileInfo fileInfo = new(path);
 
-        var shaderEntry = ShaderLibrary.GetShader(fileInfo.Name);
+        var shaderEntry = Library.GetShader(fileInfo.Name);
         if (shaderEntry is null)
         {
-            ShaderLibrary.Shaders.Add(new()
+            Library.Shaders.Add(new()
             {
                 FileInfo = fileInfo,
                 ConstantBufferType = CreateMaterialPropertyBufferStruct(fileInfo.FullName)
@@ -60,13 +60,13 @@ public sealed class ShaderCompiler
             shaderEntry.FileInfo = fileInfo;
             shaderEntry.ConstantBufferType = CreateMaterialPropertyBufferStruct(fileInfo.FullName);
 
-            foreach (var materialEntry in MaterialCompiler.MaterialLibrary.Materials)
+            // Update already existing materials with the latest shader bytecode and properties constantbuffer.
+            foreach (var materialEntry in MaterialCompiler.Library.Materials)
                 if (materialEntry.ShaderEntry.FileInfo == fileInfo)
                 {
                     materialEntry.Material.MaterialBuffer.CreatePropertiesConstantBuffer(shaderEntry.ConstantBufferType);
 
-                    materialEntry.Material.UpdateVertexShader(shaderEntry.FileInfo.FullName);
-                    materialEntry.Material.UpdatePixelShader(shaderEntry.FileInfo.FullName);
+                    materialEntry.Material.UpdateShader(shaderEntry.FileInfo.FullName);
 
                     materialEntry.OnShaderUpdate?.Invoke();
                 }
@@ -132,7 +132,7 @@ public sealed class ShaderCompiler
         // Start the scope.
         structBuilder.AppendLine("{");
 
-        // TODO: Find all Fields of the cbuffer Properties and Loop through them
+        // Find all fields of the constant buffer Properties and loop through them.
         var propertiesBufferFields = ProcessConstantBufferFields(shaderCode);
         foreach (var field in propertiesBufferFields)
             structBuilder.AppendLine(field);

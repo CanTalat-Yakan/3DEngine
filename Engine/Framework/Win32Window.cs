@@ -1,15 +1,15 @@
-﻿// Copyright (c) Amer Koleci and contributors.
-// Distributed under the MIT license. See the LICENSE file in the project root for more information.
+﻿using Win32.Numerics;
 
-using Vortice.Win32;
-using Vortice;
+using Engine.Interoperation;
 
-using static Vortice.Win32.User32;
+using static Engine.Interoperation.User32;
 
-namespace Engine;
+namespace Engine.Framework;
 
 public class Win32Window
 {
+    public Vortice.Mathematics.SizeI Size => new(Width, Height);
+
     public string Title;
     public int Width;
     public int Height;
@@ -30,11 +30,11 @@ public class Win32Window
         var style = WindowStyles.WS_OVERLAPPEDWINDOW;
         var styleEx = WindowExStyles.WS_EX_APPWINDOW | WindowExStyles.WS_EX_WINDOWEDGE;
 
-        var windowRect = new RawRect(0, 0, Width, Height);
+        var windowRect = new Rect(0, 0, Width, Height);
         AdjustWindowRectEx(ref windowRect, style, false, styleEx);
 
-        var windowWidth = Convert.ToInt32(windowRect.Right - windowRect.Left);
-        var windowHeight = Convert.ToInt32(windowRect.Bottom - windowRect.Top);
+        var windowWidth = windowRect.Right - windowRect.Left;
+        var windowHeight = windowRect.Bottom - windowRect.Top;
 
         var hwnd = CreateWindowEx(
             (int)styleEx, wndClass, Title, (int)style,

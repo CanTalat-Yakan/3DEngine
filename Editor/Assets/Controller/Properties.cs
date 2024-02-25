@@ -1,6 +1,4 @@
-﻿using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -8,6 +6,9 @@ using System.Numerics;
 using System.Reflection;
 using System;
 using Windows.Foundation;
+
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
 
 using Engine.ECS;
 using Engine.Editor;
@@ -17,7 +18,6 @@ using Engine.Runtime;
 using static Editor.Controller.Helper;
 
 using Path = System.IO.Path;
-using Texture = Vortice.Direct3D11.ID3D11Texture2D;
 
 namespace Editor.Controller;
 
@@ -72,7 +72,7 @@ internal sealed partial class Properties
     private void CreateEntityProperties(Entity entity)
     {
         // Add Bindings for the Entity.
-        Binding.SetBindings(entity);
+        Binding.SetEntityBindings(entity);
 
         Grid[] properties = new[]
         {
@@ -120,7 +120,7 @@ internal sealed partial class Properties
                 (s, e) =>
                 {
                     entity.AddComponent(
-                        ScriptCompiler.ComponentLibrary
+                        ScriptCompiler.Library
                         .GetComponent(e.SelectedItem.ToString()));
 
                     Set(entity);
@@ -187,7 +187,7 @@ internal sealed partial class Properties
     private void CreateMaterialProperties(MaterialEntry materialEntry)
     {
         // Add Bindings for the Material.
-        Binding.SetBindings(materialEntry);
+        Binding.SetMaterialBindings(materialEntry);
 
         s_stackPanel.Children.Add(
             CreateButtonWithAutoSuggestBoxAndShaderCollector(
@@ -196,7 +196,7 @@ internal sealed partial class Properties
                 {
                     string newShaderName = e.SelectedItem.ToString();
 
-                    var newShaderEntry = ShaderCompiler.ShaderLibrary
+                    var newShaderEntry = ShaderCompiler.Library
                         .GetShader(newShaderName);
 
                     if (newShaderEntry is null)
@@ -323,7 +323,7 @@ internal sealed partial class Properties
             // only listen to changes caused by user entering text.
             if (e.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
-                string[] itemSource = ScriptCompiler.ComponentLibrary
+                string[] itemSource = ScriptCompiler.Library
                     .Components.ConvertAll<string>(Type => Type.Name).ToArray();
 
                 List<string> suitableItems = new();
@@ -358,7 +358,7 @@ internal sealed partial class Properties
             // only listen to changes caused by user entering text.
             if (e.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
-                string[] itemSource = ShaderCompiler.ShaderLibrary
+                string[] itemSource = ShaderCompiler.Library
                     .Shaders.ConvertAll<string>(ShaderEntry => ShaderEntry.FileInfo.Name).ToArray();
 
                 List<string> suitableItems = new();
@@ -429,8 +429,8 @@ internal sealed partial class Properties
                         CreateSliderInt(
                             entity.ID, component, fieldInfo.Name,
                             (byte)value,
-                            (byte)attributes.OfType<SliderAttribute>().First().CustomMin,
-                            (byte)attributes.OfType<SliderAttribute>().First().CustomMax));
+                            (byte)attributes.OfType<SliderAttribute>().First().Min,
+                            (byte)attributes.OfType<SliderAttribute>().First().Max));
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
                     grid.Add(CreateNumberInputInt(
@@ -447,8 +447,8 @@ internal sealed partial class Properties
                         CreateSliderInt(
                             entity.ID, component, fieldInfo.Name,
                             (int)value,
-                            (int)attributes.OfType<SliderAttribute>().First().CustomMin,
-                            (int)attributes.OfType<SliderAttribute>().First().CustomMax));
+                            (int)attributes.OfType<SliderAttribute>().First().Min,
+                            (int)attributes.OfType<SliderAttribute>().First().Max));
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
                     grid.Add(CreateNumberInputInt(
@@ -463,8 +463,8 @@ internal sealed partial class Properties
                         CreateSlider(
                             entity.ID, component, fieldInfo.Name,
                             (float)value,
-                            (float)attributes.OfType<SliderAttribute>().First().CustomMin,
-                            (float)attributes.OfType<SliderAttribute>().First().CustomMax));
+                            (float)attributes.OfType<SliderAttribute>().First().Min,
+                            (float)attributes.OfType<SliderAttribute>().First().Max));
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
                     grid.Add(CreateNumberInput(
@@ -507,9 +507,9 @@ internal sealed partial class Properties
             else if (type == typeof(Material))
                 grid.Add(CreateTextureSlot("None", "Material"));
 
-            // Texture
-            else if (type == typeof(Texture))
-                grid.Add(CreateTextureSlot("None", "Texture"));
+            //// Texture
+            //else if (type == typeof(Texture))
+            //    grid.Add(CreateTextureSlot("None", "Texture"));
 
             // Entity
             else if (type == typeof(Entity))
@@ -619,8 +619,8 @@ internal sealed partial class Properties
                         CreateSliderInt(null,
                             propertiesConstantBuffer, fieldInfo.Name,
                             (int)value,
-                            (int)attributes.OfType<SliderAttribute>().First().CustomMin,
-                            (int)attributes.OfType<SliderAttribute>().First().CustomMax));
+                            (int)attributes.OfType<SliderAttribute>().First().Min,
+                            (int)attributes.OfType<SliderAttribute>().First().Max));
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
                     grid.Add(CreateNumberInputInt(null,
@@ -635,8 +635,8 @@ internal sealed partial class Properties
                         CreateSlider(null,
                             propertiesConstantBuffer, fieldInfo.Name,
                             (float)value,
-                            (float)attributes.OfType<SliderAttribute>().First().CustomMin,
-                            (float)attributes.OfType<SliderAttribute>().First().CustomMax));
+                            (float)attributes.OfType<SliderAttribute>().First().Min,
+                            (float)attributes.OfType<SliderAttribute>().First().Max));
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
                     grid.Add(CreateNumberInput(null,
@@ -682,7 +682,7 @@ internal sealed partial class Properties
         {
             materialEntry.Material.MaterialBuffer.SafeToSerializableProperties();
 
-            Engine.Helper.Serialization.SaveXml(materialEntry.Material.MaterialBuffer, materialEntry.FileInfo.FullName);
+            Engine.Helper.Serialization.SaveFile(materialEntry.Material.MaterialBuffer, materialEntry.FileInfo.FullName);
 
             materialEntry.Material.MaterialBuffer.UpdatePropertiesConstantBuffer();
         });
@@ -731,7 +731,7 @@ internal sealed partial class Properties
             // HeaderAttribute
             if (attribute.GetType().Equals(typeof(HeaderAttribute)))
                 // Create a header with the custom header value and add it to the grid
-                grid.Add(CreateHeader((string)((HeaderAttribute)attribute).CustomHeader));
+                grid.Add(CreateHeader((string)((HeaderAttribute)attribute).Header));
 
             // SpacerAttribute
             if (attribute.GetType().Equals(typeof(SpaceAttribute)))

@@ -117,9 +117,9 @@ internal static partial class ExtensionMethods
 
         try
         {
-            FileInfo file = new FileInfo(path);
-            using (FileStream stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None))
-                stream.Close();
+            FileInfo fileInfo = new FileInfo(path);
+            using (FileStream fileStream = fileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.None))
+                fileStream.Close();
         }
         catch (IOException)
         {

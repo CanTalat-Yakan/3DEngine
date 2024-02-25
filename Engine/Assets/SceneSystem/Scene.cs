@@ -1,6 +1,9 @@
-﻿namespace Engine.SceneSystem;
+﻿using USD.NET;
+using pxr;
 
-public sealed class Scene : ICloneable
+namespace Engine.SceneSystem;
+
+public sealed partial class Scene
 {
     public Guid ID = Guid.NewGuid();
     public EntityManager EntityManager = new();
@@ -8,10 +11,15 @@ public sealed class Scene : ICloneable
     public string Name = "Scene";
     public bool IsEnabled;
 
+    public void Save() { }
+
     public void Load() { }
 
     public void Unload() { }
+}
 
+public sealed partial class Scene : ICloneable
+{
     object ICloneable.Clone() =>
         Clone();
 
@@ -23,7 +31,6 @@ public sealed class Scene : ICloneable
         // Assign a new Guid to the cloned scene object.
         newScene.ID = Guid.NewGuid();
 
-        // Return the cloned scene object.
         return newScene;
     }
 }

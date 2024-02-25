@@ -13,13 +13,13 @@ public sealed class ToolTipAttribute(string toolTip) : Attribute
 
 public sealed class HeaderAttribute(string header) : Attribute
 {
-    public string CustomHeader = header;
+    public string Header = header;
 }
 
 public sealed class SliderAttribute(double min, double max) : Attribute
 {
-    public double CustomMin = min;
-    public double CustomMax = max;
+    public double Min = min;
+    public double Max = max;
 }
 
 public sealed class IfAttribute(string fieldName, string value) : Attribute

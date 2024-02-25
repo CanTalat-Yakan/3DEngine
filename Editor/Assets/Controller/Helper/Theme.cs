@@ -1,9 +1,11 @@
-﻿using Microsoft.UI.Composition.SystemBackdrops;
+﻿using System.Runtime.InteropServices;
+using WinRT;
+
+using Microsoft.UI.Composition.SystemBackdrops;
+using Microsoft.UI.Composition;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
-using System.Runtime.InteropServices;
-using WinRT;
 
 namespace Editor.Controller;
 
@@ -48,7 +50,7 @@ internal sealed class Theme
 
             // Enable the system backdrop.
             // Note: Be sure to have "using WinRT;" to support the Window.As<...>() call.
-            _micaController.AddSystemBackdropTarget(_mainWindow.As<Microsoft.UI.Composition.ICompositionSupportsSystemBackdrop>());
+            _micaController.AddSystemBackdropTarget(_mainWindow.As<ICompositionSupportsSystemBackdrop>());
             _micaController.SetSystemBackdropConfiguration(_configurationSource);
         }
     }

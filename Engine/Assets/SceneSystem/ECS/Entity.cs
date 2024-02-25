@@ -21,7 +21,7 @@ public enum Layers
     UI
 }
 
-public sealed partial class Entity : ICloneable, IDisposable
+public sealed partial class Entity : IDisposable
 {
     public Guid ID = Guid.NewGuid();
 
@@ -34,7 +34,7 @@ public sealed partial class Entity : ICloneable, IDisposable
     public string Tag;
     public string Layer;
 
-    public Scene Scene { get => _scene is not null ? _scene : _scene = SceneManager.GetFromEntityID(ID); set => _scene = null; }
+    public Scene Scene { get => _scene ??= SceneManager.GetFromEntityID(ID); set => _scene = null; }
     private Scene _scene;
 
     public Transform Transform => _transform;
@@ -53,12 +53,13 @@ public sealed partial class Entity : ICloneable, IDisposable
     {
         // Disable the entity.
         IsEnabled = false;
+
         // Remove all components from the entity.
         RemoveComponents();
     }
 }
 
-public sealed partial class Entity : ICloneable
+public sealed partial class Entity
 {
     public T AddComponent<T>() where T : Component, new() =>
         (T)AddComponent(new T());
@@ -147,6 +148,26 @@ public sealed partial class Entity : ICloneable
         // Return false if no matching tag is found.
         return false;
     }
+
+    public string GetDebugInformation()
+    {
+        var info =
+            $"""
+            Name: {Name}
+            ID: {ID}
+            Scene: {Scene.Name}
+            """;
+
+        if (Parent is not null)
+            info +=
+                $"""
+
+                Parent: {Parent.Name}
+                Parent ID: {Parent.ID}
+                """;
+
+        return info;
+    }
 }
 
 public sealed partial class Entity : ICloneable
@@ -187,25 +208,5 @@ public sealed partial class Entity : ICloneable
 
         // Return the new Entity object.
         return newEntity;
-    }
-
-    public string GetDebugInformation()
-    {
-        var info =
-            $"""
-            Name: {Name}
-            ID: {ID}
-            Scene: {Scene.Name}
-            """;
-
-        if (Parent is not null)
-            info +=
-                $"""
-
-                Parent: {Parent.Name}
-                Parent ID: {Parent.ID}
-                """;
-
-        return info;
     }
 }

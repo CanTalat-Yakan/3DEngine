@@ -1,13 +1,14 @@
-﻿using CommunityToolkit.WinUI.UI.Controls;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO.Compression;
 using System.IO;
 using System.Text.RegularExpressions;
 using System;
 using Windows.ApplicationModel.DataTransfer;
+
+using CommunityToolkit.WinUI.UI.Controls;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml;
 
 namespace Editor.Controller;
 
@@ -185,13 +186,13 @@ public sealed partial class Home
             path = IncrementFolderIfExists(path);
 
             Directory.CreateDirectory(path);
-            Directory.CreateDirectory(Path.Combine(path, Engine.Paths.ASSETS));
+            Directory.CreateDirectory(Path.Combine(path, Engine.Editor.Paths.ASSETS));
 
-            string zipPath = Path.Combine(AppContext.BaseDirectory, Engine.Paths.TEMPLATES, "Project", "Project.zip");
+            string zipPath = Path.Combine(AppContext.BaseDirectory, Engine.Editor.Paths.TEMPLATES, "Project", "Project.zip");
             if (File.Exists(zipPath))
                 ZipFile.ExtractToDirectory(zipPath, path);
 
-            string dllPath = Path.Combine(AppContext.BaseDirectory, Engine.Paths.TEMPLATES, "Project", "Engine.dll");
+            string dllPath = Path.Combine(AppContext.BaseDirectory, Engine.Editor.Paths.TEMPLATES, "Project", "Engine.dll");
             if (File.Exists(dllPath))
                 File.Copy(dllPath, Path.Combine(path, "Engine.dll"));
 

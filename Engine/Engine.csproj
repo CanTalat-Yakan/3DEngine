@@ -1,13 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
+		<TargetFramework>net8.0-windows10.0.22000.0</TargetFramework>
+		<SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-		<LangVersion>preview</LangVersion>
-		<!--<PublishAot>true</PublishAot>-->
 		<LangVersion>preview</LangVersion>
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<UseRidGraph>true</UseRidGraph>
+
 		<Title>3D Engine</Title>
 		<PackageId>3DEngine</PackageId>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
@@ -38,38 +39,31 @@
 
 	<ItemGroup>
 		<PackageReference Include="AssimpNet" Version="4.1.0" />
-		<PackageReference Include="ComputeSharp" Version="2.1.0" />
-		<PackageReference Include="ComputeSharp.Dynamic" Version="2.1.0" />
 		<PackageReference Include="Costura.Fody" Version="5.7.0">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="FftSharp" Version="2.1.0" />
-		<PackageReference Include="Magick.NET-Q16-HDRI-AnyCPU" Version="13.3.0" />
-		<PackageReference Include="Microsoft.CodeAnalysis" Version="4.7.0" />
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.7.0" />
+		<PackageReference Include="Magick.NET-Q16-HDRI-AnyCPU" Version="13.4.0" />
+		<PackageReference Include="MagicPhysX" Version="1.0.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis" Version="4.8.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.8.0" />
+		<PackageReference Include="System.Net.Http" Version="4.3.4" />
 		<PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+		<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
 		<PackageReference Include="Twizzle.ImGui.NET" Version="1.89.4" />
 		<PackageReference Include="Twizzle.ImGuizmo.NET" Version="1.89.4.1" />
 		<PackageReference Include="Twizzle.ImNodes.NET" Version="1.89.4" />
 		<PackageReference Include="Twizzle.ImPlot.NET" Version="1.89.4" />
 		<PackageReference Include="UniversalSceneDescription" Version="1.2.0" />
-		<PackageReference Include="Vortice.D3DCompiler" Version="3.3.4" />
-		<PackageReference Include="Vortice.Direct2D1" Version="3.3.4" />
-		<PackageReference Include="Vortice.Direct3D11" Version="3.3.4" />
-		<PackageReference Include="Vortice.Direct3D12" Version="3.3.4" />
-		<PackageReference Include="Vortice.DirectComposition" Version="3.3.4" />
-		<PackageReference Include="Vortice.DirectInput" Version="3.3.4" />
-		<PackageReference Include="Vortice.DirectStorage" Version="3.3.4" />
-		<PackageReference Include="Vortice.DirectX" Version="3.3.4" />
-		<PackageReference Include="Vortice.Dxc" Version="3.3.4" />
-		<PackageReference Include="Vortice.DXGI" Version="3.3.4" />
-		<PackageReference Include="Vortice.Mathematics" Version="1.7.2" />
-		<PackageReference Include="Vortice.MediaFoundation" Version="3.3.4" />
-		<PackageReference Include="Vortice.ShaderCompiler" Version="1.7.2" />
-		<PackageReference Include="Vortice.UIAnimation" Version="3.3.4" />
-		<PackageReference Include="Vortice.Win32" Version="2.0.0" />
-		<PackageReference Include="Vortice.XAudio2" Version="3.3.4" />
-		<PackageReference Include="Vortice.XInput" Version="3.3.4" />
+		<PackageReference Include="Vortice.Direct2D1" Version="3.4.4-beta" />
+		<PackageReference Include="Vortice.Direct3D12" Version="3.4.4-beta" />
+		<PackageReference Include="Vortice.DirectInput" Version="3.4.4-beta" />
+		<PackageReference Include="Vortice.DirectX" Version="3.4.4-beta" />
+		<PackageReference Include="Vortice.Dxc" Version="3.4.4-beta" />
+		<PackageReference Include="Vortice.DXGI" Version="3.4.4-beta" />
+		<PackageReference Include="Vortice.Mathematics" Version="1.7.7" />
+		<PackageReference Include="Vortice.Win32" Version="2.1.0" />
+		<PackageReference Include="Vortice.XInput" Version="3.4.4-beta" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -106,23 +100,14 @@
 		<Content Include="Assets\Resources\Shaders\ImGui.hlsl">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-		<Content Include="Assets\Resources\Shaders\Lit.hlsl">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Assets\Resources\Shaders\ShaderHelper.hlsl">
+		<Content Include="Assets\Resources\Shaders\Include\Common.hlsli">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Resources\Shaders\SimpleLit.hlsl">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-		<Content Include="Assets\Resources\Shaders\Skybox.hlsl">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Assets\Resources\Shaders\Unlit.hlsl">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
 		<Content Include="Assets\Resources\Templates\ComputeShader.txt">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Resources\Templates\Project\Engine.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -166,13 +151,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Include="..\3DEngine_Logo.png" Link="Assets\Resources\Textures\3DEngine_Logo.png">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
-	  <None Include="..\README.md" Link="Assets\Resources\README.md">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
+		<None Include="..\3DEngine_Logo.png" Link="Assets\Resources\Textures\3DEngine_Logo.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="..\README.md" Link="Assets\Resources\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Assets\Rendering\DataTypes\" />
+	  <Folder Include="Assets\Rendering\Graphics\" />
 	</ItemGroup>
 </Project>

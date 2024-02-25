@@ -1,45 +1,73 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 
-using Vortice.Direct3D11;
+using SharpGen.Runtime;
+using Vortice.Direct3D12;
 using Vortice.DXGI;
 using Vortice.WIC;
+using Vortice.Mathematics;
 
 namespace Engine.Loader;
 
-public sealed class ImageLoader
+public sealed partial class ImageLoader
 {
-    private static Dictionary<string, ID3D11Texture2D> s_textureStore = new();
+    private static Dictionary<string, ID3D12Resource> s_textureStore = new();
 
-    public static ID3D11Texture2D LoadTexture(ID3D11Device device, string filePath, bool fromResources = true)
+    public static void LoadTexture(out ID3D12Resource texture, ID3D12Device device, string filePath, bool fromResources = true)
     {
         if (s_textureStore.ContainsKey(filePath))
-            return s_textureStore[filePath];
-
-        string textureFilePath = filePath;
-        if (fromResources)
         {
-            // Combine the base directory and the relative path to the resources directory
-            string resourcesPath = Path.Combine(AppContext.BaseDirectory, Paths.TEXTURES);
-            // Define the full path to the texture file.
-            textureFilePath = Path.Combine(resourcesPath, filePath);
+            texture = s_textureStore[filePath];
+            return;
         }
+
+        ProcessWIC(device, filePath, fromResources, out var format, out var size);
+
+        ResourceDescription textureDescription = ResourceDescription.Texture2D(
+            format,
+            (uint)size.Width,
+            (uint)size.Height,
+            arraySize: 1,
+            mipLevels: 1);
+
+        Result result = device.CreateCommittedResource(
+            HeapProperties.DefaultHeapProperties,
+            HeapFlags.None,
+            textureDescription,
+            ResourceStates.CopyDest,
+            null,
+            out texture);
+
+        if (result.Failure)
+            throw new Exception(result.Description);
+
+        texture.Name = new FileInfo(filePath).Name;
+
+        // Add the Texture into the store with the filePath as key.
+        s_textureStore.Add(filePath, texture);
+    }
+
+    private static void ProcessWIC(ID3D12Device device, string filePath, bool fromResources, out Format format, out SizeI size)
+    {
+        // Define the full path to the texture file.
+        string textureFilePath = fromResources
+            ? Paths.TEXTURES + filePath
+            : filePath;
 
         // Loading images using Vortice.WIC
         using IWICImagingFactory wicFactory = new();
         using IWICBitmapDecoder decoder = wicFactory.CreateDecoderFromFileName(textureFilePath);
         using IWICBitmapFrameDecode frame = decoder.GetFrame(0);
 
-        Size size = frame.Size;
+        size = frame.Size;
 
         // Determine format
         Guid pixelFormat = frame.PixelFormat;
         Guid convertGUID = pixelFormat;
 
         bool useWIC2 = true;
-        Format format = ToDXGIFormat(pixelFormat);
+        format = ToDXGIFormat(pixelFormat);
         int bpp = 0;
         if (format == Format.Unknown)
         {
@@ -94,8 +122,8 @@ public sealed class ImageLoader
         if (format == Format.R32G32B32_Float)
         {
             // Special case test for optional device support for autogen mipchains for R32G32B32_FLOAT
-            FormatSupport fmtSupport = device.CheckFormatSupport(Format.R32G32B32_Float);
-            if (!fmtSupport.HasFlag(FormatSupport.MipAutogen))
+            device.CheckFormatSupport(Format.R32G32B32_Float, out var fmtSupport1, out var fmtSupport2);
+            if (!fmtSupport1.HasFlag(FormatSupport1.Mip))
             {
                 // Use R32G32B32A32_FLOAT instead which is required for Feature Level 10.0 and up
                 convertGUID = PixelFormat.Format128bppRGBAFloat;
@@ -106,8 +134,8 @@ public sealed class ImageLoader
 
         // Verify our target format is supported by the current device
         // (handles WDDM 1.0 or WDDM 1.1 device driver cases as well as DirectX 11.0 Runtime without 16bpp format support)
-        FormatSupport support = device.CheckFormatSupport(format);
-        if (!support.HasFlag(FormatSupport.Texture2D))
+        device.CheckFormatSupport(Format.R32G32B32_Float, out var support1, out var support2);
+        if (!support1.HasFlag(FormatSupport1.Texture2D))
         {
             // Fall back to RGBA 32-bit format which is supported by all devices
             convertGUID = PixelFormat.Format32bppRGBA;
@@ -144,7 +172,7 @@ public sealed class ImageLoader
 
                 bool canConvert = converter.CanConvert(pixelFormatScaler, convertGUID);
                 if (!canConvert)
-                    return null;
+                    return;
 
                 converter.Initialize(scaler, convertGUID, BitmapDitherType.ErrorDiffusion, null, 0, BitmapPaletteType.MedianCut);
                 converter.CopyPixels(rowPitch, pixels);
@@ -157,22 +185,45 @@ public sealed class ImageLoader
 
             bool canConvert = converter.CanConvert(pixelFormat, convertGUID);
             if (!canConvert)
-                return null;
+                return;
 
             converter.Initialize(frame, convertGUID, BitmapDitherType.ErrorDiffusion, null, 0, BitmapPaletteType.MedianCut);
             converter.CopyPixels(rowPitch, pixels);
         }
+    }
+}
 
+public sealed partial class ImageLoader
+{
+    private static Format ToDXGIFormat(Guid guid)
+    {
+        // Get the format based on the guid.
+        if (s_WICFormats.TryGetValue(guid, out Format format))
+            return format;
 
-        var texture = device.CreateTexture2D(pixels, format, size.Width, size.Height);
-
-        // Add the Texture into the store with the filePath as key.
-        s_textureStore.Add(filePath, texture);
-
-        return texture;
+        // If the guid is not found, return unknown format.
+        return Format.Unknown;
     }
 
-    internal static readonly Dictionary<Guid, Format> s_WICFormats = new()
+    private static int WICBitsPerPixel(IWICImagingFactory factory, Guid targetGuid)
+    {
+        // Get the component type of the specified target GUID using the WIC component factory
+        using IWICComponentInfo info = factory.CreateComponentInfo(targetGuid);
+
+        // Check if the component type is a PixelFormat
+        ComponentType type = info.ComponentType;
+        if (type != ComponentType.PixelFormat)
+            return 0;
+
+        // If the component type is a PixelFormat, get the number of bits per pixel using the pixel format info interface
+        using IWICPixelFormatInfo pixelFormatInfo = info.QueryInterface<IWICPixelFormatInfo>();
+        return pixelFormatInfo.BitsPerPixel;
+    }
+}
+
+public sealed partial class ImageLoader
+{
+    private static readonly Dictionary<Guid, Format> s_WICFormats = new()
     {
         { PixelFormat.Format128bppRGBAFloat,        Format.R32G32B32A32_Float },
 
@@ -198,7 +249,7 @@ public sealed class ImageLoader
         { PixelFormat.Format96bppRGBFloat,          Format.R32G32B32_Float },
     };
 
-    internal static readonly Dictionary<Guid, Guid> s_WICConvert = new()
+    private static readonly Dictionary<Guid, Guid> s_WICConvert = new()
     {
         // Note target GUID in this conversion table must be one of those directly supported formats (above).
 
@@ -255,29 +306,4 @@ public sealed class ImageLoader
 
         // We don't support n-channel formats
     };
-
-    internal static Format ToDXGIFormat(Guid guid)
-    {
-        // Get the format based on the guid.
-        if (s_WICFormats.TryGetValue(guid, out Format format))
-            return format;
-
-        // If the guid is not found, return unknown format.
-        return Format.Unknown;
-    }
-
-    internal static int WICBitsPerPixel(IWICImagingFactory factory, Guid targetGuid)
-    {
-        // Get the component type of the specified target GUID using the WIC component factory
-        using IWICComponentInfo info = factory.CreateComponentInfo(targetGuid);
-
-        // Check if the component type is a PixelFormat
-        ComponentType type = info.ComponentType;
-        if (type != ComponentType.PixelFormat)
-            return 0;
-
-        // If the component type is a PixelFormat, get the number of bits per pixel using the pixel format info interface
-        using IWICPixelFormatInfo pixelFormatInfo = info.QueryInterface<IWICPixelFormatInfo>();
-        return pixelFormatInfo.BitsPerPixel;
-    }
 }

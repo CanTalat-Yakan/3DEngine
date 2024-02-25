@@ -4,28 +4,22 @@ using System.Xml.Serialization;
 
 namespace Engine.Helper;
 
-public enum EDataType
+public enum DataType
 {
     XML,
-    JSON,
+    JSON
 }
 
-public static class Serialization
+public static partial class Serialization
 {
-    public static void DeleteFile(string path)
+    public static void SaveFile<T>(T file, string path, DataType dataType = DataType.XML)
     {
-        if (File.Exists(path))
-            File.Delete(path);
-    }
-
-    public static void SaveFile<T>(T file, string path, EDataType eDataType = EDataType.XML)
-    {
-        switch (eDataType)
+        switch (dataType)
         {
-            case EDataType.XML:
+            case DataType.XML:
                 SaveXml(file, path);
                 break;
-            case EDataType.JSON:
+            case DataType.JSON:
                 SaveJSON(file, path);
                 break;
             default:
@@ -33,40 +27,42 @@ public static class Serialization
         }
     }
 
-    public static T LoadFile<T>(string path, EDataType eDataType = EDataType.XML)
+    public static T LoadFile<T>(string path, DataType dataType = DataType.XML)
     {
-        object obj;
+        object result;
 
-        switch (eDataType)
+        switch (dataType)
         {
-            case EDataType.XML:
-                obj = LoadXml(typeof(T), path);
+            case DataType.XML:
+                result = LoadXml(typeof(T), path);
                 break;
-            case EDataType.JSON:
-                obj = LoadJSON(typeof(T), path);
+            case DataType.JSON:
+                result = LoadJSON(typeof(T), path);
                 break;
             default:
-                obj = null;
+                result = null;
                 break;
         }
 
-        return (T)obj;
+        return (T)result;
     }
+}
 
-    public static void SaveXml<T>(T file, string path)
+public static partial class Serialization
+{
+    private static void SaveXml<T>(T file, string path)
     {
         try
         {
-            using MemoryStream tempStream = new MemoryStream();
+            using MemoryStream temporaryMemoryStream = new MemoryStream();
 
-            new XmlSerializer(typeof(T)).Serialize(tempStream, file);
-            File.WriteAllBytes(path, tempStream.ToArray());
+            new XmlSerializer(typeof(T)).Serialize(temporaryMemoryStream, file);
+            File.WriteAllBytes(path, temporaryMemoryStream.ToArray());
         }
-
-        catch (Exception ex) { throw new Exception(ex.Message); }
+        catch (Exception ex) { Output.Log(ex.Message); }
     }
 
-    public static void SaveJSON<T>(T file, string path)
+    private static void SaveJSON<T>(T file, string path)
     {
         JsonSerializerOptions options = new();
         options.WriteIndented = true;
@@ -74,32 +70,35 @@ public static class Serialization
         string data = JsonSerializer.Serialize(file, typeof(T), options);
         File.WriteAllText(path, data);
     }
+}
 
-    public static object LoadXml(Type type, string path)
+public static partial class Serialization
+{
+    private static object LoadXml(Type type, string path)
     {
-        object obj;
+        object result = null;
 
         try
         {
-            using FileStream fs = new(path, FileMode.Open);
+            using FileStream fileStream = new(path, FileMode.Open);
 
-            obj = new XmlSerializer(type).Deserialize(fs);
+            result = new XmlSerializer(type).Deserialize(fileStream);
         }
-        catch (Exception ex) { throw new Exception(ex.Message); }
+        catch (Exception ex) { Output.Log(ex.Message); }
 
-        return obj;
+        return result;
     }
 
-    public static object LoadJSON(Type type, string path)
+    private static object LoadJSON(Type type, string path)
     {
-        object obj;
+        object result = null;
 
         try
         {
-            obj = JsonSerializer.Deserialize(File.ReadAllText(path), type);
+            result = JsonSerializer.Deserialize(File.ReadAllText(path), type);
         }
-        catch (Exception ex) { throw new Exception(ex.Message); }
+        catch (Exception ex) { Output.Log(ex.Message); }
 
-        return obj;
+        return result;
     }
 }

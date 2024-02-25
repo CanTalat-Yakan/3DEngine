@@ -20,16 +20,20 @@ public sealed class Camera : EditorComponent
     [Space]
     public byte CameraID = 0;
 
-    private Renderer _renderer => Renderer.Instance;
+    internal Renderer Renderer => _renderer ??= Renderer.Instance;
+    private Renderer _renderer;
 
     public override void OnRegister() =>
-        // Register the component with the CameraSystem.
         CameraSystem.Register(this);
 
-    public override void OnAwake() =>
+    public override void OnAwake()
+    {
         CurrentRenderingCamera = this;
 
-    public override void OnUpdate()
+        CameraBuffer.Setup();
+    }
+
+    public override void OnRender()
     {
         // Assign this camera instance as the main camera if it has "MainCamera" tag.
         if (Entity.Tag == Tags.MainCamera.ToString())
@@ -45,7 +49,7 @@ public sealed class Camera : EditorComponent
         CurrentRenderingCamera ??= this;
 
         // When the CurrentRenderingCamera is disabled or the current order is greater.
-        if (!CurrentRenderingCamera.IsEnabled || Order > CurrentRenderingCamera?.Order)
+        if (!CurrentRenderingCamera.IsEnabled || Order > CurrentRenderingCamera.Order)
             CurrentRenderingCamera = this;
 
         // Tell the mesh to recheck bounds.
@@ -69,7 +73,7 @@ public sealed class Camera : EditorComponent
             Vector3.UnitY);
 
         // Get the aspect ratio for the device's screen.
-        var aspect = (float)_renderer.Size.Width / (float)_renderer.Size.Height;
+        var aspect = (float)Renderer.Size.Width / (float)Renderer.Size.Height;
         var dAspect = aspect < 1 ? 1 * aspect : 1 / aspect;
 
         // Convert the field of view from degrees to radians.
@@ -88,11 +92,9 @@ public sealed class Camera : EditorComponent
         BoundingFrustum = new BoundingFrustum(viewProjection);
 
         // Store the transposed view-projection matrix and the position of the camera.
-        CameraBuffer.ViewConstantBuffer = new()
-        {
-            ViewProjection = Matrix4x4.Transpose(viewProjection),
-            CameraPosition = Entity.Transform.Position,
-        };
+        CameraBuffer.ViewConstantBuffer = new(
+            Matrix4x4.Transpose(viewProjection), 
+            Entity.Transform.Position);
 
         /* 
          The coordinate system used in System.Numerics is right-handed,

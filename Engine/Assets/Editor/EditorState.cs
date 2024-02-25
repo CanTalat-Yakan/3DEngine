@@ -2,8 +2,10 @@
 
 public class EditorState
 {
-    public static bool EditorBuild { get; set; } = false;
     public static string AssetsPath { get; set; }
+
+    public static bool EditorBuild { get; set; } = false;
+
     public static bool PlayMode { get; set; } = false;
     public static bool PlayModeStarted { get; set; } = false;
 
