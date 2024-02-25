@@ -27,6 +27,7 @@
 		<DefineConstants>$(DefineConstants);ENGINE</DefineConstants>
 		<GenerateAssemblyInfo>True</GenerateAssemblyInfo>
 	</PropertyGroup>
+	
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DefineConstants>$(DefineConstants);ENGINE</DefineConstants>
 		<GenerateAssemblyInfo>True</GenerateAssemblyInfo>
