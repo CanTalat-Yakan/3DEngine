@@ -1,5 +1,3 @@
-using ImageMagick;
-
 namespace Engine;
 
 public sealed class Program
