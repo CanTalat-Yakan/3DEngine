@@ -62,6 +62,8 @@ public sealed class Kernel
             GUIRenderer.Initialize();
 
             GUIInputHandler = new(hwnd);
+
+            OnGUI += GUIRenderer.ProfileWindows;
         }
 
         EditorState.AssetsPath = assetsPath;

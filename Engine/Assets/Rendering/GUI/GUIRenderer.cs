@@ -76,6 +76,29 @@ public unsafe sealed partial class GUIRenderer
 
         RenderImDrawData();
     }
+
+    private string _profiler = string.Empty;
+    private string _output = string.Empty;
+    public void ProfileWindows()
+    {
+        ImGui.SetNextWindowBgAlpha(0.35f);
+        if (ImGui.Begin("Profiler", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize))
+        {
+            if (Time.OnFixedFrame)
+                _profiler = Profiler.GetAdditionalString();
+            ImGui.Text(_profiler);
+            ImGui.End();
+        }
+
+        ImGui.SetNextWindowBgAlpha(0.35f);
+        if (ImGui.Begin("Output", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize))
+        {
+            if (Output.GetLogs.Count > 0)
+                _output = Output.DequeueLog()?.GetString() + _output;
+            ImGui.Text(_output);
+            ImGui.End();
+        }
+    }
 }
 
 public unsafe sealed partial class GUIRenderer
