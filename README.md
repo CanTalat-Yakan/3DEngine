@@ -43,26 +43,23 @@ sealed class Program
 {
     [STAThread]
     private static void Main() =>
-        new Engine.Program().Run(true);
+        new Engine.Program().Run();
 }
 ```
 
-Use the Engine.[Core](https://engine3d.gitbook.io/wiki/engine/core) to get to the Scene System.
+Use the [Engine.Kernel](https://engine3d.gitbook.io/wiki/engine/core) to get to the Scene System.
 
 Project Setup:
 
 ```XML
 <Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
+		<TargetFramework>net8.0-windows10.0.22000.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 		<PlatformTarget>x64</PlatformTarget>
 		<PublishAot>true</PublishAot>
-		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -70,12 +67,11 @@ Project Setup:
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="3DEngine" Version="1.0.7" />
+		<PackageReference Include="3DEngine" Version="2.0.1" />
 		<PackageReference Include="Costura.Fody" Version="5.7.0">
 		  <PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 	</ItemGroup>
-
 </Project>
 ```
 
