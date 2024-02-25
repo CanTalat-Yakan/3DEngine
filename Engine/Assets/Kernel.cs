@@ -49,10 +49,9 @@ public sealed class Kernel
         // Set the singleton instance of the class, if it hasn't been already.
         Instance ??= this;
 
-        EditorState.AssetsPath = assetsPath;
-
         Context.GraphicsDevice.Initialize(size, win32Window);
         Context.UploadBuffer.Initialize(Context.GraphicsDevice, 67108864); // 64 MB.
+        Context.GraphicsContext.Initialize(Context.GraphicsDevice);
 
         if (Config.GUI)
         {
@@ -64,8 +63,6 @@ public sealed class Kernel
 
             GUIInputHandler = new(hwnd);
         }
-
-        Context.GraphicsContext.Initialize(Context.GraphicsDevice);
 
         EditorState.AssetsPath = assetsPath;
 
