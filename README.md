@@ -113,7 +113,7 @@ As a Unity Developer, I've gathered a collection of top-notch assets from the Un
 * [Atlas](https://assetstore.unity.com/packages/tools/terrain/atlas-terrain-editor-207568).
 
 # Build
-In order to compile, you need to install [Visual Studio 2022 Preview](https://visualstudio.microsoft.com/vs) with the following components:
+In order to compile, you need to install [Visual Studio 2022](https://visualstudio.microsoft.com/vs) with the following components:
 
 *  [Windows 11 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk)
 *  [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)
