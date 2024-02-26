@@ -130,15 +130,7 @@ public sealed partial class CommonContext : IDisposable
     public void GPUUploadData(GraphicsContext graphicsContext)
     {
         while (UploadQueue.TryDequeue(out var upload))
-        {
-            //if (upload.mesh is not null)
-            //{
-            //    graphicsContext1.UploadMesh(upload.mesh, upload.vertexData, upload.indexData, upload.stride, upload.format);
-            //}
             if (upload.Texture2D is not null)
-            {
                 graphicsContext.UploadTexture(upload.Texture2D, upload.TextureData);
-            }
-        }
     }
 }

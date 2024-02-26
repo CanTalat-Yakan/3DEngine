@@ -30,7 +30,7 @@ internal sealed partial class Viewport(Grid content)
         config.SetVSync(PresentInterval.Immediate);
         config.SetMSAA(MultiSample.x2);
         config.SetResolutionScale(2);
-        config.GUI = false;
+        config.GUI = true;
 
         engineKernel = new(config);
         engineKernel.Initialize(hwnd, new(64, 64), win32Window: false, assetsPath: Files.AssetsPath);

@@ -100,9 +100,9 @@ internal sealed class Theme
         }
 
         // Check if the Engine.Core instance is not null.
-        if (Engine.Core.Instance is not null)
+        if (Engine.Kernel.Instance is not null)
             // If it's not null, set the theme for entity manager.
-            Engine.SceneSystem.SceneManager.MainScene.EntityManager?
+            Engine.Kernel.Instance.SceneManager.MainScene.EntityManager?
                 .GetFromTag("DefaultSky")?
                 .GetComponent<Engine.Editor.DefaultSky>()?
                 .SetTheme(_page.RequestedTheme == ElementTheme.Light);

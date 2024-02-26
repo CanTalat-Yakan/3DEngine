@@ -117,7 +117,7 @@ public sealed class GUIInputHandler
         {
             POINT pos;
             if (User32.GetCursorPos(out pos) && User32.ScreenToClient(WindowHandle, ref pos))
-                io.MousePos = new System.Numerics.Vector2(pos.X, pos.Y);
+                io.MousePos = new Vector2(pos.X, pos.Y);
         }
     }
 

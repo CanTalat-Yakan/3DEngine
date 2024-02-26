@@ -44,67 +44,24 @@ public sealed partial class GraphicsContext : IDisposable
         CommandList.DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
     }
 
-    public void ScreenBeginRender()
-    {
+    public void ScreenBeginRender() =>
         CommandList.ResourceBarrierTransition(GraphicsDevice.GetScreenResource(), ResourceStates.Present, ResourceStates.RenderTarget);
-    }
 
-    public void ScreenEndRender()
-    {
+    public void ScreenEndRender() =>
         CommandList.ResourceBarrierTransition(GraphicsDevice.GetScreenResource(), ResourceStates.RenderTarget, ResourceStates.Present);
-    }
 
-    public void BeginCommand()
-    {
+    public void BeginCommand() =>
         CommandList.Reset(GraphicsDevice.GetCommandAllocator());
-    }
 
-    public void EndCommand()
-    {
+    public void EndCommand() =>
         CommandList.Close();
-    }
 
-    public void Execute()
-    {
+    public void Execute() =>
         GraphicsDevice.CommandQueue.ExecuteCommandList(CommandList);
-    }
+}
 
-    public void UploadTexture(Texture2D texture, byte[] data)
-    {
-        ID3D12Resource resourceUpload1 = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
-            new HeapProperties(HeapType.Upload),
-            HeapFlags.None,
-            ResourceDescription.Buffer((ulong)data.Length),
-            ResourceStates.GenericRead);
-        GraphicsDevice.DestroyResource(resourceUpload1);
-
-        GraphicsDevice.DestroyResource(texture.Resource);
-        texture.Resource = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
-            HeapProperties.DefaultHeapProperties,
-            HeapFlags.None,
-            ResourceDescription.Texture2D(texture.Format, (uint)texture.Width, (uint)texture.Height, 1, 1),
-            ResourceStates.CopyDest);
-
-        uint bitsPerPixel = GraphicsDevice.GetBitsPerPixel(texture.Format);
-
-        int width = texture.Width;
-        int height = texture.Height;
-
-        SubresourceData subresourcedata = new()
-        {
-            Data = Marshal.UnsafeAddrOfPinnedArrayElement(data, 0),
-            RowPitch = (IntPtr)(width * bitsPerPixel / 8),
-            SlicePitch = (IntPtr)(width * height * bitsPerPixel / 8),
-        };
-        UpdateSubresources(CommandList, texture.Resource, resourceUpload1, 0, 0, 1, [subresourcedata]);
-
-        GCHandle gcHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-        gcHandle.Free();
-
-        CommandList.ResourceBarrierTransition(texture.Resource, ResourceStates.CopyDest, ResourceStates.GenericRead);
-        texture.ResourceStates = ResourceStates.GenericRead;
-    }
-
+public sealed partial class GraphicsContext : IDisposable
+{
     public ReadOnlyMemory<byte> LoadShader(DxcShaderStage shaderStage, string filePath, string entryPoint)
     {
         string directoryPath = AppContext.BaseDirectory + @"Assets\Resources\Shaders\";
@@ -120,6 +77,59 @@ public sealed partial class GraphicsContext : IDisposable
 
             return results.GetObjectBytecodeMemory();
         }
+    }
+
+    public void UploadTexture(Texture2D texture, byte[] data)
+    {
+        ID3D12Resource resourceUpload = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
+            new HeapProperties(HeapType.Upload),
+            HeapFlags.None,
+            ResourceDescription.Buffer((ulong)data.Length),
+            ResourceStates.GenericRead);
+        GraphicsDevice.DestroyResource(resourceUpload);
+
+        GraphicsDevice.DestroyResource(texture.Resource);
+        texture.Resource = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
+            HeapProperties.DefaultHeapProperties,
+            HeapFlags.None,
+            ResourceDescription.Texture2D(texture.Format, (uint)texture.Width, (uint)texture.Height, arraySize: 1, mipLevels: 1),
+            ResourceStates.CopyDest);
+
+        uint bitsPerPixel = GraphicsDevice.GetBitsPerPixel(texture.Format);
+
+        SubresourceData subresourcedata = new()
+        {
+            Data = Marshal.UnsafeAddrOfPinnedArrayElement(data, 0),
+            RowPitch = (IntPtr)(texture.Width * bitsPerPixel / 8),
+            SlicePitch = (IntPtr)(texture.Width * texture.Height * bitsPerPixel / 8),
+        };
+        UpdateSubresources(CommandList, texture.Resource, resourceUpload, 0, 0, 1, [subresourcedata]);
+
+        GCHandle gcHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+        gcHandle.Free();
+
+        CommandList.ResourceBarrierTransition(texture.Resource, ResourceStates.CopyDest, ResourceStates.GenericRead);
+        texture.ResourceStates = ResourceStates.GenericRead;
+    }
+
+    public void SetMesh(MeshInfo mesh)
+    {
+        CommandList.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
+
+        int previousInputSlot = -1;
+        foreach (var inputElementDescription in mesh.InputLayoutDescription.Elements)
+            if (inputElementDescription.Slot != previousInputSlot)
+            {
+                if (mesh.Vertices?.TryGetValue(inputElementDescription.SemanticName, out var vertex) ?? false)
+                    CommandList.IASetVertexBuffers(inputElementDescription.Slot, new VertexBufferView(vertex.Resource.GPUVirtualAddress + (ulong)vertex.Offset, vertex.SizeInByte - vertex.Offset, vertex.Stride));
+
+                previousInputSlot = inputElementDescription.Slot;
+            }
+
+        if (mesh.IndexBufferResource is not null)
+            CommandList.IASetIndexBuffer(new IndexBufferView(mesh.IndexBufferResource.GPUVirtualAddress, mesh.IndexSizeInByte, mesh.IndexFormat));
+
+        InputLayoutDescription = mesh.InputLayoutDescription;
     }
 }
 
@@ -192,26 +202,6 @@ public sealed partial class GraphicsContext : IDisposable
         CommandList.RSSetViewport(new Viewport(0, 0, GraphicsDevice.Size.Width, GraphicsDevice.Size.Height, 0.0f, 1.0f));
         CommandList.RSSetScissorRect(new RectI(0, 0, GraphicsDevice.Size.Width, GraphicsDevice.Size.Height));
         CommandList.OMSetRenderTargets(GraphicsDevice.GetRenderTargetScreen());
-    }
-
-    public void SetMesh(MeshInfo mesh)
-    {
-        CommandList.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
-
-        int previousInputSlot = -1;
-        foreach (var inputElementDescription in mesh.InputLayoutDescription.Elements)
-            if (inputElementDescription.Slot != previousInputSlot)
-            {
-                if (mesh.Vertices?.TryGetValue(inputElementDescription.SemanticName, out var vertex) ?? false)
-                    CommandList.IASetVertexBuffers(inputElementDescription.Slot, new VertexBufferView(vertex.Resource.GPUVirtualAddress + (ulong)vertex.Offset, vertex.SizeInByte - vertex.Offset, vertex.Stride));
-
-                previousInputSlot = inputElementDescription.Slot;
-            }
-
-        if (mesh.IndexBufferResource is not null)
-            CommandList.IASetIndexBuffer(new IndexBufferView(mesh.IndexBufferResource.GPUVirtualAddress, mesh.IndexSizeInByte, mesh.IndexFormat));
-
-        InputLayoutDescription = mesh.InputLayoutDescription;
     }
 
     public void SetConstantBufferView(UploadBuffer uploadBuffer, int offset, int slot)

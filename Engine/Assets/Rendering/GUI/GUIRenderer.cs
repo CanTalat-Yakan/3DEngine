@@ -115,12 +115,14 @@ public unsafe sealed partial class GUIRenderer
     private void RenderImDrawData()
     {
         var data = ImGui.GetDrawData();
-        var graphicsContext = Context.GraphicsContext;
 
-        graphicsContext.SetRootSignature(Context.CreateRootSignatureFromString("Cs"));
-        graphicsContext.SetPipelineState(Context.PipelineStateObjects["ImGui"], PipelineStateObjectDescription);
+        Context.GraphicsContext.SetRootSignature(Context.CreateRootSignatureFromString("Cs"));
+        Context.GraphicsContext.SetPipelineState(Context.PipelineStateObjects["ImGui"], PipelineStateObjectDescription);
 
-        graphicsContext.CommandList.IASetPrimitiveTopology(Vortice.Direct3D.PrimitiveTopology.TriangleList);
+        Context.GraphicsContext.CommandList.IASetPrimitiveTopology(Vortice.Direct3D.PrimitiveTopology.TriangleList);
+
+        data.DisplaySize /= (float)Kernel.Instance.Config.ResolutionScale;
+        data.DisplayPos /= (float)Kernel.Instance.Config.ResolutionScale;
 
         float L = data.DisplayPos.X;
         float R = data.DisplayPos.X + data.DisplaySize.X;
@@ -134,7 +136,7 @@ public unsafe sealed partial class GUIRenderer
             (R+L)/(L-R),  (T+B)/(B-T),    0.5f,       1.0f,
         };
         int index = Context.UploadBuffer.Upload<float>(mvp);
-        Context.UploadBuffer.SetConstantBufferView(graphicsContext, index, 0);
+        Context.UploadBuffer.SetConstantBufferView(Context.GraphicsContext, index, 0);
 
         Vector2 clipOffset = data.DisplayPos;
         for (int i = 0; i < data.CmdListsCount; i++)
@@ -144,14 +146,14 @@ public unsafe sealed partial class GUIRenderer
             var vertexBytes = commandList.VtxBuffer.Size * sizeof(ImDrawVert);
             var indexBytes = commandList.IdxBuffer.Size * sizeof(ImDrawIdx);
 
-            Context.UploadBuffer.UploadMeshIndex(graphicsContext, GUIMesh, new Span<byte>(commandList.IdxBuffer.Data.ToPointer(), indexBytes), Format.R16_UInt);
-            Context.UploadBuffer.UploadVertexBuffer(graphicsContext, ref GUIMesh.VertexBufferResource, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), vertexBytes));
+            Context.UploadBuffer.UploadMeshIndex(Context.GraphicsContext, GUIMesh, new Span<byte>(commandList.IdxBuffer.Data.ToPointer(), indexBytes), Format.R16_UInt);
+            Context.UploadBuffer.UploadVertexBuffer(Context.GraphicsContext, ref GUIMesh.VertexBufferResource, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), vertexBytes));
 
             GUIMesh.Vertices["POSITION"] = new VertexBuffer() { Offset = 0, Resource = GUIMesh.VertexBufferResource, SizeInByte = vertexBytes, Stride = sizeof(ImDrawVert) };
             GUIMesh.Vertices["TEXCOORD"] = new VertexBuffer() { Offset = 8, Resource = GUIMesh.VertexBufferResource, SizeInByte = vertexBytes, Stride = sizeof(ImDrawVert) };
             GUIMesh.Vertices["COLOR"] = new VertexBuffer() { Offset = 16, Resource = GUIMesh.VertexBufferResource, SizeInByte = vertexBytes, Stride = sizeof(ImDrawVert) };
 
-            graphicsContext.SetMesh(GUIMesh);
+            Context.GraphicsContext.SetMesh(GUIMesh);
 
             for (int j = 0; j < commandList.CmdBuffer.Size; j++)
             {
@@ -161,12 +163,17 @@ public unsafe sealed partial class GUIRenderer
                     throw new NotImplementedException("user callbacks not implemented");
                 else
                 {
-                    graphicsContext.SetShaderResourceView(Context.GetTextureByStringID(cmd.TextureId), 0);
+                    cmd.ClipRect *= (float)Kernel.Instance.Config.ResolutionScale;
 
-                    var rect = new Vortice.RawRect((int)(cmd.ClipRect.X - clipOffset.X), (int)(cmd.ClipRect.Y - clipOffset.Y), (int)(cmd.ClipRect.Z - clipOffset.X), (int)(cmd.ClipRect.W - clipOffset.Y));
-                    graphicsContext.CommandList.RSSetScissorRects(new[] { rect });
+                    Context.GraphicsContext.CommandList.RSSetScissorRects(new Vortice.RawRect(
+                        (int)(cmd.ClipRect.X - clipOffset.X),
+                        (int)(cmd.ClipRect.Y - clipOffset.Y),
+                        (int)(cmd.ClipRect.Z - clipOffset.X),
+                        (int)(cmd.ClipRect.W - clipOffset.Y)));
 
-                    graphicsContext.DrawIndexedInstanced((int)cmd.ElemCount, 1, (int)(cmd.IdxOffset), (int)(cmd.VtxOffset), 0);
+                    Context.GraphicsContext.SetShaderResourceView(Context.GetTextureByStringID(cmd.TextureId), 0);
+
+                    Context.GraphicsContext.DrawIndexedInstanced((int)cmd.ElemCount, 1, (int)(cmd.IdxOffset), (int)(cmd.VtxOffset), 0);
                 }
             }
         }
