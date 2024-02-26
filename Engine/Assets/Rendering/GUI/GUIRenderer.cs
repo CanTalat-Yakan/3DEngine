@@ -47,15 +47,15 @@ public unsafe sealed partial class GUIRenderer
         FontTexture.Format = Format.R8G8B8A8_UNorm;
         GUIMesh = Context.GetMesh("ImGui Mesh");
 
-        GPUUpload gpuUpload = new();
-        gpuUpload.Texture2D = FontTexture;
-        gpuUpload.Format = Format.R8G8B8A8_UNorm;
-        gpuUpload.TextureData = new byte[width * height * bytesPerPixel];
+        GPUUpload upload = new();
+        upload.Texture2D = FontTexture;
+        upload.Format = Format.R8G8B8A8_UNorm;
+        upload.TextureData = new byte[width * height * bytesPerPixel];
 
-        Span<byte> data = new(pixels, gpuUpload.TextureData.Length);
-        data.CopyTo(gpuUpload.TextureData);
+        Span<byte> data = new(pixels, upload.TextureData.Length);
+        data.CopyTo(upload.TextureData);
 
-        Context.UploadQueue.Enqueue(gpuUpload);
+        Context.UploadQueue.Enqueue(upload);
     }
 
     public void Update(IntPtr context)
