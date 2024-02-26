@@ -73,6 +73,21 @@ Project Setup:
 		  <PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 	</ItemGroup>
+
+	<ItemGroup>
+		<Content Update="$(NuGetPackageRoot)\3dengine\2.0.0\contentFiles\any\net8.0-windows10.0.22000\Assets\Resources\Models\Primitives\Cube.obj">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Update="$(NuGetPackageRoot)\3dengine\2.0.0\contentFiles\any\net8.0-windows10.0.22000\Assets\Resources\Models\Primitives\Sphere.obj">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Update="$(NuGetPackageRoot)\3dengine\2.0.0\contentFiles\any\net8.0-windows10.0.22000\Assets\Resources\Shaders\ImGui.hlsl">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Update="$(NuGetPackageRoot)\3dengine\2.0.0\contentFiles\any\net8.0-windows10.0.22000\Assets\Resources\Shaders\Include\Common.hlsli">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 </Project>
 ```
 
