@@ -99,6 +99,7 @@ public sealed class Kernel
         OnInitialize = null;
 
         Context.GraphicsDevice.Begin();
+
         Context.GraphicsContext.BeginCommand();
 
         Context.GPUUploadData(Context.GraphicsContext);
@@ -137,7 +138,7 @@ public sealed class Kernel
         Context.GraphicsContext.EndCommand();
         Context.GraphicsContext.Execute();
 
-        Context.GraphicsDevice.Present((int)Config.VSync);
+        Context.GraphicsDevice.Present();
     }
 
     public void RenderGUI()

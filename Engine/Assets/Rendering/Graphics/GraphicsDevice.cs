@@ -116,9 +116,9 @@ public sealed partial class GraphicsDevice : IDisposable
     public void Begin() =>
         GetCommandAllocator().Reset();
 
-    public void Present(int syncInterval)
+    public void Present()
     {
-        SwapChain.Present(syncInterval, PresentFlags.DoNotWait);
+        SwapChain.Present((int)Kernel.Instance.Config.VSync, PresentFlags.AllowTearing);
 
         CommandQueue.Signal(Fence, ExecuteCount);
 
