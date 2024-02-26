@@ -117,7 +117,12 @@ public sealed class GUIInputHandler
         {
             POINT pos;
             if (User32.GetCursorPos(out pos) && User32.ScreenToClient(WindowHandle, ref pos))
+            {
                 io.MousePos = new Vector2(pos.X, pos.Y);
+
+                if (Kernel.Instance.Config.ResolutionScale < 1)
+                    io.MousePos *= (float)Kernel.Instance.Config.ResolutionScale; // <--- SCALING
+            }
         }
     }
 

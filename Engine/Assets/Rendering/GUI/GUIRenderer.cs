@@ -121,8 +121,8 @@ public unsafe sealed partial class GUIRenderer
 
         Context.GraphicsContext.CommandList.IASetPrimitiveTopology(Vortice.Direct3D.PrimitiveTopology.TriangleList);
 
-        data.DisplaySize /= (float)Kernel.Instance.Config.ResolutionScale;
-        data.DisplayPos /= (float)Kernel.Instance.Config.ResolutionScale;
+        if (Kernel.Instance.Config.ResolutionScale > 1)
+            data.DisplaySize /= (float)Kernel.Instance.Config.ResolutionScale; // <--- SCALING
 
         float L = data.DisplayPos.X;
         float R = data.DisplayPos.X + data.DisplaySize.X;
@@ -163,7 +163,8 @@ public unsafe sealed partial class GUIRenderer
                     throw new NotImplementedException("user callbacks not implemented");
                 else
                 {
-                    cmd.ClipRect *= (float)Kernel.Instance.Config.ResolutionScale;
+                    if (Kernel.Instance.Config.ResolutionScale > 1)
+                        cmd.ClipRect *= (float)Kernel.Instance.Config.ResolutionScale; // <--- SCALING
 
                     Context.GraphicsContext.CommandList.RSSetScissorRects(new Vortice.RawRect(
                         (int)(cmd.ClipRect.X - clipOffset.X),

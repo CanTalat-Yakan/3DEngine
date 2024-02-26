@@ -22,10 +22,11 @@ public sealed class Program
     private void Initialize(bool renderGUI, ref Config config)
     {
         config ??= Config.GetDefault();
+        config.SetResolutionScale(0.5);
         config.GUI = renderGUI;
 
         AppWindow = new(config.WindowData);
-        AppWindow.Show();
+        AppWindow.Show(Interoperation.ShowWindowCommand.Maximize);
 
         Kernel = new(config);
         Kernel.Initialize(AppWindow.Win32Window.Handle, AppWindow.Win32Window.Size, win32Window: true);
