@@ -47,7 +47,7 @@ public unsafe sealed partial class GUIRenderer
         FontTexture.Format = Format.R8G8B8A8_UNorm;
         GUIMesh = Context.GetMesh("ImGui Mesh");
 
-        GPUUpload gpuUpload = new GPUUpload();
+        GPUUpload gpuUpload = new();
         gpuUpload.Texture2D = FontTexture;
         gpuUpload.Format = Format.R8G8B8A8_UNorm;
         gpuUpload.TextureData = new byte[width * height * bytesPerPixel];
