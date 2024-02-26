@@ -34,6 +34,7 @@ dotnet new console -n Project
 cd Project
 dotnet add package 3DEngine
 dotnet add package Costura.Fody
+./Project.csproj
 ```
 
 Engine usage: 
