@@ -90,18 +90,16 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 
     public void UploadVertexBuffer(MeshInfo meshInfo, Span<byte> vertex)
     {
-        var resource = meshInfo.VertexBufferResource;
-
-        GraphicsContext.GraphicsDevice.DestroyResource(resource);
-        resource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
+        GraphicsContext.GraphicsDevice.DestroyResource(meshInfo.VertexBufferResource);
+        meshInfo.VertexBufferResource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
             HeapProperties.DefaultHeapProperties,
             HeapFlags.None,
             ResourceDescription.Buffer((ulong)vertex.Length),
             ResourceStates.CopyDest);
 
         int uploadOffset = Upload(vertex);
-        GraphicsContext.CommandList.CopyBufferRegion(resource, 0, Resource, (ulong)uploadOffset, (ulong)vertex.Length);
-        GraphicsContext.CommandList.ResourceBarrierTransition(resource, ResourceStates.CopyDest, ResourceStates.GenericRead);
+        GraphicsContext.CommandList.CopyBufferRegion(meshInfo.VertexBufferResource, 0, Resource, (ulong)uploadOffset, (ulong)vertex.Length);
+        GraphicsContext.CommandList.ResourceBarrierTransition(meshInfo.VertexBufferResource, ResourceStates.CopyDest, ResourceStates.GenericRead);
     }
 
     public void CreateVertexBuffer(Span<float> vertices)
