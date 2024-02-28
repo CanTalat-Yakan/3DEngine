@@ -10,6 +10,7 @@ public unsafe sealed partial class GUIRenderer
 {
     public CommonContext Context;
 
+    public RootSignature RootSignature;
     public InputLayoutDescription InputLayoutDescription;
 
     public Texture2D FontTexture;
@@ -56,6 +57,8 @@ public unsafe sealed partial class GUIRenderer
         data.CopyTo(upload.TextureData);
 
         Context.UploadQueue.Enqueue(upload);
+
+        RootSignature = Context.CreateRootSignatureFromString("Cs");
     }
 
     public void Update(IntPtr context)
@@ -86,6 +89,7 @@ public unsafe sealed partial class GUIRenderer
         {
             if (Time.OnFixedFrame)
                 _profiler = Profiler.GetAdditionalString();
+
             ImGui.Text(_profiler);
             ImGui.End();
         }
@@ -94,7 +98,8 @@ public unsafe sealed partial class GUIRenderer
         if (ImGui.Begin("Output", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize))
         {
             if (Output.GetLogs.Count > 0)
-                _output = Output.DequeueLog()?.GetString() + _output;
+                _output = Output.DequeueLogs() + _output;
+
             ImGui.Text(_output);
             ImGui.End();
         }
@@ -116,7 +121,7 @@ public unsafe sealed partial class GUIRenderer
     {
         var data = ImGui.GetDrawData();
 
-        Context.GraphicsContext.SetRootSignature(Context.CreateRootSignatureFromString("Cs"));
+        Context.GraphicsContext.SetRootSignature(RootSignature);
         Context.GraphicsContext.SetPipelineState(Context.PipelineStateObjects["ImGui"], PipelineStateObjectDescription);
 
         Context.GraphicsContext.CommandList.IASetPrimitiveTopology(Vortice.Direct3D.PrimitiveTopology.TriangleList);

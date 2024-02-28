@@ -64,12 +64,10 @@ public sealed partial class GraphicsContext : IDisposable
 {
     public ReadOnlyMemory<byte> LoadShader(DxcShaderStage shaderStage, string filePath, string entryPoint)
     {
-        string directoryPath = AppContext.BaseDirectory + @"Assets\Resources\Shaders\";
-
         string directory = Path.GetDirectoryName(filePath);
         string shaderSource = File.ReadAllText(filePath);
 
-        using (ShaderIncludeHandler includeHandler = new(directoryPath, directory))
+        using (ShaderIncludeHandler includeHandler = new(Paths.SHADERS, directory))
         {
             using IDxcResult results = DxcCompiler.Compile(shaderStage, shaderSource, entryPoint, includeHandler: includeHandler);
             if (results.GetStatus().Failure)
@@ -112,9 +110,9 @@ public sealed partial class GraphicsContext : IDisposable
         texture.ResourceStates = ResourceStates.GenericRead;
     }
 
-    public void SetMesh(MeshInfo mesh)
+    public void SetMesh(MeshInfo mesh, PrimitiveTopology topology = PrimitiveTopology.TriangleList)
     {
-        CommandList.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
+        CommandList.IASetPrimitiveTopology(topology);
 
         int previousInputSlot = -1;
         foreach (var inputElementDescription in mesh.InputLayoutDescription.Elements)
@@ -297,18 +295,15 @@ public sealed partial class GraphicsContext : IDisposable
         intermediate.Unmap(0, null);
 
         if (destinationDescription.Dimension.Equals(ResourceDimension.Buffer))
-        {
             commandList.CopyBufferRegion(destinationResource, 0, intermediate, layouts[0].Offset, (ulong)layouts[0].Footprint.Width);
-        }
         else
-        {
             for (int i = 0; i < numberOfSubresources; ++i)
             {
                 TextureCopyLocation destination = new(destinationResource, i + firstSubresource);
                 TextureCopyLocation source = new(intermediate, layouts[i]);
+
                 commandList.CopyTextureRegion(destination, 0, 0, 0, source, null);
             }
-        }
 
         return requiredSize;
     }

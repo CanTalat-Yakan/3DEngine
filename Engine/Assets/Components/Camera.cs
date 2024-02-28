@@ -25,10 +25,8 @@ public sealed class Camera : EditorComponent
     public override void OnRegister() =>
         CameraSystem.Register(this);
 
-    public override void OnAwake()
-    {
+    public override void OnAwake() =>
         CurrentRenderingCamera = this;
-    }
 
     public override void OnRender()
     {

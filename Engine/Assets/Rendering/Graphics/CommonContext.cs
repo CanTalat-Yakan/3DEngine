@@ -108,9 +108,7 @@ public sealed partial class CommonContext : IDisposable
         RootSignatureParameters[] description = new RootSignatureParameters[s.Length];
 
         for (int i = 0; i < s.Length; i++)
-        {
-            char c = s[i];
-            description[i] = c switch
+            description[i] = s[i] switch
             {
                 'C' => RootSignatureParameters.ConstantBufferView,
                 'c' => RootSignatureParameters.ConstantBufferViewTable,
@@ -120,7 +118,6 @@ public sealed partial class CommonContext : IDisposable
                 'u' => RootSignatureParameters.UnorderedAccessViewTable,
                 _ => throw new NotImplementedException("error root signature desc."),
             };
-        }
 
         GraphicsDevice.CreateRootSignature(rootSignature, description);
 

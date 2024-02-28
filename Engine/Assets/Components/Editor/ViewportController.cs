@@ -34,7 +34,7 @@ public sealed class ViewportController : EditorComponent, IHide
         MovementSpeedCalculation();
 
         if (Input.GetButton(MouseButton.Right, InputState.Down)
-            || Input.GetButton(MouseButton.Middle, InputState.Down))
+         || Input.GetButton(MouseButton.Middle, InputState.Down))
         {
             Interoperation.User32.GetCursorPos(out var point);
             _mousePosition.X = point.X;
@@ -120,8 +120,8 @@ public sealed class ViewportController : EditorComponent, IHide
         // Check if none of the right, middle, and left mouse buttons are pressed.
         // If so, update the direction based on the mouse wheel input and the forward vector of the entity's transform.
         if (!Input.GetButton(MouseButton.Right)
-            && !Input.GetButton(MouseButton.Middle)
-            && !Input.GetButton(MouseButton.Right))
+         && !Input.GetButton(MouseButton.Middle)
+         && !Input.GetButton(MouseButton.Right))
             _direction += 25 * Entity.Transform.Forward * Input.GetMouseWheel();
     }
 

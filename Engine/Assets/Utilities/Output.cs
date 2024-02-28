@@ -80,7 +80,7 @@ public class Output
 
         StringBuilder stringBuilder = new();
         while (_logs.Count > 0)
-            stringBuilder.Append(_logs.Dequeue());
+            stringBuilder.Append(_logs.Dequeue().GetString());
 
         return stringBuilder.ToString();
     }
