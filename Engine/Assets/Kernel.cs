@@ -57,9 +57,6 @@ public sealed class Kernel
         if (Config.GUI)
         {
             GUIRenderer = new();
-            GUIRenderer.Context = Context;
-
-            GUIRenderer.LoadDefaultResource();
             GUIRenderer.Initialize();
 
             GUIInputHandler = new(hwnd);

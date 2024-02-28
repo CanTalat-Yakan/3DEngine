@@ -54,9 +54,6 @@ public sealed partial class CommonContext : IDisposable
 
 public sealed partial class CommonContext : IDisposable
 {
-    public string GetStringFromID(nint pointer) =>
-        PointerToString[pointer];
-
     private int somePointerValue = 65536;
     public IntPtr GetIDFromString(string name)
     {
@@ -73,30 +70,50 @@ public sealed partial class CommonContext : IDisposable
         return pointer;
     }
 
-    public Texture2D GetTextureByStringID(nint pointer) =>
-        RenderTargets[PointerToString[pointer]];
+    public string GetStringFromID(nint pointer) =>
+        PointerToString[pointer];
 
-    public MeshInfo GetMesh(string name)
+    public Texture2D GetTextureByStringID(nint pointer) =>
+        RenderTargets[GetStringFromID(pointer)];
+}
+
+public sealed partial class CommonContext : IDisposable
+{
+    public MeshInfo CreateMesh(string name, InputLayoutDescription inputLayoutDescription)
     {
         if (Meshes.TryGetValue(name, out MeshInfo mesh))
             return mesh;
         else
         {
             mesh = new();
-            mesh.InputLayoutDescription = new(
-                new InputElementDescription("POSITION", 0, Format.R32G32_Float, 0),
-                new InputElementDescription("TEXCOORD", 0, Format.R32G32_Float, 1),
-                new InputElementDescription("COLOR", 0, Format.R8G8B8A8_UNorm, 2));
+            mesh.InputLayoutDescription = inputLayoutDescription;
 
             Meshes[name] = mesh;
 
             return mesh;
         }
     }
-}
 
-public sealed partial class CommonContext : IDisposable
-{
+    public InputLayoutDescription CreateInputLayoutDescription(string s)
+    {
+        var description = new InputElementDescription[s.Length];
+
+        for (int i = 0; i < s.Length; i++)
+            description[i] = s[i] switch
+            {
+                'P' => new InputElementDescription("POSITION", 0, Format.R8G8B8A8_UNorm, i),
+                'N' => new InputElementDescription("NORMAL", 0, Format.R8G8B8A8_UNorm, i),
+                'T' => new InputElementDescription("TANGENT", 0, Format.R8G8B8A8_UNorm, i),
+                'C' => new InputElementDescription("COLOR", 0, Format.R8G8B8A8_UNorm, i),
+
+                't' => new InputElementDescription("TEXCOORD", 0, Format.R32G32_Float, i),
+                'p' => new InputElementDescription("POSITION", 0, Format.R32G32_Float, i),
+                _ => throw new NotImplementedException("error input element"),
+            };
+
+        return new(description);
+    }
+
     public RootSignature CreateRootSignatureFromString(string s)
     {
         RootSignature rootSignature;
@@ -105,7 +122,7 @@ public sealed partial class CommonContext : IDisposable
 
         rootSignature = new RootSignature();
         RootSignatures[s] = rootSignature;
-        RootSignatureParameters[] description = new RootSignatureParameters[s.Length];
+        var description = new RootSignatureParameters[s.Length];
 
         for (int i = 0; i < s.Length; i++)
             description[i] = s[i] switch
@@ -116,7 +133,7 @@ public sealed partial class CommonContext : IDisposable
                 's' => RootSignatureParameters.ShaderResourceViewTable,
                 'U' => RootSignatureParameters.UnorderedAccessView,
                 'u' => RootSignatureParameters.UnorderedAccessViewTable,
-                _ => throw new NotImplementedException("error root signature desc."),
+                _ => throw new NotImplementedException("error root signature description"),
             };
 
         GraphicsDevice.CreateRootSignature(rootSignature, description);

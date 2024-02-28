@@ -27,16 +27,16 @@ cbuffer PerModelConstantBuffer : register(b1)
     float4x4 World;
 };
 
-struct PSInputUI
+struct VSInputUI
 {
-    float4 pos : SV_POSITION;
+    float2 pos : POSITION;
     float4 col : COLOR0;
     float2 uv : TEXCOORD0;
 };
 
-struct VSInputUI
+struct PSInputUI
 {
-    float2 pos : POSITION;
+    float4 pos : SV_POSITION;
     float4 col : COLOR0;
     float2 uv : TEXCOORD0;
 };

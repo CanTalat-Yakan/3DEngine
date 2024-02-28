@@ -8,13 +8,13 @@ namespace Engine.GUI;
 
 public unsafe sealed partial class GUIRenderer
 {
-    public CommonContext Context;
-
     public RootSignature RootSignature;
-    public InputLayoutDescription InputLayoutDescription;
 
     public Texture2D FontTexture;
     public MeshInfo GUIMesh;
+
+    public CommonContext Context => _context ??= Kernel.Instance.Context;
+    public CommonContext _context;
 
     public PipelineStateObjectDescription PipelineStateObjectDescription = new()
     {
@@ -34,7 +34,25 @@ public unsafe sealed partial class GUIRenderer
         var io = ImGui.GetIO();
         io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset; // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
 
-        GUIMesh = Context.GetMesh("ImGui Mesh");
+        LoadResource();
+        LoadTexture();
+    }
+
+    public void LoadResource()
+    {
+        Context.VertexShaders["ImGui"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + "ImGui.hlsl", "VS");
+        Context.PixelShaders["ImGui"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + "ImGui.hlsl", "PS");
+
+        Context.PipelineStateObjects["ImGui"] = new PipelineStateObject(Context.VertexShaders["ImGui"], Context.PixelShaders["ImGui"]);
+
+        GUIMesh = Context.CreateMesh("ImGui Mesh", Context.CreateInputLayoutDescription("ptC"));
+
+        RootSignature = Context.CreateRootSignatureFromString("Cs");
+    }
+
+    public void LoadTexture()
+    {
+        var io = ImGui.GetIO();
 
         //ImFontPtr font = io.Fonts.AddFontFromFileTTF("c:\\Windows\\Fonts\\SIMHEI.ttf", 14, null, io.Fonts.GetGlyphRangesChineseFull());
 
@@ -61,9 +79,8 @@ public unsafe sealed partial class GUIRenderer
         data.CopyTo(upload.TextureData);
 
         Context.UploadQueue.Enqueue(upload);
-
-        RootSignature = Context.CreateRootSignatureFromString("Cs");
     }
+
 
     public void Update(IntPtr context)
     {
@@ -112,14 +129,6 @@ public unsafe sealed partial class GUIRenderer
 
 public unsafe sealed partial class GUIRenderer
 {
-    public void LoadDefaultResource()
-    {
-        Context.VertexShaders["ImGui"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + "ImGui.hlsl", "VS");
-        Context.PixelShaders["ImGui"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + "ImGui.hlsl", "PS");
-
-        Context.PipelineStateObjects["ImGui"] = new PipelineStateObject(Context.VertexShaders["ImGui"], Context.PixelShaders["ImGui"]);
-    }
-
     private void RenderImDrawData()
     {
         var data = ImGui.GetDrawData();
