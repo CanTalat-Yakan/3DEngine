@@ -4,13 +4,13 @@ using Engine.Loader;
 
 namespace Engine.Editor;
 
-public class DefaultSky : EditorComponent, IHide
+public sealed partial class DefaultSky : EditorComponent, IHide
 {
     public RootSignature RootSignature;
 
-    public Texture2D SkyGradient;
-    public Texture2D SkyGradientLight;
-    public MeshInfo GUIMesh;
+    public MeshInfo SkyMesh;
+    public Texture2D SkyGradientTexture;
+    public Texture2D SkyGradientLightTexture;
 
     public CommonContext Context => _context ??= Kernel.Instance.Context;
     public CommonContext _context;
@@ -27,11 +27,7 @@ public class DefaultSky : EditorComponent, IHide
 
     public void Initialize()
     {
-        //// Create a new material with the unlit shader and sky image.
-        //_materialSky = new(SHADER_RESOURCES + SHADER_SIMPLE_LIT, IMAGE_SKY);
-        //// Create a new material with the unlit shader and a light version of the sky image.
-        //_materialSkyLight = new(SHADER_RESOURCES + SHADER_SIMPLE_LIT, IMAGE_SKY_LIGHT);
-        LoadResource();
+        LoadResources();
 
         Entity.Name = "Sky";
         Entity.Tag = "DefaultSky";
@@ -45,20 +41,23 @@ public class DefaultSky : EditorComponent, IHide
         // Set material of Sky's Mesh component.
         //skyMesh.SetMaterial(_materialSky);
     }
+}
 
-    public void LoadResource()
+public sealed partial class DefaultSky : EditorComponent, IHide
+{
+    public void LoadResources()
     {
         Context.VertexShaders["SimpleLit"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + "SimpleLit.hlsl", "VS");
         Context.PixelShaders["SimpleLit"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + "SimpleLit.hlsl", "PS");
 
-        Context.PipelineStateObjects["SimpleLit"] = new PipelineStateObject(Context.VertexShaders["SimpleLit"], Context.PixelShaders["SimpleLit"]); ;
+        Context.PipelineStateObjects["SimpleLit"] = new PipelineStateObject(Context.VertexShaders["SimpleLit"], Context.PixelShaders["SimpleLit"]);
 
         Context.CreateMesh("Skybox", Context.CreateInputLayoutDescription("PNTt"));
 
         RootSignature = Context.CreateRootSignatureFromString("Cs");
 
-        ImageLoader.LoadTexture(out SkyGradient, Context.GraphicsDevice.Device, "SkyGradient.png", fromResources: true);
-        ImageLoader.LoadTexture(out SkyGradientLight, Context.GraphicsDevice.Device, "SkyGradient_Light.png", fromResources: true);
+        ImageLoader.LoadTexture(out SkyGradientTexture, Context.GraphicsDevice.Device, "SkyGradient.png", fromResources: true);
+        ImageLoader.LoadTexture(out SkyGradientLightTexture, Context.GraphicsDevice.Device, "SkyGradient_Light.png", fromResources: true);
     }
 
     public void SetTheme(bool light)

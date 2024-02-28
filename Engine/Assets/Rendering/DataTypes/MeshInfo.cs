@@ -23,6 +23,8 @@ public sealed class VertexBuffer : IDisposable
 
 public sealed class MeshInfo : IDisposable
 {
+    public string Name;
+
     public ID3D12Resource VertexBufferResource;
     public ID3D12Resource IndexBufferResource;
 
@@ -33,7 +35,6 @@ public sealed class MeshInfo : IDisposable
     public int IndexCount;
     public int IndexSizeInByte;
 
-    public string Name;
     public Format IndexFormat;
 
     public BoundingBox BoundingBox;

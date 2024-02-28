@@ -10,8 +10,8 @@ public unsafe sealed partial class GUIRenderer
 {
     public RootSignature RootSignature;
 
-    public Texture2D FontTexture;
     public MeshInfo GUIMesh;
+    public Texture2D FontTexture;
 
     public CommonContext Context => _context ??= Kernel.Instance.Context;
     public CommonContext _context;
@@ -34,53 +34,9 @@ public unsafe sealed partial class GUIRenderer
         var io = ImGui.GetIO();
         io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset; // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
 
-        LoadResource();
+        LoadResources();
         LoadTexture();
     }
-
-    public void LoadResource()
-    {
-        Context.VertexShaders["ImGui"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + "ImGui.hlsl", "VS");
-        Context.PixelShaders["ImGui"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + "ImGui.hlsl", "PS");
-
-        Context.PipelineStateObjects["ImGui"] = new PipelineStateObject(Context.VertexShaders["ImGui"], Context.PixelShaders["ImGui"]);
-
-        GUIMesh = Context.CreateMesh("ImGui Mesh", Context.CreateInputLayoutDescription("ptC"));
-
-        RootSignature = Context.CreateRootSignatureFromString("Cs");
-    }
-
-    public void LoadTexture()
-    {
-        var io = ImGui.GetIO();
-
-        //ImFontPtr font = io.Fonts.AddFontFromFileTTF("c:\\Windows\\Fonts\\SIMHEI.ttf", 14, null, io.Fonts.GetGlyphRangesChineseFull());
-
-        io.Fonts.GetTexDataAsRGBA32(out byte* pixels, out int width, out int height, out int bytesPerPixel);
-        io.Fonts.TexID = Context.GetIDFromString("ImGui Font");
-
-        FontTexture = new()
-        {
-            Width = width,
-            Height = height,
-            MipLevels = 1,
-            Format = Format.R8G8B8A8_UNorm,
-        };
-        Context.RenderTargets["ImGui Font"] = FontTexture;
-
-        GPUUpload upload = new()
-        {
-            Texture2D = FontTexture,
-            Format = Format.R8G8B8A8_UNorm,
-            TextureData = new byte[width * height * bytesPerPixel],
-        };
-
-        Span<byte> data = new(pixels, upload.TextureData.Length);
-        data.CopyTo(upload.TextureData);
-
-        Context.UploadQueue.Enqueue(upload);
-    }
-
 
     public void Update(IntPtr context)
     {
@@ -129,6 +85,49 @@ public unsafe sealed partial class GUIRenderer
 
 public unsafe sealed partial class GUIRenderer
 {
+    public void LoadResources()
+    {
+        Context.VertexShaders["ImGui"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + "ImGui.hlsl", "VS");
+        Context.PixelShaders["ImGui"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + "ImGui.hlsl", "PS");
+
+        Context.PipelineStateObjects["ImGui"] = new PipelineStateObject(Context.VertexShaders["ImGui"], Context.PixelShaders["ImGui"]);
+
+        GUIMesh = Context.CreateMesh("ImGui Mesh", Context.CreateInputLayoutDescription("ptC"));
+
+        RootSignature = Context.CreateRootSignatureFromString("Cs");
+    }
+
+    public void LoadTexture()
+    {
+        var io = ImGui.GetIO();
+
+        //ImFontPtr font = io.Fonts.AddFontFromFileTTF("c:\\Windows\\Fonts\\SIMHEI.ttf", 14, null, io.Fonts.GetGlyphRangesChineseFull());
+
+        io.Fonts.GetTexDataAsRGBA32(out byte* pixels, out int width, out int height, out int bytesPerPixel);
+        io.Fonts.TexID = Context.GetIDFromString("ImGui Font");
+
+        FontTexture = new()
+        {
+            Width = width,
+            Height = height,
+            MipLevels = 1,
+            Format = Format.R8G8B8A8_UNorm,
+        };
+        Context.RenderTargets["ImGui Font"] = FontTexture;
+
+        GPUUpload upload = new()
+        {
+            Texture2D = FontTexture,
+            Format = Format.R8G8B8A8_UNorm,
+            TextureData = new byte[width * height * bytesPerPixel],
+        };
+
+        Span<byte> data = new(pixels, upload.TextureData.Length);
+        data.CopyTo(upload.TextureData);
+
+        Context.UploadQueue.Enqueue(upload);
+    }
+
     private void RenderImDrawData()
     {
         var data = ImGui.GetDrawData();
@@ -153,7 +152,7 @@ public unsafe sealed partial class GUIRenderer
             (R+L)/(L-R),  (T+B)/(B-T),    0.5f,       1.0f,
         };
         int index = Context.UploadBuffer.Upload<float>(mvp);
-        Context.UploadBuffer.SetConstantBufferView(Context.GraphicsContext, index, 0);
+        Context.UploadBuffer.SetConstantBufferView(index, 0);
 
         Vector2 clipOffset = data.DisplayPos;
         for (int i = 0; i < data.CmdListsCount; i++)
@@ -163,8 +162,8 @@ public unsafe sealed partial class GUIRenderer
             var vertexBytes = commandList.VtxBuffer.Size * sizeof(ImDrawVert);
             var indexBytes = commandList.IdxBuffer.Size * sizeof(ImDrawIdx);
 
-            Context.UploadBuffer.UploadMeshIndex(Context.GraphicsContext, GUIMesh, new Span<byte>(commandList.IdxBuffer.Data.ToPointer(), indexBytes), Format.R16_UInt);
-            Context.UploadBuffer.UploadVertexBuffer(Context.GraphicsContext, ref GUIMesh.VertexBufferResource, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), vertexBytes));
+            Context.UploadBuffer.UploadMeshIndex(GUIMesh, new Span<byte>(commandList.IdxBuffer.Data.ToPointer(), indexBytes), Format.R16_UInt);
+            Context.UploadBuffer.UploadVertexBuffer(GUIMesh, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), vertexBytes));
 
             GUIMesh.Vertices["POSITION"] = new VertexBuffer() { Offset = 0, Resource = GUIMesh.VertexBufferResource, SizeInByte = vertexBytes, Stride = sizeof(ImDrawVert) };
             GUIMesh.Vertices["TEXCOORD"] = new VertexBuffer() { Offset = 8, Resource = GUIMesh.VertexBufferResource, SizeInByte = vertexBytes, Stride = sizeof(ImDrawVert) };

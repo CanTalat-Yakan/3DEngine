@@ -21,11 +21,11 @@ public sealed partial class Mesh : EditorComponent
     public Material_OLD Material => _material;
     [Show] private Material_OLD _material;
 
-    internal GraphicsContext GraphicsContext => _graphicsContext ??= Kernel.Instance.Context.GraphicsContext;
-    private GraphicsContext _graphicsContext;
+    public CommonContext Context => _context ??= Kernel.Instance.Context;
+    public CommonContext _context;
 
-    public static CommonContext Context => _context ??= Kernel.Instance.Context;
-    public static CommonContext _context;
+    public GraphicsContext GraphicsContext => _graphicsContext ??= Kernel.Instance.Context.GraphicsContext;
+    public GraphicsContext _graphicsContext;
 
     public override void OnRegister() =>
         MeshSystem.Register(this);

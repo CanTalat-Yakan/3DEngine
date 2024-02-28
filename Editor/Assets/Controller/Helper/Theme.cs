@@ -99,13 +99,10 @@ internal sealed class Theme
                     : new SolidColorBrush(Windows.UI.Color.FromArgb(255, 40, 40, 40));
         }
 
-        // Check if the Engine.Core instance is not null.
-        if (Engine.Kernel.Instance is not null)
-            // If it's not null, set the theme for entity manager.
-            Engine.Kernel.Instance.SceneManager.MainScene.EntityManager?
-                .GetFromTag("DefaultSky")?
-                .GetComponent<Engine.Editor.DefaultSky>()?
-                .SetTheme(_page.RequestedTheme == ElementTheme.Light);
+        Engine.Kernel.Instance?.SceneManager.MainScene.EntityManager?
+            .GetFromTag("DefaultSky")?
+            .GetComponent<Engine.Editor.DefaultSky>()?
+            .SetTheme(_page.RequestedTheme == ElementTheme.Light);
     }
 
     private void Window_Activated(object sender, WindowActivatedEventArgs args) =>
