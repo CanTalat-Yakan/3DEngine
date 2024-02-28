@@ -49,7 +49,7 @@ public class DefaultSky : EditorComponent, IHide
 
         Context.PipelineStateObjects["SimpleLit"] = new PipelineStateObject(Context.VertexShaders["SimpleLit"], Context.PixelShaders["SimpleLit"]); ;
 
-        //ImageLoader.LoadTexture(out var texture2D, Context.GraphicsDevice.Device, Paths.TEXTURES + "SkyGradient.png");
+        ImageLoader.LoadTexture(out var texture2D, Context.GraphicsDevice.Device, "SkyGradient.png", fromResources: true);
     }
 
     public void SetTheme(bool light)

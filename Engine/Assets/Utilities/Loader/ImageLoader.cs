@@ -15,7 +15,7 @@ public sealed partial class ImageLoader
     public static CommonContext Context => _context ??= Kernel.Instance.Context;
     public static CommonContext _context;
 
-    public static void LoadTexture(out Texture2D texture2D, ID3D12Device device, string filePath, bool fromResources = true)
+    public static void LoadTexture(out Texture2D texture2D, ID3D12Device device, string filePath, bool fromResources = false)
     {
         var textureName = new FileInfo(filePath).Name;
         if (Context.RenderTargets.ContainsKey(textureName))
@@ -26,21 +26,21 @@ public sealed partial class ImageLoader
 
         var pixels = ProcessWIC(device, filePath, fromResources, out var format, out var size);
 
-        texture2D = new();
+        texture2D = new()
+        {
+            Width = size.Width,
+            Height = size.Height,
+            MipLevels = 1,
+            Format = format,
+        };
         Context.RenderTargets[textureName] = texture2D;
 
-        texture2D.Width = size.Width;
-        texture2D.Height = size.Height;
-        texture2D.MipLevels = 1;
-        texture2D.Format = format;
-
-        GPUUpload upload = new();
-        upload.Texture2D = texture2D;
-        upload.Format = format;
-        upload.TextureData = new byte[size.Width * size.Height * GraphicsDevice.GetBitsPerPixel(format)];
-
-        Span<byte> data = new(pixels, 0, upload.TextureData.Length);
-        data.CopyTo(upload.TextureData);
+        GPUUpload upload = new()
+        {
+            Texture2D = texture2D,
+            Format = format,
+            TextureData = pixels,
+        };
 
         Context.UploadQueue.Enqueue(upload);
     }

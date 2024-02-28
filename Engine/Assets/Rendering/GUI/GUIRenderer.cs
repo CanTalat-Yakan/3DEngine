@@ -36,23 +36,26 @@ public unsafe sealed partial class GUIRenderer
 
         GUIMesh = Context.GetMesh("ImGui Mesh");
 
-        FontTexture = new Texture2D();
-        Context.RenderTargets["ImGui Font"] = FontTexture;
-
         //ImFontPtr font = io.Fonts.AddFontFromFileTTF("c:\\Windows\\Fonts\\SIMHEI.ttf", 14, null, io.Fonts.GetGlyphRangesChineseFull());
 
         io.Fonts.GetTexDataAsRGBA32(out byte* pixels, out int width, out int height, out int bytesPerPixel);
         io.Fonts.TexID = Context.GetIDFromString("ImGui Font");
 
-        FontTexture.Width = width;
-        FontTexture.Height = height;
-        FontTexture.MipLevels = 1;
-        FontTexture.Format = Format.R8G8B8A8_UNorm;
+        FontTexture = new()
+        {
+            Width = width,
+            Height = height,
+            MipLevels = 1,
+            Format = Format.R8G8B8A8_UNorm,
+        };
+        Context.RenderTargets["ImGui Font"] = FontTexture;
 
-        GPUUpload upload = new();
-        upload.Texture2D = FontTexture;
-        upload.Format = Format.R8G8B8A8_UNorm;
-        upload.TextureData = new byte[width * height * bytesPerPixel];
+        GPUUpload upload = new()
+        {
+            Texture2D = FontTexture,
+            Format = Format.R8G8B8A8_UNorm,
+            TextureData = new byte[width * height * bytesPerPixel],
+        };
 
         Span<byte> data = new(pixels, upload.TextureData.Length);
         data.CopyTo(upload.TextureData);
