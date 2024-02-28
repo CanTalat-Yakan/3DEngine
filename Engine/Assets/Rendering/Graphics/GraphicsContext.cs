@@ -62,6 +62,26 @@ public sealed partial class GraphicsContext : IDisposable
 
 public sealed partial class GraphicsContext : IDisposable
 {
+    public void SetMesh(MeshInfo mesh, PrimitiveTopology topology = PrimitiveTopology.TriangleList)
+    {
+        CommandList.IASetPrimitiveTopology(topology);
+
+        int previousInputSlot = -1;
+        foreach (var inputElementDescription in mesh.InputLayoutDescription.Elements)
+            if (inputElementDescription.Slot != previousInputSlot)
+            {
+                if (mesh.Vertices?.TryGetValue(inputElementDescription.SemanticName, out var vertex) ?? false)
+                    CommandList.IASetVertexBuffers(inputElementDescription.Slot, new VertexBufferView(vertex.Resource.GPUVirtualAddress + (ulong)vertex.Offset, vertex.SizeInByte - vertex.Offset, vertex.Stride));
+
+                previousInputSlot = inputElementDescription.Slot;
+            }
+
+        if (mesh.IndexBufferResource is not null)
+            CommandList.IASetIndexBuffer(new IndexBufferView(mesh.IndexBufferResource.GPUVirtualAddress, mesh.IndexSizeInByte, mesh.IndexFormat));
+
+        InputLayoutDescription = mesh.InputLayoutDescription;
+    }
+
     public ReadOnlyMemory<byte> LoadShader(DxcShaderStage shaderStage, string filePath, string entryPoint)
     {
         string directory = Path.GetDirectoryName(filePath);
@@ -108,26 +128,6 @@ public sealed partial class GraphicsContext : IDisposable
 
         CommandList.ResourceBarrierTransition(texture.Resource, ResourceStates.CopyDest, ResourceStates.GenericRead);
         texture.ResourceStates = ResourceStates.GenericRead;
-    }
-
-    public void SetMesh(MeshInfo mesh, PrimitiveTopology topology = PrimitiveTopology.TriangleList)
-    {
-        CommandList.IASetPrimitiveTopology(topology);
-
-        int previousInputSlot = -1;
-        foreach (var inputElementDescription in mesh.InputLayoutDescription.Elements)
-            if (inputElementDescription.Slot != previousInputSlot)
-            {
-                if (mesh.Vertices?.TryGetValue(inputElementDescription.SemanticName, out var vertex) ?? false)
-                    CommandList.IASetVertexBuffers(inputElementDescription.Slot, new VertexBufferView(vertex.Resource.GPUVirtualAddress + (ulong)vertex.Offset, vertex.SizeInByte - vertex.Offset, vertex.Stride));
-
-                previousInputSlot = inputElementDescription.Slot;
-            }
-
-        if (mesh.IndexBufferResource is not null)
-            CommandList.IASetIndexBuffer(new IndexBufferView(mesh.IndexBufferResource.GPUVirtualAddress, mesh.IndexSizeInByte, mesh.IndexFormat));
-
-        InputLayoutDescription = mesh.InputLayoutDescription;
     }
 }
 

@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 
-using SharpGen.Runtime;
 using Vortice.Direct3D12;
 using Vortice.DXGI;
 using Vortice.WIC;
@@ -15,34 +14,33 @@ public sealed partial class ImageLoader
     public static CommonContext Context => _context ??= Kernel.Instance.Context;
     public static CommonContext _context;
 
-    public static void LoadTexture(out Texture2D texture2D, ID3D12Device device, string filePath, bool fromResources = false)
+    public static Texture2D LoadTexture(string filePath, bool fromResources = false)
     {
         var textureName = new FileInfo(filePath).Name;
         if (Context.RenderTargets.ContainsKey(textureName))
-        {
-            texture2D = Context.RenderTargets[textureName];
-            return;
-        }
+            return Context.RenderTargets[textureName];
 
-        var pixels = ProcessWIC(device, filePath, fromResources, out var format, out var size);
+        var pixels = ProcessWIC(Context.GraphicsDevice.Device, filePath, fromResources, out var format, out var size);
 
-        texture2D = new()
+        Texture2D texture = new()
         {
             Width = size.Width,
             Height = size.Height,
             MipLevels = 1,
             Format = format,
         };
-        Context.RenderTargets[textureName] = texture2D;
+        Context.RenderTargets[textureName] = texture;
 
         GPUUpload upload = new()
         {
-            Texture2D = texture2D,
+            Texture2D = texture,
             Format = format,
             TextureData = pixels,
         };
 
         Context.UploadQueue.Enqueue(upload);
+
+        return texture;
     }
 
     private static byte[] ProcessWIC(ID3D12Device device, string filePath, bool fromResources, out Format format, out SizeI size)

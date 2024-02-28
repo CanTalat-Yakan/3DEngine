@@ -56,8 +56,8 @@ public sealed partial class DefaultSky : EditorComponent, IHide
 
         RootSignature = Context.CreateRootSignatureFromString("Cs");
 
-        ImageLoader.LoadTexture(out SkyGradientTexture, Context.GraphicsDevice.Device, "SkyGradient.png", fromResources: true);
-        ImageLoader.LoadTexture(out SkyGradientLightTexture, Context.GraphicsDevice.Device, "SkyGradient_Light.png", fromResources: true);
+        SkyGradientTexture = ImageLoader.LoadTexture("SkyGradient.png", fromResources: true);
+        SkyGradientLightTexture = ImageLoader.LoadTexture("SkyGradient_Light.png", fromResources: true);
     }
 
     public void SetTheme(bool light)
