@@ -17,24 +17,24 @@ cbuffer Properties : register(b10)
     bool Bool;
 };
 
-Texture2D texture0 : register(t0);
-sampler sampler0 : register(s0);
+Texture2D texture0;
+sampler sampler0;
 
-PSInput VSMain(VSInput input)
+PSInput VS(VSInput input)
 {
     PSInput output;
 
-    output.pos = mul(input.vertex, mul(World, ViewProjection));
+    output.pos = mul(input.pos, mul(World, ViewProjection));
     output.normal = mul(input.normal, World);
     output.tangent = mul(input.tangent, World);
-    output.worldpos = mul(input.vertex, World);
+    output.worldpos = mul(input.pos, World);
     output.camerapos = Camera;
-    output.uv = input.texcoord;
+    output.uv = input.uv;
 
     return output;
 }
 
-float4 PSMain(PSInput input) : SV_TARGET
+float4 PS(PSInput input) : SV_TARGET
 {
     //float4 col = texture0.Sample(sampler0, input.uv);
     float3 diffuse = dot(normalize(input.normal), -normalize(float3(0, -1, 0)));

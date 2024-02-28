@@ -12,43 +12,40 @@ namespace Engine.Loader;
 
 public sealed partial class ImageLoader
 {
-    private static Dictionary<string, ID3D12Resource> s_textureStore = new();
+    public static CommonContext Context => _context ??= Kernel.Instance.Context;
+    public static CommonContext _context;
 
-    public static void LoadTexture(out ID3D12Resource texture, ID3D12Device device, string filePath, bool fromResources = true)
+    public static void LoadTexture(out Texture2D texture2D, ID3D12Device device, string filePath, bool fromResources = true)
     {
-        if (s_textureStore.ContainsKey(filePath))
+        var textureName = new FileInfo(filePath).Name;
+        if (Context.RenderTargets.ContainsKey(textureName))
         {
-            texture = s_textureStore[filePath];
+            texture2D = Context.RenderTargets[textureName];
             return;
         }
 
-        ProcessWIC(device, filePath, fromResources, out var format, out var size);
+        var pixels = ProcessWIC(device, filePath, fromResources, out var format, out var size);
 
-        ResourceDescription textureDescription = ResourceDescription.Texture2D(
-            format,
-            (uint)size.Width,
-            (uint)size.Height,
-            arraySize: 1,
-            mipLevels: 1);
+        texture2D = new();
+        Context.RenderTargets[textureName] = texture2D;
 
-        Result result = device.CreateCommittedResource(
-            HeapProperties.DefaultHeapProperties,
-            HeapFlags.None,
-            textureDescription,
-            ResourceStates.CopyDest,
-            null,
-            out texture);
+        texture2D.Width = size.Width;
+        texture2D.Height = size.Height;
+        texture2D.MipLevels = 1;
+        texture2D.Format = format;
 
-        if (result.Failure)
-            throw new Exception(result.Description);
+        GPUUpload upload = new();
+        upload.Texture2D = texture2D;
+        upload.Format = format;
+        upload.TextureData = new byte[size.Width * size.Height * GraphicsDevice.GetBitsPerPixel(format)];
 
-        texture.Name = new FileInfo(filePath).Name;
+        Span<byte> data = new(pixels, 0, upload.TextureData.Length);
+        data.CopyTo(upload.TextureData);
 
-        // Add the Texture into the store with the filePath as key.
-        s_textureStore.Add(filePath, texture);
+        Context.UploadQueue.Enqueue(upload);
     }
 
-    private static void ProcessWIC(ID3D12Device device, string filePath, bool fromResources, out Format format, out SizeI size)
+    private static byte[] ProcessWIC(ID3D12Device device, string filePath, bool fromResources, out Format format, out SizeI size)
     {
         // Define the full path to the texture file.
         string textureFilePath = fromResources
@@ -172,7 +169,7 @@ public sealed partial class ImageLoader
 
                 bool canConvert = converter.CanConvert(pixelFormatScaler, convertGUID);
                 if (!canConvert)
-                    return;
+                    return pixels;
 
                 converter.Initialize(scaler, convertGUID, BitmapDitherType.ErrorDiffusion, null, 0, BitmapPaletteType.MedianCut);
                 converter.CopyPixels(rowPitch, pixels);
@@ -185,11 +182,13 @@ public sealed partial class ImageLoader
 
             bool canConvert = converter.CanConvert(pixelFormat, convertGUID);
             if (!canConvert)
-                return;
+                return pixels;
 
             converter.Initialize(frame, convertGUID, BitmapDitherType.ErrorDiffusion, null, 0, BitmapPaletteType.MedianCut);
             converter.CopyPixels(rowPitch, pixels);
         }
+
+        return pixels;
     }
 }
 

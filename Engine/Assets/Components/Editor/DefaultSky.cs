@@ -1,18 +1,13 @@
-﻿using System.IO;
+﻿using Engine.Loader;
+using System.IO;
+using Vortice.Dxc;
 
 namespace Engine.Editor;
 
 public class DefaultSky : EditorComponent, IHide
 {
-    private static readonly string SHADER_RESOURCES = Path.Combine(AppContext.BaseDirectory, Paths.SHADERS);
-
-    //private static readonly string SHADER_SKYBOX = "Skybox.hlsl";
-    private static readonly string SHADER_SIMPLE_LIT = "SimpleLit.hlsl";
-
-    private static readonly string IMAGE_SKY = "SkyGradient.png";
-    private static readonly string IMAGE_SKY_LIGHT = "SkyGradient_Light.png";
-
-    private static readonly string PRIMITIVES = "Primitives";
+    public CommonContext Context => _context ??= Kernel.Instance.Context;
+    public CommonContext _context;
 
     public override void OnUpdate()
     {
@@ -30,9 +25,10 @@ public class DefaultSky : EditorComponent, IHide
         //_materialSky = new(SHADER_RESOURCES + SHADER_SIMPLE_LIT, IMAGE_SKY);
         //// Create a new material with the unlit shader and a light version of the sky image.
         //_materialSkyLight = new(SHADER_RESOURCES + SHADER_SIMPLE_LIT, IMAGE_SKY_LIGHT);
+        LoadDefaultResource();
 
-        Entity.Name = "Sky"; // Set entity name to "Sky".
-        Entity.Tag = "DefaultSky"; // Set entity tag to SceneSky.
+        Entity.Name = "Sky";
+        Entity.Tag = "DefaultSky";
         Entity.IsHidden = true;
 
         // Set scale of the Sky's transform.
@@ -40,10 +36,20 @@ public class DefaultSky : EditorComponent, IHide
 
         // Add Mesh component to Sky entity.
         var skyMesh = Entity.AddComponent<Mesh>();
-        skyMesh.SetMeshInfo(Loader.ModelLoader.LoadFile(Path.Combine(PRIMITIVES, PrimitiveTypes.Sphere.ToString()) + ".obj"));
+        //skyMesh.SetMeshInfo(ModelLoader.LoadFile(Path.Combine("Primitives", PrimitiveTypes.Sphere.ToString()) + ".obj"));
 
         // Set material of Sky's Mesh component.
         //skyMesh.SetMaterial(_materialSky);
+    }
+
+    public void LoadDefaultResource()
+    {
+        Context.VertexShaders["SimpleLit"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + "SimpleLit.hlsl", "VS");
+        Context.PixelShaders["SimpleLit"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + "SimpleLit.hlsl", "PS");
+
+        Context.PipelineStateObjects["SimpleLit"] = new PipelineStateObject(Context.VertexShaders["SimpleLit"], Context.PixelShaders["SimpleLit"]); ;
+
+        //ImageLoader.LoadTexture(out var texture2D, Context.GraphicsDevice.Device, Paths.TEXTURES + "SkyGradient.png");
     }
 
     public void SetTheme(bool light)

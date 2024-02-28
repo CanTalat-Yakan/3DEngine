@@ -83,7 +83,7 @@ public sealed partial class EntityManager
 
         // Add a mesh component to the entity using the specified primitive type.
         var mesh = newEntity.AddComponent<Mesh>();
-        mesh.SetMeshInfo(Loader.ModelLoader.LoadFile(Path.Combine("Primitives", type.ToString()) + ".obj"));
+        //mesh.SetMeshInfo(Loader.ModelLoader.LoadFile(Path.Combine("Primitives", type.ToString()) + ".obj"));
 
         // Add the new entity to the entity list.
         EntityList.Add(newEntity);

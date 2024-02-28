@@ -104,7 +104,7 @@ public sealed partial class Material_OLD
     {
         #region // Create Texture
         // Load the texture and create a shader resource view for it.
-        Loader.ImageLoader.LoadTexture(out Texture, Renderer.Device, imageFileName);
+        //Loader.ImageLoader.LoadTexture(out Texture, Renderer.Device, imageFileName);
 
         ShaderResourceViewDescription shaderResourceViewDescription = new()
         {

@@ -34,6 +34,8 @@ public unsafe sealed partial class GUIRenderer
         var io = ImGui.GetIO();
         io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset; // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
 
+        GUIMesh = Context.GetMesh("ImGui Mesh");
+
         FontTexture = new Texture2D();
         Context.RenderTargets["ImGui Font"] = FontTexture;
 
@@ -46,7 +48,6 @@ public unsafe sealed partial class GUIRenderer
         FontTexture.Height = height;
         FontTexture.MipLevels = 1;
         FontTexture.Format = Format.R8G8B8A8_UNorm;
-        GUIMesh = Context.GetMesh("ImGui Mesh");
 
         GPUUpload upload = new();
         upload.Texture2D = FontTexture;
@@ -110,11 +111,10 @@ public unsafe sealed partial class GUIRenderer
 {
     public void LoadDefaultResource()
     {
-        string directoryPath = AppContext.BaseDirectory + @"Assets\Resources\Shaders\";
+        Context.VertexShaders["ImGui"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + "ImGui.hlsl", "VS");
+        Context.PixelShaders["ImGui"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + "ImGui.hlsl", "PS");
 
-        Context.VertexShaders["ImGui"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Vertex, directoryPath + "ImGui.hlsl", "VS");
-        Context.PixelShaders["ImGui"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Pixel, directoryPath + "ImGui.hlsl", "PS");
-        Context.PipelineStateObjects["ImGui"] = new PipelineStateObject(Context.VertexShaders["ImGui"], Context.PixelShaders["ImGui"]); ;
+        Context.PipelineStateObjects["ImGui"] = new PipelineStateObject(Context.VertexShaders["ImGui"], Context.PixelShaders["ImGui"]);
     }
 
     private void RenderImDrawData()

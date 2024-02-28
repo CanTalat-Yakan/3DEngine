@@ -1,9 +1,9 @@
 struct VSInput
 {
-    float4 vertex : POSITION;
+    float4 pos : POSITION;
     float4 normal : NORMAL;
     float4 tangent : TANGENT;
-    float2 texcoord : TEXCOORD0;
+    float2 uv : TEXCOORD0;
 };
 
 struct PSInput
@@ -27,14 +27,14 @@ cbuffer PerModelConstantBuffer : register(b1)
     float4x4 World;
 };
 
-struct PS_INPUT_UI
+struct PSInputUI
 {
     float4 pos : SV_POSITION;
     float4 col : COLOR0;
     float2 uv : TEXCOORD0;
 };
 
-struct VS_INPUT_UI
+struct VSInputUI
 {
     float2 pos : POSITION;
     float4 col : COLOR0;

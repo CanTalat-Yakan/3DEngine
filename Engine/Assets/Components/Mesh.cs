@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 
 using Vortice.Mathematics;
@@ -11,20 +10,22 @@ public sealed partial class Mesh : EditorComponent
     public string MeshPath;
     public string MaterialPath;
 
-    public static MeshInfo_OLD? OnGPU { get; set; }
-    public static List<MeshInfo_OLD> BatchLookup { get; private set; } = new();
+    public static MeshInfo? OnGPU { get; set; }
 
     public BoundingBox TransformedBoundingBox { get; private set; }
     public bool InBounds { get; set; }
 
-    public MeshInfo_OLD? MeshInfo => _meshInfo;
-    [Show] private MeshInfo_OLD _meshInfo;
+    public MeshInfo ? MeshInfo => _meshInfo;
+    [Show] private MeshInfo _meshInfo;
 
     public Material_OLD Material => _material;
     [Show] private Material_OLD _material;
 
     internal GraphicsContext GraphicsContext => _graphicsContext ??= Kernel.Instance.Context.GraphicsContext;
     private GraphicsContext _graphicsContext;
+
+    public static CommonContext Context => _context ??= Kernel.Instance.Context;
+    public static CommonContext _context;
 
     public override void OnRegister() =>
         MeshSystem.Register(this);
@@ -37,29 +38,29 @@ public sealed partial class Mesh : EditorComponent
 
     public override void OnUpdate()
     {
-        if (!string.IsNullOrEmpty(MeshPath))
-            if (File.Exists(MeshPath))
-                try { SetMeshInfo(Loader.ModelLoader.LoadFile(MeshPath, false)); }
-                finally { MeshPath = null; }
+        //if (!string.IsNullOrEmpty(MeshPath))
+        //    if (File.Exists(MeshPath))
+        //        try { SetMeshInfo(Loader.ModelLoader.LoadFile(MeshPath, false)); }
+        //        finally { MeshPath = null; }
 
-        if (!string.IsNullOrEmpty(MaterialPath))
-            if (File.Exists(MaterialPath))
-                try { Output.Log("Set the Material to " + SetMaterial(new FileInfo(MaterialPath).Name).FileInfo.Name); }
-                finally { MaterialPath = null; }
+        //if (!string.IsNullOrEmpty(MaterialPath))
+        //    if (File.Exists(MaterialPath))
+        //        try { Output.Log("Set the Material to " + SetMaterial(new FileInfo(MaterialPath).Name).FileInfo.Name); }
+        //        finally { MaterialPath = null; }
 
-        if (!EditorState.EditorBuild)
-            CheckBounds();
+        //if (!EditorState.EditorBuild)
+        //    CheckBounds();
     }
 
     public override void OnRender()
     {
-        // With Parallelism the App can't catch up and breaks.
-        // So check bounds in the same thread as the render call.
-        if (EditorState.EditorBuild)
-            CheckBounds();
+        //// With Parallelism the App can't catch up and breaks.
+        //// So check bounds in the same thread as the render call.
+        //if (EditorState.EditorBuild)
+        //    CheckBounds();
 
-        if (!InBounds)
-            return;
+        //if (!InBounds)
+        //    return;
 
         if (Equals(Material_OLD.OnGPU, Material)
          && Equals(Mesh.OnGPU, MeshInfo))
@@ -82,8 +83,8 @@ public sealed partial class Mesh : EditorComponent
         }
 
         // Increment the vertex, index and draw call count in the Profiler.
-        Profiler.Vertices += MeshInfo.Value.Vertices.Length;
-        Profiler.Indices += MeshInfo.Value.Indices.Length;
+        //Profiler.Vertices += MeshInfo.Vertices.Length;
+        //Profiler.Indices += MeshInfo.Value.Indices.Length;
         Profiler.DrawCalls++;
     }
 
@@ -95,26 +96,25 @@ public sealed partial class Mesh : EditorComponent
 
 public sealed partial class Mesh : EditorComponent
 {
-    public void SetMeshInfo(MeshInfo_OLD meshInfo)
+    public void SetMeshInfo(MeshInfo meshInfo)
     {
-        // Batch MeshInfo by sorting the List with the Order of the Component
-        if (BatchLookup.Contains(meshInfo))
+        if (Context.Meshes.ContainsKey(meshInfo.Name))
         {
-            Order = (byte)BatchLookup.IndexOf(meshInfo);
+            //Order = (byte)Context.Meshes.Keys.IndexOf(meshInfo.Name);
+            meshInfo = Context.Meshes[meshInfo.Name];
+            _meshInfo = meshInfo;
 
-            meshInfo.BoundingBox = BatchLookup[Order].BoundingBox;
+            return;
         }
         else
         {
-            Order = (byte)BatchLookup.Count;
-            BatchLookup.Add(meshInfo);
+            Order = (byte)Context.Meshes.Count();
+            Context.Meshes[meshInfo.Name] = meshInfo;
 
-            InstantiateBounds(BoundingBox.CreateFromPoints(
-                meshInfo.Vertices.Select(Vertex => Vertex.Position).ToArray()));
+            //InstantiateBounds(BoundingBox.CreateFromPoints(meshInfo.Ver))
+            //InstantiateBounds(BoundingBox.CreateFromPoints(
+            //    meshInfo.Vertices.Select(Vertex => Vertex.Position).ToArray()));
         }
-
-        // Assign to local variable.
-        _meshInfo = meshInfo;
 
         // Call the "CreateBuffer" method to initialize the vertex and index buffer.
         //MeshBuffers.CreateBuffer(MeshInfo.Value);
