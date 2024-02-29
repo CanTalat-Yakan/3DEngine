@@ -74,7 +74,6 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
             mesh.IndexSizeInByte = index.Length;
 
             GraphicsContext.GraphicsDevice.DestroyResource(mesh.IndexBufferResource);
-
             mesh.IndexBufferResource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
                 HeapProperties.DefaultHeapProperties,
                 HeapFlags.None,
