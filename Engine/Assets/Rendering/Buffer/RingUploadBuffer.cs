@@ -100,12 +100,4 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         GraphicsContext.CommandList.CopyBufferRegion(meshInfo.VertexBufferResource, 0, Resource, (ulong)uploadOffset, (ulong)vertex.Length);
         GraphicsContext.CommandList.ResourceBarrierTransition(meshInfo.VertexBufferResource, ResourceStates.CopyDest, ResourceStates.GenericRead);
     }
-
-    public void CreateVertexBuffer(Span<float> vertices)
-    {
-    }
-
-    public void CreateIndexBuffer(Span<int> indices)
-    {
-    }
 }
