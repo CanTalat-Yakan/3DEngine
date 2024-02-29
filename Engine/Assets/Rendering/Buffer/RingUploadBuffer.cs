@@ -95,6 +95,8 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         if (mesh.VertexBufferResource is null
          || mesh.VertexSizeInByte != vertexSizeInByte)
         {
+            mesh.VertexSizeInByte = vertexSizeInByte;
+
             GraphicsContext.GraphicsDevice.DestroyResource(mesh.VertexBufferResource);
 
             mesh.VertexBufferResource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
