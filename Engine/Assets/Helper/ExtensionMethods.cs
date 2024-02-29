@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -46,6 +47,14 @@ public static class ExtensionMethods
         vertexBuffer.SizeInByte = sizeInByte;
 
         return vertexBuffer;
+    }
+    
+    public static Dictionary<string,VertexBuffer> SetVertexBuffer(this Dictionary<string, VertexBuffer> vertices, ID3D12Resource resource, int sizeInByte)
+    {
+        foreach (var vertex in vertices.Values)
+            vertex.SetVertexBuffer(resource, sizeInByte);
+        
+        return vertices;
     }
 
     public static bool IsNaN(this float value) =>

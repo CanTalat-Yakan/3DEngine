@@ -1,4 +1,5 @@
-﻿using Engine.DataTypes;
+﻿using Assimp.Unmanaged;
+using Engine.DataTypes;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -38,7 +39,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         GPUResourcePointer = Resource.GPUVirtualAddress;
     }
 
-    public unsafe int Upload<T>(Span<T> data) where T : struct
+    public unsafe void Upload<T>(Span<T> data, out int offset) where T : struct
     {
         int size = data.Length * Marshal.SizeOf(typeof(T));
         int afterAllocateIndex = AllocateIndex + ((size + 255) & ~255);
@@ -50,10 +51,8 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 
         data.CopyTo(new Span<T>((CPUResourcePointer + AllocateIndex).ToPointer(), data.Length));
 
-        int offset = AllocateIndex;
+        offset = AllocateIndex;
         AllocateIndex = afterAllocateIndex % Size;
-
-        return offset;
     }
 }
 
@@ -64,7 +63,6 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 
     public void UploadIndexBuffer(MeshInfo mesh, Span<byte> index, Format indexFormat)
     {
-        int uploadOffset = Upload(index);
         if (mesh.IndexFormat != indexFormat
          || mesh.IndexCount != index.Length / (indexFormat == Format.R32_UInt ? 4 : 2)
          || mesh.IndexSizeInByte != index.Length)
@@ -83,11 +81,12 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         else
             GraphicsContext.CommandList.ResourceBarrierTransition(mesh.IndexBufferResource, ResourceStates.GenericRead, ResourceStates.CopyDest);
 
-        GraphicsContext.CommandList.CopyBufferRegion(mesh.IndexBufferResource, 0, Resource, (ulong)uploadOffset, (ulong)index.Length);
+        Upload(index, out var offset);
+        GraphicsContext.CommandList.CopyBufferRegion(mesh.IndexBufferResource, 0, Resource, (ulong)offset, (ulong)index.Length);
         GraphicsContext.CommandList.ResourceBarrierTransition(mesh.IndexBufferResource, ResourceStates.CopyDest, ResourceStates.GenericRead);
     }
 
-    public void UploadVertexBuffer(MeshInfo meshInfo, Span<byte> vertex)
+    public void UploadVertexBuffer(MeshInfo meshInfo, Span<byte> vertex, int vertexBytes)
     {
         GraphicsContext.GraphicsDevice.DestroyResource(meshInfo.VertexBufferResource);
         meshInfo.VertexBufferResource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
@@ -96,8 +95,10 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
             ResourceDescription.Buffer((ulong)vertex.Length),
             ResourceStates.CopyDest);
 
-        int uploadOffset = Upload(vertex);
-        GraphicsContext.CommandList.CopyBufferRegion(meshInfo.VertexBufferResource, 0, Resource, (ulong)uploadOffset, (ulong)vertex.Length);
+        Upload(vertex, out var offset);
+        GraphicsContext.CommandList.CopyBufferRegion(meshInfo.VertexBufferResource, 0, Resource, (ulong)offset, (ulong)vertex.Length);
         GraphicsContext.CommandList.ResourceBarrierTransition(meshInfo.VertexBufferResource, ResourceStates.CopyDest, ResourceStates.GenericRead);
+
+        meshInfo.Vertices.SetVertexBuffer(meshInfo.VertexBufferResource, vertexBytes);
     }
 }

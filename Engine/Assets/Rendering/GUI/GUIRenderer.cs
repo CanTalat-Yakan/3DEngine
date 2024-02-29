@@ -149,8 +149,8 @@ public unsafe sealed partial class GUIRenderer
             0.0f,         0.0f,           0.5f,       0.0f,
             (R+L)/(L-R),  (T+B)/(B-T),    0.5f,       1.0f,
         };
-        int index = Context.UploadBuffer.Upload<float>(mvp);
-        Context.UploadBuffer.SetConstantBufferView(index, 0);
+        Context.UploadBuffer.Upload<float>(mvp, out var offset);
+        Context.UploadBuffer.SetConstantBufferView(offset, 0);
 
         Vector2 clipOffset = data.DisplayPos;
         for (int i = 0; i < data.CmdListsCount; i++)
@@ -161,11 +161,7 @@ public unsafe sealed partial class GUIRenderer
             var indexBytes = commandList.IdxBuffer.Size * GUIMesh.VertexStride;
 
             Context.UploadBuffer.UploadIndexBuffer(GUIMesh, new Span<byte>(commandList.IdxBuffer.Data.ToPointer(), indexBytes), Format.R16_UInt);
-            Context.UploadBuffer.UploadVertexBuffer(GUIMesh, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), vertexBytes));
-
-            GUIMesh.Vertices["POSITION"].SetVertexBuffer(GUIMesh.VertexBufferResource, vertexBytes);
-            GUIMesh.Vertices["TEXCOORD"].SetVertexBuffer(GUIMesh.VertexBufferResource, vertexBytes);
-            GUIMesh.Vertices["COLOR"].SetVertexBuffer(GUIMesh.VertexBufferResource, vertexBytes);
+            Context.UploadBuffer.UploadVertexBuffer(GUIMesh, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), vertexBytes), vertexBytes);
 
             Context.GraphicsContext.SetMesh(GUIMesh);
 
