@@ -74,6 +74,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
             if (mesh.IndexBufferResource is null)
             {
                 GraphicsContext.GraphicsDevice.DestroyResource(mesh.IndexBufferResource);
+
                 mesh.IndexBufferResource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
                     HeapProperties.DefaultHeapProperties,
                     HeapFlags.None,
@@ -95,6 +96,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         if (mesh.VertexBufferResource is null)
         {
             GraphicsContext.GraphicsDevice.DestroyResource(mesh.VertexBufferResource);
+
             mesh.VertexBufferResource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
                 HeapProperties.DefaultHeapProperties,
                 HeapFlags.None,
