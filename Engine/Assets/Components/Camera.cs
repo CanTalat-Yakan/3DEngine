@@ -1,4 +1,5 @@
-﻿using Vortice.Mathematics;
+﻿using BenchmarkDotNet.Diagnosers;
+using Vortice.Mathematics;
 
 namespace Engine.Components;
 
@@ -6,6 +7,10 @@ public sealed class Camera : EditorComponent
 {
     public static Camera Main { get; private set; }
     public static Camera CurrentRenderingCamera { get; set; }
+
+    public RootSignature RootSignature;
+
+    public ViewConstantBuffer ViewBuffer;
 
     public BoundingFrustum? BoundingFrustum { get; private set; }
 
@@ -22,11 +27,18 @@ public sealed class Camera : EditorComponent
     internal GraphicsDevice GraphicsDevice => _graphicsDevice ??= Kernel.Instance.Context.GraphicsDevice;
     private GraphicsDevice _graphicsDevice;
 
+    public CommonContext Context => _context ??= Kernel.Instance.Context;
+    public CommonContext _context;
+
     public override void OnRegister() =>
         CameraSystem.Register(this);
 
-    public override void OnAwake() =>
+    public override void OnAwake()
+    {
+        RootSignature = Context.CreateRootSignatureFromString("C");
+
         CurrentRenderingCamera = this;
+    }
 
     public override void OnRender()
     {
@@ -84,9 +96,9 @@ public sealed class Camera : EditorComponent
         BoundingFrustum = new BoundingFrustum(viewProjection);
 
         // Store the transposed view-projection matrix and the position of the camera.
-        //CameraBuffer.ViewConstantBuffer = new(
-        //    Matrix4x4.Transpose(viewProjection), 
-        //    Entity.Transform.Position);
+        ViewBuffer = new(
+            Matrix4x4.Transpose(viewProjection),
+            Entity.Transform.Position);
 
         /* 
          The coordinate system used in System.Numerics is right-handed,
@@ -107,7 +119,10 @@ public sealed class Camera : EditorComponent
          and System.Numerics returns row - major.
          */
 
+        Context.GraphicsContext.SetRootSignature(RootSignature);
+
         //Update constant buffer data
-        //CameraBuffer.UpdateConstantBuffer();
+        Context.UploadBuffer.Upload(ViewBuffer, out var offset);
+        Context.UploadBuffer.SetConstantBufferView(offset, 0);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 using Vortice.Direct3D12;
 using Vortice.DXGI;
@@ -47,6 +48,22 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         }
 
         data.CopyTo(new Span<T>((CPUResourcePointer + AllocateIndex).ToPointer(), data.Length));
+
+        offset = AllocateIndex;
+        AllocateIndex = afterAllocateIndex % Size;
+    }
+
+    public void Upload<T>(T data, out int offset) where T : struct
+    {
+        int size = Marshal.SizeOf(typeof(T));
+        int afterAllocateIndex = AllocateIndex + ((size + 255) & ~255);
+        if (afterAllocateIndex > Size)
+        {
+            AllocateIndex = 0;
+            afterAllocateIndex = AllocateIndex + ((size + 255) & ~255);
+        }
+
+        Unsafe.Copy((void*)(CPUResourcePointer + AllocateIndex), ref data);
 
         offset = AllocateIndex;
         AllocateIndex = afterAllocateIndex % Size;
