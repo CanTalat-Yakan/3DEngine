@@ -31,9 +31,6 @@ public unsafe sealed partial class GUIRenderer
         Context.Kernel.GUIContext = ImGui.CreateContext();
         ImGui.SetCurrentContext(Context.Kernel.GUIContext);
 
-        var io = ImGui.GetIO();
-        io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset; // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
-
         LoadResources();
         LoadTexture();
     }
