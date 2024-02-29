@@ -159,15 +159,15 @@ public unsafe sealed partial class GUIRenderer
         {
             var commandList = data.CmdListsRange[i];
 
-            var indexBytes = commandList.IdxBuffer.Size * GUIMesh.IndexStride;
+            var indexBytes = commandList.IdxBuffer.Size * GraphicsDevice.GetSizeInByte(Format.R16_UInt);
             var vertexBytes = commandList.VtxBuffer.Size * GUIMesh.VertexStride;
 
             _indexBufferSize = _indexBufferSize < indexBytes
-                ? indexBytes + 10000
+                ? indexBytes
                 : _indexBufferSize;
 
             _vertexBufferSize = _vertexBufferSize < vertexBytes
-                ? vertexBytes + 5000
+                ? vertexBytes
                 : _vertexBufferSize;
 
             Context.UploadBuffer.UploadIndexBuffer(GUIMesh, new Span<byte>(commandList.IdxBuffer.Data.ToPointer(), indexBytes), Format.R16_UInt, overrideSizeInByte: _indexBufferSize);

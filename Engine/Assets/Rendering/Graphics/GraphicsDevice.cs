@@ -596,6 +596,9 @@ public sealed partial class GraphicsDevice : IDisposable
     public static int GetSizeInByte(Format format) =>
         format switch
         {
+            Format.R16_UInt => 2,
+
+            Format.R32_UInt or
             Format.R8G8B8A8_UNorm => 4,
 
             Format.R32G32_Float => 8,

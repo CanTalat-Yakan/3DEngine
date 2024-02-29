@@ -93,7 +93,6 @@ public sealed partial class CommonContext : IDisposable
             var offset = 0;
             foreach (var inputElement in mesh.InputLayoutDescription.Elements)
             {
-                mesh.IndexStride = sizeof(int);
                 mesh.VertexStride += GraphicsDevice.GetSizeInByte(inputElement.Format);
                 mesh.Vertices[inputElement.SemanticName] = new() { Offset = offset, };
                 offset += GraphicsDevice.GetSizeInByte(inputElement.Format);
