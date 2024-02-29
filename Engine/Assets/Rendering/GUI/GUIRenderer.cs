@@ -1,8 +1,5 @@
-﻿using Engine.Helper;
-using Vortice.Direct3D12;
+﻿using Vortice.Direct3D12;
 using Vortice.DXGI;
-
-using ImDrawIdx = System.UInt16;
 
 namespace Engine.GUI;
 
