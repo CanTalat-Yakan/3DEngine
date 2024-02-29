@@ -1,5 +1,4 @@
-﻿using BenchmarkDotNet.Diagnosers;
-using Vortice.Mathematics;
+﻿using Vortice.Mathematics;
 
 namespace Engine.Components;
 

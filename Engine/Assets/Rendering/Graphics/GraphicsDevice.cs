@@ -44,7 +44,7 @@ public sealed partial class GraphicsDevice : IDisposable
 
     public int BufferCount = 3;
 
-    public void Initialize(SizeI size, bool win32Window) 
+    public void Initialize(SizeI size, bool win32Window)
     {
         NativeSize = size;
 
@@ -118,7 +118,8 @@ public sealed partial class GraphicsDevice : IDisposable
 
     public void Present()
     {
-        SwapChain.Present((int)Kernel.Instance.Config.VSync, PresentFlags.AllowTearing);
+        int syncInterval = (int)Kernel.Instance.Config.VSync;
+        SwapChain.Present(syncInterval, syncInterval == 0 ? PresentFlags.AllowTearing : PresentFlags.None);
 
         CommandQueue.Signal(Fence, ExecuteCount);
 
