@@ -3,6 +3,8 @@ using System.IO;
 
 using Assimp;
 
+using Vortice.Mathematics;
+
 namespace Engine.Loader;
 
 public sealed class ModelLoader
@@ -30,33 +32,38 @@ public sealed class ModelLoader
 
         Assimp.Scene file = context.ImportFile(filePath, postProcessSteps);
 
+        List<Vector3> positions = new();
+
         List<float> vertices = new();
         List<int> indices = new();
 
         foreach (var mesh in file.Meshes)
         {
             for (int i = 0; i < mesh.VertexCount; i++)
+            {
+                if (mesh.HasVertices)
+                    positions.Add(new (mesh.Vertices[i].X, mesh.Vertices[i].Y, mesh.Vertices[i].Z));
+
                 for (int j = 0; j < inputLayoutElements.Length; j++)
                     vertices.AddRange(inputLayoutElements[j] switch
                     {
-                        'P' => [mesh.Vertices[j].X, mesh.Vertices[j].Y, mesh.Vertices[j].Z],
-                        'N' => [mesh.Normals[j].X, mesh.Normals[j].Y, mesh.Normals[j].Z],
-                        'T' => [mesh.Tangents[j].X, mesh.Tangents[j].Y, mesh.Tangents[j].Z],
+                        'P' => [mesh.Vertices[i].X, mesh.Vertices[i].Y, mesh.Vertices[i].Z],
+                        'N' => [mesh.Normals[i].X, mesh.Normals[i].Y, mesh.Normals[i].Z],
+                        'T' => [mesh.Tangents[i].X, mesh.Tangents[i].Y, mesh.Tangents[i].Z],
 
-                        'C' => [mesh.VertexColorChannels[0][j].R, mesh.VertexColorChannels[0][j].G, mesh.VertexColorChannels[0][j].B],
+                        'C' => [mesh.VertexColorChannels[0][i].R, mesh.VertexColorChannels[0][i].G, mesh.VertexColorChannels[0][i].B, mesh.VertexColorChannels[0][i].A],
 
-                        't' => [mesh.TextureCoordinateChannels[0][j].X, mesh.TextureCoordinateChannels[0][j].Y],
+                        't' => [mesh.TextureCoordinateChannels[0][i].X, mesh.TextureCoordinateChannels[0][i].Y],
                         _ => throw new NotImplementedException("error input element in model loader"),
                     });
+            }
 
             foreach (var face in mesh.Faces)
-                indices.AddRange(new[] {
-                        face.Indices[0],
-                        face.Indices[1],
-                        face.Indices[2]});
+                indices.AddRange([face.Indices[0], face.Indices[1], face.Indices[2]]);
         }
 
         var meshInfo = Context.CreateMesh(meshName, Context.CreateInputLayoutDescription(inputLayoutElements));
+        meshInfo.BoundingBox = BoundingBox.CreateFromPoints(positions.ToArray());
 
         GPUUpload upload = new()
         {

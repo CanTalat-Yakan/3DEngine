@@ -9,6 +9,7 @@ using System.IO;
 using Engine.DataTypes;
 using System.Runtime.CompilerServices;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Linq;
 
 namespace Engine.Graphics;
 
@@ -100,6 +101,23 @@ public sealed partial class GraphicsContext : IDisposable
         }
     }
 
+    public void UploadMesh(MeshInfo mesh, float[] vertexData, int[] indexData)
+    {
+        mesh.VertexBufferResource = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
+            new HeapProperties(HeapType.Upload),
+            HeapFlags.None,
+            ResourceDescription.Buffer((ulong)vertexData.Length * sizeof(float)),
+            ResourceStates.GenericRead);
+        mesh.VertexBufferResource.SetData(vertexData, 0);
+
+        mesh.IndexBufferResource = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
+            new HeapProperties(HeapType.Upload),
+            HeapFlags.None,
+            ResourceDescription.Buffer((ulong)indexData.Length * sizeof(int)),
+            ResourceStates.GenericRead);
+        mesh.IndexBufferResource.SetData(indexData, 0);
+    }
+
     public void UploadTexture(Texture2D texture, byte[] data)
     {
         ID3D12Resource resourceUpload = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
@@ -131,23 +149,6 @@ public sealed partial class GraphicsContext : IDisposable
 
         CommandList.ResourceBarrierTransition(texture.Resource, ResourceStates.CopyDest, ResourceStates.GenericRead);
         texture.ResourceStates = ResourceStates.GenericRead;
-    }
-
-    public void UploadMesh(MeshInfo mesh, float[] vertexData, int[] indexData)
-    {
-        mesh.VertexBufferResource = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
-            new HeapProperties(HeapType.Upload),
-            HeapFlags.None,
-            ResourceDescription.Buffer((ulong)vertexData.Length * sizeof(float)),
-            ResourceStates.GenericRead);
-        mesh.VertexBufferResource.SetData(vertexData, 0);
-
-        mesh.IndexBufferResource = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
-            new HeapProperties(HeapType.Upload),
-            HeapFlags.None,
-            ResourceDescription.Buffer((ulong)indexData.Length * sizeof(int)),
-            ResourceStates.GenericRead);
-        mesh.IndexBufferResource.SetData(indexData, 0);
     }
 }
 
