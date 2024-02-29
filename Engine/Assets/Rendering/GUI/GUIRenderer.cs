@@ -132,6 +132,10 @@ public unsafe sealed partial class GUIRenderer
     {
         var data = ImGui.GetDrawData();
 
+        if (data.DisplaySize.X < 1
+         || data.DisplaySize.Y < 1)
+            return;
+
         Context.GraphicsContext.SetRootSignature(RootSignature);
         Context.GraphicsContext.SetPipelineState(Context.PipelineStateObjects["ImGui"], PipelineStateObjectDescription);
 
