@@ -64,7 +64,8 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         int indexSizeInByte = overrideSizeInByte is not null ? overrideSizeInByte.Value : index.Length;
         int indexCount = indexSizeInByte / (indexFormat == Format.R32_UInt ? 4 : 2);
 
-        if (mesh.IndexFormat != indexFormat
+        if (mesh.IndexBufferResource is null
+         || mesh.IndexFormat != indexFormat
          || mesh.IndexCount != indexCount
          || mesh.IndexSizeInByte != indexSizeInByte)
         {
