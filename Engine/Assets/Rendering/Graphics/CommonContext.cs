@@ -94,10 +94,7 @@ public sealed partial class CommonContext : IDisposable
             foreach (var inputElement in mesh.InputLayoutDescription.Elements)
             {
                 mesh.VertexStride += GraphicsDevice.GetSizeInByte(inputElement.Format);
-                mesh.Vertices[inputElement.SemanticName] = new()
-                {
-                    Offset = offset,
-                };
+                mesh.Vertices[inputElement.SemanticName] = new() { Offset = offset, };
                 offset += GraphicsDevice.GetSizeInByte(inputElement.Format);
             }
             foreach (var inputElement in mesh.InputLayoutDescription.Elements)
@@ -122,8 +119,8 @@ public sealed partial class CommonContext : IDisposable
                 'C' => new InputElementDescription("COLOR", 0, Format.R32G32B32A32_Float, i),
 
                 'p' => new InputElementDescription("POSITION", 0, Format.R32G32_Float, i),
-                'c' => new InputElementDescription("COLOR", 0, Format.R8G8B8A8_UNorm, i),
                 't' => new InputElementDescription("TEXCOORD", 0, Format.R32G32_Float, i),
+                'c' => new InputElementDescription("COLOR", 0, Format.R8G8B8A8_UNorm, i),
                 _ => throw new NotImplementedException("error input element in common context"),
             };
 

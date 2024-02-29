@@ -53,8 +53,8 @@ public sealed class ModelLoader
                         'C' => [mesh.VertexColorChannels[0][i].R, mesh.VertexColorChannels[0][i].G, mesh.VertexColorChannels[0][i].B, mesh.VertexColorChannels[0][i].A],
 
                         'p' => [mesh.Vertices[i].X, mesh.Vertices[i].Y],
-                        'c' => [mesh.VertexColorChannels[0][i].R],
                         't' => [mesh.TextureCoordinateChannels[0][i].X, mesh.TextureCoordinateChannels[0][i].Y],
+                        'c' => [mesh.VertexColorChannels[0][i].R],
                         _ => throw new NotImplementedException("error input element in model loader"),
                     });
             }

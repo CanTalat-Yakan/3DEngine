@@ -25,19 +25,19 @@ public sealed class MeshInfo : IDisposable
 {
     public string Name;
 
-    public ID3D12Resource VertexBufferResource;
     public ID3D12Resource IndexBufferResource;
+    public ID3D12Resource VertexBufferResource;
 
     public InputLayoutDescription InputLayoutDescription;
 
     public Dictionary<string, VertexBuffer> Vertices = new();
 
-    public int VertexStride;
+    public Format IndexFormat;
 
     public int IndexCount;
     public int IndexSizeInByte;
 
-    public Format IndexFormat;
+    public int VertexStride;
 
     public BoundingBox BoundingBox;
 

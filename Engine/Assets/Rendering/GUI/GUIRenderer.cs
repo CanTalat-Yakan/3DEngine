@@ -10,6 +10,8 @@ public unsafe sealed partial class GUIRenderer
     public MeshInfo GUIMesh;
     public Texture2D FontTexture;
 
+    private int _indexBufferSize, _vertexBufferSize;
+
     public CommonContext Context => _context ??= Kernel.Instance.Context;
     public CommonContext _context;
 
@@ -86,9 +88,9 @@ public unsafe sealed partial class GUIRenderer
 
         Context.PipelineStateObjects["ImGui"] = new PipelineStateObject(Context.VertexShaders["ImGui"], Context.PixelShaders["ImGui"]);
 
-        GUIMesh = Context.CreateMesh("ImGui Mesh", Context.CreateInputLayoutDescription("ptc"));
-
         RootSignature = Context.CreateRootSignatureFromString("Cs");
+
+        GUIMesh = Context.CreateMesh("ImGui Mesh", Context.CreateInputLayoutDescription("ptc"));
     }
 
     public void LoadTexture()
@@ -160,8 +162,16 @@ public unsafe sealed partial class GUIRenderer
             var vertexBytes = commandList.VtxBuffer.Size * GUIMesh.VertexStride;
             var indexBytes = commandList.IdxBuffer.Size * GUIMesh.VertexStride;
 
-            Context.UploadBuffer.UploadIndexBuffer(GUIMesh, new Span<byte>(commandList.IdxBuffer.Data.ToPointer(), indexBytes), Format.R16_UInt);
-            Context.UploadBuffer.UploadVertexBuffer(GUIMesh, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), vertexBytes), vertexBytes);
+            _indexBufferSize = _indexBufferSize < data.TotalIdxCount
+                ? data.TotalIdxCount + 10000
+                : _indexBufferSize;
+
+            _vertexBufferSize = _vertexBufferSize < data.TotalVtxCount
+                ? data.TotalVtxCount + 5000
+                : _indexBufferSize;
+
+            Context.UploadBuffer.UploadIndexBuffer(GUIMesh, new Span<byte>(commandList.IdxBuffer.Data.ToPointer(), indexBytes), Format.R16_UInt, overrideSizeInByte: 10000);
+            Context.UploadBuffer.UploadVertexBuffer(GUIMesh, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), vertexBytes), vertexBytes, overrideSizeInByte: 5000);
 
             Context.GraphicsContext.SetMesh(GUIMesh);
 

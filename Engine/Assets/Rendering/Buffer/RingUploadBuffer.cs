@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 
 using Vortice.Direct3D12;
 using Vortice.DXGI;
@@ -36,7 +37,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         GPUResourcePointer = Resource.GPUVirtualAddress;
     }
 
-    public unsafe void Upload<T>(Span<T> data, out int offset) where T : struct
+    public void Upload<T>(Span<T> data, out int offset) where T : struct
     {
         int size = data.Length * Marshal.SizeOf(typeof(T));
         int afterAllocateIndex = AllocateIndex + ((size + 255) & ~255);
@@ -58,44 +59,54 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
     public void SetConstantBufferView(int offset, int slot) =>
         GraphicsContext.SetConstantBufferView(this, offset, slot);
 
-    public void UploadIndexBuffer(MeshInfo mesh, Span<byte> index, Format indexFormat)
+    public void UploadIndexBuffer(MeshInfo mesh, Span<byte> index, Format indexFormat, int? overrideSizeInByte = null)
     {
+        var indexSizeInByte = overrideSizeInByte is not null ? overrideSizeInByte.Value : index.Length;
+
         if (mesh.IndexFormat != indexFormat
-         || mesh.IndexCount != index.Length / (indexFormat == Format.R32_UInt ? 4 : 2)
-         || mesh.IndexSizeInByte != index.Length)
+         || mesh.IndexCount != indexSizeInByte / (indexFormat == Format.R32_UInt ? 4 : 2)
+         || mesh.IndexSizeInByte != indexSizeInByte)
         {
             mesh.IndexFormat = indexFormat;
-            mesh.IndexCount = index.Length / (indexFormat == Format.R32_UInt ? 4 : 2);
-            mesh.IndexSizeInByte = index.Length;
+            mesh.IndexCount = indexSizeInByte / (indexFormat == Format.R32_UInt ? 4 : 2);
+            mesh.IndexSizeInByte = indexSizeInByte;
 
-            GraphicsContext.GraphicsDevice.DestroyResource(mesh.IndexBufferResource);
-            mesh.IndexBufferResource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
-                HeapProperties.DefaultHeapProperties,
-                HeapFlags.None,
-                ResourceDescription.Buffer((ulong)index.Length),
-                ResourceStates.CopyDest);
+            if (mesh.IndexBufferResource is null)
+            {
+                GraphicsContext.GraphicsDevice.DestroyResource(mesh.IndexBufferResource);
+                mesh.IndexBufferResource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
+                    HeapProperties.DefaultHeapProperties,
+                    HeapFlags.None,
+                    ResourceDescription.Buffer((ulong)indexSizeInByte),
+                    ResourceStates.CopyDest);
+            }
         }
-        else
-            GraphicsContext.CommandList.ResourceBarrierTransition(mesh.IndexBufferResource, ResourceStates.GenericRead, ResourceStates.CopyDest);
 
         Upload(index, out var offset);
-        GraphicsContext.CommandList.CopyBufferRegion(mesh.IndexBufferResource, 0, Resource, (ulong)offset, (ulong)index.Length);
+
+        GraphicsContext.CommandList.CopyBufferRegion(mesh.IndexBufferResource, 0, Resource, (ulong)offset, (ulong)indexSizeInByte);
         GraphicsContext.CommandList.ResourceBarrierTransition(mesh.IndexBufferResource, ResourceStates.CopyDest, ResourceStates.GenericRead);
     }
 
-    public void UploadVertexBuffer(MeshInfo meshInfo, Span<byte> vertex, int vertexBytes)
+    public void UploadVertexBuffer(MeshInfo mesh, Span<byte> vertex, int vertexBytes, int? overrideSizeInByte = null)
     {
-        GraphicsContext.GraphicsDevice.DestroyResource(meshInfo.VertexBufferResource);
-        meshInfo.VertexBufferResource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
-            HeapProperties.DefaultHeapProperties,
-            HeapFlags.None,
-            ResourceDescription.Buffer((ulong)vertex.Length),
-            ResourceStates.CopyDest);
+        var vertexSizeInByte = overrideSizeInByte is not null ? overrideSizeInByte.Value : vertex.Length;
+
+        if (mesh.VertexBufferResource is null)
+        {
+            GraphicsContext.GraphicsDevice.DestroyResource(mesh.VertexBufferResource);
+            mesh.VertexBufferResource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
+                HeapProperties.DefaultHeapProperties,
+                HeapFlags.None,
+                ResourceDescription.Buffer((ulong)vertexSizeInByte),
+                ResourceStates.CopyDest);
+        }
 
         Upload(vertex, out var offset);
-        GraphicsContext.CommandList.CopyBufferRegion(meshInfo.VertexBufferResource, 0, Resource, (ulong)offset, (ulong)vertex.Length);
-        GraphicsContext.CommandList.ResourceBarrierTransition(meshInfo.VertexBufferResource, ResourceStates.CopyDest, ResourceStates.GenericRead);
 
-        meshInfo.Vertices.SetVertexBuffer(meshInfo.VertexBufferResource, vertexBytes);
+        GraphicsContext.CommandList.CopyBufferRegion(mesh.VertexBufferResource, 0, Resource, (ulong)offset, (ulong)vertexSizeInByte);
+        GraphicsContext.CommandList.ResourceBarrierTransition(mesh.VertexBufferResource, ResourceStates.CopyDest, ResourceStates.GenericRead);
+
+        mesh.Vertices.SetVertexBuffer(mesh.VertexBufferResource, vertexBytes);
     }
 }
