@@ -10,7 +10,7 @@ public sealed class ModelLoader
     public static CommonContext Context => _context ??= Kernel.Instance.Context;
     public static CommonContext _context;
 
-    public static MeshInfo LoadFile(string filePath, string inputLayoutElements = "PNTt")
+    public static MeshInfo LoadFile(string filePath, string inputLayoutElements)
     {
         var meshName = new FileInfo(filePath).Name;
         if (Context.Meshes.ContainsKey(meshName))
@@ -46,7 +46,7 @@ public sealed class ModelLoader
                         'C' => [mesh.VertexColorChannels[0][j].R, mesh.VertexColorChannels[0][j].G, mesh.VertexColorChannels[0][j].B],
 
                         't' => [mesh.TextureCoordinateChannels[0][j].X, mesh.TextureCoordinateChannels[0][j].Y],
-                        _ => throw new NotImplementedException("error input element"),
+                        _ => throw new NotImplementedException("error input element in model loader"),
                     });
 
             foreach (var face in mesh.Faces)

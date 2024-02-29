@@ -54,7 +54,7 @@ public sealed partial class DefaultSky : EditorComponent, IHide
 
         RootSignature = Context.CreateRootSignatureFromString("Cs");
 
-        SkyMesh = ModelLoader.LoadFile(Paths.PRIMITIVES + "Cube.obj");
+        SkyMesh = ModelLoader.LoadFile(Paths.PRIMITIVES + "Cube.obj", "PNTt");
         SkyGradientTexture = ImageLoader.LoadTexture(Paths.TEXTURES + "SkyGradient.png");
         SkyGradientLightTexture = ImageLoader.LoadTexture(Paths.TEXTURES + "SkyGradient_Light.png");
     }

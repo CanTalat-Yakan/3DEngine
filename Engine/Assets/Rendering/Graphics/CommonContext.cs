@@ -112,7 +112,7 @@ public sealed partial class CommonContext : IDisposable
 
                 't' => new InputElementDescription("TEXCOORD", 0, Format.R32G32_Float, i),
                 'p' => new InputElementDescription("POSITION", 0, Format.R32G32_Float, i),
-                _ => throw new NotImplementedException("error input element"),
+                _ => throw new NotImplementedException("error input element in common context"),
             };
 
         return new(description);
@@ -137,7 +137,7 @@ public sealed partial class CommonContext : IDisposable
                 's' => RootSignatureParameters.ShaderResourceViewTable,
                 'U' => RootSignatureParameters.UnorderedAccessView,
                 'u' => RootSignatureParameters.UnorderedAccessViewTable,
-                _ => throw new NotImplementedException("error root signature description"),
+                _ => throw new NotImplementedException("error root signature description in common context"),
             };
 
         GraphicsDevice.CreateRootSignature(rootSignature, description);
