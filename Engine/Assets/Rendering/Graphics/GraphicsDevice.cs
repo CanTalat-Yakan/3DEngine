@@ -461,6 +461,24 @@ public sealed partial class GraphicsDevice : IDisposable
 
 public sealed partial class GraphicsDevice : IDisposable
 {
+    public static int GetMegabytesInByte(int megabytes) =>
+        megabytes * 1024 * 1024;
+
+    public static int GetSizeInByte(Format format) =>
+        format switch
+        {
+            Format.R16_UInt => 2,
+
+            Format.R32_UInt or
+            Format.R8G8B8A8_UNorm => 4,
+
+            Format.R32G32_Float => 8,
+
+            Format.R32G32B32_Float => 12,
+
+            _ => 0,
+        };
+
     public static uint GetBitsPerPixel(Format format) =>
         format switch
         {
@@ -589,21 +607,6 @@ public sealed partial class GraphicsDevice : IDisposable
             Format.BC7_Typeless or
             Format.BC7_UNorm or
             Format.BC7_UNorm_SRgb => 8,
-
-            _ => 0,
-        };
-
-    public static int GetSizeInByte(Format format) =>
-        format switch
-        {
-            Format.R16_UInt => 2,
-
-            Format.R32_UInt or
-            Format.R8G8B8A8_UNorm => 4,
-
-            Format.R32G32_Float => 8,
-
-            Format.R32G32B32_Float => 12,
 
             _ => 0,
         };
