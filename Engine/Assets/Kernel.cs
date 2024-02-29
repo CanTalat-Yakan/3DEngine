@@ -2,6 +2,7 @@
 global using System.Numerics;
 
 global using ImGuiNET;
+global using Vortice.Dxc;
 
 global using Engine.Buffer;
 global using Engine.Data;

@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using Vortice.Direct3D12;
-using Vortice.Dxc;
+﻿using Vortice.Direct3D12;
 using Vortice.DXGI;
 
 using ImDrawIdx = System.UInt16;
