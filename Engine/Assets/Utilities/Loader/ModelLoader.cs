@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 
 using Assimp;
 
@@ -6,14 +7,15 @@ namespace Engine.Loader;
 
 public sealed class ModelLoader
 {
-    private static Dictionary<string, MeshInfo_OLD> s_meshInfoStore = new();
+    public static CommonContext Context => _context ??= Kernel.Instance.Context;
+    public static CommonContext _context;
 
-    public static MeshInfo_OLD LoadFile(string filePath, bool fromResources = true)
+    public static MeshInfo LoadFile(string filePath, string inputLayoutElements = "PNTt")
     {
-        if (s_meshInfoStore.ContainsKey(filePath))
-            return s_meshInfoStore[filePath];
+        var meshName = new FileInfo(filePath).Name;
+        if (Context.Meshes.ContainsKey(meshName))
+            return Context.Meshes[filePath];
 
-        // Create an AssimpContext instance.
         AssimpContext context = new();
         //context.SetConfig(new NormalSmoothingAngleConfig(66.0f));
 
@@ -26,59 +28,44 @@ public sealed class ModelLoader
             PostProcessSteps.CalculateTangentSpace |
             PostProcessPreset.TargetRealTimeQuality;
 
-        // Define the full path to the model file.
-        string modelFilePath = fromResources
-            ? Paths.MODELS + filePath
-            : filePath;
+        Assimp.Scene file = context.ImportFile(filePath, postProcessSteps);
 
-        // Load the model file using Assimp.
-        Assimp.Scene file = context.ImportFile(modelFilePath, postProcessSteps);
+        List<float> vertices = new();
+        List<int> indices = new();
 
-        // Create new lists for the "MeshInfo" object.
-        var vertices = new List<Vertex>();
-        var indices = new List<int>();
-
-        // Iterate over all the meshes in the file.
         foreach (var mesh in file.Meshes)
         {
-            // Add each vertex to the list.
             for (int i = 0; i < mesh.VertexCount; i++)
-                vertices.Add(new()
-                {
-                    Position = mesh.HasVertices ? new Vector3(mesh.Vertices[i].X, mesh.Vertices[i].Y, mesh.Vertices[i].Z) : Vector3.Zero,
-                    Normal = mesh.HasNormals ? new Vector3(mesh.Normals[i].X, mesh.Normals[i].Y, mesh.Normals[i].Z) : Vector3.Zero,
-                    Tangent = mesh.HasTangentBasis ? new Vector3(mesh.Tangents[i].X, mesh.Tangents[i].Y, mesh.Tangents[i].Z) : Vector3.Zero,
-                    TextureCoordinate = mesh.HasTextureCoords(0) ? new Vector2(mesh.TextureCoordinateChannels[0][i].X, mesh.TextureCoordinateChannels[0][i].Y) : Vector2.Zero,
-                });
+                for (int j = 0; j < inputLayoutElements.Length; j++)
+                    vertices.AddRange(inputLayoutElements[j] switch
+                    {
+                        'P' => [mesh.Vertices[j].X, mesh.Vertices[j].Y, mesh.Vertices[j].Z],
+                        'N' => [mesh.Normals[j].X, mesh.Normals[j].Y, mesh.Normals[j].Z],
+                        'T' => [mesh.Tangents[j].X, mesh.Tangents[j].Y, mesh.Tangents[j].Z],
 
-            // Add each face to the list.
+                        'C' => [mesh.VertexColorChannels[0][j].R, mesh.VertexColorChannels[0][j].G, mesh.VertexColorChannels[0][j].B],
+
+                        't' => [mesh.TextureCoordinateChannels[0][j].X, mesh.TextureCoordinateChannels[0][j].Y],
+                        _ => throw new NotImplementedException("error input element"),
+                    });
+
             foreach (var face in mesh.Faces)
-            {
                 indices.AddRange(new[] {
                         face.Indices[0],
                         face.Indices[1],
                         face.Indices[2]});
-
-                // Split the face into two triangles,
-                // when the face has four indices. 
-                if (face.IndexCount == 4)
-                    indices.AddRange(new[] {
-                        face.Indices[0],
-                        face.Indices[2],
-                        face.Indices[3]});
-            }
         }
 
-        MeshInfo_OLD meshInfo = new()
+        var meshInfo = Context.CreateMesh(meshName, Context.CreateInputLayoutDescription(inputLayoutElements));
+
+        GPUUpload upload = new()
         {
-            Vertices = vertices.ToArray(),
-            Indices = indices.ToArray()
+            MeshInfo = meshInfo,
+            VertexData = vertices.ToArray(),
+            IndexData = indices.ToArray(),
         };
+        Context.UploadQueue.Enqueue(upload);
 
-        // Add the MeshInfo into the store with the filePath as key.
-        s_meshInfoStore.Add(filePath, meshInfo);
-
-        // Return the completed MeshInfo object.
         return meshInfo;
     }
 }

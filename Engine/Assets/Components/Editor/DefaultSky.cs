@@ -52,12 +52,11 @@ public sealed partial class DefaultSky : EditorComponent, IHide
 
         Context.PipelineStateObjects["SimpleLit"] = new PipelineStateObject(Context.VertexShaders["SimpleLit"], Context.PixelShaders["SimpleLit"]);
 
-        Context.CreateMesh("Skybox", Context.CreateInputLayoutDescription("PNTt"));
-
         RootSignature = Context.CreateRootSignatureFromString("Cs");
 
-        SkyGradientTexture = ImageLoader.LoadTexture("SkyGradient.png", fromResources: true);
-        SkyGradientLightTexture = ImageLoader.LoadTexture("SkyGradient_Light.png", fromResources: true);
+        SkyMesh = ModelLoader.LoadFile(Paths.PRIMITIVES + "Cube.obj");
+        SkyGradientTexture = ImageLoader.LoadTexture(Paths.TEXTURES + "SkyGradient.png");
+        SkyGradientLightTexture = ImageLoader.LoadTexture(Paths.TEXTURES + "SkyGradient_Light.png");
     }
 
     public void SetTheme(bool light)

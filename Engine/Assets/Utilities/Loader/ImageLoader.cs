@@ -14,13 +14,13 @@ public sealed partial class ImageLoader
     public static CommonContext Context => _context ??= Kernel.Instance.Context;
     public static CommonContext _context;
 
-    public static Texture2D LoadTexture(string filePath, bool fromResources = false)
+    public static Texture2D LoadTexture(string filePath)
     {
         var textureName = new FileInfo(filePath).Name;
         if (Context.RenderTargets.ContainsKey(textureName))
             return Context.RenderTargets[textureName];
 
-        var pixels = ProcessWIC(Context.GraphicsDevice.Device, filePath, fromResources, out var format, out var size);
+        var pixels = ProcessWIC(Context.GraphicsDevice.Device, filePath, out var format, out var size);
 
         Texture2D texture = new()
         {
@@ -37,22 +37,16 @@ public sealed partial class ImageLoader
             Format = format,
             TextureData = pixels,
         };
-
         Context.UploadQueue.Enqueue(upload);
 
         return texture;
     }
 
-    private static byte[] ProcessWIC(ID3D12Device device, string filePath, bool fromResources, out Format format, out SizeI size)
+    private static byte[] ProcessWIC(ID3D12Device device, string filePath, out Format format, out SizeI size)
     {
-        // Define the full path to the texture file.
-        string textureFilePath = fromResources
-            ? Paths.TEXTURES + filePath
-            : filePath;
-
         // Loading images using Vortice.WIC
         using IWICImagingFactory wicFactory = new();
-        using IWICBitmapDecoder decoder = wicFactory.CreateDecoderFromFileName(textureFilePath);
+        using IWICBitmapDecoder decoder = wicFactory.CreateDecoderFromFileName(filePath);
         using IWICBitmapFrameDecode frame = decoder.GetFrame(0);
 
         size = frame.Size;

@@ -122,9 +122,12 @@ public sealed partial class EntityManager
         // Create a new material with the default shader and default image.
         _materialDefault ??= new(Paths.SHADERS + "SimpleLit.hlsl");
 
-    public static MeshInfo_OLD GetDefaultMeshInfo() =>
+    public static MeshInfo_OLD GetDefaultMeshInfo()
+    {
         // Set mesh info to a cube from the resources.
-        Loader.ModelLoader.LoadFile(Path.Combine("Primitives", "Cube.obj"));
+        //Loader.ModelLoader.LoadFile(Path.Combine("Primitives", "Cube.obj"));
+        return default;
+    }
 
     public Entity GetFromID(Guid guid)
     {

@@ -6,6 +6,9 @@ using Vortice.Mathematics;
 
 using Vortice.Dxc;
 using System.IO;
+using Engine.DataTypes;
+using System.Runtime.CompilerServices;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Engine.Graphics;
 
@@ -38,6 +41,26 @@ public sealed partial class GraphicsContext : IDisposable
 
 public sealed partial class GraphicsContext : IDisposable
 {
+    public void SetMesh(MeshInfo mesh, PrimitiveTopology topology = PrimitiveTopology.TriangleList)
+    {
+        CommandList.IASetPrimitiveTopology(topology);
+
+        int previousInputSlot = -1;
+        foreach (var inputElementDescription in mesh.InputLayoutDescription.Elements)
+            if (inputElementDescription.Slot != previousInputSlot)
+            {
+                if (mesh.Vertices?.TryGetValue(inputElementDescription.SemanticName, out var vertex) ?? false)
+                    CommandList.IASetVertexBuffers(inputElementDescription.Slot, new VertexBufferView(vertex.Resource.GPUVirtualAddress + (ulong)vertex.Offset, vertex.SizeInByte - vertex.Offset, vertex.Stride));
+
+                previousInputSlot = inputElementDescription.Slot;
+            }
+
+        if (mesh.IndexBufferResource is not null)
+            CommandList.IASetIndexBuffer(new IndexBufferView(mesh.IndexBufferResource.GPUVirtualAddress, mesh.IndexSizeInByte, mesh.IndexFormat));
+
+        InputLayoutDescription = mesh.InputLayoutDescription;
+    }
+
     public void DrawIndexedInstanced(int indexCountPerInstance, int instanceCount, int startIndexLocation, int baseVertexLocation, int startInstanceLocation)
     {
         CommandList.SetPipelineState(PipelineStateObject.GetState(GraphicsDevice, PipelineStateObjectDescription, CurrentRootSignature, InputLayoutDescription));
@@ -62,26 +85,6 @@ public sealed partial class GraphicsContext : IDisposable
 
 public sealed partial class GraphicsContext : IDisposable
 {
-    public void SetMesh(MeshInfo mesh, PrimitiveTopology topology = PrimitiveTopology.TriangleList)
-    {
-        CommandList.IASetPrimitiveTopology(topology);
-
-        int previousInputSlot = -1;
-        foreach (var inputElementDescription in mesh.InputLayoutDescription.Elements)
-            if (inputElementDescription.Slot != previousInputSlot)
-            {
-                if (mesh.Vertices?.TryGetValue(inputElementDescription.SemanticName, out var vertex) ?? false)
-                    CommandList.IASetVertexBuffers(inputElementDescription.Slot, new VertexBufferView(vertex.Resource.GPUVirtualAddress + (ulong)vertex.Offset, vertex.SizeInByte - vertex.Offset, vertex.Stride));
-
-                previousInputSlot = inputElementDescription.Slot;
-            }
-
-        if (mesh.IndexBufferResource is not null)
-            CommandList.IASetIndexBuffer(new IndexBufferView(mesh.IndexBufferResource.GPUVirtualAddress, mesh.IndexSizeInByte, mesh.IndexFormat));
-
-        InputLayoutDescription = mesh.InputLayoutDescription;
-    }
-
     public ReadOnlyMemory<byte> LoadShader(DxcShaderStage shaderStage, string filePath, string entryPoint)
     {
         string directory = Path.GetDirectoryName(filePath);
@@ -128,6 +131,23 @@ public sealed partial class GraphicsContext : IDisposable
 
         CommandList.ResourceBarrierTransition(texture.Resource, ResourceStates.CopyDest, ResourceStates.GenericRead);
         texture.ResourceStates = ResourceStates.GenericRead;
+    }
+
+    public void UploadMesh(MeshInfo mesh, float[] vertexData, int[] indexData)
+    {
+        mesh.VertexBufferResource = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
+            new HeapProperties(HeapType.Upload),
+            HeapFlags.None,
+            ResourceDescription.Buffer((ulong)vertexData.Length * sizeof(float)),
+            ResourceStates.GenericRead);
+        mesh.VertexBufferResource.SetData(vertexData, 0);
+
+        mesh.IndexBufferResource = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
+            new HeapProperties(HeapType.Upload),
+            HeapFlags.None,
+            ResourceDescription.Buffer((ulong)indexData.Length * sizeof(int)),
+            ResourceStates.GenericRead);
+        mesh.IndexBufferResource.SetData(indexData, 0);
     }
 }
 

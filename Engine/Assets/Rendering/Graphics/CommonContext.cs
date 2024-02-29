@@ -97,16 +97,17 @@ public sealed partial class CommonContext : IDisposable
         }
     }
 
-    public InputLayoutDescription CreateInputLayoutDescription(string s)
+    public InputLayoutDescription CreateInputLayoutDescription(string inputLayoutElements)
     {
-        var description = new InputElementDescription[s.Length];
+        var description = new InputElementDescription[inputLayoutElements.Length];
 
-        for (int i = 0; i < s.Length; i++)
-            description[i] = s[i] switch
+        for (int i = 0; i < inputLayoutElements.Length; i++)
+            description[i] = inputLayoutElements[i] switch
             {
-                'P' => new InputElementDescription("POSITION", 0, Format.R8G8B8A8_UNorm, i),
-                'N' => new InputElementDescription("NORMAL", 0, Format.R8G8B8A8_UNorm, i),
-                'T' => new InputElementDescription("TANGENT", 0, Format.R8G8B8A8_UNorm, i),
+                'P' => new InputElementDescription("POSITION", 0, Format.R32G32B32_Float, i),
+                'N' => new InputElementDescription("NORMAL", 0, Format.R32G32B32_Float, i),
+                'T' => new InputElementDescription("TANGENT", 0, Format.R32G32B32_Float, i),
+
                 'C' => new InputElementDescription("COLOR", 0, Format.R8G8B8A8_UNorm, i),
 
                 't' => new InputElementDescription("TEXCOORD", 0, Format.R32G32_Float, i),
@@ -117,18 +118,18 @@ public sealed partial class CommonContext : IDisposable
         return new(description);
     }
 
-    public RootSignature CreateRootSignatureFromString(string s)
+    public RootSignature CreateRootSignatureFromString(string rootSignatureParameters)
     {
         RootSignature rootSignature;
-        if (RootSignatures.TryGetValue(s, out rootSignature))
+        if (RootSignatures.TryGetValue(rootSignatureParameters, out rootSignature))
             return rootSignature;
 
         rootSignature = new RootSignature();
-        RootSignatures[s] = rootSignature;
-        var description = new RootSignatureParameters[s.Length];
+        RootSignatures[rootSignatureParameters] = rootSignature;
+        var description = new RootSignatureParameters[rootSignatureParameters.Length];
 
-        for (int i = 0; i < s.Length; i++)
-            description[i] = s[i] switch
+        for (int i = 0; i < rootSignatureParameters.Length; i++)
+            description[i] = rootSignatureParameters[i] switch
             {
                 'C' => RootSignatureParameters.ConstantBufferView,
                 'c' => RootSignatureParameters.ConstantBufferViewTable,
@@ -147,7 +148,9 @@ public sealed partial class CommonContext : IDisposable
     public void GPUUploadData(GraphicsContext graphicsContext)
     {
         while (UploadQueue.TryDequeue(out var upload))
-            if (upload.Texture2D is not null)
+            if (upload.MeshInfo is not null)
+                graphicsContext.UploadMesh(upload.MeshInfo, upload.VertexData, upload.IndexData);
+            else if (upload.Texture2D is not null)
                 graphicsContext.UploadTexture(upload.Texture2D, upload.TextureData);
     }
 }
