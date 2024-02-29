@@ -40,12 +40,10 @@ public static class ExtensionMethods
         return vector;
     }
 
-    public static VertexBuffer SetVertexBuffer(this VertexBuffer vertexBuffer, int offset, ID3D12Resource resource, int sizeInByte, int stride)
+    public static VertexBuffer SetVertexBuffer(this VertexBuffer vertexBuffer, ID3D12Resource resource, int sizeInByte)
     {
-        vertexBuffer.Offset = offset;
         vertexBuffer.Resource = resource;
         vertexBuffer.SizeInByte = sizeInByte;
-        vertexBuffer.Stride = stride;
 
         return vertexBuffer;
     }

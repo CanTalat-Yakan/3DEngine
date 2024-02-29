@@ -1,4 +1,5 @@
-﻿using Vortice.Direct3D12;
+﻿using Engine.Helper;
+using Vortice.Direct3D12;
 using Vortice.DXGI;
 
 using ImDrawIdx = System.UInt16;
@@ -91,7 +92,7 @@ public unsafe sealed partial class GUIRenderer
 
         Context.PipelineStateObjects["ImGui"] = new PipelineStateObject(Context.VertexShaders["ImGui"], Context.PixelShaders["ImGui"]);
 
-        GUIMesh = Context.CreateMesh("ImGui Mesh", Context.CreateInputLayoutDescription("ptC"));
+        GUIMesh = Context.CreateMesh("ImGui Mesh", Context.CreateInputLayoutDescription("ptc"));
 
         RootSignature = Context.CreateRootSignatureFromString("Cs");
     }
@@ -158,15 +159,15 @@ public unsafe sealed partial class GUIRenderer
         {
             var commandList = data.CmdListsRange[i];
 
-            var vertexBytes = commandList.VtxBuffer.Size * sizeof(ImDrawVert);
-            var indexBytes = commandList.IdxBuffer.Size * sizeof(ImDrawIdx);
+            var vertexBytes = commandList.VtxBuffer.Size * GUIMesh.VertexStride;
+            var indexBytes = commandList.IdxBuffer.Size * GUIMesh.VertexStride;
 
-            Context.UploadBuffer.UploadMeshIndex(GUIMesh, new Span<byte>(commandList.IdxBuffer.Data.ToPointer(), indexBytes), Format.R16_UInt);
+            Context.UploadBuffer.UploadIndexBuffer(GUIMesh, new Span<byte>(commandList.IdxBuffer.Data.ToPointer(), indexBytes), Format.R16_UInt);
             Context.UploadBuffer.UploadVertexBuffer(GUIMesh, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), vertexBytes));
 
-            GUIMesh.Vertices["POSITION"].SetVertexBuffer(0, GUIMesh.VertexBufferResource, vertexBytes, sizeof(ImDrawVert));
-            GUIMesh.Vertices["TEXCOORD"].SetVertexBuffer(8, GUIMesh.VertexBufferResource, vertexBytes, sizeof(ImDrawVert));
-            GUIMesh.Vertices["COLOR"].SetVertexBuffer(16, GUIMesh.VertexBufferResource, vertexBytes, sizeof(ImDrawVert));
+            GUIMesh.Vertices["POSITION"].SetVertexBuffer(GUIMesh.VertexBufferResource, vertexBytes);
+            GUIMesh.Vertices["TEXCOORD"].SetVertexBuffer(GUIMesh.VertexBufferResource, vertexBytes);
+            GUIMesh.Vertices["COLOR"].SetVertexBuffer(GUIMesh.VertexBufferResource, vertexBytes);
 
             Context.GraphicsContext.SetMesh(GUIMesh);
 

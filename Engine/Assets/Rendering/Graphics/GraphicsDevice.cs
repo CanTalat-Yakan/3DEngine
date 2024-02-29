@@ -593,6 +593,18 @@ public sealed partial class GraphicsDevice : IDisposable
             _ => 0,
         };
 
+    public static int GetSizeInByte(Format format) =>
+        format switch
+        {
+            Format.R8G8B8A8_UNorm => 4,
+
+            Format.R32G32_Float => 8,
+
+            Format.R32G32B32_Float => 12,
+
+            _ => 0,
+        };
+
     public ID3D12CommandAllocator GetCommandAllocator() =>
         CommandAllocators[ExecuteIndex];
 

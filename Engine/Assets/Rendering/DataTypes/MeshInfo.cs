@@ -32,6 +32,8 @@ public sealed class MeshInfo : IDisposable
 
     public Dictionary<string, VertexBuffer> Vertices = new();
 
+    public int VertexStride;
+
     public int IndexCount;
     public int IndexSizeInByte;
 

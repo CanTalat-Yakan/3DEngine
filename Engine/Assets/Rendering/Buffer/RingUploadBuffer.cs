@@ -62,7 +62,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
     public void SetConstantBufferView(int offset, int slot) =>
         GraphicsContext.SetConstantBufferView(this, offset, slot);
 
-    public void UploadMeshIndex(MeshInfo mesh, Span<byte> index, Format indexFormat)
+    public void UploadIndexBuffer(MeshInfo mesh, Span<byte> index, Format indexFormat)
     {
         int uploadOffset = Upload(index);
         if (mesh.IndexFormat != indexFormat
