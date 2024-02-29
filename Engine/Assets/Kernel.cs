@@ -52,7 +52,7 @@ public sealed class Kernel
         EditorState.AssetsPath = assetsPath;
 
         Context.GraphicsDevice.Initialize(size, win32Window);
-        Context.UploadBuffer.Initialize(Context.GraphicsDevice, GraphicsDevice.GetMegabytesInByte(1024));
+        Context.UploadBuffer.Initialize(Context.GraphicsDevice, GraphicsDevice.GetMegabytesInByte(64));
         Context.GraphicsContext.Initialize(Context.GraphicsDevice);
 
         if (Config.GUI)

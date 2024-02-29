@@ -159,21 +159,15 @@ public unsafe sealed partial class GUIRenderer
         {
             var commandList = data.CmdListsRange[i];
 
-            var indexBytes = commandList.IdxBuffer.Size * GraphicsDevice.GetSizeInByte(Format.R16_UInt);
-            var vertexBytes = commandList.VtxBuffer.Size * GUIMesh.VertexStride;
+            var mesh = Context.CreateMesh($"ImGui Mesh {i}", inputLayoutElements: "ptc", indices16Bit: true);
 
-            _indexBufferSize = _indexBufferSize < indexBytes
-                ? indexBytes
-                : _indexBufferSize;
+            var indexBytes = commandList.IdxBuffer.Size * mesh.IndexStride;
+            var vertexBytes = commandList.VtxBuffer.Size * mesh.VertexStride;
 
-            _vertexBufferSize = _vertexBufferSize < vertexBytes
-                ? vertexBytes
-                : _vertexBufferSize;
+            Context.UploadBuffer.UploadIndexBuffer(mesh, new Span<byte>(commandList.IdxBuffer.Data.ToPointer(), indexBytes), mesh.IndexFormat);
+            Context.UploadBuffer.UploadVertexBuffer(mesh, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), vertexBytes), vertexBytes);
 
-            Context.UploadBuffer.UploadIndexBuffer(GUIMesh, new Span<byte>(commandList.IdxBuffer.Data.ToPointer(), indexBytes), Format.R16_UInt, overrideSizeInByte: _indexBufferSize);
-            Context.UploadBuffer.UploadVertexBuffer(GUIMesh, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), vertexBytes), vertexBytes, overrideSizeInByte: _vertexBufferSize);
-
-            Context.GraphicsContext.SetMesh(GUIMesh);
+            Context.GraphicsContext.SetMesh(mesh);
 
             for (int j = 0; j < commandList.CmdBuffer.Size; j++)
             {

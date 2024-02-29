@@ -20,6 +20,7 @@ public sealed partial class CommonContext : IDisposable
     public Dictionary<string, ReadOnlyMemory<byte>> VertexShaders = new();
     public Dictionary<string, ReadOnlyMemory<byte>> PixelShaders = new();
     public Dictionary<string, RootSignature> RootSignatures = new();
+    public Dictionary<string, InputLayoutDescription> InputLayoutDescriptions = new();
     public Dictionary<string, MeshInfo> Meshes = new();
     public Dictionary<string, Texture2D> RenderTargets = new();
     public Dictionary<string, PipelineStateObject> PipelineStateObjects = new();
@@ -81,18 +82,19 @@ public sealed partial class CommonContext : IDisposable
 
 public sealed partial class CommonContext : IDisposable
 {
-    public MeshInfo CreateMesh(string name, InputLayoutDescription inputLayoutDescription)
+    public MeshInfo CreateMesh(string name, string inputLayoutElements = "PNTt", bool indices16Bit = true)
     {
         if (Meshes.TryGetValue(name, out MeshInfo mesh))
             return mesh;
         else
         {
             mesh = new();
-            mesh.InputLayoutDescription = inputLayoutDescription;
+            mesh.InputLayoutDescription = CreateInputLayoutDescription(inputLayoutElements);
 
             var offset = 0;
             foreach (var inputElement in mesh.InputLayoutDescription.Elements)
             {
+                mesh.IndexStride = GraphicsDevice.GetSizeInByte(indices16Bit ? Format.R16_UInt : Format.R32_UInt);
                 mesh.VertexStride += GraphicsDevice.GetSizeInByte(inputElement.Format);
                 mesh.Vertices[inputElement.SemanticName] = new() { Offset = offset, };
                 offset += GraphicsDevice.GetSizeInByte(inputElement.Format);
@@ -109,6 +111,12 @@ public sealed partial class CommonContext : IDisposable
 
     public InputLayoutDescription CreateInputLayoutDescription(string inputLayoutElements)
     {
+        InputLayoutDescription inputLayout;
+        if (InputLayoutDescriptions.TryGetValue(inputLayoutElements, out inputLayout))
+            return inputLayout;
+
+        inputLayout = new InputLayoutDescription();
+        InputLayoutDescriptions[inputLayoutElements] = inputLayout;
         var description = new InputElementDescription[inputLayoutElements.Length];
 
         for (int i = 0; i < inputLayoutElements.Length; i++)

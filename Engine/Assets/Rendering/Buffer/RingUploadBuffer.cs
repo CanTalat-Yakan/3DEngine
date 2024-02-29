@@ -49,6 +49,8 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 
         data.CopyTo(new Span<T>((CPUResourcePointer + AllocateIndex).ToPointer(), data.Length));
 
+        if (afterAllocateIndex > GraphicsDevice.GetMegabytesInByte(64) - 3000)
+            offset = AllocateIndex;
         offset = AllocateIndex;
         AllocateIndex = afterAllocateIndex % Size;
     }
