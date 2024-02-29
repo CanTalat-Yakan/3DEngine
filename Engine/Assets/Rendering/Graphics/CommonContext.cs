@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 using Vortice.Direct3D12;
 using Vortice.DXGI;
-using Vortice.Mathematics;
 
 namespace Engine.Graphics;
 
@@ -135,7 +134,7 @@ public sealed partial class CommonContext : IDisposable
                 _ => throw new NotImplementedException("error input element in common context"),
             };
 
-        return new(description);
+        return inputLayout.Elements = description;
     }
 
     public RootSignature CreateRootSignatureFromString(string rootSignatureParameters)
