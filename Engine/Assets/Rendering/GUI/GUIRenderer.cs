@@ -10,8 +10,6 @@ public unsafe sealed partial class GUIRenderer
     public MeshInfo GUIMesh;
     public Texture2D FontTexture;
 
-    private int _indexBufferSize, _vertexBufferSize;
-
     public CommonContext Context => _context ??= Kernel.Instance.Context;
     public CommonContext _context;
 
@@ -157,7 +155,7 @@ public unsafe sealed partial class GUIRenderer
         {
             var commandList = data.CmdListsRange[i];
 
-            var mesh = Context.CreateMesh($"ImGui Mesh {i}", inputLayoutElements: "ptc", indices16Bit: true);
+            var mesh = Context.CreateMesh($"ImGui Mesh {i}", inputLayoutElements: "ptc", indexFormat16Bit: true);
 
             var indexBytes = commandList.IdxBuffer.Size * mesh.IndexStride;
             var vertexBytes = commandList.VtxBuffer.Size * mesh.VertexStride;

@@ -1,5 +1,4 @@
-﻿using Engine.DataTypes;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 using Vortice.Direct3D12;
@@ -81,7 +80,7 @@ public sealed partial class CommonContext : IDisposable
 
 public sealed partial class CommonContext : IDisposable
 {
-    public MeshInfo CreateMesh(string name, string inputLayoutElements = "PNTt", bool indices16Bit = true)
+    public MeshInfo CreateMesh(string name, string inputLayoutElements = "PNTt", bool indexFormat16Bit = true)
     {
         if (Meshes.TryGetValue(name, out MeshInfo mesh))
             return mesh;
@@ -90,7 +89,7 @@ public sealed partial class CommonContext : IDisposable
             mesh = new();
             mesh.InputLayoutDescription = CreateInputLayoutDescription(inputLayoutElements);
 
-            mesh.IndexFormat = indices16Bit ? Format.R16_UInt : Format.R32_UInt;
+            mesh.IndexFormat = indexFormat16Bit ? Format.R16_UInt : Format.R32_UInt;
             mesh.IndexStride = GraphicsDevice.GetSizeInByte(mesh.IndexFormat);
 
             var offset = 0;
@@ -112,8 +111,7 @@ public sealed partial class CommonContext : IDisposable
 
     public InputLayoutDescription CreateInputLayoutDescription(string inputLayoutElements)
     {
-        InputLayoutDescription inputLayout;
-        if (InputLayoutDescriptions.TryGetValue(inputLayoutElements, out inputLayout))
+        if (InputLayoutDescriptions.TryGetValue(inputLayoutElements, out var inputLayout))
             return inputLayout;
 
         inputLayout = new InputLayoutDescription();
@@ -139,8 +137,7 @@ public sealed partial class CommonContext : IDisposable
 
     public RootSignature CreateRootSignatureFromString(string rootSignatureParameters)
     {
-        RootSignature rootSignature;
-        if (RootSignatures.TryGetValue(rootSignatureParameters, out rootSignature))
+        if (RootSignatures.TryGetValue(rootSignatureParameters, out var rootSignature))
             return rootSignature;
 
         rootSignature = new RootSignature();

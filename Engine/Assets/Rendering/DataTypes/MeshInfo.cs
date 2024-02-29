@@ -43,6 +43,8 @@ public sealed class MeshInfo : IDisposable
 
     public BoundingBox BoundingBox;
 
+    public DateTime LastTimeUsed;
+
     public void Dispose()
     {
         IndexBufferResource?.Dispose();

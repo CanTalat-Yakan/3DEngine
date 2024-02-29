@@ -118,7 +118,7 @@ public sealed partial class GraphicsDevice : IDisposable
 
     public void Present()
     {
-        SwapChain.Present((int)Kernel.Instance.Config.VSync, PresentFlags.AllowTearing);
+        SwapChain.Present((int)Kernel.Instance.Config.VSync, PresentFlags.DoNotWait);
 
         CommandQueue.Signal(Fence, ExecuteCount);
 

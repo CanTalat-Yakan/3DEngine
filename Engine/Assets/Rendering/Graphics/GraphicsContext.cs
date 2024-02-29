@@ -1,15 +1,9 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.IO;
+using System.Runtime.InteropServices;
 
 using Vortice.Direct3D;
 using Vortice.Direct3D12;
 using Vortice.Mathematics;
-
-using Vortice.Dxc;
-using System.IO;
-using Engine.DataTypes;
-using System.Runtime.CompilerServices;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Linq;
 
 namespace Engine.Graphics;
 
@@ -60,6 +54,8 @@ public sealed partial class GraphicsContext : IDisposable
             CommandList.IASetIndexBuffer(new IndexBufferView(mesh.IndexBufferResource.GPUVirtualAddress, mesh.IndexSizeInByte, mesh.IndexFormat));
 
         InputLayoutDescription = mesh.InputLayoutDescription;
+
+        mesh.LastTimeUsed = DateTime.Now;
     }
 
     public void DrawIndexedInstanced(int indexCountPerInstance, int instanceCount, int startIndexLocation, int baseVertexLocation, int startInstanceLocation)
