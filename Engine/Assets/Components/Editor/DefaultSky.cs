@@ -1,6 +1,4 @@
-﻿using ;
-
-using Engine.Loader;
+﻿using Engine.Loader;
 
 namespace Engine.Editor;
 
