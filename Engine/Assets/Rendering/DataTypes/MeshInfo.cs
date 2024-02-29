@@ -36,7 +36,9 @@ public sealed class MeshInfo : IDisposable
 
     public int IndexCount;
     public int IndexSizeInByte;
+    public int IndexStride;
 
+    public int VertexSizeInByte;
     public int VertexStride;
 
     public BoundingBox BoundingBox;

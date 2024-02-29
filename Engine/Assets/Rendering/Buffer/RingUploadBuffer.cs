@@ -72,16 +72,13 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
             mesh.IndexCount = indexCount;
             mesh.IndexSizeInByte = indexSizeInByte;
 
-            if (mesh.IndexBufferResource is null)
-            {
-                GraphicsContext.GraphicsDevice.DestroyResource(mesh.IndexBufferResource);
+            GraphicsContext.GraphicsDevice.DestroyResource(mesh.IndexBufferResource);
 
-                mesh.IndexBufferResource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
-                    HeapProperties.DefaultHeapProperties,
-                    HeapFlags.None,
-                    ResourceDescription.Buffer((ulong)indexSizeInByte),
-                    ResourceStates.CopyDest);
-            }
+            mesh.IndexBufferResource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
+                HeapProperties.DefaultHeapProperties,
+                HeapFlags.None,
+                ResourceDescription.Buffer((ulong)indexSizeInByte),
+                ResourceStates.CopyDest);
         }
 
         Upload(index, out var offset);
@@ -94,7 +91,8 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
     {
         var vertexSizeInByte = overrideSizeInByte is not null ? overrideSizeInByte.Value : vertex.Length;
 
-        if (mesh.VertexBufferResource is null)
+        if (mesh.VertexBufferResource is null
+         || mesh.VertexSizeInByte != vertexSizeInByte)
         {
             GraphicsContext.GraphicsDevice.DestroyResource(mesh.VertexBufferResource);
 
