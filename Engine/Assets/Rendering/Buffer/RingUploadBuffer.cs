@@ -1,7 +1,4 @@
-﻿using Assimp.Unmanaged;
-using Engine.DataTypes;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 using Vortice.Direct3D12;
 using Vortice.DXGI;
