@@ -88,6 +88,9 @@ public sealed partial class CommonContext : IDisposable
             mesh = new();
             mesh.InputLayoutDescription = inputLayoutDescription;
 
+            foreach (var inputElement in mesh.InputLayoutDescription.Elements)
+                mesh.Vertices[inputElement.SemanticName] = new();
+
             Meshes[name] = mesh;
 
             return mesh;

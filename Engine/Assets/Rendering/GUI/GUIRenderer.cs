@@ -1,4 +1,6 @@
-﻿using Vortice.Direct3D12;
+﻿using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using Vortice.Direct3D12;
 using Vortice.Dxc;
 using Vortice.DXGI;
 
@@ -165,9 +167,9 @@ public unsafe sealed partial class GUIRenderer
             Context.UploadBuffer.UploadMeshIndex(GUIMesh, new Span<byte>(commandList.IdxBuffer.Data.ToPointer(), indexBytes), Format.R16_UInt);
             Context.UploadBuffer.UploadVertexBuffer(GUIMesh, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), vertexBytes));
 
-            GUIMesh.Vertices["POSITION"] = new VertexBuffer() { Offset = 0, Resource = GUIMesh.VertexBufferResource, SizeInByte = vertexBytes, Stride = sizeof(ImDrawVert) };
-            GUIMesh.Vertices["TEXCOORD"] = new VertexBuffer() { Offset = 8, Resource = GUIMesh.VertexBufferResource, SizeInByte = vertexBytes, Stride = sizeof(ImDrawVert) };
-            GUIMesh.Vertices["COLOR"] = new VertexBuffer() { Offset = 16, Resource = GUIMesh.VertexBufferResource, SizeInByte = vertexBytes, Stride = sizeof(ImDrawVert) };
+            GUIMesh.Vertices["POSITION"].SetVertexBuffer(0, GUIMesh.VertexBufferResource, vertexBytes, sizeof(ImDrawVert));
+            GUIMesh.Vertices["TEXCOORD"].SetVertexBuffer(8, GUIMesh.VertexBufferResource, vertexBytes, sizeof(ImDrawVert));
+            GUIMesh.Vertices["COLOR"].SetVertexBuffer(16, GUIMesh.VertexBufferResource, vertexBytes, sizeof(ImDrawVert));
 
             Context.GraphicsContext.SetMesh(GUIMesh);
 

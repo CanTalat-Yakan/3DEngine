@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 
 using SharpGen.Runtime;
-
+using Vortice.Direct3D12;
 using Vortice.Mathematics;
 
 namespace Engine.Helper;
@@ -40,9 +40,18 @@ public static class ExtensionMethods
         return vector;
     }
 
-    public static bool IsNaN(this float value) =>
-        float.IsNaN(value);
+    public static VertexBuffer SetVertexBuffer(this VertexBuffer vertexBuffer, int offset, ID3D12Resource resource, int sizeInByte, int stride)
+    {
+        vertexBuffer.Offset = offset;
+        vertexBuffer.Resource = resource;
+        vertexBuffer.SizeInByte = sizeInByte;
+        vertexBuffer.Stride = stride;
 
+        return vertexBuffer;
+    }
+
+    public static bool IsNaN(this float value) =>
+    float.IsNaN(value);
     public static bool IsNaN(this Vector2 vector) =>
         float.IsNaN(vector.X) || float.IsNaN(vector.Y);
 
