@@ -9,7 +9,6 @@ public sealed class Camera : EditorComponent
     public static Camera CurrentRenderingCamera { get; set; }
 
     public RootSignature RootSignature;
-
     public ViewConstantBuffer ViewBuffer;
 
     public BoundingFrustum? BoundingFrustum { get; private set; }
