@@ -91,10 +91,12 @@ public sealed partial class CommonContext : IDisposable
             mesh = new();
             mesh.InputLayoutDescription = CreateInputLayoutDescription(inputLayoutElements);
 
+            mesh.IndexFormat = indices16Bit ? Format.R16_UInt : Format.R32_UInt;
+            mesh.IndexStride = GraphicsDevice.GetSizeInByte(mesh.IndexFormat);
+
             var offset = 0;
             foreach (var inputElement in mesh.InputLayoutDescription.Elements)
             {
-                mesh.IndexStride = GraphicsDevice.GetSizeInByte(indices16Bit ? Format.R16_UInt : Format.R32_UInt);
                 mesh.VertexStride += GraphicsDevice.GetSizeInByte(inputElement.Format);
                 mesh.Vertices[inputElement.SemanticName] = new() { Offset = offset, };
                 offset += GraphicsDevice.GetSizeInByte(inputElement.Format);

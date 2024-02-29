@@ -89,8 +89,6 @@ public unsafe sealed partial class GUIRenderer
         Context.PipelineStateObjects["ImGui"] = new PipelineStateObject(Context.VertexShaders["ImGui"], Context.PixelShaders["ImGui"]);
 
         RootSignature = Context.CreateRootSignatureFromString("Cs");
-
-        GUIMesh = Context.CreateMesh("ImGui Mesh", Context.CreateInputLayoutDescription("ptc"));
     }
 
     public void LoadTexture()

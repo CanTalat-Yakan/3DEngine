@@ -63,7 +63,7 @@ public sealed class ModelLoader
                 indices.AddRange([face.Indices[0], face.Indices[1], face.Indices[2]]);
         }
 
-        var meshInfo = Context.CreateMesh(meshName, Context.CreateInputLayoutDescription(inputLayoutElements));
+        var meshInfo = Context.CreateMesh(meshName, inputLayoutElements);
         meshInfo.BoundingBox = BoundingBox.CreateFromPoints(positions.ToArray());
 
         GPUUpload upload = new()
