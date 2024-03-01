@@ -63,7 +63,7 @@ public sealed partial class Mesh : EditorComponent
         if (EditorState.EditorBuild)
             CheckBounds();
 
-        if (InBounds)
+        //if (InBounds)
         {
             Context.GraphicsContext.SetPipelineState(Context.PipelineStateObjects["SimpleLit"], PipelineStateObjectDescription);
             Context.GraphicsContext.SetRootSignature(RootSignature);
@@ -132,8 +132,7 @@ public sealed partial class Mesh : EditorComponent
                 MeshInfo.BoundingBox,
                 Entity.Transform.WorldMatrix);
 
-        if (Entity.Transform.TransformChanged
-            || (Camera.CurrentRenderingCamera?.Entity.Transform.TransformChanged ?? false))
+        if (Entity.Transform.TransformChanged || (Camera.CurrentRenderingCamera?.Entity.Transform.TransformChanged ?? false))
         {
             var boundingFrustum = Camera.CurrentRenderingCamera.BoundingFrustum;
             if (boundingFrustum is not null)
