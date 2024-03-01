@@ -1,25 +1,26 @@
-﻿using System.IO;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Text;
 
+using Vortice.Direct3D12;
+using Vortice.DXGI;
 using Vortice.Mathematics;
 
 namespace Engine.Components;
 
+public struct MaterialTextureEntry(string name, int slot)
+{
+    public string Name = name;
+    public int Slot = slot;
+}
+
 public sealed partial class Mesh : EditorComponent
 {
-    public string MeshPath;
-    public string MaterialPath;
-
-    public static MeshInfo? OnGPU { get; set; }
+    public List<MaterialTextureEntry> MaterialTextures { get; private set; } = new();
+    public MeshInfo MeshInfo { get; private set; }
+    public RootSignature RootSignature { get; private set; }
 
     public BoundingBox TransformedBoundingBox { get; private set; }
     public bool InBounds { get; set; }
-
-    public MeshInfo ? MeshInfo => _meshInfo;
-    [Show] private MeshInfo _meshInfo;
-
-    public Material_OLD Material => _material;
-    [Show] private Material_OLD _material;
 
     public CommonContext Context => _context ??= Kernel.Instance.Context;
     public CommonContext _context;
@@ -27,121 +28,95 @@ public sealed partial class Mesh : EditorComponent
     public GraphicsContext GraphicsContext => _graphicsContext ??= Kernel.Instance.Context.GraphicsContext;
     public GraphicsContext _graphicsContext;
 
+    public PipelineStateObjectDescription PipelineStateObjectDescription = new()
+    {
+        InputLayout = "SimpleLit",
+        CullMode = CullMode.None,
+        RenderTargetFormat = Format.R8G8B8A8_UNorm,
+        RenderTargetCount = 1,
+        PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
+        BlendState = "Alpha",
+    };
+
     public override void OnRegister() =>
         MeshSystem.Register(this);
 
     public override void OnAwake()
     {
-        //SetMeshInfo(EntityManager.GetDefaultMeshInfo());
-        //SetMaterial(EntityManager.GetDefaultMaterial());
+
     }
 
     public override void OnUpdate()
     {
-        //if (!string.IsNullOrEmpty(MeshPath))
-        //    if (File.Exists(MeshPath))
-        //        try { SetMeshInfo(Loader.ModelLoader.LoadFile(MeshPath, false)); }
-        //        finally { MeshPath = null; }
+        if (MeshInfo is null)
+            return;
 
-        //if (!string.IsNullOrEmpty(MaterialPath))
-        //    if (File.Exists(MaterialPath))
-        //        try { Output.Log("Set the Material to " + SetMaterial(new FileInfo(MaterialPath).Name).FileInfo.Name); }
-        //        finally { MaterialPath = null; }
-
-        //if (!EditorState.EditorBuild)
-        //    CheckBounds();
+        if (!EditorState.EditorBuild)
+            CheckBounds();
     }
 
     public override void OnRender()
     {
-        //// With Parallelism the App can't catch up and breaks.
-        //// So check bounds in the same thread as the render call.
-        //if (EditorState.EditorBuild)
-        //    CheckBounds();
+        if (MeshInfo is null)
+            return;
 
-        //if (!InBounds)
-        //    return;
+        if (EditorState.EditorBuild)
+            CheckBounds();
 
-        if (Equals(Material_OLD.OnGPU, Material)
-         && Equals(Mesh.OnGPU, MeshInfo))
+        if (InBounds)
         {
-            //Material.MaterialBuffer?.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
+            Context.GraphicsContext.SetPipelineState(Context.PipelineStateObjects["SimpleLit"], PipelineStateObjectDescription);
+            Context.GraphicsContext.SetRootSignature(RootSignature);
+            Context.GraphicsContext.SetMesh(MeshInfo);
 
-            //GraphicsContext.DrawIndexedInstanced(MeshInfo.Value.Indices.Length, MeshBuffers.IndexBufferView, 1, MeshBuffers.VertexBufferView);
-        }
-        else
-        {
-            // Setup Material, PerModel and Properties constant buffer.
-            //Material.Setup();
-            //Material.MaterialBuffer?.UpdateModelConstantBuffer(Entity.Transform.GetConstantBuffer());
-            //Material.MaterialBuffer?.UpdatePropertiesConstantBuffer();
+            foreach (var texture in MaterialTextures)
+                Context.GraphicsContext.SetShaderResourceView(Context.GetTextureByString(texture.Name), texture.Slot);
 
-            //GraphicsContext.DrawIndexedInstanced(MeshInfo.Value.Indices.Length, MeshBuffers.IndexBufferView, 1, MeshBuffers.VertexBufferView);
+            Context.UploadBuffer.Upload(Entity.Transform.GetConstantBuffer(), out var offset);
+            Context.UploadBuffer.SetConstantBufferView(offset, 1);
 
-            // Assign MeshInfo to the static variable.
-            OnGPU = MeshInfo;
+            Context.GraphicsContext.DrawIndexedInstanced(MeshInfo.IndexCount, 1, 0, 0, 0);
         }
 
-        // Increment the vertex, index and draw call count in the Profiler.
-        //Profiler.Vertices += MeshInfo.Vertices.Length;
-        //Profiler.Indices += MeshInfo.Value.Indices.Length;
+        Profiler.Vertices += MeshInfo.VertexCount;
+        Profiler.Indices += MeshInfo.IndexCount;
         Profiler.DrawCalls++;
     }
 
-    public override void OnDestroy()
-    {
-        Material.Dispose();
-    }
 }
 
 public sealed partial class Mesh : EditorComponent
 {
     public void SetMeshInfo(MeshInfo meshInfo)
     {
-        if (Context.Meshes.ContainsKey(meshInfo.Name))
-        {
-            //Order = (byte)Context.Meshes.Keys.IndexOf(meshInfo.Name);
-            meshInfo = Context.Meshes[meshInfo.Name];
-            _meshInfo = meshInfo;
+        MeshInfo = meshInfo;
 
-            return;
-        }
-        else
-        {
-            Order = (byte)Context.Meshes.Count();
-            Context.Meshes[meshInfo.Name] = meshInfo;
+        InstantiateBounds(meshInfo.BoundingBox);
 
-            //InstantiateBounds(BoundingBox.CreateFromPoints(meshInfo.Ver))
-            //InstantiateBounds(BoundingBox.CreateFromPoints(
-            //    meshInfo.Vertices.Select(Vertex => Vertex.Position).ToArray()));
-        }
-
-        // Call the "CreateBuffer" method to initialize the vertex and index buffer.
-        //MeshBuffers.CreateBuffer(MeshInfo.Value);
+        RootSignature?.Dispose();
+        RootSignature = Context.CreateRootSignatureFromString("CC");
     }
 
-    public MaterialEntry SetMaterial(string materialName)
+    public void SetMaterialTexture(params MaterialTextureEntry[] textureEntries)
     {
-        var MaterialEntry = MaterialCompiler.Library.GetMaterial(materialName);
+        MaterialTextures.AddRange(textureEntries);
 
-        SetMaterial(MaterialEntry.Material);
+        StringBuilder stringBuilder = new();
+        for (int i = 0; i < textureEntries.Length; i++)
+            stringBuilder.Append("s");
 
-        return MaterialEntry;
+        var shaderResourceViews = stringBuilder.ToString();
+
+        RootSignature?.Dispose();
+        RootSignature = Context.CreateRootSignatureFromString("CC" + shaderResourceViews);
     }
 
-    public void SetMaterial(Material_OLD material) =>
-        // Assign to local variable.
-        _material = material;
-}
-
-public sealed partial class Mesh : EditorComponent
-{
     private void InstantiateBounds(BoundingBox boundingBox)
     {
-        _meshInfo.BoundingBox = boundingBox;
+        MeshInfo.BoundingBox = boundingBox;
 
         TransformedBoundingBox = BoundingBox.Transform(
-            _meshInfo.BoundingBox, 
+            MeshInfo.BoundingBox,
             Entity.Transform.WorldMatrix);
     }
 
@@ -149,7 +124,7 @@ public sealed partial class Mesh : EditorComponent
     {
         if (Entity.Transform.TransformChanged)
             TransformedBoundingBox = BoundingBox.Transform(
-                _meshInfo.BoundingBox, 
+                MeshInfo.BoundingBox,
                 Entity.Transform.WorldMatrix);
 
         if (Entity.Transform.TransformChanged

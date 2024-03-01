@@ -6,7 +6,7 @@ public sealed partial class DefaultSky : EditorComponent, IHide
 {
     public RootSignature RootSignature;
 
-    public MeshInfo SkyMesh;
+    public MeshInfo SkyMeshInfo;
     public Texture2D SkyGradientTexture;
     public Texture2D SkyGradientLightTexture;
 
@@ -33,11 +33,9 @@ public sealed partial class DefaultSky : EditorComponent, IHide
 
         Entity.Transform.LocalScale = new Vector3(-100, 100, 100);
 
-        var skyMesh = Entity.AddComponent<Mesh>();
-        //skyMesh.SetMeshInfo(ModelLoader.LoadFile(Path.Combine("Primitives", PrimitiveTypes.Sphere.ToString()) + ".obj"));
-
-        // Set material of Sky's Mesh component.
-        //skyMesh.SetMaterial(_materialSky);
+        var mesh = Entity.AddComponent<Mesh>();
+        mesh.SetMeshInfo(SkyMeshInfo);
+        mesh.SetMaterialTexture(new MaterialTextureEntry("SkyGradient.png", 0));
     }
 }
 
@@ -52,7 +50,7 @@ public sealed partial class DefaultSky : EditorComponent, IHide
 
         RootSignature = Context.CreateRootSignatureFromString("Cs");
 
-        SkyMesh = ModelLoader.LoadFile(Paths.PRIMITIVES + "Cube.obj", "PNTt");
+        SkyMeshInfo = ModelLoader.LoadFile(Paths.PRIMITIVES + "Sphere.obj", "PNTt");
         SkyGradientTexture = ImageLoader.LoadTexture(Paths.TEXTURES + "SkyGradient.png");
         SkyGradientLightTexture = ImageLoader.LoadTexture(Paths.TEXTURES + "SkyGradient_Light.png");
     }

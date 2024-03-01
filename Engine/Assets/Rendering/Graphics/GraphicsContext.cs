@@ -40,6 +40,8 @@ public sealed partial class GraphicsContext : IDisposable
     {
         CommandList.IASetPrimitiveTopology(topology);
 
+        mesh.SetVertexBuffers();
+
         int previousInputSlot = -1;
         foreach (var inputElementDescription in mesh.InputLayoutDescription.Elements)
             if (inputElementDescription.Slot != previousInputSlot)

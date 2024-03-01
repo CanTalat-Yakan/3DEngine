@@ -126,7 +126,5 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 
         GraphicsContext.CommandList.CopyBufferRegion(mesh.VertexBufferResource, 0, Resource, (ulong)offset, (ulong)vertexSizeInByte);
         GraphicsContext.CommandList.ResourceBarrierTransition(mesh.VertexBufferResource, ResourceStates.CopyDest, ResourceStates.GenericRead);
-
-        mesh.Vertices.SetVertexBuffer(mesh.VertexBufferResource, vertexBytes);
     }
 }

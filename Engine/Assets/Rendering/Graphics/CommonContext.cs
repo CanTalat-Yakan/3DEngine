@@ -55,6 +55,12 @@ public sealed partial class CommonContext : IDisposable
 
 public sealed partial class CommonContext : IDisposable
 {
+    public Texture2D GetTextureByString(string name) =>
+        RenderTargets[GetStringFromID(GetIDFromString(name))];
+
+    public Texture2D GetTextureByStringID(nint pointer) =>
+        RenderTargets[GetStringFromID(pointer)];
+
     private int somePointerValue = 65536;
     public IntPtr GetIDFromString(string name)
     {
@@ -71,11 +77,13 @@ public sealed partial class CommonContext : IDisposable
         return pointer;
     }
 
-    public string GetStringFromID(nint pointer) =>
-        PointerToString[pointer];
+    public string GetStringFromID(nint pointer)
+    {
+        if (!PointerToString.ContainsKey(pointer))
+            throw new NotImplementedException("error string from id in common context");
 
-    public Texture2D GetTextureByStringID(nint pointer) =>
-        RenderTargets[GetStringFromID(pointer)];
+        return PointerToString[pointer];
+    }
 }
 
 public sealed partial class CommonContext : IDisposable

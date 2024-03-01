@@ -24,10 +24,10 @@ PSInput VS(VSInput input)
 {
     PSInput output;
 
-    output.pos = mul(input.pos, mul(World, ViewProjection));
-    output.normal = mul(input.normal, World);
-    output.tangent = mul(input.tangent, World);
-    output.worldpos = mul(input.pos, World);
+    output.pos = mul(float4(input.pos, 1), mul(World, ViewProjection));
+    output.normal = mul(float4(input.normal, 0), World);
+    output.tangent = mul(float4(input.tangent, 0), World);
+    output.worldpos = mul(float4(input.pos, 1), World);
     output.camerapos = Camera;
     output.uv = input.uv;
 

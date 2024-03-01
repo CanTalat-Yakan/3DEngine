@@ -38,12 +38,16 @@ public sealed class MeshInfo : IDisposable
     public int IndexSizeInByte;
     public int IndexStride;
 
+    public int VertexCount;
     public int VertexSizeInByte;
     public int VertexStride;
 
     public BoundingBox BoundingBox;
 
     public DateTime LastTimeUsed;
+
+    public void SetVertexBuffers() =>
+        Vertices.SetVertexBuffer(VertexBufferResource, VertexSizeInByte);
 
     public void Dispose()
     {

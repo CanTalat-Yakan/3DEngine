@@ -40,15 +40,7 @@ public static class ExtensionMethods
         vector.X = x; vector.Y = y; vector.Z = z;
         return vector;
     }
-
-    public static VertexBuffer SetVertexBuffer(this VertexBuffer vertexBuffer, ID3D12Resource resource, int sizeInByte)
-    {
-        vertexBuffer.Resource = resource;
-        vertexBuffer.SizeInByte = sizeInByte;
-
-        return vertexBuffer;
-    }
-    
+        
     public static Dictionary<string,VertexBuffer> SetVertexBuffer(this Dictionary<string, VertexBuffer> vertices, ID3D12Resource resource, int sizeInByte)
     {
         foreach (var vertex in vertices.Values)
@@ -57,6 +49,13 @@ public static class ExtensionMethods
         return vertices;
     }
 
+    public static VertexBuffer SetVertexBuffer(this VertexBuffer vertexBuffer, ID3D12Resource resource, int sizeInByte)
+    {
+        vertexBuffer.Resource = resource;
+        vertexBuffer.SizeInByte = sizeInByte;
+
+        return vertexBuffer;
+    }
     public static bool IsNaN(this float value) =>
     float.IsNaN(value);
     public static bool IsNaN(this Vector2 vector) =>
