@@ -151,10 +151,8 @@ public sealed partial class GraphicsContext : IDisposable
 
 public sealed partial class GraphicsContext : IDisposable
 {
-    public void SetDescriptorHeapDefault()
-    {
+    public void SetDescriptorHeapDefault() =>
         CommandList.SetDescriptorHeaps(1, new[] { GraphicsDevice.ShaderResourcesHeap.Heap });
-    }
 
     public void SetRootSignature(RootSignature rootSignature)
     {
@@ -221,10 +219,8 @@ public sealed partial class GraphicsContext : IDisposable
         CommandList.OMSetRenderTargets(GraphicsDevice.GetRenderTargetScreen());
     }
 
-    public void SetConstantBufferView(UploadBuffer uploadBuffer, int offset, int slot)
-    {
+    public void SetConstantBufferView(UploadBuffer uploadBuffer, int offset, int slot) =>
         CommandList.SetGraphicsRootConstantBufferView(CurrentRootSignature.ConstantBufferView[slot], uploadBuffer.Resource.GPUVirtualAddress + (ulong)offset);
-    }
 
     public void SetPipelineState(PipelineStateObject pipelineStateObject, PipelineStateObjectDescription pipelineStateObjectDescription)
     {
@@ -232,17 +228,11 @@ public sealed partial class GraphicsContext : IDisposable
         PipelineStateObjectDescription = pipelineStateObjectDescription;
     }
 
-    public void ClearRenderTarget(Texture2D texture2D)
-    {
+    public void ClearRenderTarget(Texture2D texture2D) =>
         CommandList.ClearRenderTargetView(texture2D.RenderTargetView.GetCPUDescriptorHandleForHeapStart(), new Color4(0, 0, 0, 0));
-    }
 
-    public void ClearRenderTargetScreen(Color4? color = null)
-    {
-        color ??= new Color4(0.15f, 0.15f, 0.15f, 1);
-
-        CommandList.ClearRenderTargetView(GraphicsDevice.GetRenderTargetScreen(), color.Value);
-    }
+    public void ClearRenderTargetScreen(Color4? color = null) =>
+        CommandList.ClearRenderTargetView(GraphicsDevice.GetRenderTargetScreen(), color is not null ? color.Value : new Color4(0.15f, 0.15f, 0.15f, 1));
 }
 
 public sealed partial class GraphicsContext : IDisposable
