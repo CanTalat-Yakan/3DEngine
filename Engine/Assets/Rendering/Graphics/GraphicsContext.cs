@@ -1,9 +1,9 @@
-﻿using pxr;
-using System.IO;
+﻿using System.IO;
 using System.Runtime.InteropServices;
 
 using Vortice.Direct3D;
 using Vortice.Direct3D12;
+using Vortice.DXGI;
 using Vortice.Mathematics;
 
 namespace Engine.Graphics;
@@ -102,13 +102,13 @@ public sealed partial class GraphicsContext : IDisposable
 
     public void UploadMesh(MeshInfo mesh, float[] vertexData, int[] indexData)
     {
-        byte[] vertexByteSpan = new byte[vertexData.Length * sizeof(float)];
+        byte[] vertexByteSpan = new byte[vertexData.Length * 4];
         System.Buffer.BlockCopy(vertexData, 0, vertexByteSpan, 0, vertexByteSpan.Length);
         Kernel.Instance.Context.UploadBuffer.UploadVertexBuffer(mesh, vertexByteSpan, vertexData.Length * sizeof(float));
         // TODO
-        byte[] indexByteSpan = new byte[indexData.Length * sizeof(float)];
+        byte[] indexByteSpan = new byte[indexData.Length * 2];
         System.Buffer.BlockCopy(indexData, 0, indexByteSpan, 0, indexByteSpan.Length);
-        Kernel.Instance.Context.UploadBuffer.UploadVertexBuffer(mesh, indexByteSpan, indexData.Length * sizeof(float));
+        Kernel.Instance.Context.UploadBuffer.UploadIndexBuffer(mesh, indexByteSpan, Format.R16_UInt);
     }
 
     public void UploadTexture(Texture2D texture, byte[] data)
