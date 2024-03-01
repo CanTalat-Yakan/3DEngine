@@ -96,16 +96,7 @@ public sealed class Kernel
         OnInitialize?.Invoke();
         OnInitialize = null;
 
-        Context.GraphicsDevice.Begin();
-
-        Context.GraphicsContext.BeginCommand();
-
-        Context.GPUUploadData(Context.GraphicsContext);
-
-        Context.GraphicsContext.SetDescriptorHeapDefault();
-        Context.GraphicsContext.ScreenBeginRender();
-        Context.GraphicsContext.SetRenderTargetScreen();
-        Context.GraphicsContext.ClearRenderTargetScreen();
+        BeginRender();
 
         Profiler.Reset();
 
@@ -132,6 +123,25 @@ public sealed class Kernel
 
         Input.LateUpdate();
 
+        EndRender();
+    }
+
+    public void BeginRender()
+    {
+        Context.GraphicsDevice.Begin();
+
+        Context.GraphicsContext.BeginCommand();
+
+        Context.GPUUploadData(Context.GraphicsContext);
+
+        Context.GraphicsContext.SetDescriptorHeapDefault();
+        Context.GraphicsContext.ScreenBeginRender();
+        Context.GraphicsContext.SetRenderTargetScreen();
+        Context.GraphicsContext.ClearRenderTargetScreen();
+    }
+
+    public void EndRender()
+    {
         Context.GraphicsContext.ScreenEndRender();
         Context.GraphicsContext.EndCommand();
         Context.GraphicsContext.Execute();

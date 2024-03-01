@@ -63,7 +63,7 @@ public sealed partial class Mesh : EditorComponent
         if (EditorState.EditorBuild)
             CheckBounds();
 
-        if (InBounds)
+        //if (InBounds)
         {
             Context.GraphicsContext.SetPipelineState(Context.PipelineStateObjects["SimpleLit"], PipelineStateObjectDescription);
             Context.GraphicsContext.SetRootSignature(RootSignature);
