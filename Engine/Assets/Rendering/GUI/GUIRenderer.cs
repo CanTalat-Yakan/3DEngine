@@ -110,7 +110,6 @@ public unsafe sealed partial class GUIRenderer
         GPUUpload upload = new()
         {
             Texture2D = FontTexture,
-            Format = Format.R8G8B8A8_UNorm,
             TextureData = new byte[width * height * bytesPerPixel],
         };
 

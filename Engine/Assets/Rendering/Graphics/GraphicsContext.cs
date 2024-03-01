@@ -100,15 +100,18 @@ public sealed partial class GraphicsContext : IDisposable
         }
     }
 
-    public void UploadMesh(MeshInfo mesh, float[] vertexData, int[] indexData)
+    public void UploadMesh(MeshInfo mesh, float[] vertexData, int[] indexData, Format indexFormat)
     {
-        byte[] vertexByteSpan = new byte[vertexData.Length * 4];
+        var vertexFormat = Format.R32_Float;
+        var vertexSizeInByte = GraphicsDevice.GetSizeInByte(vertexFormat);
+        byte[] vertexByteSpan = new byte[vertexData.Length * vertexSizeInByte];
         System.Buffer.BlockCopy(vertexData, 0, vertexByteSpan, 0, vertexByteSpan.Length);
-        Kernel.Instance.Context.UploadBuffer.UploadVertexBuffer(mesh, vertexByteSpan, vertexData.Length * sizeof(float));
-        // TODO
-        byte[] indexByteSpan = new byte[indexData.Length * 2];
+        Kernel.Instance.Context.UploadBuffer.UploadVertexBuffer(mesh, vertexByteSpan, vertexData.Length * vertexSizeInByte);
+
+        var indexSizeInByte = GraphicsDevice.GetSizeInByte(indexFormat);
+        byte[] indexByteSpan = new byte[indexData.Length * indexSizeInByte];
         System.Buffer.BlockCopy(indexData, 0, indexByteSpan, 0, indexByteSpan.Length);
-        Kernel.Instance.Context.UploadBuffer.UploadIndexBuffer(mesh, indexByteSpan, Format.R16_UInt);
+        Kernel.Instance.Context.UploadBuffer.UploadIndexBuffer(mesh, indexByteSpan, indexFormat);
     }
 
     public void UploadTexture(Texture2D texture, byte[] data)

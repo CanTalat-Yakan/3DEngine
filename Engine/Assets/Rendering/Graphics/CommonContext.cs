@@ -173,7 +173,7 @@ public sealed partial class CommonContext : IDisposable
     {
         while (UploadQueue.TryDequeue(out var upload))
             if (upload.MeshInfo is not null)
-                graphicsContext.UploadMesh(upload.MeshInfo, upload.VertexData, upload.IndexData);
+                graphicsContext.UploadMesh(upload.MeshInfo, upload.VertexData, upload.IndexData, upload.IndexFormat);
             else if (upload.Texture2D is not null)
                 graphicsContext.UploadTexture(upload.Texture2D, upload.TextureData);
     }

@@ -2,7 +2,7 @@
 using System.IO;
 
 using Assimp;
-
+using Vortice.DXGI;
 using Vortice.Mathematics;
 
 namespace Engine.Loader;
@@ -73,6 +73,7 @@ public sealed class ModelLoader
             MeshInfo = meshInfo,
             VertexData = vertices.ToArray(),
             IndexData = indices.ToArray(),
+            IndexFormat = Format.R32_UInt,
         };
         Context.UploadQueue.Enqueue(upload);
 

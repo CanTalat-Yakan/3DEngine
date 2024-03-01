@@ -34,7 +34,7 @@ public sealed partial class ImageLoader
         GPUUpload upload = new()
         {
             Texture2D = texture,
-            Format = format,
+            IndexFormat = format,
             TextureData = pixels,
         };
         Context.UploadQueue.Enqueue(upload);

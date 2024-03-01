@@ -27,7 +27,7 @@ public sealed partial class Material : EditorComponent, IHide, IEquatable<Materi
     public PipelineStateObjectDescription PipelineStateObjectDescription = new()
     {
         InputLayout = "SimpleLit",
-        CullMode = CullMode.None,
+        CullMode = CullMode.Back,
         RenderTargetFormat = Format.R8G8B8A8_UNorm,
         RenderTargetCount = 1,
         PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
