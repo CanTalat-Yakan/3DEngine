@@ -36,11 +36,10 @@ PSInput VS(VSInput input)
 
 float4 PS(PSInput input) : SV_TARGET
 {
-    //float4 col = texture0.Sample(sampler0, input.uv);
+    float4 col = texture0.Sample(sampler0, input.uv);
     float3 diffuse = dot(normalize(input.normal), -normalize(float3(0, -1, 0)));
 
     diffuse = max(diffuse, float3(0.255, 0.295, 0.3255));
 
-    return float4(diffuse, 1);
-    //return col * float4(diffuse, 1);
+    return col * float4(diffuse, 1);
 }
