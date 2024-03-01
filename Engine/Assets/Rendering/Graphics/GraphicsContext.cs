@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using pxr;
+using System.IO;
 using System.Runtime.InteropServices;
 
 using Vortice.Direct3D;
@@ -101,19 +102,13 @@ public sealed partial class GraphicsContext : IDisposable
 
     public void UploadMesh(MeshInfo mesh, float[] vertexData, int[] indexData)
     {
-        mesh.VertexBufferResource = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
-            new HeapProperties(HeapType.Upload),
-            HeapFlags.None,
-            ResourceDescription.Buffer((ulong)vertexData.Length * sizeof(float)),
-            ResourceStates.GenericRead);
-        mesh.VertexBufferResource.SetData(vertexData, 0);
-
-        mesh.IndexBufferResource = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
-            new HeapProperties(HeapType.Upload),
-            HeapFlags.None,
-            ResourceDescription.Buffer((ulong)indexData.Length * sizeof(int)),
-            ResourceStates.GenericRead);
-        mesh.IndexBufferResource.SetData(indexData, 0);
+        byte[] vertexByteSpan = new byte[vertexData.Length * sizeof(float)];
+        System.Buffer.BlockCopy(vertexData, 0, vertexByteSpan, 0, vertexByteSpan.Length);
+        Kernel.Instance.Context.UploadBuffer.UploadVertexBuffer(mesh, vertexByteSpan, vertexData.Length * sizeof(float));
+        // TODO
+        byte[] indexByteSpan = new byte[indexData.Length * sizeof(float)];
+        System.Buffer.BlockCopy(indexData, 0, indexByteSpan, 0, indexByteSpan.Length);
+        Kernel.Instance.Context.UploadBuffer.UploadVertexBuffer(mesh, indexByteSpan, indexData.Length * sizeof(float));
     }
 
     public void UploadTexture(Texture2D texture, byte[] data)
