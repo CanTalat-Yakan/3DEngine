@@ -85,7 +85,7 @@ public sealed partial class EntityManager
 
         var mesh = newEntity.AddComponent<Mesh>();
         mesh.SetMeshInfo(ModelLoader.LoadFile(Paths.PRIMITIVES + type.ToString() + ".obj"));
-        mesh.SetMaterialTexture(new MaterialTextureEntry("Default.png", 0));
+        mesh.Material.SetMaterialTexture(new MaterialTextureEntry("Default.png", 0));
 
         EntityList.Add(newEntity);
 

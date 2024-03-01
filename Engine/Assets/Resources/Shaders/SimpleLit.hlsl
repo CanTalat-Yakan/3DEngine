@@ -17,8 +17,8 @@ cbuffer Properties : register(b10)
     bool Bool;
 };
 
-Texture2D texture0;
-sampler sampler0;
+Texture2D texture0 : register(t0);
+sampler sampler0 : register(s0);
 
 PSInput VS(VSInput input)
 {
