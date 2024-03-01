@@ -64,6 +64,7 @@ public sealed class ModelLoader
         }
 
         var meshInfo = Context.CreateMesh(meshName, inputLayoutElements);
+        meshInfo.IndexCount = indices.Count;
         meshInfo.VertexCount = positions.Count;
         meshInfo.BoundingBox = BoundingBox.CreateFromPoints(positions.ToArray());
 
