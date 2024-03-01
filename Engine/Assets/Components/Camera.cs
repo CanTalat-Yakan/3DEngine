@@ -2,6 +2,12 @@
 
 namespace Engine.Components;
 
+public struct ViewConstantBuffer(Matrix4x4 viewProjection, Vector3 cameraPosition)
+{
+    public Matrix4x4 ViewProjection = viewProjection;
+    public Vector3 CameraPosition = cameraPosition;
+}
+
 public sealed class Camera : EditorComponent
 {
     public static Camera Main { get; private set; }

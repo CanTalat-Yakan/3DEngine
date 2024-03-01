@@ -2,6 +2,11 @@
 
 namespace Engine.Components;
 
+public struct PerModelConstantBuffer(Matrix4x4 modelView)
+{
+    public Matrix4x4 ModelView = modelView;
+}
+
 public sealed partial class Transform : EditorComponent, IHide
 {
     public bool TransformChanged { get; set; }

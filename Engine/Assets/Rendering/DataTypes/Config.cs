@@ -1,4 +1,4 @@
-﻿namespace Engine.Data;
+﻿namespace Engine.DataTypes;
 
 public class Config
 {

@@ -1,4 +1,6 @@
-﻿using Vortice.Mathematics;
+﻿using System.Text;
+
+using Vortice.Mathematics;
 
 namespace Engine.Components;
 
@@ -78,6 +80,18 @@ public sealed partial class Mesh : EditorComponent
         InstantiateBounds(meshInfo.BoundingBox);
 
         Material.SetRootSignature("CC");
+    }
+
+    public void SetMaterialTexture(params MaterialTextureEntry[] textureEntries)
+    {
+        Material.MaterialTextures.AddRange(textureEntries);
+
+        StringBuilder stringBuilder = new();
+        for (int i = 0; i < textureEntries.Length; i++)
+            stringBuilder.Append("s");
+        var shaderResourceViews = stringBuilder.ToString();
+
+        Material.SetRootSignature("CC" + shaderResourceViews);
     }
 
     private void InstantiateBounds(BoundingBox boundingBox)

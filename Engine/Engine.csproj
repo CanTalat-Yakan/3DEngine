@@ -170,7 +170,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Assets\Rendering\DataTypes\" />
 	  <Folder Include="Assets\Rendering\Graphics\" />
 	</ItemGroup>
 </Project>

@@ -5,7 +5,6 @@ global using ImGuiNET;
 global using Vortice.Dxc;
 
 global using Engine.Buffer;
-global using Engine.Data;
 global using Engine.DataTypes;
 global using Engine.Framework;
 global using Engine.Graphics;

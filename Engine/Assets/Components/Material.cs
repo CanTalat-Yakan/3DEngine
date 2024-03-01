@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 
 using Vortice.Direct3D12;
 using Vortice.DXGI;
@@ -12,17 +11,15 @@ public struct MaterialTextureEntry(string name, int slot)
     public int Slot = slot;
 }
 
-public sealed partial class Material : EditorComponent, IHide, IEquatable<Material>
+public sealed class Material : EditorComponent, IHide, IEquatable<Material>
 {
     public static PipelineStateObject CurrentPipelineStateOnGPU { get; set; }
+
     public List<MaterialTextureEntry> MaterialTextures { get; private set; } = new();
     public RootSignature RootSignature { get; private set; }
 
     public CommonContext Context => _context ??= Kernel.Instance.Context;
     public CommonContext _context;
-
-    public GraphicsContext GraphicsContext => _graphicsContext ??= Kernel.Instance.Context.GraphicsContext;
-    public GraphicsContext _graphicsContext;
 
     public PipelineStateObjectDescription PipelineStateObjectDescription = new()
     {
@@ -49,22 +46,6 @@ public sealed partial class Material : EditorComponent, IHide, IEquatable<Materi
     public bool Equals(Material other) =>
         RootSignature == other.RootSignature
      && MaterialTextures.Count == other.MaterialTextures.Count;
-}
-
-public sealed partial class Material : EditorComponent, IHide, IEquatable<Material>
-{
-    public void SetMaterialTexture(params MaterialTextureEntry[] textureEntries)
-    {
-        MaterialTextures.AddRange(textureEntries);
-
-        StringBuilder stringBuilder = new();
-        for (int i = 0; i < textureEntries.Length; i++)
-            stringBuilder.Append("s");
-
-        var shaderResourceViews = stringBuilder.ToString();
-
-        SetRootSignature("CC" + shaderResourceViews);
-    }
 
     public void SetRootSignature(string rootSignatureParameters)
     {
