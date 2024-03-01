@@ -23,7 +23,7 @@ public sealed class Material : EditorComponent, IHide, IEquatable<Material>
 
     public PipelineStateObjectDescription PipelineStateObjectDescription = new()
     {
-        CullMode = CullMode.Back,
+        CullMode = CullMode.Front,
         RenderTargetFormat = Format.R8G8B8A8_UNorm,
         RenderTargetCount = 1,
         PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
@@ -48,8 +48,9 @@ public sealed class Material : EditorComponent, IHide, IEquatable<Material>
     }
 
     public bool Equals(Material other) =>
-        RootSignature == other.RootSignature
-     && MaterialTextures.Count == other.MaterialTextures.Count;
+        PipelineStateObjectName == other.PipelineStateObjectName
+     && MaterialTextures.Count == other.MaterialTextures.Count
+     && RootSignature == other.RootSignature;
 
     public void SetPipelineStateObject(string pipelineStateObject)
     {

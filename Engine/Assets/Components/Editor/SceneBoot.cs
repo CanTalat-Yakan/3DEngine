@@ -27,7 +27,6 @@ internal sealed class SceneBoot : EditorComponent, IHide
         // Create a sky entity in the scene.
         var defaultSky = SceneManager.MainScene.EntityManager
             .CreateEntity()
-            .AddComponent<Mesh>().Entity
             .AddComponent<DefaultSky>();
         defaultSky.Initialize();
 

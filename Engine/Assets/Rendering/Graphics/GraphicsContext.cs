@@ -106,11 +106,12 @@ public sealed partial class GraphicsContext : IDisposable
         var vertexSizeInByte = GraphicsDevice.GetSizeInByte(vertexFormat);
         byte[] vertexByteSpan = new byte[vertexData.Length * vertexSizeInByte];
         System.Buffer.BlockCopy(vertexData, 0, vertexByteSpan, 0, vertexByteSpan.Length);
-        Kernel.Instance.Context.UploadBuffer.UploadVertexBuffer(mesh, vertexByteSpan, vertexData.Length * vertexSizeInByte);
 
         var indexSizeInByte = GraphicsDevice.GetSizeInByte(indexFormat);
         byte[] indexByteSpan = new byte[indexData.Length * indexSizeInByte];
         System.Buffer.BlockCopy(indexData, 0, indexByteSpan, 0, indexByteSpan.Length);
+
+        Kernel.Instance.Context.UploadBuffer.UploadVertexBuffer(mesh, vertexByteSpan, vertexData.Length * vertexSizeInByte);
         Kernel.Instance.Context.UploadBuffer.UploadIndexBuffer(mesh, indexByteSpan, indexFormat);
     }
 
@@ -180,7 +181,7 @@ public sealed partial class GraphicsContext : IDisposable
 
         texture.StateChange(CommandList, ResourceStates.GenericRead);
 
-        GraphicsDevice.ShaderResourcesHeap.GetTemporaryHandle(out CpuDescriptorHandle CPUHandle, out GpuDescriptorHandle GPUHandle);
+        GraphicsDevice.ShaderResourcesHeap.GetTemporaryHandle(out var CPUHandle, out var GPUHandle);
 
         GraphicsDevice.Device.CreateShaderResourceView(texture.Resource, shaderResourceViewDescription, CPUHandle);
 

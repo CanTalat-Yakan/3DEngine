@@ -31,7 +31,7 @@ public sealed partial class DefaultSky : EditorComponent, IHide
 
         Entity.Transform.LocalScale = new Vector3(-100, 100, 100);
 
-        var mesh = Entity.GetComponent<Mesh>();
+        var mesh = Entity.AddComponent<Mesh>();
         mesh.SetMeshInfo(SkyMeshInfo);
         mesh.SetMaterialTexture(new MaterialTextureEntry("SkyGradient.png", 0));
         mesh.Material.SetPipelineStateObject("Unlit");
