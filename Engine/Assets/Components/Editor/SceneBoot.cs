@@ -27,6 +27,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
         // Create a sky entity in the scene.
         var defaultSky = SceneManager.MainScene.EntityManager
             .CreateEntity()
+            .AddComponent<Mesh>().Entity
             .AddComponent<DefaultSky>();
         defaultSky.Initialize();
 
@@ -42,7 +43,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
         Cubes = SceneManager.MainScene.EntityManager.CreateEntity(null, "Cubes");
 
         // Create a cube primitive under the Cubes entity.
-        SceneManager.MainScene.EntityManager.CreatePrimitive(PrimitiveTypes.Cube, Cubes);
+        SceneManager.MainScene.EntityManager.CreatePrimitive(PrimitiveTypes.Cube, parent: Cubes);
 
         Output.Log("Press 'C' to spawn 1000 Cubes");
     }
@@ -63,7 +64,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
             for (int i = 0; i < 1000; i++)
             {
                 // Create a new cube and add it to the Cubes entity.
-                var newCube = SceneManager.MainScene.EntityManager.CreatePrimitive(PrimitiveTypes.Cube, Cubes, true);
+                var newCube = SceneManager.MainScene.EntityManager.CreatePrimitive(PrimitiveTypes.Cube, parent: Cubes, hide: true);
 
                 // Set the position of the new cube with an offset on the Y axis.
                 newCube.Entity.Transform.LocalPosition = new(new Random().Next(-250, 250), new Random().Next(-250, 250), new Random().Next(-250, 250));

@@ -17,9 +17,7 @@ public sealed partial class DefaultSky : EditorComponent, IHide
     {
         var camera = Camera.CurrentRenderingCamera;
 
-        // Set the Skybox position to the rendering camera position.
         Entity.Transform.LocalPosition = camera.Entity.Transform.LocalPosition;
-        // Set the Skybox scale to the rendering camera far clipping plane.
         Entity.Transform.LocalScale = new Vector3(-1, 1, 1) * 1.9f * camera.Clipping.Y;
     }
 
@@ -33,9 +31,10 @@ public sealed partial class DefaultSky : EditorComponent, IHide
 
         Entity.Transform.LocalScale = new Vector3(-100, 100, 100);
 
-        var mesh = Entity.AddComponent<Mesh>();
+        var mesh = Entity.GetComponent<Mesh>();
         mesh.SetMeshInfo(SkyMeshInfo);
         mesh.SetMaterialTexture(new MaterialTextureEntry("SkyGradient.png", 0));
+        mesh.Material.SetPipelineStateObject("Unlit");
     }
 }
 
@@ -43,21 +42,10 @@ public sealed partial class DefaultSky : EditorComponent, IHide
 {
     public void LoadResources()
     {
-        Context.VertexShaders["SimpleLit"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + "SimpleLit.hlsl", "VS");
-        Context.PixelShaders["SimpleLit"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + "SimpleLit.hlsl", "PS");
-
-        Context.PipelineStateObjects["SimpleLit"] = new PipelineStateObject(Context.VertexShaders["SimpleLit"], Context.PixelShaders["SimpleLit"]);
-
         RootSignature = Context.CreateRootSignatureFromString("Cs");
 
         SkyMeshInfo = ModelLoader.LoadFile(Paths.PRIMITIVES + "Sphere.obj");
         SkyGradientTexture = ImageLoader.LoadTexture(Paths.TEXTURES + "SkyGradient.png");
         SkyGradientLightTexture = ImageLoader.LoadTexture(Paths.TEXTURES + "SkyGradient_Light.png");
-    }
-
-    public void SetTheme(bool light)
-    {
-        //// Switch the material of the sky component to either the default or light sky material.
-        //Entity.GetComponent<Mesh>().SetMaterial(light ? _materialSkyLight : _materialSky);
     }
 }

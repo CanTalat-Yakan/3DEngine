@@ -32,6 +32,17 @@ public sealed partial class CommonContext : IDisposable
     public CommonContext(Kernel kernel) =>
         Kernel = kernel;
 
+    public void LoadDefaultResources()
+    {
+        VertexShaders["Unlit"] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + "Unlit.hlsl", "VS");
+        PixelShaders["Unlit"] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + "Unlit.hlsl", "PS");
+        PipelineStateObjects["Unlit"] = new PipelineStateObject(VertexShaders["Unlit"], PixelShaders["Unlit"]);
+
+        VertexShaders["SimpleLit"] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + "SimpleLit.hlsl", "VS");
+        PixelShaders["SimpleLit"] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + "SimpleLit.hlsl", "PS");
+        PipelineStateObjects["SimpleLit"] = new PipelineStateObject(VertexShaders["SimpleLit"], PixelShaders["SimpleLit"]);
+    }
+
     public void Dispose()
     {
         UploadBuffer?.Dispose();

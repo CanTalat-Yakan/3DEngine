@@ -53,6 +53,7 @@ public sealed class Kernel
         Context.GraphicsDevice.Initialize(size, win32Window);
         Context.UploadBuffer.Initialize(Context.GraphicsDevice, GraphicsDevice.GetMegabytesInByte(64));
         Context.GraphicsContext.Initialize(Context.GraphicsDevice);
+        Context.LoadDefaultResources();
 
         if (Config.GUI)
         {

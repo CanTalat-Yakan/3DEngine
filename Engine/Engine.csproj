@@ -34,6 +34,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<None Remove="Assets\Resources\Shaders\Unlit.hlsl" />
 		<None Remove="Assets\Resources\Templates\Engine.dll" />
 		<None Remove="FodyWeavers.xml" />
 	</ItemGroup>
@@ -110,6 +111,9 @@
 		</Content>
 		<Content Include="Assets\Resources\Shaders\Include\Common.hlsli">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Assets\Resources\Shaders\Unlit.hlsl">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Resources\Shaders\SimpleLit.hlsl">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

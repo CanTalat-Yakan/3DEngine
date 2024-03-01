@@ -13,17 +13,16 @@ public struct MaterialTextureEntry(string name, int slot)
 
 public sealed class Material : EditorComponent, IHide, IEquatable<Material>
 {
-    public static PipelineStateObject CurrentPipelineStateOnGPU { get; set; }
+    public string PipelineStateObjectName { get; private set; }
+    public RootSignature RootSignature { get; private set; }
 
     public List<MaterialTextureEntry> MaterialTextures { get; private set; } = new();
-    public RootSignature RootSignature { get; private set; }
 
     public CommonContext Context => _context ??= Kernel.Instance.Context;
     public CommonContext _context;
 
     public PipelineStateObjectDescription PipelineStateObjectDescription = new()
     {
-        InputLayout = "SimpleLit",
         CullMode = CullMode.Back,
         RenderTargetFormat = Format.R8G8B8A8_UNorm,
         RenderTargetCount = 1,
@@ -36,7 +35,12 @@ public sealed class Material : EditorComponent, IHide, IEquatable<Material>
 
     public void Setup()
     {
-        Context.GraphicsContext.SetPipelineState(Context.PipelineStateObjects["SimpleLit"], PipelineStateObjectDescription);
+        if (string.IsNullOrEmpty(PipelineStateObjectName))
+            throw new NotImplementedException("error pipeline state object not set in material");
+
+        PipelineStateObjectDescription.InputLayout = PipelineStateObjectName;
+
+        Context.GraphicsContext.SetPipelineState(Context.PipelineStateObjects[PipelineStateObjectName], PipelineStateObjectDescription);
         Context.GraphicsContext.SetRootSignature(RootSignature);
 
         foreach (var texture in MaterialTextures)
@@ -46,6 +50,13 @@ public sealed class Material : EditorComponent, IHide, IEquatable<Material>
     public bool Equals(Material other) =>
         RootSignature == other.RootSignature
      && MaterialTextures.Count == other.MaterialTextures.Count;
+
+    public void SetPipelineStateObject(string pipelineStateObject)
+    {
+        if (Context.PipelineStateObjects.ContainsKey(pipelineStateObject))
+            PipelineStateObjectName = pipelineStateObject;
+        else throw new NotImplementedException("error pipeline state object not found in material");
+    }
 
     public void SetRootSignature(string rootSignatureParameters)
     {

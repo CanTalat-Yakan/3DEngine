@@ -49,8 +49,6 @@ public sealed partial class EntityManager
 
         EntityList.Clear();
         EntityList = null;
-
-        _materialDefault?.Dispose();
     }
 }
 
@@ -86,6 +84,7 @@ public sealed partial class EntityManager
         var mesh = newEntity.AddComponent<Mesh>();
         mesh.SetMeshInfo(ModelLoader.LoadFile(Paths.PRIMITIVES + type.ToString() + ".obj"));
         mesh.SetMaterialTexture(new MaterialTextureEntry("Default.png", 0));
+        mesh.Material.SetPipelineStateObject("SimpleLit");
 
         EntityList.Add(newEntity);
 
@@ -116,19 +115,6 @@ public sealed partial class EntityManager
 
 public sealed partial class EntityManager
 {
-    private static Material_OLD _materialDefault;
-
-    public static Material_OLD GetDefaultMaterial() =>
-        // Create a new material with the default shader and default image.
-        _materialDefault ??= new(Paths.SHADERS + "SimpleLit.hlsl");
-
-    public static MeshInfo_OLD GetDefaultMeshInfo()
-    {
-        // Set mesh info to a cube from the resources.
-        //Loader.ModelLoader.LoadFile(Path.Combine("Primitives", "Cube.obj"));
-        return default;
-    }
-
     public Entity GetFromID(Guid guid)
     {
         // Loop through all entities in the EntityList.
