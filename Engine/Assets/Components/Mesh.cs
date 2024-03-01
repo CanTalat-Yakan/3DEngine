@@ -19,7 +19,6 @@ public sealed partial class Mesh : EditorComponent
     public GraphicsContext GraphicsContext => _graphicsContext ??= Kernel.Instance.Context.GraphicsContext;
     public GraphicsContext _graphicsContext;
 
-
     public override void OnRegister() =>
         MeshSystem.Register(this);
 
