@@ -63,7 +63,7 @@ public sealed partial class Mesh : EditorComponent
         if (EditorState.EditorBuild)
             CheckBounds();
 
-        //if (InBounds)
+        if (InBounds)
         {
             Context.GraphicsContext.SetPipelineState(Context.PipelineStateObjects["SimpleLit"], PipelineStateObjectDescription);
             Context.GraphicsContext.SetRootSignature(RootSignature);
@@ -83,6 +83,11 @@ public sealed partial class Mesh : EditorComponent
         Profiler.DrawCalls++;
     }
 
+    public override void OnDestroy()
+    {
+        MeshInfo?.Dispose();
+        RootSignature?.Dispose();
+    }
 }
 
 public sealed partial class Mesh : EditorComponent

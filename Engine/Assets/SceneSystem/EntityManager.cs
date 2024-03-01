@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using Engine.Loader;
 
 namespace Engine.SceneSystem;
 
@@ -73,7 +73,6 @@ public sealed partial class EntityManager
 
     public Mesh CreatePrimitive(PrimitiveTypes type = PrimitiveTypes.Cube, Entity parent = null, bool hide = false)
     {
-        // Create a new entity with the specified name and parent.
         Entity newEntity = new()
         {
             Name = type.ToString().FormatString(),
@@ -81,14 +80,15 @@ public sealed partial class EntityManager
             IsHidden = hide
         };
 
-        // Add a mesh component to the entity using the specified primitive type.
-        var mesh = newEntity.AddComponent<Mesh>();
-        //mesh.SetMeshInfo(Loader.ModelLoader.LoadFile(Path.Combine("Primitives", type.ToString()) + ".obj"));
+        ModelLoader.LoadFile(Paths.PRIMITIVES + "Cube.obj");
+        ImageLoader.LoadTexture(Paths.TEXTURES + "Default.png");
 
-        // Add the new entity to the entity list.
+        var mesh = newEntity.AddComponent<Mesh>();
+        mesh.SetMeshInfo(ModelLoader.LoadFile(Paths.PRIMITIVES + type.ToString() + ".obj"));
+        mesh.SetMaterialTexture(new MaterialTextureEntry("Default.png", 0));
+
         EntityList.Add(newEntity);
 
-        // Return the new entity.
         return mesh;
     }
 

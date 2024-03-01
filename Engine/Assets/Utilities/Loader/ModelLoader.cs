@@ -12,11 +12,11 @@ public sealed class ModelLoader
     public static CommonContext Context => _context ??= Kernel.Instance.Context;
     public static CommonContext _context;
 
-    public static MeshInfo LoadFile(string filePath, string inputLayoutElements)
+    public static MeshInfo LoadFile(string filePath, string inputLayoutElements = "PNTt")
     {
         var meshName = new FileInfo(filePath).Name;
         if (Context.Meshes.ContainsKey(meshName))
-            return Context.Meshes[filePath];
+            return Context.Meshes[meshName];
 
         AssimpContext context = new();
         //context.SetConfig(new NormalSmoothingAngleConfig(66.0f));
@@ -32,10 +32,10 @@ public sealed class ModelLoader
 
         Assimp.Scene file = context.ImportFile(filePath, postProcessSteps);
 
-        List<Vector3> positions = new();
-
-        List<float> vertices = new();
         List<int> indices = new();
+        List<float> vertices = new();
+
+        List<Vector3> positions = new();
 
         foreach (var mesh in file.Meshes)
         {
