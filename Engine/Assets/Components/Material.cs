@@ -12,7 +12,7 @@ public struct MaterialTextureEntry(string name, int slot)
     public int Slot = slot;
 }
 
-public sealed partial class Material : EditorComponent, IHide
+public sealed partial class Material : EditorComponent, IHide, IEquatable<Material>
 {
     public static PipelineStateObject CurrentPipelineStateOnGPU { get; set; }
     public List<MaterialTextureEntry> MaterialTextures { get; private set; } = new();
@@ -45,9 +45,13 @@ public sealed partial class Material : EditorComponent, IHide
         foreach (var texture in MaterialTextures)
             Context.GraphicsContext.SetShaderResourceView(Context.GetTextureByString(texture.Name), texture.Slot);
     }
+
+    public bool Equals(Material other) =>
+        RootSignature == other.RootSignature
+     && MaterialTextures.Count == other.MaterialTextures.Count;
 }
 
-public sealed partial class Material : EditorComponent, IHide
+public sealed partial class Material : EditorComponent, IHide, IEquatable<Material>
 {
     public void SetMaterialTexture(params MaterialTextureEntry[] textureEntries)
     {

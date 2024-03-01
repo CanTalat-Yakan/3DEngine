@@ -43,8 +43,8 @@ public sealed partial class Mesh : EditorComponent
         if (!InBounds)
             return;
         
-        if (Equals(CurrentMeshInfoOnGPU, MeshInfo) 
-         && Equals(CurrentMaterialOnGPU, Material))
+        if (Equals(CurrentMeshInfoOnGPU, MeshInfo))
+            //&& Equals(CurrentMaterialOnGPU, Material))
             Context.GraphicsContext.DrawIndexedInstanced(MeshInfo.IndexCount, 1, 0, 0, 0);
         else
         {

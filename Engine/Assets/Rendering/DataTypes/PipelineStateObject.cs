@@ -117,18 +117,16 @@ public struct PipelineStateObjectDescription : IEquatable<PipelineStateObjectDes
     public override bool Equals(object obj) =>
         obj is PipelineStateObjectDescription description && Equals(description);
 
-    public bool Equals(PipelineStateObjectDescription other)
-    {
-        return RenderTargetCount == other.RenderTargetCount &&
-               RenderTargetFormat == other.RenderTargetFormat &&
-               DepthStencilFormat == other.DepthStencilFormat &&
-               BlendState == other.BlendState &&
-               DepthBias == other.DepthBias &&
-               SlopeScaledDepthBias == other.SlopeScaledDepthBias &&
-               CullMode == other.CullMode &&
-               InputLayout == other.InputLayout &&
-               PrimitiveTopologyType == other.PrimitiveTopologyType;
-    }
+    public bool Equals(PipelineStateObjectDescription other) =>
+        RenderTargetCount == other.RenderTargetCount
+     && RenderTargetFormat == other.RenderTargetFormat
+     && DepthStencilFormat == other.DepthStencilFormat
+     && BlendState == other.BlendState
+     && DepthBias == other.DepthBias
+     && SlopeScaledDepthBias == other.SlopeScaledDepthBias
+     && CullMode == other.CullMode
+     && InputLayout == other.InputLayout
+     && PrimitiveTopologyType == other.PrimitiveTopologyType;
 
     public override int GetHashCode()
     {
