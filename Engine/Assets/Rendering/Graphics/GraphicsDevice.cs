@@ -42,7 +42,7 @@ public sealed partial class GraphicsDevice : IDisposable
     public static Format SwapChainFormat = Format.R8G8B8A8_UNorm;
     public static Format DepthStencilFormat = Format.D32_Float;
     public List<ID3D12Resource> ScreenResources;
-    public ID3D12DescriptorHeap DepthStencilDescriptorHeap;
+    public ID3D12Resource DepthStencil;
 
     public int BufferCount = 3;
 
@@ -276,21 +276,12 @@ public sealed partial class GraphicsDevice : IDisposable
             mipLevels: 1);
         depthStencilDescription.Flags |= ResourceFlags.AllowDepthStencil;
 
-        var depthStencilTexture = Device.CreateCommittedResource(
+        DepthStencil = Device.CreateCommittedResource(
             new HeapProperties(HeapType.Default),
             HeapFlags.None,
             depthStencilDescription,
             ResourceStates.DepthWrite,
             new(DepthStencilFormat, 1.0f, 0));
-
-        DepthStencilViewDescription depthStencilViewDescription = new()
-        {
-            Format = DepthStencilFormat,
-            ViewDimension = DepthStencilViewDimension.Texture2D
-        };
-
-        DepthStencilDescriptorHeap = Device.CreateDescriptorHeap(new DescriptorHeapDescription(DescriptorHeapType.DepthStencilView, 1));
-        Device.CreateDepthStencilView(depthStencilTexture, depthStencilViewDescription, DepthStencilDescriptorHeap.GetCPUDescriptorHandleForHeapStart());
     }
 }
 
@@ -649,15 +640,18 @@ public sealed partial class GraphicsDevice : IDisposable
     public CpuDescriptorHandle GetRenderTargetScreen()
     {
         CpuDescriptorHandle handle = RenderTextureViewHeap.GetTemporaryCPUHandle();
-        var resource = ScreenResources[SwapChain.CurrentBackBufferIndex];
-
-        Device.CreateRenderTargetView(resource, null, handle);
+        Device.CreateRenderTargetView(ScreenResources[SwapChain.CurrentBackBufferIndex], null, handle);
 
         return handle;
     }
 
-    public CpuDescriptorHandle GetDepthStencilScreen() =>
-        DepthStencilDescriptorHeap.GetCPUDescriptorHandleForHeapStart();
+    public CpuDescriptorHandle GetDepthStencilScreen()
+    {
+        CpuDescriptorHandle handle = DepthStencilViewHeap.GetTemporaryCPUHandle();
+        Device.CreateDepthStencilView(DepthStencil, null, handle);
+
+        return handle;
+    }
 
     public ID3D12Resource GetScreenResource() =>
         ScreenResources[SwapChain.CurrentBackBufferIndex];
