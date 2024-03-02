@@ -1,6 +1,4 @@
-﻿using Engine.Loader;
-
-namespace Engine.Editor;
+﻿namespace Engine.Editor;
 
 public sealed partial class DefaultSky : EditorComponent, IHide
 {
@@ -23,29 +21,13 @@ public sealed partial class DefaultSky : EditorComponent, IHide
 
     public void Initialize()
     {
-        LoadResources();
-
         Entity.Name = "Sky";
         Entity.Tag = "DefaultSky";
         Entity.IsHidden = true;
 
-        Entity.Transform.LocalScale = new Vector3(-100, 100, 100);
-
         var mesh = Entity.AddComponent<Mesh>();
-        mesh.SetMeshInfo(SkyMeshInfo);
-        mesh.SetMaterialTextures(new MaterialTextureEntry("SkyGradient.png", 0));
-        mesh.SetMaterialPipeline("Unlit");
-    }
-}
-
-public sealed partial class DefaultSky : EditorComponent, IHide
-{
-    public void LoadResources()
-    {
-        RootSignature = Context.CreateRootSignatureFromString("Cs");
-
-        SkyMeshInfo = ModelLoader.LoadFile(Paths.PRIMITIVES + "Sphere.obj");
-        SkyGradientTexture = ImageLoader.LoadTexture(Paths.TEXTURES + "SkyGradient.png");
-        SkyGradientLightTexture = ImageLoader.LoadTexture(Paths.TEXTURES + "SkyGradient_Light.png");
+        mesh.SetMeshInfo(Context.Meshes["Sphere.obj"]);
+        mesh.SetMaterialTextures([new("Skybox.png", 0)]);
+        mesh.SetMaterialPipeline("Sky");
     }
 }

@@ -17,14 +17,15 @@ cbuffer Properties : register(b10)
     bool Bool;
 };
 
-Texture2D texture0 : register(t0);
-sampler sampler0 : register(s2);
-
 PSInput VS(VSInput input)
 {
     PSInput output;
 
     output.pos = mul(float4(input.pos, 1), mul(World, ViewProjection));
+    output.normal = mul(float4(input.normal, 0), World);
+    output.tangent = mul(float4(input.tangent, 0), World);
+    output.worldpos = mul(float4(input.pos, 1), World);
+    output.camerapos = Camera;
     output.uv = input.uv;
 
     return output;
@@ -32,7 +33,5 @@ PSInput VS(VSInput input)
 
 float4 PS(PSInput input) : SV_TARGET
 {
-    float4 col = texture0.Sample(sampler0, input.uv);
-
-    return col;
+    return float4(0.255, 0.295, 0.3255, 1);
 }

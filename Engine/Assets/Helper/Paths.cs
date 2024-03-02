@@ -1,4 +1,4 @@
-﻿namespace Engine.Editor;
+﻿namespace Engine.Helper;
 
 public sealed class Paths
 {

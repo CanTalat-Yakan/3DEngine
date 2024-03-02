@@ -78,9 +78,6 @@ public sealed partial class EntityManager
             IsHidden = hide
         };
 
-        ModelLoader.LoadFile(Paths.PRIMITIVES + "Cube.obj");
-        ImageLoader.LoadTexture(Paths.TEXTURES + "Default.png");
-
         var mesh = newEntity.AddComponent<Mesh>();
         mesh.SetMeshInfo(ModelLoader.LoadFile(Paths.PRIMITIVES + type.ToString() + ".obj"));
         mesh.SetMaterialTextures(new MaterialTextureEntry("Default.png", 0));

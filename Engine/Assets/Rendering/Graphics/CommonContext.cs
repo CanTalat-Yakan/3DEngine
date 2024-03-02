@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using Engine.Loader;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 using Vortice.Direct3D12;
@@ -34,13 +35,29 @@ public sealed partial class CommonContext : IDisposable
 
     public void LoadDefaultResources()
     {
-        VertexShaders["Unlit"] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + "Unlit.hlsl", "VS");
-        PixelShaders["Unlit"] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + "Unlit.hlsl", "PS");
-        PipelineStateObjects["Unlit"] = new PipelineStateObject(VertexShaders["Unlit"], PixelShaders["Unlit"]);
+        var shader = "Unlit";
+        VertexShaders[shader] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + shader + ".hlsl", "VS");
+        PixelShaders[shader] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + shader + ".hlsl", "PS");
+        PipelineStateObjects[shader] = new PipelineStateObject(VertexShaders[shader], PixelShaders[shader]);
+        
+        shader = "SimpleLit";
+        VertexShaders[shader] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + shader + ".hlsl", "VS");
+        PixelShaders[shader] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + shader + ".hlsl", "PS");
+        PipelineStateObjects[shader] = new PipelineStateObject(VertexShaders[shader], PixelShaders[shader]);
+        
+        shader = "Sky";
+        VertexShaders[shader] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + shader + ".hlsl", "VS");
+        PixelShaders[shader] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + shader + ".hlsl", "PS");
+        PipelineStateObjects[shader] = new PipelineStateObject(VertexShaders[shader], PixelShaders[shader]);
 
-        VertexShaders["SimpleLit"] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + "SimpleLit.hlsl", "VS");
-        PixelShaders["SimpleLit"] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + "SimpleLit.hlsl", "PS");
-        PipelineStateObjects["SimpleLit"] = new PipelineStateObject(VertexShaders["SimpleLit"], PixelShaders["SimpleLit"]);
+        ModelLoader.LoadFile(Paths.PRIMITIVES + "Cube.obj");
+        ModelLoader.LoadFile(Paths.PRIMITIVES + "Sphere.obj");
+        ImageLoader.LoadTexture(Paths.TEXTURES + "Default.png");
+        ImageLoader.LoadTexture(Paths.TEXTURES + "Skybox.png");
+        ImageLoader.LoadTexture(Paths.TEXTURES + "SkyGradient.png");
+        ImageLoader.LoadTexture(Paths.TEXTURES + "SkyGradient_HiRes.png");
+        ImageLoader.LoadTexture(Paths.TEXTURES + "Transparent.png");
+        ImageLoader.LoadTexture(Paths.TEXTURES + "UVMap.png");
     }
 
     public void Dispose()

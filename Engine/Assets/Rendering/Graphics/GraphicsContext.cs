@@ -117,40 +117,45 @@ public sealed partial class GraphicsContext : IDisposable
 
     public void UploadTexture(Texture2D texture, byte[] data)
     {
-        if (data is not null)
+        ID3D12Resource resourceUpload = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
+            new HeapProperties(HeapType.Upload),
+            HeapFlags.None,
+            ResourceDescription.Buffer((ulong)data.Length),
+            ResourceStates.GenericRead);
+        GraphicsDevice.DestroyResource(resourceUpload);
+
+        GraphicsDevice.DestroyResource(texture.Resource);
+        texture.Resource = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
+            HeapProperties.DefaultHeapProperties,
+            HeapFlags.None,
+            ResourceDescription.Texture2D(texture.Format, (uint)texture.Width, (uint)texture.Height, arraySize: 1, mipLevels: 1),
+            ResourceStates.CopyDest);
+
+        uint bitsPerPixel = GraphicsDevice.GetBitsPerPixel(texture.Format);
+        uint alignment = 4; // Adjust alignment value if needed
+
+        // Ensure row pitch is aligned
+        uint rowPitch = (uint)texture.Width * (bitsPerPixel / 8);
+        if (rowPitch % alignment != 0)
+            rowPitch += alignment - (rowPitch % alignment);
+
+        SubresourceData subresourcedata = new()
         {
-            ID3D12Resource resourceUpload = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
-                new HeapProperties(HeapType.Upload),
-                HeapFlags.None,
-                ResourceDescription.Buffer((ulong)data.Length),
-                ResourceStates.GenericRead);
-            GraphicsDevice.DestroyResource(resourceUpload);
+            Data = Marshal.UnsafeAddrOfPinnedArrayElement(data, 0),
+            RowPitch = (IntPtr)rowPitch,
+            SlicePitch = (IntPtr)(rowPitch * texture.Height), // Recalculate slice pitch
+        };
 
-            GraphicsDevice.DestroyResource(texture.Resource);
-            texture.Resource = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
-                HeapProperties.DefaultHeapProperties,
-                HeapFlags.None,
-                ResourceDescription.Texture2D(texture.Format, (uint)texture.Width, (uint)texture.Height, arraySize: 1, mipLevels: 1),
-                ResourceStates.CopyDest);
+        UpdateSubresources(CommandList, texture.Resource, resourceUpload, 0, 0, 1, [subresourcedata]);
 
-            uint bitsPerPixel = GraphicsDevice.GetBitsPerPixel(texture.Format);
-
-            SubresourceData subresourcedata = new()
-            {
-                Data = Marshal.UnsafeAddrOfPinnedArrayElement(data, 0),
-                RowPitch = (IntPtr)(texture.Width * bitsPerPixel / 8),
-                SlicePitch = (IntPtr)(texture.Width * texture.Height * bitsPerPixel / 8),
-            };
-            UpdateSubresources(CommandList, texture.Resource, resourceUpload, 0, 0, 1, [subresourcedata]);
-
-            GCHandle gcHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            gcHandle.Free();
-        }
+        GCHandle gcHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+        gcHandle.Free();
 
         CommandList.ResourceBarrierTransition(texture.Resource, ResourceStates.CopyDest, ResourceStates.GenericRead);
         texture.ResourceStates = ResourceStates.GenericRead;
     }
 }
+
 
 public sealed partial class GraphicsContext : IDisposable
 {

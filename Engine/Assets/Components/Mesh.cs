@@ -13,7 +13,7 @@ public sealed partial class Mesh : EditorComponent
     public Material Material { get; private set; } = new();
 
     public BoundingBox TransformedBoundingBox { get; private set; }
-    public bool InBounds { get; set; }
+    public bool InBounds { get; set; } = true;
 
     public CommonContext Context => _context ??= Kernel.Instance.Context;
     public CommonContext _context;
@@ -24,11 +24,11 @@ public sealed partial class Mesh : EditorComponent
     public override void OnRegister() =>
         MeshSystem.Register(this);
 
+    public override void OnStart() =>
+        CheckBounds();
+
     public override void OnUpdate()
     {
-        if (MeshInfo is null)
-            return;
-
         if (!EditorState.EditorBuild)
             CheckBounds();
     }
@@ -113,6 +113,9 @@ public sealed partial class Mesh : EditorComponent
 
     private void CheckBounds()
     {
+        if (MeshInfo is null)
+            return;
+
         if (Entity.Transform.TransformChanged)
             TransformedBoundingBox = BoundingBox.Transform(
                 MeshInfo.BoundingBox,

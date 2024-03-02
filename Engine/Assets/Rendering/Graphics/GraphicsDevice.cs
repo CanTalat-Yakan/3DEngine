@@ -294,10 +294,9 @@ public sealed partial class GraphicsDevice : IDisposable
 
         samplerDescription[0] = new(ShaderVisibility.All, 0, 0)
         {
-            AddressU = TextureAddressMode.Clamp,
-            AddressV = TextureAddressMode.Clamp,
-            AddressW = TextureAddressMode.Clamp,
-            BorderColor = StaticBorderColor.OpaqueBlack,
+            AddressU = TextureAddressMode.Mirror,
+            AddressV = TextureAddressMode.Mirror,
+            AddressW = TextureAddressMode.Mirror,
             ComparisonFunction = ComparisonFunction.Never,
             Filter = Filter.MinMagMipLinear,
             MipLODBias = 0,
