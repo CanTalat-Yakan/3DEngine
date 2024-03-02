@@ -117,32 +117,35 @@ public sealed partial class GraphicsContext : IDisposable
 
     public void UploadTexture(Texture2D texture, byte[] data)
     {
-        ID3D12Resource resourceUpload = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
-            new HeapProperties(HeapType.Upload),
-            HeapFlags.None,
-            ResourceDescription.Buffer((ulong)data.Length),
-            ResourceStates.GenericRead);
-        GraphicsDevice.DestroyResource(resourceUpload);
-
-        GraphicsDevice.DestroyResource(texture.Resource);
-        texture.Resource = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
-            HeapProperties.DefaultHeapProperties,
-            HeapFlags.None,
-            ResourceDescription.Texture2D(texture.Format, (uint)texture.Width, (uint)texture.Height, arraySize: 1, mipLevels: 1),
-            ResourceStates.CopyDest);
-
-        uint bitsPerPixel = GraphicsDevice.GetBitsPerPixel(texture.Format);
-
-        SubresourceData subresourcedata = new()
+        if (data is not null)
         {
-            Data = Marshal.UnsafeAddrOfPinnedArrayElement(data, 0),
-            RowPitch = (IntPtr)(texture.Width * bitsPerPixel / 8),
-            SlicePitch = (IntPtr)(texture.Width * texture.Height * bitsPerPixel / 8),
-        };
-        UpdateSubresources(CommandList, texture.Resource, resourceUpload, 0, 0, 1, [subresourcedata]);
+            ID3D12Resource resourceUpload = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
+                new HeapProperties(HeapType.Upload),
+                HeapFlags.None,
+                ResourceDescription.Buffer((ulong)data.Length),
+                ResourceStates.GenericRead);
+            GraphicsDevice.DestroyResource(resourceUpload);
 
-        GCHandle gcHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-        gcHandle.Free();
+            GraphicsDevice.DestroyResource(texture.Resource);
+            texture.Resource = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
+                HeapProperties.DefaultHeapProperties,
+                HeapFlags.None,
+                ResourceDescription.Texture2D(texture.Format, (uint)texture.Width, (uint)texture.Height, arraySize: 1, mipLevels: 1),
+                ResourceStates.CopyDest);
+
+            uint bitsPerPixel = GraphicsDevice.GetBitsPerPixel(texture.Format);
+
+            SubresourceData subresourcedata = new()
+            {
+                Data = Marshal.UnsafeAddrOfPinnedArrayElement(data, 0),
+                RowPitch = (IntPtr)(texture.Width * bitsPerPixel / 8),
+                SlicePitch = (IntPtr)(texture.Width * texture.Height * bitsPerPixel / 8),
+            };
+            UpdateSubresources(CommandList, texture.Resource, resourceUpload, 0, 0, 1, [subresourcedata]);
+
+            GCHandle gcHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            gcHandle.Free();
+        }
 
         CommandList.ResourceBarrierTransition(texture.Resource, ResourceStates.CopyDest, ResourceStates.GenericRead);
         texture.ResourceStates = ResourceStates.GenericRead;
@@ -186,40 +189,11 @@ public sealed partial class GraphicsContext : IDisposable
         CommandList.SetGraphicsRootDescriptorTable(CurrentRootSignature.ShaderResourceView[slot], GPUHandle);
     }
 
-    public void SetDepthStencilViewRenderTextureView(bool clearDepthStencilView = true, bool clearRenderTextureView = true)
-    {
-        //Texture2D depthStencilView; 
-        //Texture2D[] renderTextureViews = GraphicsDevice.ScreenResources.ToArray();
-
-        //depthStencilView?.StateChange(CommandList, ResourceStates.DepthWrite);
-
-        //CpuDescriptorHandle[] renderTextureViewHandles = null;
-        //if (renderTextureViews is not null)
-        //{
-        //    renderTextureViewHandles = new CpuDescriptorHandle[renderTextureViews.Length];
-        //    for (int i = 0; i < renderTextureViews.Length; i++)
-        //    {
-        //        Texture2D renderTextureView = renderTextureViews[i];
-        //        renderTextureView.StateChange(CommandList, ResourceStates.RenderTarget);
-        //        renderTextureViewHandles[i] = renderTextureView.RenderTargetView.GetCPUDescriptorHandleForHeapStart();
-        //    }
-        //}
-
-        //if (clearDepthStencilView && depthStencilView is not null)
-        //    CommandList.ClearDepthStencilView(depthStencilView.DepthStencilView.GetCPUDescriptorHandleForHeapStart(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
-
-        //if (clearRenderTextureView && renderTextureViews is not null)
-        //    foreach (var rtv in renderTextureViews)
-        //        CommandList.ClearRenderTargetView(rtv.RenderTargetView.GetCPUDescriptorHandleForHeapStart(), new Color4());
-
-        //CommandList.OMSetRenderTargets(renderTextureViewHandles, depthStencilView.DepthStencilView.GetCPUDescriptorHandleForHeapStart());
-    }
-
     public void SetRenderTargetScreen()
     {
         CommandList.RSSetViewport(new Viewport(0, 0, GraphicsDevice.Size.Width, GraphicsDevice.Size.Height, 0.0f, 1.0f));
         CommandList.RSSetScissorRect(new RectI(0, 0, GraphicsDevice.Size.Width, GraphicsDevice.Size.Height));
-        CommandList.OMSetRenderTargets(GraphicsDevice.GetRenderTargetScreen());
+        CommandList.OMSetRenderTargets(GraphicsDevice.GetRenderTargetScreen(), GraphicsDevice.GetDepthStencilScreen());
     }
 
     public void SetConstantBufferView(UploadBuffer uploadBuffer, int offset, int slot) =>
@@ -236,6 +210,9 @@ public sealed partial class GraphicsContext : IDisposable
 
     public void ClearRenderTargetScreen(Color4? color = null) =>
         CommandList.ClearRenderTargetView(GraphicsDevice.GetRenderTargetScreen(), color is not null ? color.Value : new Color4(0.15f, 0.15f, 0.15f, 1));
+
+    public void ClearDepthStencilScreen() =>
+        CommandList.ClearDepthStencilView(GraphicsDevice.GetDepthStencilScreen(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
 }
 
 public sealed partial class GraphicsContext : IDisposable

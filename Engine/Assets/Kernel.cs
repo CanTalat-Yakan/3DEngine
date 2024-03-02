@@ -134,8 +134,8 @@ public sealed class Kernel
         Context.GraphicsContext.SetDescriptorHeapDefault();
         Context.GraphicsContext.ScreenBeginRender();
         Context.GraphicsContext.SetRenderTargetScreen();
-        Context.GraphicsContext.SetDepthStencilViewRenderTextureView();
         Context.GraphicsContext.ClearRenderTargetScreen();
+        Context.GraphicsContext.ClearDepthStencilScreen();
     }
 
     public void EndRender()

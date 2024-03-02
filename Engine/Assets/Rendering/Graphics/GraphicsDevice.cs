@@ -42,6 +42,7 @@ public sealed partial class GraphicsDevice : IDisposable
     public static Format SwapChainFormat = Format.R8G8B8A8_UNorm;
     public static Format DepthStencilFormat = Format.D32_Float;
     public List<ID3D12Resource> ScreenResources;
+    public ID3D12DescriptorHeap DepthStencilDescriptorHeap;
 
     public int BufferCount = 3;
 
@@ -55,6 +56,7 @@ public sealed partial class GraphicsDevice : IDisposable
         CreateFence();
         CreateCommandAllocator();
         CreateSwapChain(win32Window);
+        CreateDepthStencil();
 
         ExecuteCount++;
     }
@@ -266,116 +268,30 @@ public sealed partial class GraphicsDevice : IDisposable
 
     public void CreateDepthStencil()
     {
-        Texture2D texture = new()
-        {
-            Width = Size.Width,
-            Height = Size.Height,
-            MipLevels = 1,
-        };
-        Kernel.Instance.Context.RenderTargets["DepthStencil"] = texture;
+        ResourceDescription depthStencilDescription = ResourceDescription.Texture2D(
+            DepthStencilFormat,
+            (uint)Size.Width,
+            (uint)Size.Height,
+            arraySize: 1,
+            mipLevels: 1);
+        depthStencilDescription.Flags |= ResourceFlags.AllowDepthStencil;
 
-        GPUUpload upload = new()
-        {
-            Texture2D = texture,
-            IndexFormat = DepthStencilFormat,
-            TextureData = null,
-        };
-        Kernel.Instance.Context.UploadQueue.Enqueue(upload);
-
-        DepthStencilDescription depthStencilDescription = new()
-        {
-            DepthEnable = true,
-            DepthFunc = ComparisonFunction.Less,
-            DepthWriteMask = DepthWriteMask.All,
-        };
+        var depthStencilTexture = Device.CreateCommittedResource(
+            new HeapProperties(HeapType.Default),
+            HeapFlags.None,
+            depthStencilDescription,
+            ResourceStates.DepthWrite,
+            new(DepthStencilFormat, 1.0f, 0));
 
         DepthStencilViewDescription depthStencilViewDescription = new()
         {
             Format = DepthStencilFormat,
-            
+            ViewDimension = DepthStencilViewDimension.Texture2D
         };
-        
-        Device.CreateDepthStencilView(texture.Resource, depthStencilViewDescription, GetDepthStencilScreen());
 
-        //TODO FINISH THE DEPTHSTENCIL CREATION
+        DepthStencilDescriptorHeap = Device.CreateDescriptorHeap(new DescriptorHeapDescription(DescriptorHeapType.DepthStencilView, 1));
+        Device.CreateDepthStencilView(depthStencilTexture, depthStencilViewDescription, DepthStencilDescriptorHeap.GetCPUDescriptorHandleForHeapStart());
     }
-
-
-    //private void CreateDepthStencilView()
-    //{
-    //    // Set up depth stencil description.
-    //    DepthStencilDescription depthStencilDescription = new()
-    //    {
-    //        DepthEnable = true,
-    //        DepthFunc = ComparisonFunction.Less,
-    //        DepthWriteMask = DepthWriteMask.All,
-    //    };
-    //    // Create a depth stencil state from the description.
-    //    Data.DepthStencilState = Device.CreateDepthStencilState(depthStencilDescription);
-
-    //    // Create a depth stencil texture description with the specified properties.
-    //    Texture2DDescription depthStencilTextureDescription = new()
-    //    {
-    //        Format = Format.D32_Float, // Set format to D32_Float.
-    //        Width = Size.Width,
-    //        Height = Size.Height,
-    //        ArraySize = 1,
-    //        MipLevels = 1,
-    //        SampleDescription = new(Config.SupportedSampleCount, Config.QualityLevels),
-    //        Usage = ResourceUsage.Default,
-    //        BindFlags = BindFlags.DepthStencil,
-    //        CPUAccessFlags = CpuAccessFlags.None,
-    //        MiscFlags = ResourceOptionFlags.None
-    //    };
-    //    // Create the depth stencil texture based on the description.
-    //    Data.DepthStencilTexture = Device.CreateTexture2D(depthStencilTextureDescription);
-
-    //    // Create a depth stencil view description for the multi sampling.
-    //    DepthStencilViewDescription depthStencilViewDescription = new(DepthStencilViewDimension.Texture2DMultisampled, Format.D32_Float);
-    //    // Create a depth stencil view for the depth stencil texture.
-    //    Data.DepthStencilView = Device.CreateDepthStencilView(Data.DepthStencilTexture, depthStencilViewDescription);
-    //}
-
-
-
-
-
-
-    //public void CreateDepthStencil(int width, int height)
-    //{
-    //    // 1. Texture Description
-    //    Texture2DDescription depthStencilDesc = new D3D12.Texture2DDescription()
-    //    {
-    //        Width = width,
-    //        Height = height,
-    //        MipLevels = 1,
-    //        ArraySize = 1,
-    //        Format = DXGI.Format.D24_UNorm_S8_UInt, // Common depth-stencil format
-    //        SampleDesc = new DXGI.SampleDescription(1, 0),
-    //        Usage = D3D12.ResourceUsage.Default,
-    //        BindFlags = D3D12.BindFlags.DepthStencil,
-    //    };
-
-    //    // 2. Create the Texture
-    //    Device.CreateCommittedResource(
-    //        new D3D12.HeapProperties(D3D12.HeapType.Default),
-    //        D3D12.HeapFlags.None,
-    //        depthStencilDesc,
-    //        D3D12.ResourceStates.DepthWrite,
-    //        new D3D12.ClearValue(DXGI.Format.D24_UNorm_S8_UInt, new D3D12.DepthStencilValue(1.0f, 0)),
-    //        out depthStencilTexture
-    //    ).ThrowIfFailed();
-    //    depthStencilTexture.Name = "DepthStencilTexture"; // Optional: Set a name
-
-    //    // 3. Create Depth-Stencil View
-    //    D3D12.DepthStencilViewDescription dsvDesc = new D3D12.DepthStencilViewDescription()
-    //    {
-    //        Format = DXGI.Format.D24_UNorm_S8_UInt,
-    //        ViewDimension = D3D12.DsvDimension.Texture2D
-    //    };
-    //    Device.CreateDepthStencilView(depthStencilTexture, dsvDesc, DepthStencilViewHeap.GetDescriptorHandle());
-    //}
-
 }
 
 public sealed partial class GraphicsDevice : IDisposable
@@ -739,15 +655,9 @@ public sealed partial class GraphicsDevice : IDisposable
 
         return handle;
     }
-    public CpuDescriptorHandle GetDepthStencilScreen()
-    {
-        CpuDescriptorHandle handle = RenderTextureViewHeap.GetTemporaryCPUHandle();
-        var resource = Kernel.Instance.Context.RenderTargets["DepthStencil"].Resource;
 
-        Device.CreateRenderTargetView(resource, null, handle);
-
-        return handle;
-    }
+    public CpuDescriptorHandle GetDepthStencilScreen() =>
+        DepthStencilDescriptorHeap.GetCPUDescriptorHandleForHeapStart();
 
     public ID3D12Resource GetScreenResource() =>
         ScreenResources[SwapChain.CurrentBackBufferIndex];
