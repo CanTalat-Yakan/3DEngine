@@ -53,9 +53,7 @@ public sealed partial class CommonContext : IDisposable
         ModelLoader.LoadFile(Paths.PRIMITIVES + "Cube.obj");
         ModelLoader.LoadFile(Paths.PRIMITIVES + "Sphere.obj");
         ImageLoader.LoadTexture(Paths.TEXTURES + "Default.png");
-        ImageLoader.LoadTexture(Paths.TEXTURES + "Skybox.png");
         ImageLoader.LoadTexture(Paths.TEXTURES + "SkyGradient.png");
-        ImageLoader.LoadTexture(Paths.TEXTURES + "SkyGradient_HiRes.png");
         ImageLoader.LoadTexture(Paths.TEXTURES + "Transparent.png");
         ImageLoader.LoadTexture(Paths.TEXTURES + "UVMap.png");
     }

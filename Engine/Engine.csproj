@@ -34,10 +34,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Remove="Assets\Resources\Shaders\Sky.hlsl" />
-		<None Remove="Assets\Resources\Textures\3DEngine_Logo.png" />
 		<None Remove="Assets\Resources\Templates\Engine.dll" />
-		<None Remove="Assets\Resources\Textures\Skybox.png" />
 		<None Remove="FodyWeavers.xml" />
 	</ItemGroup>
 
@@ -153,14 +150,8 @@
 		<Content Include="Assets\Resources\Textures\Default.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-		<Content Include="Assets\Resources\Textures\Skybox.png">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
 		<Content Include="Assets\Resources\Textures\SkyGradient.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Assets\Resources\Textures\SkyGradient_HiRes.png">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Resources\Textures\SkyGradient_Light.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
