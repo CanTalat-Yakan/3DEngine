@@ -186,30 +186,33 @@ public sealed partial class GraphicsContext : IDisposable
         CommandList.SetGraphicsRootDescriptorTable(CurrentRootSignature.ShaderResourceView[slot], GPUHandle);
     }
 
-    public void SetDepthStencilViewRenderTextureView(Texture2D depthStencilView, Texture2D[] renderTextureViews, bool clearDepthStencilView, bool clearRenderTextureView)
+    public void SetDepthStencilViewRenderTextureView(bool clearDepthStencilView = true, bool clearRenderTextureView = true)
     {
-        depthStencilView?.StateChange(CommandList, ResourceStates.DepthWrite);
+        //Texture2D depthStencilView; 
+        //Texture2D[] renderTextureViews = GraphicsDevice.ScreenResources.ToArray();
 
-        CpuDescriptorHandle[] renderTextureViewHandles = null;
-        if (renderTextureViews is not null)
-        {
-            renderTextureViewHandles = new CpuDescriptorHandle[renderTextureViews.Length];
-            for (int i = 0; i < renderTextureViews.Length; i++)
-            {
-                Texture2D renderTextureView = renderTextureViews[i];
-                renderTextureView.StateChange(CommandList, ResourceStates.RenderTarget);
-                renderTextureViewHandles[i] = renderTextureView.RenderTargetView.GetCPUDescriptorHandleForHeapStart();
-            }
-        }
+        //depthStencilView?.StateChange(CommandList, ResourceStates.DepthWrite);
 
-        if (clearDepthStencilView && depthStencilView is not null)
-            CommandList.ClearDepthStencilView(depthStencilView.DepthStencilView.GetCPUDescriptorHandleForHeapStart(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
+        //CpuDescriptorHandle[] renderTextureViewHandles = null;
+        //if (renderTextureViews is not null)
+        //{
+        //    renderTextureViewHandles = new CpuDescriptorHandle[renderTextureViews.Length];
+        //    for (int i = 0; i < renderTextureViews.Length; i++)
+        //    {
+        //        Texture2D renderTextureView = renderTextureViews[i];
+        //        renderTextureView.StateChange(CommandList, ResourceStates.RenderTarget);
+        //        renderTextureViewHandles[i] = renderTextureView.RenderTargetView.GetCPUDescriptorHandleForHeapStart();
+        //    }
+        //}
 
-        if (clearRenderTextureView && renderTextureViews is not null)
-            foreach (var rtv in renderTextureViews)
-                CommandList.ClearRenderTargetView(rtv.RenderTargetView.GetCPUDescriptorHandleForHeapStart(), new Color4());
+        //if (clearDepthStencilView && depthStencilView is not null)
+        //    CommandList.ClearDepthStencilView(depthStencilView.DepthStencilView.GetCPUDescriptorHandleForHeapStart(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
 
-        CommandList.OMSetRenderTargets(renderTextureViewHandles, depthStencilView.DepthStencilView.GetCPUDescriptorHandleForHeapStart());
+        //if (clearRenderTextureView && renderTextureViews is not null)
+        //    foreach (var rtv in renderTextureViews)
+        //        CommandList.ClearRenderTargetView(rtv.RenderTargetView.GetCPUDescriptorHandleForHeapStart(), new Color4());
+
+        //CommandList.OMSetRenderTargets(renderTextureViewHandles, depthStencilView.DepthStencilView.GetCPUDescriptorHandleForHeapStart());
     }
 
     public void SetRenderTargetScreen()

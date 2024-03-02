@@ -99,10 +99,7 @@ public sealed class Kernel
         BeginRender();
 
         Profiler.Reset();
-
         Time.Update();
-
-        Input.Fetch();
         Input.Update();
 
         SceneManager.ProcessSystems();
@@ -137,6 +134,7 @@ public sealed class Kernel
         Context.GraphicsContext.SetDescriptorHeapDefault();
         Context.GraphicsContext.ScreenBeginRender();
         Context.GraphicsContext.SetRenderTargetScreen();
+        Context.GraphicsContext.SetDepthStencilViewRenderTextureView();
         Context.GraphicsContext.ClearRenderTargetScreen();
     }
 

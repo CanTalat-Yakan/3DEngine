@@ -43,11 +43,16 @@ public sealed partial class Mesh : EditorComponent
 
         if (!InBounds)
             return;
-        
-        //if (MeshInfo.Equals(CurrentMeshInfoOnGPU)
-        // && Material.Equals(CurrentMaterialOnGPU))
-        //    Context.GraphicsContext.DrawIndexedInstanced(MeshInfo.IndexCount, 1, 0, 0, 0);
-        //else
+
+        if (MeshInfo.Equals(CurrentMeshInfoOnGPU)
+         && Material.Equals(CurrentMaterialOnGPU))
+        {
+            Context.UploadBuffer.Upload(Entity.Transform.GetConstantBuffer(), out var offset);
+            Context.UploadBuffer.SetConstantBufferView(offset, 1);
+
+            Context.GraphicsContext.DrawIndexedInstanced(MeshInfo.IndexCount, 1, 0, 0, 0);
+        }
+        else
         {
             Material.Setup();
 
@@ -82,7 +87,7 @@ public sealed partial class Mesh : EditorComponent
         Material.SetRootSignature("CC");
     }
 
-    public void SetMaterialTexture(params MaterialTextureEntry[] textureEntries)
+    public void SetMaterialTextures(params MaterialTextureEntry[] textureEntries)
     {
         Material.MaterialTextures.AddRange(textureEntries);
 
@@ -93,6 +98,9 @@ public sealed partial class Mesh : EditorComponent
 
         Material.SetRootSignature("CC" + shaderResourceViews);
     }
+
+    public void SetMaterialPipeline(string pipelineStateObjectName) =>
+        Material.SetPipelineStateObject(pipelineStateObjectName);
 
     private void InstantiateBounds(BoundingBox boundingBox)
     {

@@ -39,7 +39,8 @@ public sealed partial class GraphicsDevice : IDisposable
     public int ExecuteIndex = 0;
     public ulong ExecuteCount = 3; // Greater equal than 'bufferCount'.
 
-    public Format SwapChainFormat = Format.R8G8B8A8_UNorm;
+    public static Format SwapChainFormat = Format.R8G8B8A8_UNorm;
+    public static Format DepthStencilFormat = Format.D32_Float;
     public List<ID3D12Resource> ScreenResources;
 
     public int BufferCount = 3;
@@ -265,13 +266,36 @@ public sealed partial class GraphicsDevice : IDisposable
 
     public void CreateDepthStencil()
     {
+        Texture2D texture = new()
+        {
+            Width = Size.Width,
+            Height = Size.Height,
+            MipLevels = 1,
+        };
+        Kernel.Instance.Context.RenderTargets["DepthStencil"] = texture;
+
+        GPUUpload upload = new()
+        {
+            Texture2D = texture,
+            IndexFormat = DepthStencilFormat,
+            TextureData = null,
+        };
+        Kernel.Instance.Context.UploadQueue.Enqueue(upload);
+
         DepthStencilDescription depthStencilDescription = new()
         {
             DepthEnable = true,
             DepthFunc = ComparisonFunction.Less,
             DepthWriteMask = DepthWriteMask.All,
         };
-        //Device.CreateDepthStencilView(depthStencilDescription);
+
+        DepthStencilViewDescription depthStencilViewDescription = new()
+        {
+            Format = DepthStencilFormat,
+            
+        };
+        
+        Device.CreateDepthStencilView(texture.Resource, depthStencilViewDescription, GetDepthStencilScreen());
 
         //TODO FINISH THE DEPTHSTENCIL CREATION
     }
@@ -710,6 +734,15 @@ public sealed partial class GraphicsDevice : IDisposable
     {
         CpuDescriptorHandle handle = RenderTextureViewHeap.GetTemporaryCPUHandle();
         var resource = ScreenResources[SwapChain.CurrentBackBufferIndex];
+
+        Device.CreateRenderTargetView(resource, null, handle);
+
+        return handle;
+    }
+    public CpuDescriptorHandle GetDepthStencilScreen()
+    {
+        CpuDescriptorHandle handle = RenderTextureViewHeap.GetTemporaryCPUHandle();
+        var resource = Kernel.Instance.Context.RenderTargets["DepthStencil"].Resource;
 
         Device.CreateRenderTargetView(resource, null, handle);
 

@@ -23,6 +23,12 @@ public sealed class PipelineStateObject : IDisposable
 
     public ID3D12PipelineState GetState(GraphicsDevice device, PipelineStateObjectDescription description, RootSignature rootSignature, InputLayoutDescription inputLayout)
     {
+        description.CullMode ??= CullMode.None;
+        description.RenderTargetCount ??= 1;
+        description.RenderTargetFormat ??= GraphicsDevice.SwapChainFormat;
+        description.DepthStencilFormat ??= GraphicsDevice.DepthStencilFormat;
+        description.PrimitiveTopologyType ??= PrimitiveTopologyType.Triangle;
+
         foreach (var bundle in PipelineStateObjectBundles)
         {
             if (bundle.PipelineStateObjectDescription.Equals(description)
@@ -42,23 +48,27 @@ public sealed class PipelineStateObject : IDisposable
             VertexShader = VertexShader,
             GeometryShader = GeometryShader,
             PixelShader = PixelShader,
-            PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
+            PrimitiveTopologyType = description.PrimitiveTopologyType.Value,
             InputLayout = inputLayout,
-            DepthStencilFormat = description.DepthStencilFormat,
-            RenderTargetFormats = new Format[description.RenderTargetCount],
+            DepthStencilState = DepthStencilDescription.Default,
+            DepthStencilFormat = description.DepthStencilFormat.Value,
+            RenderTargetFormats = new Format[description.RenderTargetCount.Value],
         };
-        Array.Fill(graphicsPipelineStateDescription.RenderTargetFormats, description.RenderTargetFormat);
+        Array.Fill(graphicsPipelineStateDescription.RenderTargetFormats, description.RenderTargetFormat.Value);
 
-        if (description.BlendState == "Alpha")
-            graphicsPipelineStateDescription.BlendState = new BlendDescription(Blend.SourceAlpha, Blend.InverseSourceAlpha, Blend.One, Blend.InverseSourceAlpha);
-        else if (description.BlendState == "Add")
-            graphicsPipelineStateDescription.BlendState = BlendDescription.Additive;
-        else
-            graphicsPipelineStateDescription.BlendState = BlendDescription.Opaque;
+        graphicsPipelineStateDescription.BlendState = description.BlendState switch
+        {
+            "Alpha" => new(Blend.SourceAlpha, Blend.InverseSourceAlpha, Blend.One, Blend.InverseSourceAlpha),
+            "Add" => BlendDescription.Additive,
+            "Opaque" => BlendDescription.Opaque,
+            _ => BlendDescription.AlphaBlend,
+        };
+
+        graphicsPipelineStateDescription.DepthStencilState = DepthStencilDescription.Default;
 
         graphicsPipelineStateDescription.SampleMask = uint.MaxValue;
 
-        RasterizerDescription rasterizerState = new(CullMode.None, FillMode.Solid)
+        RasterizerDescription rasterizerState = new(description.CullMode.Value, description.Wireframe ? FillMode.Wireframe : FillMode.Solid)
         {
             DepthBias = description.DepthBias,
             SlopeScaledDepthBias = description.SlopeScaledDepthBias,
@@ -99,20 +109,22 @@ public sealed class PipelineStateObjectBundle
 
 public struct PipelineStateObjectDescription : IEquatable<PipelineStateObjectDescription>
 {
-    public int RenderTargetCount;
+    public int? RenderTargetCount;
 
-    public Format RenderTargetFormat;
-    public Format DepthStencilFormat;
+    public Format? RenderTargetFormat;
+    public Format? DepthStencilFormat;
 
     public string BlendState;
     public int DepthBias;
     public float SlopeScaledDepthBias;
 
-    public CullMode CullMode;
+    public CullMode? CullMode;
+
+    public bool Wireframe;
 
     public string InputLayout;
 
-    public PrimitiveTopologyType PrimitiveTopologyType;
+    public PrimitiveTopologyType? PrimitiveTopologyType;
 
     public override bool Equals(object obj) =>
         obj is PipelineStateObjectDescription description && Equals(description);

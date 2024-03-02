@@ -90,6 +90,8 @@ public sealed class Input
 
     public static void Update()
     {
+        Fetch();
+
         try
         {
             var currentMouseState = s_mouse?.GetCurrentMouseState();

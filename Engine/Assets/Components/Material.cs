@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 
 using Vortice.Direct3D12;
-using Vortice.DXGI;
 
 namespace Engine.Components;
 
@@ -24,9 +23,6 @@ public sealed class Material : EditorComponent, IHide, IEquatable<Material>
     public PipelineStateObjectDescription PipelineStateObjectDescription = new()
     {
         CullMode = CullMode.Front,
-        RenderTargetFormat = Format.R8G8B8A8_UNorm,
-        RenderTargetCount = 1,
-        PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
         BlendState = "Alpha",
     };
 
