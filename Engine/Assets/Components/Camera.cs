@@ -2,10 +2,11 @@
 
 namespace Engine.Components;
 
-public struct ViewConstantBuffer(Matrix4x4 viewProjection, Vector3 cameraPosition)
+public struct ViewConstantBuffer(Matrix4x4 viewProjection, Vector3 cameraPosition, Vector3 cameraLookDirection)
 {
     public Matrix4x4 ViewProjection = viewProjection;
     public Vector3 CameraPosition = cameraPosition;
+    public Vector3 CameraLookDirection = cameraLookDirection;
 }
 
 public sealed class Camera : EditorComponent
@@ -102,7 +103,8 @@ public sealed class Camera : EditorComponent
         // Store the transposed view-projection matrix and the position of the camera.
         ViewBuffer = new(
             Matrix4x4.Transpose(viewProjection),
-            Entity.Transform.Position);
+            Entity.Transform.Position,
+            Entity.Transform.Forward);
 
         /* 
          The coordinate system used in System.Numerics is right-handed,

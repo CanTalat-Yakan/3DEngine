@@ -20,6 +20,7 @@ cbuffer ViewConstantsBuffer : register(b0)
 {
     float4x4 ViewProjection;
     float3 Camera;
+    float3 ViewDirection;
 };
 
 cbuffer PerModelConstantBuffer : register(b1)

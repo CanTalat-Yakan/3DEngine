@@ -1,22 +1,5 @@
 #include "Include\Common.hlsli"
 
-cbuffer Properties : register(b10)
-{
-    // Color
-    float4 Color;
-    // Header("This is a Header!")
-    float Float;
-    int Int;
-    // Slider(1, 10)
-    float Slider;
-    // Space
-    float2 Float2;
-    float3 Float3;
-    float4 Float4;
-    // Space
-    bool Bool;
-};
-
 PSInput VS(VSInput input)
 {
     PSInput output;
@@ -33,5 +16,20 @@ PSInput VS(VSInput input)
 
 float4 PS(PSInput input) : SV_TARGET
 {
-    return float4(0.255, 0.295, 0.3255, 1);
+    float3 topColor = float3(0.81, 0.89, 0.95);
+    float3 middleColor = float3(0.44, 0.51, 0.58);
+    float3 bottomColor = float3(0.09, 0.09, 0.09);
+    
+    float3 viewDir = normalize(input.worldpos - input.camerapos);
+    float dotUp = dot(viewDir, float3(0, 1, 0));
+    float3 skyColor;
+
+    if (dotUp > 0.5) // Close to top
+        skyColor = lerp(middleColor, topColor, (dotUp - 0.5) / 0.9);
+    else if (dotUp < -0.7) // Close to bottom
+        skyColor = lerp(middleColor, bottomColor, (-dotUp - 0.7) / 0.3);
+    else // Middle
+        skyColor = middleColor;
+
+    return float4(skyColor, 1);
 }
