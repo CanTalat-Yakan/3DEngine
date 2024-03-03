@@ -16,10 +16,6 @@ public unsafe sealed partial class GUIRenderer
     public PipelineStateObjectDescription PipelineStateObjectDescription = new()
     {
         InputLayout = "ImGui",
-        CullMode = CullMode.None,
-        RenderTargetFormat = Format.R8G8B8A8_UNorm,
-        RenderTargetCount = 1,
-        PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
         BlendState = "Alpha",
     };
 
