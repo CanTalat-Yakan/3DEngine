@@ -54,6 +54,13 @@ public sealed partial class Mesh : EditorComponent
         }
         else
         {
+            Material.PipelineStateObjectDescription.Wireframe = Camera.Main.RenderMode switch
+            {
+                RenderMode.Wireframe => true,
+                RenderMode.Shaded => false,
+                _ => false
+            };
+
             Material.Setup();
 
             Context.GraphicsContext.SetMesh(MeshInfo);

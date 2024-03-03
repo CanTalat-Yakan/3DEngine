@@ -30,10 +30,10 @@ internal sealed partial class Viewport(Grid content)
         config.SetVSync(PresentInterval.Immediate);
         config.SetMSAA(MultiSample.x2);
         config.SetResolutionScale(2);
-        config.GUI = true;
+        config.GUI = false;
 
         engineKernel = new(config);
-        engineKernel.Initialize(hwnd, new(64, 64), win32Window: false, assetsPath: Files.AssetsPath);
+        engineKernel.Initialize(hwnd, new(1024, 1024), win32Window: false, assetsPath: Files.AssetsPath);
 
         // Gets the native object for the SwapChainPanel control.
         using (var nativeObject = ComObject.As<Vortice.WinUI.ISwapChainPanelNative2>(swapChainPanel))

@@ -23,6 +23,7 @@ public sealed class Material : EditorComponent, IHide, IEquatable<Material>
     public PipelineStateObjectDescription PipelineStateObjectDescription = new()
     {
         CullMode = CullMode.Front,
+        Wireframe = true,
         BlendState = "Alpha",
     };
 

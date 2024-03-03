@@ -14,11 +14,12 @@ public sealed class Camera : EditorComponent
     public static Camera Main { get; private set; }
     public static Camera CurrentRenderingCamera { get; set; }
 
-    public RootSignature RootSignature;
-    public ViewConstantBuffer ViewBuffer;
+    [Hide] public RootSignature RootSignature;
+    [Hide] public ViewConstantBuffer ViewBuffer;
 
     public BoundingFrustum? BoundingFrustum { get; private set; }
 
+    public RenderMode RenderMode = RenderMode.Shaded;
     public CameraProjection Projection = CameraProjection.Perspective;
     [Space]
     [If("Projection", "Perspective")]

@@ -79,6 +79,7 @@ public sealed partial class GraphicsDevice : IDisposable
             SwapChain.Description1.Flags).ThrowIfFailed();
 
         CreateScreenResources();
+        CreateDepthStencil();
 
         Kernel.Instance.Frame();
     }
@@ -111,6 +112,8 @@ public sealed partial class GraphicsDevice : IDisposable
         if (ScreenResources is not null)
             foreach (var screenResource in ScreenResources)
                 screenResource.Dispose();
+
+        DepthStencil?.Dispose();
     }
 }
 

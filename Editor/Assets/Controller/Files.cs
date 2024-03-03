@@ -57,7 +57,7 @@ internal sealed partial class Files
 
         // Assign the ProjectPath value from static property in "Home".
         AssetsPath = Path.Combine(Home.ProjectPath, "Assets");
-        TemplatesPath = Engine.Editor.Paths.TEMPLATES;
+        TemplatesPath = Engine.Helper.Paths.TEMPLATES;
 
         // Call the method to initialize and populate the files categories with a DataTemplate.
         PopulateFilesCategories();

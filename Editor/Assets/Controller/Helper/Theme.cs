@@ -99,10 +99,10 @@ internal sealed class Theme
                     : new SolidColorBrush(Windows.UI.Color.FromArgb(255, 40, 40, 40));
         }
 
-        Engine.Kernel.Instance?.SceneManager.MainScene.EntityManager?
-            .GetFromTag("DefaultSky")?
-            .GetComponent<Engine.Editor.DefaultSky>()?
-            .SetTheme(_page.RequestedTheme == ElementTheme.Light);
+        //Engine.Kernel.Instance?.SceneManager.MainScene.EntityManager?
+        //    .GetFromTag("DefaultSky")?
+        //    .GetComponent<Engine.Editor.DefaultSky>()?
+        //    .SetTheme(_page.RequestedTheme == ElementTheme.Light);
     }
 
     private void Window_Activated(object sender, WindowActivatedEventArgs args) =>
