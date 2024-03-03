@@ -24,10 +24,10 @@ float4 PS(PSInput input) : SV_TARGET
     float dotUp = dot(viewDir, float3(0, 1, 0));
     float3 skyColor;
 
-    if (dotUp > 0.5) // Close to top
-        skyColor = lerp(middleColor, topColor, (dotUp - 0.5) / 0.9);
-    else if (dotUp < -0.7) // Close to bottom
-        skyColor = lerp(middleColor, bottomColor, (-dotUp - 0.7) / 0.3);
+    if (dotUp > 0) // Close to top
+        skyColor = lerp(middleColor, topColor, (dotUp) / 0.9);
+    else if (dotUp < 0) // Close to bottom
+        skyColor = lerp(middleColor, bottomColor, (-dotUp) / 0.9);
     else // Middle
         skyColor = middleColor;
 
