@@ -6,6 +6,7 @@ public struct ViewConstantBuffer(Matrix4x4 viewProjection, Vector3 cameraPositio
 {
     public Matrix4x4 ViewProjection = viewProjection;
     public Vector3 CameraPosition = cameraPosition;
+    public float pad;
     public Vector3 CameraLookDirection = cameraLookDirection;
 }
 

@@ -11,6 +11,7 @@ struct PSInput
     float4 pos : SV_POSITION;
     float3 worldpos : POSITION;
     float3 camerapos : POSITION1;
+    float3 lookat : POSITION2;
     float3 normal : NORMAL;
     float3 tangent : TANGENT;
     float2 uv : TEXCOORD0;

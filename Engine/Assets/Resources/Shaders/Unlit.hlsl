@@ -1,22 +1,5 @@
 #include "Include\Common.hlsli"
 
-cbuffer Properties : register(b10)
-{
-    // Color
-    float4 Color;
-    // Header("This is a Header!")
-    float Float;
-    int Int;
-    // Slider(1, 10)
-    float Slider;
-    // Space
-    float2 Float2;
-    float3 Float3;
-    float4 Float4;
-    // Space
-    bool Bool;
-};
-
 Texture2D texture0 : register(t0);
 sampler sampler0 : register(s2);
 

@@ -11,5 +11,6 @@ public sealed class Paths
     public static readonly string SHADERS =     RESOURCES + @"Shaders\";
     public static readonly string TEXTURES =    RESOURCES + @"Textures\";
     public static readonly string MODELS =      RESOURCES + @"Models\";
-    public static readonly string PRIMITIVES =  RESOURCES + @"Models\Primitives\";
+
+    public static readonly string PRIMITIVES = MODELS + @"Primitives\";
 }

@@ -35,20 +35,13 @@ public sealed partial class CommonContext : IDisposable
 
     public void LoadDefaultResources()
     {
-        var shader = "Unlit";
-        VertexShaders[shader] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + shader + ".hlsl", "VS");
-        PixelShaders[shader] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + shader + ".hlsl", "PS");
-        PipelineStateObjects[shader] = new PipelineStateObject(VertexShaders[shader], PixelShaders[shader]);
-        
-        shader = "SimpleLit";
-        VertexShaders[shader] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + shader + ".hlsl", "VS");
-        PixelShaders[shader] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + shader + ".hlsl", "PS");
-        PipelineStateObjects[shader] = new PipelineStateObject(VertexShaders[shader], PixelShaders[shader]);
-        
-        shader = "Sky";
-        VertexShaders[shader] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + shader + ".hlsl", "VS");
-        PixelShaders[shader] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + shader + ".hlsl", "PS");
-        PipelineStateObjects[shader] = new PipelineStateObject(VertexShaders[shader], PixelShaders[shader]);
+        string[] shaderList = ["Unlit", "SimpleLit", "Sky"];
+        foreach (string shader in shaderList)
+        {
+            VertexShaders[shader] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + shader + ".hlsl", "VS");
+            PixelShaders[shader] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + shader + ".hlsl", "PS");
+            PipelineStateObjects[shader] = new PipelineStateObject(VertexShaders[shader], PixelShaders[shader]);
+        }
 
         ModelLoader.LoadFile(Paths.PRIMITIVES + "Cube.obj");
         ModelLoader.LoadFile(Paths.PRIMITIVES + "Sphere.obj");

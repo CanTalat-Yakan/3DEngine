@@ -29,6 +29,7 @@ PSInput VS(VSInput input)
     output.tangent = mul(float4(input.tangent, 0), World);
     output.worldpos = mul(float4(input.pos, 1), World);
     output.camerapos = Camera;
+    output.lookat = ViewDirection;
     output.uv = input.uv;
 
     return output;
