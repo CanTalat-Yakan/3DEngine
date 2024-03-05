@@ -101,10 +101,15 @@ internal sealed partial class Files
                     exampleTemplatePath);
 
             foreach (var subPathDirectory in Directory.GetDirectories(categoryDirectory))
+            {
+                string targetSubPath = Path.Combine(AssetsPath, categoryName, Path.GetFileName(subPathDirectory));
+                Directory.CreateDirectory(targetSubPath);
+
                 foreach (var exampleTemplatePath in Directory.GetFiles(subPathDirectory))
                     WriteFileFromTemplates(
-                        Path.Combine(AssetsPath, categoryName, Path.GetFileName(subPathDirectory), exampleTemplatePath.GetFileName()),
+                        Path.Combine(targetSubPath, exampleTemplatePath.GetFileName()),
                         exampleTemplatePath);
+            }
         }
     }
 
