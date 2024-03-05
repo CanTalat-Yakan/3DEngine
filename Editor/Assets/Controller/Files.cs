@@ -16,6 +16,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
+using Engine.Helper;
 
 namespace Editor.Controller;
 
@@ -94,16 +95,16 @@ internal sealed partial class Files
         {
             string categoryName = Path.GetFileName(categoryDirectory);
 
-            foreach (var exampleTemplate in Directory.GetFiles(categoryDirectory))
+            foreach (var exampleTemplatePath in Directory.GetFiles(categoryDirectory))
                 WriteFileFromTemplates(
-                    Path.Combine(AssetsPath, categoryName, Path.GetFileNameWithoutExtension(exampleTemplate)),
-                    exampleTemplate);
+                    Path.Combine(AssetsPath, categoryName, exampleTemplatePath.GetFileName()),
+                    exampleTemplatePath);
 
             foreach (var subPathDirectory in Directory.GetDirectories(categoryDirectory))
-                foreach (var exampleTemplate in Directory.GetFiles(subPathDirectory))
+                foreach (var exampleTemplatePath in Directory.GetFiles(subPathDirectory))
                     WriteFileFromTemplates(
-                        Path.Combine(AssetsPath, categoryName, Path.GetFileName(subPathDirectory), Path.GetFileNameWithoutExtension(exampleTemplate)),
-                        exampleTemplate);
+                        Path.Combine(AssetsPath, categoryName, Path.GetFileName(subPathDirectory), exampleTemplatePath.GetFileName()),
+                        exampleTemplatePath);
         }
     }
 

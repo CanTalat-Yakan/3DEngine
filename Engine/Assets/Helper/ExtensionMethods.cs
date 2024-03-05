@@ -40,12 +40,12 @@ public static class ExtensionMethods
         vector.X = x; vector.Y = y; vector.Z = z;
         return vector;
     }
-        
-    public static Dictionary<string,VertexBuffer> SetVertexBuffer(this Dictionary<string, VertexBuffer> vertices, ID3D12Resource resource, int sizeInByte)
+
+    public static Dictionary<string, VertexBuffer> SetVertexBuffer(this Dictionary<string, VertexBuffer> vertices, ID3D12Resource resource, int sizeInByte)
     {
         foreach (var vertex in vertices.Values)
             vertex.SetVertexBuffer(resource, sizeInByte);
-        
+
         return vertices;
     }
 
@@ -73,6 +73,13 @@ public static class ExtensionMethods
     public static string FirstCharToUpper(this string input) =>
         string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1));
 
+    public static string GetFileName(this string text)
+    {
+        var splits = Path.GetFileName(text).Split('.');
+
+        return splits[0] + "." + splits[1];
+    }
+    
     public static string RemoveExtension(this string text) =>
         text.Split('.').FirstOrDefault();
 
