@@ -97,7 +97,7 @@ public sealed class ShaderCompiler
             return null;
         }
 
-        Core.Instance.ScriptCompiler.CompileScript(propertiesConstantBufferScriptEntry);
+        Kernel.Instance.ScriptCompiler.CompileScript(propertiesConstantBufferScriptEntry);
 
         if (propertiesConstantBufferScriptEntry.Assembly is null)
         {

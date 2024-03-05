@@ -35,18 +35,18 @@ internal sealed partial class Layout
     public List<Grid> GridsToClear = new();
 
     public Layout(Grid content,
+        ModelView.Files files,
         ModelView.Viewport viewport,
         ModelView.Hierarchy hierarchy,
         ModelView.Properties properties,
-        ModelView.Output output,
-        ModelView.Files files)
+        ModelView.Output output)
     {
         MainContent = content;
+        Files = files;
         Viewport = viewport;
         Hierarchy = hierarchy;
         Properties = properties;
         Output = output;
-        Files = files;
 
         // Initialize the PropertiesRoot property to a new instance.
         PropertiesRoot = new();

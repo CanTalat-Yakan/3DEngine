@@ -45,6 +45,7 @@ internal sealed partial class Files
 
     private Category? _currentCategory;
     private string _currentSubPath;
+    internal static readonly string[] stringArray = [".hlsl"];
 
     public Files(ModelView.Files files, Grid grid, WrapPanel wrap, BreadcrumbBar bar)
     {
@@ -73,26 +74,26 @@ internal sealed partial class Files
     {
         // Create a list of categories presented with attributes Name, Symbol or Glyph, FileType, Template and Thumbnail.
         CreateCategoryTiles(
-            new() { Name = "Scenes", Glyph = "\xEA86", FileTypes = new string[] { ".usd", ".usda", ".usdc", ".usdz" }, Template = true },
-            new() { Name = "Scripts", Symbol = Symbol.Document, FileTypes = new string[] { ".cs" }, Template = true },
-            new() { Name = "Prefabs", Glyph = "\xE734", FileTypes = new string[] { ".prefab" } },
-            new() { Name = "Models", Glyph = "\xF158", FileTypes = new string[] { ".fbx", ".obj", ".blend", ".3ds", ".dae" } },
-            new() { Name = "Animations", Glyph = "\xE805", FileTypes = new string[] { ".fbx", ".dae" } },
-            new() { Name = "Materials", Glyph = "\xF156", FileTypes = new string[] { ".mat" }, Template = true },
-            new() { Name = "Textures", Symbol = Symbol.Pictures, FileTypes = new string[] { ".png", ".jpg", ".jpeg", ".tiff", ".tga", ".psd", ".bmp", }, Thumbnail = true },
-            new() { Name = "Audios", Symbol = Symbol.Audio, FileTypes = new string[] { ".m4a", ".mp3", ".wav", ".ogg" } },
-            new() { Name = "Videos", Symbol = Symbol.Video, FileTypes = new string[] { ".m4v", ".mp4", ".mov", ".avi" }, Thumbnail = false },
-            new() { Name = "Fonts", Symbol = Symbol.Font, FileTypes = new string[] { ".ttf", ".otf" } },
-            new() { Name = "Shaders", Glyph = "\xE706", FileTypes = new string[] { ".hlsl" }, Template = true },
-            new() { Name = "ComputeShaders", Glyph = "\xE706", FileTypes = new string[] { ".compute" }, Template = true },
-            new() { Name = "Documents", Symbol = Symbol.Document, FileTypes = new string[] { ".txt", ".pdf", ".doc", ".docx" }, Template = true },
-            new() { Name = "Packages", Glyph = "\xE7B8", FileTypes = new string[] { ".zip", ".7zip", ".rar" } });
+            new() { Name = "Scenes", Glyph = "\xEA86", FileTypes = [".usd", ".usda", ".usdc", ".usdz"], Template = true },
+            new() { Name = "Scripts", Symbol = Symbol.Document, FileTypes = [".cs"], Template = true },
+            new() { Name = "Prefabs", Glyph = "\xE734", FileTypes = [".prefab"] },
+            new() { Name = "Models", Glyph = "\xF158", FileTypes = [".fbx", ".obj", ".blend", ".3ds", ".dae"] },
+            new() { Name = "Animations", Glyph = "\xE805", FileTypes = [".fbx", ".dae"] },
+            new() { Name = "Materials", Glyph = "\xF156", FileTypes = [".mat"], Template = true },
+            new() { Name = "Textures", Symbol = Symbol.Pictures, FileTypes = [".png", ".jpg", ".jpeg", ".tiff", ".tga", ".psd", ".bmp",], Thumbnail = true },
+            new() { Name = "Audios", Symbol = Symbol.Audio, FileTypes = [".m4a", ".mp3", ".wav", ".ogg"] },
+            new() { Name = "Videos", Symbol = Symbol.Video, FileTypes = [".m4v", ".mp4", ".mov", ".avi"], Thumbnail = false },
+            new() { Name = "Fonts", Symbol = Symbol.Font, FileTypes = [".ttf", ".otf"] },
+            new() { Name = "Shaders", Glyph = "\xE706", FileTypes = stringArray, Template = true },
+            new() { Name = "ComputeShaders", Glyph = "\xE706", FileTypes = [".compute"], Template = true },
+            new() { Name = "Documents", Symbol = Symbol.Document, FileTypes = [".txt", ".pdf", ".doc", ".docx"], Template = true },
+            new() { Name = "Packages", Glyph = "\xE7B8", FileTypes = [".zip", ".7zip", ".rar"] });
     }
 
-    public async void GenerateExampleScriptsAsync()
+    public void GenerateExampleScriptsAsync()
     {
         foreach (var exampleTemplate in Directory.GetFiles(Path.Combine(TemplatesPath, "Examples")))
-            await WriteFileFromTemplatesAsync(
+            WriteFileFromTemplates(
                 Path.Combine(AssetsPath, "Scripts", Path.GetFileNameWithoutExtension(exampleTemplate) + ".cs"),
                 exampleTemplate);
     }
@@ -112,7 +113,7 @@ internal sealed partial class Files
         };
 
         // If the current category is not null, add the file types of the category to the filter.
-        if (_currentCategory != null)
+        if (_currentCategory is not null)
             foreach (var type in _currentCategory.Value.FileTypes)
                 picker.FileTypeFilter.Add(type);
         else
@@ -131,7 +132,7 @@ internal sealed partial class Files
         // Loop through all the picked files.
         foreach (StorageFile file in files)
             // If a file was picked, loop through all the categories and check if the file type matches.
-            if (file != null)
+            if (file is not null)
                 foreach (var category in Categories)
                     foreach (var type in category.FileTypes)
                         if (type == file.FileType)
@@ -163,7 +164,7 @@ internal sealed partial class Files
                     string targetPath = Path.Combine(AssetsPath, category.Name);
 
                     // If a currently in a subpath, check if its name matches the targetPath for the file.
-                    if (_currentCategory != null)
+                    if (_currentCategory is not null)
                         if (_currentCategory.Value.Name == category.Name)
                             if (!string.IsNullOrEmpty(_currentSubPath))
                                 targetPath = Path.Combine(targetPath, _currentSubPath);
@@ -216,7 +217,7 @@ internal sealed partial class Files
         var path = AssetsPath;
 
         // If the current category exists, combine it with the AssetsPath and set it as to the path.
-        if (_currentCategory != null)
+        if (_currentCategory is not null)
         {
             // Create the full path to the current category folder.
             path = Path.Combine(AssetsPath, _currentCategory.Value.Name);
@@ -297,7 +298,7 @@ internal sealed partial class Files
                                 IncrementFileIfExists(Path.Combine(AssetsPath, category2.Name, Path.GetFileName(path))));
 
                             // If the current category or category2 matches the original current category, set dirty to true.
-                            if (_currentCategory != null)
+                            if (_currentCategory is not null)
                                 if (_currentCategory.Value.Equals(_currentCategory.Value) || category2.Equals(_currentCategory.Value))
                                     dirty = true;
                         }
@@ -712,7 +713,7 @@ internal sealed partial class Files
                 path = Path.Combine(AssetsPath, _currentCategory.Value.Name);
 
                 // Check if there is a current sub path.
-                if (_currentSubPath != null)
+                if (_currentSubPath is not null)
                     // Set the path to the category name and the current sub path.
                     path = Path.Combine(AssetsPath, _currentCategory.Value.Name, _currentSubPath);
             }
@@ -734,7 +735,7 @@ internal sealed partial class Files
             string templatesPath = Path.Combine(TemplatesPath, _currentCategory.Value.Name.RemoveWhiteSpaces() + ".txt");
 
             // Write the file from the templates.
-            await WriteFileFromTemplatesAsync(path, templatesPath);
+            WriteFileFromTemplates(path, templatesPath);
 
             // Check if the path was provided, if yes, call the CreateFileSystemEntryTilesAsync method.
             if (pathProvided)
@@ -800,7 +801,7 @@ internal sealed partial class Files
                 path = Path.Combine(AssetsPath, _currentCategory.Value.Name);
 
                 // Check if there is a current sub path.
-                if (_currentSubPath != null)
+                if (_currentSubPath is not null)
                     // Set the path to the category name and the current sub path.
                     path = Path.Combine(AssetsPath, _currentCategory.Value.Name, _currentSubPath);
             }
@@ -929,32 +930,30 @@ internal sealed partial class Files
 
 internal sealed partial class Files
 {
-    private async Task WriteFileFromTemplatesAsync(string targetPath, string templatesPath = null)
+    private void WriteFileFromTemplates(string targetPath, string templatesPath = null)
     {
+        if (templatesPath == null || !File.Exists(templatesPath))
+            return;
+
         // Create a file stream to write the new file.
         using (FileStream fs = File.Create(targetPath))
         {
-            // Check if the template file exists.
-            if (File.Exists(templatesPath))
-            {
-                // Read the contents of the template file.
-                string text = await File.ReadAllTextAsync(templatesPath);
+            // Read the contents of the template file.
+            string text = File.ReadAllText(templatesPath);
 
-                // Get the name of the new file without the extension.
-                string fileName = Path.GetFileName(targetPath).Split('.').First();
+            // Get the name of the new file without the extension.
+            string fileName = Path.GetFileName(targetPath).Split('.').First();
 
-                // Replace the placeholder {{FileName}} with the actual file name.
-                if (text.Contains("{{FileName}}"))
-                    text = text.Replace("{{FileName}}", Regex.Replace(fileName, @"[\s+\(\)]", ""));
+            // Replace the placeholder {{FileName}} with the actual file name.
+            if (text.Contains("{{FileName}}"))
+                text = text.Replace("{{FileName}}", Regex.Replace(fileName, @"[\s+\(\)]", ""));
 
-                // Convert the text to a byte array.
-                byte[] info = new UTF8Encoding(true).GetBytes(text);
+            // Convert the text to a byte array.
+            byte[] info = new UTF8Encoding(true).GetBytes(text);
 
-                // Write the byte array to the file stream and finish it by closing the stream.
-                fs.Write(info, 0, info.Length);
-                fs.Close();
-            }
-        }
+            // Write the byte array to the file stream.
+            fs.Write(info, 0, info.Length);
+        } // The using block ensures that the FileStream is closed and disposed here.
     }
 
     private void SetBreadcrumbBar()
@@ -1008,7 +1007,7 @@ internal sealed partial class Files
         e.AcceptedOperation = DataPackageOperation.Copy;
 
         // Set the UI for the drag and drop operation.
-        if (e.DragUIOverride != null)
+        if (e.DragUIOverride is not null)
         {
             // Display the text "Add file(s)" on the drag and drop UI.
             e.DragUIOverride.Caption = "Add file(s)";

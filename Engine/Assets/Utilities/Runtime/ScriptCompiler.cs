@@ -67,8 +67,11 @@ public sealed class ScriptCompiler
 
         if (!_scriptsCollection.TryGetValue(fileInfo.FullName, out var scriptEntry))
         {
-            using FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
-            using StreamReader streamReader = new StreamReader(fileStream);
+            if (path.IsFileLocked().Value)
+                throw new Exception("File is locked and cannot be read");
+
+            using FileStream fileStream = new(path, FileMode.Open, FileAccess.Read);
+            using StreamReader streamReader = new(fileStream);
 
             scriptEntry = new ScriptEntry() { FileInfo = fileInfo };
             string code = streamReader.ReadToEnd();
@@ -166,10 +169,10 @@ public sealed class ScriptCompiler
             .Except(_ignoreAssemblies)
             .SelectMany(Assembly => Assembly.GetTypes())
             .Where(Type =>
-                (typeof(Component).IsAssignableFrom(Type) || typeof(EditorComponent).IsAssignableFrom(Type)) 
-                && !Type.Equals(typeof(Component)) 
+                (typeof(Component).IsAssignableFrom(Type) || typeof(EditorComponent).IsAssignableFrom(Type))
+                && !Type.Equals(typeof(Component))
                 && !Type.Equals(typeof(EditorComponent))
-                && !(typeof(IHide).IsAssignableFrom(Type) 
+                && !(typeof(IHide).IsAssignableFrom(Type)
                 && !Type.IsInterface))
             .ToArray();
 
