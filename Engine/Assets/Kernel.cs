@@ -7,8 +7,8 @@ global using Vortice.Dxc;
 global using Engine.Buffer;
 global using Engine.Components;
 global using Engine.DataTypes;
-global using Engine.Editor;
 global using Engine.ECS;
+global using Engine.Editor;
 global using Engine.Framework;
 global using Engine.Graphics;
 global using Engine.GUI;
@@ -23,8 +23,8 @@ public sealed class Kernel
 {
     public static Kernel Instance { get; private set; }
 
-    public event Action OnRender;
     public event Action OnInitialize;
+    public event Action OnRender;
     public event Action OnGUI;
     public event Action OnDispose;
 
