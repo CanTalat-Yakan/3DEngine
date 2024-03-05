@@ -83,7 +83,7 @@ public sealed class Kernel
 
         ScriptCompiler.CompileProjectScripts(EditorState.AssetsPath);
         ShaderCompiler.CompileProjectShaders(EditorState.AssetsPath);
-        MaterialCompiler.CompileProjectMaterials(EditorState.AssetsPath);
+        //MaterialCompiler.CompileProjectMaterials(EditorState.AssetsPath);
 
         SceneManager.ProcessSystems();
 

@@ -43,8 +43,11 @@ public sealed partial class Material : EditorComponent, IHide, IEquatable<Materi
         foreach (var texture in MaterialTextures)
             Context.GraphicsContext.SetShaderResourceView(Context.GetTextureByString(texture.Name), texture.Slot);
 
-        Context.UploadBuffer.Upload(Context.SerializableConstantBuffers[PipelineStateObjectName], out var offset);
-        Context.UploadBuffer.SetConstantBufferView(offset, 10);
+        if (Context.SerializableConstantBuffers.ContainsKey(PipelineStateObjectName))
+        {
+            Context.UploadBuffer.Upload(Context.SerializableConstantBuffers[PipelineStateObjectName], out var offset);
+            Context.UploadBuffer.SetConstantBufferView(offset, 10);
+        }
     }
 
     public bool Equals(Material other) =>

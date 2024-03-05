@@ -55,13 +55,6 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 
     public void Upload<T>(T data, out int offset)
     {
-        if (data is null)
-        {
-            offset = -1;
-
-            return;
-        }
-
         int size = Marshal.SizeOf(typeof(T));
         int afterAllocateIndex = AllocateIndex + ((size + 255) & ~255);
         if (afterAllocateIndex > Size)
@@ -79,11 +72,8 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 
 public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 {
-    public void SetConstantBufferView(int offset, int slot)
-    {
-        if (offset > 0)
-            GraphicsContext.SetConstantBufferView(this, offset, slot);
-    }
+    public void SetConstantBufferView(int offset, int slot) =>
+        GraphicsContext.SetConstantBufferView(this, offset, slot);
 
     public void UploadIndexBuffer(MeshInfo mesh, Span<byte> index, Format indexFormat, int? overrideSizeInByte = null)
     {
