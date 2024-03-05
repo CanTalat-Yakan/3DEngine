@@ -178,8 +178,4 @@
 			<PackagePath>\</PackagePath>
 		</None>
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Assets\Rendering\Graphics\" />
-	</ItemGroup>
 </Project>

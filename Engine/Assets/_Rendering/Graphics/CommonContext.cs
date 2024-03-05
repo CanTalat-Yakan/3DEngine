@@ -23,7 +23,7 @@ public sealed partial class CommonContext : IDisposable
     public Dictionary<string, MeshInfo> Meshes = new();
     public Dictionary<string, Texture2D> RenderTargets = new();
     public Dictionary<string, PipelineStateObject> PipelineStateObjects = new();
-    public Dictionary<string, SerializeConstantBuffer> SerializableConstantBuffers = new();
+    public Dictionary<string, SerializableConstantBuffer> SerializableConstantBuffers = new();
 
     public Dictionary<IntPtr, string> PointerToString = new();
     public Dictionary<string, IntPtr> StringToPointer = new();

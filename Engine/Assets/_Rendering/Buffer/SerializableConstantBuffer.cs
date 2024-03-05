@@ -21,16 +21,20 @@ public class SerializeEntry
 
 public interface IMaterialBuffer { }
 
-public sealed class SerializeConstantBuffer
+public sealed class SerializableConstantBuffer
 {
     public List<SerializeEntry> SerializableProperties { get; private set; } = new();
 
     public string ShaderName;
 
+
     private object _propertiesConstantBuffer;
 
     public object GetConstantBufferObject() =>
         _propertiesConstantBuffer;
+    
+    public object SetConstantBufferObject(object constantBuffer) =>
+        _propertiesConstantBuffer = constantBuffer;
 
     public void SafeToSerializableConstantBuffer()
     {

@@ -19,12 +19,12 @@ public sealed class MaterialEntry(FileInfo fileInfo)
 
         ShaderEntry = shaderEntry;
 
-        var shaderName = shaderEntry.FileInfo.Name.RemoveExtension();
+        var shaderName = ShaderName;
 
         Kernel.Instance.Context.CreateShader(shaderName);
         Kernel.Instance.Context.SerializableConstantBuffers[shaderName].SafeToSerializableConstantBuffer();
 
-        MaterialCompiler.SetMaterialBuffer(this, new() { ShaderName = shaderName });
+        MaterialCompiler.SetConstantBuffer(this, new() { ShaderName = shaderName });
         Serialization.SaveFile(Kernel.Instance.Context.SerializableConstantBuffers[shaderName], FileInfo.FullName);
     }
 }
@@ -63,15 +63,15 @@ public class MaterialCompiler
         var materialEntry = Library.GetMaterial(fileInfo.Name);
         if (materialEntry is null)
         {
-            var materialBuffer = Serialization.LoadFile<SerializeConstantBuffer>(path);
+            var constantBuffer = Serialization.LoadFile<SerializableConstantBuffer>(path);
 
-            if (string.IsNullOrEmpty(materialBuffer.ShaderName))
+            if (string.IsNullOrEmpty(constantBuffer.ShaderName))
                 return;
 
             materialEntry = new MaterialEntry(fileInfo);
-            SetMaterialBuffer(materialEntry, materialBuffer);
+            SetConstantBuffer(materialEntry, constantBuffer);
 
-            materialBuffer.PasteToPropertiesConstantBuffer();
+            constantBuffer.PasteToPropertiesConstantBuffer();
 
             Library.Materials.Add(materialEntry);
 
@@ -81,22 +81,24 @@ public class MaterialCompiler
         {
             materialEntry.FileInfo = fileInfo;
 
-            var materialBuffer = Serialization.LoadFile<SerializeConstantBuffer>(path);
+            var constantBuffer = Serialization.LoadFile<SerializableConstantBuffer>(path);
 
-            SetMaterialBuffer(materialEntry, materialBuffer);
+            SetConstantBuffer(materialEntry, constantBuffer);
 
-            materialBuffer.PasteToPropertiesConstantBuffer();
+            constantBuffer.PasteToPropertiesConstantBuffer();
 
             Output.Log("Updated Material");
         }
     }
 
-    public static void SetMaterialBuffer(MaterialEntry materialEntry, SerializeConstantBuffer materialBuffer)
+    public static void SetConstantBuffer(MaterialEntry materialEntry, SerializableConstantBuffer constantBuffer)
     {
-        var shaderEntry = ShaderCompiler.Library.GetShader(materialBuffer.ShaderName);
+        var shaderEntry = ShaderCompiler.Library.GetShader(constantBuffer.ShaderName);
 
         materialEntry.ShaderEntry = shaderEntry;
-        
+
+        Kernel.Instance.Context.SerializableConstantBuffers[materialEntry.ShaderName].SetConstantBufferObject(constantBuffer);
+
         if (shaderEntry.ConstantBufferType is null)
         {
             Output.Log(
