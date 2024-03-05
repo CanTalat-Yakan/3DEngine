@@ -23,6 +23,7 @@ public sealed partial class CommonContext : IDisposable
     public Dictionary<string, MeshInfo> Meshes = new();
     public Dictionary<string, Texture2D> RenderTargets = new();
     public Dictionary<string, PipelineStateObject> PipelineStateObjects = new();
+    public Dictionary<string, SerializeConstantBuffer> SerializableConstantBuffers = new();
 
     public Dictionary<IntPtr, string> PointerToString = new();
     public Dictionary<string, IntPtr> StringToPointer = new();
@@ -35,13 +36,7 @@ public sealed partial class CommonContext : IDisposable
 
     public void LoadDefaultResources()
     {
-        string[] shaderList = ["Unlit", "SimpleLit", "Sky"];
-        foreach (string shader in shaderList)
-        {
-            VertexShaders[shader] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + shader + ".hlsl", "VS");
-            PixelShaders[shader] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + shader + ".hlsl", "PS");
-            PipelineStateObjects[shader] = new PipelineStateObject(VertexShaders[shader], PixelShaders[shader]);
-        }
+        CreateShaderFromResources(["Unlit", "SimpleLit", "Sky"]);
 
         ModelLoader.LoadFile(Paths.PRIMITIVES + "Cube.obj");
         ModelLoader.LoadFile(Paths.PRIMITIVES + "Sphere.obj");
@@ -107,6 +102,26 @@ public sealed partial class CommonContext : IDisposable
 
 public sealed partial class CommonContext : IDisposable
 {
+    public void CreateShaderFromResources(params string[] shaderList)
+    {
+        foreach (string shaderName in shaderList)
+        {
+            VertexShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + shaderName + ".hlsl", "VS");
+            PixelShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + shaderName + ".hlsl", "PS");
+            PipelineStateObjects[shaderName] = new PipelineStateObject(VertexShaders[shaderName], PixelShaders[shaderName]);
+        }
+    }
+    
+    public void CreateShader(params string[] shaderPathList)
+    {
+        foreach (string shaderPath in shaderPathList)
+        {
+            VertexShaders[shaderPath] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, shaderPath + ".hlsl", "VS");
+            PixelShaders[shaderPath] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, shaderPath + ".hlsl", "PS");
+            PipelineStateObjects[shaderPath] = new PipelineStateObject(VertexShaders[shaderPath], PixelShaders[shaderPath]);
+        }
+    }
+
     public MeshInfo CreateMesh(string name, string inputLayoutElements = "PNTt", bool indexFormat16Bit = true)
     {
         if (Meshes.TryGetValue(name, out MeshInfo mesh))

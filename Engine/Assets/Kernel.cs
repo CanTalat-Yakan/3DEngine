@@ -5,11 +5,16 @@ global using ImGuiNET;
 global using Vortice.Dxc;
 
 global using Engine.Buffer;
+global using Engine.Components;
 global using Engine.DataTypes;
+global using Engine.Editor;
+global using Engine.ECS;
 global using Engine.Framework;
 global using Engine.Graphics;
 global using Engine.GUI;
 global using Engine.Helper;
+global using Engine.Runtime;
+global using Engine.SceneSystem;
 global using Engine.Utilities;
 
 namespace Engine;

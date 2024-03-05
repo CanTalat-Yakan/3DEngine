@@ -18,6 +18,8 @@ using Engine.Runtime;
 using static Editor.Controller.Helper;
 
 using Path = System.IO.Path;
+using Engine.Helper;
+using Engine;
 
 namespace Editor.Controller;
 
@@ -213,7 +215,8 @@ internal sealed partial class Properties
         s_stackPanel.Children.Add(CreateSeperator());
 
         // Get the fields of the properties constantbuffer.
-        var fieldInfos = materialEntry.Material.MaterialBuffer.GetPropertiesConstantBuffer().GetType()
+        var fieldInfos = Kernel.Instance.Context.SerializableConstantBuffers[materialEntry.ShaderName]
+            .GetConstantBufferObject().GetType()
             .GetFields(BindingFlags.Public | BindingFlags.Instance);
 
         // Initialize the collection of fields, events, and scripts.
@@ -597,7 +600,9 @@ internal sealed partial class Properties
         // Initialize a new List of Grid type.
         List<Grid> grid = new();
 
-        var propertiesConstantBuffer = materialEntry.Material.MaterialBuffer.GetPropertiesConstantBuffer();
+        var serializableConstantBuffer = Kernel.Instance.Context.SerializableConstantBuffers[materialEntry.ShaderName];
+
+        var propertiesConstantBuffer = serializableConstantBuffer.GetConstantBufferObject();
         var value = fieldInfo.GetValue(propertiesConstantBuffer);
         // Get the type of the current field.
         var type = fieldInfo.FieldType;
@@ -680,11 +685,11 @@ internal sealed partial class Properties
 
         Binding.GetMaterialBinding(fieldInfo.Name, propertiesConstantBuffer)?.SetEvent(() =>
         {
-            materialEntry.Material.MaterialBuffer.SafeToSerializableProperties();
+            var serializableConstantBuffer = Kernel.Instance.Context.SerializableConstantBuffers[materialEntry.ShaderName];
 
-            Engine.Helper.Serialization.SaveFile(materialEntry.Material.MaterialBuffer, materialEntry.FileInfo.FullName);
+            serializableConstantBuffer.SafeToSerializableConstantBuffer();
 
-            materialEntry.Material.MaterialBuffer.UpdatePropertiesConstantBuffer();
+            Serialization.SaveFile(serializableConstantBuffer, materialEntry.FileInfo.FullName);
         });
 
         return finalGrid;

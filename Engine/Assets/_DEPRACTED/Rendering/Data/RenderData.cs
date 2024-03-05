@@ -5,6 +5,8 @@ using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
 
+using Engine.Rendering;
+
 namespace Engine.Data;
 
 public struct RenderData
@@ -59,9 +61,6 @@ public struct RenderData
 
     public void Dispose()
     {
-        foreach (var materialEntry in MaterialCompiler.Library.Materials)
-            materialEntry.Material.Dispose();
-
         SwapChain?.Dispose();
 
         GraphicsQueue?.Dispose();

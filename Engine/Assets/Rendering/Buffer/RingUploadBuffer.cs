@@ -53,8 +53,15 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         AllocateIndex = afterAllocateIndex % Size;
     }
 
-    public void Upload<T>(T data, out int offset) where T : struct
+    public void Upload<T>(T data, out int offset)
     {
+        if (data is null)
+        {
+            offset = -1;
+
+            return;
+        }
+
         int size = Marshal.SizeOf(typeof(T));
         int afterAllocateIndex = AllocateIndex + ((size + 255) & ~255);
         if (afterAllocateIndex > Size)
@@ -72,8 +79,11 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 
 public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 {
-    public void SetConstantBufferView(int offset, int slot) =>
-        GraphicsContext.SetConstantBufferView(this, offset, slot);
+    public void SetConstantBufferView(int offset, int slot)
+    {
+        if (offset > 0)
+            GraphicsContext.SetConstantBufferView(this, offset, slot);
+    }
 
     public void UploadIndexBuffer(MeshInfo mesh, Span<byte> index, Format indexFormat, int? overrideSizeInByte = null)
     {
@@ -104,7 +114,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         GraphicsContext.CommandList.ResourceBarrierTransition(mesh.IndexBufferResource, ResourceStates.CopyDest, ResourceStates.GenericRead);
     }
 
-    public void UploadVertexBuffer(MeshInfo mesh, Span<byte> vertex, int vertexBytes, int? overrideSizeInByte = null)
+    public void UploadVertexBuffer(MeshInfo mesh, Span<byte> vertex, int? overrideSizeInByte = null)
     {
         var vertexSizeInByte = overrideSizeInByte is not null ? overrideSizeInByte.Value : vertex.Length;
 

@@ -155,7 +155,7 @@ public unsafe sealed partial class GUIRenderer
             var vertexBytes = commandList.VtxBuffer.Size * mesh.VertexStride;
 
             Context.UploadBuffer.UploadIndexBuffer(mesh, new Span<byte>(commandList.IdxBuffer.Data.ToPointer(), indexBytes), mesh.IndexFormat);
-            Context.UploadBuffer.UploadVertexBuffer(mesh, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), vertexBytes), vertexBytes);
+            Context.UploadBuffer.UploadVertexBuffer(mesh, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), vertexBytes));
 
             Context.GraphicsContext.SetMesh(mesh);
 

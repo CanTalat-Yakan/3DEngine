@@ -12,6 +12,8 @@ using Engine.ECS;
 using Engine.Editor;
 using Engine.Runtime;
 using Engine.SceneSystem;
+using Engine.Graphics;
+using Engine.Helper;
 
 namespace Editor.Controller;
 
@@ -134,7 +136,7 @@ internal sealed partial class Binding
             return;
 
         MaterialBindings.Clear();
-        var PropertiesConstantBuffer = materialEntry.Material.MaterialBuffer.GetPropertiesConstantBuffer();
+        var PropertiesConstantBuffer = Engine.Kernel.Instance.Context.SerializableConstantBuffers[materialEntry.ShaderName].GetConstantBufferObject();
         foreach (var field in PropertiesConstantBuffer.GetType().GetFields(AllBindingFlags))
             MaterialBindings.Add(
                 field.Name + PropertiesConstantBuffer.GetType().FullName,

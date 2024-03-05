@@ -5,6 +5,8 @@ using Vortice.Direct3D;
 using Vortice.DXGI;
 using Vortice.Mathematics;
 
+using Engine.Data;
+
 namespace Engine.Rendering;
 
 public sealed partial class Renderer

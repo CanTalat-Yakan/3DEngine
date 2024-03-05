@@ -76,9 +76,7 @@ public sealed class ShaderCompiler
             foreach (var materialEntry in MaterialCompiler.Library.Materials)
                 if (materialEntry.ShaderEntry.FileInfo == fileInfo)
                 {
-                    materialEntry.Material.MaterialBuffer.CreatePropertiesConstantBuffer(shaderEntry.ConstantBufferType);
-
-                    materialEntry.Material.UpdateShader(shaderEntry.FileInfo.FullName);
+                    Kernel.Instance.Context.CreateShader(shaderEntry.FileInfo.FullName);
 
                     materialEntry.OnShaderUpdate?.Invoke();
                 }

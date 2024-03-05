@@ -1,18 +1,18 @@
-﻿global using System.Numerics;
-global using System;
+﻿using System.Numerics;
+using System;
 
-global using ImGuiNET;
+using ImGuiNET;
 
-global using Engine.Components;
-global using Engine.Data;
-global using Engine.ECS;
-global using Engine.Editor;
-global using Engine.GUI;
-global using Engine.Helper;
-global using Engine.Rendering;
-global using Engine.Runtime;
-global using Engine.SceneSystem;
-global using Engine.Utilities;
+using Engine.Components;
+using Engine.Data;
+using Engine.ECS;
+using Engine.Editor;
+using Engine.GUI;
+using Engine.Helper;
+using Engine.Rendering;
+using Engine.Runtime;
+using Engine.SceneSystem;
+using Engine.Utilities;
 
 namespace Engine;
 

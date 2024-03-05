@@ -10,7 +10,7 @@ public struct MaterialTextureEntry(string name, int slot)
     public int Slot = slot;
 }
 
-public sealed class Material : EditorComponent, IHide, IEquatable<Material>
+public sealed partial class Material : EditorComponent, IHide, IEquatable<Material>
 {
     public string PipelineStateObjectName { get; private set; }
     public RootSignature RootSignature { get; private set; }
@@ -42,6 +42,9 @@ public sealed class Material : EditorComponent, IHide, IEquatable<Material>
 
         foreach (var texture in MaterialTextures)
             Context.GraphicsContext.SetShaderResourceView(Context.GetTextureByString(texture.Name), texture.Slot);
+
+        Context.UploadBuffer.Upload(Context.SerializableConstantBuffers[PipelineStateObjectName], out var offset);
+        Context.UploadBuffer.SetConstantBufferView(offset, 10);
     }
 
     public bool Equals(Material other) =>

@@ -111,7 +111,7 @@ public sealed partial class GraphicsContext : IDisposable
         byte[] indexByteSpan = new byte[indexData.Length * indexSizeInByte];
         System.Buffer.BlockCopy(indexData, 0, indexByteSpan, 0, indexByteSpan.Length);
 
-        Kernel.Instance.Context.UploadBuffer.UploadVertexBuffer(mesh, vertexByteSpan, vertexData.Length * vertexSizeInByte);
+        Kernel.Instance.Context.UploadBuffer.UploadVertexBuffer(mesh, vertexByteSpan);
         Kernel.Instance.Context.UploadBuffer.UploadIndexBuffer(mesh, indexByteSpan, indexFormat);
     }
 

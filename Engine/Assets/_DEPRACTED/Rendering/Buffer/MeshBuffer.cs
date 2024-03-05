@@ -1,4 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Engine.Data;
+
+using System.Runtime.CompilerServices;
 
 using Vortice.Direct3D12;
 
