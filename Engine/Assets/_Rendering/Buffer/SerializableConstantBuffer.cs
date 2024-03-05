@@ -27,28 +27,27 @@ public sealed class SerializableConstantBuffer
 
     public string ShaderName;
 
-
-    private object _propertiesConstantBuffer;
+    private object _constantBuffer;
 
     public object GetConstantBufferObject() =>
-        _propertiesConstantBuffer;
+        _constantBuffer;
     
     public object SetConstantBufferObject(object constantBuffer) =>
-        _propertiesConstantBuffer = constantBuffer;
+        _constantBuffer = constantBuffer;
 
     public void SafeToSerializableConstantBuffer()
     {
         SerializableProperties.Clear();
 
-        foreach (var fieldInfo in _propertiesConstantBuffer.GetType().GetFields())
-            SerializableProperties.Add(new(fieldInfo.Name, fieldInfo.GetValue(_propertiesConstantBuffer)));
+        foreach (var fieldInfo in _constantBuffer.GetType().GetFields())
+            SerializableProperties.Add(new(fieldInfo.Name, fieldInfo.GetValue(_constantBuffer)));
     }
 
     public void PasteToPropertiesConstantBuffer()
     {
         foreach (var serializeEntry in SerializableProperties)
-            foreach (var fieldInfo in _propertiesConstantBuffer.GetType().GetFields())
+            foreach (var fieldInfo in _constantBuffer.GetType().GetFields())
                 if (fieldInfo.Name.Equals(serializeEntry.FieldName))
-                    serializeEntry.Value = fieldInfo.GetValue(_propertiesConstantBuffer);
+                    serializeEntry.Value = fieldInfo.GetValue(_constantBuffer);
     }
 }
