@@ -31,9 +31,6 @@ public sealed class Camera : EditorComponent
     [Space]
     public byte CameraID = 0;
 
-    internal GraphicsDevice GraphicsDevice => _graphicsDevice ??= Kernel.Instance.Context.GraphicsDevice;
-    private GraphicsDevice _graphicsDevice;
-
     public CommonContext Context => _context ??= Kernel.Instance.Context;
     public CommonContext _context;
 
@@ -84,7 +81,7 @@ public sealed class Camera : EditorComponent
             Vector3.UnitY);
 
         // Get the aspect ratio for the device's screen.
-        var aspect = (float)GraphicsDevice.Size.Width / (float)GraphicsDevice.Size.Height;
+        var aspect = (float)Context.GraphicsDevice.Size.Width / (float)Context.GraphicsDevice.Size.Height;
         var dAspect = aspect < 1 ? 1 * aspect : 1 / aspect;
 
         // Convert the field of view from degrees to radians.

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.IO;
+using System.Text;
 
 using Vortice.Mathematics;
 
@@ -27,8 +28,19 @@ public sealed partial class Mesh : EditorComponent
     public override void OnStart() =>
         CheckBounds();
 
+    public string MeshPath;
+    public string ShaderName;
     public override void OnUpdate()
     {
+        if (!string.IsNullOrEmpty(MeshPath))
+            if (File.Exists(MeshPath))
+                try { SetMeshInfo(Loader.ModelLoader.LoadFile(MeshPath)); }
+                finally { MeshPath = null; }
+
+        if (!string.IsNullOrEmpty(ShaderName))
+            try { SetMaterialPipeline(ShaderName); }
+            finally { ShaderName = null; }
+
         if (!EditorState.EditorBuild)
             CheckBounds();
     }

@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Text;
 using System;
@@ -45,7 +44,6 @@ internal sealed partial class Files
 
     private Category? _currentCategory;
     private string _currentSubPath;
-    internal static readonly string[] stringArray = [".hlsl"];
 
     public Files(ModelView.Files files, Grid grid, WrapPanel wrap, BreadcrumbBar bar)
     {
@@ -84,7 +82,7 @@ internal sealed partial class Files
             new() { Name = "Audios", Symbol = Symbol.Audio, FileTypes = [".m4a", ".mp3", ".wav", ".ogg"] },
             new() { Name = "Videos", Symbol = Symbol.Video, FileTypes = [".m4v", ".mp4", ".mov", ".avi"], Thumbnail = false },
             new() { Name = "Fonts", Symbol = Symbol.Font, FileTypes = [".ttf", ".otf"] },
-            new() { Name = "Shaders", Glyph = "\xE706", FileTypes = stringArray, Template = true },
+            new() { Name = "Shaders", Glyph = "\xE706", FileTypes = [".hlsl", ".hlsli"], Template = true },
             new() { Name = "ComputeShaders", Glyph = "\xE706", FileTypes = [".compute"], Template = true },
             new() { Name = "Documents", Symbol = Symbol.Document, FileTypes = [".txt", ".pdf", ".doc", ".docx"], Template = true },
             new() { Name = "Packages", Glyph = "\xE7B8", FileTypes = [".zip", ".7zip", ".rar"] });
@@ -92,10 +90,21 @@ internal sealed partial class Files
 
     public void GenerateExampleScriptsAsync()
     {
-        foreach (var exampleTemplate in Directory.GetFiles(Path.Combine(TemplatesPath, "Examples")))
-            WriteFileFromTemplates(
-                Path.Combine(AssetsPath, "Scripts", Path.GetFileNameWithoutExtension(exampleTemplate) + ".cs"),
-                exampleTemplate);
+        foreach (var categoryDirectory in Directory.GetDirectories(Path.Combine(TemplatesPath, "Examples")))
+        {
+            string categoryName = Path.GetFileName(categoryDirectory);
+
+            foreach (var exampleTemplate in Directory.GetFiles(categoryDirectory))
+                WriteFileFromTemplates(
+                    Path.Combine(AssetsPath, categoryName, Path.GetFileNameWithoutExtension(exampleTemplate)),
+                    exampleTemplate);
+
+            foreach (var subPathDirectory in Directory.GetDirectories(categoryDirectory))
+                foreach (var exampleTemplate in Directory.GetFiles(subPathDirectory))
+                    WriteFileFromTemplates(
+                        Path.Combine(AssetsPath, categoryName, Path.GetFileName(subPathDirectory), Path.GetFileNameWithoutExtension(exampleTemplate)),
+                        exampleTemplate);
+        }
     }
 
     public async void SelectFilesAsync()

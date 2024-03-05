@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Text;
+using Vortice.Direct2D1.Effects;
 
 namespace Engine.Runtime;
 
@@ -25,6 +26,9 @@ public sealed class ShaderCompiler
 {
     public static ShaderLibrary Library { get; private set; } = new();
 
+    public CommonContext Context => _context ??= Kernel.Instance.Context;
+    public CommonContext _context;
+
     public void CompileProjectShaders(string assetsPath = null)
     {
         if (assetsPath is null)
@@ -44,6 +48,9 @@ public sealed class ShaderCompiler
     {
         FileInfo fileInfo = new(path);
 
+        if (fileInfo.Extension != ".hlsl")
+            return;
+
         var shaderEntry = Library.GetShader(fileInfo.Name);
         if (shaderEntry is null)
         {
@@ -52,6 +59,11 @@ public sealed class ShaderCompiler
                 FileInfo = fileInfo,
                 ConstantBufferType = CreateMaterialPropertyBufferStruct(fileInfo.FullName)
             });
+
+            var shader = fileInfo.Name.RemoveExtension();
+            Context.VertexShaders[shader] = Context.GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + shader + ".hlsl", "VS");
+            Context.PixelShaders[shader] = Context.GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + shader + ".hlsl", "PS");
+            Context.PipelineStateObjects[shader] = new PipelineStateObject(Context.VertexShaders[shader], Context.PixelShaders[shader]);
 
             Output.Log("Read new Shader");
         }
@@ -70,6 +82,11 @@ public sealed class ShaderCompiler
 
                     materialEntry.OnShaderUpdate?.Invoke();
                 }
+
+            var shader = fileInfo.Name.RemoveExtension();
+            Context.VertexShaders[shader] = Context.GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + shader + ".hlsl", "VS");
+            Context.PixelShaders[shader] = Context.GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + shader + ".hlsl", "PS");
+            Context.PipelineStateObjects[shader] = new PipelineStateObject(Context.VertexShaders[shader], Context.PixelShaders[shader]);
 
             Output.Log("Updated Shader");
         }
@@ -123,7 +140,6 @@ public sealed class ShaderCompiler
             using System.Numerics;
 
             using Engine.Editor;
-            using Engine.Rendering;
 
             public struct Properties{guid:N}
 
