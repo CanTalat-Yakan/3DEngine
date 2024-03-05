@@ -48,7 +48,6 @@ public sealed class Kernel
     {
         Instance ??= this;
 
-        assetsPath ??= Paths.ASSETS;
         EditorState.AssetsPath = assetsPath;
 
         Context.GraphicsDevice.Initialize(size, win32Window);
