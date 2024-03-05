@@ -8,6 +8,12 @@ using Vortice.Mathematics;
 
 namespace Engine.Graphics;
 
+public struct ResourceDelayDestroy(ID3D12Object resource, ulong destroyFrame)
+{
+    public ID3D12Object Resource = resource;
+    public ulong DestroyFrame = destroyFrame;
+}
+
 public sealed partial class GraphicsDevice : IDisposable
 {
     public SizeI Size => NativeSize.Scale(Kernel.Instance.Config.ResolutionScale);
@@ -27,13 +33,7 @@ public sealed partial class GraphicsDevice : IDisposable
     public DescriptorHeapX ShaderResourcesHeap = new();
     public DescriptorHeapX DepthStencilViewHeap = new();
     public DescriptorHeapX RenderTextureViewHeap = new();
-
-    public struct ResourceDelayDestroy(ID3D12Object resource, ulong destroyFrame)
-    {
-        public ID3D12Object Resource = resource;
-        public ulong DestroyFrame = destroyFrame;
-    }
-
+        
     public Queue<ResourceDelayDestroy> DelayDestroy = new();
 
     public int ExecuteIndex = 0;
