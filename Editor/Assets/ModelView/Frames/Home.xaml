@@ -55,7 +55,7 @@
 
                             <TextBlock FontSize="20" FontWeight="SemiBold" Foreground="Black" Text=".Net 8  C# 12  WinUI 3"/>
 
-                            <TextBlock FontSize="20" FontWeight="SemiBold" Foreground="Black" Text="Windows App SDK 1.4"/>
+                            <TextBlock FontSize="20" FontWeight="SemiBold" Foreground="Black" Text="Windows App SDK"/>
                         </StackPanel>
                     </Grid>
 
