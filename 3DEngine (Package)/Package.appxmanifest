@@ -9,7 +9,7 @@
   <Identity
     Name="28256CanTalatYakan.3DEngine"
     Publisher="CN=CanTalat-Yakan"
-    Version="2.0.0.0" />
+    Version="2.0.2.0" />
 
   <Properties>
     <DisplayName>3D Engine</DisplayName>
