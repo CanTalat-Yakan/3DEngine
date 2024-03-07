@@ -22,6 +22,7 @@ public sealed class Program
     private void Initialize(bool renderGUI, ref Config config)
     {
         config ??= Config.GetDefault();
+        config.SetResolutionScale(1);
         config.GUI = renderGUI;
 
         AppWindow = new(config.WindowData);

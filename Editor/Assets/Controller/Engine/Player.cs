@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI;
+using Engine;
 
 namespace Editor.Controller;
 
@@ -76,7 +77,7 @@ internal sealed class Player
             return;
 
         // Advance the game by one frame.
-        Engine.Core.Instance.Frame();
+        Kernel.Instance.Frame();
 
         // Log the current status of the game.
         Output.Log("Stepped Forward");

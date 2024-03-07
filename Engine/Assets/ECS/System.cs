@@ -107,7 +107,7 @@ public partial class System<T> where T : Component
 
 public partial class System<T> where T : Component
 {
-    private static ParallelOptions _parallelOptions = new() { MaxDegreeOfParallelism = 1 };
+    private static ParallelOptions _parallelOptions = new() { MaxDegreeOfParallelism = 20 };
 
     public static void Awake()
     {

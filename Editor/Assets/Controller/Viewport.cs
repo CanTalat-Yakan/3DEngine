@@ -25,11 +25,11 @@ internal sealed partial class Viewport(Grid content)
         EditorState.EditorBuild = true;
 
         var hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
-        var config = Config.GetDefault();
 
+        var config = Config.GetDefault();
         config.SetVSync(PresentInterval.Immediate);
         config.SetMSAA(MultiSample.x2);
-        config.SetResolutionScale(2);
+        config.SetResolutionScale(1);
         config.GUI = false;
 
         engineKernel = new(config);
@@ -72,12 +72,11 @@ internal sealed partial class Viewport(Grid content)
         engineKernel.OnDispose += Binding.Dispose;
     }
 
-
     public void CreateViewportSettings()
     {
         // Initialize an array of UI elements to be positioned in the top-left corner of the main content.
-        UIElement[] topLeft = new[]
-        {
+        UIElement[] topLeft =
+        [
             CreateFlyoutButton(
                 CreateIcon(Symbol.Video),
                 StackInGridVertical(
@@ -94,11 +93,11 @@ internal sealed partial class Viewport(Grid content)
                 Engine.Kernel.Instance.Config, "CameraProjection"),
             CreateComboBox(typeof(RenderMode), null,
                 Engine.Kernel.Instance.Config, "RenderMode")
-        };
+        ];
 
         // Initialize an array of UI elements to be positioned in the top-right corner of the main content.
-        UIElement[] topRight = new[]
-        {
+        UIElement[] topRight =
+        [
             CreateFlyoutButton(CreateIcon("\xE946"), CreateTextFull(out _profiler).WrapInGrid()).AddToolTip("Profile"),
 
             CreateAppBarSeperator(),
@@ -124,7 +123,7 @@ internal sealed partial class Viewport(Grid content)
             CreateAppBarSeperator(),
 
             CreateToggleButton(CreateIcon(Symbol.Globe), true).AddToolTip("Show Gizmos")
-        };
+        ];
 
         // Add the top-left and top-right UI elements to the main content.
         Content.Children.Add(WrapInStackPanelDockTopLeft(topLeft));

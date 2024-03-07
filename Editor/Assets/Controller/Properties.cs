@@ -10,16 +10,16 @@ using Windows.Foundation;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 
+using Engine;
 using Engine.ECS;
 using Engine.Editor;
-using Engine.Rendering;
+using Engine.Helper;
 using Engine.Runtime;
+using Engine.Components;
 
 using static Editor.Controller.Helper;
 
 using Path = System.IO.Path;
-using Engine.Helper;
-using Engine;
 
 namespace Editor.Controller;
 
@@ -507,7 +507,7 @@ internal sealed partial class Properties
                 grid.Add(CreateComboBox(type, entity.ID, component, fieldInfo.Name, value.ToString()));
 
             // Material
-            else if (type == typeof(Material_OLD))
+            else if (type == typeof(Material))
                 grid.Add(CreateTextureSlot("None", "Material"));
 
             //// Texture

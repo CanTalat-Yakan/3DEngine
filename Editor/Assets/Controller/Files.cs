@@ -17,6 +17,7 @@ using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
 
+using Engine;
 using Engine.Helper;
 
 namespace Editor.Controller;
@@ -263,12 +264,9 @@ internal sealed partial class Files
         // Set the breadcrumb bar with the correct values.
         SetBreadcrumbBar();
 
-        // Compile the project materials.
-        Engine.Core.Instance?.ShaderCompiler.CompileProjectShaders(AssetsPath);
-        // Compile the project materials.
-        Engine.Core.Instance?.MaterialCompiler.CompileProjectMaterials(AssetsPath);
-        // Compile the project scripts.
-        Engine.Core.Instance?.ScriptCompiler.CompileProjectScripts(AssetsPath);
+        Kernel.Instance?.ShaderCompiler.CompileProjectShaders(AssetsPath);
+        Kernel.Instance?.MaterialCompiler.CompileProjectMaterials(AssetsPath);
+        Kernel.Instance?.ScriptCompiler.CompileProjectScripts(AssetsPath);
     }
 
     public void ValidateCategoriesExist()
