@@ -13,16 +13,16 @@ public sealed class Program
     {
         HandleExceptions();
 
-        Initialize(renderGUI, ref config);
+        Initialize(renderGUI, config);
 
         AppWindow.Looping(Kernel.Frame);
         AppWindow.Dispose(Kernel.Dispose);
     }
 
-    private void Initialize(bool renderGUI, ref Config config)
+    private void Initialize(bool renderGUI, Config config)
     {
         config ??= Config.GetDefault();
-        config.SetResolutionScale(1);
+        config.SetResolutionScale(2);
         config.GUI = renderGUI;
 
         AppWindow = new(config.WindowData);

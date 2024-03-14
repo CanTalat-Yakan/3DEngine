@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Text;
 
 using Vortice.Mathematics;
@@ -100,6 +101,7 @@ public sealed partial class Mesh : EditorComponent
     public void SetMeshInfo(MeshInfo meshInfo)
     {
         MeshInfo = meshInfo;
+        Order = (byte)Array.IndexOf(Context.Meshes.Values.ToArray(), meshInfo);
 
         InstantiateBounds(meshInfo.BoundingBox);
 
