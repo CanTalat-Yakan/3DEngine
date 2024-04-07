@@ -19,7 +19,7 @@ global using Engine.Utilities;
 
 namespace Engine;
 
-public sealed class Kernel
+public sealed partial class Kernel
 {
     public static Kernel Instance { get; private set; }
 
@@ -128,6 +128,16 @@ public sealed class Kernel
         EndRender();
     }
 
+    public void Dispose()
+    {
+        Context?.Dispose();
+
+        OnDispose?.Invoke();
+    }
+}
+
+public sealed partial class Kernel
+{
     public void BeginRender()
     {
         Context.GraphicsDevice.Begin();
@@ -175,12 +185,5 @@ public sealed class Kernel
             SceneManager.Awake();
             SceneManager.Start();
         }
-    }
-
-    public void Dispose()
-    {
-        Context?.Dispose();
-
-        OnDispose?.Invoke();
     }
 }
