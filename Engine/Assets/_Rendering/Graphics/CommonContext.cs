@@ -40,6 +40,7 @@ public sealed partial class CommonContext : IDisposable
 
         ModelLoader.LoadFile(Paths.PRIMITIVES + "Cube.obj");
         ModelLoader.LoadFile(Paths.PRIMITIVES + "Sphere.obj");
+
         ImageLoader.LoadTexture(Paths.TEXTURES + "Default.png");
         ImageLoader.LoadTexture(Paths.TEXTURES + "SkyGradient.png");
         ImageLoader.LoadTexture(Paths.TEXTURES + "Transparent.png");
@@ -49,6 +50,7 @@ public sealed partial class CommonContext : IDisposable
     public void Dispose()
     {
         UploadBuffer?.Dispose();
+
         DisposeDictionaryItems(RootSignatures);
         DisposeDictionaryItems(RenderTargets);
         DisposeDictionaryItems(PipelineStateObjects);
@@ -102,9 +104,9 @@ public sealed partial class CommonContext : IDisposable
 
 public sealed partial class CommonContext : IDisposable
 {
-    public void CreateShaderFromResources(params string[] shaderList)
+    public void CreateShaderFromResources(params string[] shaderNameList)
     {
-        foreach (string shaderName in shaderList)
+        foreach (string shaderName in shaderNameList)
         {
             VertexShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + shaderName + ".hlsl", "VS");
             PixelShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + shaderName + ".hlsl", "PS");
