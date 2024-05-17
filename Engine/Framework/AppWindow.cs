@@ -30,7 +30,7 @@ public sealed partial class AppWindow
 
     public void Looping(Action onFrame)
     {
-        while (IsAvailable())
+        while (WindowIsAvailable())
             onFrame?.Invoke();
     }
 
@@ -61,8 +61,10 @@ public sealed partial class AppWindow
         RegisterClassEx(ref windowClass);
     }
 
-    public bool IsAvailable()
+    public bool WindowIsAvailable()
     {
+        Profiler.Start(out var stopwatch);
+
         if (PeekMessage(out var msg, IntPtr.Zero, 0, 0, 1))
         {
             TranslateMessage(ref msg);
@@ -71,6 +73,8 @@ public sealed partial class AppWindow
             if (msg.Value == (uint)WindowMessage.Quit)
                 return false;
         }
+
+        Profiler.Stop(stopwatch, "Window");
 
         return true;
     }

@@ -103,7 +103,7 @@ public sealed partial class Kernel
 
         BeginRender();
 
-        Profiler.Reset();
+
         Time.Update();
         Input.Update();
 
@@ -124,6 +124,8 @@ public sealed partial class Kernel
             RenderGUI();
 
         Input.LateUpdate();
+
+        Profiler.Reset();
 
         EndRender();
     }
