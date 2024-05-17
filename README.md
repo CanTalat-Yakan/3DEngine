@@ -127,9 +127,11 @@ As a Unity Developer, I've gathered a collection of top-notch assets from the Un
 # Build
 In order to compile, you need to install [Visual Studio 2022](https://visualstudio.microsoft.com/vs) with the following components:
 
-*  [Windows 11 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk)
 *  [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)
+
+Visual Studio Installer Modify Individual components with extra direct Download link:
 *  [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
+*  [Windows 11 SDK (10.0.22000.0)](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk)
 
 # Screenshots
 ![3D Engine Layout](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/Screenshots/Layout.png)
