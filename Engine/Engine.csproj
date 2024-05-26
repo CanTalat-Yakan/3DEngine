@@ -127,9 +127,6 @@
 		<Content Include="Assets\Resources\Templates\Examples\Shaders\Include\Common.hlsli.txt">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-		<Content Include="Assets\Resources\Templates\Project\Engine.dll">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
 		<Content Include="Assets\Resources\Templates\Examples\Scripts\Example.cs.txt">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>

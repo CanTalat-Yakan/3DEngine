@@ -192,9 +192,9 @@ public sealed partial class Home
             if (File.Exists(zipPath))
                 ZipFile.ExtractToDirectory(zipPath, path);
 
-            string dllPath = Path.Combine(AppContext.BaseDirectory, Engine.Helper.Paths.TEMPLATES, "Project", "Engine.dll");
-            if (File.Exists(dllPath))
-                File.Copy(dllPath, Path.Combine(path, "Engine.dll"));
+            //string dllPath = Path.Combine(AppContext.BaseDirectory, Engine.Helper.Paths.TEMPLATES, "Project", "Engine.dll");
+            //if (File.Exists(dllPath))
+            //    File.Copy(dllPath, Path.Combine(path, "Engine.dll"));
 
             PopulateProjectTiles();
         }
