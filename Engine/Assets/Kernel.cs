@@ -32,13 +32,13 @@ public sealed partial class Kernel
 
     public Config Config;
 
-    public SceneManager SceneManager;
+    public SceneManager SceneManager = new();
 
-    public ScriptCompiler ScriptCompiler;
-    public ShaderCompiler ShaderCompiler;
-    public MaterialCompiler MaterialCompiler;
+    public ScriptCompiler ScriptCompiler = new();
+    public ShaderCompiler ShaderCompiler = new();
+    public MaterialCompiler MaterialCompiler = new();
 
-    public GUIRenderer GUIRenderer;
+    public GUIRenderer GUIRenderer = new();
     public GUIInputHandler GUIInputHandler;
     public IntPtr GUIContext;
 
@@ -58,11 +58,11 @@ public sealed partial class Kernel
         Context.GraphicsDevice.Initialize(size, win32Window);
         Context.UploadBuffer.Initialize(Context.GraphicsDevice, GraphicsDevice.GetMegabytesInByte(64));
         Context.GraphicsContext.Initialize(Context.GraphicsDevice);
+
         Context.LoadDefaultResources();
 
         if (Config.GUI)
         {
-            GUIRenderer = new();
             GUIRenderer.Initialize();
 
             GUIInputHandler = new(hwnd);
@@ -72,23 +72,11 @@ public sealed partial class Kernel
 
         Input.Initialize(hwnd);
 
-        SceneManager = new();
         var boot = SceneManager.MainScene.EntityManager
             .CreateEntity(null, "Boot", hide: true)
             .AddComponent<SceneBoot>();
 
-        ScriptCompiler = new();
-        ShaderCompiler = new();
-        MaterialCompiler = new();
-
-        ScriptCompiler.CompileProjectScripts(EditorState.AssetsPath);
-        ShaderCompiler.CompileProjectShaders(EditorState.AssetsPath);
-        MaterialCompiler.CompileProjectMaterials(EditorState.AssetsPath);
-
-        SceneManager.ProcessSystems();
-
-        SceneManager.Awake();
-        SceneManager.Start();
+        Compile();
 
         Output.Log("Engine Initialized...");
     }
@@ -103,13 +91,13 @@ public sealed partial class Kernel
 
         BeginRender();
 
-
         Time.Update();
         Input.Update();
 
         SceneManager.ProcessSystems();
 
-        OnEditorPlayMode();
+        if (EditorState.PlayModeStarted)
+            Compile();
 
         if (Time.OnFixedFrame)
             SceneManager.FixedUpdate();
@@ -176,16 +164,15 @@ public sealed partial class Kernel
         GUIRenderer.Render();
     }
 
-    public void OnEditorPlayMode()
+    public void Compile()
     {
-        if (EditorState.PlayModeStarted)
-        {
             ScriptCompiler.CompileProjectScripts(EditorState.AssetsPath);
             ShaderCompiler.CompileProjectShaders(EditorState.AssetsPath);
             MaterialCompiler.CompileProjectMaterials(EditorState.AssetsPath);
 
+            SceneManager.ProcessSystems();
+
             SceneManager.Awake();
             SceneManager.Start();
-        }
-    }
+     }
 }

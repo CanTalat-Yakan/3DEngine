@@ -1,4 +1,6 @@
-﻿namespace Engine.Editor;
+﻿using System;
+
+namespace Engine.Editor;
 
 internal sealed class SceneBoot : EditorComponent, IHide
 {
@@ -35,13 +37,9 @@ internal sealed class SceneBoot : EditorComponent, IHide
 
     public override void OnStart()
     {
-        // Create a camera entity with the name "Camera" and the tag "MainCamera".
         SceneManager.MainScene.EntityManager.CreateCamera("Camera", Tags.MainCamera.ToString());
 
-        // Create a parent entity for all cube entities with the name "Cubes".
         Cubes = SceneManager.MainScene.EntityManager.CreateEntity(null, "Cubes");
-
-        // Create a cube primitive under the Cubes entity.
         SceneManager.MainScene.EntityManager.CreatePrimitive(PrimitiveTypes.Cube, parent: Cubes);
 
         Output.Log("Press 'C' to spawn 1000 Cubes");
@@ -52,26 +50,38 @@ internal sealed class SceneBoot : EditorComponent, IHide
         // Deactivate the SceneCamera when the play mode is active.
         SceneCamera.IsEnabled = !EditorState.PlayMode;
 
-        // Example.
-        // Check for the 'C' key press to trigger cube spawning.
-        if (Input.GetKey(Key.C, InputState.Down) && ViewportController.ViewportFocused)
+        if (Input.GetKey(Key.C, InputState.Pressed) && ViewportController.ViewportFocused)
         {
-            // Log message indicating that 10 cubes have been spawned.
             Output.Log($"Spawned {CubesCount += 1000} Cubes");
 
-            // Loop to spawn 1000 cubes with random attributes.
+            Random rnd = new();
+            
             for (int i = 0; i < 1000; i++)
             {
-                // Create a new cube and add it to the Cubes entity.
-                var newCube = SceneManager.MainScene.EntityManager.CreatePrimitive(PrimitiveTypes.Cube, parent: Cubes, hide: true);
+                var newCube = SceneManager.MainScene.EntityManager.CreatePrimitive(PrimitiveTypes.Cube, parent: Cubes, hide: true).Entity;
 
-                // Set the position of the new cube with an offset on the Y axis.
-                newCube.Entity.Transform.LocalPosition = new(new Random().Next(-250, 250), new Random().Next(-250, 250), new Random().Next(-250, 250));
-                // Set random rotation values for the new cube.
-                newCube.Entity.Transform.EulerAngles = new(new Random().Next(1, 360), new Random().Next(1, 360), new Random().Next(1, 360));
-                // Set random scale values for the new cube.
-                newCube.Entity.Transform.LocalScale = new(new Random().Next(1, 3), new Random().Next(1, 3), new Random().Next(1, 3));
+                newCube.Transform.LocalPosition = new(rnd.Next(-250, 250), rnd.Next(-250, 250), rnd.Next(-250, 250));
+                newCube.Transform.EulerAngles = new(rnd.Next(1, 360), rnd.Next(1, 360), rnd.Next(1, 360));
+                newCube.Transform.LocalScale = new(rnd.Next(1, 3), rnd.Next(1, 3), rnd.Next(1, 3));
+
+                newCube.AddComponent<HiddenCubeHoverEffect>();
             }
         }
     }
+}
+
+internal sealed class HiddenCubeHoverEffect : EditorComponent, IHide
+{
+    private float _verticalPostion;
+    private float _factor = 3;
+    private float _random;
+
+    public override void OnStart()
+    {
+        _random = (float)new Random().NextDouble() * 10;
+        _verticalPostion = Entity.Transform.LocalPosition.Y;
+    } 
+
+    public override void OnUpdate() =>
+        Entity.Transform.LocalPosition.Y = MathF.Sin((float)Time.Timer + _random) * _factor + _verticalPostion;
 }
