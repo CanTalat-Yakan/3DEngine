@@ -13,6 +13,7 @@ public class Win32Window
     public string Title;
     public int Width;
     public int Height;
+
     public IntPtr Handle;
     public bool IsMinimized;
 
