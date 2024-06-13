@@ -51,10 +51,9 @@
 		<PackageReference Include="EnTTSharp.Serialization.Binary" Version="1.1.0" />
 		<PackageReference Include="EnTTSharp.Serialization.Xml" Version="1.1.0" />
 		<PackageReference Include="FftSharp" Version="2.1.0" />
-		<PackageReference Include="Magick.NET-Q16-HDRI-AnyCPU" Version="13.8.0" />
 		<PackageReference Include="MagicPhysX" Version="1.0.0" />
-		<PackageReference Include="Microsoft.CodeAnalysis" Version="4.9.2" />
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.9.2" />
+		<PackageReference Include="Microsoft.CodeAnalysis" Version="4.10.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.10.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="System.Net.Http" Version="4.3.4" />
 		<PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
@@ -70,7 +69,7 @@
 		<PackageReference Include="Vortice.DirectX" Version="3.5.0" />
 		<PackageReference Include="Vortice.Dxc" Version="3.5.0" />
 		<PackageReference Include="Vortice.DXGI" Version="3.5.0" />
-		<PackageReference Include="Vortice.Mathematics" Version="1.7.8" />
+		<PackageReference Include="Vortice.Mathematics" Version="1.8.0" />
 		<PackageReference Include="Vortice.Win32" Version="2.1.0" />
 		<PackageReference Include="Vortice.XInput" Version="3.5.0" />
 	</ItemGroup>

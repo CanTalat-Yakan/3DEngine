@@ -75,13 +75,13 @@ public sealed class GUIInputHandler
         if ((io.ConfigFlags & ImGuiConfigFlags.NoMouseCursorChange) != 0)
             return false;
 
-        var requestedcursor = ImGui.GetMouseCursor();
-        if (requestedcursor == ImGuiMouseCursor.None || io.MouseDrawCursor)
+        var requestedCursor = ImGui.GetMouseCursor();
+        if (requestedCursor == ImGuiMouseCursor.None || io.MouseDrawCursor)
             User32.SetCursor(IntPtr.Zero);
         else
         {
             var cursor = SystemCursor.IDC_ARROW;
-            switch (requestedcursor)
+            switch (requestedCursor)
             {
                 case ImGuiMouseCursor.Arrow: cursor = SystemCursor.IDC_ARROW; break;
                 case ImGuiMouseCursor.TextInput: cursor = SystemCursor.IDC_IBEAM; break;
