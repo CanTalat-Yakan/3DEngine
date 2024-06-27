@@ -122,8 +122,6 @@ public partial class System<T> where T : Component
 
     public static void Start()
     {
-        // Loop through all the components in the static components array
-        // and call OnStart method on the component if it is active.
         Parallel.ForEach(s_componentsArray, _parallelOptions, component =>
         {
             if (CheckActive(component))
@@ -133,8 +131,6 @@ public partial class System<T> where T : Component
 
     public static void Update()
     {
-        // Loop through all the components in the static components array
-        // and call OnUpdate method on the component if it is active.
         Parallel.ForEach(s_componentsArray, _parallelOptions, component =>
         {
             if (CheckActive(component))
@@ -144,8 +140,6 @@ public partial class System<T> where T : Component
 
     public static void LateUpdate()
     {
-        // Loop through all the components in the static components array
-        // and call OnLateUpdate method on the component if it is active.
         Parallel.ForEach(s_componentsArray, _parallelOptions, component =>
         {
             if (CheckActive(component))
@@ -155,8 +149,6 @@ public partial class System<T> where T : Component
 
     public static void FixedUpdate()
     {
-        // Loop through all the components in the static components array
-        // and call OnLateUpdate method on the component if it is active.
         Parallel.ForEach(s_componentsArray, _parallelOptions, component =>
         {
             if (CheckActive(component))
@@ -168,15 +160,14 @@ public partial class System<T> where T : Component
     {
         // Loop through all the components in the static components array
         // and call OnRender method on the component if it is active.
-        foreach (T component in s_componentsArray) // This will run in a separate thread, asynchronously reprojecting the render target texture
+        foreach (T component in s_componentsArray) // This will run in a separate thread,
+                                                   // asynchronously re-projecting the render target texture.
             if (CheckActive(component))
                 component.OnRender();
     }
 
     public static void GUI()
     {
-        // Loop through all the components in the static components array
-        // and call OnGUI method on the component if it is active.
         foreach (T component in s_componentsArray)
             if (CheckActive(component))
                 component.OnGUI();
