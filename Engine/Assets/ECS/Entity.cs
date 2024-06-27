@@ -78,13 +78,10 @@ public sealed partial class Entity
         component.Entity = this;
         // Enable the component by default.
         component.IsEnabled = true;
-
-        // Check if Component is a subclass of EditorComponent.
-        if (component is EditorComponent)
-        {
-            component.OnAwake();
-            component.OnStart();
-        }
+        
+        // Call the Awake and Start method to initialize the component.
+        component.OnAwake();
+        component.OnStart();
 
         return component;
     }

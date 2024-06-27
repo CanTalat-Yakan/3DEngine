@@ -54,6 +54,7 @@ public sealed partial class Kernel
         Instance ??= this;
 
         EditorState.AssetsPath = assetsPath;
+        EditorState.PlayMode = win32Window;
 
         Context.GraphicsDevice.Initialize(size, win32Window);
         Context.UploadBuffer.Initialize(Context.GraphicsDevice, GraphicsDevice.GetMegabytesInByte(64));
@@ -166,13 +167,13 @@ public sealed partial class Kernel
 
     public void Compile()
     {
-            ScriptCompiler.CompileProjectScripts(EditorState.AssetsPath);
-            ShaderCompiler.CompileProjectShaders(EditorState.AssetsPath);
-            MaterialCompiler.CompileProjectMaterials(EditorState.AssetsPath);
+        ScriptCompiler.CompileProjectScripts(EditorState.AssetsPath);
+        ShaderCompiler.CompileProjectShaders(EditorState.AssetsPath);
+        MaterialCompiler.CompileProjectMaterials(EditorState.AssetsPath);
 
-            SceneManager.ProcessSystems();
+        SceneManager.ProcessSystems();
 
-            SceneManager.Awake();
-            SceneManager.Start();
-     }
+        SceneManager.Awake();
+        SceneManager.Start();
+    }
 }

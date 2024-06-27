@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Engine.Editor;
+﻿namespace Engine.Editor;
 
 internal sealed class SceneBoot : EditorComponent, IHide
 {
@@ -10,6 +8,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
     public Entity Cubes;
 
     public int CubesCount;
+    public int EntityCount;
 
     public override void OnAwake()
     {
@@ -37,12 +36,15 @@ internal sealed class SceneBoot : EditorComponent, IHide
 
     public override void OnStart()
     {
-        SceneManager.MainScene.EntityManager.CreateCamera("Camera", Tags.MainCamera.ToString());
+        var exampleCamera = SceneManager.MainScene.EntityManager.CreateCamera("Camera", Tags.MainCamera.ToString()).Entity;
+        exampleCamera.Transform.LocalPosition = new(3, 4, 5);
+        exampleCamera.Transform.EulerAngles = new(35, -150, 0);
 
         Cubes = SceneManager.MainScene.EntityManager.CreateEntity(null, "Cubes");
         SceneManager.MainScene.EntityManager.CreatePrimitive(PrimitiveTypes.Cube, parent: Cubes);
 
         Output.Log("Press 'C' to spawn 1000 Cubes");
+        Output.Log("Press 'E' to spawn 1000 Entities");
     }
 
     public override void OnUpdate()
@@ -55,7 +57,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
             Output.Log($"Spawned {CubesCount += 1000} Cubes");
 
             Random rnd = new();
-            
+
             for (int i = 0; i < 1000; i++)
             {
                 var newCube = SceneManager.MainScene.EntityManager.CreatePrimitive(PrimitiveTypes.Cube, parent: Cubes, hide: true).Entity;
@@ -64,24 +66,31 @@ internal sealed class SceneBoot : EditorComponent, IHide
                 newCube.Transform.EulerAngles = new(rnd.Next(1, 360), rnd.Next(1, 360), rnd.Next(1, 360));
                 newCube.Transform.LocalScale = new(rnd.Next(1, 3), rnd.Next(1, 3), rnd.Next(1, 3));
 
-                newCube.AddComponent<HiddenCubeHoverEffect>();
+                newCube.AddComponent<HoverEffect>();
             }
+        }
+
+        if (Input.GetKey(Key.E, InputState.Pressed) && ViewportController.ViewportFocused)
+        {
+            Output.Log($"Spawned {EntityCount += 1000} Entities");
+
+            SceneManager.MainScene.EntityManager.CreateEntity(hide: true).AddComponent<HoverEffect>();
         }
     }
 }
 
-internal sealed class HiddenCubeHoverEffect : EditorComponent, IHide
+internal sealed class HoverEffect : Component, IHide
 {
-    private float _verticalPostion;
+    private float _verticalPosition;
     private float _factor = 3;
     private float _random;
 
     public override void OnStart()
     {
         _random = (float)new Random().NextDouble() * 10;
-        _verticalPostion = Entity.Transform.LocalPosition.Y;
-    } 
+        _verticalPosition = Entity.Transform.LocalPosition.Y;
+    }
 
     public override void OnUpdate() =>
-        Entity.Transform.LocalPosition.Y = MathF.Sin((float)Time.Timer + _random) * _factor + _verticalPostion;
+        Entity.Transform.LocalPosition.Y = MathF.Sin((float)Time.Timer + _random) * _factor + _verticalPosition;
 }

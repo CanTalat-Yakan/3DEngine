@@ -1,9 +1,10 @@
-﻿using Engine.Loader;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 using Vortice.Direct3D12;
 using Vortice.DXGI;
+
+using Engine.Loader;
 
 namespace Engine.Graphics;
 
