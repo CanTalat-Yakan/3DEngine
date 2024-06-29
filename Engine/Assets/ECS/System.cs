@@ -161,7 +161,7 @@ public partial class System<T> where T : Component
         // Loop through all the components in the static components array
         // and call OnRender method on the component if it is active.
         foreach (T component in s_componentsArray) // This will run in a separate thread,
-                                                   // asynchronously re-projecting the render target texture.
+                                                   // asynchronously reprojecting the render target texture.
             if (CheckActive(component))
                 component.OnRender();
     }
