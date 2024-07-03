@@ -1,5 +1,5 @@
 ﻿using USD.NET;
-//using pxr;
+using pxr;
 
 namespace Engine.Loader;
 
@@ -7,61 +7,89 @@ public sealed class SceneLoader
 {
     public void Save(string localPath, EntityManager mainScene, EntityManager[] subscenes)
     {
-        var stage = Scene.Create();
+        var scene = Scene.Create(localPath);
+        var stage = scene.Stage;
 
-        //var stage = CreateStage(localPath);
+        SaveEntities(stage, mainScene, $"/World/{mainScene.Name}");
 
-        //foreach (var entity in mainScene.EntityList)
-        //{
-        //    var entityPath = new SdfPath($"/World/{mainScene.Name}/{entity.Name}");
-        //    var usdPrim = stage.DefinePrim(entityPath, new TfToken("Xform"));
+        foreach (var subscene in subscenes)
+        {
+            var subscenePath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(localPath), $"{subscene.Name}.usda");
+            SaveEntities(stage, subscene, $"/World/{subscene.Name}");
 
-        //    foreach (var component in entity.Components)
-        //        foreach (var attribute in component.GetType().GetProperties())
-        //        {
-        //            var value = attribute.GetValue(component);
-        //            if (value is not null)
-        //            {
-        //                var usdAttribute = usdPrim.CreateAttribute(new TfToken(attribute.Name), SdfValueTypeNames.Token);
-        //                usdAttribute.Set(new TfToken(value.ToString()));
-        //            }
-        //        }
-        //}
+            var subsceneLayer = SdfLayer.CreateNew(subscenePath);
+            stage.GetRootLayer().GetSubLayerPaths().push_back(subsceneLayer.GetIdentifier());
+        }
 
-        //stage.GetRootLayer().Save();
+        scene.Save();
     }
-    
-    public void Load(string localPath, Scene mainScene, Scene[] subScenes)
+
+    private void SaveEntities(UsdStage stage, EntityManager scene, string rootPath)
     {
-        //var stage = OpenStage(localPath);
+        foreach (var entity in scene.List)
+        {
+            var entityPath = new SdfPath($"{rootPath}/{entity.Name}");
+            var usdPrim = stage.DefinePrim(entityPath, new TfToken("Xform"));
 
-        //foreach (var prim in stage.Traverse())
-        //{
-        //    if (prim.IsA(TfType.FindByName("Xform")))
-        //    {
-        //        var entity = new Entity { Name = prim.GetName() };
+            foreach (var component in entity.Components)
+                foreach (var attribute in component.GetType().GetProperties())
+                {
+                    var value = attribute.GetValue(component);
+                    if (value is not null)
+                    {
+                        var usdAttribute = usdPrim.CreateAttribute(new TfToken(attribute.Name), SdfValueTypeNames.Token);
+                        usdAttribute.Set(new TfToken(value.ToString()));
+                    }
+                }
+        }
+    }
 
-        //        foreach (var usdAttribute in prim.GetAttributes())
-        //        {
-        //            var componentType = Type.GetType(usdAttribute.GetName());
-        //            if (componentType is not null)
-        //            {
-        //                var component = (Component)Activator.CreateInstance(componentType);
-        //                component.Entity = entity;
+    public void Load(out SystemManager systemManager, string localPath)
+    {
+        systemManager = new SystemManager();
 
-        //                var value = usdAttribute.Get();
-        //                var property = componentType.GetProperty(usdAttribute.GetName());
-        //                if (property is not null && value is not null)
-        //                {
-        //                    property.SetValue(component, Convert.ChangeType(value, property.PropertyType));
-        //                }
+        var scene = Scene.Open(localPath);
+        var stage = scene.Stage;
 
-        //                entity.Components.Add(component);
-        //            }
-        //        }
+        LoadEntities(stage, systemManager.MainScene, $"/World/{systemManager.MainScene.Name}");
 
-        //        mainScene.EntityList.Add(entity);
-        //    }
-        //}
+        var subLayerPaths = stage.GetRootLayer().GetSubLayerPaths();
+        for (uint i = 0; i < subLayerPaths.size(); i++)
+        {
+            //var subscenePath = subLayerPaths[i];
+            //var subscene = new EntityManager { Name = System.IO.Path.GetFileNameWithoutExtension(subscenePath) };
+            //var subsceneLayer = Scene.Open(subscenePath).Stage;
+            //LoadEntities(subsceneLayer, subscene, $"/World/{subscene.Name}");
+
+            //systemManager.Subscenes.Add(subscene);
+        }
+    }
+
+    private void LoadEntities(UsdStage stage, EntityManager scene, string rootPath)
+    {
+        foreach (var prim in stage.Traverse())
+            if (prim.IsA(TfType.FindByName("Xform")))
+            {
+                var entity = new Entity { Name = prim.GetName() };
+
+                foreach (var usdAttribute in prim.GetAttributes())
+                {
+                    var componentType = Type.GetType(usdAttribute.GetName());
+                    if (componentType is not null)
+                    {
+                        var component = (Component)Activator.CreateInstance(componentType);
+                        component.Entity = entity;
+
+                        var value = usdAttribute.Get();
+                        var property = componentType.GetProperty(usdAttribute.GetName());
+                        if (property is not null && value is not null)
+                            property.SetValue(component, Convert.ChangeType(value, property.PropertyType));
+
+                        entity.Components.Add(component);
+                    }
+                }
+
+                scene.List.Add(entity);
+            }
     }
 }
