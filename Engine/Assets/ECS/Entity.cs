@@ -36,8 +36,8 @@ public sealed partial class Entity : IDisposable
 
     public SceneManager SceneManager => Kernel.Instance.SceneManager;
 
-    public Scene Scene { get => _scene ??= SceneManager.GetFromEntityID(ID); set => _scene = null; }
-    private Scene _scene;
+    public EntityManager Scene { get => _scene ??= SceneManager.GetFromEntityID(ID); set => _scene = null; }
+    private EntityManager _scene;
 
     public Transform Transform => _transform;
     private Transform _transform;

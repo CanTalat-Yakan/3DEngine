@@ -14,7 +14,6 @@ global using Engine.Graphics;
 global using Engine.GUI;
 global using Engine.Helper;
 global using Engine.Runtime;
-global using Engine.SceneSystem;
 global using Engine.Utilities;
 
 namespace Engine;
@@ -74,7 +73,7 @@ public sealed partial class Kernel
 
         Input.Initialize(hwnd);
 
-        var boot = SceneManager.MainScene.EntityManager
+        var boot = SceneManager.MainScene
             .CreateEntity(null, "Boot", hide: true)
             .AddComponent<SceneBoot>();
 

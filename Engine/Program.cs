@@ -29,7 +29,7 @@ public sealed class Program
         AppWindow.Show(Interoperation.ShowWindowCommand.Maximize);
 
         Kernel = new(config);
-        Kernel.Initialize(AppWindow.Win32Window.Handle, AppWindow.Win32Window.Size, win32Window: true, assetsPath: Paths.ASSETS);
+        Kernel.Initialize(AppWindow.Win32Window.Handle, AppWindow.Win32Window.Size, win32Window: true);
 
         AppWindow.ResizeEvent += Kernel.Context.GraphicsDevice.Resize;
     }

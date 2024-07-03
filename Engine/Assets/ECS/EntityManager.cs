@@ -19,6 +19,13 @@ public enum PrimitiveTypes
 public sealed partial class EntityManager
 {
     public EventList<Entity> EntityList = new();
+    public Guid ID = Guid.NewGuid();
+
+    public bool IsEnabled;
+    public string Name = "Scene";
+
+    public string LocalPath => $"{localPath}\\{Name}.usda";
+    private string localPath = "";
 
     public Entity Duplicate(Entity refEntity, Entity parent = null)
     {
@@ -43,6 +50,21 @@ public sealed partial class EntityManager
 
         EntityList.Clear();
         EntityList = null;
+    }
+}
+
+public sealed partial class EntityManager : ICloneable
+{
+
+    object ICloneable.Clone() =>
+        Clone();
+
+    public EntityManager Clone()
+    {
+        var newEntityManager = (EntityManager)this.MemberwiseClone();
+        newEntityManager.ID = Guid.NewGuid();
+
+        return newEntityManager;
     }
 }
 

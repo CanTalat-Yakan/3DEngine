@@ -11,7 +11,6 @@ using Microsoft.UI.Xaml;
 using Engine.ECS;
 using Engine.Editor;
 using Engine.Runtime;
-using Engine.SceneSystem;
 
 namespace Editor.Controller;
 
@@ -102,7 +101,7 @@ internal sealed partial class Binding
             new(Engine.Kernel.Instance.Config, "RenderMode"));
     }
 
-    public static void SetSceneBindings(Scene scene)
+    public static void SetSceneBindings(EntityManager scene)
     {
         if (scene is null)
             return;
@@ -216,7 +215,7 @@ internal sealed partial class Binding
             return;
 
         foreach (var entry in SceneBindings.Where(kv => kv.Key.Contains("Scene@")))
-            if (entry.Value.Source is Scene scene)
+            if (entry.Value.Source is EntityManager scene)
                 UpdateBinding(scene, scene.ID, SceneBindings);
     }
 

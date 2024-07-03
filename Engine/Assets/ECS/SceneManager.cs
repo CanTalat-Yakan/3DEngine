@@ -4,21 +4,16 @@ namespace Engine.ECS;
 
 public sealed partial class SceneManager
 {
-    public Scene MainScene;
-    public List<Scene> Subscenes = new();
+    public EntityManager MainScene;
+    public List<EntityManager> Subscenes = new();
 
-    public SceneManager(Scene scene = null) =>
+    public SceneManager(EntityManager scene = null) =>
         // Initializes the main scene and creates a new empty list for the subscenes.
-        MainScene = scene ?? new Scene() { Name = "Main", IsEnabled = true, EntityManager = new() };
+        MainScene = scene ?? new EntityManager() { Name = "Main", IsEnabled = true };
 
-    public Scene AddSubscene(Guid guid = new(), string name = "Subscene", bool enable = true)
+    public EntityManager AddSubscene(Guid guid = new(), string name = "Subscene", bool enable = true)
     {
-        Scene newSubscene = new()
-        {
-            Name = name,
-            IsEnabled = enable,
-            EntityManager = new()
-        };
+        EntityManager newSubscene = new() { Name = name, IsEnabled = enable };
 
         // Set the provided GUID, if not empty.
         if (!guid.Equals(Guid.Empty))
@@ -29,26 +24,26 @@ public sealed partial class SceneManager
         return newSubscene;
     }
 
-    public void LoadSubscene(Scene subscene)
+    public void LoadSubscene(EntityManager subscene)
     {
-        SceneLoader.Load(subscene);
+        //SceneLoader.Load(subscene);
 
         Subscenes.Add(subscene);
     }
 
-    public void UnloadSubscene(Scene subscene)
+    public void UnloadSubscene(EntityManager subscene)
     {
-        subscene.Unload();
+        //SceneLoader.Load(subscene);
     }
 
     public void RemoveSubscene(Guid guid)
     {
         // Retrieves the scene with the specified GUID from the list of subscenes.
-        Scene scene = GetFromID(guid);
+        EntityManager scene = GetFromID(guid);
 
         // Destroys all entities within the scene.
-        foreach (var entity in scene.EntityManager.EntityList.ToArray())
-            scene.EntityManager.Destroy(entity);
+        foreach (var entity in scene.EntityList.ToArray())
+            scene.Destroy(entity);
 
         Subscenes.Remove(scene);
     }
@@ -56,7 +51,7 @@ public sealed partial class SceneManager
 
 public sealed partial class SceneManager
 {
-    public Scene GetFromID(Guid guid)
+    public EntityManager GetFromID(Guid guid)
     {
         // Check if the main scene ID matches the provided GUID.
         if (MainScene.ID == guid)
@@ -71,15 +66,15 @@ public sealed partial class SceneManager
         return null;
     }
 
-    public Scene GetFromEntityID(Guid guid)
+    public EntityManager GetFromEntityID(Guid guid)
     {
         // Check if the main scene contains the entity with an ID that matches the provided GUID.
-        if (MainScene.EntityManager.GetFromID(guid) is not null)
+        if (MainScene.GetFromID(guid) is not null)
             return MainScene;
 
         // Check if any of the subscenes contains the entity with an ID that matches the provided GUID.
         foreach (var subscene in Subscenes)
-            if (subscene.EntityManager.GetFromID(guid) is not null)
+            if (subscene.GetFromID(guid) is not null)
                 return subscene;
 
         // Return null if entity is not found in any scene with the provided GUID.
@@ -168,8 +163,8 @@ public sealed partial class SceneManager
         CameraSystem.Destroy();
         MeshSystem.Destroy();
 
-        MainScene.EntityManager.Dispose();
+        MainScene.Dispose();
         foreach (var scene in Subscenes)
-            scene.EntityManager.Dispose();
+            scene.Dispose();
     }
 }
