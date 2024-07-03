@@ -7,7 +7,7 @@ public sealed class SceneLoader
 {
     public void Save(string localPath, EntityManager mainScene, EntityManager[] subscenes)
     {
-
+        var stage = Scene.Create();
 
         //var stage = CreateStage(localPath);
 

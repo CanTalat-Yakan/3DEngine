@@ -34,7 +34,7 @@ public sealed partial class Entity : IDisposable
     public string Tag;
     public string Layer;
 
-    public SceneManager SceneManager => Kernel.Instance.SceneManager;
+    public SystemManager SceneManager => Kernel.Instance.SceneManager;
 
     public EntityManager Scene { get => _scene ??= SceneManager.GetFromEntityID(ID); set => _scene = null; }
     private EntityManager _scene;

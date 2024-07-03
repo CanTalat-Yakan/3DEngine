@@ -2,12 +2,12 @@
 
 namespace Engine.ECS;
 
-public sealed partial class SceneManager
+public sealed partial class SystemManager
 {
     public EntityManager MainScene;
     public List<EntityManager> Subscenes = new();
 
-    public SceneManager(EntityManager scene = null) =>
+    public SystemManager(EntityManager scene = null) =>
         // Initializes the main scene and creates a new empty list for the subscenes.
         MainScene = scene ?? new EntityManager() { Name = "Main", IsEnabled = true };
 
@@ -42,14 +42,14 @@ public sealed partial class SceneManager
         EntityManager scene = GetFromID(guid);
 
         // Destroys all entities within the scene.
-        foreach (var entity in scene.EntityList.ToArray())
+        foreach (var entity in scene.List.ToArray())
             scene.Destroy(entity);
 
         Subscenes.Remove(scene);
     }
 }
 
-public sealed partial class SceneManager
+public sealed partial class SystemManager
 {
     public EntityManager GetFromID(Guid guid)
     {
@@ -82,7 +82,7 @@ public sealed partial class SceneManager
     }
 }
 
-public sealed partial class SceneManager
+public sealed partial class SystemManager
 {
     public void ProcessSystems()
     {

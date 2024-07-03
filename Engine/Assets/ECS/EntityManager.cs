@@ -18,7 +18,7 @@ public enum PrimitiveTypes
 
 public sealed partial class EntityManager
 {
-    public EventList<Entity> EntityList = new();
+    public EventList<Entity> List = new();
     public Guid ID = Guid.NewGuid();
 
     public bool IsEnabled;
@@ -32,30 +32,29 @@ public sealed partial class EntityManager
         Entity clonedEntity = refEntity.Clone();
         clonedEntity.Parent = parent;
 
-        EntityList.Add(clonedEntity);
+        List.Add(clonedEntity);
 
         return clonedEntity;
     }
 
     public void Destroy(Entity entity)
     {
-        EntityList.Remove(entity);
+        List.Remove(entity);
         entity.Dispose();
     }
 
     public void Dispose()
     {
-        foreach (var entity in EntityList)
+        foreach (var entity in List)
             entity.Components.Clear();
 
-        EntityList.Clear();
-        EntityList = null;
+        List.Clear();
+        List = null;
     }
 }
 
 public sealed partial class EntityManager : ICloneable
 {
-
     object ICloneable.Clone() =>
         Clone();
 
@@ -80,7 +79,7 @@ public sealed partial class EntityManager
             IsHidden = hide
         };
 
-        EntityList.Add(newEntity);
+        List.Add(newEntity);
 
         return newEntity;
     }
@@ -99,7 +98,7 @@ public sealed partial class EntityManager
         mesh.SetMaterialTextures(new MaterialTextureEntry("Default.png", 0));
         mesh.SetMaterialPipeline("SimpleLit");
 
-        EntityList.Add(newEntity);
+        List.Add(newEntity);
 
         return mesh;
     }
@@ -116,7 +115,7 @@ public sealed partial class EntityManager
 
         var camera = newEntity.AddComponent<Camera>();
 
-        EntityList.Add(newEntity);
+        List.Add(newEntity);
 
         return camera;
     }
@@ -126,7 +125,7 @@ public sealed partial class EntityManager
 {
     public Entity GetFromID(Guid guid)
     {
-        foreach (var entity in EntityList)
+        foreach (var entity in List)
             if (entity?.ID == guid)
                 return entity;
 
@@ -135,7 +134,7 @@ public sealed partial class EntityManager
 
     public Entity GetFromTag(string tag)
     {
-        foreach (var entity in EntityList)
+        foreach (var entity in List)
             if (entity?.Tag == tag)
                 return entity;
 

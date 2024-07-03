@@ -31,7 +31,7 @@ public sealed partial class Kernel
 
     public Config Config;
 
-    public SceneManager SceneManager = new();
+    public SystemManager SceneManager = new();
 
     public ScriptCompiler ScriptCompiler = new();
     public ShaderCompiler ShaderCompiler = new();
