@@ -1,30 +1,33 @@
 ﻿using USD.NET;
 using pxr;
+using System.IO;
 
 namespace Engine.Loader;
 
 public sealed class SceneLoader
 {
-    public void Save(string localPath, EntityManager mainScene, EntityManager[] subscenes)
+    public static void Save(string localPath, SystemManager systemManager)
     {
-        var scene = Scene.Create(localPath);
-        var stage = scene.Stage;
+        //var scene = Scene.Create(localPath);
+        //var stage = scene.Stage;
+        var stage = UsdStage.CreateNew(localPath);
 
-        SaveEntities(stage, mainScene, $"/World/{mainScene.Name}");
+        SaveEntities(stage, systemManager.MainScene, $"/World/{systemManager.MainScene.Name}");
 
-        foreach (var subscene in subscenes)
+        foreach (var subscene in systemManager.SubScenes)
         {
-            var subscenePath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(localPath), $"{subscene.Name}.usda");
+            var subscenePath = Path.Combine(Path.GetDirectoryName(localPath), $"{subscene.Name}.usda");
             SaveEntities(stage, subscene, $"/World/{subscene.Name}");
 
             var subsceneLayer = SdfLayer.CreateNew(subscenePath);
             stage.GetRootLayer().GetSubLayerPaths().push_back(subsceneLayer.GetIdentifier());
         }
 
-        scene.Save();
+        stage.Save();
+        //scene.Save();
     }
 
-    private void SaveEntities(UsdStage stage, EntityManager scene, string rootPath)
+    private static void SaveEntities(UsdStage stage, EntityManager scene, string rootPath)
     {
         foreach (var entity in scene.List)
         {
@@ -44,10 +47,12 @@ public sealed class SceneLoader
         }
     }
 
-    public void Load(out SystemManager systemManager, string localPath)
+    public static void Load(out SystemManager systemManager, string localPath)
     {
         systemManager = new SystemManager();
 
+        if (!File.Exists(localPath))
+            throw new FileNotFoundException("USD file not found at path: " + localPath);
         var scene = Scene.Open(localPath);
         var stage = scene.Stage;
 
@@ -65,7 +70,7 @@ public sealed class SceneLoader
         }
     }
 
-    private void LoadEntities(UsdStage stage, EntityManager scene, string rootPath)
+    private static void LoadEntities(UsdStage stage, EntityManager scene, string rootPath)
     {
         foreach (var prim in stage.Traverse())
             if (prim.IsA(TfType.FindByName("Xform")))

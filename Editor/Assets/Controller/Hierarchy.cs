@@ -53,8 +53,8 @@ internal sealed partial class Hierarchy
 
         SceneEntry = new()
         {
-            ID = Engine.Kernel.Instance.SceneManager.MainScene.ID,
-            Name = Engine.Kernel.Instance.SceneManager.MainScene.Name,
+            ID = Engine.Kernel.Instance.SystemManager.MainScene.ID,
+            Name = Engine.Kernel.Instance.SystemManager.MainScene.Name,
             Hierarchy = new(),
             DataSource = new()
         };
@@ -91,7 +91,7 @@ internal sealed partial class Hierarchy
 
     public void PopulateTree(SceneEntry sceneEntry)
     {
-        Scene scene = Engine.Kernel.Instance.SceneManager.GetFromID(sceneEntry.ID);
+        Scene scene = Engine.Kernel.Instance.SystemManager.GetFromID(sceneEntry.ID);
 
         scene.EntityManager.EntityList.OnAdd += (s, e) => AddTreeEntry(sceneEntry, (Entity)e);
         scene.EntityManager.EntityList.OnRemove += (s, e) => RemoveTreeEntry(sceneEntry, (Entity)e);
@@ -111,7 +111,7 @@ internal sealed partial class Hierarchy
     private Grid[] CreateSceneHierarchy(in SceneEntry sceneEntry, Scene scene = null)
     {
         if (scene is null)
-            scene = Engine.Kernel.Instance.SceneManager.MainScene;
+            scene = Engine.Kernel.Instance.SystemManager.MainScene;
 
         var sceneGrid = new Grid[]
         {
@@ -132,7 +132,7 @@ internal sealed partial class Hierarchy
     {
         subsceneEntry = new SceneEntry() { ID = Guid.NewGuid(), Name = name, Hierarchy = new(), DataSource = new() };
 
-        var subscene = Engine.Kernel.Instance.SceneManager.AddSubscene(subsceneEntry.ID, name, enable);
+        var subscene = Engine.Kernel.Instance.SystemManager.AddSubscene(subsceneEntry.ID, name, enable);
 
         Binding.SetSceneBindings(subscene);
 
@@ -250,7 +250,7 @@ internal sealed partial class Hierarchy
             };
         items[2].Click += (s, e) => PasteEntityFromClipboardAsync(SceneEntry);
 
-        items[3].Click += (s, e) => Engine.Kernel.Instance.SceneManager.MainScene.EntityManager.CreateEntity();
+        items[3].Click += (s, e) => Engine.Kernel.Instance.SystemManager.MainScene.EntityManager.CreateEntity();
 
         MenuFlyout menuFlyout = new();
         foreach (var item in items)
@@ -290,7 +290,7 @@ internal sealed partial class Hierarchy
         items[4].Click += (s, e) => ContentDialogDeleteSubscene(sceneEntry);
         items[4].KeyboardAccelerators.Add(new KeyboardAccelerator() { Key = VirtualKey.Delete });
 
-        items[7].Click += (s, e) => Engine.Kernel.Instance.SceneManager.GetFromID(sceneEntry.ID).EntityManager.CreateEntity();
+        items[7].Click += (s, e) => Engine.Kernel.Instance.SystemManager.GetFromID(sceneEntry.ID).EntityManager.CreateEntity();
 
         MenuFlyout menuFlyout = new();
         foreach (var item in items)
@@ -320,14 +320,14 @@ internal sealed partial class Hierarchy
             item.Click += (s, e) =>
             {
                 if (sceneEntry is not null)
-                    Engine.Kernel.Instance.SceneManager.GetFromID(sceneEntry.ID).EntityManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
+                    Engine.Kernel.Instance.SystemManager.GetFromID(sceneEntry.ID).EntityManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
                 else if (_itemInvoked is not null)
                 {
                     var entity = GetEntity(_itemInvoked);
                     entity.Scene.EntityManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type), entity);
                 }
                 else
-                    Engine.Kernel.Instance.SceneManager.MainScene.EntityManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
+                    Engine.Kernel.Instance.SystemManager.MainScene.EntityManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
             };
 
             objectSubItem.Items.Add(item);
@@ -339,14 +339,14 @@ internal sealed partial class Hierarchy
         item.Click += (s, e) =>
         {
             if (sceneEntry is not null)
-                Engine.Kernel.Instance.SceneManager.GetFromID(sceneEntry.ID).EntityManager.CreateCamera();
+                Engine.Kernel.Instance.SystemManager.GetFromID(sceneEntry.ID).EntityManager.CreateCamera();
             else if (_itemInvoked is not null)
             {
                 var entity = GetEntity(_itemInvoked);
                 entity.Scene.EntityManager.CreateCamera("Camera", Tags.MainCamera.ToString(), entity);
             }
             else
-                Engine.Kernel.Instance.SceneManager.MainScene.EntityManager.CreateCamera();
+                Engine.Kernel.Instance.SystemManager.MainScene.EntityManager.CreateCamera();
         };
 
         return menuFlyout;
@@ -389,7 +389,7 @@ internal sealed partial class Hierarchy
                     return;
                 }
 
-            subsceneName.Text = subsceneName.Text.IncrementNameIfExists(Engine.Kernel.Instance.SceneManager.Subscenes.ToArray().Select(Scene => Scene.Name).ToArray());
+            subsceneName.Text = subsceneName.Text.IncrementNameIfExists(Engine.Kernel.Instance.SystemManager.SubScenes.ToArray().Select(Scene => Scene.Name).ToArray());
 
             _stackPanel.Children.Add(CreateSubsceneAndHierarchy(out SceneEntry subsceneEntry, subsceneName.Text)
                 .StackInGrid().WrapInExpanderWithToggleButton(ref subsceneEntry.Content, subsceneEntry.ID, subsceneName.Text, true)
@@ -431,7 +431,7 @@ internal sealed partial class Hierarchy
                     return;
                 }
 
-            Scene scene = Engine.Kernel.Instance.SceneManager.GetFromID(sceneEntry.ID);
+            Scene scene = Engine.Kernel.Instance.SystemManager.GetFromID(sceneEntry.ID);
 
             scene.Name = fileName.Text;
             sceneEntry.Name = fileName.Text;
@@ -497,7 +497,7 @@ internal sealed partial class Hierarchy
             sceneEntry.Content.Children.Clear();
             _stackPanel.Children.Remove(sceneEntry.Content);
 
-            Engine.Kernel.Instance.SceneManager.RemoveSubscene(sceneEntry.ID);
+            Engine.Kernel.Instance.SystemManager.RemoveSubscene(sceneEntry.ID);
         }
     }
 
@@ -516,7 +516,7 @@ internal sealed partial class Hierarchy
         if (result == ContentDialogResult.Primary)
         {
             SceneEntry sceneEntry = GetSceneEntry(treeEntry);
-            Scene scene = Engine.Kernel.Instance.SceneManager.GetFromID(sceneEntry.ID);
+            Scene scene = Engine.Kernel.Instance.SystemManager.GetFromID(sceneEntry.ID);
 
             scene.EntityManager.Destroy(GetEntity(treeEntry.ID));
 
@@ -678,14 +678,14 @@ internal sealed partial class Hierarchy
 
         // If sceneEntry is specified, get the entity with the given GUID from that scene.
         if (sceneEntry is not null)
-            entity = Engine.Kernel.Instance.SceneManager.GetFromID(sceneEntry.ID).EntityManager.GetFromID(guid);
+            entity = Engine.Kernel.Instance.SystemManager.GetFromID(sceneEntry.ID).EntityManager.GetFromID(guid);
         // Otherwise, search through all subscenes of the scene manager.
         else
         {
-            entity = Engine.Kernel.Instance.SceneManager.MainScene.EntityManager.GetFromID(guid);
+            entity = Engine.Kernel.Instance.SystemManager.MainScene.EntityManager.GetFromID(guid);
 
             if (entity is null)
-                foreach (var subscene in Engine.Kernel.Instance.SceneManager.Subscenes)
+                foreach (var subscene in Engine.Kernel.Instance.SystemManager.SubScenes)
                     if (entity is null)
                         entity = subscene.EntityManager.GetFromID(guid);
                     else break;
@@ -730,9 +730,9 @@ internal sealed partial class Hierarchy
         targetScene = null;
 
         if (sourceSceneEntry is not null)
-            sourceScene = Engine.Kernel.Instance.SceneManager.GetFromID(sourceSceneEntry.ID);
+            sourceScene = Engine.Kernel.Instance.SystemManager.GetFromID(sourceSceneEntry.ID);
         if (targetSceneEntry is not null)
-            targetScene = Engine.Kernel.Instance.SceneManager.GetFromID(targetSceneEntry.ID);
+            targetScene = Engine.Kernel.Instance.SystemManager.GetFromID(targetSceneEntry.ID);
     }
 }
 
@@ -875,7 +875,7 @@ internal sealed partial class Hierarchy
             else if (requestedOperation == DataPackageOperation.Copy)
             {
                 // Duplicate the source entity to the target entity and get the new tree entry.
-                var newEntity = Engine.Kernel.Instance.SceneManager.GetFromID(sourceSceneEntry.ID).EntityManager.Duplicate(sourceEntity, targetEntity);
+                var newEntity = Engine.Kernel.Instance.SystemManager.GetFromID(sourceSceneEntry.ID).EntityManager.Duplicate(sourceEntity, targetEntity);
                 var newTreeEntry = GetTreeEntry(newEntity.ID, targetSceneEntry);
 
                 // Iterate through each child icon node of the source tree entry.
@@ -944,7 +944,7 @@ internal sealed partial class Hierarchy
             else if (requestedOperation == DataPackageOperation.Copy)
             {
                 // Duplicate the source entity to the target scene and get the new tree entry.
-                var newEntity = Engine.Kernel.Instance.SceneManager.GetFromID(sourceSceneEntry.ID).EntityManager.Duplicate(sourceEntity);
+                var newEntity = Engine.Kernel.Instance.SystemManager.GetFromID(sourceSceneEntry.ID).EntityManager.Duplicate(sourceEntity);
                 var newTreeEntry = GetTreeEntry(newEntity.ID, targetSceneEntry);
 
                 // Iterate through each child icon node of the source tree entry.

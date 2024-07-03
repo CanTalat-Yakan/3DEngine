@@ -5,7 +5,7 @@ namespace Engine.ECS;
 public sealed partial class SystemManager
 {
     public EntityManager MainScene;
-    public List<EntityManager> Subscenes = new();
+    public List<EntityManager> SubScenes = new();
 
     public SystemManager(EntityManager scene = null) =>
         // Initializes the main scene and creates a new empty list for the subscenes.
@@ -19,7 +19,7 @@ public sealed partial class SystemManager
         if (!guid.Equals(Guid.Empty))
             newSubscene.ID = guid;
 
-        Subscenes.Add(newSubscene);
+        SubScenes.Add(newSubscene);
 
         return newSubscene;
     }
@@ -28,7 +28,7 @@ public sealed partial class SystemManager
     {
         //SceneLoader.Load(subscene);
 
-        Subscenes.Add(subscene);
+        SubScenes.Add(subscene);
     }
 
     public void UnloadSubscene(EntityManager subscene)
@@ -45,7 +45,7 @@ public sealed partial class SystemManager
         foreach (var entity in scene.List.ToArray())
             scene.Destroy(entity);
 
-        Subscenes.Remove(scene);
+        SubScenes.Remove(scene);
     }
 }
 
@@ -58,7 +58,7 @@ public sealed partial class SystemManager
             return MainScene;
 
         // Check if any of the subscenes ID matches the provided GUID.
-        foreach (var subscene in Subscenes)
+        foreach (var subscene in SubScenes)
             if (subscene.ID == guid)
                 return subscene;
 
@@ -73,7 +73,7 @@ public sealed partial class SystemManager
             return MainScene;
 
         // Check if any of the subscenes contains the entity with an ID that matches the provided GUID.
-        foreach (var subscene in Subscenes)
+        foreach (var subscene in SubScenes)
             if (subscene.GetFromID(guid) is not null)
                 return subscene;
 
@@ -164,7 +164,7 @@ public sealed partial class SystemManager
         MeshSystem.Destroy();
 
         MainScene.Dispose();
-        foreach (var scene in Subscenes)
+        foreach (var scene in SubScenes)
             scene.Dispose();
     }
 }

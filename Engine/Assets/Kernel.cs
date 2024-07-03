@@ -15,6 +15,7 @@ global using Engine.GUI;
 global using Engine.Helper;
 global using Engine.Runtime;
 global using Engine.Utilities;
+using Engine.Loader;
 
 namespace Engine;
 
@@ -31,7 +32,7 @@ public sealed partial class Kernel
 
     public Config Config;
 
-    public SystemManager SceneManager = new();
+    public SystemManager SystemManager = new();
 
     public ScriptCompiler ScriptCompiler = new();
     public ShaderCompiler ShaderCompiler = new();
@@ -73,9 +74,13 @@ public sealed partial class Kernel
 
         Input.Initialize(hwnd);
 
-        var boot = SceneManager.MainScene
+        //SceneLoader.Load(out var systemManager, Paths.DIRECTORY + "Kitchen_set.usd");
+
+        var boot = SystemManager.MainScene
             .CreateEntity(null, "Boot", hide: true)
             .AddComponent<SceneBoot>();
+
+        SceneLoader.Save(Paths.DIRECTORY + "test.usda", SystemManager);
 
         Compile();
 
@@ -95,17 +100,17 @@ public sealed partial class Kernel
         Time.Update();
         Input.Update();
 
-        SceneManager.ProcessSystems();
+        SystemManager.ProcessSystems();
 
         if (EditorState.PlayModeStarted)
             Compile();
 
         if (Time.OnFixedFrame)
-            SceneManager.FixedUpdate();
+            SystemManager.FixedUpdate();
 
-        SceneManager.Update();
-        SceneManager.LateUpdate();
-        SceneManager.Render();
+        SystemManager.Update();
+        SystemManager.LateUpdate();
+        SystemManager.Render();
 
         OnRender?.Invoke();
 
@@ -158,7 +163,7 @@ public sealed partial class Kernel
         GUIRenderer.Update(GUIContext);
         GUIInputHandler.Update();
 
-        SceneManager.GUI();
+        SystemManager.GUI();
 
         OnGUI?.Invoke();
 
@@ -171,9 +176,9 @@ public sealed partial class Kernel
         ShaderCompiler.CompileProjectShaders(EditorState.AssetsPath);
         MaterialCompiler.CompileProjectMaterials(EditorState.AssetsPath);
 
-        SceneManager.ProcessSystems();
+        SystemManager.ProcessSystems();
 
-        SceneManager.Awake();
-        SceneManager.Start();
+        SystemManager.Awake();
+        SystemManager.Start();
     }
 }

@@ -8,7 +8,7 @@ public partial class Component
 
     [Hide] public Action EventOnDestroy;
 
-    public SystemManager SceneManager => Kernel.Instance.SceneManager;
+    public SystemManager SceneManager => Kernel.Instance.SystemManager;
 
     public Component() =>
         OnRegister();
