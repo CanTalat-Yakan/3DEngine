@@ -4,7 +4,14 @@ using Vortice.Direct3D12;
 
 namespace Engine.Utilities;
 
-public sealed class Assets
+public struct AssetEntry(string name, string extension, string localPath)
+{
+    public string Name = name;
+    public string Extension = extension;
+    public string LocalPath = localPath;
+}
+
+public sealed partial class Assets
 {
     public static Dictionary<string, Type> Components = new();
     public static Dictionary<string, ScriptEntry> Scripts = new();
@@ -24,12 +31,23 @@ public sealed class Assets
 
     public static Dictionary<string, SerializableConstantBuffer> SerializableConstantBuffers = new();
 
+    public static Dictionary<Guid, AssetEntry> Metadata = new();
+
     public static void Dispose()
     {
         DisposeDictionaryItems(RootSignatures);
         DisposeDictionaryItems(PipelineStateObjects);
         DisposeDictionaryItems(RenderTargets);
         DisposeDictionaryItems(Meshes);
+
+        Components.Clear();
+        Scripts.Clear();
+        Materials.Clear();
+        Shaders.Clear();
+        VertexShaders.Clear();
+        PixelShaders.Clear();
+        InputLayoutDescriptions.Clear();
+        SerializableConstantBuffers.Clear();
     }
 
     private static void DisposeDictionaryItems<T1, T2>(Dictionary<T1, T2> dictionary) where T2 : IDisposable
@@ -38,5 +56,25 @@ public sealed class Assets
             pair.Value.Dispose();
 
         dictionary.Clear();
+    }
+}
+
+public sealed partial class Assets
+{
+    public static AssetEntry GetAssetMetadata(Guid guid)
+    {
+        if (Metadata.ContainsKey(guid))
+            return Metadata[guid];
+
+        return default;
+    }
+
+    public static AssetEntry GetAssetMetadata(string name)
+    {
+        foreach (var metadata in Metadata.Values)
+            if(metadata.Name == name) 
+                return metadata;
+
+        return default;
     }
 }

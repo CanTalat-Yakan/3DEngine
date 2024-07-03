@@ -1,26 +1,18 @@
-﻿using USD.NET;
+﻿using Engine.ECS;
 using pxr;
 
-namespace Engine.SceneSystem;
+namespace Engine.Loader;
 
-public sealed partial class Scene
+public sealed class SceneLoader
 {
-    public Guid ID = Guid.NewGuid();
-    public EntityManager EntityManager = new();
 
-    public string LocalPath => $"{localPath}\\{Name}.usda";
-    public string localPath = "";
-    public string Name = "Scene";
-
-    public bool IsEnabled;
-
-    public void Save()
+    public void Save(string localPath, Scene mainScene, Scene[] subscenes)
     {
-        var stage = CreateStage(LocalPath);
+        var stage = CreateStage(localPath);
 
-        foreach (var entity in EntityManager.EntityList)
+        foreach (var entity in mainScene.EntityManager.EntityList)
         {
-            var entityPath = new SdfPath($"/World/{entity.Name}");
+            var entityPath = new SdfPath($"/World/{mainScene.Name}/{entity.Name}");
             var usdPrim = stage.DefinePrim(entityPath, new TfToken("Xform"));
 
             foreach (var component in entity.Components)
@@ -47,9 +39,9 @@ public sealed partial class Scene
     //    sceneStage.Save();
     //}
 
-    public void Load()
+    public void Load(string localPath, Scene mainScene, Scene[] subScenes)
     {
-        var stage = OpenStage(LocalPath);
+        var stage = OpenStage(localPath);
 
         foreach (var prim in stage.Traverse())
         {
@@ -60,14 +52,14 @@ public sealed partial class Scene
                 foreach (var usdAttribute in prim.GetAttributes())
                 {
                     var componentType = Type.GetType(usdAttribute.GetName());
-                    if (componentType != null)
+                    if (componentType is not null)
                     {
                         var component = (Component)Activator.CreateInstance(componentType);
                         component.Entity = entity;
 
                         var value = usdAttribute.Get();
                         var property = componentType.GetProperty(usdAttribute.GetName());
-                        if (property != null && value != null)
+                        if (property is not null && value is not null)
                         {
                             property.SetValue(component, Convert.ChangeType(value, property.PropertyType));
                         }
@@ -76,7 +68,7 @@ public sealed partial class Scene
                     }
                 }
 
-                EntityManager.EntityList.Add(entity);
+                mainScene.EntityManager.EntityList.Add(entity);
             }
         }
     }
@@ -88,11 +80,6 @@ public sealed partial class Scene
     //    // Here you would load entities from the USD stage
     //}
 
-    public void Unload() { }
-}
-
-public sealed partial class Scene
-{
     public static UsdStage CreateStage(string path) =>
         UsdStage.CreateNew(path);
     //{
@@ -114,21 +101,4 @@ public sealed partial class Scene
         UsdStage.Open(path);
     //// Open an existing USD stage from the given path
     //UsdStage.Open(path);
-}
-
-public sealed partial class Scene : ICloneable
-{
-    object ICloneable.Clone() =>
-        Clone();
-
-    public Scene Clone()
-    {
-        // Copy the current scene object using memberwise clone method.
-        var newScene = (Scene)this.MemberwiseClone();
-
-        // Assign a new Guid to the cloned scene object.
-        newScene.ID = Guid.NewGuid();
-
-        return newScene;
-    }
 }

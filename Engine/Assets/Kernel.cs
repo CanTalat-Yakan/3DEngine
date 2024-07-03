@@ -53,13 +53,14 @@ public sealed partial class Kernel
     {
         Instance ??= this;
 
-        EditorState.AssetsPath = assetsPath;
         EditorState.PlayMode = win32Window;
+        EditorState.AssetsPath = assetsPath;
 
         Context.GraphicsDevice.Initialize(size, win32Window);
         Context.UploadBuffer.Initialize(Context.GraphicsDevice, GraphicsDevice.GetMegabytesInByte(64));
         Context.GraphicsContext.Initialize(Context.GraphicsDevice);
 
+        Context.LoadAssets();
         Context.LoadDefaultResources();
 
         if (Config.GUI)

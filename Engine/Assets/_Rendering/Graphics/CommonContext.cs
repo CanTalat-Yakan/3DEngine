@@ -5,6 +5,8 @@ using Vortice.Direct3D12;
 using Vortice.DXGI;
 
 using Engine.Loader;
+using System.IO;
+using System.Linq;
 
 namespace Engine.Graphics;
 
@@ -25,6 +27,27 @@ public sealed partial class CommonContext : IDisposable
 
     public CommonContext(Kernel kernel) =>
         Kernel = kernel;
+
+    public void LoadAssets(string[] filePaths = null)
+    {
+        if (string.IsNullOrEmpty(EditorState.AssetsPath) || !Directory.Exists(EditorState.AssetsPath))
+            return;
+
+        if (filePaths is null)
+            filePaths = Directory.EnumerateFiles(EditorState.AssetsPath, "*", SearchOption.AllDirectories).ToArray();
+
+        foreach (var filePath in filePaths)
+        {
+            var fileInfo = new FileInfo(filePath);
+
+            var guid = Guid.NewGuid();
+            var name = Path.GetFileNameWithoutExtension(filePath);
+            var extension = fileInfo.Extension;
+            var localPath = Path.GetRelativePath(EditorState.AssetsPath, fileInfo.FullName);
+
+            Assets.Metadata.Add(guid, new AssetEntry(name, extension, localPath));
+        }
+    }
 
     public void LoadDefaultResources()
     {

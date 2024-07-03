@@ -1,6 +1,6 @@
 ﻿using Engine.Loader;
 
-namespace Engine.SceneSystem;
+namespace Engine.ECS;
 
 public enum PrimitiveTypes
 {

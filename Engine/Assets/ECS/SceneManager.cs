@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Engine.SceneSystem;
+namespace Engine.ECS;
 
 public sealed partial class SceneManager
 {
@@ -31,7 +31,7 @@ public sealed partial class SceneManager
 
     public void LoadSubscene(Scene subscene)
     {
-        subscene.Load();
+        SceneLoader.Load(subscene);
 
         Subscenes.Add(subscene);
     }
