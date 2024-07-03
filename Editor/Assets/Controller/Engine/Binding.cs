@@ -12,8 +12,6 @@ using Engine.ECS;
 using Engine.Editor;
 using Engine.Runtime;
 using Engine.SceneSystem;
-using Engine.Graphics;
-using Engine.Helper;
 
 namespace Editor.Controller;
 
@@ -136,7 +134,7 @@ internal sealed partial class Binding
             return;
 
         MaterialBindings.Clear();
-        var PropertiesConstantBuffer = Engine.Kernel.Instance.Context.SerializableConstantBuffers[materialEntry.ShaderName].GetConstantBufferObject();
+        var PropertiesConstantBuffer = Engine.Utilities.Assets.SerializableConstantBuffers[materialEntry.ShaderName].GetConstantBufferObject();
         foreach (var field in PropertiesConstantBuffer.GetType().GetFields(AllBindingFlags))
             MaterialBindings.Add(
                 field.Name + PropertiesConstantBuffer.GetType().FullName,
@@ -244,7 +242,7 @@ internal sealed partial class Binding
             UpdateBinding(source, source.GetType().FullName, MaterialBindings);
     }
 
-    private static void UpdateBinding(object source, object keySufix, Dictionary<string, BindEntry> bindings)
+    private static void UpdateBinding(object source, object keySuffix, Dictionary<string, BindEntry> bindings)
     {
         if (source is null)
             return;
@@ -252,7 +250,7 @@ internal sealed partial class Binding
         var fields = source.GetType().GetFields(AllBindingFlags);
         foreach (var field in fields)
             foreach (var bindName in bindings.Keys)
-                if (string.Equals(field.Name + keySufix, bindName)
+                if (string.Equals(field.Name + keySuffix, bindName)
                     && bindings.TryGetValue(bindName, out var bindEntry)
                     && !Equals(field.GetValue(source), bindEntry.Value))
                     ProcessBindEntry(bindEntry, field, source);

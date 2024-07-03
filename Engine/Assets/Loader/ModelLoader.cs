@@ -15,8 +15,8 @@ public sealed class ModelLoader
     public static MeshInfo LoadFile(string filePath, string inputLayoutElements = "PNTt")
     {
         var meshName = new FileInfo(filePath).Name;
-        if (Context.Meshes.ContainsKey(meshName))
-            return Context.Meshes[meshName];
+        if (Assets.Meshes.ContainsKey(meshName))
+            return Assets.Meshes[meshName];
 
         AssimpContext context = new();
         //context.SetConfig(new NormalSmoothingAngleConfig(66.0f));

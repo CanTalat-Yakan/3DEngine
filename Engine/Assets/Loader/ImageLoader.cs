@@ -17,8 +17,8 @@ public sealed partial class ImageLoader
     public static Texture2D LoadTexture(string filePath)
     {
         var textureName = new FileInfo(filePath).Name;
-        if (Context.RenderTargets.ContainsKey(textureName))
-            return Context.RenderTargets[textureName];
+        if (Assets.RenderTargets.ContainsKey(textureName))
+            return Assets.RenderTargets[textureName];
 
         var pixels = ProcessWIC(Context.GraphicsDevice.Device, filePath, out var format, out var size);
 
@@ -29,7 +29,7 @@ public sealed partial class ImageLoader
             MipLevels = 1,
             Format = format,
         };
-        Context.RenderTargets[textureName] = texture;
+        Assets.RenderTargets[textureName] = texture;
 
         GPUUpload upload = new()
         {

@@ -11,11 +11,12 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 
 using Engine;
+using Engine.Components;
 using Engine.ECS;
 using Engine.Editor;
 using Engine.Helper;
 using Engine.Runtime;
-using Engine.Components;
+using Engine.Utilities;
 
 using static Editor.Controller.Helper;
 
@@ -122,8 +123,7 @@ internal sealed partial class Properties
                 (s, e) =>
                 {
                     entity.AddComponent(
-                        ScriptCompiler.Library
-                        .GetComponent(e.SelectedItem.ToString()));
+                        Assets.Components[e.SelectedItem.ToString()]);
 
                     Set(entity);
                 }));
@@ -198,8 +198,7 @@ internal sealed partial class Properties
                 {
                     string newShaderName = e.SelectedItem.ToString();
 
-                    var newShaderEntry = ShaderCompiler.Library
-                        .GetShader(newShaderName);
+                    var newShaderEntry = Assets.Shaders[newShaderName];
 
                     if (newShaderEntry is null)
                     {
@@ -215,7 +214,7 @@ internal sealed partial class Properties
         s_stackPanel.Children.Add(CreateSeperator());
 
         // Get the fields of the properties constantbuffer.
-        var fieldInfos = Kernel.Instance.Context.SerializableConstantBuffers[materialEntry.ShaderName]
+        var fieldInfos = Assets.SerializableConstantBuffers[materialEntry.ShaderName]
             .GetConstantBufferObject().GetType()
             .GetFields(BindingFlags.Public | BindingFlags.Instance);
 
@@ -326,8 +325,7 @@ internal sealed partial class Properties
             // only listen to changes caused by user entering text.
             if (e.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
-                string[] itemSource = ScriptCompiler.Library
-                    .Components.ConvertAll<string>(Type => Type.Name).ToArray();
+                string[] itemSource = Assets.Components.Values.Select(component => component.Name).ToArray();
 
                 List<string> suitableItems = new();
 
@@ -361,8 +359,7 @@ internal sealed partial class Properties
             // only listen to changes caused by user entering text.
             if (e.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
-                string[] itemSource = ShaderCompiler.Library
-                    .Shaders.ConvertAll<string>(ShaderEntry => ShaderEntry.FileInfo.Name).ToArray();
+                string[] itemSource = Assets.Shaders.Values.Select(shader => shader.FileInfo.Name).ToArray();
 
                 List<string> suitableItems = new();
 
@@ -600,7 +597,7 @@ internal sealed partial class Properties
         // Initialize a new List of Grid type.
         List<Grid> grid = new();
 
-        var serializableConstantBuffer = Kernel.Instance.Context.SerializableConstantBuffers[materialEntry.ShaderName];
+        var serializableConstantBuffer = Assets.SerializableConstantBuffers[materialEntry.ShaderName];
 
         var propertiesConstantBuffer = serializableConstantBuffer.GetConstantBufferObject();
         var value = fieldInfo.GetValue(propertiesConstantBuffer);
@@ -685,7 +682,7 @@ internal sealed partial class Properties
 
         Binding.GetMaterialBinding(fieldInfo.Name, propertiesConstantBuffer)?.SetEvent(() =>
         {
-            var serializableConstantBuffer = Kernel.Instance.Context.SerializableConstantBuffers[materialEntry.ShaderName];
+            var serializableConstantBuffer = Assets.SerializableConstantBuffers[materialEntry.ShaderName];
 
             serializableConstantBuffer.SafeToSerializableConstantBuffer();
 

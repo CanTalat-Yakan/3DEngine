@@ -17,20 +17,8 @@ public sealed class ScriptEntry
     public Assembly Assembly;
 }
 
-public sealed class ComponentLibrary
-{
-    public List<Type> Components = new();
-
-    public Type GetComponent(string componentName) =>
-        Components.Find(Type => Type.Name.ToString() == componentName);
-}
-
 public sealed class ScriptCompiler
 {
-    public static ComponentLibrary Library { get; private set; } = new();
-
-    private Dictionary<string, ScriptEntry> _scriptsCollection = new();
-
     private List<Assembly> _allAssemblies = new();
     private List<Assembly> _ignoreAssemblies = new();
 
@@ -65,7 +53,7 @@ public sealed class ScriptCompiler
     {
         FileInfo fileInfo = new(path);
 
-        if (!_scriptsCollection.TryGetValue(fileInfo.FullName, out var scriptEntry))
+        if (!Assets.Scripts.TryGetValue(fileInfo.FullName, out var scriptEntry))
         {
             if (path.IsFileLocked().Value)
                 throw new Exception("File is locked and cannot be read");
@@ -76,7 +64,7 @@ public sealed class ScriptCompiler
             scriptEntry = new ScriptEntry() { FileInfo = fileInfo };
             string code = streamReader.ReadToEnd();
             scriptEntry.Script = CreateScript(code);
-            _scriptsCollection.Add(fileInfo.FullName, scriptEntry);
+            Assets.Scripts.Add(fileInfo.FullName, scriptEntry);
 
             Output.Log("Read new Script");
         }
@@ -149,15 +137,15 @@ public sealed class ScriptCompiler
 
     private void RemoveObsoleteScripts()
     {
-        foreach (var fullName in _scriptsCollection.Keys.ToArray())
-            if (!_scriptsCollection[fullName].FileInfo.Exists)
+        foreach (var fullName in Assets.Scripts.Keys.ToArray())
+            if (!Assets.Scripts[fullName].FileInfo.Exists)
             {
-                var assembly = _scriptsCollection[fullName].Assembly;
+                var assembly = Assets.Scripts[fullName].Assembly;
                 _ignoreAssemblies.Add(assembly);
 
                 DestroyComponentTypeReferences(assembly);
 
-                _scriptsCollection.Remove(fullName);
+                Assets.Scripts.Remove(fullName);
 
                 Output.Log("Removed File");
             }
@@ -176,8 +164,10 @@ public sealed class ScriptCompiler
                 && !Type.IsInterface))
             .ToArray();
 
-        Library.Components.Clear();
-        Library.Components.AddRange(componentCollection);
+        Assets.Components.Clear(); 
+        Assets.Components = componentCollection.ToDictionary(
+            component => component.Name.ToString(), 
+            component => component);
     }
 
     private void DestroyComponentTypeReferences(Assembly assembly)

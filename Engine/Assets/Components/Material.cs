@@ -37,15 +37,15 @@ public sealed partial class Material : EditorComponent, IHide, IEquatable<Materi
 
         PipelineStateObjectDescription.InputLayout = PipelineStateObjectName;
 
-        Context.GraphicsContext.SetPipelineState(Context.PipelineStateObjects[PipelineStateObjectName], PipelineStateObjectDescription);
+        Context.GraphicsContext.SetPipelineState(Assets.PipelineStateObjects[PipelineStateObjectName], PipelineStateObjectDescription);
         Context.GraphicsContext.SetRootSignature(RootSignature);
 
         foreach (var texture in MaterialTextures)
             Context.GraphicsContext.SetShaderResourceView(Context.GetTextureByString(texture.Name), texture.Slot);
 
-        if (Context.SerializableConstantBuffers.ContainsKey(PipelineStateObjectName))
+        if (Assets.SerializableConstantBuffers.ContainsKey(PipelineStateObjectName))
         {
-            Context.UploadBuffer.Upload(Context.SerializableConstantBuffers[PipelineStateObjectName], out var offset);
+            Context.UploadBuffer.Upload(Assets.SerializableConstantBuffers[PipelineStateObjectName], out var offset);
             Context.UploadBuffer.SetConstantBufferView(offset, 10);
         }
     }
@@ -57,7 +57,7 @@ public sealed partial class Material : EditorComponent, IHide, IEquatable<Materi
 
     public void SetPipelineStateObject(string pipelineStateObject)
     {
-        if (Context.PipelineStateObjects.ContainsKey(pipelineStateObject))
+        if (Assets.PipelineStateObjects.ContainsKey(pipelineStateObject))
             PipelineStateObjectName = pipelineStateObject;
         else throw new NotImplementedException("error pipeline state object not found in material");
     }

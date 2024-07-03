@@ -22,23 +22,17 @@ public sealed partial class EntityManager
 
     public Entity Duplicate(Entity refEntity, Entity parent = null)
     {
-        // Create a clone of the reference entity.
         Entity clonedEntity = refEntity.Clone();
-        // Set the parent of the cloned entity.
         clonedEntity.Parent = parent;
 
-        // Add the cloned entity to the list of entities.
         EntityList.Add(clonedEntity);
 
-        // Return the cloned entity.
         return clonedEntity;
     }
 
     public void Destroy(Entity entity)
     {
-        // Remove the entity from the entity list.
         EntityList.Remove(entity);
-        // Call Dispose from IDisposable.
         entity.Dispose();
     }
 
@@ -90,7 +84,6 @@ public sealed partial class EntityManager
 
     public Camera CreateCamera(string name = "Camera", string tag = "Untagged", Entity parent = null, bool hide = false)
     {
-        // Create a new Entity with the given name, parent, and tag.
         Entity newEntity = new()
         {
             Name = name,
@@ -99,13 +92,10 @@ public sealed partial class EntityManager
             IsHidden = hide
         };
 
-        // Add a Camera component to the Entity.
         var camera = newEntity.AddComponent<Camera>();
 
-        // Add the new Entity to the EntityList.
         EntityList.Add(newEntity);
 
-        // Return the new Camera.
         return camera;
     }
 }
@@ -114,27 +104,19 @@ public sealed partial class EntityManager
 {
     public Entity GetFromID(Guid guid)
     {
-        // Loop through all entities in the EntityList.
         foreach (var entity in EntityList)
-            // Check if the ID of the entity matches the given ID.
             if (entity?.ID == guid)
-                // Return the entity if its ID matches the given ID.
                 return entity;
 
-        // Return null if the entity is not found.
         return null;
     }
 
     public Entity GetFromTag(string tag)
     {
-        // Iterate over all entities in the EntityList.
         foreach (var entity in EntityList)
-            // Check if the tag of the current entity matches the given tag.
-            if (entity?.Tag.ToString() == tag)
-                // Return the entity if a match is found.
+            if (entity?.Tag == tag)
                 return entity;
 
-        // Return null if no matching entity is found.
         return null;
     }
 }

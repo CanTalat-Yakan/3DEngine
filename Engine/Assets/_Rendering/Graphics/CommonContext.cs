@@ -17,15 +17,6 @@ public sealed partial class CommonContext : IDisposable
     public GraphicsDevice GraphicsDevice = new();
     public GraphicsContext GraphicsContext = new();
 
-    public Dictionary<string, ReadOnlyMemory<byte>> VertexShaders = new();
-    public Dictionary<string, ReadOnlyMemory<byte>> PixelShaders = new();
-    public Dictionary<string, RootSignature> RootSignatures = new();
-    public Dictionary<string, InputLayoutDescription> InputLayoutDescriptions = new();
-    public Dictionary<string, MeshInfo> Meshes = new();
-    public Dictionary<string, Texture2D> RenderTargets = new();
-    public Dictionary<string, PipelineStateObject> PipelineStateObjects = new();
-    public Dictionary<string, SerializableConstantBuffer> SerializableConstantBuffers = new();
-
     public Dictionary<IntPtr, string> PointerToString = new();
     public Dictionary<string, IntPtr> StringToPointer = new();
 
@@ -50,33 +41,23 @@ public sealed partial class CommonContext : IDisposable
 
     public void Dispose()
     {
-        UploadBuffer?.Dispose();
+        Assets.Dispose();
 
-        DisposeDictionaryItems(RootSignatures);
-        DisposeDictionaryItems(RenderTargets);
-        DisposeDictionaryItems(PipelineStateObjects);
-        DisposeDictionaryItems(Meshes);
+        UploadBuffer?.Dispose();
 
         GraphicsContext.Dispose();
         GraphicsDevice.Dispose();
     }
 
-    void DisposeDictionaryItems<T1, T2>(Dictionary<T1, T2> dictionary) where T2 : IDisposable
-    {
-        foreach (var pair in dictionary)
-            pair.Value.Dispose();
-
-        dictionary.Clear();
-    }
 }
 
 public sealed partial class CommonContext : IDisposable
 {
     public Texture2D GetTextureByString(string name) =>
-        RenderTargets[GetStringFromID(GetIDFromString(name))];
+        Assets.RenderTargets[GetStringFromID(GetIDFromString(name))];
 
     public Texture2D GetTextureByStringID(nint pointer) =>
-        RenderTargets[GetStringFromID(pointer)];
+        Assets.RenderTargets[GetStringFromID(pointer)];
 
     private int somePointerValue = 65536;
     public IntPtr GetIDFromString(string name)
@@ -109,25 +90,25 @@ public sealed partial class CommonContext : IDisposable
     {
         foreach (string shaderName in shaderNameList)
         {
-            VertexShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + shaderName + ".hlsl", "VS");
-            PixelShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + shaderName + ".hlsl", "PS");
-            PipelineStateObjects[shaderName] = new PipelineStateObject(VertexShaders[shaderName], PixelShaders[shaderName]);
+            Assets.VertexShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + shaderName + ".hlsl", "VS");
+            Assets.PixelShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + shaderName + ".hlsl", "PS");
+            Assets.PipelineStateObjects[shaderName] = new PipelineStateObject(Assets.VertexShaders[shaderName], Assets.PixelShaders[shaderName]);
         }
     }
-    
+
     public void CreateShader(params string[] shaderPathList)
     {
         foreach (string shaderPath in shaderPathList)
         {
-            VertexShaders[shaderPath] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, shaderPath + ".hlsl", "VS");
-            PixelShaders[shaderPath] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, shaderPath + ".hlsl", "PS");
-            PipelineStateObjects[shaderPath] = new PipelineStateObject(VertexShaders[shaderPath], PixelShaders[shaderPath]);
+            Assets.VertexShaders[shaderPath] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, shaderPath + ".hlsl", "VS");
+            Assets.PixelShaders[shaderPath] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, shaderPath + ".hlsl", "PS");
+            Assets.PipelineStateObjects[shaderPath] = new PipelineStateObject(Assets.VertexShaders[shaderPath], Assets.PixelShaders[shaderPath]);
         }
     }
 
     public MeshInfo CreateMesh(string name, string inputLayoutElements = "PNTt", bool indexFormat16Bit = true)
     {
-        if (Meshes.TryGetValue(name, out MeshInfo mesh))
+        if (Assets.Meshes.TryGetValue(name, out MeshInfo mesh))
             return mesh;
         else
         {
@@ -148,7 +129,7 @@ public sealed partial class CommonContext : IDisposable
             foreach (var inputElement in mesh.InputLayoutDescription.Elements)
                 mesh.Vertices[inputElement.SemanticName].Stride = mesh.VertexStride;
 
-            Meshes[name] = mesh;
+            Assets.Meshes[name] = mesh;
 
             return mesh;
         }
@@ -156,11 +137,11 @@ public sealed partial class CommonContext : IDisposable
 
     public InputLayoutDescription CreateInputLayoutDescription(string inputLayoutElements)
     {
-        if (InputLayoutDescriptions.TryGetValue(inputLayoutElements, out var inputLayout))
+        if (Assets.InputLayoutDescriptions.TryGetValue(inputLayoutElements, out var inputLayout))
             return inputLayout;
 
         inputLayout = new InputLayoutDescription();
-        InputLayoutDescriptions[inputLayoutElements] = inputLayout;
+        Assets.InputLayoutDescriptions[inputLayoutElements] = inputLayout;
         var description = new InputElementDescription[inputLayoutElements.Length];
 
         for (int i = 0; i < inputLayoutElements.Length; i++)
@@ -182,11 +163,11 @@ public sealed partial class CommonContext : IDisposable
 
     public RootSignature CreateRootSignatureFromString(string rootSignatureParameters)
     {
-        if (RootSignatures.TryGetValue(rootSignatureParameters, out var rootSignature))
+        if (Assets.RootSignatures.TryGetValue(rootSignatureParameters, out var rootSignature))
             return rootSignature;
 
         rootSignature = new RootSignature();
-        RootSignatures[rootSignatureParameters] = rootSignature;
+        Assets.RootSignatures[rootSignatureParameters] = rootSignature;
         var description = new RootSignatureParameters[rootSignatureParameters.Length];
 
         for (int i = 0; i < rootSignatureParameters.Length; i++)
@@ -212,14 +193,14 @@ public sealed partial class CommonContext : IDisposable
         {
             if (upload.MeshInfo is not null)
                 graphicsContext.UploadMesh(
-                    upload.MeshInfo, 
-                    upload.VertexData, 
-                    upload.IndexData, 
+                    upload.MeshInfo,
+                    upload.VertexData,
+                    upload.IndexData,
                     upload.IndexFormat);
-            
+
             if (upload.Texture2D is not null)
                 graphicsContext.UploadTexture(
-                    upload.Texture2D, 
+                    upload.Texture2D,
                     upload.TextureData);
         }
     }

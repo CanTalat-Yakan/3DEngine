@@ -76,10 +76,10 @@ public unsafe sealed partial class GUIRenderer
 {
     public void LoadResources()
     {
-        Context.VertexShaders["ImGui"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + "ImGui.hlsl", "VS");
-        Context.PixelShaders["ImGui"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + "ImGui.hlsl", "PS");
+        Assets.VertexShaders["ImGui"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + "ImGui.hlsl", "VS");
+        Assets.PixelShaders["ImGui"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + "ImGui.hlsl", "PS");
 
-        Context.PipelineStateObjects["ImGui"] = new PipelineStateObject(Context.VertexShaders["ImGui"], Context.PixelShaders["ImGui"]);
+        Assets.PipelineStateObjects["ImGui"] = new PipelineStateObject(Assets.VertexShaders["ImGui"], Assets.PixelShaders["ImGui"]);
 
         RootSignature = Context.CreateRootSignatureFromString("Cs");
     }
@@ -100,7 +100,7 @@ public unsafe sealed partial class GUIRenderer
             MipLevels = 1,
             Format = Format.R8G8B8A8_UNorm,
         };
-        Context.RenderTargets["ImGui Font"] = FontTexture;
+        Assets.RenderTargets["ImGui Font"] = FontTexture;
 
         GPUUpload upload = new()
         {
@@ -123,7 +123,7 @@ public unsafe sealed partial class GUIRenderer
             return;
 
         Context.GraphicsContext.SetRootSignature(RootSignature);
-        Context.GraphicsContext.SetPipelineState(Context.PipelineStateObjects["ImGui"], PipelineStateObjectDescription);
+        Context.GraphicsContext.SetPipelineState(Assets.PipelineStateObjects["ImGui"], PipelineStateObjectDescription);
 
         Context.GraphicsContext.CommandList.IASetPrimitiveTopology(Vortice.Direct3D.PrimitiveTopology.TriangleList);
 
