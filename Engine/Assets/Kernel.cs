@@ -13,9 +13,9 @@ global using Engine.Framework;
 global using Engine.Graphics;
 global using Engine.GUI;
 global using Engine.Helper;
+global using Engine.Loader;
 global using Engine.Runtime;
 global using Engine.Utilities;
-using Engine.Loader;
 
 namespace Engine;
 
@@ -74,13 +74,13 @@ public sealed partial class Kernel
 
         Input.Initialize(hwnd);
 
-        //SceneLoader.Load(out var systemManager, Paths.DIRECTORY + "Kitchen_set.usd");
+        SceneLoader.Load(out var systemManager, Paths.DIRECTORY + "Kitchen_set.usd");
 
         var boot = SystemManager.MainScene
             .CreateEntity(null, "Boot", hide: true)
             .AddComponent<SceneBoot>();
 
-        SceneLoader.Save(Paths.DIRECTORY + "test.usda", SystemManager);
+        //SceneLoader.Save(Paths.DIRECTORY + "test.usda", SystemManager);
 
         Compile();
 
