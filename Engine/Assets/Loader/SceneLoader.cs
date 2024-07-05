@@ -51,11 +51,6 @@ public sealed class SceneLoader
     {
         systemManager = new SystemManager();
 
-
-        if (!File.Exists(@"C:\Users\CanTalatYakan\Downloads\Kitchen_set\Kitchen_set\Kitchen_set.usd"))
-            return;
-        Scene.Open(@"C:\Users\CanTalatYakan\Downloads\Kitchen_set\Kitchen_set\Kitchen_set.usd");
-
         if (!File.Exists(localPath))
             throw new FileNotFoundException("USD file not found at path: " + localPath);
 

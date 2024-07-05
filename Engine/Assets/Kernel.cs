@@ -74,7 +74,7 @@ public sealed partial class Kernel
 
         Input.Initialize(hwnd);
 
-        SceneLoader.Load(out var systemManager, Paths.DIRECTORY + "Kitchen_set.usd");
+        SceneLoader.Load(out var systemManager, Paths.SCENENES + "teapot.usdz");
 
         var boot = SystemManager.MainScene
             .CreateEntity(null, "Boot", hide: true)
