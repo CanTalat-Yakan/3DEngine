@@ -27,7 +27,7 @@
 		<DefineConstants>$(DefineConstants);ENGINE</DefineConstants>
 		<GenerateAssemblyInfo>True</GenerateAssemblyInfo>
 	</PropertyGroup>
-	
+
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DefineConstants>$(DefineConstants);ENGINE</DefineConstants>
 		<GenerateAssemblyInfo>True</GenerateAssemblyInfo>
@@ -112,10 +112,10 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Resources\Shaders\Sky.hlsl">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Resources\Shaders\Unlit.hlsl">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Resources\Shaders\SimpleLit.hlsl">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -124,7 +124,7 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Resources\Templates\Examples\Shaders\Include\Common.hlsli.txt">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\Resources\Templates\Examples\Scripts\Example.cs.txt">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
