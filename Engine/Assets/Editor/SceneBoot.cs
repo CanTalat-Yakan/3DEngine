@@ -13,7 +13,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
     public override void OnAwake()
     {
         // Create a camera entity with the name "Camera".
-        SceneCamera = ScriptManager.MainScene.CreateCamera("Camera");
+        SceneCamera = SystemManager.MainScene.CreateCamera("Camera");
         SceneCamera.Entity.IsHidden = true;
         // Set the camera order to the maximum value.
         SceneCamera.CameraID = byte.MaxValue;
@@ -26,7 +26,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
         SceneCamera.Entity.Transform.EulerAngles = new(35, -150, 0);
 
         // Create a sky entity in the scene.
-        var defaultSky = ScriptManager.MainScene
+        var defaultSky = SystemManager.MainScene
             .CreateEntity()
             .AddComponent<DefaultSky>();
         defaultSky.Initialize();
@@ -36,12 +36,12 @@ internal sealed class SceneBoot : EditorComponent, IHide
 
     public override void OnStart()
     {
-        var exampleCamera = ScriptManager.MainScene.CreateCamera("Camera", Tags.MainCamera.ToString()).Entity;
+        var exampleCamera = SystemManager.MainScene.CreateCamera("Camera", Tags.MainCamera.ToString()).Entity;
         exampleCamera.Transform.LocalPosition = new(3, 4, 5);
         exampleCamera.Transform.EulerAngles = new(35, -150, 0);
 
-        Cubes = ScriptManager.MainScene.CreateEntity(null, "Cubes");
-        ScriptManager.MainScene.CreatePrimitive(PrimitiveTypes.Cube, parent: Cubes);
+        Cubes = SystemManager.MainScene.CreateEntity(null, "Cubes");
+        SystemManager.MainScene.CreatePrimitive(PrimitiveTypes.Cube, parent: Cubes);
 
         Output.Log("Press 'C' to spawn 1000 Cubes");
         Output.Log("Press 'E' to spawn 1000 Entities");
@@ -60,7 +60,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
 
             for (int i = 0; i < 1000; i++)
             {
-                var newCube = ScriptManager.MainScene.CreatePrimitive(PrimitiveTypes.Cube, parent: Cubes, hide: true).Entity;
+                var newCube = SystemManager.MainScene.CreatePrimitive(PrimitiveTypes.Cube, parent: Cubes, hide: true).Entity;
 
                 newCube.Transform.LocalPosition = new(rnd.Next(-250, 250), rnd.Next(-250, 250), rnd.Next(-250, 250));
                 newCube.Transform.EulerAngles = new(rnd.Next(1, 360), rnd.Next(1, 360), rnd.Next(1, 360));
@@ -76,7 +76,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
 
 
             for (int i = 0; i < 1000; i++)
-                ScriptManager.MainScene.CreateEntity(hide: true).AddComponent<HoverEffect>();
+                SystemManager.MainScene.CreateEntity(hide: true).AddComponent<HoverEffect>();
         }
     }
 }
