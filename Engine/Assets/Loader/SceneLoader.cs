@@ -9,8 +9,7 @@ public sealed class SceneLoader
     public static void Save(string localPath, SystemManager systemManager)
     {
         var scene = Scene.Create(localPath);
-        //var stage = scene.Stage;
-        var stage = UsdStage.CreateNew(localPath);
+        var stage = scene.Stage;
 
         SaveEntities(stage, systemManager.MainScene, $"/World/{systemManager.MainScene.Name}");
 
@@ -20,11 +19,10 @@ public sealed class SceneLoader
             SaveEntities(stage, subscene, $"/World/{subscene.Name}");
 
             var subsceneLayer = SdfLayer.CreateNew(subscenePath);
-            //stage.GetRootLayer().GetSubLayerPaths().push_back(subsceneLayer.GetDisplayNameFromIdentifier());
+            stage.GetRootLayer().GetSubLayerPaths().push_back(subsceneLayer.GetDisplayName());
         }
 
-        stage.Save();
-        //scene.Save();
+        scene.Save();
     }
 
     private static void SaveEntities(UsdStage stage, EntityManager scene, string rootPath)
@@ -51,9 +49,6 @@ public sealed class SceneLoader
     {
         systemManager = new SystemManager();
 
-        if (!File.Exists(localPath))
-            throw new FileNotFoundException("USD file not found at path: " + localPath);
-
         var scene = Scene.Open(localPath);
         var stage = scene.Stage;
 
@@ -67,7 +62,7 @@ public sealed class SceneLoader
             //var subsceneLayer = Scene.Open(subscenePath).Stage;
             //LoadEntities(subsceneLayer, subscene, $"/World/{subscene.Name}");
 
-            //systemManager.Subscenes.Add(subscene);
+            //systemManager.SubScenes.Add(subscene);
         }
     }
 

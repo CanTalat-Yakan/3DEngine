@@ -60,7 +60,7 @@
 		<PackageReference Include="Twizzle.ImGuizmo.NET" Version="1.89.4.1" />
 		<PackageReference Include="Twizzle.ImNodes.NET" Version="1.89.4" />
 		<PackageReference Include="Twizzle.ImPlot.NET" Version="1.89.4" />
-		<PackageReference Include="UniversalSceneDescription" Version="4.0.0" />
+		<PackageReference Include="UniversalSceneDescription" Version="4.0.1" />
 		<PackageReference Include="Vortice.Direct2D1" Version="3.5.0" />
 		<PackageReference Include="Vortice.Direct3D12" Version="3.5.0" />
 		<PackageReference Include="Vortice.DirectInput" Version="3.5.0" />
