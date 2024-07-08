@@ -38,6 +38,9 @@ public sealed partial class EntityManager
         Func<byte, int, EntityKey> entityKeyFactory = (generation, index) => new EntityKey(generation, index);
         // Instantiate the registry with the desired maxAge(reuse limit) and the entityKeyFactory function
         Registry = new(10, entityKeyFactory);
+
+        Registry.Register<Component>();
+        Registry.Register<EditorComponent>();
     }
 
     public EntityKey Duplicate(EntityKey refEntity, EntityKey? parentKey = null)

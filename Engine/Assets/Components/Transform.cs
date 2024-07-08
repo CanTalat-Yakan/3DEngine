@@ -64,7 +64,7 @@ public sealed partial class Transform : EditorComponent, IHide
     public override void OnRender() =>
         TransformChanged = false;
 
-    public override string ToString() =>
+    public string GetString() =>
         $"""
         {LocalPosition}
         {EulerAngles}

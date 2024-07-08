@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.ComponentModel;
+using System.Reflection;
 
 using EnTTSharp.Entities;
 
@@ -57,6 +58,8 @@ public sealed partial class EntityData : EditorComponent
         _registry = _entityManager.Registry;
 
         EntityDataSystem.Register(this);
+        
+        _registry.AssignComponent(entityKey, this);
 
         _transform = AddComponent<Transform>();
     }
