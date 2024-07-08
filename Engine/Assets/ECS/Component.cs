@@ -12,16 +12,16 @@ public partial class Component
     [Hide] public byte Order = 0;
     [Hide] public bool IsEnabled;
 
-    public Component() { }
-
     public SystemManager SystemManager => Kernel.Instance.SystemManager;
 
-    public void InvokeEventOnDestroy() =>
-        EventOnDestroy();
+    public Component() { }
 }
 
 public partial class Component
 {
+    public void InvokeEventOnDestroy() =>
+        EventOnDestroy();
+
     public virtual void OnRegister() =>
         ScriptSystem.Register(this);
 
