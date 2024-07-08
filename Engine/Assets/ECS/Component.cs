@@ -1,17 +1,20 @@
-﻿namespace Engine.ECS;
+﻿using EnTTSharp.Entities;
+
+namespace Engine.ECS;
 
 public partial class Component
 {
-    [Hide] public Entity Entity;
-    [Hide] public byte Order = 0;
-    [Hide] public bool IsEnabled;
+    [Hide] public EntityData EntityData { get; init; }
+    [Hide] public EntityKey EntityKey;
 
     [Hide] public Action EventOnDestroy;
 
-    public SystemManager SystemManager => Kernel.Instance.SystemManager;
+    [Hide] public byte Order = 0;
+    [Hide] public bool IsEnabled;
 
-    public Component() =>
-        OnRegister();
+    public Component() { }
+
+    public SystemManager SystemManager => Kernel.Instance.SystemManager;
 
     public void InvokeEventOnDestroy() =>
         EventOnDestroy();
@@ -44,10 +47,10 @@ public partial class Component : ICloneable, IDisposable
     object ICloneable.Clone() =>
         Clone();
 
-    public Component Clone() =>
+    public virtual Component Clone() =>
         (Component)MemberwiseClone();
 
-    public void Dispose() =>
+    public virtual void Dispose() =>
         InvokeEventOnDestroy();
 }
 

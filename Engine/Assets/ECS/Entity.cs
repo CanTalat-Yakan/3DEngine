@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Reflection;
+
+using EnTTSharp.Entities;
 
 namespace Engine.ECS;
 
@@ -21,47 +23,55 @@ public enum Layers
     UI
 }
 
-public sealed partial class Entity : IDisposable
+public sealed partial class EntityData : EditorComponent
 {
+    private readonly EntityRegistry<EntityKey> _registry;
+
     public Guid ID = Guid.NewGuid();
 
-    public Entity Parent;
+    public EntityData Parent;
 
     public string Name;
-    public bool IsEnabled = true;
+    public bool IsActive = true;
     public bool IsStatic = false;
     [Hide] public bool IsHidden = false;
     public string Tag;
     public string Layer;
 
-    public SystemManager ScriptManager => Kernel.Instance.SystemManager;
-
-    public EntityManager Scene { get => _scene ??= ScriptManager.GetFromEntityID(ID); set => _scene = null; }
-    private EntityManager _scene;
+    public EntityManager EntityManager => _entityManager;
+    private EntityManager _entityManager;
 
     public Transform Transform => _transform;
     private Transform _transform;
 
-    public bool ActiveInHierarchy => Parent is null ? IsEnabled : IsEnabled && (Parent.ActiveInHierarchy && Parent.IsEnabled);
+    public bool IsActiveInHierarchy => Parent is null ? IsActive : IsActive && (Parent.IsActiveInHierarchy && Parent.IsActive);
 
-    public EventList<Component> Components => _components;
-    private EventList<Component> _components = new();
+    public EntityData() { }
 
-    public Entity() =>
-        // Add the Transform component to the Entity when initialized.
-        AddComponent(_transform = new());
-
-    public void Dispose()
+    public EntityData(EntityManager entityManager, EntityKey entityKey)
     {
-        // Disable the entity.
-        IsEnabled = false;
+        EntityData = this;
+        EntityKey = entityKey;
 
-        // Remove all components from the entity.
-        RemoveComponents();
+        _entityManager = entityManager;
+        _registry = _entityManager.Registry;
+
+        EntityDataSystem.Register(this);
+
+        _transform = AddComponent<Transform>();
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
+
+        IsActive = false;
+
+        RemoveComponents<Component>();
     }
 }
 
-public sealed partial class Entity
+public sealed partial class EntityData : EditorComponent
 {
     public T AddComponent<T>() where T : Component, new() =>
         (T)AddComponent(new T());
@@ -71,70 +81,59 @@ public sealed partial class Entity
 
     public Component AddComponent(Component component)
     {
-        // Add the component to the Entity's component list.
-        _components.Add(component);
+        typeof(Component)
+            .GetProperty("EntityData", BindingFlags.Instance | BindingFlags.Public)
+            .SetValue(component, this);
 
-        // Assign this Entity to the component's Entity.
-        component.Entity = this;
-        // Enable the component by default.
+        component.EntityKey = EntityKey;
         component.IsEnabled = true;
-        
-        // Call the Awake and Start method to initialize the component.
+
+        component.OnRegister();
+
+        _registry.AssignComponent(component.EntityKey, component);
+
         component.OnAwake();
         component.OnStart();
 
         return component;
     }
 
-    public void RemoveComponent(Component component)
+    public void RemoveComponent<T>() where T : Component
     {
-        // Invoke the component's OnDestroy event.
+        _registry.GetComponent(EntityKey, out T component);
+
         component.InvokeEventOnDestroy();
 
-        // Remove the component from the Entity's component list.
-        _components.Remove(component);
+        _registry.RemoveComponent<T>(EntityKey);
+
+        //_components.Remove(component);
     }
 
-    public void RemoveComponents()
+    public void RemoveComponents<T>() where T : Component
     {
-        // Destroy all components associated with the Entity.
-        foreach (var component in _components)
-            component.Dispose();
-
-        // Clear list of components associated with the Entity.
-        _components.Clear();
+        if (_registry.GetComponent(EntityKey, out T[] components))
+            foreach (var component in components)
+                component.OnDestroy();
     }
 
     public T GetComponent<T>() where T : Component
     {
-        // Iterate through all components of the entity.
-        foreach (var component in _components)
-            // Check if the component type is equal to the type specified in the function.
-            if (component.GetType().Equals(typeof(T)))
-                // If a match is found, return the component as the specified type.
-                return (T)component;
-
-        // If no match is found, return null.
-        return null;
+        if (_registry.GetComponent(EntityKey, out T component))
+            return component;
+        else
+            return null;
     }
 
     public T[] GetComponents<T>() where T : Component
     {
-        // Initialize an empty list of components.
-        List<T> components = new();
-
-        // Loop through all components of the Entity
-        foreach (var component in _components)
-            // If the component is of the specified type, add it to the list
-            if (component.GetType().Equals(typeof(T)))
-                components.Add((T)component);
-
-        // Return the array of components of the specified type.
-        return components.ToArray();
+        if (_registry.GetComponent(EntityKey, out T[] components))
+            return components;
+        else
+            return null;
     }
 
     public Component[] GetComponents() =>
-        _components.ToArray();
+        GetComponents<Component>();
 
     public bool CompareTag(params string[] tags)
     {
@@ -154,7 +153,7 @@ public sealed partial class Entity
             $"""
             Name: {Name}
             ID: {ID}
-            Scene: {Scene.Name}
+            Scene: {EntityManager.Name}
             """;
 
         if (Parent is not null)
@@ -169,19 +168,23 @@ public sealed partial class Entity
     }
 }
 
-public sealed partial class Entity : ICloneable
+public sealed partial class EntityData : EditorComponent, ICloneable
 {
     object ICloneable.Clone() =>
         Clone();
 
-    public Entity Clone()
+    public override EntityData Clone()
     {
+        base.Clone();
+
+        var newEntityKey = _registry.Create();
+
         // Create a new Entity object with a new ID and set its properties.
-        var newEntity = new Entity()
+        var newEntityData = new EntityData(_entityManager, newEntityKey)
         {
             ID = Guid.NewGuid(), // Generate a new ID for the new Entity object.
             Name = Name,
-            IsEnabled = IsEnabled,
+            IsActive = IsActive,
             IsHidden = IsHidden,
             IsStatic = IsStatic,
             Layer = Layer,
@@ -189,27 +192,29 @@ public sealed partial class Entity : ICloneable
         };
 
         // Copy the original Entity object's Transform properties to the new Entity object.
-        newEntity.Transform.LocalPosition = Transform.LocalPosition;
-        newEntity.Transform.LocalRotation = Transform.LocalRotation;
-        newEntity.Transform.LocalScale = Transform.LocalScale;
+        newEntityData.Transform.LocalPosition = Transform.LocalPosition;
+        newEntityData.Transform.LocalRotation = Transform.LocalRotation;
+        newEntityData.Transform.LocalScale = Transform.LocalScale;
 
         // Loop through the original Entity object's Components,
         // clone each one and register it to the new Entity object.
-        for (int i = 1; i < _components.Count; i++) // Skip transform.
+        foreach (var component in GetComponents())
         {
+            if (component.GetType().Equals(typeof(EntityData))
+             || component.GetType().Equals(typeof(Transform)))
+                continue;
+
             // Clone the Component.
-            var newComponent = _components[i].Clone();
+            var newComponent = component.Clone();
             // Call OnRegister method on the new Component.
             newComponent.OnRegister();
             // Add the new Component to the new Entity object.
-            newEntity.AddComponent(newComponent);
+            newEntityData.AddComponent(newComponent);
         }
 
-        // Return the new Entity object.
-        return newEntity;
+        return newEntityData;
     }
 }
-
 
 /*
 using EnTTSharp.Entities;

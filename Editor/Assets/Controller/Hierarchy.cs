@@ -12,7 +12,6 @@ using Microsoft.UI.Xaml;
 
 using Engine.Components;
 using Engine.ECS;
-using Engine.SceneSystem;
 
 namespace Editor.Controller;
 
@@ -93,8 +92,8 @@ internal sealed partial class Hierarchy
     {
         Scene scene = Engine.Kernel.Instance.SystemManager.GetFromID(sceneEntry.ID);
 
-        scene.EntityManager.EntityList.OnAdd += (s, e) => AddTreeEntry(sceneEntry, (Entity)e);
-        scene.EntityManager.EntityList.OnRemove += (s, e) => RemoveTreeEntry(sceneEntry, (Entity)e);
+        scene.EntityManager.EntityList.OnAdd += (s, e) => AddTreeEntry(sceneEntry, (EntityData)e);
+        scene.EntityManager.EntityList.OnRemove += (s, e) => RemoveTreeEntry(sceneEntry, (EntityData)e);
 
         foreach (var entity in scene.EntityManager.EntityList)
             AddTreeEntry(sceneEntry, entity);
@@ -143,7 +142,7 @@ internal sealed partial class Hierarchy
         return subsceneGrid;
     }
 
-    private TreeEntry AddTreeEntry(SceneEntry sceneEntry, Entity entity)
+    private TreeEntry AddTreeEntry(SceneEntry sceneEntry, EntityData entity)
     {
         if (entity.IsHidden)
             return null;
@@ -169,7 +168,7 @@ internal sealed partial class Hierarchy
         return treeEntry;
     }
 
-    private void RemoveTreeEntry(SceneEntry sceneEntry, Entity entity)
+    private void RemoveTreeEntry(SceneEntry sceneEntry, EntityData entity)
     {
         var treeEntry = GetTreeEntry(entity.ID);
 
@@ -215,12 +214,12 @@ internal sealed partial class Hierarchy
         items[5].Click += (s, e) =>
         {
             var entity = GetEntity(_itemInvoked);
-            entity.Scene.EntityManager.CreateEntity(entity.Parent);
+            entity.EntityManager.EntityManager.CreateEntity(entity.Parent);
         };
         items[6].Click += (s, e) =>
         {
             var entity = GetEntity(_itemInvoked);
-            entity.Scene.EntityManager.CreateEntity(entity);
+            entity.EntityManager.EntityManager.CreateEntity(entity);
         };
 
         MenuFlyout menuFlyout = new();
@@ -324,7 +323,7 @@ internal sealed partial class Hierarchy
                 else if (_itemInvoked is not null)
                 {
                     var entity = GetEntity(_itemInvoked);
-                    entity.Scene.EntityManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type), entity);
+                    entity.EntityManager.EntityManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type), entity);
                 }
                 else
                     Engine.Kernel.Instance.SystemManager.MainScene.EntityManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
@@ -343,7 +342,7 @@ internal sealed partial class Hierarchy
             else if (_itemInvoked is not null)
             {
                 var entity = GetEntity(_itemInvoked);
-                entity.Scene.EntityManager.CreateCamera("Camera", Tags.MainCamera.ToString(), entity);
+                entity.EntityManager.EntityManager.CreateCamera("Camera", Tags.MainCamera.ToString(), entity);
             }
             else
                 Engine.Kernel.Instance.SystemManager.MainScene.EntityManager.CreateCamera();
@@ -672,9 +671,9 @@ internal sealed partial class Hierarchy
     /// <summary>
     /// This method returns an Entity object with the specified GUID, optionally searching in a specific SceneEntry.
     /// </summary>
-    public Entity GetEntity(Guid guid, SceneEntry sceneEntry = null)
+    public EntityData GetEntity(Guid guid, SceneEntry sceneEntry = null)
     {
-        Entity entity;
+        EntityData entity;
 
         // If sceneEntry is specified, get the entity with the given GUID from that scene.
         if (sceneEntry is not null)
@@ -697,7 +696,7 @@ internal sealed partial class Hierarchy
     /// <summary>
     /// This method returns an Entity object corresponding to the given TreeEntry and optionally searching in a specific SceneEntry.
     /// </summary>
-    public Entity GetEntity(TreeEntry entry, SceneEntry sceneEntry = null)
+    public EntityData GetEntity(TreeEntry entry, SceneEntry sceneEntry = null)
     {
         // If entry is null, return null.
         if (entry is null)
@@ -711,14 +710,14 @@ internal sealed partial class Hierarchy
     /// This method retrieves an Entity object corresponding to the given TreeEntry and optionally searching in a specific SceneEntry,
     /// and stores it in the out parameter 'entity'.
     /// </summary>
-    public void GetEntity(out Entity entity, TreeEntry entry, SceneEntry sceneEntry = null) =>
+    public void GetEntity(out EntityData entity, TreeEntry entry, SceneEntry sceneEntry = null) =>
         entity = GetEntity(entry.ID, sceneEntry);
 
     /// <summary>
     /// This method retrieves an Entity object with the specified GUID, optionally searching in a specific SceneEntry,
     /// and stores it in the out parameter 'entity'.
     /// </summary>
-    public void GetEntity(out Entity entity, Guid guid, SceneEntry sceneEntry = null) =>
+    public void GetEntity(out EntityData entity, Guid guid, SceneEntry sceneEntry = null) =>
         entity = GetEntity(guid, sceneEntry);
 
     /// <summary>
@@ -822,10 +821,10 @@ internal sealed partial class Hierarchy
 
         // Get the source tree entry, entity and target tree entry from their respective GUIDs.
         GetEntries(out TreeEntry sourceTreeEntry, out SceneEntry sourceSceneEntry, sourceEntityGuid);
-        GetEntity(out Entity sourceEntity, sourceEntityGuid, sourceSceneEntry);
+        GetEntity(out EntityData sourceEntity, sourceEntityGuid, sourceSceneEntry);
 
         GetEntries(out TreeEntry targetTreeEntry, out SceneEntry targetSceneEntry, targetEntityGuid);
-        GetEntity(out Entity targetEntity, targetEntityGuid, targetSceneEntry);
+        GetEntity(out EntityData targetEntity, targetEntityGuid, targetSceneEntry);
 
         // Get the source and target scenes from their respective entries.
         GetScenes(out Scene sourceScene, out Scene targetScene, sourceSceneEntry, targetSceneEntry);
@@ -882,7 +881,7 @@ internal sealed partial class Hierarchy
                 foreach (var childIconNode in sourceTreeEntry.IconNode.Children)
                 {
                     // Get the child entity for the child icon node.
-                    GetEntity(out Entity childEntity, sourceScene.EntityManager.GetFromID(childIconNode.TreeEntry.ID).ID, sourceSceneEntry);
+                    GetEntity(out EntityData childEntity, sourceScene.EntityManager.GetFromID(childIconNode.TreeEntry.ID).ID, sourceSceneEntry);
                     // Recursively paste the child entity and its children to the new entity.
                     PasteEntity(childEntity.ID, newEntity.ID, DataPackageOperation.Copy);
                 }
@@ -901,7 +900,7 @@ internal sealed partial class Hierarchy
     {
         // Get the source tree entry, entity and target tree entry from their respective GUIDs.
         GetEntries(out TreeEntry sourceTreeEntry, out SceneEntry sourceSceneEntry, sourceEntityGuid);
-        GetEntity(out Entity sourceEntity, sourceEntityGuid, sourceSceneEntry);
+        GetEntity(out EntityData sourceEntity, sourceEntityGuid, sourceSceneEntry);
 
         // Get the source and target scene.
         GetScenes(out Scene sourceScene, out Scene targetScene, sourceSceneEntry, targetSceneEntry);
@@ -951,7 +950,7 @@ internal sealed partial class Hierarchy
                 foreach (var childIconNode in sourceTreeEntry.IconNode.Children)
                 {
                     // Get the child entity for the child icon node.
-                    GetEntity(out Entity childEntity, sourceScene.EntityManager.GetFromID(childIconNode.TreeEntry.ID).ID, sourceSceneEntry);
+                    GetEntity(out EntityData childEntity, sourceScene.EntityManager.GetFromID(childIconNode.TreeEntry.ID).ID, sourceSceneEntry);
                     // Recursively paste the child entity and its children to the new entity.
                     PasteEntity(childEntity.ID, newEntity.ID, DataPackageOperation.Copy);
                 }

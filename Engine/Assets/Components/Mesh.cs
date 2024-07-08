@@ -60,7 +60,7 @@ public sealed partial class Mesh : EditorComponent
         if (MeshInfo.Equals(CurrentMeshInfoOnGPU)
          && Material.Equals(CurrentMaterialOnGPU))
         {
-            Context.UploadBuffer.Upload(Entity.Transform.GetConstantBuffer(), out var offset);
+            Context.UploadBuffer.Upload(EntityData.Transform.GetConstantBuffer(), out var offset);
             Context.UploadBuffer.SetConstantBufferView(offset, 1);
 
             Context.GraphicsContext.DrawIndexedInstanced(MeshInfo.IndexCount, 1, 0, 0, 0);
@@ -78,7 +78,7 @@ public sealed partial class Mesh : EditorComponent
 
             Context.GraphicsContext.SetMesh(MeshInfo);
 
-            Context.UploadBuffer.Upload(Entity.Transform.GetConstantBuffer(), out var offset);
+            Context.UploadBuffer.Upload(EntityData.Transform.GetConstantBuffer(), out var offset);
             Context.UploadBuffer.SetConstantBufferView(offset, 1);
 
             Context.GraphicsContext.DrawIndexedInstanced(MeshInfo.IndexCount, 1, 0, 0, 0);
@@ -129,7 +129,7 @@ public sealed partial class Mesh : EditorComponent
 
         TransformedBoundingBox = BoundingBox.Transform(
             MeshInfo.BoundingBox,
-            Entity.Transform.WorldMatrix);
+            EntityData.Transform.WorldMatrix);
     }
 
     private void CheckBounds()
@@ -137,12 +137,12 @@ public sealed partial class Mesh : EditorComponent
         if (MeshInfo is null)
             return;
 
-        if (Entity.Transform.TransformChanged)
+        if (EntityData.Transform.TransformChanged)
             TransformedBoundingBox = BoundingBox.Transform(
                 MeshInfo.BoundingBox,
-                Entity.Transform.WorldMatrix);
+                EntityData.Transform.WorldMatrix);
 
-        if (Entity.Transform.TransformChanged || (Camera.CurrentRenderingCamera?.Entity.Transform.TransformChanged ?? false))
+        if (EntityData.Transform.TransformChanged || (Camera.CurrentRenderingCamera?.EntityData.Transform.TransformChanged ?? false))
         {
             var boundingFrustum = Camera.CurrentRenderingCamera.BoundingFrustum;
             if (boundingFrustum is not null)

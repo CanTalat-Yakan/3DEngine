@@ -38,14 +38,11 @@ public sealed partial class SystemManager
 
     public void RemoveSubscene(Guid guid)
     {
-        // Retrieves the scene with the specified GUID from the list of subscenes.
-        EntityManager scene = GetFromID(guid);
+        var entityManager = GetFromID(guid);
 
-        // Destroys all entities within the scene.
-        foreach (var entity in scene.List.ToArray())
-            scene.Destroy(entity);
+        entityManager.Dispose();
 
-        SubScenes.Remove(scene);
+        SubScenes.Remove(entityManager);
     }
 }
 
@@ -86,11 +83,11 @@ public sealed partial class SystemManager
 {
     public void ProcessSystems()
     {
-        TransformSystem.CopyToArray();
-        CameraSystem.CopyToArray();
-        MeshSystem.SortAndCopyToArrayIfDirty();
-        EditorScriptSystem.CopyToArray();
-        ScriptSystem.CopyToArray();
+        TransformSystem.CachePoolIfDirty();
+        CameraSystem.CachePoolIfDirty();
+        MeshSystem.CachePoolIfDirty();
+        EditorScriptSystem.CachePoolIfDirty();
+        ScriptSystem.CachePoolIfDirty();
     }
 
     public void Awake()

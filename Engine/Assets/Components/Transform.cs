@@ -11,7 +11,7 @@ public sealed partial class Transform : EditorComponent, IHide
 {
     public bool TransformChanged { get; set; }
 
-    public Transform Parent => Entity.Parent?.Transform;
+    public Transform Parent => EntityData.Parent?.Transform;
 
     public Vector3 Forward => TransformVector3(LocalForward, Parent?.Forward);
     public Vector3 LocalForward = Vector3.UnitZ;

@@ -27,12 +27,12 @@ public sealed class SceneLoader
 
     private static void SaveEntities(UsdStage stage, EntityManager scene, string rootPath)
     {
-        foreach (var entity in scene.List)
+        foreach (var entity in scene.GetAllEntityData())
         {
             var entityPath = new SdfPath($"{rootPath}/{entity.Name}");
             var usdPrim = stage.DefinePrim(entityPath, new TfToken("Xform"));
 
-            foreach (var component in entity.Components)
+            foreach (var component in entity.GetComponents())
                 foreach (var attribute in component.GetType().GetProperties())
                 {
                     var value = attribute.GetValue(component);
@@ -71,26 +71,22 @@ public sealed class SceneLoader
         foreach (var prim in stage.Traverse())
             if (prim.IsA(TfType.FindByName("Xform")))
             {
-                var entity = new Entity { Name = prim.GetName() };
+                var entity = scene.CreateEntity(null, prim.GetName());
 
                 foreach (var usdAttribute in prim.GetAttributes())
                 {
                     var componentType = Type.GetType(usdAttribute.GetName());
                     if (componentType is not null)
                     {
-                        var component = (Component)Activator.CreateInstance(componentType);
-                        component.Entity = entity;
+                        var component = entity.AddComponent(componentType);
+                        component.EntityKey = entity.EntityKey;
 
                         var value = usdAttribute.Get();
                         var property = componentType.GetProperty(usdAttribute.GetName());
                         if (property is not null && value is not null)
                             property.SetValue(component, Convert.ChangeType(value, property.PropertyType));
-
-                        entity.Components.Add(component);
                     }
                 }
-
-                scene.List.Add(entity);
             }
     }
 }

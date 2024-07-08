@@ -111,7 +111,7 @@ internal sealed partial class Binding
         SceneBindings.Add("IsEnabled" + scene.ID, new(scene, "IsEnabled"));
     }
 
-    public static void SetEntityBindings(Entity entity)
+    public static void SetEntityBindings(EntityData entity)
     {
         if (entity is null)
             return;
@@ -224,7 +224,7 @@ internal sealed partial class Binding
         if (EntityBindings.Count == 0)
             return;
 
-        Entity entity = EntityBindings.FirstOrDefault().Value.Source as Entity;
+        EntityData entity = EntityBindings.FirstOrDefault().Value.Source as EntityData;
 
         UpdateBinding(entity, entity.ID, EntityBindings);
 
