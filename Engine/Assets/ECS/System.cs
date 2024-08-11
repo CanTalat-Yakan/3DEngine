@@ -28,7 +28,7 @@ public partial class System<T> where T : Component
         s_dirty = true;
     }
 
-    internal static void FetchArray(bool sort = false)
+    public static void FetchArray(bool sort = false)
     {
         if (!s_dirty)
             return;
