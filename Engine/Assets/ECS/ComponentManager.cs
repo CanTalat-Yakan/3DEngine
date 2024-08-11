@@ -47,9 +47,10 @@ public sealed partial class ComponentManager
 
         return null;
     }
+
     public Type[] GetComponents(Entity entity)
     {
-        var componentTypes = new List<Type>();
+        List<Type> componentTypes = new();
 
         foreach (var sparseSet in _componentSparseSets.Values)
         {
@@ -62,6 +63,7 @@ public sealed partial class ComponentManager
 
         return componentTypes.ToArray();
     }
+
     public void RemoveComponent<T>(Entity entity) where T : Component
     {
         if (_componentSparseSets.TryGetValue(typeof(T), out var sparseSet))
@@ -116,7 +118,8 @@ public sealed partial class ComponentManager
             return page;
         }
 
-        private int GetPageNumber(int entityId) => entityId / MaxPageSize;
+        private int GetPageNumber(int entityId) => 
+            entityId / MaxPageSize;
 
         public void Add(Entity entity, T component)
         {
@@ -143,8 +146,7 @@ public sealed partial class ComponentManager
         public void Remove(Entity entity)
         {
             int pageNumber = GetPageNumber(entity.ID);
-            if (_pages.TryGetValue(pageNumber, out var page) &&
-                page.SparseArray.TryGetValue(entity.ID, out int denseIndex))
+            if (_pages.TryGetValue(pageNumber, out var page) && page.SparseArray.TryGetValue(entity.ID, out int denseIndex))
             {
                 // Invoke the destruction event before removing the component
                 page.DenseArray[denseIndex].InvokeEventOnDestroy();
@@ -166,9 +168,7 @@ public sealed partial class ComponentManager
 
                 // Optionally remove the page if it's empty
                 if (page.DenseArray.Count == 0)
-                {
                     _pages.Remove(pageNumber);
-                }
             }
         }
 

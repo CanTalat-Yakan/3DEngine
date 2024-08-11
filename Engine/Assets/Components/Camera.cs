@@ -48,7 +48,7 @@ public sealed class Camera : EditorComponent
         CurrentRenderingCamera = this;
     }
 
-    public override void OnFixedRender()
+    public override void OnRender()
     {
         // Assign this camera instance as the main camera if it has "MainCamera" tag.
         if (Entity.Data.Tag == Tags.MainCamera.ToString())

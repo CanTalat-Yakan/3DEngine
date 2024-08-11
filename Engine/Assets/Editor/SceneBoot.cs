@@ -75,13 +75,13 @@ internal sealed class SceneBoot : EditorComponent, IHide
 
         if (Input.GetKey(Key.E, InputState.Pressed) && ViewportController.ViewportFocused)
         {
-            Output.Log($"Spawned {EntityCount += 1000} Entities");
+            Output.Log($"Spawned {EntityCount += 1_000} Entities");
 
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 1_000; i++)
                 Entity.Manager.CreateEntity(hide: true);
         }
 
-        if (Input.GetKey(Key.V, InputState.Down) && ViewportController.ViewportFocused)
+        if (Input.GetKey(Key.V, InputState.Pressed) && ViewportController.ViewportFocused)
             if (!ExampleCamera.HasComponent<ViewportController>())
             {
                 Output.Log($"Viewport Controller added");

@@ -43,7 +43,7 @@ public sealed partial class Mesh : EditorComponent
             finally { ShaderName = null; }
     }
 
-    public override void OnFixedRender()
+    public override void OnRender()
     {
         if (MeshInfo is null || Material is null)
             return;

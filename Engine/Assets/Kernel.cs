@@ -107,13 +107,12 @@ public sealed partial class Kernel
         if (EditorState.PlayModeStarted)
             Compile();
 
+        if (Time.OnFixedFrame)
+            Profiler.Benchmark(SystemManager.FixedUpdate);
+
         Profiler.Benchmark(SystemManager.Update);
         Profiler.Benchmark(SystemManager.LateUpdate);
         Profiler.Benchmark(SystemManager.Render);
-        Profiler.Benchmark(SystemManager.FixedRender);
-
-        if (Time.OnFixedFrame)
-            Profiler.Benchmark(SystemManager.FixedUpdate);
 
         OnRender?.Invoke();
 

@@ -32,8 +32,6 @@ public partial class Component
 
     public virtual void OnRender() { }
 
-    public virtual void OnFixedRender() { }
-
     public virtual void OnDestroy() { }
 
     public virtual void OnGUI() { }
