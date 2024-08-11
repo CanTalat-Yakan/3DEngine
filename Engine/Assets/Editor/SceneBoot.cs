@@ -78,14 +78,19 @@ internal sealed class SceneBoot : EditorComponent, IHide
             Output.Log($"Spawned {EntityCount += 1_000} Entities");
 
             for (int i = 0; i < 1_000; i++)
-                Entity.Manager.CreateEntity(hide: true);
+                Entity.Manager.CreateEntity(hide: true).AddComponent<EmptyComponent>();
         }
+
+        if (Input.GetKey(Key.N, InputState.Down) && ViewportController.ViewportFocused)
+            Output.Log(EmptyComponent.Number);
 
         if (Input.GetKey(Key.V, InputState.Pressed) && ViewportController.ViewportFocused)
             if (!ExampleCamera.HasComponent<ViewportController>())
             {
                 Output.Log($"Viewport Controller added");
+
                 Input.SetLockMouse(false);
+
                 ExampleCamera.AddComponent<ViewportController>().LockCursor = true;
             }
     }
@@ -105,4 +110,12 @@ internal sealed class HoverEffect : Component, IHide
 
     public override void OnUpdate() =>
         Entity.Transform.SetPosition(y: MathF.Sin((float)Time.Timer + _random) * _factor + _verticalPosition);
+}
+
+internal sealed class EmptyComponent : SimpleComponent, IHide
+{
+    public static int Number = 0;
+
+    public override void OnUpdate() =>
+        Number++;
 }

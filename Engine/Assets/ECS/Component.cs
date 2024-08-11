@@ -56,3 +56,11 @@ public class EditorComponent : Component, IHide
     public override void OnRegister() =>
         EditorScriptSystem.Register(this);
 }
+
+public partial class SimpleComponent : Component, IHide
+{
+    public override void OnRegister() =>
+        SimpleSystem.Register(this);
+
+    public override void OnUpdate() { }
+}

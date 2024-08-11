@@ -90,8 +90,9 @@ public sealed partial class SystemManager
         TransformSystem.FetchArray();
         CameraSystem.FetchArray();
         MeshSystem.FetchArray(sort: true);
-        EditorScriptSystem.FetchArray();
         ScriptSystem.FetchArray();
+        EditorScriptSystem.FetchArray();
+        SimpleSystem.FetchArray();
     }
 
     public void Awake()
@@ -117,6 +118,8 @@ public sealed partial class SystemManager
 
         if (EditorState.PlayMode)
             ScriptSystem.Update();
+
+        SimpleSystem.SimpleUpdate();
     }
 
     public void LateUpdate()
@@ -139,11 +142,7 @@ public sealed partial class SystemManager
     {
         CameraSystem.Render();
 
-        ScriptSystem.Render();
-        EditorScriptSystem.Render();
-
-        Profiler.Benchmark("Mesh Render",
-            MeshSystem.Render);
+        MeshSystem.Render();
 
         Mesh.CurrentMeshInfoOnGPU = null;
         Mesh.CurrentMaterialOnGPU = null;

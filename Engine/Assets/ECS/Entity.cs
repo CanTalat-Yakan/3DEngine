@@ -56,12 +56,13 @@ public sealed partial class Entity
 
         component.OnRegister();
 
-        if (EditorState.PlayMode || component is EditorComponent)
-        {
-            // Call the Awake and Start method to initialize the editor component.
-            component.OnAwake();
-            component.OnStart();
-        }
+        if (component is not SimpleComponent)
+            if (EditorState.PlayMode || component is EditorComponent)
+            {
+                // Call the Awake and Start method to initialize the editor component.
+                component.OnAwake();
+                component.OnStart();
+            }
 
         return component;
     }

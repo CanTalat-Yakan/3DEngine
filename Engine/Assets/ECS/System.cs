@@ -10,6 +10,7 @@ internal sealed class MeshSystem : System<Mesh> { }
 
 public sealed class ScriptSystem : System<Component> { }
 public sealed class EditorScriptSystem : System<EditorComponent> { }
+public sealed class SimpleSystem : System<SimpleComponent> { }
 
 public partial class System<T> where T : Component
 {
@@ -86,75 +87,43 @@ public partial class System<T> where T : Component
         && component.Entity.Data.IsEnabled
         && component.Entity.Manager.IsEnabled
         && component.Entity.Data.ActiveInHierarchy;
+
+    private static void IfActive(T component, Action action)
+    {
+        if (CheckActive(component))
+            action.Invoke();
+    }
 }
 
 public partial class System<T> where T : Component
 {
-    private static ParallelOptions _parallelOptions = new() { MaxDegreeOfParallelism = 20 };
+    private static ParallelOptions _options = new() { MaxDegreeOfParallelism = Environment.ProcessorCount };
 
-    public static void Awake()
-    {
-        // Loop through all the components in the static components array
-        // and call OnAwake method on the component if it is active.
-        Parallel.ForEach(s_components, _parallelOptions, component =>
-        {
-            if (CheckActive(component))
-                component.OnAwake();
-        });
-    }
+    public static void Awake() =>
+        Parallel.ForEach(s_components, _options, component => IfActive(component, component.OnAwake));
 
-    public static void Start()
-    {
-        Parallel.ForEach(s_components, _parallelOptions, component =>
-        {
-            if (CheckActive(component))
-                component.OnStart();
-        });
-    }
+    public static void Start() =>
+        Parallel.ForEach(s_components, _options, component => IfActive(component, component.OnStart));
 
-    public static void Update()
-    {
-        Parallel.ForEach(s_components, _parallelOptions, component =>
-        {
-            if (CheckActive(component))
-                component.OnUpdate();
-        });
-    }
+    public static void Update() =>
+        Parallel.ForEach(s_components, _options, component => IfActive(component, component.OnUpdate));
 
-    public static void LateUpdate()
-    {
-        Parallel.ForEach(s_components, _parallelOptions, component =>
-        {
-            if (CheckActive(component))
-                component.OnLateUpdate();
-        });
-    }
+    public static void SimpleUpdate() =>
+        Parallel.ForEach(s_components, _options, component => component.OnUpdate());
 
-    public static void FixedUpdate()
-    {
-        Parallel.ForEach(s_components, _parallelOptions, component =>
-        {
-            if (CheckActive(component))
-                component.OnFixedUpdate();
-        });
-    }
+    public static void LateUpdate() =>
+        Parallel.ForEach(s_components, _options, component => IfActive(component, component.OnLateUpdate));
+
+    public static void FixedUpdate() =>
+        Parallel.ForEach(s_components, _options, component => IfActive(component, component.OnFixedUpdate));
 
     public static void Render()
     {
-        // Loop through all the components in the static components array
-        // and call OnRender method on the component if it is active.
-        foreach (T component in s_components) // This will run in a separate thread,
-                                              // asynchronously reprojecting the render target texture.
-            if (CheckActive(component))
-                component.OnRender();
+        // This will run in a separate thread, asynchronously reprojecting the render target texture.
+        foreach (T component in s_components)
+            IfActive(component, component.OnRender);
     }
 
-    public static void GUI()
-    {
-        Parallel.ForEach(s_components, _parallelOptions, component =>
-        {
-            if (CheckActive(component))
-                component.OnGUI();
-        });
-    }
+    public static void GUI() =>
+        Parallel.ForEach(s_components, _options, component => IfActive(component, component.OnGUI));
 }
