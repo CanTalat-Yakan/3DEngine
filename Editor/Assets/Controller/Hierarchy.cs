@@ -52,8 +52,8 @@ internal sealed partial class Hierarchy
 
         SceneEntry = new()
         {
-            ID = Engine.Kernel.Instance.SystemManager.MainScene.ID,
-            Name = Engine.Kernel.Instance.SystemManager.MainScene.Name,
+            ID = Engine.Kernel.Instance.SystemManager.MainEntityManager.ID,
+            Name = Engine.Kernel.Instance.SystemManager.MainEntityManager.Name,
             Hierarchy = new(),
             DataSource = new()
         };
@@ -110,7 +110,7 @@ internal sealed partial class Hierarchy
     private Grid[] CreateSceneHierarchy(in SceneEntry sceneEntry, Scene scene = null)
     {
         if (scene is null)
-            scene = Engine.Kernel.Instance.SystemManager.MainScene;
+            scene = Engine.Kernel.Instance.SystemManager.MainEntityManager;
 
         var sceneGrid = new Grid[]
         {
@@ -249,7 +249,7 @@ internal sealed partial class Hierarchy
             };
         items[2].Click += (s, e) => PasteEntityFromClipboardAsync(SceneEntry);
 
-        items[3].Click += (s, e) => Engine.Kernel.Instance.SystemManager.MainScene.EntityManager.CreateEntity();
+        items[3].Click += (s, e) => Engine.Kernel.Instance.SystemManager.MainEntityManager.EntityManager.CreateEntity();
 
         MenuFlyout menuFlyout = new();
         foreach (var item in items)
@@ -326,7 +326,7 @@ internal sealed partial class Hierarchy
                     entity.EntityManager.EntityManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type), entity);
                 }
                 else
-                    Engine.Kernel.Instance.SystemManager.MainScene.EntityManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
+                    Engine.Kernel.Instance.SystemManager.MainEntityManager.EntityManager.CreatePrimitive((PrimitiveTypes)Enum.Parse(typeof(PrimitiveTypes), type));
             };
 
             objectSubItem.Items.Add(item);
@@ -345,7 +345,7 @@ internal sealed partial class Hierarchy
                 entity.EntityManager.EntityManager.CreateCamera("Camera", Tags.MainCamera.ToString(), entity);
             }
             else
-                Engine.Kernel.Instance.SystemManager.MainScene.EntityManager.CreateCamera();
+                Engine.Kernel.Instance.SystemManager.MainEntityManager.EntityManager.CreateCamera();
         };
 
         return menuFlyout;
@@ -388,7 +388,7 @@ internal sealed partial class Hierarchy
                     return;
                 }
 
-            subsceneName.Text = subsceneName.Text.IncrementNameIfExists(Engine.Kernel.Instance.SystemManager.SubScenes.ToArray().Select(Scene => Scene.Name).ToArray());
+            subsceneName.Text = subsceneName.Text.IncrementNameIfExists(Engine.Kernel.Instance.SystemManager.SubEntityManagers.ToArray().Select(Scene => Scene.Name).ToArray());
 
             _stackPanel.Children.Add(CreateSubsceneAndHierarchy(out SceneEntry subsceneEntry, subsceneName.Text)
                 .StackInGrid().WrapInExpanderWithToggleButton(ref subsceneEntry.Content, subsceneEntry.ID, subsceneName.Text, true)
@@ -681,10 +681,10 @@ internal sealed partial class Hierarchy
         // Otherwise, search through all subscenes of the scene manager.
         else
         {
-            entity = Engine.Kernel.Instance.SystemManager.MainScene.EntityManager.GetFromID(guid);
+            entity = Engine.Kernel.Instance.SystemManager.MainEntityManager.EntityManager.GetFromID(guid);
 
             if (entity is null)
-                foreach (var subscene in Engine.Kernel.Instance.SystemManager.SubScenes)
+                foreach (var subscene in Engine.Kernel.Instance.SystemManager.SubEntityManagers)
                     if (entity is null)
                         entity = subscene.EntityManager.GetFromID(guid);
                     else break;

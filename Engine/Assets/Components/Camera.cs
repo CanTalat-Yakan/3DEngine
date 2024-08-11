@@ -47,7 +47,7 @@ public sealed class Camera : EditorComponent
     public override void OnRender()
     {
         // Assign this camera instance as the main camera if it has "MainCamera" tag.
-        if (EntityData.Tag == Tags.MainCamera.ToString())
+        if (Entity.Data.Tag == Tags.MainCamera.ToString())
             Main = this;
 
         // Override the Component Order with the local variable.
@@ -65,7 +65,7 @@ public sealed class Camera : EditorComponent
 
         // Tell the mesh to recheck bounds.
         if (previousRenderingCamera != CurrentRenderingCamera)
-            EntityData.Transform.TransformChanged = true;
+            Entity.Transform.TransformChanged = true;
 
         if (CurrentRenderingCamera == this)
             // Recreates the view constants data to be used by the Camera.
@@ -76,8 +76,8 @@ public sealed class Camera : EditorComponent
     {
         // Calculate the view matrix to use for the camera.
         var view = Matrix4x4.CreateLookAt(
-            EntityData.Transform.Position,
-            EntityData.Transform.Position + EntityData.Transform.Forward,
+            Entity.Transform.Position,
+            Entity.Transform.Position + Entity.Transform.Forward,
             Vector3.UnitY);
 
         // Get the aspect ratio for the device's screen.
@@ -102,8 +102,8 @@ public sealed class Camera : EditorComponent
         // Store the transposed view-projection matrix and the position of the camera.
         ViewBuffer = new(
             Matrix4x4.Transpose(viewProjection),
-            EntityData.Transform.Position,
-            EntityData.Transform.Forward);
+            Entity.Transform.Position,
+            Entity.Transform.Forward);
 
         /* 
          The coordinate system used in System.Numerics is right-handed,

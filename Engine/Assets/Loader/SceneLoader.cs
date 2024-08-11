@@ -11,9 +11,9 @@ public sealed class SceneLoader
         var scene = Scene.Create(localPath);
         var stage = scene.Stage;
 
-        SaveEntities(stage, systemManager.MainScene, $"/World/{systemManager.MainScene.Name}");
+        SaveEntities(stage, systemManager.MainEntityManager, $"/World/{systemManager.MainEntityManager.Name}");
 
-        foreach (var subscene in systemManager.SubScenes)
+        foreach (var subscene in systemManager.SubEntityManagers)
         {
             var subscenePath = Path.Combine(Path.GetDirectoryName(localPath), $"{subscene.Name}.usda");
             SaveEntities(stage, subscene, $"/World/{subscene.Name}");
@@ -25,15 +25,15 @@ public sealed class SceneLoader
         scene.Save();
     }
 
-    private static void SaveEntities(UsdStage stage, EntityManager scene, string rootPath)
+    private static void SaveEntities(UsdStage stage, EntityManager EntityManager, string rootPath)
     {
-        foreach (var entity in scene.GetAllEntityData())
+        foreach (var entity in EntityManager.Entities.Values)
         {
-            var entityPath = new SdfPath($"{rootPath}/{entity.Name}");
+            var entityPath = new SdfPath($"{rootPath}/{entity.Data.Name}");
             var usdPrim = stage.DefinePrim(entityPath, new TfToken("Xform"));
 
             foreach (var component in entity.GetComponents())
-                foreach (var attribute in component.GetType().GetProperties())
+                foreach (var attribute in component.GetProperties())
                 {
                     var value = attribute.GetValue(component);
                     if (value is not null)
@@ -52,7 +52,7 @@ public sealed class SceneLoader
         var scene = Scene.Open(localPath);
         var stage = scene.Stage;
 
-        LoadEntities(stage, systemManager.MainScene, $"/World/{systemManager.MainScene.Name}");
+        LoadEntities(stage, systemManager.MainEntityManager, $"/World/{systemManager.MainEntityManager.Name}");
 
         var subLayerPaths = stage.GetRootLayer().GetSubLayerPaths();
         for (uint i = 0; i < subLayerPaths.size(); i++)
@@ -66,12 +66,13 @@ public sealed class SceneLoader
         }
     }
 
-    private static void LoadEntities(UsdStage stage, EntityManager scene, string rootPath)
+    private static void LoadEntities(UsdStage stage, EntityManager EntityManager, string rootPath)
     {
         foreach (var prim in stage.Traverse())
             if (prim.IsA(TfType.FindByName("Xform")))
             {
-                var entity = scene.CreateEntity(null, prim.GetName());
+                EntityData entityData = new() { Name = prim.GetName() };
+                Entity entity = EntityManager.CreateEntity(entityData);
 
                 foreach (var usdAttribute in prim.GetAttributes())
                 {
@@ -79,7 +80,7 @@ public sealed class SceneLoader
                     if (componentType is not null)
                     {
                         var component = entity.AddComponent(componentType);
-                        component.EntityKey = entity.EntityKey;
+                        component.Entity = entity;
 
                         var value = usdAttribute.Get();
                         var property = componentType.GetProperty(usdAttribute.GetName());

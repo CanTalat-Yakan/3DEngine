@@ -1,177 +1,158 @@
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
-
-using EnTTSharp.Entities;
-using EnTTSharp.Entities.Pools;
-using Microsoft.Win32;
 
 namespace Engine.ECS;
 
-internal sealed class EntityDataSystem : SystemBase<EntityData> { }
-internal sealed class TransformSystem : SystemBase<Transform> { }
-internal sealed class CameraSystem : SystemBase<Camera> { }
-internal sealed class MeshSystem : SystemBase<Mesh> { }
+internal sealed class TransformSystem : System<Transform> { }
+internal sealed class CameraSystem : System<Camera> { }
+internal sealed class MeshSystem : System<Mesh> { }
 
-public sealed class ScriptSystem : SystemBase<Component> { }
-public sealed class EditorScriptSystem : SystemBase<EditorComponent> { }
+public sealed class ScriptSystem : System<Component> { }
+public sealed class EditorScriptSystem : System<EditorComponent> { }
 
-public partial class SystemBase<T> where T : Component
+public partial class System<T> where T : Component
 {
-    protected readonly static List<EntityRegistry<EntityKey>> Registries = new();
+    public static T[] Components => s_components.ToArray();
+    private static IEnumerable<T> s_components;
 
-    public static IReadOnlyPool<EntityKey, T> ComponentPool => _componentPool ??= GetCombinedPool();
-    private static IReadOnlyPool<EntityKey, T> _componentPool;
-
-    private static bool s_isDirty;
-
-    public static IReadOnlyPool<EntityKey, T> GetCombinedPool()
-    {
-        List<IReadOnlyPool<EntityKey, T>> pools = new();
-
-        foreach (var registry in Registries)
-            pools.Add(registry.GetPool<T>());
-
-        Pool<EntityKey, T> combinedPool = new();
-
-        foreach (var pool in pools)
-            foreach (var entityComponent in pool)
-                combinedPool.Add(entityComponent);
-
-        return combinedPool;
-    }
+    private static bool s_dirty = true;
 
     public static void Register(T component)
     {
-        var registry = component.EntityData.EntityManager.Registry;
+        Kernel.Instance.SystemManager.ComponentManager.AddComponent(component.Entity, component);
 
-        RegisterComponent(registry, component);
-
+        // Register the OnDestroy event of the component.
         component.EventOnDestroy += () => Destroy(component);
 
-        Registries.Add(registry);
-
-        s_isDirty = true;
+        s_dirty = true;
     }
 
-    public static void RegisterComponent(EntityRegistry<EntityKey> registry, T component)
+    internal static void FetchArray(bool sort = false)
     {
-        bool componentRegistered = false;
-        foreach (var componentType in ComponentPool.Select(component => component.GetType()))
-            if (componentType.Equals(typeof(T)))
-                componentRegistered = true;
+        if (!s_dirty)
+            return;
 
-        if (!componentRegistered)
-        {
-            // Use reflection to get the first method named 'Register'
-            var registerMethod = registry.GetType()
-                .GetMethods(BindingFlags.Instance | BindingFlags.Public)
-                .First(method => method.Name == "Register");
-            var genericMethod = registerMethod.MakeGenericMethod(component.GetType());
+        s_components = Kernel.Instance.SystemManager.ComponentManager.GetDenseArray<T>();
 
-            genericMethod.Invoke(registry, null);
-        }
+        if (sort)
+            s_components = s_components.OrderBy(Component => Component.Order);
+
+        s_dirty = false;
     }
-}
 
-public partial class SystemBase<T> where T : Component
-{
     public static void Destroy(T component)
     {
         component.OnDestroy();
 
-        component.EntityData.EntityManager.Registry.RemoveComponent<T>(component.EntityKey);
-
-        s_isDirty = true;
+        s_dirty = true;
     }
 
-    public static void Destroy(Type componentType) { }
-
-    public static void Destroy() { }
-
-    public static void Replace(Type oldComponentType, Type newComponentType) { }
-
-    public static void CachePoolIfDirty()
+    public static void Destroy(Type componentType)
     {
-        if (!s_isDirty)
-            return;
+        foreach (var component in s_components
+            .Where(c => c.GetType() == componentType)
+            .ToArray())
+        {
+            Destroy(component);
 
-        _componentPool = null;
-        _ = ComponentPool;
+            component.Entity.RemoveComponent(component);
+        }
+    }
+
+    public static void Destroy()
+    {
+        foreach (var component in s_components)
+            component.OnDestroy();
+
+        s_components = null;
+    }
+
+    public static void Replace(Type oldComponentType, Type newComponentType)
+    {
+        foreach (var component in s_components
+            .Where(Component => Component.GetType() == oldComponentType)
+            .ToArray())
+        {
+            Destroy(component);
+
+            component.Entity.RemoveComponent(component);
+            component.Entity.AddComponent(newComponentType);
+        }
     }
 
     private static bool CheckActive(T component) =>
-            component.IsEnabled
-         && component.EntityData.IsEnabled
-         && component.EntityData.EntityManager.IsEnabled
-         && component.EntityData.IsActiveInHierarchy;
+           component.IsEnabled
+        && component.Entity.Data.IsEnabled
+        && component.Entity.Manager.IsEnabled
+        && component.Entity.Data.ActiveInHierarchy;
 }
 
-public partial class SystemBase<T> where T : Component
+public partial class System<T> where T : Component
 {
     private static ParallelOptions _parallelOptions = new() { MaxDegreeOfParallelism = 20 };
 
-    public static void Awake() =>
-        Parallel.ForEach(ComponentPool, _parallelOptions, entity =>
+    public static void Awake()
+    {
+        // Loop through all the components in the static components array
+        // and call OnAwake method on the component if it is active.
+        Parallel.ForEach(s_components, _parallelOptions, component =>
         {
-            ComponentPool.TryGet(entity, out var component);
             if (CheckActive(component))
                 component.OnAwake();
         });
+    }
 
-    public static void Start() =>
-        Parallel.ForEach(ComponentPool, _parallelOptions, entity =>
+    public static void Start()
+    {
+        Parallel.ForEach(s_components, _parallelOptions, component =>
         {
-            ComponentPool.TryGet(entity, out var component);
             if (CheckActive(component))
                 component.OnStart();
         });
+    }
 
-    public static void Update() =>
-        Parallel.ForEach(ComponentPool, _parallelOptions, entity =>
+    public static void Update()
+    {
+        Parallel.ForEach(s_components, _parallelOptions, component =>
         {
-            ComponentPool.TryGet(entity, out var component);
             if (CheckActive(component))
                 component.OnUpdate();
         });
+    }
 
-    public static void LateUpdate() =>
-        Parallel.ForEach(ComponentPool, _parallelOptions, entity =>
+    public static void LateUpdate()
+    {
+        Parallel.ForEach(s_components, _parallelOptions, component =>
         {
-            ComponentPool.TryGet(entity, out var component);
             if (CheckActive(component))
                 component.OnLateUpdate();
         });
+    }
 
-    public static void FixedUpdate() =>
-        Parallel.ForEach(ComponentPool, _parallelOptions, entity =>
+    public static void FixedUpdate()
+    {
+        Parallel.ForEach(s_components, _parallelOptions, component =>
         {
-            ComponentPool.TryGet(entity, out var component);
             if (CheckActive(component))
                 component.OnFixedUpdate();
         });
+    }
 
     public static void Render()
     {
         // Loop through all the components in the static components array
         // and call OnRender method on the component if it is active.
-        foreach (EntityKey entity in ComponentPool) // This will run in a separate thread,
-        {                                           // asynchronously reprojecting the render target texture.
-            ComponentPool.TryGet(entity, out var component);
+        foreach (T component in s_components) // This will run in a separate thread,
+                                              // asynchronously reprojecting the render target texture.
             if (CheckActive(component))
                 component.OnRender();
-        }
     }
 
     public static void GUI()
     {
-        foreach (EntityKey entity in ComponentPool)
-        {
-            ComponentPool.TryGet(entity, out var component);
+        foreach (T component in s_components)
             if (CheckActive(component))
                 component.OnGUI();
-        }
     }
 }

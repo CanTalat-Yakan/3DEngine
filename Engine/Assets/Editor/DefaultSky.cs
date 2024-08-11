@@ -15,17 +15,17 @@ public sealed partial class DefaultSky : EditorComponent, IHide
     {
         var camera = Camera.CurrentRenderingCamera;
 
-        EntityData.Transform.LocalPosition = camera.EntityData.Transform.LocalPosition;
-        EntityData.Transform.LocalScale = new Vector3(-1, 1, 1) * 1.9f * camera.Clipping.Y;
+        Entity.Transform.LocalPosition = camera.Entity.Transform.LocalPosition;
+        Entity.Transform.LocalScale = new Vector3(-1, 1, 1) * 1.9f * camera.Clipping.Y;
     }
 
     public void Initialize()
     {
-        EntityData.Name = "Sky";
-        EntityData.Tag = "DefaultSky";
-        EntityData.IsHidden = true;
+        Entity.Data.Name = "Sky";
+        Entity.Data.Tag = "DefaultSky";
+        Entity.Data.IsHidden = true;
 
-        var mesh = EntityData.AddComponent<Mesh>();
+        var mesh = Entity.AddComponent<Mesh>();
         mesh.SetMeshInfo(Assets.Meshes["Sphere.obj"]);
         mesh.SetMaterialTextures([new("Default.png", 0)]);
         mesh.SetMaterialPipeline("Sky");

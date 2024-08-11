@@ -1,9 +1,4 @@
-﻿using System.ComponentModel;
-using System.Reflection;
-
-using EnTTSharp.Entities;
-
-namespace Engine.ECS;
+﻿namespace Engine.ECS;
 
 public enum Tags
 {
@@ -24,57 +19,26 @@ public enum Layers
     UI
 }
 
-public sealed partial class EntityData : EditorComponent
+public sealed partial class Entity
 {
-    private readonly EntityRegistry<EntityKey> _registry;
+    public int ID { get; }
+    public EntityData Data { get; }
 
-    public Guid ID = Guid.NewGuid();
+    public EntityManager Manager;
 
-    public EntityData Parent;
+    public Transform Transform => Data.Transform;
 
-    public string Name;
-    public bool IsActive = true;
-    public bool IsStatic = false;
-    [Hide] public bool IsHidden = false;
-    public string Tag;
-    public string Layer;
+    public SystemManager SystemManager => _systemManager ??= Kernel.Instance.SystemManager;
+    public SystemManager _systemManager;
 
-    public EntityManager EntityManager => _entityManager;
-    private EntityManager _entityManager;
-
-    public Transform Transform => _transform;
-    private Transform _transform;
-
-    public bool IsActiveInHierarchy => Parent is null ? IsActive : IsActive && (Parent.IsActiveInHierarchy && Parent.IsActive);
-
-    public EntityData() { }
-
-    public EntityData(EntityManager entityManager, EntityKey entityKey)
+    public Entity(int id, EntityData data)
     {
-        EntityData = this;
-        EntityKey = entityKey;
-
-        _entityManager = entityManager;
-        _registry = _entityManager.Registry;
-
-        EntityDataSystem.Register(this);
-        
-        _registry.AssignComponent(entityKey, this);
-
-        _transform = AddComponent<Transform>();
-    }
-
-    public override void Dispose()
-    {
-        base.Dispose();
-
-        IsActive = false;
-
-        RemoveComponents<Component>();
+        ID = id;
+        Data = data;
     }
 }
 
-public sealed partial class EntityData : EditorComponent
+public sealed partial class Entity
 {
     public T AddComponent<T>() where T : Component, new() =>
         (T)AddComponent(new T());
@@ -84,69 +48,92 @@ public sealed partial class EntityData : EditorComponent
 
     public Component AddComponent(Component component)
     {
-        typeof(Component)
-            .GetProperty("EntityData", BindingFlags.Instance | BindingFlags.Public)
-            .SetValue(component, this);
-
-        component.EntityKey = EntityKey;
+        component.Entity = this;
         component.IsEnabled = true;
 
         component.OnRegister();
 
-        _registry.AssignComponent(component.EntityKey, component);
-
-        component.OnAwake();
-        component.OnStart();
+        if (EditorState.PlayMode || component is EditorComponent)
+        {
+            // Call the Awake and Start method to initialize the editor component.
+            component.OnAwake();
+            component.OnStart();
+        }
 
         return component;
     }
 
-    public void RemoveComponent<T>() where T : Component
-    {
-        _registry.GetComponent(EntityKey, out T component);
+    public bool HasComponent<T>() where T : Component =>
+        GetComponent<T>() is not null;
 
-        component.InvokeEventOnDestroy();
+    public T GetComponent<T>() where T : Component =>
+        SystemManager.ComponentManager.GetComponent<T>(this);
 
-        _registry.RemoveComponent<T>(EntityKey);
+    public Component GetComponent(Type type) =>
+        SystemManager.ComponentManager.GetComponent(this, type);
 
-        //_components.Remove(component);
-    }
+    public Type[] GetComponents() =>
+        SystemManager.ComponentManager.GetComponents(this);
+    
+    public void RemoveComponent<T>() where T : Component =>
+        SystemManager.ComponentManager.RemoveComponent<T>(this);
 
-    public void RemoveComponents<T>() where T : Component
-    {
-        if (_registry.GetComponent(EntityKey, out T[] components))
-            foreach (var component in components)
-                component.OnDestroy();
-    }
+    public void RemoveComponent(Component component) =>
+        SystemManager.ComponentManager.RemoveComponent(this, component.GetType());
 
-    public T GetComponent<T>() where T : Component
-    {
-        if (_registry.GetComponent(EntityKey, out T component))
-            return component;
-        else
-            return null;
-    }
+    public void RemoveComponents() =>
+        SystemManager.ComponentManager.RemoveComponents(this);
+}
 
-    public T[] GetComponents<T>() where T : Component
-    {
-        if (_registry.GetComponent(EntityKey, out T[] components))
-            return components;
-        else
-            return null;
-    }
+public sealed partial class Entity : ICloneable, IDisposable
+{
+    object ICloneable.Clone() =>
+        Clone();
 
-    public Component[] GetComponents() =>
-        GetComponents<Component>();
+    public Entity Clone() =>
+         Manager.CreateEntity(Data.Clone());
 
+    public void Dispose() =>
+        Data.Dispose();
+}
+
+public sealed partial class EntityData
+{
+    public Entity Entity;
+    public Entity Parent;
+
+    public Guid ID = Guid.NewGuid();
+
+    public string Name;
+    public bool IsEnabled = true;
+    public bool IsStatic = false;
+    [Hide] public bool IsHidden = false;
+    public string Tag;
+    public string Layer;
+
+    public Transform Transform => _transform ??= Entity.GetComponent<Transform>();
+    private Transform _transform;
+
+    public bool ActiveInHierarchy => Parent is null ? IsEnabled : IsEnabled && (Parent.Data.ActiveInHierarchy && Parent.Data.IsEnabled);
+}
+
+public sealed partial class EntityData
+{
     public bool CompareTag(params string[] tags)
     {
-        // Check if the Entity has a specified tag.
         foreach (var tag in tags)
-            // If the Entity has the tag, return true.
             if (Tag.Equals(tag))
                 return true;
 
-        // Return false if no matching tag is found.
+        return false;
+    }
+
+    public bool CompareLayer(params string[] layers)
+    {
+        foreach (var layer in layers)
+            if (Layer.Equals(layers))
+                return true;
+
         return false;
     }
 
@@ -155,15 +142,15 @@ public sealed partial class EntityData : EditorComponent
         var info =
             $"""
             Name: {Name}
-            ID: {ID}
-            Scene: {EntityManager.Name}
+            ID: {Entity.ID}
+            Scene: {Entity.Manager.Name}
             """;
 
         if (Parent is not null)
             info +=
                 $"""
 
-                Parent: {Parent.Name}
+                Parent: {Parent.Data.Name}
                 Parent ID: {Parent.ID}
                 """;
 
@@ -171,23 +158,18 @@ public sealed partial class EntityData : EditorComponent
     }
 }
 
-public sealed partial class EntityData : EditorComponent, ICloneable
+public sealed partial class EntityData : ICloneable, IDisposable
 {
     object ICloneable.Clone() =>
         Clone();
 
-    public override EntityData Clone()
+    public EntityData Clone()
     {
-        base.Clone();
-
-        var newEntityKey = _registry.Create();
-
         // Create a new Entity object with a new ID and set its properties.
-        var newEntityData = new EntityData(_entityManager, newEntityKey)
+        EntityData newEntity = new()
         {
-            ID = Guid.NewGuid(), // Generate a new ID for the new Entity object.
             Name = Name,
-            IsActive = IsActive,
+            IsEnabled = IsEnabled,
             IsHidden = IsHidden,
             IsStatic = IsStatic,
             Layer = Layer,
@@ -195,106 +177,30 @@ public sealed partial class EntityData : EditorComponent, ICloneable
         };
 
         // Copy the original Entity object's Transform properties to the new Entity object.
-        newEntityData.Transform.LocalPosition = Transform.LocalPosition;
-        newEntityData.Transform.LocalRotation = Transform.LocalRotation;
-        newEntityData.Transform.LocalScale = Transform.LocalScale;
+        newEntity.Transform.LocalPosition = Transform.LocalPosition;
+        newEntity.Transform.LocalRotation = Transform.LocalRotation;
+        newEntity.Transform.LocalScale = Transform.LocalScale;
 
-        // Loop through the original Entity object's Components,
-        // clone each one and register it to the new Entity object.
-        foreach (var component in GetComponents())
-        {
-            if (component.GetType().Equals(typeof(EntityData))
-             || component.GetType().Equals(typeof(Transform)))
-                continue;
+        //// Loop through the original Entity object's Components,
+        //// clone each one and register it to the new Entity object.
+        //for (int i = 1; i < _components.Count; i++) // Skip transform.
+        //{
+        //    // Clone the Component.
+        //    var newComponent = _components[i].Clone();
+        //    // Call OnRegister method on the new Component.
+        //    newComponent.OnRegister();
+        //    // Add the new Component to the new Entity object.
+        //    newEntity.AddComponent(newComponent);
+        //}
 
-            // Clone the Component.
-            var newComponent = component.Clone();
-            // Call OnRegister method on the new Component.
-            newComponent.OnRegister();
-            // Add the new Component to the new Entity object.
-            newEntityData.AddComponent(newComponent);
-        }
+        // Return the new Entity object.
+        return newEntity;
+    }
 
-        return newEntityData;
+    public void Dispose()
+    {
+        IsEnabled = false;
+
+        Entity.RemoveComponents();
     }
 }
-
-/*
-using EnTTSharp.Entities;
-
-namespace Engine.ECS;
-
-internal class ExampleCodeEnTT
-{
-    public readonly struct Position
-    {
-        public readonly double X;
-        public readonly double Y;
-
-        public Position(double x, double y)
-        {
-            X = x;
-            Y = y;
-        }
-    }
-
-    public readonly struct Velocity
-    {
-        public readonly double DeltaX;
-        public readonly double DeltaY;
-
-        public Velocity(double deltaX, double deltaY)
-        {
-            DeltaX = deltaX;
-            DeltaY = deltaY;
-        }
-    }
-
-    public void UpdatePosition(EntityRegistry<EntityKey> registry, TimeSpan deltaTime)
-    {
-        // view contains all the entities that have both a position and a velocity component ...
-        var view = registry.View<Velocity, Position>();
-
-        foreach (var entity in view)
-            if (view.GetComponent(entity, out Position pos) &&
-                view.GetComponent(entity, out Velocity velocity))
-            {
-                Position posChanged = new(pos.X + velocity.DeltaX * deltaTime.TotalSeconds,
-                                          pos.Y + velocity.DeltaY * deltaTime.TotalSeconds);
-                registry.AssignComponent(entity, in posChanged);
-            }
-    }
-
-    public void ClearVelocity(EntityRegistry<EntityKey> registry)
-    {
-        var view = registry.View<Velocity>();
-
-        foreach (var entity in view)
-            registry.AssignComponent(entity, new Velocity(0, 0));
-    }
-
-    public void Start()
-    {
-        Random rnd = new();
-
-        // Define the entity key factory function
-        Func<byte, int, EntityKey> entityKeyFactory = (generation, index) => new EntityKey(generation, index);
-        // Instantiate the registry with the desired maxAge and the entityKeyFactory function
-        EntityRegistry<EntityKey> registry = new(10, entityKeyFactory);
-
-        registry.Register<Velocity>();
-        registry.Register<Position>();
-
-        for (int x = 0; x < 10; x += 1)
-        {
-            var entity = registry.Create();
-            registry.AssignComponent<Position>(entity);
-            if ((x % 2) == 0)
-                registry.AssignComponent(entity, new Velocity(rnd.NextDouble(), rnd.NextDouble()));
-        }
-
-        UpdatePosition(registry, TimeSpan.FromSeconds(0.24));
-        ClearVelocity(registry);
-    }
-}
- */

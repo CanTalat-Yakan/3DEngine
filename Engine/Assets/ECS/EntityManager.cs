@@ -1,8 +1,4 @@
-﻿using EnTTSharp.Entities;
-using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using static Assimp.Metadata;
+﻿using System.Collections.Generic;
 
 namespace Engine.ECS;
 
@@ -22,7 +18,8 @@ public enum PrimitiveTypes
 
 public sealed partial class EntityManager
 {
-    public readonly EntityRegistry<EntityKey> Registry;
+    public Dictionary<int, Entity> Entities = new Dictionary<int, Entity>();
+    private int nextEntityID = 0;
 
     public Guid ID = Guid.NewGuid();
 
@@ -32,49 +29,120 @@ public sealed partial class EntityManager
     public string LocalPath => $"{localPath}\\{Name}.usda";
     private string localPath = "";
 
-    public EntityManager()
+    public Entity Duplicate(Entity refEntity, Entity parent = null)
     {
-        // Define the entity key factory function
-        Func<byte, int, EntityKey> entityKeyFactory = (generation, index) => new EntityKey(generation, index);
-        // Instantiate the registry with the desired maxAge(reuse limit) and the entityKeyFactory function
-        Registry = new(10, entityKeyFactory);
+        Entity clonedEntity = refEntity.Clone();
+        clonedEntity.Data.Parent = parent;
 
-        Registry.Register<Component>();
-        Registry.Register<EditorComponent>();
+        return clonedEntity;
     }
 
-    public EntityKey Duplicate(EntityKey refEntity, EntityKey? parentKey = null)
-    {
-        var newEntity = Registry.Create();
-
-        var newEntityData = GetEntityData(refEntity).Clone();
-
-        if (parentKey is not null)
-            newEntityData.Parent = GetEntityData(parentKey.Value);
-
-        Registry.AssignComponent(newEntity, newEntityData);
-
-        return newEntity;
-    }
-
-    public void Destroy(EntityKey entity)
-    {
-        if (Registry.Contains(entity))
-        {
-            GetEntityData(entity).OnDestroy();
-
-            Registry.Destroy(entity);
-        }
-    }
+    public void Destroy(EntityData entity) =>
+        entity.Dispose();
 
     public void Dispose()
     {
-        foreach (var entity in Registry)
-        {
-            GetEntityData(entity).OnDestroy();
+        foreach (var entity in Entities.Values)
+            entity.Dispose();
 
-            Registry.Destroy(entity);
-        }
+        Entities.Clear();
+    }
+}
+
+public sealed partial class EntityManager
+{
+    public Entity CreateEntity(EntityData data)
+    {
+        int id = nextEntityID++;
+        Entity entity = new(id, data);
+
+        entity.Manager = this;
+        data.Entity = entity;
+
+        // Add the Transform component to the Entity when initialized.
+        entity.AddComponent<Transform>();
+
+        Entities[id] = entity;
+
+        return entity;
+    }
+
+    public void DestroyEntity(Entity entity)
+    {
+        if (Entities.ContainsKey(entity.ID))
+            Entities.Remove(entity.ID);
+    }
+
+    public Entity GetEntity(int ID) =>
+        Entities.TryGetValue(ID, out var entity) ? entity : null;
+
+    public Entity GetEntityFromGUID(Guid guid)
+    {
+        foreach (var entity in Entities.Values)
+            if (entity?.Data.ID == guid)
+                return entity;
+
+        return null;
+    }
+
+    public Entity GetEntityFromTag(string tag)
+    {
+        foreach (var entity in Entities.Values)
+            if (entity?.Data.Tag == tag)
+                return entity;
+
+        return null;
+    }
+
+    public IEnumerable<Entity> GetAllEntities() =>
+        Entities.Values;
+}
+
+public sealed partial class EntityManager
+{
+    public Entity CreateEntity(Entity parent = null, string name = "New Entity", string tag = "Untagged", bool hide = false)
+    {
+        EntityData newEntityData = new()
+        {
+            Name = name,
+            Parent = parent,
+            Tag = tag,
+            IsHidden = hide
+        };
+
+        return CreateEntity(newEntityData);
+    }
+
+    public Mesh CreatePrimitive(PrimitiveTypes type = PrimitiveTypes.Cube, Entity parent = null, bool hide = false)
+    {
+        EntityData newEntityData = new()
+        {
+            Name = type.ToString().FormatString(),
+            Parent = parent,
+            IsHidden = hide
+        };
+        Entity newEntity = CreateEntity(newEntityData);
+
+        var mesh = newEntity.AddComponent<Mesh>();
+        mesh.SetMeshInfo(ModelLoader.LoadFile(Paths.PRIMITIVES + type.ToString() + ".obj"));
+        mesh.SetMaterialTextures(new MaterialTextureEntry("Default.png", 0));
+        mesh.SetMaterialPipeline("SimpleLit");
+
+        return mesh;
+    }
+
+    public Camera CreateCamera(string name = "Camera", string tag = "Untagged", Entity parent = null, bool hide = false)
+    {
+        EntityData newEntityData = new()
+        {
+            Name = name,
+            Parent = parent,
+            Tag = tag,
+            IsHidden = hide
+        };
+        Entity newEntity = CreateEntity(newEntityData);
+
+        return newEntity.AddComponent<Camera>();
     }
 }
 
@@ -89,111 +157,5 @@ public sealed partial class EntityManager : ICloneable
         newEntityManager.ID = Guid.NewGuid();
 
         return newEntityManager;
-    }
-}
-
-public sealed partial class EntityManager
-{
-    public EntityData CreateEntity(EntityData parent = null, string name = "New Entity", string tag = "Untagged", bool hide = false)
-    {
-        var newEntityKey = Registry.Create();
-
-        EntityData newEntityData = new(this, newEntityKey)
-        {
-            Name = name,
-            Parent = parent,
-            Tag = tag,
-            IsHidden = hide
-        };
-
-        return newEntityData;
-    }
-
-    public Mesh CreatePrimitive(PrimitiveTypes type = PrimitiveTypes.Cube, EntityData parent = null, bool hide = false)
-    {
-        var newEntityKey = Registry.Create();
-
-        EntityData newEntityData = new(this, newEntityKey)
-        {
-            Name = type.ToString().FormatString(),
-            Parent = parent,
-            IsHidden = hide
-        };
-
-        var mesh = newEntityData.AddComponent<Mesh>();
-        mesh.SetMeshInfo(ModelLoader.LoadFile(Paths.PRIMITIVES + type.ToString() + ".obj"));
-        mesh.SetMaterialTextures(new MaterialTextureEntry("Default.png", 0));
-        mesh.SetMaterialPipeline("SimpleLit");
-
-        return mesh;
-    }
-
-    public Camera CreateCamera(string name = "Camera", string tag = "Untagged", EntityData parent = null, bool hide = false)
-    {
-        var newEntityKey = Registry.Create();
-
-        EntityData newEntityData = new(this, newEntityKey)
-        {
-            Name = name,
-            Parent = parent,
-            Tag = tag,
-            IsHidden = hide
-        };
-
-        var camera = newEntityData.AddComponent<Camera>();
-
-        return camera;
-    }
-}
-
-public sealed partial class EntityManager
-{
-    public EntityData[] GetAllEntityData()
-    {
-        List<EntityData> entityDataList = new();
-
-        foreach (var entity in Registry)
-            entityDataList.Add(GetEntityData(entity));
-
-        return entityDataList.ToArray();
-    }
-
-    public static EntityData GetEntityData(EntityKey entity)
-    {
-        if (EntityDataSystem.ComponentPool.TryGet(entity, out var entityData))
-            return entityData;
-        else
-            return null;
-    }
-
-    public EntityData GetFromID(Guid guid)
-    {
-        EntityData entityData = null;
-
-        foreach (var entity in Registry)
-        {
-            entityData = GetEntityData(entity);
-
-            if (entityData?.ID == guid)
-                return entityData;
-        }
-
-        return null;
-    }
-
-    public EntityData GetFromTag(string tag)
-    {
-
-        EntityData entityData = null;
-
-        foreach (var entity in Registry)
-        {
-            entityData = GetEntityData(entity);
-
-            if (entityData?.Tag == tag)
-                return entityData;
-        }
-
-        return null;
     }
 }
