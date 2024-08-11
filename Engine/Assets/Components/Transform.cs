@@ -110,15 +110,6 @@ public sealed partial class Transform : EditorComponent, IHide
 
 public sealed partial class Transform : EditorComponent, IHide
 {
-    private Vector3 TransformVector3(Vector3 local) =>
-        Parent is not null ? Vector3.Transform(local, Parent.Rotation) + Parent.Position : local;
-
-    private Vector3 MultiplyVector3(Vector3 local) =>
-        Parent is not null ? Vector3.Multiply(local, Parent.Scale) : local;
-
-    private Quaternion MultiplyQuaternion(Quaternion local) =>
-        Parent is not null ? Quaternion.Multiply(local, Parent.Rotation) : local;
-
     private Vector3 CheckDirty(Vector3 newValue, Vector3 oldValue)
     {
         if (!newValue.Equals(oldValue))
@@ -134,6 +125,18 @@ public sealed partial class Transform : EditorComponent, IHide
 
         return newValue;
     }
+}
+
+public sealed partial class Transform : EditorComponent, IHide
+{
+    private Vector3 TransformVector3(Vector3 local) =>
+        Parent is not null ? Vector3.Transform(local, Parent.Rotation) + Parent.Position : local;
+
+    private Vector3 MultiplyVector3(Vector3 local) =>
+        Parent is not null ? Vector3.Multiply(local, Parent.Scale) : local;
+
+    private Quaternion MultiplyQuaternion(Quaternion local) =>
+        Parent is not null ? Quaternion.Multiply(local, Parent.Rotation) : local;
 
     private void SetEulerAngles(Vector3 value)
     {
