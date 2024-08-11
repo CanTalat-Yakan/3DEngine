@@ -41,18 +41,12 @@ public sealed partial class Mesh : EditorComponent
         if (!string.IsNullOrEmpty(ShaderName))
             try { SetMaterialPipeline(ShaderName); }
             finally { ShaderName = null; }
-
-        if (!EditorState.EditorBuild)
-            CheckBounds();
     }
 
-    public override void OnRender()
+    public override void OnFixedRender()
     {
         if (MeshInfo is null || Material is null)
             return;
-
-        if (EditorState.EditorBuild)
-            CheckBounds();
 
         if (!InBounds)
             return;
@@ -137,16 +131,17 @@ public sealed partial class Mesh : EditorComponent
         if (MeshInfo is null)
             return;
 
-        if (Entity.Transform.TransformChanged)
+        Entity.Transform.TransformChanged += () =>
             TransformedBoundingBox = BoundingBox.Transform(
                 MeshInfo.BoundingBox,
                 Entity.Transform.WorldMatrix);
 
-        if (Entity.Transform.TransformChanged || (Camera.CurrentRenderingCamera?.Entity.Transform.TransformChanged ?? false))
-        {
-            var boundingFrustum = Camera.CurrentRenderingCamera.BoundingFrustum;
-            if (boundingFrustum is not null)
-                InBounds = boundingFrustum.Value.Intersects(TransformedBoundingBox);
-        }
+        if (Camera.CurrentRenderingCamera is not null)
+            Camera.CurrentRenderingCamera.Entity.Transform.TransformChanged += () =>
+            {
+                var boundingFrustum = Camera.CurrentRenderingCamera.BoundingFrustum;
+                if (boundingFrustum is not null)
+                    InBounds = boundingFrustum.Value.Intersects(TransformedBoundingBox);
+            };
     }
 }

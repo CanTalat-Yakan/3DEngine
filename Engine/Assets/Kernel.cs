@@ -90,7 +90,6 @@ public sealed partial class Kernel
     public void Frame()
     {
         Profiler.Start(out var stopwatch);
-        Profiler.Start(out var stopwatch1);
 
         if (!Context.IsRendering)
             return;
@@ -98,51 +97,36 @@ public sealed partial class Kernel
         OnInitialize?.Invoke();
         OnInitialize = null;
 
-        BeginRender();
-
-        Profiler.Stop(stopwatch, "Begin Render");
-        Profiler.Start(out stopwatch);
+        Profiler.Benchmark(BeginRender);
 
         Time.Update();
         Input.Update();
 
-        SystemManager.ProcessSystems();
+        Profiler.Benchmark(SystemManager.ProcessSystems);
 
         if (EditorState.PlayModeStarted)
             Compile();
 
-        Profiler.Stop(stopwatch, "Before Update");
-        Profiler.Start(out stopwatch);
+        Profiler.Benchmark(SystemManager.Update);
+        Profiler.Benchmark(SystemManager.LateUpdate);
+        Profiler.Benchmark(SystemManager.Render);
+        Profiler.Benchmark(SystemManager.FixedRender);
 
-        Profiler.Start(out var stopwatch2);
         if (Time.OnFixedFrame)
-            SystemManager.FixedUpdate();
-        Profiler.Stop(stopwatch2, "Fixed Update");
-
-        Profiler.Start(out var stopwatch3);
-        SystemManager.Update();
-        Profiler.Stop(stopwatch3, "Update");
-        Profiler.Start(out var stopwatch4);
-        SystemManager.LateUpdate();
-        Profiler.Stop(stopwatch4, "Late Update");
-        Profiler.Start(out var stopwatch5);
-        SystemManager.Render();
-        Profiler.Stop(stopwatch5, "Render Update");
+            Profiler.Benchmark(SystemManager.FixedUpdate);
 
         OnRender?.Invoke();
 
-        Profiler.Stop(stopwatch, "After Update");
-
         if (Config.GUI)
-            RenderGUI();
+            Profiler.Benchmark(RenderGUI);
 
         Input.LateUpdate();
 
         Profiler.Reset();
 
-        EndRender();
+        Profiler.Benchmark(EndRender);
 
-        Profiler.Stop(stopwatch1, "Frame");
+        Profiler.Stop(stopwatch, "Frame");
     }
 
     public void Dispose()

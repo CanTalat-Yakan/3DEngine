@@ -1,4 +1,6 @@
-﻿namespace Engine.ECS;
+﻿using System.Collections.Generic;
+
+namespace Engine.ECS;
 
 public enum Tags
 {
@@ -74,7 +76,7 @@ public sealed partial class Entity
 
     public Type[] GetComponents() =>
         SystemManager.ComponentManager.GetComponents(this);
-    
+
     public void RemoveComponent<T>() where T : Component =>
         SystemManager.ComponentManager.RemoveComponent<T>(this);
 
@@ -100,7 +102,11 @@ public sealed partial class Entity : ICloneable, IDisposable
 public sealed partial class EntityData
 {
     public Entity Entity;
-    public Entity Parent;
+
+    public Entity Parent { get => _parent; set => _parent = SetParent(Parent, value); }
+    public Entity _parent;
+
+    public List<Entity> Children { get; private set; } = new();
 
     public Guid ID = Guid.NewGuid();
 
@@ -115,6 +121,17 @@ public sealed partial class EntityData
     private Transform _transform;
 
     public bool ActiveInHierarchy => Parent is null ? IsEnabled : IsEnabled && (Parent.Data.ActiveInHierarchy && Parent.Data.IsEnabled);
+
+    private Entity SetParent(Entity oldParent, Entity newParent)
+    {
+        if (oldParent != newParent)
+        {
+            newParent?.Data.Children.Remove(Entity);
+            oldParent?.Data.Children.Add(Entity);
+        }
+
+        return newParent;
+    }
 }
 
 public sealed partial class EntityData

@@ -141,12 +141,21 @@ public partial class System<T> where T : Component
 
     public static void Render()
     {
+        Parallel.ForEach(s_components, _parallelOptions, component =>
+        {
+            if (CheckActive(component))
+                component.OnRender();
+        });
+    }
+
+    public static void FixedRender()
+    {
         // Loop through all the components in the static components array
         // and call OnRender method on the component if it is active.
         foreach (T component in s_components) // This will run in a separate thread,
                                               // asynchronously reprojecting the render target texture.
             if (CheckActive(component))
-                component.OnRender();
+                component.OnFixedRender();
     }
 
     public static void GUI()

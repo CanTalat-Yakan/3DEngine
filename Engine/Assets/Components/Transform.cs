@@ -1,4 +1,6 @@
-﻿using Vortice.Mathematics;
+﻿using System.Linq;
+
+using Vortice.Mathematics;
 
 namespace Engine.Components;
 
@@ -9,8 +11,10 @@ public struct PerModelConstantBuffer(Matrix4x4 modelView)
 
 public sealed partial class Transform : EditorComponent, IHide
 {
-    public bool TransformChanged { get; set; }
+    public Action TransformChanged { get; set; }
+
     public Transform Parent => Entity.Data.Parent?.Transform;
+    public Transform[] Children => Entity.Data.Children?.Select(Entity => Entity.Transform).ToArray();
 
     public Vector3 LocalForward { get => _localForward; set => _localForward = CheckDirty(value, _localForward); }
     private Vector3 _localForward = Vector3.UnitZ;
@@ -44,16 +48,16 @@ public sealed partial class Transform : EditorComponent, IHide
         TransformSystem.Register(this);
 
     public override void OnAwake() =>
-        TransformChanged = true;
+        RecreateWorldMatrix();
 
-    public override void OnUpdate()
+    public void RecreateWorldMatrix()
     {
-        if (TransformChanged)
-            TransformChanged = true;
-        else return;
-
         CalculateOrientation();
         CalculateWorldMatrix();
+
+        TransformChanged?.Invoke();
+        foreach (var child in Children)
+            child.RecreateWorldMatrix();
     }
 
     public string GetString() =>
@@ -72,11 +76,11 @@ public sealed partial class Transform : EditorComponent, IHide
     private void CalculateOrientation()
     {
         // Calculate forward direction from Euler angles
-        LocalForward = CalculateForward(EulerAngles);
+        _localForward = CalculateForward(EulerAngles);
 
         // Calculate right and up directions
-        LocalRight = Vector3.Normalize(Vector3.Cross(LocalForward, Vector3.UnitY));
-        LocalUp = Vector3.Normalize(Vector3.Cross(LocalRight, LocalForward));
+        _localRight = Vector3.Normalize(Vector3.Cross(LocalForward, Vector3.UnitY));
+        _localUp = Vector3.Normalize(Vector3.Cross(LocalRight, LocalForward));
     }
 
     private Vector3 CalculateForward(Vector3 eulerAngles)
@@ -96,7 +100,6 @@ public sealed partial class Transform : EditorComponent, IHide
         var rotationMatrix = Matrix4x4.CreateFromQuaternion(LocalRotation);
         var scaleMatrix = Matrix4x4.CreateScale(LocalScale);
 
-        // Calculate world matrix
         _worldMatrix = scaleMatrix * rotationMatrix * translationMatrix;
 
         // Apply parent transformation if available
@@ -118,14 +121,16 @@ public sealed partial class Transform : EditorComponent, IHide
 
     private Vector3 CheckDirty(Vector3 newValue, Vector3 oldValue)
     {
-        TransformChanged = !newValue.Equals(oldValue);
+        if (!newValue.Equals(oldValue))
+            RecreateWorldMatrix();
 
         return newValue;
     }
 
     private Quaternion CheckDirty(Quaternion newValue, Quaternion oldValue)
     {
-        TransformChanged = !newValue.Equals(oldValue);
+        if (!newValue.Equals(oldValue))
+            RecreateWorldMatrix();
 
         return newValue;
     }
@@ -151,7 +156,7 @@ public sealed partial class Transform : EditorComponent, IHide
         if (y.HasValue) _localPosition.Y = y.Value;
         if (z.HasValue) _localPosition.Z = z.Value;
 
-        TransformChanged = true;
+        RecreateWorldMatrix();
     }
 
     internal void SetScale(float? x = null, float? y = null, float? z = null)
@@ -160,7 +165,7 @@ public sealed partial class Transform : EditorComponent, IHide
         if (y.HasValue) _localScale.Y = y.Value;
         if (z.HasValue) _localScale.Z = z.Value;
 
-        TransformChanged = true;
+        RecreateWorldMatrix();
     }
 
     internal void SetEulerAngles(float? x = null, float? y = null, float? z = null)
@@ -171,6 +176,6 @@ public sealed partial class Transform : EditorComponent, IHide
 
         _localRotation = _eulerAngles.ToRadians().FromEuler();
 
-        TransformChanged = true;
+        RecreateWorldMatrix();
     }
 }

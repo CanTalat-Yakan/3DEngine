@@ -111,8 +111,6 @@ public sealed partial class SystemManager
 
     public void Update()
     {
-        Profiler.Benchmark("Transform Update",
-            TransformSystem.Update);
         MeshSystem.Update();
 
         EditorScriptSystem.Update();
@@ -139,13 +137,19 @@ public sealed partial class SystemManager
 
     public void Render()
     {
-        CameraSystem.Render();
-
         ScriptSystem.Render();
         EditorScriptSystem.Render();
+    }
+    
+    public void FixedRender()
+    {
+        CameraSystem.FixedRender();
+
+        ScriptSystem.FixedRender();
+        EditorScriptSystem.FixedRender();
 
         Profiler.Benchmark("Mesh Render",
-            MeshSystem.Render);
+            MeshSystem.FixedRender);
 
         Mesh.CurrentMeshInfoOnGPU = null;
         Mesh.CurrentMaterialOnGPU = null;

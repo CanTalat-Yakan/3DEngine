@@ -15,8 +15,11 @@ public sealed class Profiler
     public static float Indices { get; set; }
 
     public static StringBuilder AdditionalProfiling { get; set; } = new();
+    
+    public static double Benchmark(Action action) =>
+        Benchmark(null, action);
 
-    public static double Benchmark(string name = null, Action action = null)
+    public static double Benchmark(string name, Action action)
     {
         Stopwatch stopwatch = new();
         stopwatch.Start();
@@ -27,8 +30,10 @@ public sealed class Profiler
 
         double delta = stopwatch.Elapsed.TotalSeconds;
 
-        if (!string.IsNullOrEmpty(name))
-            AdditionalProfiling.Append($"{name}: {delta * 1000:F2} ms\n");
+        if (string.IsNullOrEmpty(name))
+            name = action.Method.Name.FormatString();
+
+        AdditionalProfiling.Append($"{name}: {delta * 1000:F2} ms\n");
 
         return delta;
     }

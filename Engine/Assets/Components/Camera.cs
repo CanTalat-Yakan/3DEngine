@@ -44,7 +44,7 @@ public sealed class Camera : EditorComponent
         CurrentRenderingCamera = this;
     }
 
-    public override void OnRender()
+    public override void OnFixedRender()
     {
         // Assign this camera instance as the main camera if it has "MainCamera" tag.
         if (Entity.Data.Tag == Tags.MainCamera.ToString())
@@ -65,7 +65,7 @@ public sealed class Camera : EditorComponent
 
         // Tell the mesh to recheck bounds.
         if (previousRenderingCamera != CurrentRenderingCamera)
-            Entity.Transform.TransformChanged = true;
+            Entity.Transform.RecreateWorldMatrix();
 
         if (CurrentRenderingCamera == this)
             // Recreates the view constants data to be used by the Camera.

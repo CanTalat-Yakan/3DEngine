@@ -82,18 +82,17 @@ internal sealed class SceneBoot : EditorComponent, IHide
         }
 
         if (Input.GetKey(Key.V, InputState.Down) && ViewportController.ViewportFocused)
-        {
-            Output.Log($"Viewport Controller added");
-
             if (!ExampleCamera.HasComponent<ViewportController>())
+            {
+                Output.Log($"Viewport Controller added");
+
                 ExampleCamera.AddComponent<ViewportController>();
-        }
+            }
     }
 }
 
 internal sealed class HoverEffect : Component, IHide
 {
-    private Vector3 _localPosition;
     private float _verticalPosition;
     private float _factor = 3;
     private float _random;
