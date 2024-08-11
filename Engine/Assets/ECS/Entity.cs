@@ -127,8 +127,8 @@ public sealed partial class EntityData
     {
         if (oldParent != newParent)
         {
-            newParent?.Data.Children.Remove(Entity);
-            oldParent?.Data.Children.Add(Entity);
+            oldParent?.Data.Children.Remove(Entity);
+            newParent?.Data.Children.Add(Entity);
         }
 
         return newParent;

@@ -51,13 +51,14 @@ public sealed partial class EntityManager
 
 public sealed partial class EntityManager
 {
-    public Entity CreateEntity(EntityData data)
+    public Entity CreateEntity(EntityData data, Entity parent = null)
     {
         int id = nextEntityID++;
         Entity entity = new(id, data);
 
         entity.Manager = this;
         data.Entity = entity;
+        data.Parent = parent;
 
         // Add the Transform component to the Entity when initialized.
         entity.AddComponent<Transform>();
@@ -105,12 +106,11 @@ public sealed partial class EntityManager
         EntityData newEntityData = new()
         {
             Name = name,
-            Parent = parent,
             Tag = tag,
             IsHidden = hide
         };
 
-        return CreateEntity(newEntityData);
+        return CreateEntity(newEntityData, parent);
     }
 
     public Mesh CreatePrimitive(PrimitiveTypes type = PrimitiveTypes.Cube, Entity parent = null, bool hide = false)
@@ -118,10 +118,9 @@ public sealed partial class EntityManager
         EntityData newEntityData = new()
         {
             Name = type.ToString().FormatString(),
-            Parent = parent,
             IsHidden = hide
         };
-        Entity newEntity = CreateEntity(newEntityData);
+        Entity newEntity = CreateEntity(newEntityData, parent);
 
         var mesh = newEntity.AddComponent<Mesh>();
         mesh.SetMeshInfo(ModelLoader.LoadFile(Paths.PRIMITIVES + type.ToString() + ".obj"));
@@ -136,11 +135,10 @@ public sealed partial class EntityManager
         EntityData newEntityData = new()
         {
             Name = name,
-            Parent = parent,
             Tag = tag,
             IsHidden = hide
         };
-        Entity newEntity = CreateEntity(newEntityData);
+        Entity newEntity = CreateEntity(newEntityData, parent);
 
         return newEntity.AddComponent<Camera>();
     }
