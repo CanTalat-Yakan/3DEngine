@@ -42,12 +42,6 @@
 		<PackageReference Include="Costura.Fody" Version="5.7.0">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
-		<PackageReference Include="EnTTSharp" Version="1.1.0" />
-		<PackageReference Include="EnTTSharp.Annotations" Version="1.1.0" />
-		<PackageReference Include="EnTTSharp.Benchmarks" Version="1.1.0" />
-		<PackageReference Include="EnTTSharp.Serialization" Version="1.1.0" />
-		<PackageReference Include="EnTTSharp.Serialization.Binary" Version="1.1.0" />
-		<PackageReference Include="EnTTSharp.Serialization.Xml" Version="1.1.0" />
 		<PackageReference Include="FftSharp" Version="2.1.0" />
 		<PackageReference Include="MagicPhysX" Version="1.0.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis" Version="4.10.0" />

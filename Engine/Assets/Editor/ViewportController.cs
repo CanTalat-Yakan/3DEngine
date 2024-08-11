@@ -56,12 +56,12 @@ public sealed class ViewportController : EditorComponent, IHide
             _euler.Y = Input.GetMouseDelta().X;
 
             // Update the entity rotation based on the calculated rotation and rotation speed.
-            EntityData.Transform.EulerAngles -= _euler * Time.FixedDelta * _rotationSpeed;
+            Entity.Transform.EulerAngles -= _euler * Time.FixedDelta * _rotationSpeed;
 
             // Clamp Vertical Rotation to 90 degrees up and down.
-            var clampedEuler = EntityData.Transform.EulerAngles;
+            var clampedEuler = Entity.Transform.EulerAngles;
             clampedEuler.X = Math.Clamp(clampedEuler.X, -89, 89);
-            EntityData.Transform.EulerAngles = clampedEuler;
+            Entity.Transform.EulerAngles = clampedEuler;
         }
 
         // Check if the middle mouse button is pressed. If so, call the ScreenMovement function.
@@ -77,7 +77,7 @@ public sealed class ViewportController : EditorComponent, IHide
             ScrollMovement();
 
         // Update the entity's position based on the calculated direction and movement speed.
-        EntityData.Transform.LocalPosition += _direction * Time.DeltaF * _movementSpeedScaled;
+        Entity.Transform.LocalPosition += _direction * Time.DeltaF * _movementSpeedScaled;
 
         // Reset the direction vector.
         _direction = Vector3.Zero;
@@ -111,12 +111,12 @@ public sealed class ViewportController : EditorComponent, IHide
     private void TransformMovement() =>
         // Calculate the direction based on the forward and right vectors of the entity's transform
         // and the X and Y axis inputs from the Input class.
-        _direction = EntityData.Transform.Forward * Input.GetAxis().Y + EntityData.Transform.Right * Input.GetAxis().X;
+        _direction = Entity.Transform.Forward * Input.GetAxis().Y + Entity.Transform.Right * Input.GetAxis().X;
 
     private void ScreenMovement() =>
         // Update the direction by subtracting the right vector multiplied by the mouse X axis input,
         // and the local up vector multiplied by the mouse Y axis input, both scaled by the time delta.
-        _direction -= EntityData.Transform.Right * Input.GetMouseDelta().X * 0.5f + EntityData.Transform.Up * Input.GetMouseDelta().Y * 0.5f;
+        _direction -= Entity.Transform.Right * Input.GetMouseDelta().X * 0.5f + Entity.Transform.Up * Input.GetMouseDelta().Y * 0.5f;
 
     private void ScrollMovement()
     {
@@ -125,7 +125,7 @@ public sealed class ViewportController : EditorComponent, IHide
         if (!Input.GetButton(MouseButton.Right)
          && !Input.GetButton(MouseButton.Middle)
          && !Input.GetButton(MouseButton.Right))
-            _direction += 25 * EntityData.Transform.Forward * Input.GetMouseWheel();
+            _direction += 25 * Entity.Transform.Forward * Input.GetMouseWheel();
     }
 
     private void HeightTransformMovement()
@@ -148,7 +148,7 @@ public sealed class ViewportController : EditorComponent, IHide
         // Check if either the W or S key is pressed and update the direction
         // based on the local up vector of the entity's transform and the input variable.
         if (Input.GetKey(Key.W) || Input.GetKey(Key.S))
-            _direction += input * EntityData.Transform.Up;
+            _direction += input * Entity.Transform.Up;
         // If neither the W or S key is pressed, update the direction
         // based on the global Y unit vector and the input variable.
         else
