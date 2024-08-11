@@ -4,6 +4,8 @@ using System.Linq;
 
 using Vortice.DirectInput;
 
+using Engine.Interoperation;
+
 namespace Engine.Utilities;
 
 public enum MouseButton
@@ -20,7 +22,7 @@ public enum InputState
     Up
 }
 
-public sealed class Input
+public sealed partial class Input
 {
     private static IDirectInput8 s_directInput;
     private static IDirectInputDevice8 s_mouse;
@@ -36,8 +38,9 @@ public sealed class Input
 
     private static Vector2 s_mouseDelta = Vector2.Zero;
     private static Vector2 s_mousePosition = Vector2.Zero;
+    private static Vector2 s_lockedmousePosition = Vector2.Zero;
     private static int s_mouseWheel = 0;
-    private static bool s_lockMouse;
+    private static bool s_lockMouse = false;
 
     public static void Initialize(IntPtr windowHandle)
     {
@@ -68,14 +71,6 @@ public sealed class Input
         }
     }
 
-    public static void Dispose()
-    {
-        s_directInput?.Dispose();
-        s_keyboard?.Dispose();
-        s_mouse?.Dispose();
-        s_joystick?.Dispose();
-    }
-
     public static void Fetch()
     {
         s_mouse?.Acquire();
@@ -88,6 +83,17 @@ public sealed class Input
         s_joystick?.Poll();
     }
 
+    public static void Dispose()
+    {
+        s_directInput?.Dispose();
+        s_keyboard?.Dispose();
+        s_mouse?.Dispose();
+        s_joystick?.Dispose();
+    }
+}
+
+public sealed partial class Input
+{
     public static void Update()
     {
         Fetch();
@@ -125,7 +131,9 @@ public sealed class Input
         catch { }
 
         if (s_lockMouse)
-            Interoperation.User32.SetCursorPos(0, 0);
+            LockMouse();
+        else
+            s_lockedmousePosition = s_mousePosition;
 
         // Reset axis vector.
         s_axis = Vector2.Zero;
@@ -146,7 +154,10 @@ public sealed class Input
         }
         catch { }
     }
+}
 
+public sealed partial class Input
+{
     public static bool GetKey(Key key, InputState state = InputState.Pressed)
     {
         KeyboardState currentKeyboardState;
@@ -212,6 +223,19 @@ public sealed class Input
 
     public static int GetMouseWheel() =>
         s_mouseWheel;
+}
 
-    public static void LockMouse(bool b) => s_lockMouse = b;
+public sealed partial class Input
+{
+    public static void SetLockMouse(bool lockMouse) =>
+        s_lockMouse = lockMouse;
+
+    private static void LockMouse()
+    {
+        User32.SetCursorPos((int)s_lockedmousePosition.X, (int)s_lockedmousePosition.Y);
+        User32.SetCursor(User32.LoadCursor(IntPtr.Zero, null));
+
+        if (GetKey(Key.Escape, InputState.Pressed))
+            SetLockMouse(false);
+    }
 }

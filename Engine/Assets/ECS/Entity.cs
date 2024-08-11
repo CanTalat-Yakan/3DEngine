@@ -108,7 +108,7 @@ public sealed partial class EntityData
 
     public List<Entity> Children { get; private set; } = new();
 
-    public Guid ID = Guid.NewGuid();
+    public Guid GUID = Guid.NewGuid();
 
     public string Name;
     public bool IsEnabled = true;
@@ -131,27 +131,6 @@ public sealed partial class EntityData
         }
 
         return newParent;
-    }
-}
-
-public sealed partial class EntityData
-{
-    public bool CompareTag(params string[] tags)
-    {
-        foreach (var tag in tags)
-            if (Tag.Equals(tag))
-                return true;
-
-        return false;
-    }
-
-    public bool CompareLayer(params string[] layers)
-    {
-        foreach (var layer in layers)
-            if (Layer.Equals(layers))
-                return true;
-
-        return false;
     }
 
     public string GetDebugInformation()

@@ -17,6 +17,8 @@ public sealed class ViewportController : EditorComponent, IHide
     public float RotationSpeed { get => _rotationSpeed; set => _rotationSpeed = value; }
     private float _rotationSpeed = 5;
 
+    public bool LockCursor = true;
+
     private Vector3 _direction;
     private Vector3 _euler;
 
@@ -30,6 +32,8 @@ public sealed class ViewportController : EditorComponent, IHide
 
     public override void OnUpdate()
     {
+        Input.SetLockMouse(false);
+
         // Call the MovementSpeedCalculation function to calculate the movement speed.
         MovementSpeedCalculation();
 
@@ -49,8 +53,7 @@ public sealed class ViewportController : EditorComponent, IHide
             TransformMovement();
             HeightTransformMovement();
 
-            //User32.SetCursor(User32.LoadCursor(IntPtr.Zero, SystemCursor.IDC_CROSS));
-            Interoperation.User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
+            Input.SetLockMouse(LockCursor);
 
             _euler.X = Input.GetMouseDelta().Y;
             _euler.Y = Input.GetMouseDelta().X;
@@ -67,7 +70,7 @@ public sealed class ViewportController : EditorComponent, IHide
         // Check if the middle mouse button is pressed. If so, call the ScreenMovement function.
         if (Input.GetButton(MouseButton.Middle) && ViewportFocused)
         {
-            Interoperation.User32.SetCursorPos((int)_mousePosition.X, (int)_mousePosition.Y);
+            Input.SetLockMouse(LockCursor);
 
             ScreenMovement();
         }

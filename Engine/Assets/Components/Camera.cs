@@ -14,6 +14,10 @@ public sealed class Camera : EditorComponent
 {
     public static Camera Main { get; private set; }
     public static Camera CurrentRenderingCamera { get; set; }
+    public static Camera PreviousRenderingCamera { get; private set; }
+
+    public static Action CameraChanged { get; set; }
+
 
     [Hide] public RootSignature RootSignature;
     [Hide] public ViewConstantBuffer ViewBuffer;
@@ -54,7 +58,7 @@ public sealed class Camera : EditorComponent
         Order = CameraID;
 
         // To check the CurrentRenderingCamera later.
-        var previousRenderingCamera = CurrentRenderingCamera;
+        PreviousRenderingCamera = CurrentRenderingCamera;
 
         // Set the CurrentRenderingCamera, if it hasn't been already.
         CurrentRenderingCamera ??= this;
@@ -64,8 +68,12 @@ public sealed class Camera : EditorComponent
             CurrentRenderingCamera = this;
 
         // Tell the mesh to recheck bounds.
-        if (previousRenderingCamera != CurrentRenderingCamera)
+        if (PreviousRenderingCamera != CurrentRenderingCamera)
+        {
             Entity.Transform.RecreateWorldMatrix();
+
+            CameraChanged?.Invoke();
+        }
 
         if (CurrentRenderingCamera == this)
             // Recreates the view constants data to be used by the Camera.

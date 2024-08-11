@@ -19,7 +19,7 @@ public sealed partial class SystemManager
 
         // Set the provided GUID, if not empty.
         if (!guid.Equals(Guid.Empty))
-            newSubscene.ID = guid;
+            newSubscene.GUID = guid;
 
         SubEntityManagers.Add(newSubscene);
 
@@ -55,12 +55,12 @@ public sealed partial class SystemManager
     public EntityManager GetFromID(Guid guid)
     {
         // Check if the main scene ID matches the provided GUID.
-        if (MainEntityManager.ID == guid)
+        if (MainEntityManager.GUID == guid)
             return MainEntityManager;
 
         // Check if any of the subscenes ID matches the provided GUID.
         foreach (var subscene in SubEntityManagers)
-            if (subscene.ID == guid)
+            if (subscene.GUID == guid)
                 return subscene;
 
         // Return null if no scene was found with the provided GUID.

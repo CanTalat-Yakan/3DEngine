@@ -79,7 +79,7 @@ internal sealed partial class Properties
 
         Grid[] properties = new[]
         {
-                CreateBool(entity.ID, null, "IsStatic", false).WrapInField("Static"),
+                CreateBool(entity.GUID, null, "IsStatic", false).WrapInField("Static"),
                 CreateEnum(Enum.GetNames(typeof(Tags))).WrapInField("Tag"),
                 CreateEnum(Enum.GetNames(typeof(Layers))).WrapInField("Layer"),
                 CreateTextFullWithOpacity(entity.GetDebugInformation()).WrapInField("Debug")
@@ -88,17 +88,17 @@ internal sealed partial class Properties
         Grid[] transform = new[]
         {
                 CreateVec3InputWithRGB(
-                    entity.ID,
+                    entity.GUID,
                     entity.Transform, "LocalPosition",
                     entity.Transform.LocalPosition)
                 .WrapInField("Position"),
                 CreateQuaternionInputWithRGBFromEuler(
-                    entity.ID,
+                    entity.GUID,
                     entity.Transform, "_localRotation",
                     entity.Transform.LocalRotation)
                 .WrapInField("Rotation"),
                 CreateVec3InputWithRGB(
-                    entity.ID,
+                    entity.GUID,
                     entity.Transform, "LocalScale",
                     entity.Transform.LocalScale)
                 .WrapInField("Scale"),
@@ -107,7 +107,7 @@ internal sealed partial class Properties
         s_stackPanel.Children.Add(
             properties.StackInGrid()
             .WrapInExpanderWithEditableHeaderAndCheckBox(
-                entity.ID,
+                entity.GUID,
                 entity.Name,
                 true));
 
@@ -169,7 +169,7 @@ internal sealed partial class Properties
                     .StackInGrid()
                     .WrapInExpanderWithToggleButton(
                         ref content,
-                        entity.ID,
+                        entity.GUID,
                         component)
                     .AddContentFlyout(CreateDefaultMenuFlyout(entity, component)));
 
@@ -411,7 +411,7 @@ internal sealed partial class Properties
         // Create a Text with Opacity and return early.
         if (attributes.OfType<ShowOnlyAttribute>().Any())
         {
-            grid.Add(CreateTextWithOpacity(entity.ID, component, fieldInfo.Name, value.ToString()));
+            grid.Add(CreateTextWithOpacity(entity.GUID, component, fieldInfo.Name, value.ToString()));
 
             finalGrid = ReturnProcessedFieldInfo(grid, attributes, fieldInfo, toolTip);
         }
@@ -427,14 +427,14 @@ internal sealed partial class Properties
                 if (attributes.OfType<SliderAttribute>().Any())
                     grid.Add(
                         CreateSliderInt(
-                            entity.ID, component, fieldInfo.Name,
+                            entity.GUID, component, fieldInfo.Name,
                             (byte)value,
                             (byte)attributes.OfType<SliderAttribute>().First().Min,
                             (byte)attributes.OfType<SliderAttribute>().First().Max));
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
                     grid.Add(CreateNumberInputInt(
-                        entity.ID, component, fieldInfo.Name,
+                        entity.GUID, component, fieldInfo.Name,
                         (byte)value,
                         byte.MinValue,
                         byte.MaxValue));
@@ -445,14 +445,14 @@ internal sealed partial class Properties
                 if (attributes.OfType<SliderAttribute>().Any())
                     grid.Add(
                         CreateSliderInt(
-                            entity.ID, component, fieldInfo.Name,
+                            entity.GUID, component, fieldInfo.Name,
                             (int)value,
                             (int)attributes.OfType<SliderAttribute>().First().Min,
                             (int)attributes.OfType<SliderAttribute>().First().Max));
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
                     grid.Add(CreateNumberInputInt(
-                        entity.ID, component, fieldInfo.Name,
+                        entity.GUID, component, fieldInfo.Name,
                         (int)value));
 
             // Float
@@ -461,47 +461,47 @@ internal sealed partial class Properties
                 if (attributes.OfType<SliderAttribute>().Any())
                     grid.Add(
                         CreateSlider(
-                            entity.ID, component, fieldInfo.Name,
+                            entity.GUID, component, fieldInfo.Name,
                             (float)value,
                             (float)attributes.OfType<SliderAttribute>().First().Min,
                             (float)attributes.OfType<SliderAttribute>().First().Max));
                 // If the field doesn't have the `SliderAttribute`, add a number input element.
                 else
                     grid.Add(CreateNumberInput(
-                        entity.ID, component, fieldInfo.Name,
+                        entity.GUID, component, fieldInfo.Name,
                         (float)value));
 
             // String
             else if (type == typeof(string))
-                grid.Add(CreateTextInput(entity.ID, component, fieldInfo.Name, (string)value));
+                grid.Add(CreateTextInput(entity.GUID, component, fieldInfo.Name, (string)value));
 
             // Vector 2
             else if (type == typeof(Vector2))
-                grid.Add(CreateVec2Input(entity.ID, component, fieldInfo.Name, (Vector2)value));
+                grid.Add(CreateVec2Input(entity.GUID, component, fieldInfo.Name, (Vector2)value));
 
             // Vector 3
             else if (type == typeof(Vector3))
-                grid.Add(CreateVec3Input(entity.ID, component, fieldInfo.Name, (Vector3)value));
+                grid.Add(CreateVec3Input(entity.GUID, component, fieldInfo.Name, (Vector3)value));
 
             // Vector 4
             else if (type == typeof(Vector4))
                 // If the field has the `ColorAttribute`, add a color button element.
                 if (attributes.OfType<ColorAttribute>().Any())
                     grid.Add(CreateColorButton(
-                        entity.ID, component, fieldInfo.Name,
+                        entity.GUID, component, fieldInfo.Name,
                         (Vector4)value));
                 else
                     grid.Add(CreateVec4Input(
-                        entity.ID, component, fieldInfo.Name,
+                        entity.GUID, component, fieldInfo.Name,
                         (Vector4)value));
 
             // Bool
             else if (type == typeof(bool))
-                grid.Add(CreateBool(entity.ID, component, fieldInfo.Name, (bool)value));
+                grid.Add(CreateBool(entity.GUID, component, fieldInfo.Name, (bool)value));
 
             // Enum
             else if (type.IsEnum)
-                grid.Add(CreateComboBox(type, entity.ID, component, fieldInfo.Name, value.ToString()));
+                grid.Add(CreateComboBox(type, entity.GUID, component, fieldInfo.Name, value.ToString()));
 
             // Material
             else if (type == typeof(Material))
@@ -555,7 +555,7 @@ internal sealed partial class Properties
         if (attributes.OfType<IfAttribute>().Any())
         {
             var attribute = attributes.OfType<IfAttribute>().First();
-            var bindEntry = Binding.GetBinding(attribute.FieldName, component, entity.ID);
+            var bindEntry = Binding.GetBinding(attribute.FieldName, component, entity.GUID);
 
             bindEntry.Event += () =>
             {
@@ -572,7 +572,7 @@ internal sealed partial class Properties
         if (attributes.OfType<IfNotAttribute>().Any())
         {
             var attribute = attributes.OfType<IfNotAttribute>().First();
-            var bindEntry = Binding.GetBinding(attribute.FieldName, component, entity.ID);
+            var bindEntry = Binding.GetBinding(attribute.FieldName, component, entity.GUID);
 
             bindEntry.Event += () =>
             {

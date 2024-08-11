@@ -27,7 +27,7 @@ public sealed partial class Mesh : EditorComponent
         MeshSystem.Register(this);
 
     public override void OnStart() =>
-        CheckBounds();
+        SubscribeCheckBounds();
 
     public string MeshPath;
     public string ShaderName;
@@ -35,7 +35,7 @@ public sealed partial class Mesh : EditorComponent
     {
         if (!string.IsNullOrEmpty(MeshPath))
             if (File.Exists(MeshPath))
-                try { SetMeshInfo(Loader.ModelLoader.LoadFile(MeshPath)); }
+                try { SetMeshInfo(ModelLoader.LoadFile(MeshPath)); }
                 finally { MeshPath = null; }
 
         if (!string.IsNullOrEmpty(ShaderName))
@@ -86,8 +86,12 @@ public sealed partial class Mesh : EditorComponent
         Profiler.DrawCalls++;
     }
 
-    public override void OnDestroy() =>
+    public override void OnDestroy()
+    {
+        UnsubscribeCheckBounds();
+
         MeshInfo?.Dispose();
+    }
 }
 
 public sealed partial class Mesh : EditorComponent
@@ -125,23 +129,48 @@ public sealed partial class Mesh : EditorComponent
             MeshInfo.BoundingBox,
             Entity.Transform.WorldMatrix);
     }
+}
+
+public sealed partial class Mesh : EditorComponent
+{
+    private void SubscribeCheckBounds()
+    {
+        CheckBounds();
+
+        Entity.Transform.TransformChanged += CheckBounds;
+
+        Camera.CurrentRenderingCamera.Entity.Transform.TransformChanged += CheckBounds;
+        Camera.CameraChanged += ReplaceCameraCheckBounds;
+    }
+
+    private void UnsubscribeCheckBounds()
+    {
+        Entity.Transform.TransformChanged -= CheckBounds;
+
+        Camera.CurrentRenderingCamera.Entity.Transform.TransformChanged -= CheckBounds;
+    }
+
+    private void ReplaceCameraCheckBounds()
+    {
+        CheckBounds();
+
+        Camera.CurrentRenderingCamera.Entity.Transform.TransformChanged += CheckBounds;
+
+        if (Camera.PreviousRenderingCamera is not null)
+            Camera.PreviousRenderingCamera.Entity.Transform.TransformChanged -= CheckBounds;
+    }
 
     private void CheckBounds()
     {
         if (MeshInfo is null)
             return;
 
-        Entity.Transform.TransformChanged += () =>
-            TransformedBoundingBox = BoundingBox.Transform(
-                MeshInfo.BoundingBox,
-                Entity.Transform.WorldMatrix);
+        TransformedBoundingBox = BoundingBox.Transform(
+            MeshInfo.BoundingBox,
+            Entity.Transform.WorldMatrix);
 
-        if (Camera.CurrentRenderingCamera is not null)
-            Camera.CurrentRenderingCamera.Entity.Transform.TransformChanged += () =>
-            {
-                var boundingFrustum = Camera.CurrentRenderingCamera.BoundingFrustum;
-                if (boundingFrustum is not null)
-                    InBounds = boundingFrustum.Value.Intersects(TransformedBoundingBox);
-            };
+        var boundingFrustum = Camera.CurrentRenderingCamera.BoundingFrustum;
+        if (boundingFrustum is not null)
+            InBounds = boundingFrustum.Value.Intersects(TransformedBoundingBox);
     }
 }

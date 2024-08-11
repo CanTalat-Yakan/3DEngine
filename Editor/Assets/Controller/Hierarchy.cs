@@ -52,7 +52,7 @@ internal sealed partial class Hierarchy
 
         SceneEntry = new()
         {
-            ID = Engine.Kernel.Instance.SystemManager.MainEntityManager.ID,
+            ID = Engine.Kernel.Instance.SystemManager.MainEntityManager.GUID,
             Name = Engine.Kernel.Instance.SystemManager.MainEntityManager.Name,
             Hierarchy = new(),
             DataSource = new()
@@ -147,7 +147,7 @@ internal sealed partial class Hierarchy
         if (entity.IsHidden)
             return null;
 
-        TreeEntry treeEntry = new() { Name = entity.Name, ID = entity.ID };
+        TreeEntry treeEntry = new() { Name = entity.Name, ID = entity.GUID };
         treeEntry.IconNode = new() { Name = treeEntry.Name, TreeEntry = treeEntry, IsExpanded = false };
         treeEntry.IconNode.IsActive = true;
         treeEntry.ParentID = entity.Parent is not null ? entity.Parent.ID : null;
@@ -170,7 +170,7 @@ internal sealed partial class Hierarchy
 
     private void RemoveTreeEntry(SceneEntry sceneEntry, EntityData entity)
     {
-        var treeEntry = GetTreeEntry(entity.ID);
+        var treeEntry = GetTreeEntry(entity.GUID);
 
         if (treeEntry is null)
             return;
@@ -883,7 +883,7 @@ internal sealed partial class Hierarchy
                     // Get the child entity for the child icon node.
                     GetEntity(out EntityData childEntity, sourceScene.EntityManager.GetFromID(childIconNode.TreeEntry.ID).ID, sourceSceneEntry);
                     // Recursively paste the child entity and its children to the new entity.
-                    PasteEntity(childEntity.ID, newEntity.ID, DataPackageOperation.Copy);
+                    PasteEntity(childEntity.GUID, newEntity.ID, DataPackageOperation.Copy);
                 }
 
                 // Migrate the icon node and entity recursively to the target scene.
@@ -952,7 +952,7 @@ internal sealed partial class Hierarchy
                     // Get the child entity for the child icon node.
                     GetEntity(out EntityData childEntity, sourceScene.EntityManager.GetFromID(childIconNode.TreeEntry.ID).ID, sourceSceneEntry);
                     // Recursively paste the child entity and its children to the new entity.
-                    PasteEntity(childEntity.ID, newEntity.ID, DataPackageOperation.Copy);
+                    PasteEntity(childEntity.GUID, newEntity.ID, DataPackageOperation.Copy);
                 }
 
                 // Migrate the icon node and entity recursively to the target scene.

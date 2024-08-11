@@ -106,9 +106,9 @@ internal sealed partial class Binding
         if (scene is null)
             return;
         SceneBindings.Clear();
-        SceneBindings.Add("Scene@" + scene.ID, new(scene, "Scene@"));
-        SceneBindings.Add("Name" + scene.ID, new(scene, "Name"));
-        SceneBindings.Add("IsEnabled" + scene.ID, new(scene, "IsEnabled"));
+        SceneBindings.Add("Scene@" + scene.GUID, new(scene, "Scene@"));
+        SceneBindings.Add("Name" + scene.GUID, new(scene, "Name"));
+        SceneBindings.Add("IsEnabled" + scene.GUID, new(scene, "IsEnabled"));
     }
 
     public static void SetEntityBindings(EntityData entity)
@@ -117,14 +117,14 @@ internal sealed partial class Binding
             return;
 
         EntityBindings.Clear();
-        EntityBindings.Add("Entity@" + entity.ID, new(entity, "Entity@"));
-        EntityBindings.Add("Name" + entity.ID, new(entity, "Name"));
-        EntityBindings.Add("IsStatic" + entity.ID, new(entity, "IsStatic"));
-        EntityBindings.Add("IsEnabled" + entity.ID, new(entity, "IsEnabled"));
+        EntityBindings.Add("Entity@" + entity.GUID, new(entity, "Entity@"));
+        EntityBindings.Add("Name" + entity.GUID, new(entity, "Name"));
+        EntityBindings.Add("IsStatic" + entity.GUID, new(entity, "IsStatic"));
+        EntityBindings.Add("IsEnabled" + entity.GUID, new(entity, "IsEnabled"));
 
         foreach (var component in entity.Components.ToArray())
             foreach (var field in component.GetType().GetFields(AllBindingFlags))
-                EntityBindings.Add(field.Name + component.GetType().FullName + entity.ID, new(component, field.Name));
+                EntityBindings.Add(field.Name + component.GetType().FullName + entity.GUID, new(component, field.Name));
     }
 
     public static void SetMaterialBindings(MaterialEntry materialEntry)
@@ -216,7 +216,7 @@ internal sealed partial class Binding
 
         foreach (var entry in SceneBindings.Where(kv => kv.Key.Contains("Scene@")))
             if (entry.Value.Source is EntityManager scene)
-                UpdateBinding(scene, scene.ID, SceneBindings);
+                UpdateBinding(scene, scene.GUID, SceneBindings);
     }
 
     private static void UpdateEntityBindings()
@@ -226,10 +226,10 @@ internal sealed partial class Binding
 
         EntityData entity = EntityBindings.FirstOrDefault().Value.Source as EntityData;
 
-        UpdateBinding(entity, entity.ID, EntityBindings);
+        UpdateBinding(entity, entity.GUID, EntityBindings);
 
         foreach (var component in entity.Components.ToArray())
-            UpdateBinding(component, component.GetType().FullName + entity.ID, EntityBindings);
+            UpdateBinding(component, component.GetType().FullName + entity.GUID, EntityBindings);
     }
 
     private static void UpdateMaterialBindings()

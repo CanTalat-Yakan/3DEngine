@@ -21,7 +21,7 @@ public sealed partial class EntityManager
     public Dictionary<int, Entity> Entities = new Dictionary<int, Entity>();
     private int nextEntityID = 0;
 
-    public Guid ID = Guid.NewGuid();
+    public Guid GUID = Guid.NewGuid();
 
     public bool IsEnabled;
     public string Name = "Scene";
@@ -79,7 +79,7 @@ public sealed partial class EntityManager
     public Entity GetEntityFromGUID(Guid guid)
     {
         foreach (var entity in Entities.Values)
-            if (entity?.Data.ID == guid)
+            if (entity?.Data.GUID == guid)
                 return entity;
 
         return null;
@@ -154,7 +154,7 @@ public sealed partial class EntityManager : ICloneable
     public EntityManager Clone()
     {
         var newEntityManager = (EntityManager)this.MemberwiseClone();
-        newEntityManager.ID = Guid.NewGuid();
+        newEntityManager.GUID = Guid.NewGuid();
 
         return newEntityManager;
     }
