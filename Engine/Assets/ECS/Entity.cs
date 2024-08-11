@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Engine.ECS;
 
@@ -66,7 +67,7 @@ public sealed partial class Entity
     }
 
     public bool HasComponent<T>() where T : Component =>
-        GetComponent<T>() is not null;
+        GetComponents().Contains(typeof(T));
 
     public T GetComponent<T>() where T : Component =>
         SystemManager.ComponentManager.GetComponent<T>(this);

@@ -134,11 +134,8 @@ public sealed partial class ComponentManager
         public T Get(Entity entity)
         {
             int pageNumber = GetPageNumber(entity.ID);
-            if (_pages.TryGetValue(pageNumber, out var page) &&
-                page.SparseArray.TryGetValue(entity.ID, out int denseIndex))
-            {
+            if (_pages.TryGetValue(pageNumber, out var page) && page.SparseArray.TryGetValue(entity.ID, out int denseIndex))
                 return page.DenseArray[denseIndex];
-            }
 
             return default;
         }

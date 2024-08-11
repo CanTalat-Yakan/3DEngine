@@ -160,8 +160,10 @@ public partial class System<T> where T : Component
 
     public static void GUI()
     {
-        foreach (T component in s_components)
+        Parallel.ForEach(s_components, _parallelOptions, component =>
+        {
             if (CheckActive(component))
                 component.OnGUI();
+        });
     }
 }
