@@ -1,17 +1,15 @@
 ﻿namespace Engine.ECS;
 
-public partial class Component
+public interface IComponent { }
+
+public partial class Component : IComponent
 {
     [Hide] public Entity Entity;
+
     [Hide] public byte Order = 0;
     [Hide] public bool IsEnabled;
 
     [Hide] public Action EventOnDestroy;
-
-    public SystemManager SystemManager => Kernel.Instance.SystemManager;
-
-    public Component() =>
-        OnRegister();
 
     public void InvokeEventOnDestroy() =>
         EventOnDestroy();

@@ -76,7 +76,7 @@ public sealed partial class Kernel
 
         SceneLoader.Load(out var systemManager, Paths.SCENENES + "teapot.usdz");
 
-        var boot = SystemManager.MainScene
+        var boot = SystemManager.MainEntityManager
             .CreateEntity(null, "Boot", hide: true)
             .AddComponent<SceneBoot>();
 
@@ -89,6 +89,9 @@ public sealed partial class Kernel
 
     public void Frame()
     {
+        Profiler.Start(out var stopwatch);
+        Profiler.Start(out var stopwatch1);
+
         if (!Context.IsRendering)
             return;
 
@@ -96,6 +99,9 @@ public sealed partial class Kernel
         OnInitialize = null;
 
         BeginRender();
+
+        Profiler.Stop(stopwatch, "Begin Render");
+        Profiler.Start(out stopwatch);
 
         Time.Update();
         Input.Update();
@@ -105,14 +111,27 @@ public sealed partial class Kernel
         if (EditorState.PlayModeStarted)
             Compile();
 
+        Profiler.Stop(stopwatch, "Before Update");
+        Profiler.Start(out stopwatch);
+
+        Profiler.Start(out var stopwatch2);
         if (Time.OnFixedFrame)
             SystemManager.FixedUpdate();
+        Profiler.Stop(stopwatch2, "Fixed Update");
 
+        Profiler.Start(out var stopwatch3);
         SystemManager.Update();
+        Profiler.Stop(stopwatch3, "Update");
+        Profiler.Start(out var stopwatch4);
         SystemManager.LateUpdate();
+        Profiler.Stop(stopwatch4, "Late Update");
+        Profiler.Start(out var stopwatch5);
         SystemManager.Render();
+        Profiler.Stop(stopwatch5, "Render Update");
 
         OnRender?.Invoke();
+
+        Profiler.Stop(stopwatch, "After Update");
 
         if (Config.GUI)
             RenderGUI();
@@ -122,6 +141,8 @@ public sealed partial class Kernel
         Profiler.Reset();
 
         EndRender();
+
+        Profiler.Stop(stopwatch1, "Frame");
     }
 
     public void Dispose()

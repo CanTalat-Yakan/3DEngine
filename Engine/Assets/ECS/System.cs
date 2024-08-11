@@ -13,17 +13,14 @@ public sealed class EditorScriptSystem : System<EditorComponent> { }
 
 public partial class System<T> where T : Component
 {
-    public static T[] Components => s_componentsArray;
-
-    private static List<T> s_components = new();
-    private static T[] s_componentsArray;
+    public static T[] Components => s_components.ToArray();
+    private static IEnumerable<T> s_components;
 
     private static bool s_dirty = true;
 
     public static void Register(T component)
     {
-        // Adds the given component to the static list of components.
-        s_components.Add(component);
+        Kernel.Instance.SystemManager.ComponentManager.AddComponent(component.Entity, component);
 
         // Register the OnDestroy event of the component.
         component.EventOnDestroy += () => Destroy(component);
@@ -31,12 +28,21 @@ public partial class System<T> where T : Component
         s_dirty = true;
     }
 
+    internal static void FetchArray(bool sort = false)
+    {
+        if (!s_dirty)
+            return;
+
+        s_components = Kernel.Instance.SystemManager.ComponentManager.GetDenseArray<T>();
+
+        if (sort)
+            s_components = s_components.OrderBy(Component => Component.Order);
+
+        s_dirty = false;
+    }
+
     public static void Destroy(T component)
     {
-        // Remove the specified component from the collection of registered components.
-        s_components.Remove(component);
-
-        // Trigger the OnDestroy event for the component.
         component.OnDestroy();
 
         s_dirty = true;
@@ -44,7 +50,6 @@ public partial class System<T> where T : Component
 
     public static void Destroy(Type componentType)
     {
-        // Remove all components of the specified type from the collection of registered components.
         foreach (var component in s_components
             .Where(c => c.GetType() == componentType)
             .ToArray())
@@ -57,17 +62,14 @@ public partial class System<T> where T : Component
 
     public static void Destroy()
     {
-        // Remove all components and call OnDestroy().
         foreach (var component in s_components)
             component.OnDestroy();
 
-        s_components.Clear();
-        s_componentsArray = null;
+        s_components = null;
     }
 
     public static void Replace(Type oldComponentType, Type newComponentType)
     {
-        // Remove all components of the specified type from the collection of registered components.
         foreach (var component in s_components
             .Where(Component => Component.GetType() == oldComponentType)
             .ToArray())
@@ -79,30 +81,11 @@ public partial class System<T> where T : Component
         }
     }
 
-    internal static void CopyToArray() =>
-        s_componentsArray = s_components.ToArray();
-
-    internal static void SortAndCopyToArray() =>
-        s_componentsArray = s_components
-        .OrderBy(Component => Component.Order)
-        .ToArray();
-
-    internal static void SortAndCopyToArrayIfDirty()
-    {
-        if (s_dirty)
-        {
-            SortAndCopyToArray();
-
-            s_dirty = false;
-        }
-    }
-
     private static bool CheckActive(T component) =>
-        // Check if the component is active.
            component.IsEnabled
-        && component.Entity.IsEnabled
-        && component.Entity.Scene.IsEnabled
-        && component.Entity.ActiveInHierarchy;
+        && component.Entity.Data.IsEnabled
+        && component.Entity.Manager.IsEnabled
+        && component.Entity.Data.ActiveInHierarchy;
 }
 
 public partial class System<T> where T : Component
@@ -113,7 +96,7 @@ public partial class System<T> where T : Component
     {
         // Loop through all the components in the static components array
         // and call OnAwake method on the component if it is active.
-        Parallel.ForEach(s_componentsArray, _parallelOptions, component =>
+        Parallel.ForEach(s_components, _parallelOptions, component =>
         {
             if (CheckActive(component))
                 component.OnAwake();
@@ -122,7 +105,7 @@ public partial class System<T> where T : Component
 
     public static void Start()
     {
-        Parallel.ForEach(s_componentsArray, _parallelOptions, component =>
+        Parallel.ForEach(s_components, _parallelOptions, component =>
         {
             if (CheckActive(component))
                 component.OnStart();
@@ -131,7 +114,7 @@ public partial class System<T> where T : Component
 
     public static void Update()
     {
-        Parallel.ForEach(s_componentsArray, _parallelOptions, component =>
+        Parallel.ForEach(s_components, _parallelOptions, component =>
         {
             if (CheckActive(component))
                 component.OnUpdate();
@@ -140,7 +123,7 @@ public partial class System<T> where T : Component
 
     public static void LateUpdate()
     {
-        Parallel.ForEach(s_componentsArray, _parallelOptions, component =>
+        Parallel.ForEach(s_components, _parallelOptions, component =>
         {
             if (CheckActive(component))
                 component.OnLateUpdate();
@@ -149,7 +132,7 @@ public partial class System<T> where T : Component
 
     public static void FixedUpdate()
     {
-        Parallel.ForEach(s_componentsArray, _parallelOptions, component =>
+        Parallel.ForEach(s_components, _parallelOptions, component =>
         {
             if (CheckActive(component))
                 component.OnFixedUpdate();
@@ -160,15 +143,15 @@ public partial class System<T> where T : Component
     {
         // Loop through all the components in the static components array
         // and call OnRender method on the component if it is active.
-        foreach (T component in s_componentsArray) // This will run in a separate thread,
-                                                   // asynchronously reprojecting the render target texture.
+        foreach (T component in s_components) // This will run in a separate thread,
+                                              // asynchronously reprojecting the render target texture.
             if (CheckActive(component))
                 component.OnRender();
     }
 
     public static void GUI()
     {
-        foreach (T component in s_componentsArray)
+        foreach (T component in s_components)
             if (CheckActive(component))
                 component.OnGUI();
     }

@@ -37,8 +37,8 @@ internal sealed partial class Properties
 
         if (content is null)
             CreateEmptyMessage();
-        else if (content.GetType() == typeof(Entity))
-            CreateEntityProperties((Entity)content);
+        else if (content.GetType() == typeof(EntityData))
+            CreateEntityProperties((EntityData)content);
         else if (content.GetType() == typeof(MaterialEntry))
             CreateMaterialProperties((MaterialEntry)content);
         else if (content.GetType() == typeof(string))
@@ -72,7 +72,7 @@ internal sealed partial class Properties
         s_stackPanel.Children.Add(grid);
     }
 
-    private void CreateEntityProperties(Entity entity)
+    private void CreateEntityProperties(EntityData entity)
     {
         // Add Bindings for the Entity.
         Binding.SetEntityBindings(entity);
@@ -287,7 +287,7 @@ internal sealed partial class Properties
             }
     }
 
-    private MenuFlyout CreateDefaultMenuFlyout(Entity entity, Component component)
+    private MenuFlyout CreateDefaultMenuFlyout(EntityData entity, Component component)
     {
         // Create an array of MenuFlyoutItems.
         MenuFlyoutItem[] items = new[] {
@@ -379,7 +379,7 @@ internal sealed partial class Properties
         return grid;
     }
 
-    public Grid CreateFromComponentFieldInfo(object component, Entity entity, FieldInfo fieldInfo, FieldInfo[] nonPublic)
+    public Grid CreateFromComponentFieldInfo(object component, EntityData entity, FieldInfo fieldInfo, FieldInfo[] nonPublic)
     {
         Grid finalGrid = null;
 
@@ -512,14 +512,14 @@ internal sealed partial class Properties
             //    grid.Add(CreateTextureSlot("None", "Texture"));
 
             // Entity
-            else if (type == typeof(Entity))
+            else if (type == typeof(EntityData))
                 // Check if value is null.
                 if (value is null)
                     // Add empty reference slot.
                     grid.Add(CreateReferenceSlot("None", type.ToString().FormatString()));
                 else
                     // Add a reference slot with entity name.
-                    grid.Add(CreateReferenceSlot(((Entity)value).Name, type.ToString().FormatString()));
+                    grid.Add(CreateReferenceSlot(((EntityData)value).Name, type.ToString().FormatString()));
 
             // Component.
             else if (type == typeof(Component))

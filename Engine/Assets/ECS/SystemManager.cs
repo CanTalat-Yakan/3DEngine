@@ -4,14 +4,16 @@ namespace Engine.ECS;
 
 public sealed partial class SystemManager
 {
-    public EntityManager MainScene;
-    public List<EntityManager> SubScenes = new();
+    public ComponentManager ComponentManager { get; } = new();
+
+    public EntityManager MainEntityManager;
+    public List<EntityManager> SubEntityManagers = new();
 
     public SystemManager(EntityManager scene = null) =>
         // Initializes the main scene and creates a new empty list for the subscenes.
-        MainScene = scene ?? new EntityManager() { Name = "Main", IsEnabled = true };
+        MainEntityManager = scene ?? new EntityManager() { Name = "Main Layer", IsEnabled = true };
 
-    public EntityManager AddSubscene(Guid guid = new(), string name = "Subscene", bool enable = true)
+    public EntityManager AddSubscene(Guid guid = new(), string name = "Sub Layer", bool enable = true)
     {
         EntityManager newSubscene = new() { Name = name, IsEnabled = enable };
 
@@ -19,7 +21,7 @@ public sealed partial class SystemManager
         if (!guid.Equals(Guid.Empty))
             newSubscene.ID = guid;
 
-        SubScenes.Add(newSubscene);
+        SubEntityManagers.Add(newSubscene);
 
         return newSubscene;
     }
@@ -28,7 +30,7 @@ public sealed partial class SystemManager
     {
         //SceneLoader.Load(subscene);
 
-        SubScenes.Add(subscene);
+        SubEntityManagers.Add(subscene);
     }
 
     public void UnloadSubscene(EntityManager subscene)
@@ -39,13 +41,12 @@ public sealed partial class SystemManager
     public void RemoveSubscene(Guid guid)
     {
         // Retrieves the scene with the specified GUID from the list of subscenes.
-        EntityManager scene = GetFromID(guid);
+        EntityManager entityManager = GetFromID(guid);
 
         // Destroys all entities within the scene.
-        foreach (var entity in scene.List.ToArray())
-            scene.Destroy(entity);
+        entityManager.Dispose();
 
-        SubScenes.Remove(scene);
+        SubEntityManagers.Remove(entityManager);
     }
 }
 
@@ -54,11 +55,11 @@ public sealed partial class SystemManager
     public EntityManager GetFromID(Guid guid)
     {
         // Check if the main scene ID matches the provided GUID.
-        if (MainScene.ID == guid)
-            return MainScene;
+        if (MainEntityManager.ID == guid)
+            return MainEntityManager;
 
         // Check if any of the subscenes ID matches the provided GUID.
-        foreach (var subscene in SubScenes)
+        foreach (var subscene in SubEntityManagers)
             if (subscene.ID == guid)
                 return subscene;
 
@@ -69,12 +70,12 @@ public sealed partial class SystemManager
     public EntityManager GetFromEntityID(Guid guid)
     {
         // Check if the main scene contains the entity with an ID that matches the provided GUID.
-        if (MainScene.GetFromID(guid) is not null)
-            return MainScene;
+        if (MainEntityManager.GetEntityFromGUID(guid) is not null)
+            return MainEntityManager;
 
         // Check if any of the subscenes contains the entity with an ID that matches the provided GUID.
-        foreach (var subscene in SubScenes)
-            if (subscene.GetFromID(guid) is not null)
+        foreach (var subscene in SubEntityManagers)
+            if (subscene.GetEntityFromGUID(guid) is not null)
                 return subscene;
 
         // Return null if entity is not found in any scene with the provided GUID.
@@ -86,11 +87,11 @@ public sealed partial class SystemManager
 {
     public void ProcessSystems()
     {
-        TransformSystem.CopyToArray();
-        CameraSystem.CopyToArray();
-        MeshSystem.SortAndCopyToArrayIfDirty();
-        EditorScriptSystem.CopyToArray();
-        ScriptSystem.CopyToArray();
+        TransformSystem.FetchArray();
+        CameraSystem.FetchArray();
+        MeshSystem.FetchArray(sort: true);
+        EditorScriptSystem.FetchArray();
+        ScriptSystem.FetchArray();
     }
 
     public void Awake()
@@ -146,8 +147,6 @@ public sealed partial class SystemManager
         Profiler.Benchmark("Mesh Render",
             MeshSystem.Render);
 
-        TransformSystem.Render();
-
         Mesh.CurrentMeshInfoOnGPU = null;
         Mesh.CurrentMaterialOnGPU = null;
     }
@@ -163,8 +162,8 @@ public sealed partial class SystemManager
         CameraSystem.Destroy();
         MeshSystem.Destroy();
 
-        MainScene.Dispose();
-        foreach (var scene in SubScenes)
+        MainEntityManager.Dispose();
+        foreach (var scene in SubEntityManagers)
             scene.Dispose();
     }
 }

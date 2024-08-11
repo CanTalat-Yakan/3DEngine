@@ -7,14 +7,16 @@ internal sealed class SceneBoot : EditorComponent, IHide
     public Entity DefaultSky;
     public Entity Cubes;
 
+    public Entity ExampleCamera;
+
     public int CubesCount;
     public int EntityCount;
 
     public override void OnAwake()
     {
         // Create a camera entity with the name "Camera".
-        SceneCamera = SystemManager.MainScene.CreateCamera("Camera");
-        SceneCamera.Entity.IsHidden = true;
+        SceneCamera = Entity.Manager.CreateCamera("Camera");
+        SceneCamera.Entity.Data.IsHidden = true;
         // Set the camera order to the maximum value.
         SceneCamera.CameraID = byte.MaxValue;
 
@@ -26,7 +28,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
         SceneCamera.Entity.Transform.EulerAngles = new(35, -150, 0);
 
         // Create a sky entity in the scene.
-        var defaultSky = SystemManager.MainScene
+        var defaultSky = Entity.Manager
             .CreateEntity()
             .AddComponent<DefaultSky>();
         defaultSky.Initialize();
@@ -36,15 +38,16 @@ internal sealed class SceneBoot : EditorComponent, IHide
 
     public override void OnStart()
     {
-        var exampleCamera = SystemManager.MainScene.CreateCamera("Camera", Tags.MainCamera.ToString()).Entity;
-        exampleCamera.Transform.LocalPosition = new(3, 4, 5);
-        exampleCamera.Transform.EulerAngles = new(35, -150, 0);
+        ExampleCamera = Entity.Manager.CreateCamera("Camera", Tags.MainCamera.ToString()).Entity;
+        ExampleCamera.Transform.LocalPosition = new(3, 4, 5);
+        ExampleCamera.Transform.EulerAngles = new(35, -150, 0);
 
-        Cubes = SystemManager.MainScene.CreateEntity(null, "Cubes");
-        SystemManager.MainScene.CreatePrimitive(PrimitiveTypes.Cube, parent: Cubes);
+        Cubes = Entity.Manager.CreateEntity(null, "Cubes");
+        Entity.Manager.CreatePrimitive(PrimitiveTypes.Cube, parent: Cubes);
 
         Output.Log("Press 'C' to spawn 1000 Cubes");
         Output.Log("Press 'E' to spawn 1000 Entities");
+        Output.Log("Press 'V' to add a Viewport Controller");
     }
 
     public override void OnUpdate()
@@ -60,7 +63,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
 
             for (int i = 0; i < 1000; i++)
             {
-                var newCube = SystemManager.MainScene.CreatePrimitive(PrimitiveTypes.Cube, parent: Cubes, hide: true).Entity;
+                var newCube = Entity.Manager.CreatePrimitive(PrimitiveTypes.Cube, parent: Cubes, hide: true).Entity;
 
                 newCube.Transform.LocalPosition = new(rnd.Next(-250, 250), rnd.Next(-250, 250), rnd.Next(-250, 250));
                 newCube.Transform.EulerAngles = new(rnd.Next(1, 360), rnd.Next(1, 360), rnd.Next(1, 360));
@@ -74,15 +77,23 @@ internal sealed class SceneBoot : EditorComponent, IHide
         {
             Output.Log($"Spawned {EntityCount += 1000} Entities");
 
-
             for (int i = 0; i < 1000; i++)
-                SystemManager.MainScene.CreateEntity(hide: true).AddComponent<HoverEffect>();
+                Entity.Manager.CreateEntity(hide: true);
+        }
+
+        if (Input.GetKey(Key.V, InputState.Down) && ViewportController.ViewportFocused)
+        {
+            Output.Log($"Viewport Controller added");
+
+            if (!ExampleCamera.HasComponent<ViewportController>())
+                ExampleCamera.AddComponent<ViewportController>();
         }
     }
 }
 
 internal sealed class HoverEffect : Component, IHide
 {
+    private Vector3 _localPosition;
     private float _verticalPosition;
     private float _factor = 3;
     private float _random;
@@ -94,5 +105,5 @@ internal sealed class HoverEffect : Component, IHide
     }
 
     public override void OnUpdate() =>
-        Entity.Transform.LocalPosition.Y = MathF.Sin((float)Time.Timer + _random) * _factor + _verticalPosition;
+        Entity.Transform.SetPosition(y: MathF.Sin((float)Time.Timer + _random) * _factor + _verticalPosition);
 }

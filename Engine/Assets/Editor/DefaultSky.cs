@@ -21,9 +21,9 @@ public sealed partial class DefaultSky : EditorComponent, IHide
 
     public void Initialize()
     {
-        Entity.Name = "Sky";
-        Entity.Tag = "DefaultSky";
-        Entity.IsHidden = true;
+        Entity.Data.Name = "Sky";
+        Entity.Data.Tag = "DefaultSky";
+        Entity.Data.IsHidden = true;
 
         var mesh = Entity.AddComponent<Mesh>();
         mesh.SetMeshInfo(Assets.Meshes["Sphere.obj"]);
