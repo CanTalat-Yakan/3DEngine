@@ -9,6 +9,7 @@ global using Engine.Components;
 global using Engine.DataTypes;
 global using Engine.ECS;
 global using Engine.Editor;
+global using Engine.Essentials;
 global using Engine.Framework;
 global using Engine.Graphics;
 global using Engine.GUI;

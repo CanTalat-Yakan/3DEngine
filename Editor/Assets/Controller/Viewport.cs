@@ -11,6 +11,7 @@ using Engine.Editor;
 using Engine.Utilities;
 
 using static Editor.Controller.Helper;
+using Engine.Assets.Essentials;
 
 namespace Editor.Controller;
 

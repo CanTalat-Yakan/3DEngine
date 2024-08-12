@@ -1,4 +1,4 @@
-﻿namespace Engine.Editor;
+﻿namespace Engine.Essentials;
 
 public sealed partial class DefaultSky : EditorComponent, IHide
 {

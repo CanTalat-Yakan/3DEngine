@@ -2,6 +2,7 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
+using Engine.Assets.Essentials;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -26,8 +27,8 @@ public sealed partial class Viewport : UserControl
         // The code inside the event handler will be executed each time the event is raised.
         CompositionTarget.Rendering += (s, e) => EngineKernel.Frame();
 
-        PointerEntered += (s, e) => Engine.Editor.ViewportController.ViewportFocused = true;
-        PointerExited += (s, e) => Engine.Editor.ViewportController.ViewportFocused = false;
+        PointerEntered += (s, e) => ViewportController.ViewportFocused = true;
+        PointerExited += (s, e) => ViewportController.ViewportFocused = false;
 
         var cross = InputSystemCursor.Create(InputSystemCursorShape.Cross);
         x_CustomCursorGrid.InputCursor = cross;

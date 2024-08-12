@@ -26,8 +26,9 @@ public sealed partial class Transform : EditorComponent, IHide
     public Vector3 _localPosition = Vector3.Zero;
     public Vector3 LocalScale { get => _localScale; set => _localScale = CheckDirty(value, _localScale); }
     public Vector3 _localScale = Vector3.One;
-
+    public Quaternion LocalRotation { get => _localRotation; set => SetQuaternion(CheckDirty(value, _localRotation)); }
     private Quaternion _localRotation = Quaternion.Identity;
+    public Vector3 EulerAngles { get => _eulerAngles; set => SetEulerAngles(CheckDirty(value, _eulerAngles)); }
     private Vector3 _eulerAngles = Vector3.Zero;
 
     public Vector3 Forward => TransformVector3(LocalForward);
@@ -36,8 +37,6 @@ public sealed partial class Transform : EditorComponent, IHide
     public Vector3 Position => TransformVector3(LocalPosition);
     public Vector3 Scale => MultiplyVector3(LocalScale);
     public Quaternion Rotation => MultiplyQuaternion(_localRotation);
-    public Quaternion LocalRotation { get => _localRotation; set => SetQuaternion(CheckDirty(value, _localRotation)); }
-    public Vector3 EulerAngles { get => _eulerAngles; set => SetEulerAngles(CheckDirty(value, _eulerAngles)); }
 
     public Matrix4x4 WorldMatrix => _worldMatrix;
     private Matrix4x4 _worldMatrix = Matrix4x4.Identity;
@@ -112,7 +111,7 @@ public sealed partial class Transform : EditorComponent, IHide
 {
     private Vector3 CheckDirty(Vector3 newValue, Vector3 oldValue)
     {
-        if (!newValue.Equals(oldValue))
+        if (newValue != oldValue)
             RecreateWorldMatrix();
 
         return newValue;
@@ -120,7 +119,7 @@ public sealed partial class Transform : EditorComponent, IHide
 
     private Quaternion CheckDirty(Quaternion newValue, Quaternion oldValue)
     {
-        if (!newValue.Equals(oldValue))
+        if (newValue != oldValue)
             RecreateWorldMatrix();
 
         return newValue;
@@ -138,16 +137,16 @@ public sealed partial class Transform : EditorComponent, IHide
     private Quaternion MultiplyQuaternion(Quaternion local) =>
         Parent is not null ? Quaternion.Multiply(local, Parent.Rotation) : local;
 
-    private void SetEulerAngles(Vector3 value)
-    {
-        _eulerAngles = value;
-        _localRotation = value.ToRadians().FromEuler();
-    }
-
     private void SetQuaternion(Quaternion value)
     {
         _localRotation = value;
         _eulerAngles = value.ToEuler();
+    }
+
+    private void SetEulerAngles(Vector3 value)
+    {
+        _eulerAngles = value;
+        _localRotation = value.ToRadians().FromEuler();
     }
 }
 

@@ -1,4 +1,4 @@
-﻿namespace Engine.Editor;
+﻿namespace Engine.Essentials;
 
 internal sealed class SceneBoot : EditorComponent, IHide
 {
@@ -15,8 +15,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
     public override void OnAwake()
     {
         // Create a camera entity with the name "Camera".
-        SceneCamera = Entity.Manager.CreateCamera("Camera");
-        SceneCamera.Entity.Data.IsHidden = true;
+        SceneCamera = Entity.Manager.CreateCamera("Camera", hide: true);
         // Set the camera order to the maximum value.
         SceneCamera.CameraID = byte.MaxValue;
 
@@ -83,7 +82,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
 
         if (Input.GetKey(Key.N, InputState.Down) && ViewportController.ViewportFocused)
             Output.Log(EmptyComponent.Number);
-
+        
         if (Input.GetKey(Key.V, InputState.Pressed) && ViewportController.ViewportFocused)
             if (!ExampleCamera.HasComponent<ViewportController>())
             {
@@ -91,7 +90,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
 
                 Input.SetLockMouse(false);
 
-                ExampleCamera.AddComponent<ViewportController>().LockCursor = true;
+                ExampleCamera.AddComponent<ViewportController>();
             }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Engine.ECS;
 
@@ -31,7 +32,7 @@ public sealed partial class ComponentManager
         if (_componentSparseSets.TryGetValue(typeof(T), out var sparseSet))
         {
             var typedSparseSet = (SparseSet<T>)sparseSet;
-            return typedSparseSet.Get(entity);
+            return typedSparseSet.Get(entity).First();
         }
 
         return null;
@@ -55,10 +56,11 @@ public sealed partial class ComponentManager
         foreach (var sparseSet in _componentSparseSets.Values)
         {
             var getMethod = sparseSet.GetType().GetMethod("Get");
-            var component = getMethod.Invoke(sparseSet, [entity]);
+            var components = getMethod.Invoke(sparseSet, [entity]);
 
-            if (component is not null)
-                componentTypes.Add(component.GetType());
+            if (components is not null)
+                foreach (var component in components as Array)
+                    componentTypes.Add(component.GetType());
         }
 
         return componentTypes.ToArray();
@@ -103,9 +105,8 @@ public sealed partial class ComponentManager
 
         private class SparsePage
         {
-            public Dictionary<int, int> SparseArray { get; } = new(); // Maps entity ID to dense index
+            public Dictionary<int, List<int>> SparseArray { get; } = new(); // Maps entity ID to a list of dense indices
             public List<T> DenseArray { get; } = new(); // List of components
-            public List<int> EntityIDArray { get; } = new(); // List of entity IDs
         }
 
         private SparsePage GetPage(int pageNumber)
@@ -118,8 +119,23 @@ public sealed partial class ComponentManager
             return page;
         }
 
-        private int GetPageNumber(int entityId) => 
+        private int GetPageNumber(int entityId) =>
             entityId / MaxPageSize;
+
+        public T[] Get(Entity entity)
+        {
+            int pageNumber = GetPageNumber(entity.ID);
+            if (_pages.TryGetValue(pageNumber, out var page) && page.SparseArray.TryGetValue(entity.ID, out List<int> denseIndices))
+            {
+                var componentArray = new T[denseIndices.Count];
+                for (int i = 0; i < denseIndices.Count; i++)
+                    componentArray[i] = page.DenseArray[denseIndices[i]];
+
+                return componentArray;
+            }
+
+            return default;
+        }
 
         public void Add(Entity entity, T component)
         {
@@ -128,42 +144,53 @@ public sealed partial class ComponentManager
 
             if (!page.SparseArray.ContainsKey(entity.ID))
             {
-                page.SparseArray[entity.ID] = page.DenseArray.Count;
-                page.DenseArray.Add(component);
-                page.EntityIDArray.Add(entity.ID);
+                page.SparseArray[entity.ID] = new List<int>();
             }
-        }
 
-        public T Get(Entity entity)
-        {
-            int pageNumber = GetPageNumber(entity.ID);
-            if (_pages.TryGetValue(pageNumber, out var page) && page.SparseArray.TryGetValue(entity.ID, out int denseIndex))
-                return page.DenseArray[denseIndex];
-
-            return default;
+            // Add the component to the dense array and keep track of the index
+            int index = page.DenseArray.Count;
+            page.DenseArray.Add(component);
+            page.SparseArray[entity.ID].Add(index);
         }
 
         public void Remove(Entity entity)
         {
             int pageNumber = GetPageNumber(entity.ID);
-            if (_pages.TryGetValue(pageNumber, out var page) && page.SparseArray.TryGetValue(entity.ID, out int denseIndex))
+            if (_pages.TryGetValue(pageNumber, out var page) && page.SparseArray.TryGetValue(entity.ID, out List<int> denseIndices))
             {
-                // Invoke the destruction event before removing the component
-                page.DenseArray[denseIndex].InvokeEventOnDestroy();
+                // Sort dense indices in descending order to avoid shifting problems during removal
+                denseIndices.Sort((a, b) => b.CompareTo(a));
 
-                int lastDenseIndex = page.DenseArray.Count - 1;
+                foreach (var denseIndex in denseIndices)
+                {
+                    // Invoke the destruction event for the component
+                    page.DenseArray[denseIndex].InvokeEventOnDestroy();
 
-                // Swap the last element with the element to be removed
-                page.DenseArray[denseIndex] = page.DenseArray[lastDenseIndex];
-                page.EntityIDArray[denseIndex] = page.EntityIDArray[lastDenseIndex];
+                    int lastDenseIndex = page.DenseArray.Count - 1;
 
-                // Update the sparse array to point to the new location
-                page.SparseArray[page.EntityIDArray[denseIndex]] = denseIndex;
+                    if (denseIndex != lastDenseIndex)
+                    {
+                        // Swap the last element with the element to be removed
+                        page.DenseArray[denseIndex] = page.DenseArray[lastDenseIndex];
 
-                // Remove the last element
-                page.DenseArray.RemoveAt(lastDenseIndex);
-                page.EntityIDArray.RemoveAt(lastDenseIndex);
+                        // Update the sparse array for the entity that was at the last position
+                        foreach (var key in page.SparseArray.Keys)
+                        {
+                            var indices = page.SparseArray[key];
+                            for (int i = 0; i < indices.Count; i++)
+                                if (indices[i] == lastDenseIndex)
+                                {
+                                    indices[i] = denseIndex;
+                                    break;
+                                }
+                        }
+                    }
 
+                    // Remove the last element from the dense array
+                    page.DenseArray.RemoveAt(lastDenseIndex);
+                }
+
+                // Remove the entity entry if all components are removed
                 page.SparseArray.Remove(entity.ID);
 
                 // Optionally remove the page if it's empty
@@ -177,13 +204,6 @@ public sealed partial class ComponentManager
             foreach (var page in _pages.Values)
                 foreach (var component in page.DenseArray)
                     yield return component;
-        }
-
-        public IEnumerable<int> GetAllEntityIDs()
-        {
-            foreach (var page in _pages.Values)
-                foreach (var id in page.EntityIDArray)
-                    yield return id;
         }
     }
 }
