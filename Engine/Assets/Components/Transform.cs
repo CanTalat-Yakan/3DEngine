@@ -19,13 +19,13 @@ public sealed partial class Transform : EditorComponent, IHide
     public Vector3 LocalForward { get => _localForward; set => _localForward = CheckDirty(value, _localForward); }
     private Vector3 _localForward = Vector3.UnitZ;
     public Vector3 LocalRight { get => _localRight; set => _localRight = CheckDirty(value, _localRight); }
-    public Vector3 _localRight = Vector3.UnitX;
+    private Vector3 _localRight = Vector3.UnitX;
     public Vector3 LocalUp { get => _localUp; set => _localUp = CheckDirty(value, _localUp); }
-    public Vector3 _localUp = Vector3.UnitY;
+    private Vector3 _localUp = Vector3.UnitY;
     public Vector3 LocalPosition { get => _localPosition; set => _localPosition = CheckDirty(value, _localPosition); }
-    public Vector3 _localPosition = Vector3.Zero;
+    private Vector3 _localPosition = Vector3.Zero;
     public Vector3 LocalScale { get => _localScale; set => _localScale = CheckDirty(value, _localScale); }
-    public Vector3 _localScale = Vector3.One;
+    private Vector3 _localScale = Vector3.One;
     public Quaternion LocalRotation { get => _localRotation; set => SetQuaternion(CheckDirty(value, _localRotation)); }
     private Quaternion _localRotation = Quaternion.Identity;
     public Vector3 EulerAngles { get => _eulerAngles; set => SetEulerAngles(CheckDirty(value, _eulerAngles)); }
