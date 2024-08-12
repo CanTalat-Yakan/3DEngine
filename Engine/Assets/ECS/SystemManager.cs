@@ -90,6 +90,7 @@ public sealed partial class SystemManager
         TransformSystem.FetchArray();
         CameraSystem.FetchArray();
         MeshSystem.FetchArray(sort: true);
+
         ScriptSystem.FetchArray();
         EditorScriptSystem.FetchArray();
         SimpleSystem.FetchArray();

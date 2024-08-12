@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Vortice.Direct3D12;
 using Vortice.DXGI;
 
-using Engine.Loader;
 using System.IO;
 using System.Linq;
 
