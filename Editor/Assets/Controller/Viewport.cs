@@ -8,10 +8,10 @@ using SharpGen.Runtime;
 
 using Engine.DataTypes;
 using Engine.Editor;
+using Engine.Essentials;
 using Engine.Utilities;
 
 using static Editor.Controller.Helper;
-using Engine.Assets.Essentials;
 
 namespace Editor.Controller;
 

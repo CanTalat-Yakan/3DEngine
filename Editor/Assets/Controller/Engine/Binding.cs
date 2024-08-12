@@ -9,8 +9,8 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 
 using Engine.ECS;
+using Engine.Essentials;
 using Engine.Runtime;
-using Engine.Assets.Essentials;
 
 namespace Editor.Controller;
 
