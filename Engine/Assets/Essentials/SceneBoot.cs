@@ -5,12 +5,15 @@ internal sealed class SceneBoot : EditorComponent, IHide
     public Camera SceneCamera;
 
     public Entity DefaultSky;
+    public Entity Empty;
     public Entity Cubes;
 
     public Entity ExampleCamera;
 
     public int CubesCount;
     public int EntityCount;
+
+    private bool _processing = false;
 
     public override void OnAwake()
     {
@@ -40,6 +43,8 @@ internal sealed class SceneBoot : EditorComponent, IHide
         ExampleCamera = Entity.Manager.CreateCamera("Camera", Tags.MainCamera.ToString()).Entity;
         ExampleCamera.Transform.LocalPosition = new(3, 4, 5);
         ExampleCamera.Transform.EulerAngles = new(35, -150, 0);
+
+        Empty = Entity.Manager.CreateEntity(null, "Empty");
 
         Cubes = Entity.Manager.CreateEntity(null, "Cubes");
         Entity.Manager.CreatePrimitive(PrimitiveTypes.Cube, parent: Cubes);
@@ -77,12 +82,28 @@ internal sealed class SceneBoot : EditorComponent, IHide
             Output.Log($"Spawned {EntityCount += 1_000} Entities");
 
             for (int i = 0; i < 1_000; i++)
-                Entity.Manager.CreateEntity(hide: true).AddComponent<EmptyComponent>();
+                Entity.Manager.CreateEntity(Empty, hide: true).AddComponent<EmptyComponent>();
         }
 
         if (Input.GetKey(Key.N, InputState.Down) && ViewportController.ViewportFocused)
             Output.Log(EmptyComponent.Number);
-        
+
+        if (Empty.Data.Children.Count == 0)
+        {
+            _processing = false;
+            EntityCount = 0;
+        }
+
+        if (!_processing && Input.GetKey(Key.R, InputState.Pressed) && ViewportController.ViewportFocused)
+        {
+            _processing = true;
+
+            foreach(var child in Empty.Data.Children.ToArray())
+                Entity.Manager.DestroyEntity(child);
+
+            Output.Log($"Destroyed {EntityCount} Entities");
+        }
+
         if (Input.GetKey(Key.V, InputState.Pressed) && ViewportController.ViewportFocused)
             if (!ExampleCamera.HasComponent<ViewportController>())
             {

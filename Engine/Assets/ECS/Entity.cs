@@ -200,5 +200,7 @@ public sealed partial class EntityData : ICloneable, IDisposable
         IsEnabled = false;
 
         Entity.RemoveComponents();
+
+        Parent?.Data.Children.Remove(Entity);
     }
 }

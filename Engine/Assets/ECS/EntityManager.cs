@@ -70,8 +70,15 @@ public sealed partial class EntityManager
 
     public void DestroyEntity(Entity entity)
     {
-        if (Entities.ContainsKey(entity.ID))
-            Entities.Remove(entity.ID);
+        if (entity is null)
+            return;
+
+        if (!Entities.ContainsKey(entity.ID))
+            return;
+
+        entity.Dispose();
+
+        Entities.Remove(entity.ID);
     }
 
     public Entity GetEntity(int ID) =>

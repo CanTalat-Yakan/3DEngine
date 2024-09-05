@@ -164,7 +164,7 @@ public sealed partial class ComponentManager
                 foreach (var denseIndex in denseIndices)
                 {
                     // Invoke the destruction event for the component
-                    page.DenseArray[denseIndex].InvokeEventOnDestroy();
+                    page.DenseArray[denseIndex].Dispose();
 
                     int lastDenseIndex = page.DenseArray.Count - 1;
 

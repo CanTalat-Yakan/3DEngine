@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-using Vortice.Mathematics;
+﻿using Vortice.Mathematics;
 
 namespace Engine.Components;
 
@@ -14,7 +12,6 @@ public sealed partial class Transform : EditorComponent, IHide
     public Action TransformChanged { get; set; }
 
     public Transform Parent => Entity.Data.Parent?.Transform;
-    public Transform[] Children => Entity.Data.Children?.Select(Entity => Entity.Transform).ToArray();
 
     public Vector3 LocalForward { get => _localForward; set => _localForward = CheckDirty(value, _localForward); }
     private Vector3 _localForward = Vector3.UnitZ;
@@ -55,8 +52,8 @@ public sealed partial class Transform : EditorComponent, IHide
         CalculateWorldMatrix();
 
         TransformChanged?.Invoke();
-        foreach (var child in Children)
-            child.RecreateWorldMatrix();
+        foreach (var child in Entity.Data.Children)
+            child.Transform.RecreateWorldMatrix();
     }
 
     public string GetString() =>
