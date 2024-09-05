@@ -4,6 +4,9 @@ global using System.Numerics;
 global using ImGuiNET;
 global using Vortice.Dxc;
 
+global using USD.NET;
+global using pxr;
+
 global using Engine.Buffer;
 global using Engine.Components;
 global using Engine.DataTypes;

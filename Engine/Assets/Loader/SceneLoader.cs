@@ -1,6 +1,7 @@
-﻿using USD.NET;
-using pxr;
-using System.IO;
+﻿using System.IO;
+
+using static pxr.UsdGeom;
+using static pxr.UsdShade;
 
 namespace Engine.Loader;
 
@@ -52,17 +53,20 @@ public sealed class SceneLoader
         var scene = Scene.Open(localPath);
         var stage = scene.Stage;
 
+        UsdGeomSetStageUpAxis(stage, UsdGeomTokens.y);
+        UsdGeomSetStageMetersPerUnit(stage, 1);
+
         LoadEntities(stage, systemManager.MainEntityManager, $"/World/{systemManager.MainEntityManager.Name}");
 
         var subLayerPaths = stage.GetRootLayer().GetSubLayerPaths();
         for (uint i = 0; i < subLayerPaths.size(); i++)
         {
             //var subscenePath = subLayerPaths[i];
-            //var subscene = new EntityManager { Name = System.IO.Path.GetFileNameWithoutExtension(subscenePath) };
+            //var subscene = new EntityManager { Name = Path.GetFileNameWithoutExtension(subscenePath) };
             //var subsceneLayer = Scene.Open(subscenePath).Stage;
             //LoadEntities(subsceneLayer, subscene, $"/World/{subscene.Name}");
 
-            //systemManager.SubScenes.Add(subscene);
+            //systemManager.SubEntityManagers.Add(subscene);
         }
     }
 

@@ -2,12 +2,16 @@
 using System.IO;
 
 using Assimp;
+
 using Vortice.DXGI;
 using Vortice.Mathematics;
 
+using static pxr.UsdGeom;
+using static pxr.UsdShade;
+
 namespace Engine.Loader;
 
-public sealed class ModelLoader
+public sealed partial class ModelLoader
 {
     public static CommonContext Context => _context ??= Kernel.Instance.Context;
     public static CommonContext _context;
@@ -42,7 +46,7 @@ public sealed class ModelLoader
             for (int i = 0; i < mesh.VertexCount; i++)
             {
                 if (mesh.HasVertices)
-                    positions.Add(new (mesh.Vertices[i].X, mesh.Vertices[i].Y, mesh.Vertices[i].Z));
+                    positions.Add(new(mesh.Vertices[i].X, mesh.Vertices[i].Y, mesh.Vertices[i].Z));
 
                 for (int j = 0; j < inputLayoutElements.Length; j++)
                     vertices.AddRange(inputLayoutElements[j] switch
@@ -78,5 +82,42 @@ public sealed class ModelLoader
         Context.UploadQueue.Enqueue(upload);
 
         return meshInfo;
+    }
+}
+
+public sealed partial class ModelLoader
+{
+    public static UsdGeomMesh ConvertMeshToUSD(UsdStage stage)
+    {
+        var mesh = UsdGeomMesh.Define(stage, "/TexModeI/mesh");
+        mesh.CreateOrientationAttr(UsdGeomTokens.leftHanded);
+        mesh.CreatePointsAttr();
+        mesh.CreateFaceVertexCountsAttr();
+        mesh.CreateFaceVertexIndicesAttr();
+        mesh.CreateExtentAttr();
+
+        return mesh;
+    }
+    public static UsdGeomMesh ConvertMeshFromUSD(UsdStage stage)
+    {
+        var mesh = UsdGeomMesh.Get(stage, "/TexModeI/mesh");
+
+        UsdGeomSetStageUpAxis(stage, UsdGeomTokens.y);
+        UsdGeomSetStageMetersPerUnit(stage, 1);
+
+        return mesh;
+    }
+
+    public static UsdShadeMaterial ConvertMaterialToUSD(UsdStage stage)
+    {
+        var material = UsdShadeMaterial.Define(stage, "/TexModeI/material");
+
+        return material;
+    }
+    public static UsdShadeMaterial ConvertMaterialFromUSD(UsdStage stage)
+    {
+        var material = UsdShadeMaterial.Get(stage, "/TexModeI/material");
+
+        return material;
     }
 }
