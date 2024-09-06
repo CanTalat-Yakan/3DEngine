@@ -135,6 +135,7 @@ public sealed partial class CommonContext : IDisposable
         else
         {
             mesh = new();
+            mesh.Name = name;
             mesh.InputLayoutDescription = CreateInputLayoutDescription(inputLayoutElements);
 
             mesh.IndexFormat = indexFormat16Bit ? Format.R16_UInt : Format.R32_UInt;

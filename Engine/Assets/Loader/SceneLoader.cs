@@ -73,7 +73,27 @@ public sealed class SceneLoader
     private static void LoadEntities(UsdStage stage, EntityManager EntityManager, string rootPath)
     {
         foreach (var prim in stage.Traverse())
-            if (prim.IsA(TfType.FindByName("Xform")))
+        {
+            var a = prim.GetName();
+            var b = prim.GetPath();
+            var c = prim.GetPrimPath();
+            var d = prim.GetPrimTypeInfo();
+            var e = prim.GetType();
+            var type = prim.GetTypeName(); // Important
+            var g = prim.GetPrimTypeInfo();
+
+            if (type.ToString().Equals("Mesh"))
+            {
+                var meshInfo = ModelLoader.ConvertMeshFromUSD(prim);
+
+                EntityData entityData = new() { Name = prim.GetName() };
+                Entity entity = EntityManager.CreateEntity(entityData);
+
+                var mesh = entity.AddComponent<Mesh>();
+                mesh.SetMeshInfo(meshInfo);
+            }
+
+            if (type.ToString().Equals("Xform"))
             {
                 EntityData entityData = new() { Name = prim.GetName() };
                 Entity entity = EntityManager.CreateEntity(entityData);
@@ -93,6 +113,7 @@ public sealed class SceneLoader
                     }
                 }
             }
+        }
     }
 }
 
