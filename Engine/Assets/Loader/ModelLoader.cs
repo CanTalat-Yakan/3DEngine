@@ -108,6 +108,10 @@ public sealed partial class ModelLoader
 
     public static MeshInfo ConvertMeshFromUSD(UsdPrim prim)
     {
+        var meshName = prim.GetName();
+        if (Assets.Meshes.ContainsKey(meshName))
+            return Assets.Meshes[meshName];
+
         UsdGeomMesh usdMesh = new(prim);
 
         List<int> indices = new();
@@ -130,7 +134,9 @@ public sealed partial class ModelLoader
         {
             vertices.AddRange([
                 points[i][0], points[i][1], points[i][2],
-                normals[i][0], normals[i][1], normals[i][2]]);
+                normals[i][0], normals[i][1], normals[i][2],
+                0, 0, 0,
+                0, 0]);
 
             positions.Add(new(points[i][0], points[i][1], points[i][2]));
         }
@@ -149,7 +155,7 @@ public sealed partial class ModelLoader
             for (int j = 0; j < faceVertexCounts[i]; ++j)
                 indices.Add(faceVertexIndices[idx++]);
 
-        return CreateMesh(prim.GetName(), "PN", indices, vertices, positions);
+        return CreateMesh(prim.GetName(), "PNTt", indices, vertices, positions);
     }
 
     public static UsdShadeMaterial ConvertMaterialToUSD(Components.Material material, UsdShadeMaterial usdMaterial)

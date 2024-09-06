@@ -46,10 +46,8 @@ public sealed class SceneLoader
         }
     }
 
-    public static void Load(out SystemManager systemManager, string localPath)
+    public static void Load(SystemManager systemManager, string localPath)
     {
-        systemManager = new SystemManager();
-
         var scene = Scene.Open(localPath);
         var stage = scene.Stage;
 
@@ -91,6 +89,8 @@ public sealed class SceneLoader
 
                 var mesh = entity.AddComponent<Mesh>();
                 mesh.SetMeshInfo(meshInfo);
+                mesh.SetMaterialTextures([new("Default.png", 0)]);
+                mesh.SetMaterialPipeline("SimpleLit");
             }
 
             if (type.ToString().Equals("Xform"))
