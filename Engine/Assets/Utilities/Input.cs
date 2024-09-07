@@ -29,9 +29,9 @@ public sealed partial class Input
     private static IDirectInputDevice8 s_keyboard;
     private static IDirectInputDevice8 s_joystick;
 
-    private static MouseState s_mouseState = new();
-    private static KeyboardState s_keyboardState = new();
-    private static JoystickState s_joystickState = new();
+    private static MouseState s_previousMouseState = new();
+    private static KeyboardState s_previousKeyboardState = new();
+    private static JoystickState s_previousJoystickState = new();
 
     private static Vector2 s_axis = Vector2.Zero;
     private static Vector2 s_joystickAxis = Vector2.Zero;
@@ -104,7 +104,7 @@ public sealed partial class Input
             if (currentMouseState is not null)
             {
                 // Get the pointer position from Win32.
-                Interoperation.User32.GetCursorPos(out var pointer);
+                User32.GetCursorPos(out var pointer);
                 s_mousePosition.X = pointer.X;
                 s_mousePosition.Y = pointer.Y;
 
@@ -148,9 +148,9 @@ public sealed partial class Input
     {
         try
         {
-            s_mouseState = s_mouse?.GetCurrentMouseState();
-            s_keyboardState = s_keyboard?.GetCurrentKeyboardState();
-            s_joystickState = s_joystick?.GetCurrentJoystickState();
+            s_previousMouseState = s_mouse?.GetCurrentMouseState();
+            s_previousKeyboardState = s_keyboard?.GetCurrentKeyboardState();
+            s_previousJoystickState = s_joystick?.GetCurrentJoystickState();
         }
         catch { }
     }
@@ -166,9 +166,9 @@ public sealed partial class Input
 
         return state switch
         {
-            InputState.Down => currentKeyboardState.IsPressed(key) && !s_keyboardState.IsPressed(key),
+            InputState.Down => currentKeyboardState.IsPressed(key) && !s_previousKeyboardState.IsPressed(key),
             InputState.Pressed => currentKeyboardState.IsPressed(key),
-            InputState.Up => !currentKeyboardState.IsPressed(key) && s_keyboardState.IsPressed(key),
+            InputState.Up => !currentKeyboardState.IsPressed(key) && s_previousKeyboardState.IsPressed(key),
             _ => false
         };
     }
@@ -183,9 +183,9 @@ public sealed partial class Input
         {
             InputState.Down => button switch
             {
-                MouseButton.Left => currentMouseState.Buttons[0] && !s_mouseState.Buttons[0],
-                MouseButton.Right => currentMouseState.Buttons[1] && !s_mouseState.Buttons[1],
-                MouseButton.Middle => currentMouseState.Buttons[2] && !s_mouseState.Buttons[2],
+                MouseButton.Left => currentMouseState.Buttons[0] && !s_previousMouseState.Buttons[0],
+                MouseButton.Right => currentMouseState.Buttons[1] && !s_previousMouseState.Buttons[1],
+                MouseButton.Middle => currentMouseState.Buttons[2] && !s_previousMouseState.Buttons[2],
                 _ => false
             },
             InputState.Pressed => button switch
@@ -197,9 +197,9 @@ public sealed partial class Input
             },
             InputState.Up => button switch
             {
-                MouseButton.Left => !currentMouseState.Buttons[0] && s_mouseState.Buttons[0],
-                MouseButton.Right => !currentMouseState.Buttons[1] && s_mouseState.Buttons[1],
-                MouseButton.Middle => !currentMouseState.Buttons[2] && s_mouseState.Buttons[2],
+                MouseButton.Left => !currentMouseState.Buttons[0] && s_previousMouseState.Buttons[0],
+                MouseButton.Right => !currentMouseState.Buttons[1] && s_previousMouseState.Buttons[1],
+                MouseButton.Middle => !currentMouseState.Buttons[2] && s_previousMouseState.Buttons[2],
                 _ => false
             },
             _ => false
