@@ -1,3 +1,5 @@
+using System.IO;
+
 namespace Engine;
 
 public sealed class Program
@@ -37,14 +39,13 @@ public sealed class Program
     private static void HandleExceptions()
     {
         var rootPath = AppContext.BaseDirectory;
-        var logFilePath = rootPath + "Application.log";
+        var logFilePath = Path.Combine(rootPath, "Application.log");
 
         ExceptionHandler.CreateTraceLog(rootPath, logFilePath);
 
         AppDomain.CurrentDomain.UnhandledException += (s, e) =>
         {
-            var exception = e.ExceptionObject as Exception;
-            if (exception is not null)
+            if (e.ExceptionObject is Exception exception)
                 ExceptionHandler.HandleException(exception);
         };
     }

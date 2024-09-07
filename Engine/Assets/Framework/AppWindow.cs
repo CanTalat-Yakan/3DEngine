@@ -89,48 +89,44 @@ public sealed partial class AppWindow
 {
     private static IntPtr WndProc(IntPtr hWnd, uint msg, UIntPtr wParam, IntPtr lParam)
     {
-        if (ProcessMessage(msg, wParam, lParam))
-            return IntPtr.Zero;
+        GUIInputHandler.Instance?.ProcessMessage((WindowMessage)msg, wParam, lParam);
 
         switch ((WindowMessage)msg)
         {
             case WindowMessage.Destroy:
                 PostQuitMessage(0);
                 break;
+            case WindowMessage.Size:
+                HandleSizeMessage(wParam, lParam);
+                break;
+            // Only handle other specific messages as needed
+            default:
+                break;
         }
 
         return DefWindowProc(hWnd, msg, wParam, lParam);
     }
 
-    public static bool ProcessMessage(uint msg, UIntPtr wParam, IntPtr lParam)
+    private static void HandleSizeMessage(UIntPtr wParam, IntPtr lParam)
     {
-        if (GUIInputHandler.Instance?.ProcessMessage((WindowMessage)msg, wParam, lParam) ?? false)
-            return true;
 
-        switch ((WindowMessage)msg)
+        switch ((SizeMessage)wParam)
         {
-            case WindowMessage.Size:
-                switch ((SizeMessage)wParam)
-                {
-                    case SizeMessage.SIZE_RESTORED:
-                    case SizeMessage.SIZE_MAXIMIZED:
-                        Win32Window.IsMinimized = false;
+            case SizeMessage.SIZE_RESTORED:
+            case SizeMessage.SIZE_MAXIMIZED:
+                Win32Window.IsMinimized = false;
 
-                        var lp = (int)lParam;
-                        Win32Window.Width = Utils.Loword(lp);
-                        Win32Window.Height = Utils.Hiword(lp);
+                var lp = (int)lParam;
+                Win32Window.Width = Utils.Loword(lp);
+                Win32Window.Height = Utils.Hiword(lp);
 
-                        ResizeEvent?.Invoke(Win32Window.Width, Win32Window.Height); // <-- This is where resizing is handled.
-                        break;
-                    case SizeMessage.SIZE_MINIMIZED:
-                        Win32Window.IsMinimized = true;
-                        break;
-                    default:
-                        break;
-                }
+                ResizeEvent?.Invoke(Win32Window.Width, Win32Window.Height);
+                break;
+            case SizeMessage.SIZE_MINIMIZED:
+                Win32Window.IsMinimized = true;
+                break;
+            default:
                 break;
         }
-
-        return false;
     }
 }

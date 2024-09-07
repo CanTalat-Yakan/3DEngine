@@ -448,6 +448,9 @@ internal static class User32
     [DllImport(LibraryName, CharSet = CharSet.Unicode)]
     public static extern IntPtr DispatchMessage([In] ref Message lpmsg);
 
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern bool WaitMessage();
+
     [DllImport(LibraryName, ExactSpelling = true)]
     public static extern int GetSystemMetrics(SystemMetrics smIndex);
 
