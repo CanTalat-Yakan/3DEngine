@@ -68,7 +68,7 @@ public sealed partial class Entity
     }
 
     public bool HasComponent<T>() where T : Component =>
-        GetComponents().Contains(typeof(T));
+        GetComponentTypes().Contains(typeof(T));
 
     public T GetComponent<T>() where T : Component =>
         SystemManager.ComponentManager.GetComponent<T>(this);
@@ -76,7 +76,10 @@ public sealed partial class Entity
     public Component GetComponent(Type type) =>
         SystemManager.ComponentManager.GetComponent(this, type);
 
-    public Type[] GetComponents() =>
+    public Type[] GetComponentTypes() =>
+        SystemManager.ComponentManager.GetComponentTypes(this);
+
+    public Component[] GetComponents() =>
         SystemManager.ComponentManager.GetComponents(this);
 
     public void RemoveComponent<T>() where T : Component =>
@@ -95,7 +98,7 @@ public sealed partial class Entity : ICloneable, IDisposable
         Clone();
 
     public Entity Clone() =>
-         Manager.CreateEntity(Data.Clone());
+        Data.Clone();
 
     public void Dispose() =>
         Data.Dispose();
@@ -161,10 +164,10 @@ public sealed partial class EntityData : ICloneable, IDisposable
     object ICloneable.Clone() =>
         Clone();
 
-    public EntityData Clone()
+    public Entity Clone()
     {
         // Create a new Entity object with a new ID and set its properties.
-        EntityData newEntity = new()
+        EntityData newEntityData = new()
         {
             Name = Name,
             IsEnabled = IsEnabled,
@@ -173,23 +176,24 @@ public sealed partial class EntityData : ICloneable, IDisposable
             Layer = Layer,
             Tag = Tag
         };
+        Entity newEntity = Entity.Manager.CreateEntity(newEntityData, Entity.Data.Parent);
 
         // Copy the original Entity object's Transform properties to the new Entity object.
         newEntity.Transform.LocalPosition = Transform.LocalPosition;
         newEntity.Transform.LocalRotation = Transform.LocalRotation;
         newEntity.Transform.LocalScale = Transform.LocalScale;
 
+        var components = Entity.GetComponents();
+
         //// Loop through the original Entity object's Components,
         //// clone each one and register it to the new Entity object.
-        //for (int i = 1; i < _components.Count; i++) // Skip transform.
-        //{
-        //    // Clone the Component.
-        //    var newComponent = _components[i].Clone();
-        //    // Call OnRegister method on the new Component.
-        //    newComponent.OnRegister();
-        //    // Add the new Component to the new Entity object.
-        //    newEntity.AddComponent(newComponent);
-        //}
+        for (int i = 1; i < components.Count(); i++) // Skip transform.
+        {
+            // Clone the Component.
+            var newComponent = components[i].Clone();
+            // Add the new Component to the new Entity object.
+            newEntity.AddComponent(newComponent);
+        }
 
         // Return the new Entity object.
         return newEntity;

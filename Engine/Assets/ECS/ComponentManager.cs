@@ -49,7 +49,7 @@ public sealed partial class ComponentManager
         return null;
     }
 
-    public Type[] GetComponents(Entity entity)
+    public Type[] GetComponentTypes(Entity entity)
     {
         List<Type> componentTypes = new();
 
@@ -64,6 +64,21 @@ public sealed partial class ComponentManager
         }
 
         return componentTypes.ToArray();
+    }
+
+    public Component[] GetComponents(Entity entity)
+    {
+        var componentTypes = GetComponentTypes(entity);
+        List<Component> components = new();
+
+        foreach (var componentType in componentTypes)
+            if (_componentSparseSets.TryGetValue(componentType, out var sparseSet))
+            {
+                var getMethod = sparseSet.GetType().GetMethod("Get");
+                components.Add((Component)getMethod.Invoke(sparseSet, [entity]));
+            }
+
+        return components.ToArray();
     }
 
     public void RemoveComponent<T>(Entity entity) where T : Component

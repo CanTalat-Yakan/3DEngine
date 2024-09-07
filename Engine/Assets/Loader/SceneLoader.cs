@@ -33,7 +33,7 @@ public sealed class SceneLoader
             var entityPath = new SdfPath($"{rootPath}/{entity.Data.Name}");
             var usdPrim = stage.DefinePrim(entityPath, new TfToken("Xform"));
 
-            foreach (var component in entity.GetComponents())
+            foreach (var component in entity.GetComponentTypes())
                 foreach (var attribute in component.GetProperties())
                 {
                     var value = attribute.GetValue(component);
