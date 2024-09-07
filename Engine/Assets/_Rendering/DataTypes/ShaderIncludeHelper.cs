@@ -3,9 +3,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 
 using SharpGen.Runtime;
-using Vortice.Dxc;
 
-namespace Engine.Helper;
+namespace Engine.DataTypes;
 
 public class ShaderIncludeHandler : CallbackBase, IDxcIncludeHandler
 {
@@ -66,7 +65,6 @@ public class ShaderIncludeHandler : CallbackBase, IDxcIncludeHandler
 
         return null;
     }
-
 
     private class SourceCodeBlob : IDisposable
     {
