@@ -41,7 +41,7 @@ public sealed partial class SystemManager
     public void RemoveSubscene(Guid guid)
     {
         // Retrieves the scene with the specified GUID from the list of subscenes.
-        EntityManager entityManager = GetFromGUID(guid);
+        EntityManager entityManager = GetEntityManagerFromGUID(guid);
 
         // Destroys all entities within the scene.
         entityManager.Dispose();
@@ -52,7 +52,7 @@ public sealed partial class SystemManager
 
 public sealed partial class SystemManager
 {
-    public EntityManager GetFromGUID(Guid guid)
+    public EntityManager GetEntityManagerFromGUID(Guid guid)
     {
         // Check if the main scene ID matches the provided GUID.
         if (MainEntityManager.GUID == guid)
@@ -67,7 +67,7 @@ public sealed partial class SystemManager
         return null;
     }
 
-    public EntityManager GetFromEntityGUID(Guid guid)
+    public EntityManager GetEntityManagerFromEntityGUID(Guid guid)
     {
         // Check if the main scene contains the entity with an ID that matches the provided GUID.
         if (MainEntityManager.GetEntityFromGUID(guid) is not null)

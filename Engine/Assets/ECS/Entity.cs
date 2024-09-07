@@ -24,7 +24,7 @@ public enum Layers
 
 public sealed partial class Entity
 {
-    public int ID { get; }
+    public int ID { get; set; }
     public EntityData Data { get; }
 
     public EntityManager Manager;

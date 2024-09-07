@@ -18,7 +18,7 @@ public enum PrimitiveTypes
 
 public sealed partial class EntityManager
 {
-    public Dictionary<int, Entity> Entities = new Dictionary<int, Entity>();
+    public EventDictionary<int, Entity> Entities = new();
     private int nextEntityID = 0;
 
     public Guid GUID = Guid.NewGuid();
@@ -62,6 +62,21 @@ public sealed partial class EntityManager
 
         // Add the Transform component to the Entity when initialized.
         entity.AddComponent<Transform>();
+
+        Entities[id] = entity;
+
+        return entity;
+    }
+    
+    public Entity MigrateEntity(Entity entity, Entity parent = null)
+    {
+        int id = nextEntityID++;
+
+        entity.Manager.Entities.Remove(entity.ID);
+        entity.Manager = this;
+
+        entity.ID = id;
+        entity.Data.Parent = parent;
 
         Entities[id] = entity;
 
