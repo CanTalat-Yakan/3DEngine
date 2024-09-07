@@ -1,5 +1,3 @@
-using System.IO;
-
 namespace Engine;
 
 public sealed class Program
@@ -39,7 +37,7 @@ public sealed class Program
     private static void HandleExceptions()
     {
         var rootPath = AppContext.BaseDirectory;
-        var logFilePath = Path.Combine(rootPath, "Application.log");
+        var logFilePath = rootPath + "Application.log";
 
         ExceptionHandler.CreateTraceLog(rootPath, logFilePath);
 

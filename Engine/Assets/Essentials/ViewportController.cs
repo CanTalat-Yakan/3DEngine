@@ -15,9 +15,9 @@ public sealed class ViewportController : EditorComponent, IHide
     private float _movementSpeedScaled = 2;
 
     public float RotationSpeed { get => _rotationSpeed; set => _rotationSpeed = value; }
-    private float _rotationSpeed = 5;
+    private float _rotationSpeed = 20;
 
-    public bool LockCursor = true;
+    public bool LockCursor { get; set; } = true;
 
     private Vector3 _direction;
     private Vector3 _euler;
@@ -34,7 +34,6 @@ public sealed class ViewportController : EditorComponent, IHide
     {
         Input.SetLockMouse(false);
 
-        // Call the MovementSpeedCalculation function to calculate the movement speed.
         MovementSpeedCalculation();
 
         if (Input.GetButton(MouseButton.Right, InputState.Down)
@@ -50,21 +49,11 @@ public sealed class ViewportController : EditorComponent, IHide
         // Then update the Rotation of this Entity and clamp its vertical rotation.
         if (Input.GetButton(MouseButton.Right) && ViewportFocused)
         {
-            TransformMovement();
-            HeightTransformMovement();
-
             Input.SetLockMouse(LockCursor);
 
-            _euler.X = Input.GetMouseDelta().Y;
-            _euler.Y = Input.GetMouseDelta().X;
-
-            // Update the entity rotation based on the calculated rotation and rotation speed.
-            Entity.Transform.EulerAngles -= _euler * Time.FixedDelta * _rotationSpeed;
-
-            // Clamp Vertical Rotation to 90 degrees up and down.
-            var clampedEuler = Entity.Transform.EulerAngles;
-            clampedEuler.X = Math.Clamp(clampedEuler.X, -89, 89);
-            Entity.Transform.EulerAngles = clampedEuler;
+            CalculateMovementDirection();
+            HeightTransformMovement();
+            CameraRotation();
         }
 
         // Check if the middle mouse button is pressed. If so, call the ScreenMovement function.
@@ -92,6 +81,22 @@ public sealed class ViewportController : EditorComponent, IHide
         Camera.RenderMode = Kernel.Instance.Config.RenderMode;
     }
 
+    private void CameraRotation()
+    {
+        Vector2 mouseDelta = Input.GetMouseDelta();
+
+        _euler.X = mouseDelta.Y;
+        _euler.Y = mouseDelta.X;
+
+        // Update the entity rotation based on the calculated rotation and rotation speed.
+        Entity.Transform.EulerAngles -= _euler * Time.DeltaF * _rotationSpeed;
+
+        // Clamp Vertical Rotation to 90 degrees up and down.
+        var clampedEuler = Entity.Transform.EulerAngles;
+        clampedEuler.X = Math.Clamp(clampedEuler.X, -89, 89);
+        Entity.Transform.EulerAngles = clampedEuler;
+    }
+
     private void MovementSpeedCalculation()
     {
         // Check if either the right or middle mouse button is pressed.
@@ -111,7 +116,7 @@ public sealed class ViewportController : EditorComponent, IHide
             _movementSpeedScaled /= 4;
     }
 
-    private void TransformMovement() =>
+    private void CalculateMovementDirection() =>
         // Calculate the direction based on the forward and right vectors of the entity's transform
         // and the X and Y axis inputs from the Input class.
         _direction = Entity.Transform.Forward * Input.GetAxis().Y + Entity.Transform.Right * Input.GetAxis().X;
@@ -127,7 +132,7 @@ public sealed class ViewportController : EditorComponent, IHide
         // If so, update the direction based on the mouse wheel input and the forward vector of the entity's transform.
         if (!Input.GetButton(MouseButton.Right)
          && !Input.GetButton(MouseButton.Middle)
-         && !Input.GetButton(MouseButton.Right))
+         && !Input.GetButton(MouseButton.Left))
             _direction += 25 * Entity.Transform.Forward * Input.GetMouseWheel();
     }
 

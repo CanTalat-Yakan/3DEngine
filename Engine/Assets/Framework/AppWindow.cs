@@ -109,7 +109,6 @@ public sealed partial class AppWindow
 
     private static void HandleSizeMessage(UIntPtr wParam, IntPtr lParam)
     {
-
         switch ((SizeMessage)wParam)
         {
             case SizeMessage.SIZE_RESTORED:
