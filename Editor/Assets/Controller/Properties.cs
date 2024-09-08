@@ -10,7 +10,6 @@ using Windows.Foundation;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 
-using Engine;
 using Engine.Components;
 using Engine.ECS;
 using Engine.Editor;
@@ -38,7 +37,7 @@ internal sealed partial class Properties
         if (content is null)
             CreateEmptyMessage();
         else if (content.GetType() == typeof(EntityData))
-            CreateEntityProperties((EntityData)content);
+            CreateEntityProperties((Entity)content);
         else if (content.GetType() == typeof(MaterialEntry))
             CreateMaterialProperties((MaterialEntry)content);
         else if (content.GetType() == typeof(string))
@@ -72,43 +71,43 @@ internal sealed partial class Properties
         s_stackPanel.Children.Add(grid);
     }
 
-    private void CreateEntityProperties(EntityData entity)
+    private void CreateEntityProperties(Entity entity)
     {
         // Add Bindings for the Entity.
         Binding.SetEntityBindings(entity);
 
         Grid[] properties = new[]
         {
-                CreateBool(entity.GUID, null, "IsStatic", false).WrapInField("Static"),
-                CreateEnum(Enum.GetNames(typeof(Tags))).WrapInField("Tag"),
-                CreateEnum(Enum.GetNames(typeof(Layers))).WrapInField("Layer"),
-                CreateTextFullWithOpacity(entity.GetDebugInformation()).WrapInField("Debug")
+            CreateBool(entity.GUID, null, "IsStatic", false).WrapInField("Static"),
+            CreateEnum(Enum.GetNames(typeof(Tags))).WrapInField("Tag"),
+            CreateEnum(Enum.GetNames(typeof(Layers))).WrapInField("Layer"),
+            CreateTextFullWithOpacity(entity.Data.GetDebugInformation()).WrapInField("Debug")
         };
 
         Grid[] transform = new[]
         {
-                CreateVec3InputWithRGB(
-                    entity.GUID,
-                    entity.Transform, "LocalPosition",
-                    entity.Transform.LocalPosition)
-                .WrapInField("Position"),
-                CreateQuaternionInputWithRGBFromEuler(
-                    entity.GUID,
-                    entity.Transform, "_localRotation",
-                    entity.Transform.LocalRotation)
-                .WrapInField("Rotation"),
-                CreateVec3InputWithRGB(
-                    entity.GUID,
-                    entity.Transform, "LocalScale",
-                    entity.Transform.LocalScale)
-                .WrapInField("Scale"),
-            };
+            CreateVec3InputWithRGB(
+                entity.GUID,
+                entity.Transform, "LocalPosition",
+                entity.Transform.LocalPosition)
+            .WrapInField("Position"),
+            CreateQuaternionInputWithRGBFromEuler(
+                entity.GUID,
+                entity.Transform, "_localRotation",
+                entity.Transform.LocalRotation)
+            .WrapInField("Rotation"),
+            CreateVec3InputWithRGB(
+                entity.GUID,
+                entity.Transform, "LocalScale",
+                entity.Transform.LocalScale)
+            .WrapInField("Scale"),
+        };
 
         s_stackPanel.Children.Add(
             properties.StackInGrid()
             .WrapInExpanderWithEditableHeaderAndCheckBox(
                 entity.GUID,
-                entity.Name,
+                entity.Data.Name,
                 true));
 
         s_stackPanel.Children.Add(CreateSeperator());
@@ -178,7 +177,7 @@ internal sealed partial class Properties
             }
 
             // Add an event handler to update the current stackPanel when a new component is added.
-            entity.Components.OnAdd += (s, e) =>
+            entity.EventOnAddComponent += () =>
             {
                 if (s_currentlySet.Equals(entity))
                     Set(entity);
@@ -247,13 +246,13 @@ internal sealed partial class Properties
 
         Grid[] properties = new[]
         {
-                CreateText(Path.GetFileNameWithoutExtension(path)).WrapInFieldEqual("File name:"),
-                CreateText(Path.GetExtension(path)).WrapInFieldEqual("File type:"),
-                CreateText(SizeSuffix(fileInfo.Length)).WrapInFieldEqual("File size:"),
-                CreateSpacer(),
-                CreateTextEqual(fileInfo.CreationTime.ToShortDateString() + "⠀" + fileInfo.CreationTime.ToShortTimeString()).WrapInFieldEqual("Creation time:"),
-                CreateTextEqual(fileInfo.LastAccessTime.ToShortDateString() + "⠀" + fileInfo.LastAccessTime.ToShortTimeString()).WrapInFieldEqual("Last access time:"),
-                CreateTextEqual(fileInfo.LastWriteTime.ToShortDateString() + "⠀" + fileInfo.LastWriteTime.ToShortTimeString()).WrapInFieldEqual("Last update time:")
+            CreateText(Path.GetFileNameWithoutExtension(path)).WrapInFieldEqual("File name:"),
+            CreateText(Path.GetExtension(path)).WrapInFieldEqual("File type:"),
+            CreateText(SizeSuffix(fileInfo.Length)).WrapInFieldEqual("File size:"),
+            CreateSpacer(),
+            CreateTextEqual(fileInfo.CreationTime.ToShortDateString() + "⠀" + fileInfo.CreationTime.ToShortTimeString()).WrapInFieldEqual("Creation time:"),
+            CreateTextEqual(fileInfo.LastAccessTime.ToShortDateString() + "⠀" + fileInfo.LastAccessTime.ToShortTimeString()).WrapInFieldEqual("Last access time:"),
+            CreateTextEqual(fileInfo.LastWriteTime.ToShortDateString() + "⠀" + fileInfo.LastWriteTime.ToShortTimeString()).WrapInFieldEqual("Last update time:")
         };
 
         s_stackPanel.Children.Add(properties.StackInGrid().WrapInExpander(Path.GetFileName(path), false));
@@ -269,10 +268,10 @@ internal sealed partial class Properties
         if (File.Exists(path))
             // When the file extension is in a readable format, continue.
             if (fileInfo.Extension == ".cs"
-                || fileInfo.Extension == ".txt"
-                || fileInfo.Extension == ".usd"
-                || fileInfo.Extension == ".mat"
-                || fileInfo.Extension == ".hlsl")
+             || fileInfo.Extension == ".txt"
+             || fileInfo.Extension == ".usd"
+             || fileInfo.Extension == ".mat"
+             || fileInfo.Extension == ".hlsl")
             {
                 // Read all the lines in the file asynchronously and store them in an array of strings.
                 string[] lines = await File.ReadAllLinesAsync(path);
@@ -287,12 +286,10 @@ internal sealed partial class Properties
             }
     }
 
-    private MenuFlyout CreateDefaultMenuFlyout(EntityData entity, Component component)
+    private MenuFlyout CreateDefaultMenuFlyout(Entity entity, Component component)
     {
         // Create an array of MenuFlyoutItems.
-        MenuFlyoutItem[] items = new[] {
-                new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) },
-            };
+        MenuFlyoutItem[] items = new[] { new MenuFlyoutItem() { Text = "Delete", Icon = new SymbolIcon(Symbol.Delete) } };
 
         // Add a click event to the first item in the items array.
         // The event will remove the component from the entity when clicked.
@@ -379,7 +376,7 @@ internal sealed partial class Properties
         return grid;
     }
 
-    public Grid CreateFromComponentFieldInfo(object component, EntityData entity, FieldInfo fieldInfo, FieldInfo[] nonPublic)
+    public Grid CreateFromComponentFieldInfo(object component, Entity entity, FieldInfo fieldInfo, FieldInfo[] nonPublic)
     {
         Grid finalGrid = null;
 
@@ -714,11 +711,13 @@ internal sealed partial class Properties
 
         // Create the grid that contains the event information and attributes.
         return
-            (new Grid[] {
-                    // Stack processed attributes in a grid.
-                    ProcessAttributes(attributes).StackInGrid(),
-                    // Stack event grid and wrap it with field name.
-                    CreateEvent(eventInfo.Name, (s, e) => eventInfo.GetRaiseMethod()).WrapInField(eventInfo.Name)})
+            (new Grid[] 
+            {
+                // Stack processed attributes in a grid.
+                ProcessAttributes(attributes).StackInGrid(),
+                // Stack event grid and wrap it with field name.
+                CreateEvent(eventInfo.Name, (s, e) => eventInfo.GetRaiseMethod()).WrapInField(eventInfo.Name)
+            })
             .StackInGrid(0).AddToolTip(toolTip);
     }
 
@@ -746,10 +745,12 @@ internal sealed partial class Properties
     }
 
     public Grid ReturnProcessedFieldInfo(List<Grid> grid, object[] attributes, FieldInfo fieldInfo, ToolTip toolTip) =>
-        new Grid[] {
+        new Grid[] 
+        {
             // Stack processed attributes in a grid.
             ProcessAttributes(attributes).StackInGrid(),
             // Stack field grid and wrap it with field name.
-            grid.ToArray().StackInGrid().WrapInField(fieldInfo.Name)}
+            grid.ToArray().StackInGrid().WrapInField(fieldInfo.Name)
+        }
         .StackInGrid(0).AddToolTip(toolTip);
 }

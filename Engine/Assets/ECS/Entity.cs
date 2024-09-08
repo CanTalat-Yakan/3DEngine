@@ -24,6 +24,7 @@ public enum Layers
 
 public sealed partial class Entity
 {
+    public Guid GUID { get; } = Guid.NewGuid();
     public int ID { get; set; }
     public EntityData Data { get; }
 
@@ -33,6 +34,8 @@ public sealed partial class Entity
 
     public SystemManager SystemManager => _systemManager ??= Kernel.Instance.SystemManager;
     public SystemManager _systemManager;
+
+    public Action EventOnAddComponent;
 
     public Entity(int id, EntityData data)
     {
@@ -63,6 +66,8 @@ public sealed partial class Entity
                 component.OnAwake();
                 component.OnStart();
             }
+
+        EventOnAddComponent?.Invoke();
 
         return component;
     }
@@ -112,8 +117,6 @@ public sealed partial class EntityData
     public Entity _parent;
 
     public List<Entity> Children { get; private set; } = new();
-
-    public Guid GUID = Guid.NewGuid();
 
     public string Name;
     public bool IsEnabled = true;
