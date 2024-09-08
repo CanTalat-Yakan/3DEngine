@@ -4,7 +4,7 @@ public sealed partial class DefaultSky : EditorComponent, IHide
 {
     public RootSignature RootSignature;
 
-    public MeshInfo SkyMeshInfo;
+    public MeshData SkyMeshData;
     public Texture2D SkyGradientTexture;
     public Texture2D SkyGradientLightTexture;
 
@@ -26,7 +26,7 @@ public sealed partial class DefaultSky : EditorComponent, IHide
         Entity.Data.IsHidden = true;
 
         var mesh = Entity.AddComponent<Mesh>();
-        mesh.SetMeshInfo(Assets.Meshes["Sphere.obj"]);
+        mesh.SetMeshData(Assets.Meshes["Sphere.obj"]);
         mesh.SetMaterialTextures([new("Default.png", 0)]);
         mesh.SetMaterialPipeline("Sky");
     }

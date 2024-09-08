@@ -13,23 +13,23 @@ namespace Engine.Loader;
 
 public sealed partial class ModelLoader
 {
-    private static MeshInfo CreateMesh(string meshName, string inputLayoutElements, List<int> indices, List<float> vertices, List<Vector3> positions)
+    private static MeshData CreateMesh(string meshName, string inputLayoutElements, List<int> indices, List<float> vertices, List<Vector3> positions)
     {
-        var meshInfo = Context.CreateMesh(meshName, inputLayoutElements);
-        meshInfo.IndexCount = indices.Count;
-        meshInfo.VertexCount = positions.Count;
-        meshInfo.BoundingBox = BoundingBox.CreateFromPoints(positions.ToArray());
+        var meshData = Context.CreateMesh(meshName, inputLayoutElements);
+        meshData.IndexCount = indices.Count;
+        meshData.VertexCount = positions.Count;
+        meshData.BoundingBox = BoundingBox.CreateFromPoints(positions.ToArray());
 
         GPUUpload upload = new()
         {
-            MeshInfo = meshInfo,
+            MeshData = meshData,
             VertexData = vertices.ToArray(),
             IndexData = indices.ToArray(),
             IndexFormat = Format.R32_UInt,
         };
         Context.UploadQueue.Enqueue(upload);
 
-        return meshInfo;
+        return meshData;
     }
 }
 
@@ -38,7 +38,7 @@ public sealed partial class ModelLoader
     public static CommonContext Context => _context ??= Kernel.Instance.Context;
     public static CommonContext _context;
 
-    public static MeshInfo LoadFile(string filePath, string inputLayoutElements = "PNTt")
+    public static MeshData LoadFile(string filePath, string inputLayoutElements = "PNTt")
     {
         var meshName = new FileInfo(filePath).Name;
         if (Assets.Meshes.ContainsKey(meshName))
@@ -95,7 +95,7 @@ public sealed partial class ModelLoader
 
 public sealed partial class ModelLoader
 {
-    public static UsdGeomMesh ConvertMeshToUSD(MeshInfo mesh, UsdGeomMesh usdMesh)
+    public static UsdGeomMesh ConvertMeshToUSD(MeshData mesh, UsdGeomMesh usdMesh)
     {
         usdMesh.CreateOrientationAttr(UsdGeomTokens.leftHanded);
         usdMesh.CreatePointsAttr();
@@ -106,7 +106,7 @@ public sealed partial class ModelLoader
         return usdMesh;
     }
 
-    public static MeshInfo ConvertMeshFromUSD(UsdPrim prim)
+    public static MeshData ConvertMeshFromUSD(UsdPrim prim)
     {
         var meshName = prim.GetName();
         if (Assets.Meshes.ContainsKey(meshName))
@@ -155,7 +155,7 @@ public sealed partial class ModelLoader
             for (int j = 0; j < faceVertexCounts[i]; ++j)
                 indices.Add(faceVertexIndices[idx++]);
 
-        return CreateMesh(prim.GetName(), "PNTt", indices, vertices, positions);
+        return CreateMesh(meshName, "PNTt", indices, vertices, positions);
     }
 
     public static UsdShadeMaterial ConvertMaterialToUSD(Components.Material material, UsdShadeMaterial usdMaterial)

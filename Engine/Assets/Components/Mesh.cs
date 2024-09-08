@@ -8,10 +8,10 @@ namespace Engine.Components;
 
 public sealed partial class Mesh : EditorComponent
 {
-    public static MeshInfo CurrentMeshInfoOnGPU { get; set; }
+    public static MeshData CurrentMeshDataOnGPU { get; set; }
     public static Material CurrentMaterialOnGPU { get; set; }
 
-    public MeshInfo MeshInfo { get; private set; }
+    public MeshData MeshData { get; private set; }
     public Material Material { get; private set; } = new();
 
     public BoundingBox TransformedBoundingBox { get; private set; }
@@ -35,7 +35,7 @@ public sealed partial class Mesh : EditorComponent
     {
         if (!string.IsNullOrEmpty(MeshPath))
             if (File.Exists(MeshPath))
-                try { SetMeshInfo(ModelLoader.LoadFile(MeshPath)); }
+                try { SetMeshData(ModelLoader.LoadFile(MeshPath)); }
                 finally { MeshPath = null; }
 
         if (!string.IsNullOrEmpty(ShaderName))
@@ -45,19 +45,19 @@ public sealed partial class Mesh : EditorComponent
 
     public override void OnRender()
     {
-        if (MeshInfo is null || Material is null)
+        if (MeshData is null || Material is null)
             return;
 
         if (!InBounds)
             return;
 
-        if (MeshInfo.Equals(CurrentMeshInfoOnGPU)
+        if (MeshData.Equals(CurrentMeshDataOnGPU)
          && Material.Equals(CurrentMaterialOnGPU))
         {
             Context.UploadBuffer.Upload(Entity.Transform.GetConstantBuffer(), out var offset);
             Context.UploadBuffer.SetConstantBufferView(offset, 1);
 
-            Context.GraphicsContext.DrawIndexedInstanced(MeshInfo.IndexCount, 1, 0, 0, 0);
+            Context.GraphicsContext.DrawIndexedInstanced(MeshData.IndexCount, 1, 0, 0, 0);
         }
         else
         {
@@ -70,19 +70,19 @@ public sealed partial class Mesh : EditorComponent
 
             Material.Setup();
 
-            Context.GraphicsContext.SetMesh(MeshInfo);
+            Context.GraphicsContext.SetMesh(MeshData);
 
             Context.UploadBuffer.Upload(Entity.Transform.GetConstantBuffer(), out var offset);
             Context.UploadBuffer.SetConstantBufferView(offset, 1);
 
-            Context.GraphicsContext.DrawIndexedInstanced(MeshInfo.IndexCount, 1, 0, 0, 0);
+            Context.GraphicsContext.DrawIndexedInstanced(MeshData.IndexCount, 1, 0, 0, 0);
 
-            CurrentMeshInfoOnGPU = MeshInfo;
+            CurrentMeshDataOnGPU = MeshData;
             CurrentMaterialOnGPU = Material;
         }
 
-        Profiler.Vertices += MeshInfo.VertexCount;
-        Profiler.Indices += MeshInfo.IndexCount;
+        Profiler.Vertices += MeshData.VertexCount;
+        Profiler.Indices += MeshData.IndexCount;
         Profiler.DrawCalls++;
     }
 
@@ -90,18 +90,18 @@ public sealed partial class Mesh : EditorComponent
     {
         UnsubscribeCheckBounds();
 
-        MeshInfo?.Dispose();
+        MeshData?.Dispose();
     }
 }
 
 public sealed partial class Mesh : EditorComponent
 {
-    public void SetMeshInfo(MeshInfo meshInfo)
+    public void SetMeshData(MeshData meshData)
     {
-        MeshInfo = meshInfo;
-        Order = (byte)Array.IndexOf(Assets.Meshes.Values.ToArray(), meshInfo);
+        MeshData = meshData;
+        Order = (byte)Array.IndexOf(Assets.Meshes.Values.ToArray(), meshData);
 
-        InstantiateBounds(meshInfo.BoundingBox);
+        InstantiateBounds(meshData.BoundingBox);
 
         Material.SetRootSignature("CC");
     }
@@ -123,10 +123,10 @@ public sealed partial class Mesh : EditorComponent
 
     private void InstantiateBounds(BoundingBox boundingBox)
     {
-        MeshInfo.BoundingBox = boundingBox;
+        MeshData.BoundingBox = boundingBox;
 
         TransformedBoundingBox = BoundingBox.Transform(
-            MeshInfo.BoundingBox,
+            MeshData.BoundingBox,
             Entity.Transform.WorldMatrix);
     }
 }
@@ -162,11 +162,11 @@ public sealed partial class Mesh : EditorComponent
 
     private void CheckBounds()
     {
-        if (MeshInfo is null)
+        if (MeshData is null)
             return;
 
         TransformedBoundingBox = BoundingBox.Transform(
-            MeshInfo.BoundingBox,
+            MeshData.BoundingBox,
             Entity.Transform.WorldMatrix);
 
         var boundingFrustum = Camera.CurrentRenderingCamera.BoundingFrustum;

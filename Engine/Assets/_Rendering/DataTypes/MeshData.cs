@@ -21,7 +21,7 @@ public sealed class VertexBuffer : IDisposable
     }
 }
 
-public sealed class MeshInfo : IDisposable
+public sealed class MeshData : IDisposable
 {
     public string Name;
 

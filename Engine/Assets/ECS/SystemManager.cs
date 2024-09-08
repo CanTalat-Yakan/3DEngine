@@ -145,7 +145,7 @@ public sealed partial class SystemManager
 
         MeshSystem.Render();
 
-        Mesh.CurrentMeshInfoOnGPU = null;
+        Mesh.CurrentMeshDataOnGPU = null;
         Mesh.CurrentMaterialOnGPU = null;
     }
 

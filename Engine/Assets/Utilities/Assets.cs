@@ -27,7 +27,7 @@ public sealed partial class Assets
     public static Dictionary<string, PipelineStateObject> PipelineStateObjects = new();
 
     public static Dictionary<string, Texture2D> RenderTargets = new();
-    public static Dictionary<string, MeshInfo> Meshes = new();
+    public static Dictionary<string, MeshData> Meshes = new();
 
     public static Dictionary<string, SerializableConstantBuffer> SerializableConstantBuffers = new();
 

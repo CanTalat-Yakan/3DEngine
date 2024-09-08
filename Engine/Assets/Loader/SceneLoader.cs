@@ -82,13 +82,13 @@ public sealed class SceneLoader
 
             if (type.ToString().Equals("Mesh"))
             {
-                var meshInfo = ModelLoader.ConvertMeshFromUSD(prim);
+                var meshData = ModelLoader.ConvertMeshFromUSD(prim);
 
                 EntityData entityData = new() { Name = prim.GetName() };
                 Entity entity = EntityManager.CreateEntity(entityData);
 
                 var mesh = entity.AddComponent<Mesh>();
-                mesh.SetMeshInfo(meshInfo);
+                mesh.SetMeshData(meshData);
                 mesh.SetMaterialTextures([new("Default.png", 0)]);
                 mesh.SetMaterialPipeline("SimpleLit");
             }

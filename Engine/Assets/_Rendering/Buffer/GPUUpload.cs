@@ -12,5 +12,5 @@ public sealed class GPUUpload
     public byte[] TextureData;
 
     public Texture2D Texture2D;
-    public MeshInfo MeshInfo;
+    public MeshData MeshData;
 }

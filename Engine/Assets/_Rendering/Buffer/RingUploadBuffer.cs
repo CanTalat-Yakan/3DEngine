@@ -75,7 +75,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
     public void SetConstantBufferView(int offset, int slot) =>
         GraphicsContext.SetConstantBufferView(this, offset, slot);
 
-    public void UploadIndexBuffer(MeshInfo mesh, Span<byte> index, Format indexFormat, int? overrideSizeInByte = null)
+    public void UploadIndexBuffer(MeshData mesh, Span<byte> index, Format indexFormat, int? overrideSizeInByte = null)
     {
         int indexSizeInByte = overrideSizeInByte is not null ? overrideSizeInByte.Value : index.Length;
         int indexCount = indexSizeInByte / GraphicsDevice.GetSizeInByte(indexFormat);
@@ -104,7 +104,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         GraphicsContext.CommandList.ResourceBarrierTransition(mesh.IndexBufferResource, ResourceStates.CopyDest, ResourceStates.GenericRead);
     }
 
-    public void UploadVertexBuffer(MeshInfo mesh, Span<byte> vertex, int? overrideSizeInByte = null)
+    public void UploadVertexBuffer(MeshData mesh, Span<byte> vertex, int? overrideSizeInByte = null)
     {
         var vertexSizeInByte = overrideSizeInByte is not null ? overrideSizeInByte.Value : vertex.Length;
 

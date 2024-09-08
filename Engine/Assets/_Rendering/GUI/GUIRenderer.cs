@@ -6,7 +6,7 @@ public unsafe sealed partial class GUIRenderer
 {
     public RootSignature RootSignature;
 
-    public MeshInfo GUIMesh;
+    public MeshData GUIMesh;
     public Texture2D FontTexture;
 
     public CommonContext Context => _context ??= Kernel.Instance.Context;
@@ -149,15 +149,15 @@ public unsafe sealed partial class GUIRenderer
         {
             var commandList = data.CmdListsRange[i];
 
-            var mesh = Context.CreateMesh($"ImGui Mesh {i}", inputLayoutElements: "ptc", indexFormat16Bit: true);
+            var meshData = Context.CreateMesh($"ImGui Mesh {i}", inputLayoutElements: "ptc", indexFormat16Bit: true);
 
-            var indexBytes = commandList.IdxBuffer.Size * mesh.IndexStride;
-            var vertexBytes = commandList.VtxBuffer.Size * mesh.VertexStride;
+            var indexBytes = commandList.IdxBuffer.Size * meshData.IndexStride;
+            var vertexBytes = commandList.VtxBuffer.Size * meshData.VertexStride;
 
-            Context.UploadBuffer.UploadIndexBuffer(mesh, new Span<byte>(commandList.IdxBuffer.Data.ToPointer(), indexBytes), mesh.IndexFormat);
-            Context.UploadBuffer.UploadVertexBuffer(mesh, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), vertexBytes));
+            Context.UploadBuffer.UploadIndexBuffer(meshData, new Span<byte>(commandList.IdxBuffer.Data.ToPointer(), indexBytes), meshData.IndexFormat);
+            Context.UploadBuffer.UploadVertexBuffer(meshData, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), vertexBytes));
 
-            Context.GraphicsContext.SetMesh(mesh);
+            Context.GraphicsContext.SetMesh(meshData);
 
             for (int j = 0; j < commandList.CmdBuffer.Size; j++)
             {

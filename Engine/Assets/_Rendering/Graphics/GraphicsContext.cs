@@ -37,7 +37,7 @@ public sealed partial class GraphicsContext : IDisposable
 
 public sealed partial class GraphicsContext : IDisposable
 {
-    public void SetMesh(MeshInfo mesh, PrimitiveTopology topology = PrimitiveTopology.TriangleList)
+    public void SetMesh(MeshData mesh, PrimitiveTopology topology = PrimitiveTopology.TriangleList)
     {
         CommandList.IASetPrimitiveTopology(topology);
 
@@ -100,7 +100,7 @@ public sealed partial class GraphicsContext : IDisposable
         }
     }
 
-    public void UploadMesh(MeshInfo mesh, float[] vertexData, int[] indexData, Format indexFormat)
+    public void UploadMesh(MeshData mesh, float[] vertexData, int[] indexData, Format indexFormat)
     {
         var vertexFormat = Format.R32_Float;
         var vertexSizeInByte = GraphicsDevice.GetSizeInByte(vertexFormat);

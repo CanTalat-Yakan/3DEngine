@@ -128,9 +128,9 @@ public sealed partial class CommonContext : IDisposable
         }
     }
 
-    public MeshInfo CreateMesh(string name, string inputLayoutElements = "PNTt", bool indexFormat16Bit = true)
+    public MeshData CreateMesh(string name, string inputLayoutElements = "PNTt", bool indexFormat16Bit = true)
     {
-        if (Assets.Meshes.TryGetValue(name, out MeshInfo mesh))
+        if (Assets.Meshes.TryGetValue(name, out MeshData mesh))
             return mesh;
         else
         {
@@ -214,9 +214,9 @@ public sealed partial class CommonContext : IDisposable
     {
         while (UploadQueue.TryDequeue(out var upload))
         {
-            if (upload.MeshInfo is not null)
+            if (upload.MeshData is not null)
                 graphicsContext.UploadMesh(
-                    upload.MeshInfo,
+                    upload.MeshData,
                     upload.VertexData,
                     upload.IndexData,
                     upload.IndexFormat);
