@@ -44,7 +44,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
         ExampleCamera.Transform.LocalPosition = new(3, 4, 5);
         ExampleCamera.Transform.EulerAngles = new(35, -150, 0);
 
-        Empty = Entity.Manager.CreateEntity(null, "Empty");
+        Empty = Entity.Manager.CreateEntity(null, "Empty", hide: true);
 
         Cubes = Entity.Manager.CreateEntity(null, "Cubes");
         Entity.Manager.CreatePrimitive(PrimitiveTypes.Cube, parent: Cubes);

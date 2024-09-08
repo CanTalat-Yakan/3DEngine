@@ -9,7 +9,7 @@ global using pxr;
 
 global using Engine.Buffer;
 global using Engine.Components;
-global using Engine.DataTypes;
+global using Engine.DataStructures;
 global using Engine.ECS;
 global using Engine.Editor;
 global using Engine.Essentials;

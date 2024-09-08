@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 using SharpGen.Runtime;
 
-namespace Engine.DataTypes;
+namespace Engine.DataStructures;
 
 public class ShaderIncludeHandler : CallbackBase, IDxcIncludeHandler
 {

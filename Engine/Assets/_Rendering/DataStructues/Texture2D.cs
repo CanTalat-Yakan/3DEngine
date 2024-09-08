@@ -1,7 +1,7 @@
 ﻿using Vortice.Direct3D12;
 using Vortice.DXGI;
 
-namespace Engine.DataTypes;
+namespace Engine.DataStructures;
 
 public sealed class Texture2D : IDisposable
 {

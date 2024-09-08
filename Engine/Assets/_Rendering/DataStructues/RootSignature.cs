@@ -2,7 +2,7 @@
 
 using Vortice.Direct3D12;
 
-namespace Engine.DataTypes;
+namespace Engine.DataStructures;
 
 public enum RootSignatureParameters
 {
