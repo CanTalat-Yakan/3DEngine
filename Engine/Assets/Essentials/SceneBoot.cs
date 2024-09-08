@@ -52,7 +52,8 @@ internal sealed class SceneBoot : EditorComponent, IHide
         Output.Log("Press 'C' to spawn 1000 Cubes");
         Output.Log("Press 'T' to spawn 1000 Simple Entities");
         Output.Log("Press 'R' to destroy all Simple  Entities");
-        Output.Log("Press 'V' to add a Viewport Controller");
+        if (!EditorState.EditorBuild)
+            Output.Log("Press 'V' to add a Viewport Controller");
     }
 
     public override void OnUpdate()
@@ -99,14 +100,14 @@ internal sealed class SceneBoot : EditorComponent, IHide
         {
             _processing = true;
 
-            foreach(var child in Empty.Data.Children.ToArray())
+            foreach (var child in Empty.Data.Children.ToArray())
                 Entity.Manager.DestroyEntity(child);
 
             Output.Log($"Destroyed {EntityCount} Entities");
         }
 
         if (Input.GetKey(Key.V, InputState.Pressed) && ViewportController.ViewportFocused)
-            if (EditorState.PlayMode && !ExampleCamera.HasComponent<ViewportController>())
+            if (!EditorState.EditorBuild && !ExampleCamera.HasComponent<ViewportController>())
             {
                 Output.Log($"Viewport Controller added");
 
