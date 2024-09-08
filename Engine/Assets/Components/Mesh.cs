@@ -17,11 +17,11 @@ public sealed partial class Mesh : EditorComponent
     public BoundingBox TransformedBoundingBox { get; private set; }
     public bool InBounds { get; set; } = true;
 
-    public CommonContext Context => _context ??= Kernel.Instance.Context;
-    public CommonContext _context;
+    [Hide] public CommonContext Context => _context ??= Kernel.Instance.Context;
+    private CommonContext _context;
 
-    public GraphicsContext GraphicsContext => _graphicsContext ??= Kernel.Instance.Context.GraphicsContext;
-    public GraphicsContext _graphicsContext;
+    [Hide] public GraphicsContext GraphicsContext => _graphicsContext ??= Kernel.Instance.Context.GraphicsContext;
+    private GraphicsContext _graphicsContext;
 
     public override void OnRegister() =>
         MeshSystem.Register(this);

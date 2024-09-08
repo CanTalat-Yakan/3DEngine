@@ -73,7 +73,7 @@ internal sealed partial class Hierarchy
         treeView.SelectedNode = selectedNode;
 
         var treeViewIconNode = (TreeViewIconNode)selectedNode.Content;
-        var entity = GetEntityData(treeViewIconNode.TreeEntry);
+        var entity = GetEntityData(treeViewIconNode.TreeEntry).Entity;
 
         Properties.Set(entity);
     }

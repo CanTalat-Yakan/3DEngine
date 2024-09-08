@@ -11,6 +11,7 @@ using Microsoft.UI.Xaml;
 using Engine.ECS;
 using Engine.Essentials;
 using Engine.Runtime;
+using Engine.Editor;
 
 namespace Editor.Controller;
 
@@ -122,9 +123,10 @@ internal sealed partial class Binding
         EntityBindings.Add("IsStatic" + entity.GUID, new(entity, "IsStatic"));
         EntityBindings.Add("IsEnabled" + entity.GUID, new(entity, "IsEnabled"));
 
-        foreach (var component in entity.GetComponentTypes())
-            foreach (var field in component.GetFields(AllBindingFlags))
-                EntityBindings.Add(field.Name + component.GetType().FullName + entity.GUID, new(component, field.Name));
+        foreach (var component in entity.GetComponents())
+            foreach (var fieldInfo in component.GetType().GetFields(AllBindingFlags))
+                if(!fieldInfo.GetCustomAttributes().OfType<HideAttribute>().Any())
+                    EntityBindings.Add(fieldInfo.Name + component.GetType().FullName + entity.GUID, new(component, fieldInfo.Name));
     }
 
     public static void SetMaterialBindings(MaterialEntry materialEntry)
