@@ -36,7 +36,7 @@ internal sealed partial class Properties
 
         if (content is null)
             CreateEmptyMessage();
-        else if (content.GetType() == typeof(EntityData))
+        else if (content.GetType() == typeof(Entity))
             CreateEntityProperties((Entity)content);
         else if (content.GetType() == typeof(MaterialEntry))
             CreateMaterialProperties((MaterialEntry)content);

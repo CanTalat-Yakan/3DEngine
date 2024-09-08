@@ -26,6 +26,7 @@ public sealed partial class Entity
 {
     public Guid GUID { get; } = Guid.NewGuid();
     public int ID { get; set; }
+
     public EntityData Data { get; }
 
     public EntityManager Manager;
@@ -72,20 +73,20 @@ public sealed partial class Entity
         return component;
     }
 
-    public bool HasComponent<T>() where T : Component =>
-        GetComponentTypes().Contains(typeof(T));
-
-    public T GetComponent<T>() where T : Component =>
+    public T[] GetComponent<T>() where T : Component =>
         SystemManager.ComponentManager.GetComponent<T>(this);
 
-    public Component GetComponent(Type type) =>
+    public Component[] GetComponent(Type type) =>
         SystemManager.ComponentManager.GetComponent(this, type);
+    
+    public Component[] GetComponents() =>
+        SystemManager.ComponentManager.GetComponents(this);
 
     public Type[] GetComponentTypes() =>
         SystemManager.ComponentManager.GetComponentTypes(this);
 
-    public Component[] GetComponents() =>
-        SystemManager.ComponentManager.GetComponents(this);
+    public bool HasComponent<T>() where T : Component =>
+        GetComponentTypes().Contains(typeof(T));
 
     public void RemoveComponent<T>() where T : Component =>
         SystemManager.ComponentManager.RemoveComponent<T>(this);
@@ -125,7 +126,7 @@ public sealed partial class EntityData
     public string Tag;
     public string Layer;
 
-    public Transform Transform => _transform ??= Entity.GetComponent<Transform>();
+    public Transform Transform => _transform ??= Entity.GetComponent<Transform>().FirstOrDefault();
     private Transform _transform;
 
     public bool ActiveInHierarchy => Parent is null ? IsEnabled : IsEnabled && (Parent.Data.ActiveInHierarchy && Parent.Data.IsEnabled);

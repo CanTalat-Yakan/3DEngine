@@ -146,10 +146,10 @@ internal sealed partial class Hierarchy
         if (entity.Data.IsHidden)
             return null;
 
-        TreeEntry treeEntry = new() { Name = entity.Data.Name, ID = entity.Data.GUID };
+        TreeEntry treeEntry = new() { Name = entity.Data.Name, ID = entity.GUID };
         treeEntry.IconNode = new() { Name = treeEntry.Name, TreeEntry = treeEntry, IsExpanded = false };
         treeEntry.IconNode.IsActive = true;
-        treeEntry.ParentID = entity.Data.Parent is not null ? entity.Data.Parent.Data.GUID : null;
+        treeEntry.ParentID = entity.Data.Parent is not null ? entity.Data.Parent.GUID : null;
 
         var components = entity.GetComponents();
         treeEntry.IconNode.Camera = components.OfType<Camera>().Any();
@@ -169,7 +169,7 @@ internal sealed partial class Hierarchy
 
     private void RemoveTreeEntry(SceneEntry sceneEntry, Entity entity)
     {
-        var treeEntry = GetTreeEntry(entity.Data.GUID);
+        var treeEntry = GetTreeEntry(entity.GUID);
 
         if (treeEntry is null)
             return;
@@ -874,15 +874,15 @@ internal sealed partial class Hierarchy
             {
                 // Duplicate the source entity to the target entity and get the new tree entry.
                 var newEntity = Engine.Kernel.Instance.SystemManager.GetEntityManagerFromGUID(sourceSceneEntry.ID).Duplicate(sourceEntity, targetEntity);
-                var newTreeEntry = GetTreeEntry(newEntity.Data.GUID, targetSceneEntry);
+                var newTreeEntry = GetTreeEntry(newEntity.GUID, targetSceneEntry);
 
                 // Iterate through each child icon node of the source tree entry.
                 foreach (var childIconNode in sourceTreeEntry.IconNode.Children)
                 {
                     // Get the child entity for the child icon node.
-                    GetEntity(out Entity childEntity, sourceEntityManager.GetEntityFromGUID(childIconNode.TreeEntry.ID).Data.GUID, sourceSceneEntry);
+                    GetEntity(out Entity childEntity, sourceEntityManager.GetEntityFromGUID(childIconNode.TreeEntry.ID).GUID, sourceSceneEntry);
                     // Recursively paste the child entity and its children to the new entity.
-                    PasteEntity(childEntity.Data.GUID, newEntity.Data.GUID, DataPackageOperation.Copy);
+                    PasteEntity(childEntity.GUID, newEntity.GUID, DataPackageOperation.Copy);
                 }
 
                 // Migrate the icon node and entity recursively to the target scene.
@@ -943,15 +943,15 @@ internal sealed partial class Hierarchy
             {
                 // Duplicate the source entity to the target scene and get the new tree entry.
                 var newEntity = Engine.Kernel.Instance.SystemManager.GetEntityManagerFromGUID(sourceSceneEntry.ID).Duplicate(sourceEntity);
-                var newTreeEntry = GetTreeEntry(newEntity.Data.GUID, targetSceneEntry);
+                var newTreeEntry = GetTreeEntry(newEntity.GUID, targetSceneEntry);
 
                 // Iterate through each child icon node of the source tree entry.
                 foreach (var childIconNode in sourceTreeEntry.IconNode.Children)
                 {
                     // Get the child entity for the child icon node.
-                    GetEntity(out Entity childEntity, sourceEntityManager.GetEntityFromGUID(childIconNode.TreeEntry.ID).Data.GUID, sourceSceneEntry);
+                    GetEntity(out Entity childEntity, sourceEntityManager.GetEntityFromGUID(childIconNode.TreeEntry.ID).GUID, sourceSceneEntry);
                     // Recursively paste the child entity and its children to the new entity.
-                    PasteEntity(childEntity.Data.GUID, newEntity.Data.GUID, DataPackageOperation.Copy);
+                    PasteEntity(childEntity.GUID, newEntity.GUID, DataPackageOperation.Copy);
                 }
 
                 // Migrate the icon node and entity recursively to the target scene.

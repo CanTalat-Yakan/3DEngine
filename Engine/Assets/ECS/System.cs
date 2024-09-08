@@ -94,7 +94,7 @@ public partial class System<T> where T : Component
 
 public partial class System<T> where T : Component
 {
-    private static ParallelOptions _options = new() { MaxDegreeOfParallelism = Environment.ProcessorCount };
+    private static ParallelOptions _options = new() { MaxDegreeOfParallelism = EditorState.EditorBuild ? 1 : Environment.ProcessorCount };
 
     public static void SimpleUpdate() =>
         Parallel.ForEach(s_components, _options, component => component.OnUpdate());

@@ -102,7 +102,7 @@ public sealed partial class EntityManager
     public Entity GetEntityFromGUID(Guid guid)
     {
         foreach (var entity in Entities.Values)
-            if (entity?.Data.GUID == guid)
+            if (entity?.GUID == guid)
                 return entity;
 
         return null;

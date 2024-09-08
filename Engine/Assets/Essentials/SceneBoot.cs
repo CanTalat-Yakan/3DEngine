@@ -50,7 +50,8 @@ internal sealed class SceneBoot : EditorComponent, IHide
         Entity.Manager.CreatePrimitive(PrimitiveTypes.Cube, parent: Cubes);
 
         Output.Log("Press 'C' to spawn 1000 Cubes");
-        Output.Log("Press 'E' to spawn 1000 Entities");
+        Output.Log("Press 'T' to spawn 1000 Simple Entities");
+        Output.Log("Press 'R' to destroy all Simple  Entities");
         Output.Log("Press 'V' to add a Viewport Controller");
     }
 
@@ -77,7 +78,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
             }
         }
 
-        if (Input.GetKey(Key.E, InputState.Pressed) && ViewportController.ViewportFocused)
+        if (Input.GetKey(Key.T, InputState.Pressed) && ViewportController.ViewportFocused)
         {
             Output.Log($"Spawned {EntityCount += 1_000} Entities");
 
