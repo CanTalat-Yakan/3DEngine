@@ -52,13 +52,13 @@ public sealed partial class CommonContext : IDisposable
     {
         CreateShaderFromResources(["Unlit", "SimpleLit", "Sky"]);
 
-        ModelLoader.LoadFile(Paths.PRIMITIVES + "Cube.obj");
-        ModelLoader.LoadFile(Paths.PRIMITIVES + "Sphere.obj");
+        ModelLoader.LoadFile(AssetsPaths.PRIMITIVES + "Cube.obj");
+        ModelLoader.LoadFile(AssetsPaths.PRIMITIVES + "Sphere.obj");
 
-        ImageLoader.LoadTexture(Paths.TEXTURES + "Default.png");
-        ImageLoader.LoadTexture(Paths.TEXTURES + "SkyGradient.png");
-        ImageLoader.LoadTexture(Paths.TEXTURES + "Transparent.png");
-        ImageLoader.LoadTexture(Paths.TEXTURES + "UVMap.png");
+        ImageLoader.LoadTexture(AssetsPaths.TEXTURES + "Default.png");
+        ImageLoader.LoadTexture(AssetsPaths.TEXTURES + "SkyGradient.png");
+        ImageLoader.LoadTexture(AssetsPaths.TEXTURES + "Transparent.png");
+        ImageLoader.LoadTexture(AssetsPaths.TEXTURES + "UVMap.png");
     }
 
     public void Dispose()
@@ -112,8 +112,8 @@ public sealed partial class CommonContext : IDisposable
     {
         foreach (string shaderName in shaderNameList)
         {
-            Assets.VertexShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + shaderName + ".hlsl", "VS");
-            Assets.PixelShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + shaderName + ".hlsl", "PS");
+            Assets.VertexShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, AssetsPaths.SHADERS + shaderName + ".hlsl", "VS");
+            Assets.PixelShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, AssetsPaths.SHADERS + shaderName + ".hlsl", "PS");
             Assets.PipelineStateObjects[shaderName] = new PipelineStateObject(Assets.VertexShaders[shaderName], Assets.PixelShaders[shaderName]);
         }
     }

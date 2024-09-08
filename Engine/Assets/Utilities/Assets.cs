@@ -4,6 +4,22 @@ using Vortice.Direct3D12;
 
 namespace Engine.Utilities;
 
+public sealed class AssetsPaths
+{
+    public static readonly string DIRECTORY = AppContext.BaseDirectory;
+
+    public static readonly string ASSETS = DIRECTORY + @"Assets\";
+    public static readonly string RESOURCES = ASSETS + @"Resources\";
+
+    public static readonly string SCENENES = RESOURCES + @"Scenes\";
+    public static readonly string TEMPLATES = RESOURCES + @"Templates\";
+    public static readonly string SHADERS = RESOURCES + @"Shaders\";
+    public static readonly string TEXTURES = RESOURCES + @"Textures\";
+    public static readonly string MODELS = RESOURCES + @"Models\";
+
+    public static readonly string PRIMITIVES = MODELS + @"Primitives\";
+}
+
 public struct AssetEntry(string name, string extension, string localPath)
 {
     public string Name = name;

@@ -106,7 +106,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
         }
 
         if (Input.GetKey(Key.V, InputState.Pressed) && ViewportController.ViewportFocused)
-            if (!ExampleCamera.HasComponent<ViewportController>())
+            if (EditorState.PlayMode && !ExampleCamera.HasComponent<ViewportController>())
             {
                 Output.Log($"Viewport Controller added");
 

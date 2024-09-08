@@ -25,7 +25,7 @@ public sealed class ShaderCompiler
         if (!Directory.Exists(shadersFolderPath))
             return;
 
-        CheckShaderEntry(Paths.SHADERS + "SimpleLit.hlsl");
+        CheckShaderEntry(AssetsPaths.SHADERS + "SimpleLit.hlsl");
 
         foreach (var shaderFilePath in Directory.GetFiles(shadersFolderPath, "*", SearchOption.AllDirectories))
             CheckShaderEntry(shaderFilePath);
@@ -48,8 +48,8 @@ public sealed class ShaderCompiler
             Assets.Shaders.Add(fileInfo.Name.RemoveExtension(), shaderEntry);
 
             var shader = fileInfo.Name.RemoveExtension();
-            Assets.VertexShaders[shader] = Context.GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + shader + ".hlsl", "VS");
-            Assets.PixelShaders[shader] = Context.GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + shader + ".hlsl", "PS");
+            Assets.VertexShaders[shader] = Context.GraphicsContext.LoadShader(DxcShaderStage.Vertex, AssetsPaths.SHADERS + shader + ".hlsl", "VS");
+            Assets.PixelShaders[shader] = Context.GraphicsContext.LoadShader(DxcShaderStage.Pixel, AssetsPaths.SHADERS + shader + ".hlsl", "PS");
             Assets.PipelineStateObjects[shader] = new PipelineStateObject(Assets.VertexShaders[shader], Assets.PixelShaders[shader]);
 
             Output.Log("Read new Shader");
@@ -69,8 +69,8 @@ public sealed class ShaderCompiler
                 }
 
             var shader = fileInfo.Name.RemoveExtension();
-            Assets.VertexShaders[shader] = Context.GraphicsContext.LoadShader(DxcShaderStage.Vertex, Paths.SHADERS + shader + ".hlsl", "VS");
-            Assets.PixelShaders[shader] = Context.GraphicsContext.LoadShader(DxcShaderStage.Pixel, Paths.SHADERS + shader + ".hlsl", "PS");
+            Assets.VertexShaders[shader] = Context.GraphicsContext.LoadShader(DxcShaderStage.Vertex, AssetsPaths.SHADERS + shader + ".hlsl", "VS");
+            Assets.PixelShaders[shader] = Context.GraphicsContext.LoadShader(DxcShaderStage.Pixel, AssetsPaths.SHADERS + shader + ".hlsl", "PS");
             Assets.PipelineStateObjects[shader] = new PipelineStateObject(Assets.VertexShaders[shader], Assets.PixelShaders[shader]);
 
             Output.Log("Updated Shader");

@@ -90,7 +90,7 @@ public sealed partial class GraphicsContext : IDisposable
         string directory = Path.GetDirectoryName(filePath);
         string shaderSource = File.ReadAllText(filePath);
 
-        using (ShaderIncludeHandler includeHandler = new(Paths.SHADERS, directory))
+        using (ShaderIncludeHandler includeHandler = new(AssetsPaths.SHADERS, directory))
         {
             using IDxcResult results = DxcCompiler.Compile(shaderStage, shaderSource, entryPoint, includeHandler: includeHandler);
             if (results.GetStatus().Failure)

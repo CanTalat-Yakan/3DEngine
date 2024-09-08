@@ -19,6 +19,7 @@ using Microsoft.UI.Xaml;
 
 using Engine;
 using Engine.Helper;
+using Engine.Utilities;
 
 namespace Editor.Controller;
 
@@ -59,7 +60,7 @@ internal sealed partial class Files
 
         // Assign the ProjectPath value from static property in "Home".
         AssetsPath = Path.Combine(Home.ProjectPath, "Assets");
-        TemplatesPath = Paths.TEMPLATES;
+        TemplatesPath = AssetsPaths.TEMPLATES;
 
         // Call the method to initialize and populate the files categories with a DataTemplate.
         PopulateFilesCategories();

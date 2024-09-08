@@ -5,7 +5,7 @@ using System.Numerics;
 using Engine;
 using Engine.Buffer;
 using Engine.Components;
-using Engine.DataTypes;
+using Engine.DataStructures;
 using Engine.ECS;
 using Engine.Editor;
 using Engine.Framework;
@@ -13,7 +13,6 @@ using Engine.Graphics;
 using Engine.GUI;
 using Engine.Helper;
 using Engine.Runtime;
-using Engine.SceneSystem;
 using Engine.Utilities;
 
 public class Example : Component
