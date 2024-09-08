@@ -3,6 +3,7 @@
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
 		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+		<WindowsSdkPackageVersion>10.0.22621.38</WindowsSdkPackageVersion>
 		<RootNamespace></RootNamespace>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<Platforms>x86;x64;arm64</Platforms>
@@ -35,7 +36,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240607001" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.240829007" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1" />
 		<PackageReference Include="Vortice.WinUI" Version="3.5.0" />
 		<PackageReference Include="WinUIEx" Version="2.3.4" />

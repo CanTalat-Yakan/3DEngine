@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 
-using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
+
+using CommunityToolkit.WinUI.UI.Controls;
 
 namespace Editor.Controller;
 
@@ -122,7 +123,7 @@ internal sealed partial class Layout
         grid2.RowDefinitions.Add(new() { Height = top.Length, MinHeight = top.MinHeight });
         grid2.RowDefinitions.Add(bottomRowDefinition = new() { Height = bottom.Length, MinHeight = bottom.MinHeight });
 
-        GridSplitter splitV = new() { VerticalAlignment = VerticalAlignment.Top, CursorBehavior = GridSplitter.SplitterCursorBehavior.ChangeOnGripperHover };
+        GridSplitter splitV = new() { VerticalAlignment = VerticalAlignment.Top };
 
         ((Grid)bottom.Content).Margin = new(0, 16, 0, 0);
         ((Grid)top.Content).Padding = new(0, 16, 0, 0);
@@ -166,7 +167,6 @@ internal sealed partial class Layout
             HorizontalAlignment = HorizontalAlignment.Right,
             Margin = new Thickness(0, 0, -16, 0),
             Opacity = 0.5f,
-            CursorBehavior = GridSplitter.SplitterCursorBehavior.ChangeOnGripperHover,
             ResizeBehavior = GridSplitter.GridResizeBehavior.BasedOnAlignment
         };
 
@@ -198,7 +198,6 @@ internal sealed partial class Layout
             HorizontalAlignment = HorizontalAlignment.Right,
             Margin = new(0, 0, -16, 0),
             Opacity = 0.5f,
-            CursorBehavior = GridSplitter.SplitterCursorBehavior.ChangeOnGripperHover,
             ResizeBehavior = GridSplitter.GridResizeBehavior.CurrentAndNext,
         };
         GridSplitter splitH2 = new()
@@ -206,7 +205,6 @@ internal sealed partial class Layout
             HorizontalAlignment = HorizontalAlignment.Right,
             Margin = new(0, 0, -16, 0),
             Opacity = 0.5f,
-            CursorBehavior = GridSplitter.SplitterCursorBehavior.ChangeOnGripperHover,
             ResizeBehavior = GridSplitter.GridResizeBehavior.PreviousAndNext,
         };
         Grid.SetColumn(splitH2, 1);
