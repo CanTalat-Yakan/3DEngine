@@ -1,10 +1,11 @@
 {
   "profiles": {
     "Editor (Package)": {
-      "commandName": "MsixPackage"
+      "commandName": "MsixPackage",
+      "nativeDebugging": true
     },
-    "Editor (Unpackaged)": {
-      "commandName": "Project"
-    }
+    //"Editor (Unpackaged)": {
+    //  "commandName": "Project"
+    //}
   }
 }

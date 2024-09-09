@@ -6,10 +6,8 @@
 		<WindowsSdkPackageVersion>10.0.22621.38</WindowsSdkPackageVersion>
 		<RootNamespace></RootNamespace>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
-		<Platforms>x64;</Platforms>
-		<!--<RuntimeIdentifiers>win10-x64;</RuntimeIdentifiers>-->
-		<RuntimeIdentifiers Condition="$([MSBuild]::GetTargetFrameworkVersion('$(TargetFramework)')) &gt;= 8">win-x64;</RuntimeIdentifiers>
-		<RuntimeIdentifiers Condition="$([MSBuild]::GetTargetFrameworkVersion('$(TargetFramework)')) &lt; 8">win10-x64;</RuntimeIdentifiers>
+		<Platforms>x64;x86;</Platforms>
+		<RuntimeIdentifiers>win-x86;win-x64;</RuntimeIdentifiers>
 		<PublishProfile>win-$(Platform).pubxml</PublishProfile>
 		<UseWinUI>true</UseWinUI>
 		<EnableMsixTooling>true</EnableMsixTooling>
@@ -58,20 +56,10 @@
 		</Content>
 	</ItemGroup>
 
-	<!--
-	Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
-	Tools extension to be activated for this project even if the Windows App SDK Nuget
-	package has not yet been restored.
-	-->
 	<ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
 		<ProjectCapability Include="Msix" />
 	</ItemGroup>
 
-	<!--
-    Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution
-    Explorer "Package and Publish" context menu entry to be enabled for this project even if
-    the Windows App SDK Nuget package has not yet been restored.
-	-->
 	<PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
 		<HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
 	</PropertyGroup>
