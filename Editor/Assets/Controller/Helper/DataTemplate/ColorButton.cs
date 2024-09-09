@@ -1,10 +1,10 @@
 ﻿using System.Numerics;
 
-using CommunityToolkit.WinUI.UI.Controls;
+using CommunityToolkit.WinUI.Controls;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 
-using ColorPicker = CommunityToolkit.WinUI.UI.Controls.ColorPicker;
+using ColorPicker = CommunityToolkit.WinUI.Controls.ColorPicker;
 
 namespace Editor.Controller;
 

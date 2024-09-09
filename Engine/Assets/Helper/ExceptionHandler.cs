@@ -38,12 +38,12 @@ public class ExceptionHandler
     public static void HandleException(Exception exception)
     {
         // Write file name, line number, and method name.
-        StackTrace stackTrace = new(exception, true);
-        StackFrame stackFrame = stackTrace.GetFrame(0); // Get the top frame (most recent method call).
+        StackTrace stackTrace = exception.StackTrace is null ? null : new(exception, true);
+        StackFrame stackFrame = stackTrace?.GetFrame(0); // Get the top frame (most recent method call).
 
-        string fileName = stackFrame.GetFileName();
-        int lineNumber = stackFrame.GetFileLineNumber();
-        string methodName = stackFrame.GetMethod().Name;
+        string fileName = stackFrame?.GetFileName();
+        int lineNumber = stackFrame?.GetFileLineNumber() ?? 0;
+        string methodName = stackFrame?.GetMethod().Name;
 
         StringBuilder stringBuilder = new();
 

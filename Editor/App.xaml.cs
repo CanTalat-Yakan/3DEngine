@@ -3,8 +3,6 @@ using System;
 
 using Microsoft.UI.Xaml;
 
-using Editor.Controller;
-
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -23,8 +21,6 @@ public partial class App : Application
     /// </summary>
     public App()
     {
-        this.InitializeComponent();
-
         var documentsDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         var rootPath = Path.Combine(documentsDir, "3DEngine");
         var logFilePath = Path.Combine(rootPath, "Application.log");
@@ -33,12 +29,13 @@ public partial class App : Application
 
         this.UnhandledException += (s, e) =>
         {
-            if (Main.Instance is not null)
-                Engine.Helper.ExceptionHandler.HandleException(e.Exception);
+            Engine.Helper.ExceptionHandler.HandleException(e.Exception);
 
             // Mark the event as handled to prevent it from being processed further.
             e.Handled = true;
         };
+
+        this.InitializeComponent();
     }
 
     /// <summary>
@@ -57,5 +54,4 @@ public partial class App : Application
     // USE CASE: var window = (Application.Current as App)?.Window as MainWindow;
     // USE CASE: var hWnd = (Application.Current as App)?.Window.GetWindowHandle();
     // var hwnd = WinRT.Interop.WindowNative.GetWindowHandle((Application.Current as App)?.Window as MainWindow);
-
 }

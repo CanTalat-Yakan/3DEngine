@@ -5,7 +5,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System;
 
-using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml;
@@ -257,7 +256,7 @@ public sealed partial class Output
         if (!string.IsNullOrEmpty(m.Script))
             stackFlyout.Children.Add(new TextBlock() { Text = m.GetInfo() + "\n" });
 
-        stackFlyout.Children.Add(new MarkdownTextBlock() { Text = m.Message, TextWrapping = TextWrapping.Wrap, Width = 800, Padding = new Thickness(8) });
+        stackFlyout.Children.Add(new TextBlock() { Text = m.Message, TextWrapping = TextWrapping.Wrap, Width = 800, Padding = new Thickness(8) });
 
         if (!string.IsNullOrEmpty(m.Script))
         {

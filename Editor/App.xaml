@@ -2,7 +2,7 @@
     x:Class="Editor.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Engine">
+    xmlns:local="using:Editor">
 
     <Application.Resources>
         <ResourceDictionary>
@@ -11,10 +11,12 @@
                 <!-- Other merged dictionaries here -->
             </ResourceDictionary.MergedDictionaries>
             <!-- Other app resources here -->
-            <StaticResource x:Key="WindowCaptionBackground" ResourceKey="SystemControlBackgroundBaseLowBrush" />
-            <StaticResource x:Key="WindowCaptionBackgroundDisabled" ResourceKey="SystemControlBackgroundBaseLowBrush" />
-            <StaticResource x:Key="WindowCaptionForeground" ResourceKey="SystemControlForegroundBaseHighBrush" />
-            <StaticResource x:Key="WindowCaptionForegroundDisabled" ResourceKey="SystemControlDisabledBaseMediumLowBrush" />
+
+            <!-- Custom App Resources -->
+            <SolidColorBrush x:Key="WindowCaptionBackground" Color="{StaticResource SystemControlBackgroundBaseLowBrush}" />
+            <SolidColorBrush x:Key="WindowCaptionBackgroundDisabled" Color="{StaticResource SystemControlBackgroundBaseLowBrush}" />
+            <SolidColorBrush x:Key="WindowCaptionForeground" Color="{StaticResource SystemControlForegroundBaseHighBrush}" />
+            <SolidColorBrush x:Key="WindowCaptionForegroundDisabled" Color="{StaticResource SystemControlDisabledBaseMediumLowBrush}" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>
