@@ -6,6 +6,9 @@ using Assimp;
 using Vortice.DXGI;
 using Vortice.Mathematics;
 
+using static pxr.UsdGeom;
+using static pxr.UsdShade;
+
 namespace Engine.Loader;
 
 public sealed partial class ModelLoader
@@ -92,4 +95,78 @@ public sealed partial class ModelLoader
 
 public sealed partial class ModelLoader
 {
+    public static UsdGeomMesh ConvertMeshToUSD(MeshData mesh, UsdGeomMesh usdMesh)
+    {
+        usdMesh.CreateOrientationAttr(UsdGeomTokens.leftHanded);
+        usdMesh.CreatePointsAttr();
+        usdMesh.CreateFaceVertexCountsAttr();
+        usdMesh.CreateFaceVertexIndicesAttr();
+        usdMesh.CreateExtentAttr();
+
+        return usdMesh;
+    }
+
+    public static MeshData ConvertMeshFromUSD(UsdPrim prim)
+    {
+        var meshName = prim.GetName();
+        if (Assets.Meshes.ContainsKey(meshName))
+            return Assets.Meshes[meshName];
+
+        UsdGeomMesh usdMesh = new(prim);
+
+        List<int> indices = new();
+        List<float> vertices = new();
+
+        List<Vector3> positions = new();
+
+        // Read normals
+        VtVec3fArray normals = usdMesh.GetNormalsAttr().Get();
+
+        // Read tangents
+        //VtVec3fArray tangents = usdMesh.GetTangentsAttr().Get();
+
+        // Read UVs
+        //VtVec2fArray uvs = usdMesh.GetPrimvar("st").Get(); // Typically UVs are stored in "st" primvar
+
+        // Read points (vertices)
+        VtVec3fArray points = usdMesh.GetPointsAttr().Get();
+        for (int i = 0; i < points.size(); i++)
+        {
+            vertices.AddRange([
+                points[i][0], points[i][1], points[i][2],
+                normals[i][0], normals[i][1], normals[i][2],
+                0, 0, 0,
+                0, 0]);
+
+            positions.Add(new(points[i][0], points[i][1], points[i][2]));
+        }
+
+        // Read face vertex counts
+        VtIntArray faceVertexCounts = usdMesh.GetFaceVertexCountsAttr().Get();
+
+        // Read face vertex indices
+        VtIntArray faceVertexIndices = usdMesh.GetFaceVertexIndicesAttr().Get();
+
+        // Triangulate faces consisting of 4 or more vertices per face
+        UsdGeomMesh.Triangulate(faceVertexIndices, faceVertexCounts);
+
+        int idx = 0;
+        for (int i = 0; i < faceVertexCounts.size(); i++)
+            for (int j = 0; j < faceVertexCounts[i]; ++j)
+                indices.Add(faceVertexIndices[idx++]);
+
+        return CreateMesh(meshName, "PNTt", indices, vertices, positions);
+    }
+
+    public static UsdShadeMaterial ConvertMaterialToUSD(Components.Material material, UsdShadeMaterial usdMaterial)
+    {
+        return usdMaterial;
+    }
+
+    public static UsdShadeMaterial ConvertMaterialFromUSD(UsdPrim prim)
+    {
+        UsdShadeMaterial material = new(prim);
+
+        return material;
+    }
 }

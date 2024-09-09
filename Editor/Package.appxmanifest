@@ -8,15 +8,15 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Name="f1060ba9-e395-4fb6-b06e-308d1d88d573"
-    Publisher="CN=Can"
-    Version="1.0.0.0" />
+    Name="28256CanTalatYakan.3DEngine"
+    Publisher="CN=CanTalat-Yakan"
+    Version="0.0.1.0" />
 
-  <mp:PhoneIdentity PhoneProductId="f1060ba9-e395-4fb6-b06e-308d1d88d573" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="3b4f3926-e7d0-4d9c-ab3f-7a0d6a4e2923" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>Editor</DisplayName>
-    <PublisherDisplayName>Can</PublisherDisplayName>
+    <DisplayName>3D Engine</DisplayName>
+    <PublisherDisplayName>Can Talat Yakan</PublisherDisplayName>
     <Logo>Assets\Resources\Images\StoreLogo.png</Logo>
   </Properties>
 
