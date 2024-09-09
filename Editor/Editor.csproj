@@ -38,6 +38,7 @@
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.ColorPicker" Version="8.1.240821" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.1.240821" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.Sizers" Version="8.1.240821" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.240829007" />
 		<PackageReference Include="Vortice.WinUI" Version="3.5.0" />
 		<PackageReference Include="WinUIEx" Version="2.3.4" />
