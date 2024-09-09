@@ -1,9 +1,9 @@
-﻿<Application
+<?xml version="1.0" encoding="utf-8"?>
+<Application
     x:Class="Editor.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Editor">
-
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -11,12 +11,6 @@
                 <!-- Other merged dictionaries here -->
             </ResourceDictionary.MergedDictionaries>
             <!-- Other app resources here -->
-
-            <!-- Custom App Resources -->
-            <SolidColorBrush x:Key="WindowCaptionBackground" Color="{StaticResource SystemControlBackgroundBaseLowBrush}" />
-            <SolidColorBrush x:Key="WindowCaptionBackgroundDisabled" Color="{StaticResource SystemControlBackgroundBaseLowBrush}" />
-            <SolidColorBrush x:Key="WindowCaptionForeground" Color="{StaticResource SystemControlForegroundBaseHighBrush}" />
-            <SolidColorBrush x:Key="WindowCaptionForegroundDisabled" Color="{StaticResource SystemControlDisabledBaseMediumLowBrush}" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

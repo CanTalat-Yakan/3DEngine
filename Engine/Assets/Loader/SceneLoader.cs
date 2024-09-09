@@ -1,119 +1,116 @@
 ﻿using System.IO;
 
-using static pxr.UsdGeom;
-using static pxr.UsdShade;
-
 namespace Engine.Loader;
 
 public sealed class SceneLoader
 {
     public static void Save(string localPath, SystemManager systemManager)
     {
-        var scene = Scene.Create(localPath);
-        var stage = scene.Stage;
+        //var scene = Scene.Create(localPath);
+        //var stage = scene.Stage;
 
-        SaveEntities(stage, systemManager.MainEntityManager, $"/World/{systemManager.MainEntityManager.Name}");
+        //SaveEntities(stage, systemManager.MainEntityManager, $"/World/{systemManager.MainEntityManager.Name}");
 
-        foreach (var subscene in systemManager.SubEntityManagers)
-        {
-            var subscenePath = Path.Combine(Path.GetDirectoryName(localPath), $"{subscene.Name}.usda");
-            SaveEntities(stage, subscene, $"/World/{subscene.Name}");
+        //foreach (var subscene in systemManager.SubEntityManagers)
+        //{
+        //    var subscenePath = Path.Combine(Path.GetDirectoryName(localPath), $"{subscene.Name}.usda");
+        //    SaveEntities(stage, subscene, $"/World/{subscene.Name}");
 
-            var subsceneLayer = SdfLayer.CreateNew(subscenePath);
-            stage.GetRootLayer().GetSubLayerPaths().push_back(subsceneLayer.GetDisplayName());
-        }
+        //    var subsceneLayer = SdfLayer.CreateNew(subscenePath);
+        //    stage.GetRootLayer().GetSubLayerPaths().push_back(subsceneLayer.GetDisplayName());
+        //}
 
-        scene.Save();
+        //scene.Save();
     }
 
-    private static void SaveEntities(UsdStage stage, EntityManager EntityManager, string rootPath)
+    private static void SaveEntities(object stage, EntityManager EntityManager, string rootPath)
     {
-        foreach (var entity in EntityManager.Entities.Values)
-        {
-            var entityPath = new SdfPath($"{rootPath}/{entity.Data.Name}");
-            var usdPrim = stage.DefinePrim(entityPath, new TfToken("Xform"));
+        //foreach (var entity in EntityManager.Entities.Values)
+        //{
+        //    var entityPath = new SdfPath($"{rootPath}/{entity.Data.Name}");
+        //    var usdPrim = stage.DefinePrim(entityPath, new TfToken("Xform"));
 
-            foreach (var component in entity.GetComponentTypes())
-                foreach (var attribute in component.GetProperties())
-                {
-                    var value = attribute.GetValue(component);
-                    if (value is not null)
-                    {
-                        var usdAttribute = usdPrim.CreateAttribute(new TfToken(attribute.Name), SdfValueTypeNames.Token);
-                        usdAttribute.Set(new TfToken(value.ToString()));
-                    }
-                }
-        }
+        //    foreach (var component in entity.GetComponentTypes())
+        //        foreach (var attribute in component.GetProperties())
+        //        {
+        //            var value = attribute.GetValue(component);
+        //            if (value is not null)
+        //            {
+        //                var usdAttribute = usdPrim.CreateAttribute(new TfToken(attribute.Name), SdfValueTypeNames.Token);
+        //                usdAttribute.Set(new TfToken(value.ToString()));
+        //            }
+        //        }
+        //}
     }
 
     public static void Load(SystemManager systemManager, string localPath)
     {
-        var scene = Scene.Open(localPath);
-        var stage = scene.Stage;
+        //var scene = Scene.Open(localPath);
+        //var stage = scene.Stage;
 
-        UsdGeomSetStageUpAxis(stage, UsdGeomTokens.y);
-        UsdGeomSetStageMetersPerUnit(stage, 1);
+        //UsdGeomSetStageUpAxis(stage, UsdGeomTokens.y);
+        //UsdGeomSetStageMetersPerUnit(stage, 1);
 
-        LoadEntities(stage, systemManager.MainEntityManager, $"/World/{systemManager.MainEntityManager.Name}");
+        //LoadEntities(stage, systemManager.MainEntityManager, $"/World/{systemManager.MainEntityManager.Name}");
 
-        var subLayerPaths = stage.GetRootLayer().GetSubLayerPaths();
-        for (uint i = 0; i < subLayerPaths.size(); i++)
-        {
-            //var subscenePath = subLayerPaths[i];
-            //var subscene = new EntityManager { Name = Path.GetFileNameWithoutExtension(subscenePath) };
-            //var subsceneLayer = Scene.Open(subscenePath).Stage;
-            //LoadEntities(subsceneLayer, subscene, $"/World/{subscene.Name}");
+        //var subLayerPaths = stage.GetRootLayer().GetSubLayerPaths();
+        //for (uint i = 0; i < subLayerPaths.size(); i++)
+        //{
+        //    //var subscenePath = subLayerPaths[i];
+        //    //var subscene = new EntityManager { Name = Path.GetFileNameWithoutExtension(subscenePath) };
+        //    //var subsceneLayer = Scene.Open(subscenePath).Stage;
+        //    //LoadEntities(subsceneLayer, subscene, $"/World/{subscene.Name}");
 
-            //systemManager.SubEntityManagers.Add(subscene);
-        }
+        //    //systemManager.SubEntityManagers.Add(subscene);
+        //}
     }
 
-    private static void LoadEntities(UsdStage stage, EntityManager EntityManager, string rootPath)
+    private static void LoadEntities(object stage, EntityManager EntityManager, string rootPath)
     {
-        foreach (var prim in stage.Traverse())
-        {
-            var a = prim.GetName();
-            var b = prim.GetPath();
-            var c = prim.GetPrimPath();
-            var d = prim.GetPrimTypeInfo();
-            var e = prim.GetType();
-            var type = prim.GetTypeName(); // Important
-            var g = prim.GetPrimTypeInfo();
+        //foreach (var prim in stage.Traverse())
+        //{
+        //    var a = prim.GetName();
+        //    var b = prim.GetPath();
+        //    var c = prim.GetPrimPath();
+        //    var d = prim.GetPrimTypeInfo();
+        //    var e = prim.GetType();
+        //    var type = prim.GetTypeName(); // Important
+        //    var g = prim.GetPrimTypeInfo();
 
-            if (type.ToString().Equals("Mesh"))
-            {
-                var meshData = ModelLoader.ConvertMeshFromUSD(prim);
+        //    if (type.ToString().Equals("Mesh"))
+        //    {
+        //        var meshData = ModelLoader.ConvertMeshFromUSD(prim);
 
-                EntityData entityData = new() { Name = prim.GetName() };
-                Entity entity = EntityManager.CreateEntity(entityData);
+        //        EntityData entityData = new() { Name = prim.GetName() };
+        //        Entity entity = EntityManager.CreateEntity(entityData);
 
-                var mesh = entity.AddComponent<Mesh>();
-                mesh.SetMeshData(meshData);
-                mesh.SetMaterialTextures([new("Default.png", 0)]);
-                mesh.SetMaterialPipeline("SimpleLit");
-            }
+        //        var mesh = entity.AddComponent<Mesh>();
+        //        mesh.SetMeshData(meshData);
+        //        mesh.SetMaterialTextures([new("Default.png", 0)]);
+        //        mesh.SetMaterialPipeline("SimpleLit");
+        //    }
 
-            if (type.ToString().Equals("Xform"))
-            {
-                EntityData entityData = new() { Name = prim.GetName() };
-                Entity entity = EntityManager.CreateEntity(entityData);
+        //    if (type.ToString().Equals("Xform"))
+        //    {
+        //        EntityData entityData = new() { Name = prim.GetName() };
+        //        Entity entity = EntityManager.CreateEntity(entityData);
 
-                foreach (var usdAttribute in prim.GetAttributes())
-                {
-                    var componentType = Type.GetType(usdAttribute.GetName());
-                    if (componentType is not null)
-                    {
-                        var component = entity.AddComponent(componentType);
-                        component.Entity = entity;
+        //        foreach (var usdAttribute in prim.GetAttributes())
+        //        {
+        //            var componentType = Type.GetType(usdAttribute.GetName());
+        //            if (componentType is not null)
+        //            {
+        //                var component = entity.AddComponent(componentType);
+        //                component.Entity = entity;
 
-                        var value = usdAttribute.Get();
-                        var property = componentType.GetProperty(usdAttribute.GetName());
-                        if (property is not null && value is not null)
-                            property.SetValue(component, Convert.ChangeType(value, property.PropertyType));
-                    }
-                }
-            }
-        }
+        //                var value = usdAttribute.Get();
+        //                var property = componentType.GetProperty(usdAttribute.GetName());
+        //                if (property is not null && value is not null)
+        //                    property.SetValue(component, Convert.ChangeType(value, property.PropertyType));
+        //            }
+        //        }
+        //    }
+        //}
     }
 }
 
