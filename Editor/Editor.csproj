@@ -19,7 +19,6 @@
 		<ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
 		<GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
 		<PackageCertificateThumbprint>932F2F816AE9010D3416044B6890848745431BC0</PackageCertificateThumbprint>
-		<AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -30,9 +29,16 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<None Remove="FodyWeavers.xml" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.ColorPicker" Version="8.1.240821" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.Primitives" Version="8.1.240821" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.Sizers" Version="8.1.240821" />
+		<PackageReference Include="Costura.Fody" Version="5.7.0">
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.240829007" />
 		<PackageReference Include="Vortice.WinUI" Version="3.5.0" />

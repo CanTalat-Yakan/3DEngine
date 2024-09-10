@@ -9,7 +9,7 @@
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<UseRidGraph>true</UseRidGraph>
-		
+
 		<Title>3D Engine</Title>
 		<PackageId>3DEngine</PackageId>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
@@ -19,8 +19,8 @@
 		<PackageProjectUrl>https://github.com/CanTalat-Yakan/3DEngine</PackageProjectUrl>
 		<PackageIcon>3DEngine_Logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageTags>3D Game Engine .Net8 C#12</PackageTags>
-		<Version>3.0.0</Version>
+		<PackageTags>3DEngine 3D Game Engine .Net8 C#12 OpenUSD USD</PackageTags>
+		<Version>3.0.1</Version>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -45,8 +45,8 @@
 		</PackageReference>
 		<PackageReference Include="FftSharp" Version="2.1.0" />
 		<PackageReference Include="MagicPhysX" Version="1.0.0" />
-		<PackageReference Include="Microsoft.CodeAnalysis" Version="4.10.0" />
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.10.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis" Version="4.11.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.11.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="System.Net.Http" Version="4.3.4" />
 		<PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
@@ -55,15 +55,15 @@
 		<PackageReference Include="Twizzle.ImGuizmo.NET" Version="1.89.4.1" />
 		<PackageReference Include="Twizzle.ImNodes.NET" Version="1.89.4" />
 		<PackageReference Include="Twizzle.ImPlot.NET" Version="1.89.4" />
-		<PackageReference Include="UniversalSceneDescription" Version="5.0.0" />
+		<PackageReference Include="UniversalSceneDescription" Version="6.0.0" />
 		<PackageReference Include="Vortice.Direct2D1" Version="3.5.0" />
 		<PackageReference Include="Vortice.Direct3D12" Version="3.5.0" />
 		<PackageReference Include="Vortice.DirectInput" Version="3.5.0" />
 		<PackageReference Include="Vortice.DirectX" Version="3.5.0" />
 		<PackageReference Include="Vortice.Dxc" Version="3.5.0" />
 		<PackageReference Include="Vortice.DXGI" Version="3.5.0" />
-		<PackageReference Include="Vortice.Mathematics" Version="1.8.0" />
-		<PackageReference Include="Vortice.Win32" Version="2.2.1" />
+		<PackageReference Include="Vortice.Mathematics" Version="1.9.2" />
+		<PackageReference Include="Vortice.Win32" Version="2.2.6" />
 		<PackageReference Include="Vortice.XInput" Version="3.5.0" />
 	</ItemGroup>
 

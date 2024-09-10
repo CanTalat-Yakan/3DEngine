@@ -3,8 +3,8 @@
     "Editor (Package)": {
       "commandName": "MsixPackage",
       "nativeDebugging": true
-    },
-    //"Editor (Unpackaged)": {
+    }
+    //, "Editor (Unpackaged)": {
     //  "commandName": "Project"
     //}
   }
