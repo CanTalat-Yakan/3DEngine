@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Vortice.WIC;
 
 namespace Engine.ECS;
 
@@ -16,6 +17,15 @@ public sealed partial class ComponentManager
         { typeof(EditorComponent), typeof(EditorComponent) },
         { typeof(SimpleComponent), typeof(SimpleComponent) },
     };
+
+    public Type GetBaseComponentType(Type componentType)
+    {
+        if (_typeMap.TryGetValue(componentType, out var baseComponentType)
+         || _typeMap.TryGetValue(componentType.BaseType, out baseComponentType))
+            return baseComponentType;
+
+        return componentType;
+    }
 
     public IEnumerable<T> GetDenseArray<T>() where T : Component
     {
@@ -39,7 +49,7 @@ public sealed partial class ComponentManager
 
     public T[] GetComponent<T>(Entity entity) where T : Component
     {
-        if (_componentSparseSets.TryGetValue(typeof(T), out var sparseSet))
+        if (_componentSparseSets.TryGetValue(GetBaseComponentType(typeof(T)), out var sparseSet))
         {
             var typedSparseSet = (SparseSet<T>)sparseSet;
             var components = typedSparseSet.Get(entity);
@@ -52,33 +62,20 @@ public sealed partial class ComponentManager
 
     public Component[] GetComponent(Entity entity, Type componentType)
     {
-        if (_typeMap.TryGetValue(componentType, out var baseComponentType)
-         || _typeMap.TryGetValue(componentType.BaseType, out baseComponentType))
-            if (_componentSparseSets.TryGetValue(baseComponentType, out var sparseSet))
-            {
-                var getMethod = sparseSet.GetType().GetMethod("Get");
-                var components = (Component[])getMethod.Invoke(sparseSet, [entity]);
+        if (_componentSparseSets.TryGetValue(GetBaseComponentType(componentType), out var sparseSet))
+        {
+            var getMethod = sparseSet.GetType().GetMethod("Get");
+            var components = (Component[])getMethod.Invoke(sparseSet, [entity]);
 
-                return components;
-            }
+            return components;
+        }
 
         return Array.Empty<Component>();
     }
 
     public Component[] GetComponents(Entity entity)
     {
-        var componentTypes = GetComponentTypes(entity);
-        List<Component> components = new();
-
-        foreach (var componentType in componentTypes)
-            components.AddRange(GetComponent(entity, componentType));
-
-        return components.ToArray();
-    }
-
-    public Type[] GetComponentTypes(Entity entity)
-    {
-        List<Type> componentTypes = new();
+        List<Component> componentsCollection = new();
 
         foreach (var sparseSet in _componentSparseSets.Values)
         {
@@ -86,9 +83,18 @@ public sealed partial class ComponentManager
             var components = getMethod.Invoke(sparseSet, [entity]);
 
             if (components is not null)
-                foreach (var component in components as Array)
-                    componentTypes.Add(component.GetType());
+                componentsCollection.AddRange((Component[])components);
         }
+
+        return componentsCollection.ToArray();
+    }
+
+    public Type[] GetComponentTypes(Entity entity)
+    {
+        List<Type> componentTypes = new();
+
+        foreach (var component in GetComponents(entity))
+            componentTypes.Add(component.GetType());
 
         return componentTypes.ToArray();
     }

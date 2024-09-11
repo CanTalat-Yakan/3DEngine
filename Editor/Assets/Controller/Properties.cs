@@ -73,13 +73,6 @@ internal sealed partial class Properties
 
     private void CreateEntityProperties(Entity entity)
     {
-        // Add an event handler to update the current stackPanel when a new component is added.
-        entity.EventOnAddComponent = () =>
-        {
-            if (s_currentlySet.Equals(entity))
-                Set(entity);
-        };
-
         // Add Bindings for the Entity.
         Binding.SetEntityBindings(entity);
 
@@ -183,6 +176,13 @@ internal sealed partial class Properties
                 // Add an event handler to remove the current component from the stack panel when it's destroyed.
                 component.EventOnDestroy += () => s_stackPanel.Children.Remove(tmp);
             }
+
+            // Add an event handler to update the current stackPanel when a new component is added.
+            component.EventOnDestroy += () =>
+            {
+                if (s_currentlySet.Equals(entity))
+                    Set(entity);
+            };
         }
     }
 
