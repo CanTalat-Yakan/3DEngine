@@ -11,6 +11,7 @@
 		<UseWinUI>true</UseWinUI>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<LangVersion>preview</LangVersion>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 		<ApplicationIcon>Assets\Resources\Textures\App.ico</ApplicationIcon>
 		<UseRidGraph>true</UseRidGraph>
 	</PropertyGroup>
