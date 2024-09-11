@@ -36,7 +36,7 @@ public sealed partial class Entity
     public SystemManager SystemManager => _systemManager ??= Kernel.Instance.SystemManager;
     public SystemManager _systemManager;
 
-    public Action EventOnAddComponent;
+    public Delegate EventOnAddComponent;
 
     public Entity(int id, EntityData data)
     {
@@ -68,7 +68,7 @@ public sealed partial class Entity
                 component.OnStart();
             }
 
-        EventOnAddComponent?.Invoke();
+        EventOnAddComponent?.DynamicInvoke();
 
         return component;
     }

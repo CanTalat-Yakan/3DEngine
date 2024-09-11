@@ -6,6 +6,17 @@ public sealed partial class ComponentManager
 {
     private Dictionary<Type, SparseSet> _componentSparseSets = new();
 
+    private Dictionary<Type, Type> _typeMap = new()
+    {
+        { typeof(Transform), typeof(Transform) },
+        { typeof(Camera), typeof(Camera) },
+        { typeof(Mesh), typeof(Mesh) },
+
+        { typeof(Component), typeof(Component) },
+        { typeof(EditorComponent), typeof(EditorComponent) },
+        { typeof(SimpleComponent), typeof(SimpleComponent) },
+    };
+
     public IEnumerable<T> GetDenseArray<T>() where T : Component
     {
         if (_componentSparseSets.TryGetValue(typeof(T), out var sparseSet))
@@ -41,13 +52,15 @@ public sealed partial class ComponentManager
 
     public Component[] GetComponent(Entity entity, Type componentType)
     {
-        if (_componentSparseSets.TryGetValue(componentType, out var sparseSet))
-        {
-            var getMethod = sparseSet.GetType().GetMethod("Get");
-            var components = (Component[])getMethod.Invoke(sparseSet, [entity]);
+        if (_typeMap.TryGetValue(componentType, out var baseComponentType)
+         || _typeMap.TryGetValue(componentType.BaseType, out baseComponentType))
+            if (_componentSparseSets.TryGetValue(baseComponentType, out var sparseSet))
+            {
+                var getMethod = sparseSet.GetType().GetMethod("Get");
+                var components = (Component[])getMethod.Invoke(sparseSet, [entity]);
 
-            return components;
-        }
+                return components;
+            }
 
         return Array.Empty<Component>();
     }

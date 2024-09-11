@@ -15,7 +15,7 @@ using Engine.Editor;
 
 namespace Editor.Controller;
 
-internal sealed class BindEntry(object source, string sourcePath)
+internal sealed class BindEntry(object source, string sourcePath) : IDisposable
 {
     public object Value { get; set; }
 
@@ -43,6 +43,9 @@ internal sealed class BindEntry(object source, string sourcePath)
 
     public void Invoke() =>
         Event?.Invoke();
+
+    public void Dispose() =>
+        Event = null;
 }
 
 internal sealed partial class Binding
@@ -84,13 +87,21 @@ internal sealed partial class Binding
         SceneBindings?.Clear();
         EntityBindings?.Clear();
     }
+
+    public static void ClearAndDispose(Dictionary<string, BindEntry> dictionary)
+    {
+        foreach (var bindEntry in dictionary.Values)
+            bindEntry.Dispose();
+
+        dictionary.Clear();
+    }
 }
 
 internal sealed partial class Binding
 {
     public static void SetRendererBindings()
     {
-        RendererBindings.Clear();
+        ClearAndDispose(RendererBindings);
         RendererBindings.Add(
             "FOV" + ViewportController.Camera?.GetType().FullName,
             new(ViewportController.Camera, "FOV"));
@@ -106,7 +117,7 @@ internal sealed partial class Binding
     {
         if (scene is null)
             return;
-        SceneBindings.Clear();
+        ClearAndDispose(SceneBindings);
         SceneBindings.Add("Scene@" + scene.GUID, new(scene, "Scene@"));
         SceneBindings.Add("Name" + scene.GUID, new(scene, "Name"));
         SceneBindings.Add("IsEnabled" + scene.GUID, new(scene, "IsEnabled"));
@@ -117,7 +128,7 @@ internal sealed partial class Binding
         if (entity is null)
             return;
 
-        EntityBindings.Clear();
+        ClearAndDispose(EntityBindings);
         EntityBindings.Add("Entity@" + entity.GUID, new(entity, "Entity@"));
         EntityBindings.Add("Name" + entity.GUID, new(entity, "Name"));
         EntityBindings.Add("IsStatic" + entity.GUID, new(entity, "IsStatic"));
@@ -125,8 +136,8 @@ internal sealed partial class Binding
 
         foreach (var component in entity.GetComponents())
             foreach (var fieldInfo in component.GetType().GetFields(AllBindingFlags))
-                if(!fieldInfo.GetCustomAttributes().OfType<HideAttribute>().Any())
-                    EntityBindings.Add(fieldInfo.Name + component.GetType().FullName + entity.GUID, new(component, fieldInfo.Name));
+                if (!fieldInfo.GetCustomAttributes().OfType<HideAttribute>().Any())
+                    EntityBindings.TryAdd(fieldInfo.Name + component.GetType().FullName + entity.GUID, new(component, fieldInfo.Name));
     }
 
     public static void SetMaterialBindings(MaterialEntry materialEntry)
@@ -134,7 +145,7 @@ internal sealed partial class Binding
         if (materialEntry is null)
             return;
 
-        MaterialBindings.Clear();
+        ClearAndDispose(MaterialBindings);
         var PropertiesConstantBuffer = Engine.Utilities.Assets.SerializableConstantBuffers[materialEntry.ShaderName].GetConstantBufferObject();
         foreach (var field in PropertiesConstantBuffer.GetType().GetFields(AllBindingFlags))
             MaterialBindings.Add(
@@ -230,8 +241,8 @@ internal sealed partial class Binding
 
         UpdateBinding(entity, entity.GUID, EntityBindings);
 
-        foreach (var component in entity.GetComponentTypes())
-            UpdateBinding(component, component.FullName + entity.GUID, EntityBindings);
+        foreach (var component in entity.GetComponents())
+            UpdateBinding(component, component.GetType().FullName + entity.GUID, EntityBindings);
     }
 
     private static void UpdateMaterialBindings()
@@ -252,8 +263,8 @@ internal sealed partial class Binding
         foreach (var field in fields)
             foreach (var bindName in bindings.Keys)
                 if (string.Equals(field.Name + keySuffix, bindName)
-                    && bindings.TryGetValue(bindName, out var bindEntry)
-                    && !Equals(field.GetValue(source), bindEntry.Value))
+                 && bindings.TryGetValue(bindName, out var bindEntry)
+                 && !Equals(field.GetValue(source), bindEntry.Value))
                     ProcessBindEntry(bindEntry, field, source);
     }
 }

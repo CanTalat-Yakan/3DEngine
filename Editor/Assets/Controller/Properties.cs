@@ -73,6 +73,13 @@ internal sealed partial class Properties
 
     private void CreateEntityProperties(Entity entity)
     {
+        // Add an event handler to update the current stackPanel when a new component is added.
+        entity.EventOnAddComponent = () =>
+        {
+            if (s_currentlySet.Equals(entity))
+                Set(entity);
+        };
+
         // Add Bindings for the Entity.
         Binding.SetEntityBindings(entity);
 
@@ -127,8 +134,9 @@ internal sealed partial class Properties
                     Set(entity);
                 }));
 
+        var components = entity.GetComponents();
         // Iterate through all the components of the given entity.
-        foreach (var component in entity.GetComponents())
+        foreach (var component in components)
         {
             // Skip the Transform component of the entity.
             if (component != entity.Transform)
@@ -175,13 +183,6 @@ internal sealed partial class Properties
                 // Add an event handler to remove the current component from the stack panel when it's destroyed.
                 component.EventOnDestroy += () => s_stackPanel.Children.Remove(tmp);
             }
-
-            // Add an event handler to update the current stackPanel when a new component is added.
-            entity.EventOnAddComponent += () =>
-            {
-                if (s_currentlySet.Equals(entity))
-                    Set(entity);
-            };
         }
     }
 
@@ -711,7 +712,7 @@ internal sealed partial class Properties
 
         // Create the grid that contains the event information and attributes.
         return
-            (new Grid[] 
+            (new Grid[]
             {
                 // Stack processed attributes in a grid.
                 ProcessAttributes(attributes).StackInGrid(),
@@ -745,7 +746,7 @@ internal sealed partial class Properties
     }
 
     public Grid ReturnProcessedFieldInfo(List<Grid> grid, object[] attributes, FieldInfo fieldInfo, ToolTip toolTip) =>
-        new Grid[] 
+        new Grid[]
         {
             // Stack processed attributes in a grid.
             ProcessAttributes(attributes).StackInGrid(),
