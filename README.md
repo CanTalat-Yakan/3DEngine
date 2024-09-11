@@ -1,139 +1,126 @@
-
 ![Logo](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/3DEngine_Logo.png)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/CanTalat-Yakan/3DEngine/blob/master/LICENSE) 
-# [3D Engine - Get it in the Microsoft Store](https://www.microsoft.com/store/apps/9NFSX6JPV0PS)
-## [Documentation](https://engine3d.gitbook.io/wiki/) 
 
-# Windows App SDK
+# 3D Engine
 
-**Use the [WinAppSDK](https://github.com/microsoft/WindowsAppSDK) to create beautiful, modern apps for Windows 11 that are backwards compatible** to Windows 10 October 2018 Update (build 17763 / version 1809)!
+[Get it on the Microsoft Store](https://www.microsoft.com/store/apps/9NFSX6JPV0PS)  
+[Documentation](https://engine3d.gitbook.io/wiki/)
 
-* Use your current installer *(no requirement to use MSIX, but there are [reliability/security benefits to using MSIX](https://docs.microsoft.com/windows/msix/overview#key-features)!)*
-* Additive platform APIs *(only add what you need, leave the rest of your app as-is)*
-* Works with Win32, WPF, WinForms, and more apps
+## Overview
 
-# Vortice.Windows
+The **3D Engine** is a high-performance, feature-rich game engine designed for modern game development. It leverages cutting-edge technology and APIs to provide a robust platform for creating immersive 3D experiences.
 
-[Vortice.Windows](https://github.com/amerkoleci/Vortice.Windows) is a collection of Win32 and UWP libraries with bindings support for [DXGI](https://docs.microsoft.com/en-us/windows/desktop/direct3ddxgi/d3d10-graphics-programming-guide-dxgi), [WIC](https://docs.microsoft.com/en-us/windows/desktop/wic/-wic-lh), [DirectWrite](https://docs.microsoft.com/en-us/windows/desktop/directwrite/direct-write-portal), [Direct2D](https://docs.microsoft.com/en-us/windows/desktop/direct2d/direct2d-portal), [Direct3D9](https://docs.microsoft.com/en-us/windows/win32/direct3d9/dx9-graphics), [Direct3D11](https://docs.microsoft.com/en-us/windows/desktop/direct3d11/atoc-dx-graphics-direct3d-11), [Direct3D12](https://docs.microsoft.com/en-us/windows/desktop/direct3d12/directx-12-programming-guide), [XInput](https://docs.microsoft.com/en-us/windows/win32/xinput/getting-started-with-xinput), [XAudio2](https://docs.microsoft.com/en-us/windows/win32/xaudio2/xaudio2-introduction), [X3DAudio](https://docs.microsoft.com/it-it/windows/win32/xaudio2/x3daudio), [DirectInput](https://docs.microsoft.com/en-us/previous-versions/windows/desktop/ee416842(v=vs.85)), [DirectStorage](https://devblogs.microsoft.com/directx/landing-page/), [DirectML](https://docs.microsoft.com/en-us/windows/ai/directml/dml-intro), [UIAnimation](https://docs.microsoft.com/en-us/windows/win32/api/_uianimation) and [DirectSound](https://learn.microsoft.com/en-us/previous-versions/windows/desktop/bb318665(v=vs.85)).
+## Key Technologies
 
-This library targets **.net7.0** and **.net8.0** and uses modern C# 12, see [CHANGELOG](https://github.com/amerkoleci/Vortice.Windows/blob/main/CHANGELOG.md) for list of changes between commits.
+### Windows App SDK
 
-If you are looking for high-performance low level bindings, please visit [Vortice.Win32](https://github.com/amerkoleci/Vortice.Win32)
+- **Use the [WinAppSDK](https://github.com/microsoft/WindowsAppSDK) to create beautiful, modern apps for Windows 11, with backward compatibility to Windows 10 October 2018 Update (build 17763 / version 1809).**
+  - Continue using your existing installer with optional MSIX for enhanced reliability and security.
+  - Integrate with Win32, WPF, WinForms, and more.
 
-# Entity Component System (ECS)
+### Vortice.Windows
 
-The Entity Component System is an architectural pattern often used in video game development. It facilitates code reusability by separating the data from the behavior. In addition, ECS obeys the "composition over inheritance principle," providing improved flexibility and helping developers identify entities in a game's scene where all the objects are classified as entities. One reason ECS is faster than a game object component system is that you put all the data you need together in the same place in memory. Doing so avoids the performance overhead of having to search around to find it.
+- **[Vortice.Windows](https://github.com/amerkoleci/Vortice.Windows)** provides bindings for key Windows libraries including:
+  - DXGI, WIC, DirectWrite, Direct2D, Direct3D9, Direct3D11, Direct3D12, XInput, XAudio2, X3DAudio, DirectInput, DirectStorage, DirectML, UIAnimation, and DirectSound.
+- Targets **.NET 7.0** and **.NET 8.0** with modern C# 12. [CHANGELOG](https://github.com/amerkoleci/Vortice.Windows/blob/main/CHANGELOG.md) for updates.
 
-# NuGet Package
-With the [NuGet](https://www.nuget.org/packages/3DEngine/) you can also only get the Engine with the NuGet Package Manager and create applications using the 3DEngine (w/o Editor) in a new project and implement all features via code.
+### Entity Component System (ECS)
 
-If you want the Editor, this is the GitHub Repo for the complete [3DEngine](https://github.com/CanTalat-Yakan/3DEngine/tree/master).
+- **ECS** is a design pattern for high-performance and flexible game development. It emphasizes separation of data from behavior and supports the "composition over inheritance" principle, improving performance and code reusability.
 
-```Batch
-dotnet new console -n Project
-cd Project
-dotnet add package 3DEngine
-dotnet add package Costura.Fody
-./Project.csproj
-```
+## NuGet Package
 
-Engine usage: 
+- **[3DEngine NuGet Package](https://www.nuget.org/packages/3DEngine/)**: Install the package via NuGet Package Manager for integration into your project.
 
-```C#
-sealed class Program
-{
-    [STAThread]
-    private static void Main() =>
-        new Engine.Program().Run();
-}
-```
+  ```bash
+  dotnet new console -n Project
+  cd Project
+  dotnet add package 3DEngine
+  dotnet add package Costura.Fody
+  ./Project.csproj
+  ```
 
-Use the [Engine.Kernel](https://engine3d.gitbook.io/wiki/engine/core) to get to the Scene System.
+  Example usage:
 
-Project Setup:
+  ```csharp
+  sealed class Program
+  {
+      [STAThread]
+      private static void Main() =>
+          new Engine.Program().Run();
+  }
+  ```
 
-```XML
-<Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<OutputType>WinExe</OutputType>
-		<TargetFramework>net8.0-windows10.0.22000.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-		<PlatformTarget>x64</PlatformTarget>
-		<PublishAot>true</PublishAot>
-	</PropertyGroup>
+  Setup in your project:
 
-	<ItemGroup>
-	  <None Remove="FodyWeavers.xml" />
-	</ItemGroup>
+  ```xml
+  <Project Sdk="Microsoft.NET.Sdk">
+      <PropertyGroup>
+          <OutputType>WinExe</OutputType>
+          <TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
+          <ImplicitUsings>enable</ImplicitUsings>
+          <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+          <PlatformTarget>x64</PlatformTarget>
+          <PublishAot>true</PublishAot>
+      </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="3DEngine" Version="2.0.1" />
-		<PackageReference Include="Costura.Fody" Version="5.7.0">
-		  <PrivateAssets>all</PrivateAssets>
-		</PackageReference>
-	</ItemGroup>
+      <ItemGroup>
+        <None Remove="FodyWeavers.xml" />
+      </ItemGroup>
 
-	<ItemGroup>
-		<Content Update="$(NuGetPackageRoot)\3dengine\2.0.0\contentFiles\any\net8.0-windows10.0.22000\Assets\Resources\Models\Primitives\Cube.obj">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Update="$(NuGetPackageRoot)\3dengine\2.0.0\contentFiles\any\net8.0-windows10.0.22000\Assets\Resources\Models\Primitives\Sphere.obj">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Update="$(NuGetPackageRoot)\3dengine\2.0.0\contentFiles\any\net8.0-windows10.0.22000\Assets\Resources\Shaders\ImGui.hlsl">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Update="$(NuGetPackageRoot)\3dengine\2.0.0\contentFiles\any\net8.0-windows10.0.22000\Assets\Resources\Shaders\Include\Common.hlsli">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-	</ItemGroup>
-</Project>
-```
+      <ItemGroup>
+          <PackageReference Include="3DEngine" Version="3.0.3" />
+          <PackageReference Include="Costura.Fody" Version="5.7.0">
+            <PrivateAssets>all</PrivateAssets>
+          </PackageReference>
+      </ItemGroup>
 
-Also set the Files inside the Assets Folder to "CopyIfNewer" in the Properties Panel inside Visual Studio, so it is included in the Build Folder. This will be obsolete in the Future by the USD Format.
+      <ItemGroup>
+          <Content Update="$(NuGetPackageRoot)\3dengine\3.0.3\contentFiles\any\net8.0-windows10.0.22000\Assets\Resources\**\*">
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          </Content>
+      </ItemGroup>
+  </Project>
+  ```
 
-# Solution
-The 3D Engine contains three Projects: 
-* 3DEngine (Package)
-* Editor
-* Engine
- 
-You can compile the 3DEngine (Package) for the Editor and the Engine as a standalone. 
+  Ensure "CopyIfNewer" is set for files in the Assets folder in Visual Studio.
 
-# Upcoming Features and Development Roadmap
+## Solution Structure
 
-* Materials,
-* Render Textures,
-* Compute Shader,
-* Post Processing,
-* Gizmos,
-* USD,
-* Asynchronous Reprojection,
-* Lumen (Erebus, Aruna),
-* Nanite (Nano Tech),
-* Networking,
-* Spatial Audio,
-* PhsyX 5,
-* Export to UWP for Xbox Platform.
+The 3D Engine repository includes:
+- **3DEngine (Package)**
+- **Editor**
+- **Engine**
 
-As a Unity Developer, I've gathered a collection of top-notch assets from the Unity Asset Store. I plan to incorporate my favorite ones into this game engine when the time is right for implementing them in the creation of various games. Here's a list of some plugins that I'll be integrating into the engine:
+You can build the package for both the Editor and Engine as standalone components.
 
-* [KWS Water System](https://assetstore.unity.com/packages/tools/particles-effects/kws-water-system-hdrp-rendering-205007),
-* [Acerola's Water System](https://github.com/GarrettGunnell/Water),
-* [Expanse](https://assetstore.unity.com/packages/tools/particles-effects/expanse-volumetric-skies-clouds-and-atmospheres-in-hdrp-192456),
-* [Atlas](https://assetstore.unity.com/packages/tools/terrain/atlas-terrain-editor-207568).
+## Upcoming Features and Development Roadmap
 
-# Build
-In order to compile, you need to install [Visual Studio 2022](https://visualstudio.microsoft.com/vs) with the following components:
+- USD Integration
+- Materials
+- Render Textures
+- Compute Shaders
+- Post Processing
+- Gizmos
+- Asynchronous Reprojection
+- Radiance Cascade (Alexander Sannikov)
+- Virtualized Geometry (Nano Tech, Chris K)
+- Networking
+- Spatial Audio
+- PhysX 5
+- UWP Export for Xbox Platform
 
-*  [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)
+## Build Instructions
 
-Visual Studio Installer Modify Individual components with extra direct Download link:
-*  [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
-*  [Windows 11 SDK (10.0.22000.0)](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk)
+To compile the 3D Engine, ensure you have [Visual Studio 2022](https://visualstudio.microsoft.com/vs) with the following components:
 
-# Screenshots
+- [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)
+- [Visual Studio Installer](https://visualstudio.microsoft.com/vs) with:
+  - [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
+  - [Windows 11 SDK (10.0.22621.0)](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk)
+
+## Screenshots
+
 ![3D Engine Layout](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/Screenshots/Layout.png)
 ![1](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/Screenshots/Screenshot_1.png)
 ![2](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/Screenshots/Screenshot_2.png)

@@ -28,14 +28,15 @@ public sealed partial class AppWindow
     public void Show(ShowWindowCommand command = ShowWindowCommand.Normal) =>
         ShowWindow(Win32Window.Handle, command);
 
-    public void Looping(Action onFrame)
+    public void Looping(params Delegate[] onFrame)
     {
         while (true)
         {
             if (!WindowAvailable())
                 break;
 
-            onFrame?.Invoke();
+            foreach (var frame in onFrame)
+                frame?.DynamicInvoke();
         }
     }
 

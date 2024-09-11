@@ -9,13 +9,13 @@ public sealed class Program
     private static void Main() =>
         new Program().Run();
 
-    public void Run(bool renderGUI = true, Config config = null)
+    public void Run(bool renderGUI = true, Config config = null, Delegate frame = null)
     {
         HandleExceptions();
 
         Initialize(renderGUI, config);
 
-        AppWindow.Looping(Kernel.Frame);
+        AppWindow.Looping(Kernel.Frame, frame);
         AppWindow.Dispose(Kernel.Dispose);
     }
 
