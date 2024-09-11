@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Vortice.WIC;
 
 namespace Engine.ECS;
@@ -89,15 +90,8 @@ public sealed partial class ComponentManager
         return componentsCollection.ToArray();
     }
 
-    public Type[] GetComponentTypes(Entity entity)
-    {
-        List<Type> componentTypes = new();
-
-        foreach (var component in GetComponents(entity))
-            componentTypes.Add(component.GetType());
-
-        return componentTypes.ToArray();
-    }
+    public Type[] GetComponentTypes(Entity entity) =>
+        GetComponents(entity).Select(component => component.GetType()).ToArray();
 
     public void RemoveComponent<T>(Entity entity) where T : Component
     {

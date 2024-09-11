@@ -56,6 +56,29 @@ public static class ExtensionMethods
 
         return vertexBuffer;
     }
+
+    public static List<float> ToFloats(this List<Vertex> vertices)
+    {
+        return vertices
+            .SelectMany(vertex => vertex.position.ToFloats()
+                .Concat(vertex.normal.ToFloats())
+                .Concat(vertex.uv.ToFloats())
+                .Concat(vertex.color.ToFloats()))
+            .ToList();
+    }
+
+    private static IEnumerable<float> ToFloats(this Vector3 vector)
+    {
+        yield return vector.X;
+        yield return vector.Y;
+        yield return vector.Z;
+    }
+
+    private static IEnumerable<float> ToFloats(this Vector2 vector)
+    {
+        yield return vector.X;
+        yield return vector.Y;
+    }
     public static bool IsNaN(this float value) =>
     float.IsNaN(value);
     public static bool IsNaN(this Vector2 vector) =>

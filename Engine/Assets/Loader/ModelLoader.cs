@@ -105,11 +105,13 @@ public sealed partial class ModelLoader
         VtVec3fArray points = usdMesh.GetPointsAttr().Get();
         for (int i = 0; i < points.size(); i++)
         {
-            vertices.AddRange([
+            vertices.AddRange(
+            [
                 points[i][0], points[i][1], points[i][2],
                 normals[i][0], normals[i][1], normals[i][2],
-                0, 0, 0,
-                0, 0]);
+                0, 0,
+                0, 0
+            ]);
 
             positions.Add(new(points[i][0], points[i][1], points[i][2]));
         }

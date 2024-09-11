@@ -159,6 +159,12 @@ public sealed partial class CommonContext : IDisposable
         }
     }
 
+    public MeshData CreateMeshData(List<int> indices, List<float> vertices, List<Vector3> positions, string meshName = null, string inputLayoutElements = null) =>
+        CreateMeshData(meshName ??= Guid.NewGuid().ToString(), inputLayoutElements ??= "PNTt", indices, vertices, positions);
+    
+    public MeshData CreateMeshData(string meshName, string inputLayoutElements, List<int> indices, List<Vertex> vertices, List<Vector3> positions) =>
+        CreateMeshData(meshName, inputLayoutElements, indices, vertices.ToFloats(), positions);
+
     public MeshData CreateMeshData(string meshName, string inputLayoutElements, List<int> indices, List<float> vertices, List<Vector3> positions)
     {
         var meshData = CreateMesh(meshName, inputLayoutElements);
@@ -176,6 +182,39 @@ public sealed partial class CommonContext : IDisposable
         UploadQueue.Enqueue(upload);
 
         return meshData;
+    }
+
+    public enum InputLayoutElements
+    {
+        Position3D,
+        Position2D,
+        Normal,
+        Tangent,
+        ColorRGBA,
+        ColorSRGBA,
+        UV
+    }
+
+    public InputLayoutDescription CreateInputLayoutDescription(params InputLayoutElements[] elements)
+    {
+        List<char> inputLayoutElements = new();
+
+        foreach (var element in elements)
+        {
+            inputLayoutElements.Add(element switch
+            {
+                InputLayoutElements.Position3D => 'P',
+                InputLayoutElements.Position2D => 'p',
+                InputLayoutElements.Normal => 'N',
+                InputLayoutElements.Tangent => 'T',
+                InputLayoutElements.UV => 't',
+                InputLayoutElements.ColorRGBA => 'C',
+                InputLayoutElements.ColorSRGBA => 'c',
+                _ => throw new NotImplementedException(),
+            });
+        }
+
+        return CreateInputLayoutDescription(inputLayoutElements.ToString());
     }
 
     public InputLayoutDescription CreateInputLayoutDescription(string inputLayoutElements)
