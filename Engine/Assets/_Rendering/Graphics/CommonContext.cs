@@ -6,6 +6,7 @@ using Vortice.DXGI;
 
 using System.IO;
 using System.Linq;
+using Vortice.Mathematics;
 
 namespace Engine.Graphics;
 
@@ -156,6 +157,25 @@ public sealed partial class CommonContext : IDisposable
 
             return mesh;
         }
+    }
+
+    public MeshData CreateMeshData(string meshName, string inputLayoutElements, List<int> indices, List<float> vertices, List<Vector3> positions)
+    {
+        var meshData = CreateMesh(meshName, inputLayoutElements);
+        meshData.IndexCount = indices.Count;
+        meshData.VertexCount = positions.Count;
+        meshData.BoundingBox = BoundingBox.CreateFromPoints(positions.ToArray());
+
+        GPUUpload upload = new()
+        {
+            MeshData = meshData,
+            VertexData = vertices.ToArray(),
+            IndexData = indices.ToArray(),
+            IndexFormat = Format.R32_UInt,
+        };
+        UploadQueue.Enqueue(upload);
+
+        return meshData;
     }
 
     public InputLayoutDescription CreateInputLayoutDescription(string inputLayoutElements)

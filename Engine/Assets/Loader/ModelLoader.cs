@@ -1,37 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-using Assimp;
-
-using Vortice.DXGI;
-using Vortice.Mathematics;
-
 using static pxr.UsdGeom;
 using static pxr.UsdShade;
 
 namespace Engine.Loader;
-
-public sealed partial class ModelLoader
-{
-    private static MeshData CreateMesh(string meshName, string inputLayoutElements, List<int> indices, List<float> vertices, List<Vector3> positions)
-    {
-        var meshData = Context.CreateMesh(meshName, inputLayoutElements);
-        meshData.IndexCount = indices.Count;
-        meshData.VertexCount = positions.Count;
-        meshData.BoundingBox = BoundingBox.CreateFromPoints(positions.ToArray());
-
-        GPUUpload upload = new()
-        {
-            MeshData = meshData,
-            VertexData = vertices.ToArray(),
-            IndexData = indices.ToArray(),
-            IndexFormat = Format.R32_UInt,
-        };
-        Context.UploadQueue.Enqueue(upload);
-
-        return meshData;
-    }
-}
 
 public sealed partial class ModelLoader
 {
@@ -44,17 +17,17 @@ public sealed partial class ModelLoader
         if (Assets.Meshes.ContainsKey(meshName))
             return Assets.Meshes[meshName];
 
-        AssimpContext context = new();
-        //context.SetConfig(new NormalSmoothingAngleConfig(66.0f));
+        Assimp.AssimpContext context = new();
+        //context.SetConfig(new Assimp.Configs.NormalSmoothingAngleConfig(66.0f));
 
         var postProcessSteps =
-              PostProcessSteps.Triangulate
-            | PostProcessSteps.GenerateSmoothNormals
-            | PostProcessSteps.FlipUVs
-            | PostProcessSteps.JoinIdenticalVertices
-            | PostProcessSteps.PreTransformVertices
-            | PostProcessSteps.CalculateTangentSpace
-            | PostProcessPreset.TargetRealTimeQuality;
+              Assimp.PostProcessSteps.Triangulate
+            | Assimp.PostProcessSteps.GenerateSmoothNormals
+            | Assimp.PostProcessSteps.FlipUVs
+            | Assimp.PostProcessSteps.JoinIdenticalVertices
+            | Assimp.PostProcessSteps.PreTransformVertices
+            | Assimp.PostProcessSteps.CalculateTangentSpace
+            | Assimp.PostProcessPreset.TargetRealTimeQuality;
 
         Assimp.Scene file = context.ImportFile(filePath, postProcessSteps);
 
@@ -89,7 +62,7 @@ public sealed partial class ModelLoader
                 indices.AddRange([face.Indices[0], face.Indices[1], face.Indices[2]]);
         }
 
-        return CreateMesh(meshName, inputLayoutElements, indices, vertices, positions);
+        return Context.CreateMeshData(meshName, inputLayoutElements, indices, vertices, positions);
     }
 }
 
@@ -155,7 +128,7 @@ public sealed partial class ModelLoader
             for (int j = 0; j < faceVertexCounts[i]; ++j)
                 indices.Add(faceVertexIndices[idx++]);
 
-        return CreateMesh(meshName, "PNTt", indices, vertices, positions);
+        return Context.CreateMeshData(meshName, "PNTt", indices, vertices, positions);
     }
 
     public static UsdShadeMaterial ConvertMaterialToUSD(Components.Material material, UsdShadeMaterial usdMaterial)
