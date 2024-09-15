@@ -46,6 +46,22 @@ With your support, we can create a powerful and user-friendly engine, complete w
   Example usage:
 
   ```csharp
+  sealed class RunProgram
+  {
+      [STAThread]
+      private static void Main() =>
+          new Engine.Program().Run(true, null, Frame);
+  
+      private static bool initialized = false;
+      public static void Frame()
+      {
+          if (!initialized)
+          {
+              initialized = true;
+          }
+      }
+  }
+
   sealed class Program
   {
       [STAThread]
@@ -72,14 +88,14 @@ With your support, we can create a powerful and user-friendly engine, complete w
       </ItemGroup>
 
       <ItemGroup>
-          <PackageReference Include="3DEngine" Version="3.0.3" />
+          <PackageReference Include="3DEngine" Version="3.0.9" />
           <PackageReference Include="Costura.Fody" Version="5.7.0">
             <PrivateAssets>all</PrivateAssets>
           </PackageReference>
       </ItemGroup>
 
       <ItemGroup>
-          <Content Update="$(NuGetPackageRoot)\3dengine\3.0.3\contentFiles\any\net8.0-windows10.0.22621\Assets\Resources\**\*">
+          <Content Update="$(NuGetPackageRoot)\3dengine\3.0.9\contentFiles\any\net8.0-windows10.0.22621\Assets\Resources\**\*">
               <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
           </Content>
       </ItemGroup>

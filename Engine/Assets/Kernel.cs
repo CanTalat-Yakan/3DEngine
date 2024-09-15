@@ -148,7 +148,7 @@ public sealed partial class Kernel
 
         Context.GraphicsContext.BeginCommand();
 
-        Context.GPUUploadData(Context.GraphicsContext);
+        Context.GPUUploadData();
 
         Context.GraphicsContext.SetDescriptorHeapDefault();
         Context.GraphicsContext.ScreenBeginRender();

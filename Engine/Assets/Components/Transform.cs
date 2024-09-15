@@ -64,6 +64,38 @@ public sealed partial class Transform : EditorComponent, IHide
 
 public sealed partial class Transform : EditorComponent, IHide
 {
+    public void SetPosition(float? x = null, float? y = null, float? z = null)
+    {
+        if (x.HasValue) _localPosition.X = x.Value;
+        if (y.HasValue) _localPosition.Y = y.Value;
+        if (z.HasValue) _localPosition.Z = z.Value;
+
+        RecreateWorldMatrix();
+    }
+
+    public void SetScale(float? x = null, float? y = null, float? z = null)
+    {
+        if (x.HasValue) _localScale.X = x.Value;
+        if (y.HasValue) _localScale.Y = y.Value;
+        if (z.HasValue) _localScale.Z = z.Value;
+
+        RecreateWorldMatrix();
+    }
+
+    public void SetEulerAngles(float? x = null, float? y = null, float? z = null)
+    {
+        if (x.HasValue) _eulerAngles.X = x.Value;
+        if (y.HasValue) _eulerAngles.Y = y.Value;
+        if (z.HasValue) _eulerAngles.Z = z.Value;
+
+        _localRotation = _eulerAngles.ToRadians().FromEuler();
+
+        RecreateWorldMatrix();
+    }
+}
+
+public sealed partial class Transform : EditorComponent, IHide
+{
     private void CalculateOrientation()
     {
         // Calculate forward direction from Euler angles
@@ -107,6 +139,7 @@ public sealed partial class Transform : EditorComponent, IHide
             return;
 
         oldValue = newValue;
+
         RecreateWorldMatrix();
     }
 
@@ -117,6 +150,8 @@ public sealed partial class Transform : EditorComponent, IHide
 
         _localRotation = newValue;
         _eulerAngles = newValue.ToEuler();
+
+        RecreateWorldMatrix();
     }
 
     private void SetEulerAngles(Vector3 newValue)
@@ -126,6 +161,8 @@ public sealed partial class Transform : EditorComponent, IHide
 
         _eulerAngles = newValue;
         _localRotation = newValue.ToRadians().FromEuler();
+
+        RecreateWorldMatrix();
     }
 
     private Vector3 TransformVector3(Vector3 local) =>
@@ -136,36 +173,4 @@ public sealed partial class Transform : EditorComponent, IHide
 
     private Quaternion MultiplyQuaternion(Quaternion local) =>
         Parent is not null ? Quaternion.Multiply(local, Parent.Rotation) : local;
-}
-
-public sealed partial class Transform : EditorComponent, IHide
-{
-    public void SetPosition(float? x = null, float? y = null, float? z = null)
-    {
-        if (x.HasValue) _localPosition.X = x.Value;
-        if (y.HasValue) _localPosition.Y = y.Value;
-        if (z.HasValue) _localPosition.Z = z.Value;
-
-        RecreateWorldMatrix();
-    }
-
-    public void SetScale(float? x = null, float? y = null, float? z = null)
-    {
-        if (x.HasValue) _localScale.X = x.Value;
-        if (y.HasValue) _localScale.Y = y.Value;
-        if (z.HasValue) _localScale.Z = z.Value;
-
-        RecreateWorldMatrix();
-    }
-
-    public void SetEulerAngles(float? x = null, float? y = null, float? z = null)
-    {
-        if (x.HasValue) _eulerAngles.X = x.Value;
-        if (y.HasValue) _eulerAngles.Y = y.Value;
-        if (z.HasValue) _eulerAngles.Z = z.Value;
-
-        _localRotation = _eulerAngles.ToRadians().FromEuler();
-
-        RecreateWorldMatrix();
-    }
 }

@@ -53,6 +53,7 @@ public sealed class ViewportController : EditorComponent, IHide
 
             CalculateMovementDirection();
             HeightTransformMovement();
+
             CameraRotation();
         }
 

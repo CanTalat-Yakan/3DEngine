@@ -159,14 +159,11 @@ public sealed partial class CommonContext : IDisposable
         }
     }
 
-    public MeshData CreateMeshData(List<int> indices, List<float> vertices, List<Vector3> positions, string meshName = null, string inputLayoutElements = null) =>
-        CreateMeshData(meshName ??= Guid.NewGuid().ToString(), inputLayoutElements ??= "PNTt", indices, vertices, positions);
-    
-    public MeshData CreateMeshData(string meshName, string inputLayoutElements, List<int> indices, List<Vertex> vertices, List<Vector3> positions) =>
-        CreateMeshData(meshName, inputLayoutElements, indices, vertices.ToFloats(), positions);
-
-    public MeshData CreateMeshData(string meshName, string inputLayoutElements, List<int> indices, List<float> vertices, List<Vector3> positions)
+    public MeshData CreateMeshData(List<int> indices, List<float> vertices, List<Vector3> positions, string meshName = null, string inputLayoutElements = null)
     {
+        meshName ??= Guid.NewGuid().ToString();
+        inputLayoutElements ??= "PNTt";
+
         var meshData = CreateMesh(meshName, inputLayoutElements);
         meshData.IndexCount = indices.Count;
         meshData.VertexCount = positions.Count;
@@ -269,19 +266,19 @@ public sealed partial class CommonContext : IDisposable
         return rootSignature;
     }
 
-    public void GPUUploadData(GraphicsContext graphicsContext)
+    public void GPUUploadData()
     {
         while (UploadQueue.TryDequeue(out var upload))
         {
             if (upload.MeshData is not null)
-                graphicsContext.UploadMesh(
+                GraphicsContext.UploadMesh(
                     upload.MeshData,
                     upload.VertexData,
                     upload.IndexData,
                     upload.IndexFormat);
 
             if (upload.Texture2D is not null)
-                graphicsContext.UploadTexture(
+                GraphicsContext.UploadTexture(
                     upload.Texture2D,
                     upload.TextureData);
         }

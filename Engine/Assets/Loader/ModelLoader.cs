@@ -62,7 +62,7 @@ public sealed partial class ModelLoader
                 indices.AddRange([face.Indices[0], face.Indices[1], face.Indices[2]]);
         }
 
-        return Context.CreateMeshData(meshName, inputLayoutElements, indices, vertices, positions);
+        return Context.CreateMeshData(indices, vertices, positions, meshName, inputLayoutElements);
     }
 }
 
@@ -127,7 +127,7 @@ public sealed partial class ModelLoader
             for (int j = 0; j < faceVertexCounts[i]; ++j)
                 indices.Add(faceVertexIndices[idx++]);
 
-        return Context.CreateMeshData(meshName, "PNTt", indices, vertices, positions);
+        return Context.CreateMeshData(indices, vertices, positions, meshName, "PNTt");
     }
 
     public static UsdShadeMaterial ConvertMaterialToUSD(Components.Material material, UsdShadeMaterial usdMaterial)

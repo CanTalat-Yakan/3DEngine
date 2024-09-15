@@ -51,6 +51,9 @@ public sealed class MeshData : IDisposable
     public void SetVertexBuffers() =>
         Vertices.SetVertexBuffer(VertexBufferResource, VertexSizeInByte);
 
+    public bool IsValid() =>
+        VertexBufferResource is not null && VertexStride != 0;
+
     public void Dispose()
     {
         IndexBufferResource?.Dispose();
