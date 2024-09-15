@@ -63,15 +63,15 @@ public sealed partial class Mesh : EditorComponent
         }
         else
         {
+            if (CurrentMaterialOnGPU is null || !Material.Equals(CurrentMaterialOnGPU))
+                Material.Setup();
+
             Material.PipelineStateObjectDescription.Wireframe = ViewportController.Camera.RenderMode switch
             {
                 RenderMode.Wireframe => true,
                 RenderMode.Shaded => false,
                 _ => false
             };
-
-            if (CurrentMaterialOnGPU is null || Material.Equals(CurrentMaterialOnGPU))
-                Material.Setup();
 
             Context.GraphicsContext.SetMesh(MeshData);
 
