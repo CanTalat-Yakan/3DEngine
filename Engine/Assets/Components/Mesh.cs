@@ -66,13 +66,6 @@ public sealed partial class Mesh : EditorComponent
             if (CurrentMaterialOnGPU is null || !Material.Equals(CurrentMaterialOnGPU))
                 Material.Setup();
 
-            Material.PipelineStateObjectDescription.Wireframe = ViewportController.Camera.RenderMode switch
-            {
-                RenderMode.Wireframe => true,
-                RenderMode.Shaded => false,
-                _ => false
-            };
-
             Context.GraphicsContext.SetMesh(MeshData);
 
             Context.UploadBuffer.Upload(Entity.Transform.GetConstantBuffer(), out var offset);

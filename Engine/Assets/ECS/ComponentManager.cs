@@ -236,8 +236,11 @@ public sealed partial class ComponentManager
         public IEnumerable<T> GetAllComponents()
         {
             foreach (var page in _pages.Values)
-                foreach (var component in page.DenseArray)
-                    yield return component;
+            {
+                var denseArray = page.DenseArray;
+                for (int i = 0; i < denseArray.Count; i++)
+                    yield return denseArray[i];
+            }
         }
     }
 }
