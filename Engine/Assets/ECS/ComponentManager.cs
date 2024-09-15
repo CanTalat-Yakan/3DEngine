@@ -76,7 +76,7 @@ public sealed partial class ComponentManager
 
     public Component[] GetComponents(Entity entity)
     {
-        List<Component> componentsCollection = new();
+        List<Component> componentCollection = new();
 
         foreach (var sparseSet in _componentSparseSets.Values)
         {
@@ -84,10 +84,10 @@ public sealed partial class ComponentManager
             var components = getMethod.Invoke(sparseSet, [entity]);
 
             if (components is not null)
-                componentsCollection.AddRange((Component[])components);
+                componentCollection.AddRange((Component[])components);
         }
 
-        return componentsCollection.ToArray();
+        return componentCollection.ToArray();
     }
 
     public Type[] GetComponentTypes(Entity entity) =>

@@ -30,6 +30,9 @@ public partial class Component : IComponent
 
     public void InvokeEventOnDestroy() =>
         EventOnDestroy();
+
+    public void Destroy() =>
+        Entity.Manager.DestroyEntity(Entity);
 }
 
 public partial class Component

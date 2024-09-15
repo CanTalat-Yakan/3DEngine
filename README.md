@@ -1,4 +1,4 @@
-![Logo](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/3DEngine_Logo.png)
+![Logo](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/3DEngine_Logo_BG_.png)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/CanTalat-Yakan/3DEngine/blob/master/LICENSE) 
 
 # 3D Engine
@@ -8,25 +8,28 @@
 
 ## Overview
 
-The **3D Engine** is a high-performance, feature-rich game engine designed for modern game development. It leverages cutting-edge technology and APIs to provide a robust platform for creating immersive 3D experiences.
+The 3D Engine is currently in an early stage of development and is not yet equipped with the essential features required for a production-ready game engine. 
+However, a clear and forward-looking development roadmap has been established, with active work being done to implement advanced systems such as virtualized geometry and Radiance Cascades for fully dynamic global illumination.
+As development progresses, I plan to foster a community starting next year, with the aim of building a C# game engine that integrates seamlessly with Unity workflows. 
+With your support, we can create a powerful and user-friendly engine, complete with an editor, that meets the demands of modern game development.
 
 ## Key Technologies
 
 ### Windows App SDK
 
-- **Use the [WinAppSDK](https://github.com/microsoft/WindowsAppSDK) to create beautiful, modern apps for Windows 11, with backward compatibility to Windows 10 October 2018 Update (build 17763 / version 1809).**
-  - Continue using your existing installer with optional MSIX for enhanced reliability and security.
-  - Integrate with Win32, WPF, WinForms, and more.
-
+- **Use the [WinAppSDK](https://github.com/microsoft/WindowsAppSDK) to create beautiful, modern apps for Windows 11.**
 ### Vortice.Windows
 
 - **[Vortice.Windows](https://github.com/amerkoleci/Vortice.Windows)** provides bindings for key Windows libraries including:
   - DXGI, WIC, DirectWrite, Direct2D, Direct3D9, Direct3D11, Direct3D12, XInput, XAudio2, X3DAudio, DirectInput, DirectStorage, DirectML, UIAnimation, and DirectSound.
-- Targets **.NET 7.0** and **.NET 8.0** with modern C# 12. [CHANGELOG](https://github.com/amerkoleci/Vortice.Windows/blob/main/CHANGELOG.md) for updates.
-
+  
 ### Entity Component System (ECS)
 
 - **ECS** is a design pattern for high-performance and flexible game development. It emphasizes separation of data from behavior and supports the "composition over inheritance" principle, improving performance and code reusability.
+
+### Universal Scene Description (OpenUSD / USD.NET)
+
+- **OpenUSD** is a framework for interchange of 3D computer graphics data. The framework focuses on collaboration, non-destructive editing, and enabling multiple views and opinions about graphics data.
 
 ## NuGet Package
 
@@ -76,14 +79,14 @@ The **3D Engine** is a high-performance, feature-rich game engine designed for m
       </ItemGroup>
 
       <ItemGroup>
-          <Content Update="$(NuGetPackageRoot)\3dengine\3.0.3\contentFiles\any\net8.0-windows10.0.22000\Assets\Resources\**\*">
+          <Content Update="$(NuGetPackageRoot)\3dengine\3.0.3\contentFiles\any\net8.0-windows10.0.22621\Assets\Resources\**\*">
               <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
           </Content>
       </ItemGroup>
   </Project>
   ```
 
-  Ensure "CopyIfNewer" is set for files in the Assets folder in Visual Studio.
+  Ensure "PreserveNewest" is set for files in the Assets folder in Visual Studio. Replace the Path to the NuGet Package 3DEngine\3.0.3
 
 ## Solution Structure
 
@@ -92,7 +95,7 @@ The 3D Engine repository includes:
 - **Editor**
 - **Engine**
 
-You can build the package for both the Editor and Engine as standalone components.
+You can build the 3DEngine (Package) for both the Editor and Engine as a MSIX Application or the Engine as a portable Win32 Application.
 
 ## Upcoming Features and Development Roadmap
 
@@ -108,7 +111,7 @@ You can build the package for both the Editor and Engine as standalone component
 - Networking
 - Spatial Audio
 - PhysX 5
-- UWP Export for Xbox Platform
+- Export Build to the Xbox Platform
 
 ## Build Instructions
 

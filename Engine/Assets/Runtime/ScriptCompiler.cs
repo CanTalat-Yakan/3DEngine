@@ -44,7 +44,7 @@ public sealed class ScriptCompiler
 
     private static ScriptOptions CreateScriptOptions() =>
         ScriptOptions.Default
-            .WithImports("System")
+            .WithImports("System", "System.Collections.Generic", "System.Linq")
             .WithReferences(typeof(Kernel).Assembly)
             .WithAllowUnsafe(true)
             .WithCheckOverflow(true);
