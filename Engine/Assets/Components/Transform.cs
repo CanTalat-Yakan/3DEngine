@@ -38,6 +38,8 @@ public sealed partial class Transform : EditorComponent, IHide
     public Matrix4x4 WorldMatrix => _worldMatrix;
     private Matrix4x4 _worldMatrix = Matrix4x4.Identity;
 
+    private PerModelConstantBuffer? _perModelConsantBuffer;
+
     public override void OnRegister() =>
         TransformSystem.Register(this);
 
@@ -59,7 +61,7 @@ public sealed partial class Transform : EditorComponent, IHide
 
     internal PerModelConstantBuffer GetConstantBuffer() =>
         // Transpose and set world matrix in constant buffer
-        new(Matrix4x4.Transpose(_worldMatrix));
+        _perModelConsantBuffer ??= new(Matrix4x4.Transpose(_worldMatrix));
 }
 
 public sealed partial class Transform : EditorComponent, IHide

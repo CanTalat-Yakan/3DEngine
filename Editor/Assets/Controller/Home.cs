@@ -194,12 +194,31 @@ public sealed partial class Home
             if (File.Exists(zipPath))
                 ZipFile.ExtractToDirectory(zipPath, path);
 
-            //string dllPath = Path.Combine(AppContext.BaseDirectory, AssetsPaths.TEMPLATES, "Project", "Engine.dll");
-            //if (File.Exists(dllPath))
-            //    File.Copy(dllPath, Path.Combine(path, "Engine.dll"));
+            ReplaceDefaultProjectName(path, fileName.Text);
 
             PopulateProjectTiles();
         }
+    }
+
+    private void ReplaceDefaultProjectName(string path, string fileName)
+    {
+        string csprojFilePath = $@"{path}\project.csproj";
+        string destinationFilePath = $@"{path}\{fileName}.csproj";
+
+        // Rename the file by moving it to the new file path
+        File.Move(csprojFilePath, destinationFilePath);
+
+        string slnFilePath = $@"{path}\project.sln";
+
+        // Read the file content
+        string content = File.ReadAllText(slnFilePath);
+
+        // Replace all occurrences of "Project" with the new text
+        string updatedContent = content.Replace("TOBEREPLACED", $"{fileName}");
+        updatedContent = updatedContent.Replace("TOBEREPLACED.csproj", $"{fileName}.csproj");
+
+        // Write the updated content back to the file
+        File.WriteAllText(slnFilePath, updatedContent);
     }
 
     private async void ContentDialogRename(string path)
@@ -265,9 +284,11 @@ public sealed partial class Home
                 PrimaryButtonText = "Delete",
                 CloseButtonText = "Cancel",
                 DefaultButton = ContentDialogButton.Close,
-                Content = new TextBlock() {
+                Content = new TextBlock()
+                {
                     Text = "If you delete this project, you won't be able to recover it. \nDo you want to proceed?",
-                    TextWrapping = TextWrapping.WrapWholeWords },
+                    TextWrapping = TextWrapping.WrapWholeWords
+                },
             };
 
             result = await dialog.ShowAsync();
