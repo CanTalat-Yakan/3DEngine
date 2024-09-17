@@ -6,7 +6,7 @@ using Vortice.Mathematics;
 
 namespace Engine.DataStructures;
 
-public record Vertex(Vector3 position, Vector3 normal, Vector2 uv, Vector3 color);
+public record Vertex(Vector3 position, Vector3 normal, Vector3 tangent, Vector2 uv);
 
 public sealed class VertexBuffer : IDisposable
 {

@@ -57,15 +57,13 @@ public static class ExtensionMethods
         return vertexBuffer;
     }
 
-    public static List<float> ToFloats(this List<Vertex> vertices)
-    {
-        return vertices
-            .SelectMany(vertex => vertex.position.ToFloats()
-                .Concat(vertex.normal.ToFloats())
-                .Concat(vertex.uv.ToFloats())
-                .Concat(vertex.color.ToFloats()))
-            .ToList();
-    }
+    public static List<float> ToFloats(this List<Vertex> vertices) =>
+        vertices.SelectMany(
+            vertex => vertex.position.ToFloats()
+            .Concat(vertex.normal.ToFloats())
+            .Concat(vertex.tangent.ToFloats())
+            .Concat(vertex.uv.ToFloats()))
+        .ToList();
 
     private static IEnumerable<float> ToFloats(this Vector3 vector)
     {

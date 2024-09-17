@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Vortice.WIC;
 
 namespace Engine.ECS;
 

@@ -102,7 +102,7 @@ public sealed partial class Transform : EditorComponent, IHide
     {
         var rotationMatrix = Matrix4x4.CreateFromQuaternion(LocalRotation);
         _localForward = Vector3.Transform(Vector3.UnitZ, rotationMatrix);
-        _localRight = Vector3.Transform(Vector3.UnitX, rotationMatrix);
+        _localRight = Vector3.Transform(-Vector3.UnitX, rotationMatrix);
         _localUp = Vector3.Transform(Vector3.UnitY, rotationMatrix);
     }
 
