@@ -102,7 +102,7 @@ public static class ExtensionMethods
 
         return splits[0] + "." + splits[1];
     }
-    
+
     public static string RemoveExtension(this string text) =>
         text.Split('.').FirstOrDefault();
 

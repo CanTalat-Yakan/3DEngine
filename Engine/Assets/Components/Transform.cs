@@ -100,34 +100,18 @@ public sealed partial class Transform : EditorComponent, IHide
 {
     private void CalculateOrientation()
     {
-        // Calculate forward direction from Euler angles
-        _localForward = CalculateForward(EulerAngles);
-
-        // Calculate right and up directions
-        _localRight = Vector3.Normalize(Vector3.Cross(LocalForward, Vector3.UnitY));
-        _localUp = Vector3.Normalize(Vector3.Cross(LocalRight, LocalForward));
-    }
-
-    private Vector3 CalculateForward(Vector3 eulerAngles)
-    {
-        float sinX = MathF.Sin(eulerAngles.X.ToRadians());
-        float cosX = MathF.Cos(eulerAngles.X.ToRadians());
-        float sinY = MathF.Sin(eulerAngles.Y.ToRadians());
-        float cosY = MathF.Cos(eulerAngles.Y.ToRadians());
-
-        return Vector3.Normalize(new Vector3(sinY * cosX, -sinX, cosY * cosX));
+        var rotationMatrix = Matrix4x4.CreateFromQuaternion(LocalRotation);
+        _localForward = Vector3.Transform(Vector3.UnitZ, rotationMatrix);
+        _localRight = Vector3.Transform(Vector3.UnitX, rotationMatrix);
+        _localUp = Vector3.Transform(Vector3.UnitY, rotationMatrix);
     }
 
     private void CalculateWorldMatrix()
     {
-        // Create transformation matrices
-        var translationMatrix = Matrix4x4.CreateTranslation(LocalPosition);
-        var rotationMatrix = Matrix4x4.CreateFromQuaternion(LocalRotation);
-        var scaleMatrix = Matrix4x4.CreateScale(LocalScale);
+        _worldMatrix = Matrix4x4.CreateScale(LocalScale) *
+               Matrix4x4.CreateFromQuaternion(LocalRotation) *
+               Matrix4x4.CreateTranslation(LocalPosition);
 
-        _worldMatrix = scaleMatrix * rotationMatrix * translationMatrix;
-
-        // Apply parent transformation if available
         if (Parent is not null)
             _worldMatrix *= Parent.WorldMatrix;
     }
