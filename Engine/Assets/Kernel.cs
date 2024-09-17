@@ -82,8 +82,7 @@ public sealed partial class Kernel
             .CreateEntity(null, "Boot", hide: true)
             .AddComponent<SceneBoot>();
 
-        SceneLoader.Load(SystemManager, AssetsPaths.SCENENES + "teapot.usdz");
-
+        //SceneLoader.Load(SystemManager, AssetsPaths.SCENENES + "teapot.usdz");
         //SceneLoader.Save(AssetsPaths.DIRECTORY + "test.usda", SystemManager);
 
         Compile();

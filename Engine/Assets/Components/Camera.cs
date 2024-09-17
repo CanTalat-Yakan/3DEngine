@@ -31,7 +31,7 @@ public sealed class Camera : EditorComponent
     public float FOV = 90;
     [If("Projection", "Orthographic")]
     public float Size = 15;
-    public Vector2 Clipping = new Vector2(0.1f, 1000f);
+    public Vector2 Clipping = new Vector2(0.1f, 10000f);
     [Space]
     public byte CameraID = 0;
 

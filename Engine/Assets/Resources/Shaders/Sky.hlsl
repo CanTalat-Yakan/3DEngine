@@ -16,8 +16,8 @@ PSInput VS(VSInput input)
 
 float4 PS(PSInput input) : SV_TARGET
 {
-    float3 topColor = float3(0.81, 0.89, 0.95);
-    float3 middleColor = float3(0.44, 0.51, 0.58);
+    float3 topColor = float3(0.44, 0.51, 0.58);
+    float3 middleColor = float3(0.81, 0.89, 0.95);
     float3 bottomColor = float3(0.09, 0.09, 0.09);
     
     float3 viewDir = normalize(input.worldpos - input.camerapos);
@@ -25,7 +25,7 @@ float4 PS(PSInput input) : SV_TARGET
     float3 skyColor;
 
     if (dotUp > 0) // Close to top
-        skyColor = lerp(middleColor, topColor, (dotUp) / 0.9);
+        skyColor = lerp(middleColor, topColor, (dotUp) / 0.5);
     else if (dotUp < 0) // Close to bottom
         skyColor = lerp(middleColor, bottomColor, (-dotUp) / 0.9);
     else // Middle
