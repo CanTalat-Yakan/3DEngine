@@ -26,9 +26,6 @@ public sealed partial class Mesh : EditorComponent
     public override void OnRegister() =>
         MeshSystem.Register(this);
 
-    public override void OnStart() =>
-        SubscribeCheckBounds();
-
     public string MeshPath;
     public string ShaderName;
     public override void OnUpdate()
@@ -45,6 +42,9 @@ public sealed partial class Mesh : EditorComponent
 
     public override void OnRender()
     {
+        if (!Context.IsRendering)
+            return;
+
         if (MeshData is null || Material is null)
             return;
 
@@ -94,10 +94,14 @@ public sealed partial class Mesh : EditorComponent
 {
     public void SetMeshData(MeshData meshData)
     {
+        if (meshData is null)
+            return;
+
         MeshData = meshData;
         Order = (byte)Array.IndexOf(Assets.Meshes.Values.ToArray(), meshData);
 
         InstantiateBounds(meshData.BoundingBox);
+        SubscribeCheckBounds();
 
         Material.SetRootSignature("CC");
     }
@@ -158,9 +162,6 @@ public sealed partial class Mesh : EditorComponent
 
     private void CheckBounds()
     {
-        if (MeshData is null)
-            return;
-
         TransformedBoundingBox = BoundingBox.Transform(
             MeshData.BoundingBox,
             Entity.Transform.WorldMatrix);

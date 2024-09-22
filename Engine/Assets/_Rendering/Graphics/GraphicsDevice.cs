@@ -33,7 +33,7 @@ public sealed partial class GraphicsDevice : IDisposable
     public DescriptorHeapX ShaderResourcesHeap = new();
     public DescriptorHeapX DepthStencilViewHeap = new();
     public DescriptorHeapX RenderTextureViewHeap = new();
-        
+
     public Queue<ResourceDelayDestroy> DelayDestroy = new();
 
     public int ExecuteIndex = 0;

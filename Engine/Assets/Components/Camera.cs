@@ -50,6 +50,9 @@ public sealed class Camera : EditorComponent
 
     public override void OnRender()
     {
+        if (!Context.IsRendering)
+            return;
+
         // Assign this camera instance as the main camera if it has "MainCamera" tag.
         if (Entity.Data.Tag == Tags.MainCamera.ToString())
             Main = this;

@@ -77,8 +77,10 @@ public static class ExtensionMethods
         yield return vector.X;
         yield return vector.Y;
     }
+
     public static bool IsNaN(this float value) =>
-    float.IsNaN(value);
+        float.IsNaN(value);
+
     public static bool IsNaN(this Vector2 vector) =>
         float.IsNaN(vector.X) || float.IsNaN(vector.Y);
 
@@ -86,10 +88,10 @@ public static class ExtensionMethods
         float.IsNaN(vector.X) || float.IsNaN(vector.Y) || float.IsNaN(vector.Z);
 
     public static string SplitFirst(this string text, params char[] separators) =>
-        text.Split(separators).FirstOrDefault();
+        text.Split(separators)[0];
 
     public static string SplitLast(this string text, params char[] separators) =>
-        text.Split(separators).Last();
+        text.Split(separators)[^1];
 
     public static string FirstCharToUpper(this string input) =>
         string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1));

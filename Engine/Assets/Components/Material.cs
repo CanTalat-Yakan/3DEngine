@@ -32,6 +32,9 @@ public sealed partial class Material : EditorComponent, IHide, IEquatable<Materi
 
     public void Setup()
     {
+        if (!Context.IsRendering)
+            return;
+
         if (string.IsNullOrEmpty(PipelineStateObjectName))
             throw new NotImplementedException("error pipeline state object not set in material");
 
@@ -64,6 +67,9 @@ public sealed partial class Material : EditorComponent, IHide, IEquatable<Materi
 
     public void SetPipelineStateObject(string pipelineStateObject)
     {
+        if (!Context.IsRendering)
+            return;
+
         if (Assets.PipelineStateObjects.ContainsKey(pipelineStateObject))
             PipelineStateObjectName = pipelineStateObject;
         else throw new NotImplementedException("error pipeline state object not found in material");
@@ -71,6 +77,9 @@ public sealed partial class Material : EditorComponent, IHide, IEquatable<Materi
 
     public void SetRootSignature(string rootSignatureParameters)
     {
+        if (!Context.IsRendering)
+            return;
+
         RootSignature?.Dispose();
         RootSignature = Context.CreateRootSignatureFromString(rootSignatureParameters);
     }

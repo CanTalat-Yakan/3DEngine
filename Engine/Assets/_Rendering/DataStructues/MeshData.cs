@@ -19,7 +19,7 @@ public sealed class VertexBuffer : IDisposable
     public void Dispose()
     {
         if (Offset == 0)
-            Resource.Dispose();
+            Resource?.Dispose();
     }
 }
 

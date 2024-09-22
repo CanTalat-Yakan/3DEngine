@@ -85,12 +85,14 @@ public sealed partial class GraphicsContext : IDisposable
 
 public sealed partial class GraphicsContext : IDisposable
 {
-    public ReadOnlyMemory<byte> LoadShader(DxcShaderStage shaderStage, string filePath, string entryPoint)
+    public ReadOnlyMemory<byte> LoadShader(DxcShaderStage shaderStage, string filePath, string entryPoint, bool fromResources = false)
     {
+        filePath = fromResources ? AssetsPaths.SHADERS + filePath : filePath;
+
         string directory = Path.GetDirectoryName(filePath);
         string shaderSource = File.ReadAllText(filePath);
 
-        using (ShaderIncludeHandler includeHandler = new(AssetsPaths.SHADERS, directory))
+        using (ShaderIncludeHandler includeHandler = new(directory))
         {
             using IDxcResult results = DxcCompiler.Compile(shaderStage, shaderSource, entryPoint, includeHandler: includeHandler);
             if (results.GetStatus().Failure)
