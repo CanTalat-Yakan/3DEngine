@@ -90,7 +90,7 @@ public sealed partial class GraphicsContext : IDisposable
         filePath = fromResources ? AssetsPaths.SHADERS + filePath : filePath;
 
         string directory = Path.GetDirectoryName(filePath);
-        tring shaderSource = File.ReadAllText(filePath);
+        string shaderSource = File.ReadAllText(filePath);
 
         using (ShaderIncludeHandler includeHandler = new(directory))
         {

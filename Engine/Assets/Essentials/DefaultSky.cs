@@ -16,7 +16,7 @@ public sealed partial class DefaultSky : EditorComponent, IHide
         var camera = Camera.CurrentRenderingCamera;
 
         Entity.Transform.LocalPosition = camera.Entity.Transform.LocalPosition;
-        Entity.Transform.LocalScale = new Vector3(-1, 1, 1) * 1.9f * camera.Clipping.Y;
+        Entity.Transform.LocalScale = new Vector3(-1, 1, 1) * 1.5f * camera.Clipping.Y;
     }
 
     public void Initialize()

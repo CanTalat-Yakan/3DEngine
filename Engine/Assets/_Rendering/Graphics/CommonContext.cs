@@ -160,21 +160,21 @@ public sealed partial class CommonContext : IDisposable
         }
     }
 
-    public MeshData CreateMeshData(List<int> indices, List<float> vertices, List<Vector3> positions, string meshName = null, string inputLayoutElements = null)
+    public MeshData CreateMeshData(int[] indices, float[] vertices, Vector3[] positions, string meshName = null, string inputLayoutElements = null)
     {
         meshName ??= Guid.NewGuid().ToString();
         inputLayoutElements ??= "PNTt";
 
         var meshData = CreateMesh(meshName, inputLayoutElements);
-        meshData.IndexCount = indices.Count;
-        meshData.VertexCount = positions.Count;
-        meshData.BoundingBox = BoundingBox.CreateFromPoints(positions.ToArray());
+        meshData.IndexCount = indices.Length;
+        meshData.VertexCount = positions.Length;
+        meshData.BoundingBox = BoundingBox.CreateFromPoints(positions);
 
         GPUUpload upload = new()
         {
             MeshData = meshData,
-            VertexData = vertices.ToArray(),
-            IndexData = indices.ToArray(),
+            VertexData = vertices,
+            IndexData = indices,
             IndexFormat = Format.R32_UInt,
         };
         UploadQueue.Enqueue(upload);
