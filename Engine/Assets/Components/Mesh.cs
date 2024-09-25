@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -92,6 +93,9 @@ public sealed partial class Mesh : EditorComponent
 
 public sealed partial class Mesh : EditorComponent
 {
+    public void SetMeshData(List<int> indices, List<float> vertices, List<Vector3> positions, string meshName = null, InputLayoutHelper inputLayoutElements = null) =>
+        SetMeshData(Context.CreateMeshData(indices, vertices, positions, meshName, inputLayoutElements.GetString()));
+
     public void SetMeshData(MeshData meshData)
     {
         if (meshData is null)

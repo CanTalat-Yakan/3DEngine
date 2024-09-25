@@ -11,11 +11,15 @@ public sealed partial class ModelLoader
     public static CommonContext Context => _context ??= Kernel.Instance.Context;
     public static CommonContext _context;
 
-    public static MeshData LoadFile(string filePath, string inputLayoutElements = "PNTt")
+    public static MeshData LoadFile(string filePath, InputLayoutHelper inputLayoutElementsHelper = null)
     {
         var meshName = new FileInfo(filePath).Name;
         if (Assets.Meshes.ContainsKey(meshName))
             return Assets.Meshes[meshName];
+
+       string inputLayoutElements = inputLayoutElementsHelper is not null 
+            ? inputLayoutElementsHelper.GetString() 
+            : new InputLayoutHelper().GetDefault();
 
         Assimp.AssimpContext context = new();
         //context.SetConfig(new Assimp.Configs.NormalSmoothingAngleConfig(66.0f));

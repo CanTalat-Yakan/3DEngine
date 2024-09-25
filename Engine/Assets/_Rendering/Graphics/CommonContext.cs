@@ -182,39 +182,6 @@ public sealed partial class CommonContext : IDisposable
         return meshData;
     }
 
-    public enum InputLayoutElements
-    {
-        Position3D,
-        Position2D,
-        Normal,
-        Tangent,
-        ColorRGBA,
-        ColorSRGBA,
-        UV
-    }
-
-    public InputLayoutDescription CreateInputLayoutDescription(params InputLayoutElements[] elements)
-    {
-        List<char> inputLayoutElements = new();
-
-        foreach (var element in elements)
-        {
-            inputLayoutElements.Add(element switch
-            {
-                InputLayoutElements.Position3D => 'P',
-                InputLayoutElements.Position2D => 'p',
-                InputLayoutElements.Normal => 'N',
-                InputLayoutElements.Tangent => 'T',
-                InputLayoutElements.UV => 't',
-                InputLayoutElements.ColorRGBA => 'C',
-                InputLayoutElements.ColorSRGBA => 'c',
-                _ => throw new NotImplementedException(),
-            });
-        }
-
-        return CreateInputLayoutDescription(inputLayoutElements.ToString());
-    }
-
     public InputLayoutDescription CreateInputLayoutDescription(string inputLayoutElements)
     {
         if (Assets.InputLayoutDescriptions.TryGetValue(inputLayoutElements, out var inputLayout))
