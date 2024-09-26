@@ -5,6 +5,7 @@
 
 [Get it on the Microsoft Store](https://www.microsoft.com/store/apps/9NFSX6JPV0PS)  
 [Documentation](https://engine3d.gitbook.io/wiki/)
+[Discord](https://discord.gg/c3UtTVNbRb)
 
 ## Overview
 
