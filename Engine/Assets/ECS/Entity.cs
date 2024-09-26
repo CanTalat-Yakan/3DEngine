@@ -46,10 +46,16 @@ public sealed partial class Entity
 public sealed partial class Entity
 {
     public T AddComponent<T>() where T : Component, new() =>
-        (T)AddComponent(new T());
+        (T)AddComponent(ComponentPoolManager.GetPool<T>().Get());
 
-    public Component AddComponent(Type type) =>
-        AddComponent((Component)Activator.CreateInstance(type));
+    public Component AddComponent(Type type)
+    {
+        var pool = ComponentPoolManager.GetPool(type);
+        var getMethod = pool.GetType().GetMethod("Get");
+        var component = (Component)getMethod.Invoke(pool, null);
+
+        return AddComponent(component);
+    }
 
     public Component AddComponent(Component component)
     {
@@ -74,7 +80,7 @@ public sealed partial class Entity
 
     public Component[] GetComponent(Type type) =>
         SystemManager.ComponentManager.GetComponent(this, type);
-    
+
     public Component[] GetComponents() =>
         SystemManager.ComponentManager.GetComponents(this);
 
@@ -84,11 +90,23 @@ public sealed partial class Entity
     public bool HasComponent<T>() where T : Component =>
         GetComponentTypes().Contains(typeof(T));
 
-    public void RemoveComponent<T>() where T : Component =>
+    public void RemoveComponent<T>(T component) where T : Component
+    {
         SystemManager.ComponentManager.RemoveComponent<T>(this);
 
-    public void RemoveComponent(Component component) =>
+        var pool = ComponentPoolManager.GetPool<T>();
+        pool.Return(component);
+    }
+
+    public void RemoveComponent(Component component)
+    {
         SystemManager.ComponentManager.RemoveComponent(this, component.GetType());
+
+        var type = component.GetType();
+        var pool = ComponentPoolManager.GetPool(type);
+        var returnMethod = pool.GetType().GetMethod("Return");
+        returnMethod.Invoke(pool, new object[] { component });
+    }
 
     public void RemoveComponents() =>
         SystemManager.ComponentManager.RemoveComponents(this);

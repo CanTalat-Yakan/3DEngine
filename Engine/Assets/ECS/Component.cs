@@ -28,6 +28,8 @@ public partial class Component : IComponent
 
     [Hide] public ComponentMethods BitFlag = ComponentMethods.All;
 
+    public Component() { }
+
     public void InvokeEventOnDestroy() =>
         EventOnDestroy();
 
