@@ -57,7 +57,7 @@ public sealed partial class Entity
         return AddComponent(component);
     }
 
-    public Component AddComponent(Component component)
+    private Component AddComponent(Component component)
     {
         component.Entity = this;
         component.IsEnabled = true;
@@ -105,7 +105,7 @@ public sealed partial class Entity
         var type = component.GetType();
         var pool = ComponentPoolManager.GetPool(type);
         var returnMethod = pool.GetType().GetMethod("Return");
-        returnMethod.Invoke(pool, new object[] { component });
+        returnMethod.Invoke(pool, [component]);
     }
 
     public void RemoveComponents() =>
@@ -206,12 +206,7 @@ public sealed partial class EntityData : ICloneable, IDisposable
         //// Loop through the original Entity object's Components,
         //// clone each one and register it to the new Entity object.
         for (int i = 1; i < components.Count(); i++) // Skip transform.
-        {
-            // Clone the Component.
-            var newComponent = components[i].Clone();
-            // Add the new Component to the new Entity object.
-            newEntity.AddComponent(newComponent);
-        }
+            newEntity.AddComponent(components[i].GetType()); // TODO: Copy All members
 
         // Return the new Entity object.
         return newEntity;
