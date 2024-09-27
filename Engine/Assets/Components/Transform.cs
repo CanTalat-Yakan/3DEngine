@@ -51,6 +51,9 @@ public sealed partial class Transform : EditorComponent, IHide
 
     internal void RecreateWorldMatrix()
     {
+        if (Entity.Data.IsStatic && _worldMatrix != Matrix4x4.Identity)
+            return;
+
         CalculateOrientation();
         CalculateWorldMatrix();
 
@@ -59,9 +62,13 @@ public sealed partial class Transform : EditorComponent, IHide
             child.Transform.RecreateWorldMatrix();
     }
 
-    internal PerModelConstantBuffer GetConstantBuffer() =>
-        // Transpose and set world matrix in constant buffer
-        _perModelConsantBuffer ??= new(Matrix4x4.Transpose(_worldMatrix));
+    internal PerModelConstantBuffer GetConstantBuffer()
+    {
+        if (!Entity.Data.IsStatic || _perModelConsantBuffer is null)
+            _perModelConsantBuffer = new(Matrix4x4.Transpose(_worldMatrix));
+
+        return _perModelConsantBuffer.Value;
+    }
 }
 
 public sealed partial class Transform : EditorComponent, IHide
@@ -108,9 +115,10 @@ public sealed partial class Transform : EditorComponent, IHide
 
     private void CalculateWorldMatrix()
     {
-        _worldMatrix = Matrix4x4.CreateScale(LocalScale) *
-               Matrix4x4.CreateFromQuaternion(LocalRotation) *
-               Matrix4x4.CreateTranslation(LocalPosition);
+        _worldMatrix =
+            Matrix4x4.CreateScale(LocalScale)
+          * Matrix4x4.CreateFromQuaternion(LocalRotation)
+          * Matrix4x4.CreateTranslation(LocalPosition);
 
         if (Parent is not null)
             _worldMatrix *= Parent.WorldMatrix;
