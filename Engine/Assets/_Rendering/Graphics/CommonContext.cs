@@ -130,39 +130,46 @@ public sealed partial class CommonContext : IDisposable
         }
     }
 
-    public MeshData CreateMesh(string name, string inputLayoutElements = "PNTt", bool indexFormat16Bit = true)
+    public MeshData CreateMesh(InputLayoutHelper inputLayoutHelper, string name = null, bool indexFormat16Bit = true) =>
+        CreateMesh(name, inputLayoutHelper.GetString(), indexFormat16Bit);
+
+    public MeshData CreateMesh(string name = null, string inputLayoutElements = "PNTt", bool indexFormat16Bit = true)
     {
-        if (Assets.Meshes.TryGetValue(name, out MeshData mesh))
-            return mesh;
+        if (!string.IsNullOrEmpty(name) && Assets.Meshes.TryGetValue(name, out var meshData))
+            return meshData;
         else
         {
-            mesh = new();
-            mesh.Name = name;
-            mesh.InputLayoutDescription = CreateInputLayoutDescription(inputLayoutElements);
+            meshData = new();
 
-            mesh.IndexFormat = indexFormat16Bit ? Format.R16_UInt : Format.R32_UInt;
-            mesh.IndexStride = GraphicsDevice.GetSizeInByte(mesh.IndexFormat);
+            meshData.Name = name;
+            meshData.InputLayoutDescription = CreateInputLayoutDescription(inputLayoutElements);
+
+            meshData.IndexFormat = indexFormat16Bit ? Format.R16_UInt : Format.R32_UInt;
+            meshData.IndexStride = GraphicsDevice.GetSizeInByte(meshData.IndexFormat);
 
             var offset = 0;
-            foreach (var inputElement in mesh.InputLayoutDescription.Elements)
+            foreach (var inputElement in meshData.InputLayoutDescription.Elements)
             {
-                mesh.VertexStride += GraphicsDevice.GetSizeInByte(inputElement.Format);
-                mesh.Vertices[inputElement.SemanticName] = new() { Offset = offset, };
+                meshData.VertexStride += GraphicsDevice.GetSizeInByte(inputElement.Format);
+                meshData.Vertices[inputElement.SemanticName] = new() { Offset = offset, };
                 offset += GraphicsDevice.GetSizeInByte(inputElement.Format);
             }
 
-            foreach (var inputElement in mesh.InputLayoutDescription.Elements)
-                mesh.Vertices[inputElement.SemanticName].Stride = mesh.VertexStride;
+            foreach (var inputElement in meshData.InputLayoutDescription.Elements)
+                meshData.Vertices[inputElement.SemanticName].Stride = meshData.VertexStride;
 
-            Assets.Meshes[name] = mesh;
+            if (!string.IsNullOrEmpty(name))
+                Assets.Meshes[name] = meshData;
 
-            return mesh;
+            return meshData;
         }
     }
 
+    public MeshData CreateMeshData(int[] indices, float[] vertices, Vector3[] positions, InputLayoutHelper inputLayoutHelper, string meshName = null) =>
+        CreateMeshData(indices, vertices, positions, meshName, inputLayoutHelper.GetString());
+
     public MeshData CreateMeshData(int[] indices, float[] vertices, Vector3[] positions, string meshName = null, string inputLayoutElements = null)
     {
-        meshName ??= Guid.NewGuid().ToString();
         inputLayoutElements ??= "PNTt";
 
         var meshData = CreateMesh(meshName, inputLayoutElements);

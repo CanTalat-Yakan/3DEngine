@@ -93,8 +93,8 @@ public sealed partial class Mesh : EditorComponent
 
 public sealed partial class Mesh : EditorComponent
 {
-    public void SetMeshData(int[] indices, float[] vertices, Vector3[] positions, string meshName = null, InputLayoutHelper inputLayoutElements = null) =>
-        SetMeshData(Context.CreateMeshData(indices, vertices, positions, meshName, inputLayoutElements.GetString()));
+    public void SetMeshData(int[] indices, float[] vertices, Vector3[] positions, InputLayoutHelper inputLayoutElements, string meshName = null) =>
+        SetMeshData(Context.CreateMeshData(indices, vertices, positions, inputLayoutElements, meshName));
 
     public void SetMeshData(MeshData meshData)
     {
