@@ -73,7 +73,7 @@ public interface IHide { }
 public class EditorComponent : Component, IHide
 {
     public override void OnRegister() =>
-        EditorScriptSystem.Register(this);
+        EditorSystem.Register(this);
 }
 
 public partial class SimpleComponent : Component, IHide

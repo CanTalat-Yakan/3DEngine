@@ -92,7 +92,7 @@ public sealed partial class SystemManager
         MeshSystem.FetchArray(sort: true);
 
         ScriptSystem.FetchArray();
-        EditorScriptSystem.FetchArray();
+        EditorSystem.FetchArray();
         SimpleSystem.FetchArray();
     }
 
@@ -115,7 +115,7 @@ public sealed partial class SystemManager
     {
         MeshSystem.Update();
 
-        EditorScriptSystem.Update();
+        EditorSystem.Update();
 
         if (EditorState.PlayMode)
             ScriptSystem.Update();
@@ -125,7 +125,7 @@ public sealed partial class SystemManager
 
     public void LateUpdate()
     {
-        EditorScriptSystem.LateUpdate();
+        EditorSystem.LateUpdate();
 
         if (EditorState.PlayMode)
             ScriptSystem.LateUpdate();
@@ -133,7 +133,7 @@ public sealed partial class SystemManager
 
     public void FixedUpdate()
     {
-        EditorScriptSystem.FixedUpdate();
+        EditorSystem.FixedUpdate();
 
         if (EditorState.PlayMode)
             ScriptSystem.FixedUpdate();
@@ -151,7 +151,7 @@ public sealed partial class SystemManager
 
     public void GUI()
     {
-        EditorScriptSystem.GUI();
+        EditorSystem.GUI();
         ScriptSystem.GUI();
     }
 

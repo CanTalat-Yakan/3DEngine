@@ -9,7 +9,7 @@ internal sealed class CameraSystem : System<Camera> { }
 internal sealed class MeshSystem : System<Mesh> { }
 
 public sealed class ScriptSystem : System<Component> { }
-public sealed class EditorScriptSystem : System<EditorComponent> { }
+public sealed class EditorSystem : System<EditorComponent> { }
 public sealed class SimpleSystem : System<SimpleComponent> { }
 
 public partial class System<T> where T : Component

@@ -174,7 +174,7 @@ public sealed class ScriptCompiler
     {
         foreach (var type in assembly.GetTypes())
             if (type.IsSubclassOf(typeof(EditorComponent)))
-                EditorScriptSystem.Destroy(type);
+                EditorSystem.Destroy(type);
             else if (type.IsSubclassOf(typeof(Component)))
                 ScriptSystem.Destroy(type);
     }
@@ -190,7 +190,7 @@ public sealed class ScriptCompiler
                         if (type.IsSubclassOf(typeof(Component)))
                             ScriptSystem.Replace(ignoreType, type);
                         else if (type.IsSubclassOf(typeof(EditorComponent)))
-                            EditorScriptSystem.Replace(ignoreType, type);
+                            EditorSystem.Replace(ignoreType, type);
                     }
             }
     }
