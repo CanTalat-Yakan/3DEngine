@@ -7,21 +7,21 @@ public static class ComponentPoolManager
 {
     private static readonly Dictionary<Type, object> _pools = new();
 
-    public static Pools<T> GetPool<T>() where T : Component
+    public static GenericPools<T> GetPool<T>() where T : Component
     {
         Type type = typeof(T);
         if (!_pools.TryGetValue(type, out object poolObj))
         {
             // Create a factory method for the type
             Func<T> factoryMethod = CreateFactoryMethod<T>();
-            Pools<T> pool = new(factoryMethod);
+            GenericPools<T> pool = new(factoryMethod);
 
             _pools[type] = pool;
 
             return pool;
         }
 
-        return (Pools<T>)poolObj;
+        return (GenericPools<T>)poolObj;
     }
 
     public static object GetPool(Type type)
@@ -30,7 +30,7 @@ public static class ComponentPoolManager
         {
             // Create a factory method for the type
             var factoryMethod = CreateFactoryMethod(type);
-            var poolType = typeof(Pools<>).MakeGenericType(type);
+            var poolType = typeof(GenericPools<>).MakeGenericType(type);
 
             poolObj = Activator.CreateInstance(poolType, factoryMethod);
 
@@ -47,13 +47,13 @@ public static class ComponentPoolManager
         () => Activator.CreateInstance(type);
 }
 
-public class Pools<T> where T : class
+public class GenericPools<T> where T : class
 {
     private readonly ConcurrentQueue<T> _pool;
     private readonly int _batchSize;
     private readonly Func<T> _factoryMethod;
 
-    public Pools(Func<T> factoryMethod, int initialBatchSize = 100, int batchSize = 100)
+    public GenericPools(Func<T> factoryMethod, int initialBatchSize = 100, int batchSize = 100)
     {
         _factoryMethod = factoryMethod ?? throw new ArgumentNullException(nameof(factoryMethod));
         _batchSize = batchSize;
