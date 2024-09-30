@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -43,8 +44,8 @@ public record MessageLog(
 
 public class Output
 {
-    public static Queue<MessageLog> GetLogs => _logs;
-    private static Queue<MessageLog> _logs = new();
+    public static ConcurrentQueue<MessageLog> GetLogs => _logs;
+    private static ConcurrentQueue<MessageLog> _logs = new();
 
     public static void Log(
         object obj,
@@ -70,7 +71,9 @@ public class Output
         if (_logs.Count == 0)
             return null;
 
-        return _logs.Dequeue();
+        _logs.TryDequeue(out var result);
+
+        return result;
     }
 
     public static string DequeueLogs()
@@ -80,7 +83,11 @@ public class Output
 
         StringBuilder stringBuilder = new();
         while (_logs.Count > 0)
-            stringBuilder.Append(_logs.Dequeue().GetString());
+        {
+            _logs.TryDequeue(out var result);
+            if (result is not null)
+                stringBuilder.Append(result.GetString());
+        }
 
         return stringBuilder.ToString();
     }
