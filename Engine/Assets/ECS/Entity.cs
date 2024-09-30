@@ -46,11 +46,11 @@ public sealed partial class Entity
 public sealed partial class Entity
 {
     public T AddComponent<T>() where T : Component, new() =>
-        (T)AddComponent(ComponentPoolManager.GetPool<T>().Get());
+        (T)AddComponent(PoolManager.GetPool<T>().Get());
 
     public Component AddComponent(Type type)
     {
-        var pool = ComponentPoolManager.GetPool(type);
+        var pool = PoolManager.GetPool(type);
         var getMethod = pool.GetType().GetMethod("Get");
         var component = (Component)getMethod.Invoke(pool, null);
 
@@ -94,7 +94,7 @@ public sealed partial class Entity
     {
         SystemManager.ComponentManager.RemoveComponent<T>(this);
 
-        var pool = ComponentPoolManager.GetPool<T>();
+        var pool = PoolManager.GetPool<T>();
         pool.Return(component);
     }
 
@@ -103,7 +103,7 @@ public sealed partial class Entity
         SystemManager.ComponentManager.RemoveComponent(this, component.GetType());
 
         var type = component.GetType();
-        var pool = ComponentPoolManager.GetPool(type);
+        var pool = PoolManager.GetPool(type);
         var returnMethod = pool.GetType().GetMethod("Return");
         returnMethod.Invoke(pool, [component]);
     }
