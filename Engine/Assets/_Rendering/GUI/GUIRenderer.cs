@@ -149,7 +149,7 @@ public unsafe sealed partial class GUIRenderer
         {
             var commandList = data.CmdListsRange[i];
 
-            var meshData = Context.CreateMesh(new InputLayoutHelper().AddPosition2D().AddUV().AddColorSRGBA(), indexFormat16Bit: true);
+            var meshData = Context.CreateMesh(new InputLayoutHelper().AddPosition2D().AddUV().AddColorSRGBA(), $"ImGui Mesh {i}", indexFormat16Bit: true);
 
             var indexBytes = commandList.IdxBuffer.Size * meshData.IndexStride;
             var vertexBytes = commandList.VtxBuffer.Size * meshData.VertexStride;
