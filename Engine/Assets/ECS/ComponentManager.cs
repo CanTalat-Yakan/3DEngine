@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Engine.ECS;
@@ -127,11 +128,11 @@ public sealed partial class ComponentManager
     private class SparseSet<T> : SparseSet where T : Component
     {
         private const int MaxPageSize = 1_000; // Define the maximum size of a page
-        private Dictionary<int, SparsePage> _pages = new(); // Maps page number to a SparsePage
+        private ConcurrentDictionary<int, SparsePage> _pages = new(); // Maps page number to a SparsePage
 
         private class SparsePage
         {
-            public Dictionary<int, List<int>> SparseArray { get; } = new(); // Maps entity ID to a list of dense indices
+            public ConcurrentDictionary<int, List<int>> SparseArray { get; } = new(); // Maps entity ID to a list of dense indices
             public List<T> DenseArray { get; } = new(); // List of components
         }
 
@@ -224,11 +225,11 @@ public sealed partial class ComponentManager
                 }
 
                 // Remove the entity entry if all components are removed
-                page.SparseArray.Remove(entity.ID);
+                page.SparseArray.TryRemove(entity.ID, out _);
 
                 // Optionally remove the page if it's empty
                 if (page.DenseArray.Count == 0)
-                    _pages.Remove(pageNumber);
+                    _pages.TryRemove(pageNumber, out _);
             }
         }
 

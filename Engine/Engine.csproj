@@ -16,11 +16,12 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<Authors>CanTalat-Yakan</Authors>
 		<Product>3DEngine</Product>
-		<PackageProjectUrl>https://github.com/CanTalat-Yakan/3DEngine</PackageProjectUrl>
+		<PackageProjectUrl>https://discord.gg/c3UtTVNbRb</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/CanTalat-Yakan/3DEngine</RepositoryUrl>
 		<PackageIcon>3DEngine_Logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>3D Game Engine .Net8 C#12</PackageTags>
-		<Version>3.0.31</Version>
+		<Version>3.0.33</Version>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
