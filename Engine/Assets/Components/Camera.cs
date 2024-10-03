@@ -108,7 +108,8 @@ public sealed class Camera : EditorComponent
         // Calculate the view-projection matrix for the camera.
         var viewProjection = view * projection;
 
-        BoundingFrustum = new BoundingFrustum(viewProjection);
+        // Create the bounding frustum with 10% padding.
+        BoundingFrustum = new(view * Matrix4x4.CreateScale(1.1f) * projection);
 
         // Store the transposed view-projection matrix and the position of the camera.
         ViewBuffer = new(
