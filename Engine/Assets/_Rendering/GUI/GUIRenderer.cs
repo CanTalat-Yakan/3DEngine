@@ -39,7 +39,7 @@ public unsafe sealed partial class GUIRenderer
 
     public void Render()
     {
-        ImGui.ShowDemoWindow();
+        //ImGui.ShowDemoWindow();
 
         ImGui.Render();
 

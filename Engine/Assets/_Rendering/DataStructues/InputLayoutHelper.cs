@@ -4,6 +4,7 @@ namespace Engine.DataStructures;
 
 public enum InputLayoutElementTypes
 {
+    Float,
     Position3D,
     Position2D,
     Normal,
@@ -27,6 +28,13 @@ public class InputLayoutHelper
     public string GetString() => 
         _inputLayoutElements.ToString();
 
+    public InputLayoutHelper AddFloat()
+    {
+        _inputLayoutElements.Append(CreateInputLayoutDescription(InputLayoutElementTypes.Float));
+
+        return this;
+    }
+    
     public InputLayoutHelper AddPosition3D()
     {
         _inputLayoutElements.Append(CreateInputLayoutDescription(InputLayoutElementTypes.Position3D));
@@ -83,6 +91,7 @@ public class InputLayoutHelper
         for (int i = 0; i < elements.Length; i++)
             inputLayoutElements[i] = elements[i] switch
             {
+                InputLayoutElementTypes.Float => 'F',
                 InputLayoutElementTypes.Position3D => 'P',
                 InputLayoutElementTypes.Position2D => 'p',
                 InputLayoutElementTypes.Normal => 'N',

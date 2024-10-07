@@ -201,6 +201,7 @@ public sealed partial class CommonContext : IDisposable
         for (int i = 0; i < inputLayoutElements.Length; i++)
             description[i] = inputLayoutElements[i] switch
             {
+                'F' => new InputElementDescription("POSITION", 0, Format.R32_Float, i),
                 'P' => new InputElementDescription("POSITION", 0, Format.R32G32B32_Float, i),
                 'N' => new InputElementDescription("NORMAL", 0, Format.R32G32B32_Float, i),
                 'T' => new InputElementDescription("TANGENT", 0, Format.R32G32B32_Float, i),
