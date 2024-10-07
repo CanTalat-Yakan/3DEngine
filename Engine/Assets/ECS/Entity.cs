@@ -129,7 +129,7 @@ public sealed partial class EntityData
     public Entity Entity;
 
     public Entity Parent { get => _parent; set => _parent = SetParent(Parent, value); }
-    public Entity _parent;
+    private Entity _parent;
 
     public List<Entity> Children { get; private set; } = new();
 
