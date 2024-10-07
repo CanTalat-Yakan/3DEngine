@@ -165,10 +165,10 @@ public sealed partial class CommonContext : IDisposable
         }
     }
 
-    public MeshData CreateMeshData(int[] indices, float[] vertices, Vector3[] positions, InputLayoutHelper inputLayoutHelper, string meshName = null) =>
-        CreateMeshData(indices, vertices, positions, meshName, inputLayoutHelper.GetString());
+    public MeshData CreateMeshData(float[] vertices, int[] indices, Vector3[] positions, InputLayoutHelper inputLayoutHelper, string meshName = null) =>
+        CreateMeshData(vertices, indices, positions, meshName, inputLayoutHelper.GetString());
 
-    public MeshData CreateMeshData(int[] indices, float[] vertices, Vector3[] positions, string meshName = null, string inputLayoutElements = null)
+    public MeshData CreateMeshData(float[] vertices, int[] indices, Vector3[] positions, string meshName = null, string inputLayoutElements = null)
     {
         inputLayoutElements ??= "PNTt";
 
