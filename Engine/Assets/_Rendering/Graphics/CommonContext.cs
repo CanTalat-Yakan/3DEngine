@@ -165,16 +165,16 @@ public sealed partial class CommonContext : IDisposable
         }
     }
 
-    public MeshData CreateMeshData(float[] vertices, int[] indices, Vector3[] positions, InputLayoutHelper inputLayoutHelper, string meshName = null) =>
-        CreateMeshData(vertices, indices, positions, meshName, inputLayoutHelper.GetString());
+    public MeshData CreateMeshData(float[] vertices, int[] indices, Vector3[] positions, InputLayoutHelper inputLayoutHelper, string meshName = null, bool unsignedInt32IndexFormat = true) =>
+        CreateMeshData(vertices, indices, positions, meshName, inputLayoutHelper.GetString(), unsignedInt32IndexFormat);
 
-    public MeshData CreateMeshData(float[] vertices, int[] indices, Vector3[] positions, string meshName = null, string inputLayoutElements = null)
+    public MeshData CreateMeshData(float[] vertices, int[] indices, Vector3[] positions, string meshName = null, string inputLayoutElements = null, bool unsignedInt32IndexFormat = true)
     {
         inputLayoutElements ??= "PNTt";
 
         var meshData = CreateMesh(meshName, inputLayoutElements);
+        meshData.VertexCount = vertices.Length;
         meshData.IndexCount = indices.Length;
-        meshData.VertexCount = positions.Length;
         meshData.BoundingBox = BoundingBox.CreateFromPoints(positions);
 
         GPUUpload upload = new()
@@ -182,7 +182,7 @@ public sealed partial class CommonContext : IDisposable
             MeshData = meshData,
             VertexData = vertices,
             IndexData = indices,
-            IndexFormat = Format.R32_UInt,
+            IndexFormat = unsignedInt32IndexFormat ? Format.R32_UInt : Format.R16_UInt,
         };
         UploadQueue.Enqueue(upload);
 
@@ -201,15 +201,15 @@ public sealed partial class CommonContext : IDisposable
         for (int i = 0; i < inputLayoutElements.Length; i++)
             description[i] = inputLayoutElements[i] switch
             {
-                'F' => new InputElementDescription("POSITION", 0, Format.R32_Float, i),
+                'f' => new InputElementDescription("POSITION", 0, Format.R32_Float, i),
+                'p' => new InputElementDescription("POSITION", 0, Format.R32G32_Float, i),
                 'P' => new InputElementDescription("POSITION", 0, Format.R32G32B32_Float, i),
-                'N' => new InputElementDescription("NORMAL", 0, Format.R32G32B32_Float, i),
+                't' => new InputElementDescription("TEXCOORD", 0, Format.R32G32_Float, i),
                 'T' => new InputElementDescription("TANGENT", 0, Format.R32G32B32_Float, i),
+                'N' => new InputElementDescription("NORMAL", 0, Format.R32G32B32_Float, i),
+                'c' => new InputElementDescription("COLOR", 0, Format.R8G8B8A8_UNorm, i),
                 'C' => new InputElementDescription("COLOR", 0, Format.R32G32B32A32_Float, i),
 
-                'p' => new InputElementDescription("POSITION", 0, Format.R32G32_Float, i),
-                't' => new InputElementDescription("TEXCOORD", 0, Format.R32G32_Float, i),
-                'c' => new InputElementDescription("COLOR", 0, Format.R8G8B8A8_UNorm, i),
                 _ => throw new NotImplementedException("error input element in common context"),
             };
 

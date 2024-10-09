@@ -28,7 +28,7 @@ public sealed class Camera : EditorComponent
     public CameraProjection Projection = CameraProjection.Perspective;
     [Space]
     [If("Projection", "Perspective")]
-    public float FOV = 90;
+    public float FieldOfView = 90;
     [If("Projection", "Orthographic")]
     public float Size = 15;
     public Vector2 Clipping = new Vector2(0.1f, 10000f);
@@ -96,7 +96,7 @@ public sealed class Camera : EditorComponent
         var dAspect = aspect < 1 ? 1 * aspect : 1 / aspect;
 
         // Convert the field of view from degrees to radians.
-        var radAngle = (FOV).ToRadians();
+        var radAngle = (FieldOfView).ToRadians();
         var radHFOV = 2 * MathF.Atan(MathF.Tan(radAngle * 0.5f) * dAspect);
         var hFOV = radHFOV.ToDegrees();
 

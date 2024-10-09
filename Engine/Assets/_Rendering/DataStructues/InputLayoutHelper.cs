@@ -5,8 +5,8 @@ namespace Engine.DataStructures;
 public enum InputLayoutElementTypes
 {
     Float,
-    Position3D,
     Position2D,
+    Position3D,
     Normal,
     Tangent,
     ColorRGBA,
@@ -31,56 +31,48 @@ public class InputLayoutHelper
     public InputLayoutHelper AddFloat()
     {
         _inputLayoutElements.Append(CreateInputLayoutDescription(InputLayoutElementTypes.Float));
-
         return this;
     }
     
     public InputLayoutHelper AddPosition3D()
     {
         _inputLayoutElements.Append(CreateInputLayoutDescription(InputLayoutElementTypes.Position3D));
-
         return this;
     }
 
     public InputLayoutHelper AddPosition2D()
     {
         _inputLayoutElements.Append(CreateInputLayoutDescription(InputLayoutElementTypes.Position2D));
-
         return this;
     }
 
     public InputLayoutHelper AddNormal()
     {
         _inputLayoutElements.Append(CreateInputLayoutDescription(InputLayoutElementTypes.Normal));
-
         return this;
     }
 
     public InputLayoutHelper AddTangent()
     {
         _inputLayoutElements.Append(CreateInputLayoutDescription(InputLayoutElementTypes.Tangent));
-
         return this;
     }
 
     public InputLayoutHelper AddColorRGBA()
     {
         _inputLayoutElements.Append(CreateInputLayoutDescription(InputLayoutElementTypes.ColorRGBA));
-
         return this;
     }
 
     public InputLayoutHelper AddColorSRGBA()
     {
         _inputLayoutElements.Append(CreateInputLayoutDescription(InputLayoutElementTypes.ColorSRGBA));
-
         return this;
     }
 
     public InputLayoutHelper AddUV()
     {
         _inputLayoutElements.Append(CreateInputLayoutDescription(InputLayoutElementTypes.UV));
-
         return this;
     }
 
@@ -91,14 +83,14 @@ public class InputLayoutHelper
         for (int i = 0; i < elements.Length; i++)
             inputLayoutElements[i] = elements[i] switch
             {
-                InputLayoutElementTypes.Float => 'F',
-                InputLayoutElementTypes.Position3D => 'P',
+                InputLayoutElementTypes.Float => 'f',
                 InputLayoutElementTypes.Position2D => 'p',
-                InputLayoutElementTypes.Normal => 'N',
-                InputLayoutElementTypes.Tangent => 'T',
+                InputLayoutElementTypes.Position3D => 'P',
                 InputLayoutElementTypes.UV => 't',
-                InputLayoutElementTypes.ColorRGBA => 'C',
+                InputLayoutElementTypes.Tangent => 'T',
+                InputLayoutElementTypes.Normal => 'N',
                 InputLayoutElementTypes.ColorSRGBA => 'c',
+                InputLayoutElementTypes.ColorRGBA => 'C',
                 _ => throw new NotImplementedException(),
             };
 

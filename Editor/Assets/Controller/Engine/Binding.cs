@@ -103,8 +103,8 @@ internal sealed partial class Binding
     {
         ClearAndDispose(RendererBindings);
         RendererBindings.Add(
-            "FOV" + ViewportController.Camera?.GetType().FullName,
-            new(ViewportController.Camera, "FOV"));
+            "FieldOfView" + ViewportController.Camera?.GetType().FullName,
+            new(ViewportController.Camera, "FieldOfView"));
         RendererBindings.Add(
             "CameraProjection" + Engine.Kernel.Instance.Config,
             new(Engine.Kernel.Instance.Config, "CameraProjection"));
