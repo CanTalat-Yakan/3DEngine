@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Engine.DataStructures;
+namespace Engine.Helper;
 
 public enum InputLayoutElementTypes
 {
@@ -18,14 +18,14 @@ public class InputLayoutHelper
 {
     private StringBuilder _inputLayoutElements = new();
 
-    public string GetDefault() =>
-        CreateInputLayoutDescription(
+    public static string GetDefault() =>
+        new InputLayoutHelper().CreateInputLayoutDescription(
             InputLayoutElementTypes.Position3D,
             InputLayoutElementTypes.Normal,
             InputLayoutElementTypes.Tangent,
             InputLayoutElementTypes.UV);
 
-    public string GetString() => 
+    public string GetString() =>
         _inputLayoutElements.ToString();
 
     public InputLayoutHelper AddFloat()
@@ -33,7 +33,7 @@ public class InputLayoutHelper
         _inputLayoutElements.Append(CreateInputLayoutDescription(InputLayoutElementTypes.Float));
         return this;
     }
-    
+
     public InputLayoutHelper AddPosition3D()
     {
         _inputLayoutElements.Append(CreateInputLayoutDescription(InputLayoutElementTypes.Position3D));

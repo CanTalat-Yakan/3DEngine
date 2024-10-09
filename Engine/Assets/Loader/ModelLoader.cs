@@ -19,7 +19,7 @@ public sealed partial class ModelLoader
 
        string inputLayoutElements = inputLayoutElementsHelper is not null 
             ? inputLayoutElementsHelper.GetString() 
-            : new InputLayoutHelper().GetDefault();
+            : InputLayoutHelper.GetDefault();
 
         Assimp.AssimpContext context = new();
         //context.SetConfig(new Assimp.Configs.NormalSmoothingAngleConfig(66.0f));

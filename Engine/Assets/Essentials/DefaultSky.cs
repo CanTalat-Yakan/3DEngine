@@ -28,6 +28,7 @@ public sealed partial class DefaultSky : EditorComponent, IHide
         var mesh = Entity.AddComponent<Mesh>();
         mesh.SetMeshData(Assets.Meshes["Sphere.obj"]);
         mesh.SetMaterialTextures([new("Default.png", 0)]);
+        mesh.SetRootSignature();
         mesh.SetMaterialPipeline("Sky");
     }
 }

@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
-
 using SharpGen.Runtime;
 
-namespace Engine.DataStructures;
+namespace Engine.Helper;
 
 public class ShaderIncludeHandler : CallbackBase, IDxcIncludeHandler
 {

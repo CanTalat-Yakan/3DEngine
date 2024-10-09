@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Text;
 
 using Vortice.Mathematics;
+
+using Engine.Helper;
 
 namespace Engine.Components;
 
@@ -95,7 +96,7 @@ public sealed partial class Mesh : EditorComponent
 {
     public void SetMeshData(float[] vertices, int[] indices, Vector3[] positions, InputLayoutHelper inputLayoutElements, string meshName = null, bool unsignedInt32IndexFormat = true) =>
         SetMeshData(Context.CreateMeshData(vertices, indices, positions, inputLayoutElements, meshName, unsignedInt32IndexFormat));
-
+    
     public void SetMeshData(MeshData meshData)
     {
         if (meshData is null)
@@ -106,21 +107,13 @@ public sealed partial class Mesh : EditorComponent
 
         InstantiateBounds(meshData.BoundingBox);
         SubscribeCheckBounds();
-
-        Material.SetRootSignature("CC");
     }
 
-    public void SetMaterialTextures(params MaterialTextureEntry[] textureEntries)
-    {
+    public void SetMaterialTextures(params MaterialTextureEntry[] textureEntries) =>
         Material.MaterialTextures.AddRange(textureEntries);
 
-        StringBuilder stringBuilder = new();
-        for (int i = 0; i < textureEntries.Length; i++)
-            stringBuilder.Append("s");
-        var shaderResourceViews = stringBuilder.ToString();
-
-        Material.SetRootSignature("CC" + shaderResourceViews);
-    }
+    public void SetRootSignature(RootSignatureHelper rootSignatureHelper = null) =>
+        Material.SetRootSignature(rootSignatureHelper?.GetString() ?? RootSignatureHelper.GetDefault());
 
     public void SetMaterialPipeline(string pipelineStateObjectName) =>
         Material.SetPipelineStateObject(pipelineStateObjectName);
