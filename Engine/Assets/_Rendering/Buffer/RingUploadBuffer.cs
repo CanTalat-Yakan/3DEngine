@@ -77,16 +77,17 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 
     public void UploadIndexBuffer(MeshData mesh, Span<byte> index, Format indexFormat, int? overrideSizeInByte = null)
     {
-        int indexSizeInByte = overrideSizeInByte is not null ? overrideSizeInByte.Value : index.Length;
+        int indexSizeInByte = overrideSizeInByte ?? index.Length;
         int indexCount = indexSizeInByte / GraphicsDevice.GetSizeInByte(indexFormat);
 
-        if (mesh.IndexBufferResource is null
-         || mesh.IndexFormat != indexFormat
-         || mesh.IndexCount != indexCount
-         || mesh.IndexSizeInByte != indexSizeInByte)
+        bool needRecreateResource = 
+            mesh.IndexBufferResource is null 
+         || mesh.IndexFormat != indexFormat 
+         || indexSizeInByte > mesh.IndexSizeInByte;
+
+        if (needRecreateResource)
         {
             mesh.IndexFormat = indexFormat;
-            mesh.IndexCount = indexCount;
             mesh.IndexSizeInByte = indexSizeInByte;
 
             GraphicsContext.GraphicsDevice.DestroyResource(mesh.IndexBufferResource);
@@ -96,20 +97,39 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
                 HeapFlags.None,
                 ResourceDescription.Buffer((ulong)indexSizeInByte),
                 ResourceStates.CopyDest);
+
+            mesh.IndexBufferState = ResourceStates.CopyDest;
         }
+        else if (mesh.IndexBufferState != ResourceStates.CopyDest)
+        {
+            // Transition to CopyDest state
+            GraphicsContext.CommandList.ResourceBarrierTransition(
+                mesh.IndexBufferResource, mesh.IndexBufferState, ResourceStates.CopyDest);
+            mesh.IndexBufferState = ResourceStates.CopyDest;
+        }
+
+        mesh.IndexCount = indexCount;
 
         Upload(index, out var offset);
 
-        GraphicsContext.CommandList.CopyBufferRegion(mesh.IndexBufferResource, 0, Resource, (ulong)offset, (ulong)indexSizeInByte);
-        GraphicsContext.CommandList.ResourceBarrierTransition(mesh.IndexBufferResource, ResourceStates.CopyDest, ResourceStates.GenericRead);
+        GraphicsContext.CommandList.CopyBufferRegion(
+            mesh.IndexBufferResource, 0, Resource, (ulong)offset, (ulong)indexSizeInByte);
+
+        // Transition to GenericRead state
+        GraphicsContext.CommandList.ResourceBarrierTransition(
+            mesh.IndexBufferResource, ResourceStates.CopyDest, ResourceStates.GenericRead);
+        mesh.IndexBufferState = ResourceStates.GenericRead;
     }
 
     public void UploadVertexBuffer(MeshData mesh, Span<byte> vertex, int? overrideSizeInByte = null)
     {
-        var vertexSizeInByte = overrideSizeInByte is not null ? overrideSizeInByte.Value : vertex.Length;
+        int vertexSizeInByte = overrideSizeInByte ?? vertex.Length;
 
-        if (mesh.VertexBufferResource is null
-         || mesh.VertexSizeInByte != vertexSizeInByte)
+        bool needRecreateResource = 
+            mesh.VertexBufferResource is null 
+         || vertexSizeInByte > mesh.VertexSizeInByte;
+
+        if (needRecreateResource)
         {
             mesh.VertexSizeInByte = vertexSizeInByte;
 
@@ -120,11 +140,25 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
                 HeapFlags.None,
                 ResourceDescription.Buffer((ulong)vertexSizeInByte),
                 ResourceStates.CopyDest);
+
+            mesh.VertexBufferState = ResourceStates.CopyDest;
+        }
+        else if (mesh.VertexBufferState != ResourceStates.CopyDest)
+        {
+            // Transition to CopyDest state
+            GraphicsContext.CommandList.ResourceBarrierTransition(
+                mesh.VertexBufferResource, mesh.VertexBufferState, ResourceStates.CopyDest);
+            mesh.VertexBufferState = ResourceStates.CopyDest;
         }
 
         Upload(vertex, out var offset);
 
-        GraphicsContext.CommandList.CopyBufferRegion(mesh.VertexBufferResource, 0, Resource, (ulong)offset, (ulong)vertexSizeInByte);
-        GraphicsContext.CommandList.ResourceBarrierTransition(mesh.VertexBufferResource, ResourceStates.CopyDest, ResourceStates.GenericRead);
+        GraphicsContext.CommandList.CopyBufferRegion(
+            mesh.VertexBufferResource, 0, Resource, (ulong)offset, (ulong)vertexSizeInByte);
+
+        // Transition to GenericRead state
+        GraphicsContext.CommandList.ResourceBarrierTransition(
+            mesh.VertexBufferResource, ResourceStates.CopyDest, ResourceStates.GenericRead);
+        mesh.VertexBufferState = ResourceStates.GenericRead;
     }
 }

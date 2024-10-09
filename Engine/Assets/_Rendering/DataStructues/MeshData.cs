@@ -27,22 +27,25 @@ public sealed class MeshData : IDisposable
 {
     public string Name;
 
-    public ID3D12Resource IndexBufferResource;
     public ID3D12Resource VertexBufferResource;
+    public ID3D12Resource IndexBufferResource;
+
+    public ResourceStates VertexBufferState = ResourceStates.GenericRead;
+    public ResourceStates IndexBufferState = ResourceStates.GenericRead;
 
     public InputLayoutDescription InputLayoutDescription;
 
     public Dictionary<string, VertexBuffer> Vertices = new();
 
-    public Format IndexFormat;
+    public int VertexCount;
+    public int VertexSizeInByte;
+    public int VertexStride;
 
     public int IndexCount;
     public int IndexSizeInByte;
     public int IndexStride;
 
-    public int VertexCount;
-    public int VertexSizeInByte;
-    public int VertexStride;
+    public Format IndexFormat;
 
     public BoundingBox BoundingBox;
 
@@ -52,7 +55,8 @@ public sealed class MeshData : IDisposable
         Vertices.SetVertexBuffer(VertexBufferResource, VertexSizeInByte);
 
     public bool IsValid() =>
-        VertexBufferResource is not null && VertexStride != 0;
+        VertexBufferResource is not null
+     && VertexBufferState is ResourceStates.GenericRead;
 
     public void Dispose()
     {
