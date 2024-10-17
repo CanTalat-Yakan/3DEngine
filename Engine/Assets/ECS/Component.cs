@@ -37,8 +37,8 @@ public partial class Component : IComponent, IDisposable
     public void Dispose() =>
         InvokeEventOnDestroy();
 
-    public void Return() { }
-    // InvokeEventOnDestroy();
+    public void Return() =>
+    InvokeEventOnDestroy();
 }
 
 public partial class Component

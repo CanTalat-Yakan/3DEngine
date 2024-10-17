@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Engine.Essentials;
+﻿namespace Engine.Essentials;
 
 internal sealed class SceneBoot : EditorComponent, IHide
 {
@@ -20,7 +18,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
     public override void OnAwake()
     {
         // Create a camera entity with the name "Camera".
-        SceneCamera = Entity.Manager.CreateCamera("Camera", hide: true);
+        SceneCamera = Entity.Manager.CreateCamera("Camera", "DefaultCamera", hide: true);
         // Set the camera order to the maximum value.
         SceneCamera.CameraID = byte.MaxValue;
 
@@ -42,7 +40,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
 
     public override void OnStart()
     {
-        ExampleCamera = Entity.Manager.CreateCamera("Camera", Tags.MainCamera.ToString()).Entity;
+        ExampleCamera = Entity.Manager.CreateCamera("Camera", "MainCamera").Entity;
         ExampleCamera.Transform.LocalPosition = new(3, 4, 5);
         ExampleCamera.Transform.EulerAngles = new(35, -150, 0);
 
