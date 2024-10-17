@@ -115,7 +115,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
             {
                 Output.Log($"Viewport Controller added");
 
-                Input.SetLockMouse(false);
+                Input.SetMouseLockState(false);
 
                 ExampleCamera.AddComponent<ViewportController>();
             }

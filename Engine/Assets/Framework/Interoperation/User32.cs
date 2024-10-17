@@ -420,10 +420,8 @@ internal static class User32
     [DllImport(LibraryName, CharSet = CharSet.Unicode)]
     public static extern IntPtr LoadCursor(IntPtr hInstance, IntPtr lpCursorResource);
 
-    public static IntPtr LoadCursor(IntPtr hInstance, SystemCursor cursor)
-    {
-        return LoadCursor(hInstance, new IntPtr((int)cursor));
-    }
+    public static IntPtr LoadCursor(IntPtr hInstance, SystemCursor cursor) =>
+        LoadCursor(hInstance, new IntPtr((int)cursor));
 
     [DllImport(LibraryName, CharSet = CharSet.Unicode)]
     public static extern int GetMessage(out Message lpMsg, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax);
@@ -493,6 +491,9 @@ internal static class User32
     [return: MarshalAs(UnmanagedType.U1)]
     [DllImport(LibraryName, ExactSpelling = true)]
     public static extern bool AdjustWindowRectEx([In][Out] ref Rect lpRect, WindowStyles dwStyle, bool bMenu, WindowExStyles exStyle);
+
+    [DllImport(LibraryName, ExactSpelling = true)]
+    public static extern bool GetWindowRect(IntPtr hWnd, out Rect lpRect);
 
     [DllImport(LibraryName, CharSet = CharSet.Unicode)]
     public static extern IntPtr CreateWindowEx(

@@ -35,7 +35,7 @@ public sealed class ViewportController : EditorComponent, IHide
 
     public override void OnUpdate()
     {
-        Input.SetLockMouse(false);
+        Input.SetMouseLockState(false);
 
         MovementSpeedCalculation();
 
@@ -49,7 +49,7 @@ public sealed class ViewportController : EditorComponent, IHide
 
         if (Input.GetButton(MouseButton.Right) && ViewportFocused)
         {
-            Input.SetLockMouse(LockCursor);
+            Input.SetMouseLockState(LockCursor);
 
             CalculateMovementDirection();
             HeightTransformMovement();
@@ -59,7 +59,7 @@ public sealed class ViewportController : EditorComponent, IHide
 
         if (Input.GetButton(MouseButton.Middle) && ViewportFocused)
         {
-            Input.SetLockMouse(LockCursor);
+            Input.SetMouseLockState(LockCursor);
 
             ScreenSpaceMovement();
         }

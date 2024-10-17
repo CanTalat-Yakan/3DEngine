@@ -25,6 +25,9 @@ public sealed partial class AppWindow
             windowData.Height);
     }
 
+    public static bool IsFocused() =>
+        GetForegroundWindow() == Win32Window.Handle;
+
     public void Show(WindowCommand command = WindowCommand.Normal) =>
         ShowWindow(Win32Window.Handle, (ShowWindowCommand)command);
 
