@@ -142,6 +142,31 @@ public sealed partial class Input
                 s_joystickAxis.X = currentJoystickState.X / 32767f; // Normalize joystick values to a range of -1 to 1.
                 s_joystickAxis.Y = currentJoystickState.Y / 32767f;
             }
+
+            // Create a new snapshot of the input state
+            s_currentSnapshot = new()
+            {
+                MousePosition = s_mousePosition,
+                MouseDelta = s_mouseDelta,
+                MouseWheel = s_mouseWheel,
+                JoystickAxis = s_joystickAxis,
+                PreviousMouseState = s_currentSnapshot?.MouseState,
+                PreviousKeyboardState = s_currentSnapshot?.KeyboardState,
+                PreviousJoystickState = s_currentSnapshot?.JoystickState,
+                MouseState = s_mouse?.GetCurrentMouseState(),
+                KeyboardState = s_keyboard?.GetCurrentKeyboardState(),
+                JoystickState = s_joystick?.GetCurrentJoystickState(),
+            };
+
+            // Reset axis vector.
+            s_axis = Vector2.Zero;
+            // Update axis based on keyboard input.
+            if (GetKey(Key.W)) s_axis.Y++;
+            if (GetKey(Key.S)) s_axis.Y--;
+            if (GetKey(Key.D)) s_axis.X++;
+            if (GetKey(Key.A)) s_axis.X--;
+
+            s_currentSnapshot.Axis = s_axis;
         }
         catch { }
 
@@ -149,31 +174,6 @@ public sealed partial class Input
             LockMouse();
         else
             s_lockedmousePosition = s_mousePosition;
-
-        // Create a new snapshot of the input state
-        s_currentSnapshot = new()
-        {
-            MousePosition = s_mousePosition,
-            MouseDelta = s_mouseDelta,
-            MouseWheel = s_mouseWheel,
-            JoystickAxis = s_joystickAxis,
-            PreviousMouseState = s_currentSnapshot?.MouseState,
-            PreviousKeyboardState = s_currentSnapshot?.KeyboardState,
-            PreviousJoystickState = s_currentSnapshot?.JoystickState,
-            MouseState = s_mouse?.GetCurrentMouseState(),
-            KeyboardState = s_keyboard?.GetCurrentKeyboardState(),
-            JoystickState = s_joystick?.GetCurrentJoystickState(),
-        };
-
-        // Reset axis vector.
-        s_axis = Vector2.Zero;
-        // Update axis based on keyboard input.
-        if (GetKey(Key.W)) s_axis.Y++;
-        if (GetKey(Key.S)) s_axis.Y--;
-        if (GetKey(Key.D)) s_axis.X++;
-        if (GetKey(Key.A)) s_axis.X--;
-
-        s_currentSnapshot.Axis = s_axis;
     }
 }
 

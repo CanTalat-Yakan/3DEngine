@@ -3,7 +3,7 @@
 public class Config
 {
     public WindowData WindowData;
-    public WindowCommand WindowCommand;
+    public WindowCommand WindowCommand = WindowCommand.ShowMaximized;
 
     public CameraProjection CameraProjection = CameraProjection.Perspective;
     public RenderMode RenderMode = RenderMode.Shaded;
