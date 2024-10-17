@@ -182,9 +182,9 @@ public sealed partial class Input
     public static bool GetKey(Key key, InputState state = InputState.Pressed) =>
         state switch
         {
-            InputState.Down => s_currentSnapshot.KeyboardState.IsPressed(key) && !s_currentSnapshot.PreviousKeyboardState.IsPressed(key),
-            InputState.Pressed => s_currentSnapshot.KeyboardState.IsPressed(key),
-            InputState.Up => !s_currentSnapshot.KeyboardState.IsPressed(key) && s_currentSnapshot.PreviousKeyboardState.IsPressed(key),
+            InputState.Down => (s_currentSnapshot?.KeyboardState.IsPressed(key) ?? false) && (!s_currentSnapshot?.PreviousKeyboardState.IsPressed(key) ?? false),
+            InputState.Pressed => s_currentSnapshot?.KeyboardState.IsPressed(key) ?? false,
+            InputState.Up => (!s_currentSnapshot?.KeyboardState.IsPressed(key) ?? false) && (s_currentSnapshot?.PreviousKeyboardState.IsPressed(key) ?? false),
             _ => false
         };
 
