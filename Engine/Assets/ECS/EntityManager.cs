@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Engine.ECS;
 
@@ -29,17 +30,6 @@ public sealed partial class EntityManager
     public string LocalPath => $"{localPath}\\{Name}.usda";
     private string localPath = "";
 
-    public Entity Duplicate(Entity refEntity, Entity parent = null)
-    {
-        Entity clonedEntity = refEntity.Clone();
-        clonedEntity.Data.Parent = parent;
-
-        return clonedEntity;
-    }
-
-    public void Destroy(EntityData entity) =>
-        entity.Dispose();
-
     public void Dispose()
     {
         foreach (var entity in Entities.Values)
@@ -53,8 +43,9 @@ public sealed partial class EntityManager
 {
     public Entity CreateEntity(EntityData data, Entity parent = null)
     {
-        int id = nextEntityID++;
-        Entity entity = new(id, data);
+        Entity entity = PoolManager.GetPool<Entity>().Get();
+        entity.ID = nextEntityID++;
+        entity.Data = data;
 
         entity.Manager = this;
         data.Entity = entity;
@@ -63,11 +54,19 @@ public sealed partial class EntityManager
         // Add the Transform component to the Entity when initialized.
         entity.AddComponent<Transform>();
 
-        Entities[id] = entity;
+        Entities[entity.ID] = entity;
 
         return entity;
     }
-    
+
+    public Entity DuplicateEntity(Entity refEntity, Entity parent = null)
+    {
+        Entity clonedEntity = refEntity.Clone();
+        clonedEntity.Data.Parent = parent;
+
+        return clonedEntity;
+    }
+
     public Entity MigrateEntity(Entity entity, Entity parent = null)
     {
         int id = nextEntityID++;
@@ -94,6 +93,21 @@ public sealed partial class EntityManager
         entity.Dispose();
 
         Entities.Remove(entity.ID);
+    }
+
+    public void ReturnEntity(Entity entity)
+    {
+        if (entity is null)
+            return;
+
+        if (!Entities.ContainsKey(entity.ID))
+            return;
+
+        entity.Return();
+
+        Entities.Remove(entity.ID);
+
+        PoolManager.GetPool<Entity>().Return(entity);
     }
 
     public Entity GetEntity(int ID) =>

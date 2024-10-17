@@ -516,13 +516,13 @@ internal sealed partial class Hierarchy
             SceneEntry sceneEntry = GetSceneEntry(treeEntry);
             EntityManager entityManger = Engine.Kernel.Instance.SystemManager.GetEntityManagerFromGUID(sceneEntry.ID);
 
-            entityManger.Destroy(GetEntity(treeEntry.ID).Data);
+            entityManger.DestroyEntity(GetEntity(treeEntry.ID));
 
             Binding.Remove(treeEntry.ID);
 
             foreach (var iconNode in treeEntry.IconNode.Children)
             {
-                entityManger.Destroy(GetEntity(iconNode.TreeEntry.ID).Data);
+                entityManger.DestroyEntity(GetEntity(iconNode.TreeEntry.ID));
                 sceneEntry.DataSource.Remove(iconNode);
             }
 
@@ -873,7 +873,7 @@ internal sealed partial class Hierarchy
             else if (requestedOperation == DataPackageOperation.Copy)
             {
                 // Duplicate the source entity to the target entity and get the new tree entry.
-                var newEntity = Engine.Kernel.Instance.SystemManager.GetEntityManagerFromGUID(sourceSceneEntry.ID).Duplicate(sourceEntity, targetEntity);
+                var newEntity = Engine.Kernel.Instance.SystemManager.GetEntityManagerFromGUID(sourceSceneEntry.ID).DuplicateEntity(sourceEntity, targetEntity);
                 var newTreeEntry = GetTreeEntry(newEntity.GUID, targetSceneEntry);
 
                 // Iterate through each child icon node of the source tree entry.
@@ -942,7 +942,7 @@ internal sealed partial class Hierarchy
             else if (requestedOperation == DataPackageOperation.Copy)
             {
                 // Duplicate the source entity to the target scene and get the new tree entry.
-                var newEntity = Engine.Kernel.Instance.SystemManager.GetEntityManagerFromGUID(sourceSceneEntry.ID).Duplicate(sourceEntity);
+                var newEntity = Engine.Kernel.Instance.SystemManager.GetEntityManagerFromGUID(sourceSceneEntry.ID).DuplicateEntity(sourceEntity);
                 var newTreeEntry = GetTreeEntry(newEntity.GUID, targetSceneEntry);
 
                 // Iterate through each child icon node of the source tree entry.

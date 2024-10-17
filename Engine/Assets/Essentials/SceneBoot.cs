@@ -1,4 +1,6 @@
-﻿namespace Engine.Essentials;
+﻿using System.Threading.Tasks;
+
+namespace Engine.Essentials;
 
 internal sealed class SceneBoot : EditorComponent, IHide
 {
@@ -79,6 +81,10 @@ internal sealed class SceneBoot : EditorComponent, IHide
             }
         }
 
+        if (!_processing && Input.GetKey(Key.U, InputState.Pressed) && ViewportController.ViewportFocused)
+            foreach (var child in Cubes.Data.Children.ToArray())
+                Entity.Manager.ReturnEntity(child);
+
         if (Input.GetKey(Key.T, InputState.Pressed) && ViewportController.ViewportFocused)
         {
             Output.Log($"Spawned {EntityCount += 1_000} Entities");
@@ -101,9 +107,9 @@ internal sealed class SceneBoot : EditorComponent, IHide
             _processing = true;
 
             foreach (var child in Empty.Data.Children.ToArray())
-                Entity.Manager.DestroyEntity(child);
+                Entity.Manager.ReturnEntity(child);
 
-            Output.Log($"Destroyed {EntityCount} Entities");
+            Output.Log($"Returned {EntityCount} Entities");
         }
 
         if (Input.GetKey(Key.V, InputState.Pressed) && ViewportController.ViewportFocused)

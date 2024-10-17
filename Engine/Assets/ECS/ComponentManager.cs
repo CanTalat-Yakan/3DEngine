@@ -93,30 +93,30 @@ public sealed partial class ComponentManager
     public Type[] GetComponentTypes(Entity entity) =>
         GetComponents(entity).Select(component => component.GetType()).ToArray();
 
-    public void RemoveComponent<T>(Entity entity) where T : Component
+    public void RemoveComponent<T>(Entity entity, bool dispose) where T : Component
     {
         if (_componentSparseSets.TryGetValue(typeof(T), out var sparseSet))
         {
             var typedSparseSet = (SparseSet<T>)sparseSet;
-            typedSparseSet.Remove(entity);
+            typedSparseSet.Remove(entity, dispose);
         }
     }
 
-    public void RemoveComponent(Entity entity, Type componentType)
+    public void RemoveComponent(Entity entity, Type componentType, bool dispose)
     {
         if (_componentSparseSets.TryGetValue(componentType, out var sparseSet))
         {
             var removeMethod = sparseSet.GetType().GetMethod("Remove");
-            removeMethod.Invoke(sparseSet, [entity]);
+            removeMethod.Invoke(sparseSet, [entity, dispose]);
         }
     }
 
-    public void RemoveComponents(Entity entity)
+    public void RemoveComponents(Entity entity, bool dispose)
     {
         foreach (var sparseSet in _componentSparseSets.Values)
         {
             var removeMethod = sparseSet.GetType().GetMethod("Remove");
-            removeMethod.Invoke(sparseSet, [entity]);
+            removeMethod.Invoke(sparseSet, [entity, dispose]);
         }
     }
 }
@@ -187,7 +187,7 @@ public sealed partial class ComponentManager
             page.SparseArray[entity.ID].Add(index);
         }
 
-        public void Remove(Entity entity)
+        public void Remove(Entity entity, bool dispose)
         {
             int pageNumber = GetPageNumber(entity.ID);
             if (_pages.TryGetValue(pageNumber, out var page) && page.SparseArray.TryGetValue(entity.ID, out List<int> denseIndices))
@@ -197,8 +197,11 @@ public sealed partial class ComponentManager
 
                 foreach (var denseIndex in denseIndices)
                 {
-                    // Invoke the destruction event for the component
-                    page.DenseArray[denseIndex].Dispose();
+                    if (dispose)
+                        // Invoke the destruction event for the component
+                        page.DenseArray[denseIndex].Dispose();
+                    else
+                        page.DenseArray[denseIndex].Return();
 
                     int lastDenseIndex = page.DenseArray.Count - 1;
 

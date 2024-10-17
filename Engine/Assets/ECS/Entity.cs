@@ -27,7 +27,7 @@ public sealed partial class Entity
     public int ID { get; set; }
     public Guid GUID { get; } = Guid.NewGuid();
 
-    public EntityData Data { get; }
+    public EntityData Data { get; set; }
 
     public EntityManager Manager;
 
@@ -35,12 +35,6 @@ public sealed partial class Entity
 
     public SystemManager SystemManager => _systemManager ??= Kernel.Instance.SystemManager;
     public SystemManager _systemManager;
-
-    public Entity(int id, EntityData data)
-    {
-        ID = id;
-        Data = data;
-    }
 }
 
 public sealed partial class Entity
@@ -90,26 +84,36 @@ public sealed partial class Entity
     public bool HasComponent<T>() where T : Component =>
         GetComponentTypes().Contains(typeof(T));
 
-    public void RemoveComponent<T>(T component) where T : Component
+    public void RemoveComponent<T>(T component, bool dispose = true) where T : Component
     {
-        SystemManager.ComponentManager.RemoveComponent<T>(this);
+        PoolManager.GetPool<T>().Return(component);
 
-        var pool = PoolManager.GetPool<T>();
-        pool.Return(component);
+        SystemManager.ComponentManager.RemoveComponent<T>(this, dispose);
     }
 
-    public void RemoveComponent(Component component)
+    public void RemoveComponent(Component component, bool dispose = true)
     {
-        SystemManager.ComponentManager.RemoveComponent(this, component.GetType());
+        ReturnComponent(component);
 
+        SystemManager.ComponentManager.RemoveComponent(this, component.GetType(), dispose);
+    }
+
+    public void RemoveComponents(bool dispose = true)
+    {
+        foreach (var component in GetComponents())
+            ReturnComponent(component);
+
+        SystemManager.ComponentManager.RemoveComponents(this, dispose);
+    }
+
+    public void ReturnComponent(Component component)
+    {
         var type = component.GetType();
         var pool = PoolManager.GetPool(type);
         var returnMethod = pool.GetType().GetMethod("Return");
+
         returnMethod.Invoke(pool, [component]);
     }
-
-    public void RemoveComponents() =>
-        SystemManager.ComponentManager.RemoveComponents(this);
 }
 
 public sealed partial class Entity : ICloneable, IDisposable
@@ -122,6 +126,9 @@ public sealed partial class Entity : ICloneable, IDisposable
 
     public void Dispose() =>
         Data.Dispose();
+
+    public void Return() =>
+        Data.Return();
 }
 
 public sealed partial class EntityData
@@ -217,6 +224,15 @@ public sealed partial class EntityData : ICloneable, IDisposable
         IsEnabled = false;
 
         Entity.RemoveComponents();
+
+        Parent?.Data.Children.Remove(Entity);
+    }
+
+    public void Return()
+    {
+        IsEnabled = false;
+
+        Entity.RemoveComponents(dispose: false);
 
         Parent?.Data.Children.Remove(Entity);
     }
