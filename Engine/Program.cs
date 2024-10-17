@@ -26,7 +26,7 @@ public sealed class Program
         config.GUI = renderGUI;
 
         AppWindow = new(config.WindowData);
-        AppWindow.Show(Interoperation.ShowWindowCommand.Maximize);
+        AppWindow.Show(config.WindowCommand);
 
         Kernel = new(config);
         Kernel.Initialize(AppWindow.Win32Window.Handle, AppWindow.Win32Window.Size, win32Window: true);

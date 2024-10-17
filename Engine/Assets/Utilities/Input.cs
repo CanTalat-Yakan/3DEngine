@@ -22,16 +22,31 @@ public enum InputState
     Up
 }
 
+public class InputSnapshot
+{
+    public Vector2 MousePosition { get; init; }
+    public Vector2 MouseDelta { get; init; }
+    public int MouseWheel { get; init; }
+    public Vector2 Axis { get; set; }
+    public Vector2 JoystickAxis { get; init; }
+
+    public MouseState MouseState { get; init; }
+    public KeyboardState KeyboardState { get; init; }
+    public JoystickState JoystickState { get; init; }
+    public MouseState PreviousMouseState { get; init; }
+    public KeyboardState PreviousKeyboardState { get; init; }
+    public JoystickState PreviousJoystickState { get; init; }
+}
+
 public sealed partial class Input
 {
+    // Immutable snapshot of the input state
+    private static InputSnapshot s_currentSnapshot;
+
     private static IDirectInput8 s_directInput;
     private static IDirectInputDevice8 s_mouse;
     private static IDirectInputDevice8 s_keyboard;
     private static IDirectInputDevice8 s_joystick;
-
-    private static MouseState s_previousMouseState = new();
-    private static KeyboardState s_previousKeyboardState = new();
-    private static JoystickState s_previousJoystickState = new();
 
     private static Vector2 s_axis = Vector2.Zero;
     private static Vector2 s_joystickAxis = Vector2.Zero;
@@ -135,6 +150,21 @@ public sealed partial class Input
         else
             s_lockedmousePosition = s_mousePosition;
 
+        // Create a new snapshot of the input state
+        s_currentSnapshot = new()
+        {
+            MousePosition = s_mousePosition,
+            MouseDelta = s_mouseDelta,
+            MouseWheel = s_mouseWheel,
+            JoystickAxis = s_joystickAxis,
+            PreviousMouseState = s_currentSnapshot?.MouseState,
+            PreviousKeyboardState = s_currentSnapshot?.KeyboardState,
+            PreviousJoystickState = s_currentSnapshot?.JoystickState,
+            MouseState = s_mouse?.GetCurrentMouseState(),
+            KeyboardState = s_keyboard?.GetCurrentKeyboardState(),
+            JoystickState = s_joystick?.GetCurrentJoystickState(),
+        };
+
         // Reset axis vector.
         s_axis = Vector2.Zero;
         // Update axis based on keyboard input.
@@ -142,87 +172,66 @@ public sealed partial class Input
         if (GetKey(Key.S)) s_axis.Y--;
         if (GetKey(Key.D)) s_axis.X++;
         if (GetKey(Key.A)) s_axis.X--;
-    }
 
-    public static void LateUpdate()
-    {
-        try
-        {
-            s_previousMouseState = s_mouse?.GetCurrentMouseState();
-            s_previousKeyboardState = s_keyboard?.GetCurrentKeyboardState();
-            s_previousJoystickState = s_joystick?.GetCurrentJoystickState();
-        }
-        catch { }
+        s_currentSnapshot.Axis = s_axis;
     }
 }
 
 public sealed partial class Input
 {
-    public static bool GetKey(Key key, InputState state = InputState.Pressed)
-    {
-        KeyboardState currentKeyboardState;
-        try { currentKeyboardState = s_keyboard?.GetCurrentKeyboardState(); }
-        catch { return false; }
-
-        return state switch
+    public static bool GetKey(Key key, InputState state = InputState.Pressed) =>
+        state switch
         {
-            InputState.Down => currentKeyboardState.IsPressed(key) && !s_previousKeyboardState.IsPressed(key),
-            InputState.Pressed => currentKeyboardState.IsPressed(key),
-            InputState.Up => !currentKeyboardState.IsPressed(key) && s_previousKeyboardState.IsPressed(key),
+            InputState.Down => s_currentSnapshot.KeyboardState.IsPressed(key) && !s_currentSnapshot.PreviousKeyboardState.IsPressed(key),
+            InputState.Pressed => s_currentSnapshot.KeyboardState.IsPressed(key),
+            InputState.Up => !s_currentSnapshot.KeyboardState.IsPressed(key) && s_currentSnapshot.PreviousKeyboardState.IsPressed(key),
             _ => false
         };
-    }
 
-    public static bool GetButton(MouseButton button, InputState state = InputState.Pressed)
-    {
-        MouseState currentMouseState;
-        try { currentMouseState = s_mouse?.GetCurrentMouseState(); }
-        catch { return false; }
-
-        return state switch
+    public static bool GetButton(MouseButton button, InputState state = InputState.Pressed) =>
+        state switch
         {
             InputState.Down => button switch
             {
-                MouseButton.Left => currentMouseState.Buttons[0] && !s_previousMouseState.Buttons[0],
-                MouseButton.Right => currentMouseState.Buttons[1] && !s_previousMouseState.Buttons[1],
-                MouseButton.Middle => currentMouseState.Buttons[2] && !s_previousMouseState.Buttons[2],
+                MouseButton.Left => s_currentSnapshot.MouseState.Buttons[0] && !s_currentSnapshot.PreviousMouseState.Buttons[0],
+                MouseButton.Right => s_currentSnapshot.MouseState.Buttons[1] && !s_currentSnapshot.PreviousMouseState.Buttons[1],
+                MouseButton.Middle => s_currentSnapshot.MouseState.Buttons[2] && !s_currentSnapshot.PreviousMouseState.Buttons[2],
                 _ => false
             },
             InputState.Pressed => button switch
             {
-                MouseButton.Left => currentMouseState.Buttons[0],
-                MouseButton.Right => currentMouseState.Buttons[1],
-                MouseButton.Middle => currentMouseState.Buttons[2],
+                MouseButton.Left => s_currentSnapshot.MouseState.Buttons[0],
+                MouseButton.Right => s_currentSnapshot.MouseState.Buttons[1],
+                MouseButton.Middle => s_currentSnapshot.MouseState.Buttons[2],
                 _ => false
             },
             InputState.Up => button switch
             {
-                MouseButton.Left => !currentMouseState.Buttons[0] && s_previousMouseState.Buttons[0],
-                MouseButton.Right => !currentMouseState.Buttons[1] && s_previousMouseState.Buttons[1],
-                MouseButton.Middle => !currentMouseState.Buttons[2] && s_previousMouseState.Buttons[2],
+                MouseButton.Left => !s_currentSnapshot.MouseState.Buttons[0] && s_currentSnapshot.PreviousMouseState.Buttons[0],
+                MouseButton.Right => !s_currentSnapshot.MouseState.Buttons[1] && s_currentSnapshot.PreviousMouseState.Buttons[1],
+                MouseButton.Middle => !s_currentSnapshot.MouseState.Buttons[2] && s_currentSnapshot.PreviousMouseState.Buttons[2],
                 _ => false
             },
             _ => false
         };
-    }
 
     public static Vector2 GetAxis() =>
-        s_axis.IsNaN() ? Vector2.Zero : s_axis;
+        s_currentSnapshot.Axis.IsNaN() ? Vector2.Zero : s_currentSnapshot.Axis;
 
     public static Vector2 GetJoystickAxis() =>
-        s_joystickAxis.IsNaN() ? Vector2.Zero : s_axis;
+        s_currentSnapshot.JoystickAxis.IsNaN() ? Vector2.Zero : s_currentSnapshot.JoystickAxis;
 
     public static Vector2 GetMouseDelta() =>
-        s_mouseDelta.IsNaN() ? Vector2.Zero : s_mouseDelta;
+        s_currentSnapshot.MouseDelta.IsNaN() ? Vector2.Zero : s_currentSnapshot.MouseDelta;
 
     public static Vector2 GetMousePosition() =>
-        s_mousePosition.IsNaN() ? Vector2.Zero : s_mousePosition;
+        s_currentSnapshot.MousePosition.IsNaN() ? Vector2.Zero : s_currentSnapshot.MousePosition;
 
     public static Vector2 GetRawMousePosition() =>
-        s_mousePosition;
+        s_currentSnapshot.MousePosition;
 
     public static int GetMouseWheel() =>
-        s_mouseWheel;
+        s_currentSnapshot.MouseWheel;
 }
 
 public sealed partial class Input

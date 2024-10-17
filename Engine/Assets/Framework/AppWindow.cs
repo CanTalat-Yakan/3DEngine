@@ -25,8 +25,8 @@ public sealed partial class AppWindow
             windowData.Height);
     }
 
-    public void Show(ShowWindowCommand command = ShowWindowCommand.Normal) =>
-        ShowWindow(Win32Window.Handle, command);
+    public void Show(WindowCommand command = WindowCommand.Normal) =>
+        ShowWindow(Win32Window.Handle, (ShowWindowCommand)command);
 
     public void Looping(params Delegate[] onFrame)
     {

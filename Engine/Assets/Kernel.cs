@@ -122,8 +122,6 @@ public sealed partial class Kernel
         if (Config.GUI)
             Profiler.Benchmark(RenderGUI);
 
-        Input.LateUpdate();
-
         Profiler.Reset();
 
         Profiler.Benchmark(EndRender);
