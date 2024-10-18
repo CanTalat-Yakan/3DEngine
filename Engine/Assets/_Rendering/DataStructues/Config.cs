@@ -18,6 +18,7 @@ public class Config
 
     public bool Debug = true;
     public bool GUI = true;
+    public bool SceneBoot = true;
 
     public static Config GetDefault(
         PresentInterval presentInterval = PresentInterval.Immediate,

@@ -6,36 +6,6 @@ using Engine.Interoperation;
 
 namespace Engine.Utilities;
 
-public enum MouseButton
-{
-    Left,
-    Right,
-    Middle
-}
-
-public enum InputState
-{
-    Down,
-    Pressed,
-    Up
-}
-
-public class InputSnapshot
-{
-    public Vector2 MousePosition { get; init; }
-    public Vector2 MouseDelta { get; init; }
-    public int MouseWheel { get; init; }
-    public Vector2 Axis { get; set; }
-    public Vector2 JoystickAxis { get; init; }
-
-    public MouseState MouseState { get; init; }
-    public KeyboardState KeyboardState { get; init; }
-    public JoystickState JoystickState { get; init; }
-    public MouseState PreviousMouseState { get; init; }
-    public KeyboardState PreviousKeyboardState { get; init; }
-    public JoystickState PreviousJoystickState { get; init; }
-}
-
 public sealed partial class Input
 {
     // Immutable snapshot of the input state
@@ -236,10 +206,10 @@ public sealed partial class Input
         s_currentSnapshot.MousePosition.IsNaN() ? Vector2.Zero : s_currentSnapshot.MousePosition;
 
     public static Vector2 GetRawMousePosition() =>
-        s_currentSnapshot.MousePosition;
+        s_currentSnapshot?.MousePosition ?? Vector2.Zero;
 
     public static int GetMouseWheel() =>
-        s_currentSnapshot.MouseWheel;
+        s_currentSnapshot?.MouseWheel ?? 0;
 }
 
 public sealed partial class Input
@@ -249,11 +219,20 @@ public sealed partial class Input
 
     public static void SetMousePosition(int x, int y) =>
         User32.SetCursorPos((int)s_lockedmousePosition.X, (int)s_lockedmousePosition.Y);
-    
-    public static void SetMouseRelativePosition(int u, int v)
+
+    /// <summary> The values need to be between 0 and 1 </summary>
+    public static void SetMouseRelativePosition(Vector3 relativePosition) =>
+        SetMouseRelativePosition(relativePosition.X, relativePosition.Y);
+
+    /// <summary> The values need to be between 0 and 1 </summary>
+    public static void SetMouseRelativePosition(float u, float v)
     {
+        int titlebarHeight = 32;
+
         User32.GetWindowRect(AppWindow.Win32Window.Handle, out var rect);
-        User32.SetCursorPos(AppWindow.Win32Window.Width * u + rect.Left, AppWindow.Win32Window.Height * v + rect.Top);
+        User32.SetCursorPos(
+            (int)(AppWindow.Win32Window.Width * u) + rect.Left,
+            (int)(AppWindow.Win32Window.Height * v) + rect.Top + titlebarHeight);
     }
 
     private static void LockMouse()
@@ -264,6 +243,36 @@ public sealed partial class Input
         if (GetKey(Key.Escape, InputState.Pressed))
             SetMouseLockState(false);
     }
+}
+
+public enum MouseButton
+{
+    Left,
+    Right,
+    Middle
+}
+
+public enum InputState
+{
+    Down,
+    Pressed,
+    Up
+}
+
+public class InputSnapshot
+{
+    public Vector2 MousePosition { get; init; }
+    public Vector2 MouseDelta { get; init; }
+    public int MouseWheel { get; init; }
+    public Vector2 Axis { get; set; }
+    public Vector2 JoystickAxis { get; init; }
+
+    public MouseState MouseState { get; init; }
+    public KeyboardState KeyboardState { get; init; }
+    public JoystickState JoystickState { get; init; }
+    public MouseState PreviousMouseState { get; init; }
+    public KeyboardState PreviousKeyboardState { get; init; }
+    public JoystickState PreviousJoystickState { get; init; }
 }
 
 public enum Key

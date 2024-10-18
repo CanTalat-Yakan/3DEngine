@@ -9,21 +9,22 @@ public sealed class Program
     private static void Main() =>
         new Program().Run();
 
-    public void Run(bool renderGUI = true, Config config = null, Delegate frame = null)
+    public void Run(bool renderGUI = true, bool sceneBoot = true, Config config = null, Delegate frame = null)
     {
         HandleExceptions();
 
-        Initialize(renderGUI, config);
+        Initialize(renderGUI, sceneBoot, config);
 
         AppWindow.Looping(Kernel.Frame, frame);
         AppWindow.Dispose(Kernel.Dispose);
     }
 
-    private void Initialize(bool renderGUI, Config config)
+    private void Initialize(bool renderGUI, bool sceneBoot, Config config)
     {
         config ??= Config.GetDefault();
         config.SetResolutionScale(1);
         config.GUI = renderGUI;
+        config.SceneBoot = sceneBoot;
 
         AppWindow = new(config.WindowData);
         AppWindow.Show(config.WindowCommand);

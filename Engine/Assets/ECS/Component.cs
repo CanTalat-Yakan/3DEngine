@@ -28,17 +28,11 @@ public partial class Component : IComponent, IDisposable
 
     [Hide] public ComponentMethods BitFlag = ComponentMethods.All;
 
-    public void InvokeEventOnDestroy() =>
+    public void Dispose() =>
         EventOnDestroy();
 
-    public void Destroy() =>
-        Entity.Manager.DestroyEntity(Entity);
-
-    public void Dispose() =>
-        InvokeEventOnDestroy();
-
     public void Return() =>
-    InvokeEventOnDestroy();
+        EventOnDestroy();
 }
 
 public partial class Component

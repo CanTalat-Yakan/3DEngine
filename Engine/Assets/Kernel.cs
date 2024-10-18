@@ -78,9 +78,10 @@ public sealed partial class Kernel
 
         Input.Initialize(hwnd);
 
-        var boot = SystemManager.MainEntityManager
-            .CreateEntity(null, "Boot", "DefaultBoot", hide: true)
-            .AddComponent<SceneBoot>();
+        if (Config.SceneBoot)
+            SystemManager.MainEntityManager
+                .CreateEntity(null, "Boot", "DefaultBoot", hide: true)
+                .AddComponent<SceneBoot>();
 
         //SceneLoader.Load(SystemManager, AssetsPaths.SCENENES + "teapot.usdz");
         //SceneLoader.Save(AssetsPaths.DIRECTORY + "test.usda", SystemManager);
