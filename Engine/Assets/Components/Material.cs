@@ -38,7 +38,7 @@ public sealed partial class Material : EditorComponent, IHide, IEquatable<Materi
         if (string.IsNullOrEmpty(PipelineStateObjectName))
             throw new NotImplementedException("error pipeline state object not set in material");
 
-        PipelineStateObjectDescription.Wireframe = ViewportController.Camera.RenderMode switch
+        PipelineStateObjectDescription.Wireframe = Camera.Main?.RenderMode switch
         {
             RenderMode.Shaded => false,
             RenderMode.Wireframe => true,
