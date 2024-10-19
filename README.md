@@ -64,21 +64,21 @@ Install the package via NuGet Package Manager for integration into your project.
       </ItemGroup>
 
       <ItemGroup>
-          <PackageReference Include="3DEngine" Version="3.0.53" />
+          <PackageReference Include="3DEngine" Version="3.0.54" />
           <PackageReference Include="Costura.Fody" Version="5.7.0">
             <PrivateAssets>all</PrivateAssets>
           </PackageReference>
       </ItemGroup>
 
       <ItemGroup>
-          <Content Update="$(NuGetPackageRoot)\3dengine\3.0.53\contentFiles\any\net8.0-windows10.0.22621\Assets\Resources\**\*">
+          <Content Update="$(NuGetPackageRoot)\3dengine\3.0.54\contentFiles\any\net8.0-windows10.0.22621\Assets\Resources\**\*">
               <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
           </Content>
       </ItemGroup>
   </Project>
   ```
 
-  Ensure "PreserveNewest" is set for files in the Assets folder in Visual Studio. Replace the Path to the NuGet Package 3DEngine\3.0.53
+  Ensure "PreserveNewest" is set for files in the Assets folder in Visual Studio. Replace the Path to the NuGet Package 3DEngine\3.0.54
     
   ### Setup program:
 
@@ -165,8 +165,8 @@ Install the package via NuGet Package Manager for integration into your project.
   ### Example usage:
 
   ```csharp
-  Engine.Loader.ImageLoader.LoadTexture(AssetsPaths.ASSETS + "Textures\\TextureAtlas.png");
-  Engine.Kernel.Instance.Context.CreateShader(AssetsPaths.ASSETS + "Shaders\\VoxelShader");
+  Engine.Loader.ImageLoader.LoadTexture(Engine.Utilities.AssetPaths.ASSETS + "Textures\\TextureAtlas.png");
+  Engine.Kernel.Instance.Context.CreateShader(Engine.Utilities.AssetPaths.ASSETS + "Shaders\\VoxelShader");
 
   Entity.Manager.CreateEntity(name: "Controller").AddComponent<PlayerController>().Initialize(this);
   Entity.Manager.CreateEntity(name: "Sky").AddComponent<DefaultSky>().Initialize();

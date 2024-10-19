@@ -188,9 +188,9 @@ public sealed partial class Home
             path = IncrementFolderIfExists(path);
 
             Directory.CreateDirectory(path);
-            Directory.CreateDirectory(Path.Combine(path, AssetsPaths.ASSETS));
+            Directory.CreateDirectory(Path.Combine(path, AssetPaths.ASSETS));
 
-            string zipPath = Path.Combine(AppContext.BaseDirectory, AssetsPaths.TEMPLATES, "Project", "Project.zip");
+            string zipPath = Path.Combine(AppContext.BaseDirectory, AssetPaths.TEMPLATES, "Project", "Project.zip");
             if (File.Exists(zipPath))
                 ZipFile.ExtractToDirectory(zipPath, path);
 

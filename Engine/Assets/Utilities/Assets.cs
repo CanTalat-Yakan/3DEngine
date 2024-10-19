@@ -4,7 +4,7 @@ using Vortice.Direct3D12;
 
 namespace Engine.Utilities;
 
-public sealed class AssetsPaths
+public sealed class AssetPaths
 {
     public static readonly string DIRECTORY = AppContext.BaseDirectory;
 

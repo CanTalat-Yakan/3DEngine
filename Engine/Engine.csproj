@@ -21,7 +21,7 @@
 		<PackageIcon>3DEngine_Logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>3D Game Engine .Net8 C#12</PackageTags>
-		<Version>3.0.53</Version>
+		<Version>3.0.54</Version>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -162,7 +162,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="..\3DEngine_Logo.png" Link="Assets\Resources\Textures\3DEngine_Logo.png">
+		<None Include="..\Images\3DEngine_Logo.png" Link="Assets\Resources\Textures\3DEngine_Logo.png">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>

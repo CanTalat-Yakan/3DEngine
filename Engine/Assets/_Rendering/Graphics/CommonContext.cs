@@ -53,13 +53,13 @@ public sealed partial class CommonContext : IDisposable
     {
         CreateShaderFromResources(["Unlit", "SimpleLit", "Sky"]);
 
-        ModelLoader.LoadFile(AssetsPaths.PRIMITIVES + "Cube.obj");
-        ModelLoader.LoadFile(AssetsPaths.PRIMITIVES + "Sphere.obj");
+        ModelLoader.LoadFile(AssetPaths.PRIMITIVES + "Cube.obj");
+        ModelLoader.LoadFile(AssetPaths.PRIMITIVES + "Sphere.obj");
 
-        ImageLoader.LoadTexture(AssetsPaths.TEXTURES + "Default.png");
-        ImageLoader.LoadTexture(AssetsPaths.TEXTURES + "SkyGradient.png");
-        ImageLoader.LoadTexture(AssetsPaths.TEXTURES + "Transparent.png");
-        ImageLoader.LoadTexture(AssetsPaths.TEXTURES + "UVMap.png");
+        ImageLoader.LoadTexture(AssetPaths.TEXTURES + "Default.png");
+        ImageLoader.LoadTexture(AssetPaths.TEXTURES + "SkyGradient.png");
+        ImageLoader.LoadTexture(AssetPaths.TEXTURES + "Transparent.png");
+        ImageLoader.LoadTexture(AssetPaths.TEXTURES + "UVMap.png");
     }
 
     public void Dispose()
