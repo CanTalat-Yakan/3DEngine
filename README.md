@@ -57,15 +57,27 @@ Install the package via NuGet Package Manager for integration into your project.
               renderGUI: true,
               sceneBoot: true,
               config: Engine.DataStructures.Config.GetDefault(),
-              initialization: () => { },
+              initialization: () => 
+                Engine.Kernel.Instance.SystemManager.MainEntityManager.CreateEntity().AddComponent<GameManager>(),
               frame: () => { });
   }
   ```
-  
-  ### Access system and add entity with components:
+    
+  ### Examples:
 
   ```csharp
-  Engine.Kernel.Instance.SystemManager.MainEntityManager.CreateEntity().AddComponent<GameManager>());
+  ImageLoader.LoadTexture(AssetsPaths.ASSETS + "Textures\\TextureAtlas.png");
+  Kernel.Instance.Context.CreateShader(AssetsPaths.ASSETS + "Shaders\\VoxelShader");
+
+  Entity.Manager.CreateEntity(name: "Controller").AddComponent<PlayerController>().Initialize(this);
+  Entity.Manager.CreateEntity(name: "Sky").AddComponent<DefaultSky>().Initialize();
+
+  if (Input.GetKey(Key.Escape, InputState.Down))
+      LOCKED = !LOCKED;
+
+  if (!LOCKED)
+      Input.SetMouseRelativePosition(0.5f, 0.5f);
+  Input.SetMouseLockState(!LOCKED);
   ```
 
   ### Example script:
