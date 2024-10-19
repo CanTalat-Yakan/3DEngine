@@ -48,20 +48,20 @@ Install the package via NuGet Package Manager for integration into your project.
 
   ### Example usage:
 
-  ```csharp
-  class Program
-  {
-      [STAThread]
-      private static void Main() =>
-          new Engine.Program().Run(
-              renderGUI: true,
-              sceneBoot: true,
-              config: Engine.DataStructures.Config.GetDefault(),
-              initialization: () => 
-                Engine.Kernel.Instance.SystemManager.MainEntityManager.CreateEntity().AddComponent<GameManager>(),
-              frame: () => { });
-  }
-  ```
+```csharp
+class Program
+{
+    [STAThread]
+    private static void Main() =>
+        new Engine.Program().Run(
+            renderGUI: true,
+            sceneBoot: true,
+            config: Engine.DataStructures.Config.GetDefault(),
+            initialization: () => 
+              Engine.Kernel.Instance.SystemManager.MainEntityManager.CreateEntity().AddComponent<GameManager>(),
+            frame: () => { });
+}
+```
     
   ### Examples:
 
