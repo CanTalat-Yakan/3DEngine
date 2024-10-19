@@ -61,13 +61,13 @@ With your support, we can create a powerful and user-friendly engine, complete w
   ```
   
   Access system and add entity with components:
-- 
+
   ```csharp
   Engine.Kernel.Instance.SystemManager.MainEntityManager.CreateEntity().AddComponent<GameManager>());
   ```
 
   Example script:
-- 
+
   ```csharp
   public class Example : Component
   {
@@ -104,8 +104,6 @@ With your support, we can create a powerful and user-friendly engine, complete w
           ScriptSystem.Register(this);
   }
   ```
-
-
 
   Setup in your project:
 
