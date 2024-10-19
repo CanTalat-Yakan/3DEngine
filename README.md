@@ -152,6 +152,14 @@ Install the package via NuGet Package Manager for integration into your project.
   Entity.Manager.CreateEntity(name: "Controller").AddComponent<PlayerController>().Initialize(this);
   Entity.Manager.CreateEntity(name: "Sky").AddComponent<DefaultSky>().Initialize();
 
+  var mesh = gameManager.Entity.Manager.CreateEntity().AddComponent<Mesh>();
+  mesh.SetMeshData(vertices, indices, positions, new InputLayoutHelper().GetDefault());
+  mesh.SetRootSignature();
+  mesh.SetMaterialTextures([new("TextureAtlas.png", 0)]);
+  mesh.SetMaterialPipeline("VoxelShader");
+  
+  Output.Log(Entity.Transform.Position);
+
   if (Input.GetKey(Key.Escape, InputState.Down))
       LOCKED = !LOCKED;
 
