@@ -1,4 +1,4 @@
-![Logo](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/3DEngine_Logo_BG.png)
+![Logo](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/images/3DEngine_Logo_BG.png)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/CanTalat-Yakan/3DEngine/blob/master/LICENSE) 
 
 # 3D Engine
@@ -198,15 +198,15 @@ To compile the 3D Engine, ensure you have [Visual Studio 2022](https://visualstu
 
 ## Screenshots
 
-![3D Engine Layout](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/Screenshots/Layout.png)
-![1](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/Screenshots/Screenshot_1.png)
-![2](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/Screenshots/Screenshot_2.png)
-![3](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/Screenshots/Screenshot_3.png)
-![4](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/Screenshots/Screenshot_4.png)
-![5](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/Screenshots/Screenshot_5.png)
-![6](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/Screenshots/Screenshot_6.png)
-![7](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/Screenshots/Screenshot_7.png)
-![8](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/Screenshots/Screenshot_8.png)
-![9](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/Screenshots/Screenshot_9.png)
-![10](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/Screenshots/Screenshot_10.png)
-![13](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/Screenshots/Screenshot_Folder.png)
+![3D Engine Layout](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/images/Layout.png)
+![1](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/images/Screenshot_1.png)
+![2](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/images/Screenshot_2.png)
+![3](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/images/Screenshot_3.png)
+![4](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/images/Screenshot_4.png)
+![5](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/images/Screenshot_5.png)
+![6](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/images/Screenshot_6.png)
+![7](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/images/Screenshot_7.png)
+![8](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/images/Screenshot_8.png)
+![9](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/images/Screenshot_9.png)
+![10](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/images/Screenshot_10.png)
+![13](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/master/images/Screenshot_Folder.png)
