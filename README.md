@@ -60,6 +60,12 @@ With your support, we can create a powerful and user-friendly engine, complete w
   }
   ```
   
+  Access system and add entity with components:
+- 
+  ```csharp
+  Engine.Kernel.Instance.SystemManager.MainEntityManager.CreateEntity().AddComponent<GameManager>());
+  ```
+
   Setup in your project:
 
   ```xml
