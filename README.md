@@ -34,7 +34,9 @@ With your support, we can create a powerful and user-friendly engine, complete w
 
 ## NuGet Package
 
-**[3DEngine NuGet Package](https://www.nuget.org/packages/3DEngine/)**: Install the package via NuGet Package Manager for integration into your project.
+### **[3DEngine NuGet Package](https://www.nuget.org/packages/3DEngine/)**: 
+
+Install the package via NuGet Package Manager for integration into your project.
 
   ```bash
   dotnet new console -n Project
