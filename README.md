@@ -153,7 +153,7 @@ Install the package via NuGet Package Manager for integration into your project.
   Entity.Manager.CreateEntity(name: "Sky").AddComponent<DefaultSky>().Initialize();
 
   var mesh = gameManager.Entity.Manager.CreateEntity().AddComponent<Mesh>();
-  mesh.SetMeshData(vertices, indices, positions, InputLayoutHelper.AddPosition3D().AddNormal().AddTangent().AddUV());
+  mesh.SetMeshData(vertices, indices, positions, InputLayoutHelper.AddPosition3D());
   mesh.SetRootSignature();
   mesh.SetMaterialTextures([new("TextureAtlas.png", 0)]);
   mesh.SetMaterialPipeline("VoxelShader");
