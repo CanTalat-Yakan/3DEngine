@@ -48,4 +48,13 @@ public class Example : Component
     // This is the base function of OnRegister.
     public override void OnRegister() =>
         ScriptSystem.Register(this);
+        
+    public override void OnAwake() { }
+    public override void OnStart() { }
+    public override void OnUpdate() { }
+    public override void OnLateUpdate() { }
+    public override void OnFixedUpdate() { }
+    public override void OnRender() { }
+    public override void OnGUI() { }
+    public override void OnDestroy() { }
 }

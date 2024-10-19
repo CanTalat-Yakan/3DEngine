@@ -104,6 +104,15 @@ Install the package via NuGet Package Manager for integration into your project.
       // This is the base function of OnRegister.
       public override void OnRegister() =>
           ScriptSystem.Register(this);
+        
+      public override void OnAwake() { }
+      public override void OnStart() { }
+      public override void OnUpdate() { }
+      public override void OnLateUpdate() { }
+      public override void OnFixedUpdate() { }
+      public override void OnRender() { }
+      public override void OnGUI() { }
+      public override void OnDestroy() { }
   }
   ```
 
