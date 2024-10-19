@@ -46,7 +46,39 @@ Install the package via NuGet Package Manager for integration into your project.
   ./Project.csproj
   ```
 
-  ### Example usage:
+  ### Setup project:
+
+  ```xml
+  <Project Sdk="Microsoft.NET.Sdk">
+      <PropertyGroup>
+          <OutputType>WinExe</OutputType>
+          <TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
+          <ImplicitUsings>enable</ImplicitUsings>
+          <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+          <PlatformTarget>x64</PlatformTarget>
+          <PublishAot>true</PublishAot>
+      </PropertyGroup>
+
+      <ItemGroup>
+        <None Remove="FodyWeavers.xml" />
+      </ItemGroup>
+
+      <ItemGroup>
+          <PackageReference Include="3DEngine" Version="3.0.52 />
+          <PackageReference Include="Costura.Fody" Version="5.7.0">
+            <PrivateAssets>all</PrivateAssets>
+          </PackageReference>
+      </ItemGroup>
+
+      <ItemGroup>
+          <Content Update="$(NuGetPackageRoot)\3dengine\3.0.52\contentFiles\any\net8.0-windows10.0.22621\Assets\Resources\**\*">
+              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          </Content>
+      </ItemGroup>
+  </Project>
+  ```
+    
+  ### Setup program:
 
   ```csharp
   class Program
@@ -62,7 +94,7 @@ Install the package via NuGet Package Manager for integration into your project.
               frame: () => { });
   }
   ```
-    
+
   ### Examples:
 
   ```csharp
@@ -126,38 +158,6 @@ Install the package via NuGet Package Manager for integration into your project.
       public override void OnGUI() { }
       public override void OnDestroy() { }
   }
-  ```
-
-  ### Setup in your project:
-
-  ```xml
-  <Project Sdk="Microsoft.NET.Sdk">
-      <PropertyGroup>
-          <OutputType>WinExe</OutputType>
-          <TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
-          <ImplicitUsings>enable</ImplicitUsings>
-          <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-          <PlatformTarget>x64</PlatformTarget>
-          <PublishAot>true</PublishAot>
-      </PropertyGroup>
-
-      <ItemGroup>
-        <None Remove="FodyWeavers.xml" />
-      </ItemGroup>
-
-      <ItemGroup>
-          <PackageReference Include="3DEngine" Version="3.0.52 />
-          <PackageReference Include="Costura.Fody" Version="5.7.0">
-            <PrivateAssets>all</PrivateAssets>
-          </PackageReference>
-      </ItemGroup>
-
-      <ItemGroup>
-          <Content Update="$(NuGetPackageRoot)\3dengine\3.0.52\contentFiles\any\net8.0-windows10.0.22621\Assets\Resources\**\*">
-              <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-          </Content>
-      </ItemGroup>
-  </Project>
   ```
 
   Ensure "PreserveNewest" is set for files in the Assets folder in Visual Studio. Replace the Path to the NuGet Package 3DEngine\3.0.52
