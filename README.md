@@ -171,7 +171,7 @@ Install the package via NuGet Package Manager for integration into your project.
 
   var mesh = gameManager.Entity.Manager.CreateEntity().AddComponent<Mesh>();
   mesh.SetMeshData(vertices, indices, positions, InputLayoutHelper.AddPosition3D());
-  mesh.SetRootSignature();
+  mesh.SetRootSignature(new RootSignatureHelper().AddConstantBufferView().AddShaderResourceViewTable);
   mesh.SetMaterialTextures([new("TextureAtlas.png", 0)]);
   mesh.SetMaterialPipeline("VoxelShader");
   
