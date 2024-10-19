@@ -10,7 +10,7 @@
 ## Overview
 
 The 3D Engine is currently in an early stage of development and is not yet equipped with the essential features required for a production-ready game engine. 
-However, a clear and forward-looking development roadmap has been established, with active work being done to implement advanced systems such as virtualized geometry and Radiance Cascades for fully dynamic global illumination.
+However, a clear and forward-looking development roadmap has been established, with active work being done to implement advanced systems such as virtualized geometry and radiance cascades for fully dynamic global illumination.
 As development progresses, I plan to foster a community starting next year, with the aim of building a C# game engine that integrates seamlessly with Unity workflows. 
 With your support, we can create a powerful and user-friendly engine, complete with an editor, that meets the demands of modern game development.
 
@@ -64,7 +64,7 @@ Install the package via NuGet Package Manager for integration into your project.
       </ItemGroup>
 
       <ItemGroup>
-          <PackageReference Include="3DEngine" Version="3.0.52 />
+          <PackageReference Include="3DEngine" Version="3.0.52" />
           <PackageReference Include="Costura.Fody" Version="5.7.0">
             <PrivateAssets>all</PrivateAssets>
           </PackageReference>
@@ -98,6 +98,23 @@ Install the package via NuGet Package Manager for integration into your project.
   ### Example script:
 
   ```csharp
+  using System;
+  using System.Collections;
+  using System.Numerics;
+  
+  using Engine;
+  using Engine.Buffer;
+  using Engine.Components;
+  using Engine.DataStructures;
+  using Engine.ECS;
+  using Engine.Editor;
+  using Engine.Framework;
+  using Engine.Graphics;
+  using Engine.GUI;
+  using Engine.Helper;
+  using Engine.Runtime;
+  using Engine.Utilities;
+
   public class Example : Component
   {
       [ToolTip("This is a ToolTip")]
@@ -146,8 +163,8 @@ Install the package via NuGet Package Manager for integration into your project.
   ### Example usage:
 
   ```csharp
-  ImageLoader.LoadTexture(AssetsPaths.ASSETS + "Textures\\TextureAtlas.png");
-  Kernel.Instance.Context.CreateShader(AssetsPaths.ASSETS + "Shaders\\VoxelShader");
+  Engine.Loader.ImageLoader.LoadTexture(AssetsPaths.ASSETS + "Textures\\TextureAtlas.png");
+  Engine.Kernel.Instance.Context.CreateShader(AssetsPaths.ASSETS + "Shaders\\VoxelShader");
 
   Entity.Manager.CreateEntity(name: "Controller").AddComponent<PlayerController>().Initialize(this);
   Entity.Manager.CreateEntity(name: "Sky").AddComponent<DefaultSky>().Initialize();
@@ -158,14 +175,14 @@ Install the package via NuGet Package Manager for integration into your project.
   mesh.SetMaterialTextures([new("TextureAtlas.png", 0)]);
   mesh.SetMaterialPipeline("VoxelShader");
   
-  Output.Log(Entity.Transform.Position);
+  Engine.Utilities.Output.Log(Entity.Transform.Position);
 
-  if (Input.GetKey(Key.Escape, InputState.Down))
+  if (Engine.Utilities.Input.GetKey(Key.Escape, InputState.Down))
       LOCKED = !LOCKED;
 
   if (!LOCKED)
-      Input.SetMouseRelativePosition(0.5f, 0.5f);
-  Input.SetMouseLockState(!LOCKED);
+      Engine.Utilities.Input.SetMouseRelativePosition(0.5f, 0.5f);
+  Engine.Utilities.Input.SetMouseLockState(!LOCKED);
   ```
 
   Ensure "PreserveNewest" is set for files in the Assets folder in Visual Studio. Replace the Path to the NuGet Package 3DEngine\3.0.52
