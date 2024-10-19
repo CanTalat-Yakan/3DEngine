@@ -7,13 +7,15 @@ public sealed class Program
 
     [STAThread]
     private static void Main() =>
-        new Program().Run();
+        new Program().Run(sceneBoot: true);
 
-    public void Run(bool renderGUI = true, bool sceneBoot = true, Config config = null, Delegate frame = null)
+    public void Run(bool renderGUI = true, bool sceneBoot = false, Config config = null, Delegate initialization = null, Delegate frame = null)
     {
         HandleExceptions();
 
         Initialize(renderGUI, sceneBoot, config);
+
+        initialization?.DynamicInvoke();
 
         AppWindow.Looping(Kernel.Frame, frame);
         AppWindow.Dispose(Kernel.Dispose);
