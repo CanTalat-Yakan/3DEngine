@@ -25,39 +25,51 @@ public class RootSignatureHelper
     public string GetString() =>
         _rootSignatureParameters.ToString();
 
-    public RootSignatureHelper AddConstantBufferView()
+    public RootSignatureHelper AddConstantBufferView(int count = 1)
     {
-        _rootSignatureParameters.Append(CreateRootSignatureParameters(RootSignatureParameterTypes.ConstantBufferView));
+        for (int i = 0; i < count; i++)
+            _rootSignatureParameters.Append(CreateRootSignatureParameters(RootSignatureParameterTypes.ConstantBufferView));
+        
         return this;
     }
 
-    public RootSignatureHelper AddConstantBufferViewTable()
+    public RootSignatureHelper AddConstantBufferViewTable(int count = 1)
     {
-        _rootSignatureParameters.Append(CreateRootSignatureParameters(RootSignatureParameterTypes.ConstantBufferViewTable));
+        for (int i = 0; i < count; i++)
+            _rootSignatureParameters.Append(CreateRootSignatureParameters(RootSignatureParameterTypes.ConstantBufferViewTable));
+    
         return this;
     }
 
-    public RootSignatureHelper AddShaderResourceView()
+    public RootSignatureHelper AddShaderResourceView(int count = 1)
     {
-        _rootSignatureParameters.Append(CreateRootSignatureParameters(RootSignatureParameterTypes.ShaderResourceView));
+        for (int i = 0; i < count; i++)
+            _rootSignatureParameters.Append(CreateRootSignatureParameters(RootSignatureParameterTypes.ShaderResourceView));
+        
         return this;
     }
 
-    public RootSignatureHelper AddShaderResourceViewTable()
+    public RootSignatureHelper AddShaderResourceViewTable(int count = 1)
     {
-        _rootSignatureParameters.Append(CreateRootSignatureParameters(RootSignatureParameterTypes.ShaderResourceViewTable));
+        for (int i = 0; i < count; i++)
+            _rootSignatureParameters.Append(CreateRootSignatureParameters(RootSignatureParameterTypes.ShaderResourceViewTable));
+        
         return this;
     }
 
-    public RootSignatureHelper AddUnorderedAccessView()
+    public RootSignatureHelper AddUnorderedAccessView(int count = 1)
     {
-        _rootSignatureParameters.Append(CreateRootSignatureParameters(RootSignatureParameterTypes.UnorderedAccessView));
+        for (int i = 0; i < count; i++)
+            _rootSignatureParameters.Append(CreateRootSignatureParameters(RootSignatureParameterTypes.UnorderedAccessView));
+        
         return this;
     }
 
-    public RootSignatureHelper AddUnorderedAccessViewTable()
+    public RootSignatureHelper AddUnorderedAccessViewTable(int count = 1)
     {
-        _rootSignatureParameters.Append(CreateRootSignatureParameters(RootSignatureParameterTypes.UnorderedAccessViewTable));
+        for (int i = 0; i < count; i++)
+            _rootSignatureParameters.Append(CreateRootSignatureParameters(RootSignatureParameterTypes.UnorderedAccessViewTable));
+        
         return this;
     }
 

@@ -64,19 +64,21 @@ Install the package via NuGet Package Manager for integration into your project.
       </ItemGroup>
 
       <ItemGroup>
-          <PackageReference Include="3DEngine" Version="3.0.52" />
+          <PackageReference Include="3DEngine" Version="3.0.53" />
           <PackageReference Include="Costura.Fody" Version="5.7.0">
             <PrivateAssets>all</PrivateAssets>
           </PackageReference>
       </ItemGroup>
 
       <ItemGroup>
-          <Content Update="$(NuGetPackageRoot)\3dengine\3.0.52\contentFiles\any\net8.0-windows10.0.22621\Assets\Resources\**\*">
+          <Content Update="$(NuGetPackageRoot)\3dengine\3.0.53\contentFiles\any\net8.0-windows10.0.22621\Assets\Resources\**\*">
               <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
           </Content>
       </ItemGroup>
   </Project>
   ```
+
+  Ensure "PreserveNewest" is set for files in the Assets folder in Visual Studio. Replace the Path to the NuGet Package 3DEngine\3.0.53
     
   ### Setup program:
 
@@ -171,7 +173,7 @@ Install the package via NuGet Package Manager for integration into your project.
 
   var mesh = gameManager.Entity.Manager.CreateEntity().AddComponent<Mesh>();
   mesh.SetMeshData(vertices, indices, positions, InputLayoutHelper.AddPosition3D());
-  mesh.SetRootSignature(new RootSignatureHelper().AddConstantBufferView().AddShaderResourceViewTable);
+  mesh.SetRootSignature(new RootSignatureHelper().AddConstantBufferView(2).AddShaderResourceViewTable());
   mesh.SetMaterialTextures([new("TextureAtlas.png", 0)]);
   mesh.SetMaterialPipeline("VoxelShader");
   
@@ -184,8 +186,6 @@ Install the package via NuGet Package Manager for integration into your project.
       Engine.Utilities.Input.SetMouseRelativePosition(0.5f, 0.5f);
   Engine.Utilities.Input.SetMouseLockState(!LOCKED);
   ```
-
-  Ensure "PreserveNewest" is set for files in the Assets folder in Visual Studio. Replace the Path to the NuGet Package 3DEngine\3.0.52
 
 ## Solution Structure
 
