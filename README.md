@@ -95,23 +95,6 @@ Install the package via NuGet Package Manager for integration into your project.
   }
   ```
 
-  ### Examples:
-
-  ```csharp
-  ImageLoader.LoadTexture(AssetsPaths.ASSETS + "Textures\\TextureAtlas.png");
-  Kernel.Instance.Context.CreateShader(AssetsPaths.ASSETS + "Shaders\\VoxelShader");
-
-  Entity.Manager.CreateEntity(name: "Controller").AddComponent<PlayerController>().Initialize(this);
-  Entity.Manager.CreateEntity(name: "Sky").AddComponent<DefaultSky>().Initialize();
-
-  if (Input.GetKey(Key.Escape, InputState.Down))
-      LOCKED = !LOCKED;
-
-  if (!LOCKED)
-      Input.SetMouseRelativePosition(0.5f, 0.5f);
-  Input.SetMouseLockState(!LOCKED);
-  ```
-
   ### Example script:
 
   ```csharp
@@ -158,6 +141,23 @@ Install the package via NuGet Package Manager for integration into your project.
       public override void OnGUI() { }
       public override void OnDestroy() { }
   }
+  ```
+
+  ### Example usage:
+
+  ```csharp
+  ImageLoader.LoadTexture(AssetsPaths.ASSETS + "Textures\\TextureAtlas.png");
+  Kernel.Instance.Context.CreateShader(AssetsPaths.ASSETS + "Shaders\\VoxelShader");
+
+  Entity.Manager.CreateEntity(name: "Controller").AddComponent<PlayerController>().Initialize(this);
+  Entity.Manager.CreateEntity(name: "Sky").AddComponent<DefaultSky>().Initialize();
+
+  if (Input.GetKey(Key.Escape, InputState.Down))
+      LOCKED = !LOCKED;
+
+  if (!LOCKED)
+      Input.SetMouseRelativePosition(0.5f, 0.5f);
+  Input.SetMouseLockState(!LOCKED);
   ```
 
   Ensure "PreserveNewest" is set for files in the Assets folder in Visual Studio. Replace the Path to the NuGet Package 3DEngine\3.0.52
