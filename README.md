@@ -66,6 +66,47 @@ With your support, we can create a powerful and user-friendly engine, complete w
   Engine.Kernel.Instance.SystemManager.MainEntityManager.CreateEntity().AddComponent<GameManager>());
   ```
 
+  Example script:
+- 
+  ```csharp
+  public class Example : Component
+  {
+      [ToolTip("This is a ToolTip")]
+      [Show]
+      private string _visibleString = "This field is private";
+      [Hide]
+      public string HiddenString = "This field is public";
+      [ShowOnly]
+      public string ShowOnlyString = "This string is not editable";
+      public int Int;
+      public float Float;
+      public Vector2 Vector2;
+      public Vector3 Vector3;
+      public Vector4 Vector4;
+      [Slider(1, 100)]
+      public float Slider;
+      public bool Bool;
+      [If("Bool", "True")]
+      [ShowOnly]
+      public string IfField = "This field is only visible if the bool is true";
+      [IfNot("Bool", "True")]
+      [ShowOnly]
+      public string IfNotField = "This field is only visible if the bool is not true";
+      [Color]
+      public Vector4 Color;
+      public Entity? _Entity;
+      [Space]
+      [Header("Header")]
+      public event Action? Event;
+  
+      // This is the base function of OnRegister.
+      public override void OnRegister() =>
+          ScriptSystem.Register(this);
+  }
+  ```
+
+
+
   Setup in your project:
 
   ```xml
