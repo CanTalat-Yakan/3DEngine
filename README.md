@@ -51,18 +51,15 @@ With your support, we can create a powerful and user-friendly engine, complete w
   {
       [STAThread]
       private static void Main() =>
-          new Engine.Program().Run(true, null, Frame);
-  
-      private static bool initialized = false;
-      public static void Frame()
-      {
-          if (!initialized)
-          {
-              initialized = true;
-          }
-      }
+          new Engine.Program().Run(
+              renderGUI: true,
+              sceneBoot: true,
+              config: Engine.DataStructures.Config.GetDefault(),
+              initialization: () => { },
+              frame: () => { });
   }
-
+  ```
+  
   Setup in your project:
 
   ```xml
