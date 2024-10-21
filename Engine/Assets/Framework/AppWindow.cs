@@ -79,6 +79,8 @@ public sealed partial class AppWindow
             if (msg.Value == (uint)WindowMessage.Quit)
                 return false;
 
+            Input.ProcessMouseLockState();
+
             TranslateMessage(ref msg);
             DispatchMessage(ref msg);
         }
@@ -94,6 +96,8 @@ public sealed partial class AppWindow
     private static IntPtr WndProc(IntPtr hWnd, uint msg, UIntPtr wParam, IntPtr lParam)
     {
         GUIInputHandler.Instance?.ProcessMessage((WindowMessage)msg, wParam, lParam);
+
+        Input.ProcessMouseLockState();
 
         switch ((WindowMessage)msg)
         {

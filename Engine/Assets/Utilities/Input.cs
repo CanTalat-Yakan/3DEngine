@@ -229,9 +229,11 @@ public sealed partial class Input
 
 public sealed partial class Input
 {
-    private static void ProcessMouseLockState()
+    public static void ProcessMouseLockState()
     {
-        // Once every change
+        if (s_currentSnapshot is null)
+            return;
+
         if (s_mouseLockState != s_currentSnapshot.MouseLockState)
             switch (s_mouseLockState)
             {
