@@ -241,26 +241,25 @@ public sealed partial class Input
                     break;
                 case MouseLockState.UnlockedInvisible:
                 case MouseLockState.LockedInvisible:
-                    SetCursorIcon();
+                    SetCursorIcon(SystemCursor.IDC_CROSS);
                     break;
                 default:
                     break;
             }
-        // Else every frame
-        else
-            switch (s_mouseLockState)
-            {
-                case MouseLockState.Unlocked:
-                case MouseLockState.UnlockedInvisible:
-                    s_lockedmousePosition = s_mousePosition;
-                    break;
-                case MouseLockState.Locked:
-                case MouseLockState.LockedInvisible:
-                    SetMousePosition(s_lockedmousePosition);
-                    break;
-                default:
-                    break;
-            }
+
+        switch (s_mouseLockState)
+        {
+            case MouseLockState.Unlocked:
+            case MouseLockState.UnlockedInvisible:
+                s_lockedmousePosition = s_mousePosition;
+                break;
+            case MouseLockState.Locked:
+            case MouseLockState.LockedInvisible:
+                SetMousePosition(s_lockedmousePosition);
+                break;
+            default:
+                break;
+        }
     }
 
     public static void SetCursorIcon(SystemCursor? cursor = null) =>
