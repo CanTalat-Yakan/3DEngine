@@ -19,11 +19,11 @@ public sealed partial class Input
     private static Vector2 s_axis = Vector2.Zero;
     private static Vector2 s_joystickAxis = Vector2.Zero;
 
+    private static MouseLockState s_mouseLockState = MouseLockState.Unlocked;
     private static Vector2 s_mouseDelta = Vector2.Zero;
     private static Vector2 s_mousePosition = Vector2.Zero;
     private static Vector2 s_lockedmousePosition = Vector2.Zero;
     private static int s_mouseWheel = 0;
-    private static MouseLockState s_mouseLockState = MouseLockState.Unlocked;
 
     public static void Initialize(IntPtr windowHandle)
     {
@@ -55,6 +55,7 @@ public sealed partial class Input
 
         s_currentSnapshot = new()
         {
+            MouseLockState = s_mouseLockState,
             MousePosition = s_mousePosition,
             MouseDelta = s_mouseDelta,
             MouseWheel = s_mouseWheel,
@@ -96,6 +97,8 @@ public sealed partial class Input
     {
         Fetch();
 
+        ProcessMouseLockState();
+
         try
         {
             var currentMouseState = s_mouse?.GetCurrentMouseState();
@@ -103,6 +106,7 @@ public sealed partial class Input
             {
                 // Get the pointer position from Win32.
                 User32.GetCursorPos(out var pointer);
+
                 s_mousePosition.X = pointer.X;
                 s_mousePosition.Y = pointer.Y;
 
@@ -129,6 +133,7 @@ public sealed partial class Input
             // Create a new snapshot of the input state
             s_currentSnapshot = new()
             {
+                MouseLockState = s_mouseLockState,
                 MousePosition = s_mousePosition,
                 MouseDelta = s_mouseDelta,
                 MouseWheel = s_mouseWheel,
@@ -152,28 +157,6 @@ public sealed partial class Input
             s_currentSnapshot.Axis = s_axis;
         }
         catch { }
-
-        switch (s_mouseLockState)
-        {
-            case MouseLockState.UnLockedInvisible:
-                SetCursorIcon();
-                s_lockedmousePosition = s_mousePosition;
-                break;
-            case MouseLockState.Unlocked:
-                SetCursorIcon(SystemCursor.IDC_ARROW);
-                s_lockedmousePosition = s_mousePosition;
-                break;
-            case MouseLockState.Locked:
-                SetCursorIcon(SystemCursor.IDC_ARROW);
-                SetMousePosition((int)s_lockedmousePosition.X, (int)s_lockedmousePosition.Y);
-                break;
-            case MouseLockState.LockedInvisible:
-                SetCursorIcon();
-                SetMousePosition((int)s_lockedmousePosition.X, (int)s_lockedmousePosition.Y);
-                break;
-            default:
-                break;
-        }
     }
 }
 
@@ -246,15 +229,56 @@ public sealed partial class Input
 
 public sealed partial class Input
 {
+    private static void ProcessMouseLockState()
+    {
+        // Once every change
+        if (s_mouseLockState != s_currentSnapshot.MouseLockState)
+            switch (s_mouseLockState)
+            {
+                case MouseLockState.Unlocked:
+                    SetCursorIcon(SystemCursor.IDC_ARROW);
+                    break;
+                case MouseLockState.UnLockedInvisible:
+                    SetCursorIcon();
+                    break;
+                case MouseLockState.Locked:
+                    SetCursorIcon(SystemCursor.IDC_ARROW);
+                    break;
+                case MouseLockState.LockedInvisible:
+                    SetCursorIcon();
+                    break;
+                default:
+                    break;
+            }
+        // Else every frame
+        else
+            switch (s_mouseLockState)
+            {
+                case MouseLockState.Unlocked:
+                    s_lockedmousePosition = s_mousePosition;
+                    break;
+                case MouseLockState.UnLockedInvisible:
+                    s_lockedmousePosition = s_mousePosition;
+                    break;
+                case MouseLockState.Locked:
+                    SetMousePosition(s_lockedmousePosition);
+                    break;
+                case MouseLockState.LockedInvisible:
+                    SetMousePosition(s_lockedmousePosition);
+                    break;
+                default:
+                    break;
+            }
+    }
+
     public static void SetCursorIcon(SystemCursor? cursor = null) =>
         User32.SetCursor(User32.LoadCursor(cursor.HasValue ? (nint)cursor.Value : 0, null));
 
-    public static void SetMousePosition(int x, int y)
-    {
-        User32.SetCursorPos(x, y);
+    public static void SetMousePosition(Vector2 position) =>
+        SetMousePosition((int)position.X, (int)position.Y);
 
-        s_lockedmousePosition = s_mousePosition;
-    }
+    public static void SetMousePosition(int x, int y) =>
+        User32.SetCursorPos(x, y);
 
     public static void SetMouseRelativePosition(float u, float v)
     {
@@ -264,8 +288,6 @@ public sealed partial class Input
         User32.SetCursorPos(
             (int)(AppWindow.Win32Window.Width * u) + rect.Left,
             (int)(AppWindow.Win32Window.Height * v) + rect.Top + titlebarHeight);
-
-        s_lockedmousePosition = s_mousePosition;
     }
 
     public static void SetMouseLockState(MouseLockState mouseLockState, Vector2? lockedMousePosition = null)
@@ -279,8 +301,8 @@ public sealed partial class Input
 
 public enum MouseLockState
 {
-    UnLockedInvisible,
     Unlocked,
+    UnLockedInvisible,
     Locked,
     LockedInvisible
 }
@@ -301,6 +323,7 @@ public enum InputState
 
 public class InputSnapshot
 {
+    public MouseLockState MouseLockState { get; init; }
     public Vector2 MousePosition { get; init; }
     public Vector2 MouseDelta { get; init; }
     public int MouseWheel { get; init; }
