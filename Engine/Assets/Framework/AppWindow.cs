@@ -97,11 +97,6 @@ public sealed partial class AppWindow
 
         switch ((WindowMessage)msg)
         {
-            case WindowMessage.MouseMove:
-                if (Input.GetMouseLockState() == MouseLockState.Locked
-                 || Input.GetMouseLockState() == MouseLockState.LockedInvisible)
-                    SetCursorPos(Input.GetLockedMousePostion());
-                return IntPtr.Zero;
             case WindowMessage.SetCursor:
                 return IntPtr.Zero;
             case WindowMessage.Destroy:

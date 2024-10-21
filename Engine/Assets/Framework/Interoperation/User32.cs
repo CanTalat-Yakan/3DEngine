@@ -553,7 +553,29 @@ internal static class User32
     public static extern bool ReleaseCapture();
 
     [DllImport(LibraryName)]
-    public static extern short GetKeyState(VK nVirtKey);
+    public static extern short GetKeyState(VK nVirtKey); 
+    
+    [DllImport("user32.dll")]
+    static extern bool ClipCursor(ref Rect lpRect);
+
+    [DllImport("user32.dll")]
+    static extern bool ClipCursor(IntPtr lpRect); // To release the cursor
+
+    public static void LockCursor()
+    {
+        GetCursorPos(out var lockedPos);
+
+        Rect rect;
+        rect.Left = lockedPos.X;
+        rect.Top = lockedPos.Y;
+        rect.Right = lockedPos.X + 1;
+        rect.Bottom = lockedPos.Y + 1;
+
+        ClipCursor(ref rect); 
+    }
+
+    public static void UnlockCursor() =>
+        ClipCursor(IntPtr.Zero); 
 }
 
 struct POINT

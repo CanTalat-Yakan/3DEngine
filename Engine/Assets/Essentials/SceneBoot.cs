@@ -79,7 +79,7 @@ internal sealed class SceneBoot : EditorComponent, IHide
             }
         }
 
-        if (!_processing && Input.GetKey(Key.U, InputState.Pressed) && ViewportController.ViewportFocused)
+        if (!_processing && Input.GetKey(Key.U, InputState.Down) && ViewportController.ViewportFocused)
             foreach (var child in Cubes.Data.Children.ToArray())
                 Entity.Manager.ReturnEntity(child);
 
@@ -100,17 +100,19 @@ internal sealed class SceneBoot : EditorComponent, IHide
             EntityCount = 0;
         }
 
-        if (!_processing && Input.GetKey(Key.R, InputState.Pressed) && ViewportController.ViewportFocused)
+        if (!_processing && Input.GetKey(Key.R, InputState.Down) && ViewportController.ViewportFocused)
         {
             _processing = true;
 
             foreach (var child in Empty.Data.Children.ToArray())
                 Entity.Manager.ReturnEntity(child);
 
+            EntityCount = 0;
+
             Output.Log($"Returned {EntityCount} Entities");
         }
 
-        if (Input.GetKey(Key.V, InputState.Pressed) && ViewportController.ViewportFocused)
+        if (Input.GetKey(Key.V, InputState.Down) && ViewportController.ViewportFocused)
             if (!EditorState.EditorBuild && !ExampleCamera.HasComponent<ViewportController>())
             {
                 Output.Log($"Viewport Controller added");
