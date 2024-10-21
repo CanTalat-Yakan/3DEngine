@@ -14,7 +14,7 @@ public sealed partial class ImageLoader
     public static CommonContext Context => _context ??= Kernel.Instance.Context;
     public static CommonContext _context;
 
-    public static Texture2D LoadTexture(string filePath)
+    public static Texture2D LoadFile(string filePath)
     {
         var textureName = new FileInfo(filePath).Name;
         if (Assets.RenderTargets.ContainsKey(textureName))

@@ -56,10 +56,10 @@ public sealed partial class CommonContext : IDisposable
         ModelLoader.LoadFile(AssetPaths.PRIMITIVES + "Cube.obj");
         ModelLoader.LoadFile(AssetPaths.PRIMITIVES + "Sphere.obj");
 
-        ImageLoader.LoadTexture(AssetPaths.TEXTURES + "Default.png");
-        ImageLoader.LoadTexture(AssetPaths.TEXTURES + "SkyGradient.png");
-        ImageLoader.LoadTexture(AssetPaths.TEXTURES + "Transparent.png");
-        ImageLoader.LoadTexture(AssetPaths.TEXTURES + "UVMap.png");
+        ImageLoader.LoadFile(AssetPaths.TEXTURES + "Default.png");
+        ImageLoader.LoadFile(AssetPaths.TEXTURES + "SkyGradient.png");
+        ImageLoader.LoadFile(AssetPaths.TEXTURES + "Transparent.png");
+        ImageLoader.LoadFile(AssetPaths.TEXTURES + "UVMap.png");
     }
 
     public void Dispose()

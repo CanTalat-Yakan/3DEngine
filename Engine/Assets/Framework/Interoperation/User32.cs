@@ -529,6 +529,8 @@ internal static class User32
     [DllImport(LibraryName)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool SetCursorPos(int x, int y);
+    public static bool SetCursorPos(Vector2 position) =>
+        SetCursorPos((int)position.X, (int)position.Y);
 
     [DllImport(LibraryName)]
     public static extern bool ClientToScreen(IntPtr hWnd, ref POINT lpPoint);

@@ -274,21 +274,26 @@ public sealed partial class Input
     public static void SetCursorIcon(SystemCursor? cursor = null) =>
         User32.SetCursor(User32.LoadCursor(cursor.HasValue ? (nint)cursor.Value : 0, null));
 
-    public static void SetMousePosition(Vector2 position) =>
-        SetMousePosition((int)position.X, (int)position.Y);
-
     public static void SetMousePosition(int x, int y) =>
         User32.SetCursorPos(x, y);
 
-    public static void SetMouseRelativePosition(float u, float v)
-    {
-        int titlebarHeight = 32;
+    public static void SetMousePosition(Vector2 position) =>
+        SetMousePosition((int)position.X, (int)position.Y);
 
+    public static Vector2 GetRelativeMousePosition(double u, double v, int titlebarHeight = 32)
+    {
         User32.GetWindowRect(AppWindow.Win32Window.Handle, out var rect);
-        User32.SetCursorPos(
+
+        return new(
             (int)(AppWindow.Win32Window.Width * u) + rect.Left,
             (int)(AppWindow.Win32Window.Height * v) + rect.Top + titlebarHeight);
     }
+
+    public static void SetRelativeMousePosition(double u, double v) =>
+        User32.SetCursorPos(GetRelativeMousePosition(u, v));
+
+    public static void SetMouseLockState(MouseLockState mouseLockState, double u, double v) =>
+        SetMouseLockState(mouseLockState, GetRelativeMousePosition(u, v));
 
     public static void SetMouseLockState(MouseLockState mouseLockState, Vector2? lockedMousePosition = null)
     {
