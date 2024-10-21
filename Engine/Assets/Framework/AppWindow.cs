@@ -97,6 +97,7 @@ public sealed partial class AppWindow
 
         switch ((WindowMessage)msg)
         {
+            case WindowMessage.MouseMove:
             case WindowMessage.SetCursor:
                 return IntPtr.Zero; // Indicate message has been handled
             case WindowMessage.Destroy:
