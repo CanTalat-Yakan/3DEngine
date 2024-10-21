@@ -42,11 +42,7 @@ public sealed class ViewportController : EditorComponent, IHide
 
         if (Input.GetButton(MouseButton.Right, InputState.Down)
          || Input.GetButton(MouseButton.Middle, InputState.Down))
-        {
-            Interoperation.User32.GetCursorPos(out var point);
-            _mousePosition.X = point.X;
-            _mousePosition.Y = point.Y;
-        }
+            _mousePosition = Input.GetMousePosition();
 
         if (Input.GetButton(MouseButton.Right) && ViewportFocused)
         {

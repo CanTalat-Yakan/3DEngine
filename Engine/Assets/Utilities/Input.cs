@@ -236,14 +236,10 @@ public sealed partial class Input
             switch (s_mouseLockState)
             {
                 case MouseLockState.Unlocked:
-                    SetCursorIcon(SystemCursor.IDC_ARROW);
-                    break;
-                case MouseLockState.UnLockedInvisible:
-                    SetCursorIcon();
-                    break;
                 case MouseLockState.Locked:
                     SetCursorIcon(SystemCursor.IDC_ARROW);
                     break;
+                case MouseLockState.UnlockedInvisible:
                 case MouseLockState.LockedInvisible:
                     SetCursorIcon();
                     break;
@@ -255,14 +251,10 @@ public sealed partial class Input
             switch (s_mouseLockState)
             {
                 case MouseLockState.Unlocked:
-                    s_lockedmousePosition = s_mousePosition;
-                    break;
-                case MouseLockState.UnLockedInvisible:
+                case MouseLockState.UnlockedInvisible:
                     s_lockedmousePosition = s_mousePosition;
                     break;
                 case MouseLockState.Locked:
-                    SetMousePosition(s_lockedmousePosition);
-                    break;
                 case MouseLockState.LockedInvisible:
                     SetMousePosition(s_lockedmousePosition);
                     break;
@@ -307,7 +299,7 @@ public sealed partial class Input
 public enum MouseLockState
 {
     Unlocked,
-    UnLockedInvisible,
+    UnlockedInvisible,
     Locked,
     LockedInvisible
 }
