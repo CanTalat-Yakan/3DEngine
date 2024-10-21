@@ -95,8 +95,8 @@ public unsafe sealed partial class GUIRenderer
 
         FontTexture = new()
         {
-            Width = width,
-            Height = height,
+            Width = (uint)width,
+            Height = (uint)height,
             MipLevels = 1,
             Format = Format.R8G8B8A8_UNorm,
         };
@@ -154,8 +154,8 @@ public unsafe sealed partial class GUIRenderer
             var indexBytes = commandList.IdxBuffer.Size * meshData.IndexStride;
             var vertexBytes = commandList.VtxBuffer.Size * meshData.VertexStride;
 
-            Context.UploadBuffer.UploadIndexBuffer(meshData, new Span<byte>(commandList.IdxBuffer.Data.ToPointer(), indexBytes), meshData.IndexFormat);
-            Context.UploadBuffer.UploadVertexBuffer(meshData, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), vertexBytes));
+            Context.UploadBuffer.UploadIndexBuffer(meshData, new Span<byte>(commandList.IdxBuffer.Data.ToPointer(), (int)indexBytes), meshData.IndexFormat);
+            Context.UploadBuffer.UploadVertexBuffer(meshData, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), (int)vertexBytes));
 
             Context.GraphicsContext.SetMesh(meshData);
 
@@ -178,7 +178,7 @@ public unsafe sealed partial class GUIRenderer
 
                     Context.GraphicsContext.SetShaderResourceView(Context.GetTextureByStringID(cmd.TextureId), 0);
 
-                    Context.GraphicsContext.DrawIndexedInstanced((int)cmd.ElemCount, 1, (int)(cmd.IdxOffset), (int)(cmd.VtxOffset), 0);
+                    Context.GraphicsContext.DrawIndexedInstanced(cmd.ElemCount, 1, cmd.IdxOffset, cmd.VtxOffset, 0);
                 }
             }
         }

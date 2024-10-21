@@ -12,9 +12,9 @@ public sealed class VertexBuffer : IDisposable
 {
     public ID3D12Resource Resource;
 
-    public int Offset;
-    public int SizeInByte;
-    public int Stride;
+    public uint Offset;
+    public uint SizeInByte;
+    public uint Stride;
 
     public void Dispose()
     {
@@ -37,13 +37,13 @@ public sealed class MeshData : IDisposable
 
     public Dictionary<string, VertexBuffer> Vertices = new();
 
-    public int VertexCount;
-    public int VertexSizeInByte;
-    public int VertexStride;
+    public uint VertexCount;
+    public uint VertexSizeInByte;
+    public uint VertexStride;
 
-    public int IndexCount;
-    public int IndexSizeInByte;
-    public int IndexStride;
+    public uint IndexCount;
+    public uint IndexSizeInByte;
+    public uint IndexStride;
 
     public Format IndexFormat;
 

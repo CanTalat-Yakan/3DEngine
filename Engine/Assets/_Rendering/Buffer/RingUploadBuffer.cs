@@ -37,7 +37,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         GPUResourcePointer = Resource.GPUVirtualAddress;
     }
 
-    public void Upload<T>(Span<T> data, out int offset) where T : struct
+    public void Upload<T>(Span<T> data, out uint offset) where T : struct
     {
         int size = data.Length * Marshal.SizeOf(typeof(T));
         int afterAllocateIndex = AllocateIndex + ((size + 255) & ~255);
@@ -49,11 +49,11 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 
         data.CopyTo(new Span<T>((CPUResourcePointer + AllocateIndex).ToPointer(), data.Length));
 
-        offset = AllocateIndex;
+        offset = (uint)AllocateIndex;
         AllocateIndex = afterAllocateIndex % Size;
     }
 
-    public void Upload<T>(T data, out int offset)
+    public void Upload<T>(T data, out uint offset)
     {
         int size = Marshal.SizeOf(typeof(T));
         int afterAllocateIndex = AllocateIndex + ((size + 255) & ~255);
@@ -65,20 +65,20 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 
         Unsafe.Copy((void*)(CPUResourcePointer + AllocateIndex), ref data);
 
-        offset = AllocateIndex;
+        offset = (uint)AllocateIndex;
         AllocateIndex = afterAllocateIndex % Size;
     }
 }
 
 public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 {
-    public void SetConstantBufferView(int offset, int slot) =>
+    public void SetConstantBufferView(uint offset, uint slot) =>
         GraphicsContext.SetConstantBufferView(this, offset, slot);
 
-    public void UploadIndexBuffer(MeshData mesh, Span<byte> index, Format indexFormat, int? overrideSizeInByte = null)
+    public void UploadIndexBuffer(MeshData mesh, Span<byte> index, Format indexFormat, uint? overrideSizeInByte = null)
     {
-        int indexSizeInByte = overrideSizeInByte ?? index.Length;
-        int indexCount = indexSizeInByte / GraphicsDevice.GetSizeInByte(indexFormat);
+        uint indexSizeInByte = overrideSizeInByte ?? (uint)index.Length;
+        uint indexCount = indexSizeInByte / (uint)GraphicsDevice.GetSizeInByte(indexFormat);
 
         bool needRecreateResource = 
             mesh.IndexBufferResource is null 
@@ -121,9 +121,9 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         mesh.IndexBufferState = ResourceStates.GenericRead;
     }
 
-    public void UploadVertexBuffer(MeshData mesh, Span<byte> vertex, int? overrideSizeInByte = null)
+    public void UploadVertexBuffer(MeshData mesh, Span<byte> vertex, uint? overrideSizeInByte = null)
     {
-        int vertexSizeInByte = overrideSizeInByte ?? vertex.Length;
+        uint vertexSizeInByte = overrideSizeInByte ?? (uint)vertex.Length;
 
         bool needRecreateResource = 
             mesh.VertexBufferResource is null 

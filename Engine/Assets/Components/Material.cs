@@ -4,10 +4,10 @@ using Vortice.Direct3D12;
 
 namespace Engine.Components;
 
-public struct MaterialTextureEntry(string name, int slot)
+public struct MaterialTextureEntry(string name, uint slot)
 {
     public string Name = name;
-    public int Slot = slot;
+    public uint Slot = slot;
 }
 
 public sealed partial class Material : EditorComponent, IHide, IEquatable<Material>

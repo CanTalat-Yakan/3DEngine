@@ -14,7 +14,7 @@ public sealed partial class ImageLoader
     public static CommonContext Context => _context ??= Kernel.Instance.Context;
     public static CommonContext _context;
 
-    public static Texture2D LoadFile(string filePath)
+    public static Texture2D LoadTexture(string filePath)
     {
         var textureName = new FileInfo(filePath).Name;
         if (Assets.RenderTargets.ContainsKey(textureName))
@@ -24,8 +24,8 @@ public sealed partial class ImageLoader
 
         Texture2D texture = new()
         {
-            Width = size.Width,
-            Height = size.Height,
+            Width = (uint)size.Width,
+            Height = (uint)size.Height,
             MipLevels = 1,
             Format = format,
         };
@@ -56,7 +56,7 @@ public sealed partial class ImageLoader
 
         bool useWIC2 = true;
         format = ToDXGIFormat(pixelFormat);
-        int bpp = 0;
+        uint bpp = 0;
         if (format == Format.Unknown)
         {
             if (pixelFormat == PixelFormat.Format96bppRGBFixedPoint)
@@ -131,13 +131,13 @@ public sealed partial class ImageLoader
             bpp = 32;
         }
 
-        int rowPitch = (size.Width * bpp + 7) / 8;
-        int sizeInBytes = rowPitch * size.Height;
+        uint rowPitch = (uint)((size.Width * bpp + 7) / 8);
+        uint sizeInBytes = rowPitch * (uint)size.Height;
 
         byte[] pixels = new byte[sizeInBytes];
 
-        int width = size.Width;
-        int height = size.Height;
+        uint width = (uint)size.Width;
+        uint height = (uint)size.Height;
 
         // Load image data
         if (convertGUID == pixelFormat && size.Width == width && size.Height == height)
@@ -195,7 +195,7 @@ public sealed partial class ImageLoader
         return Format.Unknown;
     }
 
-    private static int WICBitsPerPixel(IWICImagingFactory factory, Guid targetGuid)
+    private static uint WICBitsPerPixel(IWICImagingFactory factory, Guid targetGuid)
     {
         // Get the component type of the specified target GUID using the WIC component factory
         using IWICComponentInfo info = factory.CreateComponentInfo(targetGuid);

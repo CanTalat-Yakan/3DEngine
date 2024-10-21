@@ -41,7 +41,7 @@ public static class ExtensionMethods
         return vector;
     }
 
-    public static Dictionary<string, VertexBuffer> SetVertexBuffer(this Dictionary<string, VertexBuffer> vertices, ID3D12Resource resource, int sizeInByte)
+    public static Dictionary<string, VertexBuffer> SetVertexBuffer(this Dictionary<string, VertexBuffer> vertices, ID3D12Resource resource, uint sizeInByte)
     {
         foreach (var vertex in vertices.Values)
             vertex.SetVertexBuffer(resource, sizeInByte);
@@ -49,7 +49,7 @@ public static class ExtensionMethods
         return vertices;
     }
 
-    public static VertexBuffer SetVertexBuffer(this VertexBuffer vertexBuffer, ID3D12Resource resource, int sizeInByte)
+    public static VertexBuffer SetVertexBuffer(this VertexBuffer vertexBuffer, ID3D12Resource resource, uint sizeInByte)
     {
         vertexBuffer.Resource = resource;
         vertexBuffer.SizeInByte = sizeInByte;

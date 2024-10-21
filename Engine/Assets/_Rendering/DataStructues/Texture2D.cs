@@ -13,9 +13,9 @@ public sealed class Texture2D : IDisposable
     public ID3D12DescriptorHeap RenderTargetView;
     public ID3D12DescriptorHeap DepthStencilView;
 
-    public int Width;
-    public int Height;
-    public int MipLevels;
+    public uint Width;
+    public uint Height;
+    public uint MipLevels;
 
     public Format Format;
     public Format RenderTextureViewFormat;

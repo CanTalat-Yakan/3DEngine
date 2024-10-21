@@ -36,7 +36,7 @@ public sealed partial class GraphicsDevice : IDisposable
 
     public Queue<ResourceDelayDestroy> DelayDestroy = new();
 
-    public int ExecuteIndex = 0;
+    public uint ExecuteIndex = 0;
     public ulong ExecuteCount = 3; // Greater equal than 'bufferCount'.
 
     public static Format SwapChainFormat = Format.R8G8B8A8_UNorm;
@@ -44,7 +44,7 @@ public sealed partial class GraphicsDevice : IDisposable
     public List<ID3D12Resource> ScreenResources;
     public ID3D12Resource DepthStencil;
 
-    public int BufferCount = 3;
+    public uint BufferCount = 3;
 
     public void Initialize(SizeI size, bool win32Window)
     {
@@ -73,8 +73,8 @@ public sealed partial class GraphicsDevice : IDisposable
 
         SwapChain.ResizeBuffers(
             SwapChain.Description.BufferCount,
-            Size.Width,
-            Size.Height,
+            (uint)Size.Width,
+            (uint)Size.Height,
             SwapChain.Description1.Format,
             SwapChain.Description1.Flags).ThrowIfFailed();
 
@@ -124,7 +124,7 @@ public sealed partial class GraphicsDevice : IDisposable
 
     public void Present()
     {
-        int syncInterval = (int)Kernel.Instance.Config.VSync;
+        uint syncInterval = (uint)Kernel.Instance.Config.VSync;
         SwapChain.Present(syncInterval, syncInterval == 0 ? PresentFlags.AllowTearing : PresentFlags.None);
 
         CommandQueue.Signal(Fence, ExecuteCount);
@@ -164,7 +164,7 @@ public sealed partial class GraphicsDevice : IDisposable
 
         DXGI.CreateDXGIFactory1(out Factory).ThrowIfFailed();
 
-        int index = 0;
+        uint index = 0;
         while (true)
         {
             var result = Factory.EnumAdapterByGpuPreference(index, GpuPreference.HighPerformance, out Adapter);
@@ -237,8 +237,8 @@ public sealed partial class GraphicsDevice : IDisposable
     {
         SwapChainDescription1 swapChainDescription = new()
         {
-            Width = Size.Width,
-            Height = Size.Height,
+            Width = (uint)Size.Width,
+            Height = (uint)Size.Height,
             Format = SwapChainFormat,
             Stereo = false,
             SampleDescription = SampleDescription.Default,
@@ -261,7 +261,7 @@ public sealed partial class GraphicsDevice : IDisposable
     private void CreateScreenResources()
     {
         ScreenResources = new();
-        for (int i = 0; i < BufferCount; i++)
+        for (uint i = 0; i < BufferCount; i++)
         {
             SwapChain.GetBuffer(i, out ID3D12Resource resource).ThrowIfFailed();
 
@@ -328,16 +328,16 @@ public sealed partial class GraphicsDevice : IDisposable
 
         var rootParameters = new RootParameter1[types.Count];
 
-        int constantBufferViewCount = 0;
-        int shaderResourceViewCount = 0;
-        int unorderedAccessViewCount = 0;
+        uint constantBufferViewCount = 0;
+        uint shaderResourceViewCount = 0;
+        uint unorderedAccessViewCount = 0;
 
         rootSignature.ConstantBufferView.Clear();
         rootSignature.ShaderResourceView.Clear();
         rootSignature.UnorderedAccessView.Clear();
 
-        for (int i = 0; i < types.Count; i++)
-            switch (types[i])
+        for (uint i = 0; i < types.Count; i++)
+            switch (types[(int)i])
             {
                 case RootSignatureParameters.ConstantBufferView:
                     rootParameters[i] = new RootParameter1(RootParameterType.ConstantBufferView, new RootDescriptor1(constantBufferViewCount, 0), ShaderVisibility.All);
@@ -378,7 +378,7 @@ public sealed partial class GraphicsDevice : IDisposable
             Parameters = rootParameters,
         };
 
-        rootSignature.Resource = Device.CreateRootSignature<ID3D12RootSignature>(0, rootSignatureDescription);
+        rootSignature.Resource = Device.CreateRootSignature(rootSignatureDescription);
     }
 
     public void CreateRenderTexture(Texture2D texture)
@@ -637,12 +637,12 @@ public sealed partial class GraphicsDevice : IDisposable
         };
 
     public ID3D12CommandAllocator GetCommandAllocator() =>
-        CommandAllocators[ExecuteIndex];
+        CommandAllocators[(int)ExecuteIndex];
 
     public CpuDescriptorHandle GetRenderTargetScreen()
     {
         CpuDescriptorHandle handle = RenderTextureViewHeap.GetTemporaryCPUHandle();
-        Device.CreateRenderTargetView(ScreenResources[SwapChain.CurrentBackBufferIndex], null, handle);
+        Device.CreateRenderTargetView(ScreenResources[(int)SwapChain.CurrentBackBufferIndex], null, handle);
 
         return handle;
     }
@@ -656,5 +656,5 @@ public sealed partial class GraphicsDevice : IDisposable
     }
 
     public ID3D12Resource GetScreenResource() =>
-        ScreenResources[SwapChain.CurrentBackBufferIndex];
+        ScreenResources[(int)SwapChain.CurrentBackBufferIndex];
 }

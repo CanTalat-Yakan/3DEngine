@@ -56,10 +56,10 @@ public sealed partial class CommonContext : IDisposable
         ModelLoader.LoadFile(AssetPaths.PRIMITIVES + "Cube.obj");
         ModelLoader.LoadFile(AssetPaths.PRIMITIVES + "Sphere.obj");
 
-        ImageLoader.LoadFile(AssetPaths.TEXTURES + "Default.png");
-        ImageLoader.LoadFile(AssetPaths.TEXTURES + "SkyGradient.png");
-        ImageLoader.LoadFile(AssetPaths.TEXTURES + "Transparent.png");
-        ImageLoader.LoadFile(AssetPaths.TEXTURES + "UVMap.png");
+        ImageLoader.LoadTexture(AssetPaths.TEXTURES + "Default.png");
+        ImageLoader.LoadTexture(AssetPaths.TEXTURES + "SkyGradient.png");
+        ImageLoader.LoadTexture(AssetPaths.TEXTURES + "Transparent.png");
+        ImageLoader.LoadTexture(AssetPaths.TEXTURES + "UVMap.png");
     }
 
     public void Dispose()
@@ -145,14 +145,14 @@ public sealed partial class CommonContext : IDisposable
             meshData.InputLayoutDescription = CreateInputLayoutDescription(inputLayoutElements);
 
             meshData.IndexFormat = indexFormat16Bit ? Format.R16_UInt : Format.R32_UInt;
-            meshData.IndexStride = GraphicsDevice.GetSizeInByte(meshData.IndexFormat);
+            meshData.IndexStride = (uint)GraphicsDevice.GetSizeInByte(meshData.IndexFormat);
 
-            var offset = 0;
+            uint offset = 0;
             foreach (var inputElement in meshData.InputLayoutDescription.Elements)
             {
-                meshData.VertexStride += GraphicsDevice.GetSizeInByte(inputElement.Format);
+                meshData.VertexStride += (uint)GraphicsDevice.GetSizeInByte(inputElement.Format);
                 meshData.Vertices[inputElement.SemanticName] = new() { Offset = offset, };
-                offset += GraphicsDevice.GetSizeInByte(inputElement.Format);
+                offset += (uint)GraphicsDevice.GetSizeInByte(inputElement.Format);
             }
 
             foreach (var inputElement in meshData.InputLayoutDescription.Elements)
@@ -173,8 +173,8 @@ public sealed partial class CommonContext : IDisposable
         inputLayoutElements ??= "PNTt";
 
         var meshData = CreateMesh(meshName, inputLayoutElements);
-        meshData.VertexCount = vertices.Length;
-        meshData.IndexCount = indices.Length;
+        meshData.VertexCount = (uint)vertices.Length;
+        meshData.IndexCount = (uint)indices.Length;
         meshData.BoundingBox = BoundingBox.CreateFromPoints(positions);
 
         GPUUpload upload = new()
@@ -198,8 +198,8 @@ public sealed partial class CommonContext : IDisposable
         Assets.InputLayoutDescriptions[inputLayoutElements] = inputLayout;
         var description = new InputElementDescription[inputLayoutElements.Length];
 
-        for (int i = 0; i < inputLayoutElements.Length; i++)
-            description[i] = inputLayoutElements[i] switch
+        for (uint i = 0; i < inputLayoutElements.Length; i++)
+            description[i] = inputLayoutElements[(int)i] switch
             {
                 'f' => new InputElementDescription("POSITION", 0, Format.R32_Float, i),
                 'p' => new InputElementDescription("POSITION", 0, Format.R32G32_Float, i),
