@@ -461,9 +461,7 @@ internal static class User32
     public static uint GetWindowLong(IntPtr hWnd, int nIndex)
     {
         if (IntPtr.Size == 4)
-        {
             return GetWindowLong32b(hWnd, nIndex);
-        }
 
         return GetWindowLongPtr(hWnd, nIndex);
     }
@@ -477,9 +475,7 @@ internal static class User32
     public static uint SetWindowLong(IntPtr hWnd, int nIndex, uint value)
     {
         if (IntPtr.Size == 4)
-        {
             return SetWindowLong32b(hWnd, nIndex, value);
-        }
 
         return SetWindowLongPtr(hWnd, nIndex, value);
     }
@@ -515,7 +511,6 @@ internal static class User32
     [return: MarshalAs(UnmanagedType.Bool)]
     [DllImport(LibraryName, ExactSpelling = true)]
     public static extern bool ShowWindow(IntPtr hWnd, ShowWindowCommand nCmdShow);
-
 
     [DllImport(LibraryName)]
     public static extern void PostQuitMessage(int nExitCode);

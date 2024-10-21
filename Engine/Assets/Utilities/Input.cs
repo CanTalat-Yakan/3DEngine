@@ -241,7 +241,7 @@ public sealed partial class Input
                     break;
                 case MouseLockState.UnlockedInvisible:
                 case MouseLockState.LockedInvisible:
-                    SetCursorIcon(SystemCursor.IDC_CROSS);
+                    SetCursorIcon(0);
                     break;
                 default:
                     break;
@@ -262,8 +262,8 @@ public sealed partial class Input
         }
     }
 
-    public static void SetCursorIcon(SystemCursor? cursor = null) =>
-        User32.SetCursor(User32.LoadCursor(cursor.HasValue ? (nint)cursor.Value : 0, null));
+    public static void SetCursorIcon(SystemCursor cursor) =>
+        User32.SetCursor(User32.LoadCursor(0, cursor));
 
     public static void SetMousePosition(int x, int y) =>
         User32.SetCursorPos(x, y);
