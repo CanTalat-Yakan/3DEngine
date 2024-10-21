@@ -226,6 +226,15 @@ public sealed partial class Input
 
     public static int GetMouseWheel() =>
         s_currentSnapshot.MouseWheel;
+
+    public static MouseLockState GetMouseLockState() =>
+        s_currentSnapshot?.MouseLockState ?? MouseLockState.None;
+
+    public static Vector2 GetLockedMousePostion() =>
+        s_lockedmousePosition;
+
+    public static SystemCursor GetCursorIcon() => 
+        s_cursorIcon;
 }
 
 public sealed partial class Input
@@ -265,8 +274,6 @@ public sealed partial class Input
     public static void SetCursorIcon(SystemCursor? cursorIcon = null) =>
         User32.SetCursor(cursorIcon is null ? 0 : User32.LoadCursor(0, s_cursorIcon = cursorIcon.Value));
     
-    public static SystemCursor GetCursorIcon() => s_cursorIcon;
-
     public static void SetMousePosition(int x, int y) =>
         User32.SetCursorPos(x, y);
 
