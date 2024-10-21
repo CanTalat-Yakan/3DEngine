@@ -20,7 +20,7 @@ public sealed class ViewportController : EditorComponent, IHide
     public float RotationSpeed { get => _rotationSpeed; set => _rotationSpeed = value; }
     private float _rotationSpeed = 25;
 
-    public bool LockCursor { get; set; } = true;
+    public bool LockCursor { get; set; } = false;
 
     private Vector3 _direction;
     private Vector3 _euler;
@@ -35,7 +35,8 @@ public sealed class ViewportController : EditorComponent, IHide
 
     public override void OnUpdate()
     {
-        Input.SetMouseLockState(false);
+        if (LockCursor)
+            Input.SetMouseLockState(MouseLockState.Unlocked);
 
         MovementSpeedCalculation();
 
@@ -49,7 +50,8 @@ public sealed class ViewportController : EditorComponent, IHide
 
         if (Input.GetButton(MouseButton.Right) && ViewportFocused)
         {
-            Input.SetMouseLockState(LockCursor);
+            if (LockCursor)
+                Input.SetMouseLockState(MouseLockState.LockedInvisible);
 
             CalculateMovementDirection();
             HeightTransformMovement();
@@ -59,7 +61,8 @@ public sealed class ViewportController : EditorComponent, IHide
 
         if (Input.GetButton(MouseButton.Middle) && ViewportFocused)
         {
-            Input.SetMouseLockState(LockCursor);
+            if (LockCursor)
+                Input.SetMouseLockState(MouseLockState.LockedInvisible);
 
             ScreenSpaceMovement();
         }
