@@ -77,7 +77,9 @@ public sealed class GUIInputHandler
 
         var requestedCursor = ImGui.GetMouseCursor();
         if (requestedCursor == ImGuiMouseCursor.None || io.MouseDrawCursor)
-            User32.SetCursor(IntPtr.Zero);
+        {
+            //User32.SetCursor(IntPtr.Zero);
+        }
         else
         {
             var cursor = SystemCursor.IDC_ARROW;
@@ -93,7 +95,7 @@ public sealed class GUIInputHandler
                 case ImGuiMouseCursor.Hand: cursor = SystemCursor.IDC_HAND; break;
                 case ImGuiMouseCursor.NotAllowed: cursor = SystemCursor.IDC_NO; break;
             }
-            User32.SetCursor(User32.LoadCursor(IntPtr.Zero, cursor));
+            //User32.SetCursor(User32.LoadCursor(IntPtr.Zero, cursor));
         }
 
         return true;

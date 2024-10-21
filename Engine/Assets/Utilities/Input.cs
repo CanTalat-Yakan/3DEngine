@@ -52,7 +52,22 @@ public sealed partial class Input
             s_joystick.SetCooperativeLevel(windowHandle, CooperativeLevel.Foreground | CooperativeLevel.NonExclusive);
             s_joystick.SetDataFormat<RawJoystickState>();
         }
-    }
+
+        s_currentSnapshot = new()
+        {
+            MousePosition = s_mousePosition,
+            MouseDelta = s_mouseDelta,
+            MouseWheel = s_mouseWheel,
+            Axis = s_axis,
+            JoystickAxis = s_joystickAxis,
+            MouseState = null,
+            KeyboardState = null,
+            JoystickState = null,
+            PreviousMouseState = null,
+            PreviousKeyboardState = null,
+            PreviousJoystickState = null,
+        };
+}
 
     public static void Fetch()
     {
@@ -149,7 +164,7 @@ public sealed partial class Input
 {
     public static bool GetKey(Key key, InputState state = InputState.Pressed)
     {
-        if (s_currentSnapshot is null)
+        if (s_currentSnapshot.MouseState is null)
             return false;
 
         return state switch
@@ -163,7 +178,7 @@ public sealed partial class Input
 
     public static bool GetButton(MouseButton button, InputState state = InputState.Pressed)
     {
-        if (s_currentSnapshot is null)
+        if (s_currentSnapshot.KeyboardState is null)
             return false;
 
         return state switch
@@ -206,10 +221,10 @@ public sealed partial class Input
         s_currentSnapshot.MousePosition.IsNaN() ? Vector2.Zero : s_currentSnapshot.MousePosition;
 
     public static Vector2 GetRawMousePosition() =>
-        s_currentSnapshot?.MousePosition ?? Vector2.Zero;
+        s_currentSnapshot.MousePosition;
 
     public static int GetMouseWheel() =>
-        s_currentSnapshot?.MouseWheel ?? 0;
+        s_currentSnapshot.MouseWheel;
 }
 
 public sealed partial class Input
