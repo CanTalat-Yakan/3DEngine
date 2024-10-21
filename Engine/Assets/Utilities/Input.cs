@@ -230,7 +230,7 @@ public sealed partial class Input
 public sealed partial class Input
 {
     public static void SetCursorIcon(SystemCursor? cursor = null) =>
-        User32.SetCursor(User32.LoadCursor(cursor.HasValue ? (nint)cursor.Value : IntPtr.Zero, null));
+        User32.SetCursor(User32.LoadCursor(cursor.HasValue ? (nint)cursor.Value : 0, null));
 
     public static void SetMouseLockState(bool locked) =>
         s_mouseLockState = locked;
