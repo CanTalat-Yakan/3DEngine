@@ -64,21 +64,21 @@ Install the package via NuGet Package Manager for integration into your project.
       </ItemGroup>
 
       <ItemGroup>
-          <PackageReference Include="3DEngine" Version="3.0.54" />
+          <PackageReference Include="3DEngine" Version="3.0.55" />
           <PackageReference Include="Costura.Fody" Version="5.7.0">
             <PrivateAssets>all</PrivateAssets>
           </PackageReference>
       </ItemGroup>
 
       <ItemGroup>
-          <Content Update="$(NuGetPackageRoot)\3dengine\3.0.54\contentFiles\any\net8.0-windows10.0.22621\Assets\Resources\**\*">
+          <Content Update="$(NuGetPackageRoot)\3dengine\3.0.55\contentFiles\any\net8.0-windows10.0.22621\Assets\Resources\**\*">
               <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
           </Content>
       </ItemGroup>
   </Project>
   ```
 
-  Ensure "PreserveNewest" is set for files in the Assets folder in Visual Studio. Replace the Path to the NuGet Package 3DEngine\3.0.54
+  Ensure "PreserveNewest" is set for files in the Assets folder in Visual Studio. Replace the Path to the NuGet Package 3DEngine\3.0.55
     
   ### Setup program:
 
@@ -165,14 +165,16 @@ Install the package via NuGet Package Manager for integration into your project.
   ### Example usage:
 
   ```csharp
-  Engine.Loader.ImageLoader.LoadTexture(Engine.Utilities.AssetPaths.ASSETS + "Textures\\TextureAtlas.png");
+  Engine.Loader.ModelLoader.LoadFile(Engine.Utilities.AssetPaths.ASSETS + "Meshes\\Model.obj");
+  Engine.Loader.ImageLoader.LoadFile(Engine.Utilities.AssetPaths.ASSETS + "Textures\\TextureAtlas.png");
   Engine.Kernel.Instance.Context.CreateShader(Engine.Utilities.AssetPaths.ASSETS + "Shaders\\VoxelShader");
 
   Entity.Manager.CreateEntity(name: "Controller").AddComponent<PlayerController>().Initialize(this);
   Entity.Manager.CreateEntity(name: "Sky").AddComponent<DefaultSky>().Initialize();
 
-  var mesh = gameManager.Entity.Manager.CreateEntity().AddComponent<Mesh>();
-  mesh.SetMeshData(vertices, indices, positions, InputLayoutHelper.AddPosition3D());
+  var mesh = Entity.Manager.CreateEntity().AddComponent<Mesh>();
+  mesh.SetMeshData(Assets.Meshes["Model.obj"]);
+  mesh.SetMeshData(vertices, indices, positions, InputLayoutHelper.AddPosition3D().AddUV());
   mesh.SetRootSignature(new RootSignatureHelper().AddConstantBufferView(2).AddShaderResourceViewTable());
   mesh.SetMaterialTextures([new("TextureAtlas.png", 0)]);
   mesh.SetMaterialPipeline("VoxelShader");

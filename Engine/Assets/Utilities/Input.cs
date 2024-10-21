@@ -214,6 +214,9 @@ public sealed partial class Input
 
 public sealed partial class Input
 {
+    public static void SetCursorIcon(SystemCursor? cursor = null) =>
+        User32.SetCursor(User32.LoadCursor(cursor.HasValue ? (nint)cursor.Value : IntPtr.Zero, null));
+
     public static void SetMouseLockState(bool locked) =>
         s_mouseLockState = locked;
 
@@ -238,7 +241,6 @@ public sealed partial class Input
     private static void LockMouse()
     {
         User32.SetCursorPos((int)s_lockedmousePosition.X, (int)s_lockedmousePosition.Y);
-        User32.SetCursor(User32.LoadCursor(IntPtr.Zero, null));
 
         if (GetKey(Key.Escape, InputState.Pressed))
             SetMouseLockState(false);

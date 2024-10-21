@@ -18,7 +18,6 @@ public sealed class Camera : EditorComponent
 
     public static Action CameraChanged { get; set; }
 
-
     [Hide] public RootSignature RootSignature;
     [Hide] public ViewConstantBuffer ViewBuffer;
 
