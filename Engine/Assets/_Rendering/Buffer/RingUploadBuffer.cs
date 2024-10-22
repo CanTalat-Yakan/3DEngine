@@ -95,7 +95,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
             mesh.IndexBufferResource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
                 HeapProperties.DefaultHeapProperties,
                 HeapFlags.None,
-                ResourceDescription.Buffer((ulong)indexSizeInByte),
+                ResourceDescription.Buffer(indexSizeInByte),
                 ResourceStates.CopyDest);
 
             mesh.IndexBufferState = ResourceStates.CopyDest;
@@ -113,7 +113,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         Upload(index, out var offset);
 
         GraphicsContext.CommandList.CopyBufferRegion(
-            mesh.IndexBufferResource, 0, Resource, (ulong)offset, (ulong)indexSizeInByte);
+            mesh.IndexBufferResource, 0, Resource, offset, indexSizeInByte);
 
         // Transition to GenericRead state
         GraphicsContext.CommandList.ResourceBarrierTransition(
@@ -138,7 +138,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
             mesh.VertexBufferResource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
                 HeapProperties.DefaultHeapProperties,
                 HeapFlags.None,
-                ResourceDescription.Buffer((ulong)vertexSizeInByte),
+                ResourceDescription.Buffer(vertexSizeInByte),
                 ResourceStates.CopyDest);
 
             mesh.VertexBufferState = ResourceStates.CopyDest;
@@ -154,7 +154,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         Upload(vertex, out var offset);
 
         GraphicsContext.CommandList.CopyBufferRegion(
-            mesh.VertexBufferResource, 0, Resource, (ulong)offset, (ulong)vertexSizeInByte);
+            mesh.VertexBufferResource, 0, Resource, offset, vertexSizeInByte);
 
         // Transition to GenericRead state
         GraphicsContext.CommandList.ResourceBarrierTransition(

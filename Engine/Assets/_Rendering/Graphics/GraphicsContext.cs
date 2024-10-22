@@ -131,14 +131,14 @@ public sealed partial class GraphicsContext : IDisposable
         texture.Resource = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
             HeapProperties.DefaultHeapProperties,
             HeapFlags.None,
-            ResourceDescription.Texture2D(texture.Format, (uint)texture.Width, (uint)texture.Height, arraySize: 1, mipLevels: 1),
+            ResourceDescription.Texture2D(texture.Format, texture.Width, texture.Height, arraySize: 1, mipLevels: 1),
             ResourceStates.CopyDest);
 
         uint bitsPerPixel = GraphicsDevice.GetBitsPerPixel(texture.Format);
         uint alignment = 4; // Adjust alignment value if needed
 
         // Ensure row pitch is aligned
-        uint rowPitch = (uint)texture.Width * (bitsPerPixel / 8);
+        uint rowPitch = texture.Width * (bitsPerPixel / 8);
         if (rowPitch % alignment != 0)
             rowPitch += alignment - (rowPitch % alignment);
 
@@ -295,7 +295,7 @@ public sealed partial class GraphicsContext : IDisposable
         intermediate.Unmap(0, null);
 
         if (destinationDescription.Dimension.Equals(ResourceDimension.Buffer))
-            commandList.CopyBufferRegion(destinationResource, 0, intermediate, layouts[0].Offset, (ulong)layouts[0].Footprint.Width);
+            commandList.CopyBufferRegion(destinationResource, 0, intermediate, layouts[0].Offset, layouts[0].Footprint.Width);
         else
             for (uint i = 0; i < numberOfSubresources; ++i)
             {
