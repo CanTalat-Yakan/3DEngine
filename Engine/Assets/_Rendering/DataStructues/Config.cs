@@ -13,8 +13,6 @@ public class Config
     public double ResolutionScale = 1;
 
     public MultiSample MultiSample = MultiSample.None;
-    public uint SupportedSampleCount = 1;
-    public uint QualityLevels = 0;
 
     public bool Debug = true;
     public bool GUI = true;

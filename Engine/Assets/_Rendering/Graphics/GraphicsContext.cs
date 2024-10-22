@@ -68,11 +68,17 @@ public sealed partial class GraphicsContext : IDisposable
         CommandList.DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, (int)baseVertexLocation, startInstanceLocation);
     }
 
-    public void ScreenBeginRender() =>
-        CommandList.ResourceBarrierTransition(GraphicsDevice.GetScreenResource(), ResourceStates.Present, ResourceStates.RenderTarget);
+    public void ScreenBeginRender()
+    {
 
-    public void ScreenEndRender() =>
-        CommandList.ResourceBarrierTransition(GraphicsDevice.GetScreenResource(), ResourceStates.RenderTarget, ResourceStates.Present);
+        CommandList.ResourceBarrierTransition(GraphicsDevice.GetRenderTarget(), ResourceStates.Present, ResourceStates.RenderTarget);
+    }
+
+    public void ScreenEndRender()
+    {
+
+        CommandList.ResourceBarrierTransition(GraphicsDevice.GetRenderTarget(), ResourceStates.RenderTarget, ResourceStates.Present);
+    }
 
     public void BeginCommand() =>
         CommandList.Reset(GraphicsDevice.GetCommandAllocator());
