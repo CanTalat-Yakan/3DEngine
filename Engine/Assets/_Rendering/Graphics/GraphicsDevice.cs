@@ -55,7 +55,9 @@ public sealed partial class GraphicsDevice : IDisposable
         CreateDescriptorHeaps();
         CreateFence();
         CreateCommandAllocator();
-        CreateSwapChain(win32Window);
+        CreateSwapChain(win32Window); 
+        CheckMSAASupport();
+        CreateScreenResources();
         CreateDepthStencil();
 
         ExecuteCount++;
@@ -254,8 +256,25 @@ public sealed partial class GraphicsDevice : IDisposable
             : Factory.CreateSwapChainForComposition(CommandQueue, swapChainDescription);
 
         SwapChain = swapChain.QueryInterface<IDXGISwapChain3>();
+    }
 
-        CreateScreenResources();
+    private void CheckMSAASupport()
+    {
+        var config = Kernel.Instance.Config;
+        uint qualityLevels = 0;
+        uint sampleCount;
+        for (sampleCount = (uint)config.MultiSample; sampleCount > 1; sampleCount /= 2)
+        {
+            qualityLevels = Device.CheckMultisampleQualityLevels(SwapChainFormat, sampleCount);
+            if (qualityLevels > 0)
+                break;
+        }
+
+        if (sampleCount < 2 && config.MultiSample != MultiSample.None)
+            Output.Log("MSAA not supported");
+
+        config.SupportedSampleCount = sampleCount;
+        config.QualityLevels = qualityLevels - 1;
     }
 
     private void CreateScreenResources()
@@ -381,77 +400,6 @@ public sealed partial class GraphicsDevice : IDisposable
         rootSignature.Resource = Device.CreateRootSignature(rootSignatureDescription);
     }
 
-    public void CreateRenderTexture(Texture2D texture)
-    {
-        ResourceDescription resourceDescription = new()
-        {
-            Width = (ulong)texture.Width,
-            Height = texture.Height,
-            MipLevels = 1,
-            SampleDescription = new SampleDescription(1, 0),
-            Dimension = ResourceDimension.Texture2D,
-            DepthOrArraySize = 1,
-            Format = texture.Format,
-        };
-
-        if (texture.DepthStencilViewFormat != 0)
-        {
-            DestroyResource(texture.Resource);
-            resourceDescription.Flags = ResourceFlags.AllowDepthStencil;
-
-            Device.CreateCommittedResource<ID3D12Resource>(HeapProperties.DefaultHeapProperties,
-                 HeapFlags.None,
-                 resourceDescription,
-                 ResourceStates.GenericRead,
-                 new ClearValue(texture.DepthStencilViewFormat, new DepthStencilValue(1.0f, 0)),
-                 out texture.Resource).ThrowIfFailed();
-
-            if (texture.DepthStencilView is null)
-            {
-                DescriptorHeapDescription descriptorHeapDescription = new()
-                {
-                    DescriptorCount = 1,
-                    Type = DescriptorHeapType.DepthStencilView,
-                    Flags = DescriptorHeapFlags.None,
-                    NodeMask = 0,
-                };
-                Device.CreateDescriptorHeap(descriptorHeapDescription, out texture.DepthStencilView).ThrowIfFailed();
-            }
-
-            Device.CreateDepthStencilView(texture.Resource, null, texture.DepthStencilView.GetCPUDescriptorHandleForHeapStart());
-        }
-        else if (texture.RenderTextureViewFormat != 0)
-        {
-            DestroyResource(texture.Resource);
-            resourceDescription.Flags = ResourceFlags.AllowRenderTarget | ResourceFlags.AllowUnorderedAccess;
-
-            Device.CreateCommittedResource<ID3D12Resource>(HeapProperties.DefaultHeapProperties,
-                 HeapFlags.None,
-                 resourceDescription,
-                 ResourceStates.GenericRead,
-                 new ClearValue(texture.DepthStencilViewFormat, new Color4(0, 0, 0, 0)),
-                 out texture.Resource).ThrowIfFailed();
-
-            if (texture.RenderTargetView is null)
-            {
-                DescriptorHeapDescription descriptorHeapDescription = new()
-                {
-                    DescriptorCount = 1,
-                    Type = DescriptorHeapType.RenderTargetView,
-                    Flags = DescriptorHeapFlags.None,
-                    NodeMask = 0,
-                };
-                Device.CreateDescriptorHeap(descriptorHeapDescription, out texture.RenderTargetView).ThrowIfFailed();
-            }
-
-            Device.CreateRenderTargetView(texture.Resource, null, texture.RenderTargetView.GetCPUDescriptorHandleForHeapStart());
-        }
-        else
-            throw new NotImplementedException();
-
-        texture.ResourceStates = ResourceStates.GenericRead;
-    }
-
     public void CreateUploadBuffer(UploadBuffer uploadBuffer, int size)
     {
         DestroyResource(uploadBuffer.Resource);
@@ -474,12 +422,8 @@ public sealed partial class GraphicsDevice : IDisposable
     {
         while (DelayDestroy.Count > 0)
             if (DelayDestroy.Peek().DestroyFrame <= completedFrame)
-            {
-                var p = DelayDestroy.Dequeue();
-                p.Resource?.Dispose();
-            }
-            else
-                break;
+                DelayDestroy.Dequeue().Resource?.Dispose();
+            else break;
     }
 }
 

@@ -98,7 +98,14 @@ public sealed partial class Input
         Fetch();
 
         ProcessMouseLockState();
+        ProcessInputStates();
+    }
+}
 
+public sealed partial class Input
+{
+    private static void ProcessInputStates()
+    {
         try
         {
             var currentMouseState = s_mouse?.GetCurrentMouseState();
@@ -158,10 +165,7 @@ public sealed partial class Input
         }
         catch { }
     }
-}
 
-public sealed partial class Input
-{
     public static bool GetKey(Key key, InputState state = InputState.Pressed)
     {
         if (s_currentSnapshot.MouseState is null)
@@ -229,7 +233,7 @@ public sealed partial class Input
 
 public sealed partial class Input
 {
-    public static void ProcessMouseLockState()
+    private static void ProcessMouseLockState()
     {
         if (s_mouseLockState != s_currentSnapshot.MouseLockState)
             switch (s_mouseLockState)
