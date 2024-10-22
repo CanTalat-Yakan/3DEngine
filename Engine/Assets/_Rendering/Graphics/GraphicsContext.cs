@@ -68,17 +68,11 @@ public sealed partial class GraphicsContext : IDisposable
         CommandList.DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, (int)baseVertexLocation, startInstanceLocation);
     }
 
-    public void ScreenBeginRender()
-    {
-
+    public void ScreenBeginRender() =>
         CommandList.ResourceBarrierTransition(GraphicsDevice.GetRenderTarget(), ResourceStates.Present, ResourceStates.RenderTarget);
-    }
 
-    public void ScreenEndRender()
-    {
-
+    public void ScreenEndRender() =>
         CommandList.ResourceBarrierTransition(GraphicsDevice.GetRenderTarget(), ResourceStates.RenderTarget, ResourceStates.Present);
-    }
 
     public void BeginCommand() =>
         CommandList.Reset(GraphicsDevice.GetCommandAllocator());
@@ -210,7 +204,7 @@ public sealed partial class GraphicsContext : IDisposable
     {
         CommandList.RSSetViewport(new Viewport(0, 0, GraphicsDevice.Size.Width, GraphicsDevice.Size.Height, 0.0f, 1.0f));
         CommandList.RSSetScissorRect(new RectI(0, 0, GraphicsDevice.Size.Width, GraphicsDevice.Size.Height));
-        CommandList.OMSetRenderTargets(GraphicsDevice.GetRenderTargetScreen(), GraphicsDevice.GetDepthStencilScreen());
+        CommandList.OMSetRenderTargets(GraphicsDevice.GetRenderTargetHandle(), GraphicsDevice.GetDepthStencilHandle());
     }
 
     public void SetConstantBufferView(UploadBuffer uploadBuffer, uint offset, uint slot) =>
@@ -226,10 +220,10 @@ public sealed partial class GraphicsContext : IDisposable
         CommandList.ClearRenderTargetView(texture2D.RenderTargetView.GetCPUDescriptorHandleForHeapStart(), new Color4(0, 0, 0, 0));
 
     public void ClearRenderTargetScreen(Color4? color = null) =>
-        CommandList.ClearRenderTargetView(GraphicsDevice.GetRenderTargetScreen(), color is not null ? color.Value : new Color4(0.15f, 0.15f, 0.15f, 1));
+        CommandList.ClearRenderTargetView(GraphicsDevice.GetRenderTargetHandle(), color is not null ? color.Value : new Color4(0.15f, 0.15f, 0.15f, 1));
 
     public void ClearDepthStencilScreen() =>
-        CommandList.ClearDepthStencilView(GraphicsDevice.GetDepthStencilScreen(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
+        CommandList.ClearDepthStencilView(GraphicsDevice.GetDepthStencilHandle(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
 }
 
 public sealed partial class GraphicsContext : IDisposable

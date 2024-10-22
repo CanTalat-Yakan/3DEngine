@@ -12,7 +12,7 @@ namespace Engine.Graphics;
 
 public sealed partial class CommonContext : IDisposable
 {
-    public bool IsRendering => GraphicsDevice.RenderTextureViewHeap is not null;
+    public bool IsRendering => GraphicsDevice.RenderTargetsViewHeap is not null;
 
     public Kernel Kernel { get; private set; }
 

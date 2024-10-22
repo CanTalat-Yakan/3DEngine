@@ -31,8 +31,8 @@ public sealed partial class GraphicsDevice : IDisposable
     public EventWaitHandle WaitHandle;
 
     public DescriptorHeapX ShaderResourcesHeap = new();
-    public DescriptorHeapX RenderTextureViewHeap = new();
-    public DescriptorHeapX MSAARenderTextureViewHeap = new();
+    public DescriptorHeapX RenderTargetsViewHeap = new();
+    public DescriptorHeapX MSAARenderTargetViewHeap = new();
     public DescriptorHeapX DepthStencilViewHeap = new();
 
     public Queue<ResourceDelayDestroy> DelayDestroy = new();
@@ -42,8 +42,8 @@ public sealed partial class GraphicsDevice : IDisposable
 
     public static Format SwapChainFormat = Format.R8G8B8A8_UNorm;
     public static Format DepthStencilFormat = Format.D32_Float;
-    public List<ID3D12Resource> RenderTextures;
-    public ID3D12Resource MSAARenderTexture;
+    public List<ID3D12Resource> RenderTargets;
+    public ID3D12Resource MSAARenderTarget;
     public ID3D12Resource DepthStencil;
 
     public uint BufferCount = 3;
@@ -57,7 +57,7 @@ public sealed partial class GraphicsDevice : IDisposable
         CreateDescriptorHeaps();
         CreateFence();
         CreateCommandAllocator();
-        CreateSwapChain(win32Window); 
+        CreateSwapChain(win32Window);
         CreateRenderTargets();
         CreateMSAARenderTargetView();
         CreateDepthStencil();
@@ -104,8 +104,8 @@ public sealed partial class GraphicsDevice : IDisposable
         Factory?.Dispose();
         CommandQueue?.Dispose();
         ShaderResourcesHeap?.Dispose();
-        RenderTextureViewHeap?.Dispose();
-        MSAARenderTextureViewHeap?.Dispose();
+        RenderTargetsViewHeap?.Dispose();
+        MSAARenderTargetViewHeap?.Dispose();
         DepthStencilViewHeap?.Dispose();
         SwapChain?.Dispose();
         Fence?.Dispose();
@@ -115,11 +115,11 @@ public sealed partial class GraphicsDevice : IDisposable
 
     public void DisposeScreenResources()
     {
-        if (RenderTextures is not null)
-            foreach (var screenResource in RenderTextures)
+        if (RenderTargets is not null)
+            foreach (var screenResource in RenderTargets)
                 screenResource.Dispose();
 
-        MSAARenderTexture?.Dispose();
+        MSAARenderTarget?.Dispose();
         DepthStencil?.Dispose();
     }
 }
@@ -217,8 +217,8 @@ public sealed partial class GraphicsDevice : IDisposable
             Type = DescriptorHeapType.RenderTargetView,
             Flags = DescriptorHeapFlags.None,
         };
-        RenderTextureViewHeap.Initialize(this, descriptorHeapDescription);
-        MSAARenderTextureViewHeap.Initialize(this, descriptorHeapDescription);
+        RenderTargetsViewHeap.Initialize(this, descriptorHeapDescription);
+        MSAARenderTargetViewHeap.Initialize(this, descriptorHeapDescription);
     }
 
     private void CreateFence()
@@ -266,12 +266,12 @@ public sealed partial class GraphicsDevice : IDisposable
 
     private void CreateRenderTargets()
     {
-        RenderTextures = new();
+        RenderTargets = new();
         for (uint i = 0; i < BufferCount; i++)
         {
             SwapChain.GetBuffer(i, out ID3D12Resource resource).ThrowIfFailed();
 
-            RenderTextures.Add(resource);
+            RenderTargets.Add(resource);
         }
     }
 
@@ -301,7 +301,7 @@ public sealed partial class GraphicsDevice : IDisposable
             mipLevels: 1);
         MSAARenderTargetDescription.Flags |= ResourceFlags.AllowRenderTarget;
 
-        MSAARenderTexture = Device.CreateCommittedResource(
+        MSAARenderTarget = Device.CreateCommittedResource(
             new HeapProperties(HeapType.Default),
             HeapFlags.None,
             MSAARenderTargetDescription,
@@ -605,25 +605,25 @@ public sealed partial class GraphicsDevice : IDisposable
         CommandAllocators[(int)ExecuteIndex];
 
     public ID3D12Resource GetRenderTarget() =>
-        RenderTextures[(int)SwapChain.CurrentBackBufferIndex];
+        RenderTargets[(int)SwapChain.CurrentBackBufferIndex];
 
-    public CpuDescriptorHandle GetRenderTargetScreen()
+    public CpuDescriptorHandle GetRenderTargetHandle()
     {
-        CpuDescriptorHandle handle = RenderTextureViewHeap.GetTemporaryCPUHandle();
-        Device.CreateRenderTargetView(RenderTextures[(int)SwapChain.CurrentBackBufferIndex], null, handle);
-
-        return handle;
-    }
-    
-    public CpuDescriptorHandle GetMSAARenderTargetScreen()
-    {
-        CpuDescriptorHandle handle = MSAARenderTextureViewHeap.GetTemporaryCPUHandle();
-        Device.CreateRenderTargetView(MSAARenderTexture, null, handle);
+        CpuDescriptorHandle handle = RenderTargetsViewHeap.GetTemporaryCPUHandle();
+        Device.CreateRenderTargetView(RenderTargets[(int)SwapChain.CurrentBackBufferIndex], null, handle);
 
         return handle;
     }
 
-    public CpuDescriptorHandle GetDepthStencilScreen()
+    public CpuDescriptorHandle GetMSAARenderTargetHandle()
+    {
+        CpuDescriptorHandle handle = MSAARenderTargetViewHeap.GetTemporaryCPUHandle();
+        Device.CreateRenderTargetView(MSAARenderTarget, null, handle);
+
+        return handle;
+    }
+
+    public CpuDescriptorHandle GetDepthStencilHandle()
     {
         CpuDescriptorHandle handle = DepthStencilViewHeap.GetTemporaryCPUHandle();
         Device.CreateDepthStencilView(DepthStencil, null, handle);
