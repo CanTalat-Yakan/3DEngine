@@ -6,7 +6,6 @@ using Vortice.Direct3D12;
 using Vortice.DXGI;
 using Vortice.WIC;
 using Vortice.Mathematics;
-using Vortice.Direct2D1.Effects;
 
 namespace Engine.Loader;
 
@@ -29,7 +28,9 @@ public sealed partial class ImageLoader
             Height = (uint)size.Height,
             MipLevels = mipLevels,
             Format = format,
+            Name = textureName,
         };
+
         Assets.RenderTargets[textureName] = texture;
 
         GPUUpload upload = new()
@@ -134,6 +135,9 @@ public sealed partial class ImageLoader
         }
 
         uint rowPitch = (uint)((size.Width * bpp + 7) / 8);
+        uint alignment = D3D12.TextureDataPitchAlignment; // Typically 256
+        rowPitch = (rowPitch + alignment - 1) & ~(alignment - 1);
+
         uint sizeInBytes = rowPitch * (uint)size.Height;
 
         uint width = (uint)size.Width;
@@ -151,6 +155,9 @@ public sealed partial class ImageLoader
         {
             uint mipWidth = Math.Max(1, width >> (int)level);
             uint mipHeight = Math.Max(1, height >> (int)level);
+
+            if (mipWidth == 0) mipWidth = 1;
+            if (mipHeight == 0) mipHeight = 1;
 
             IWICBitmapSource mipSource = source;
 
@@ -171,6 +178,9 @@ public sealed partial class ImageLoader
                 converter.Initialize(mipSource, convertGUID, BitmapDitherType.None, null, 0.0, BitmapPaletteType.MedianCut);
                 mipSource = converter;
             }
+
+            bpp = WICBitsPerPixel(wicFactory, convertGUID);
+            rowPitch = Math.Max(1, (mipWidth * bpp + 7) / 8);
 
             uint imageSize = rowPitch * mipHeight;
 

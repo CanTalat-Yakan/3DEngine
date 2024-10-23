@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 
 using Vortice.Direct3D;
 using Vortice.Direct3D12;
 using Vortice.DXGI;
 using Vortice.Mathematics;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Engine.Graphics;
 
@@ -68,7 +66,6 @@ public sealed partial class GraphicsContext : IDisposable
 
         mesh.LastTimeUsed = DateTime.Now;
     }
-
     public void UploadMesh(MeshData mesh, float[] vertexData, int[] indexData, Format indexFormat)
     {
         var vertexFormat = Format.R32_Float;
@@ -88,39 +85,6 @@ public sealed partial class GraphicsContext : IDisposable
     {
         uint mipLevels = texture.MipLevels;
 
-        // Calculate total size needed for all mip levels
-        ulong totalSize = 0;
-        List<SubresourceData> subresources = new List<SubresourceData>();
-
-        for (uint level = 0; level < mipLevels; level++)
-        {
-            uint mipWidth = Math.Max(1, texture.Width >> (int)level);
-            uint mipHeight = Math.Max(1, texture.Height >> (int)level);
-            uint rowPitch = (mipWidth * GraphicsDevice.GetBitsPerPixel(texture.Format) + 7) / 8;
-            uint imageSize = rowPitch * mipHeight;
-
-            unsafe
-            {
-                SubresourceData subresource = new SubresourceData
-                {
-                    pData = (void*)Marshal.UnsafeAddrOfPinnedArrayElement(mipData[(int)level], 0),
-                    RowPitch = (IntPtr)rowPitch,
-                    SlicePitch = (IntPtr)imageSize,
-                };
-                subresources.Add(subresource);
-            }
-
-            totalSize += imageSize;
-        }
-
-        // Create the upload buffer
-        ID3D12Resource resourceUpload = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
-            new HeapProperties(HeapType.Upload),
-            HeapFlags.None,
-            ResourceDescription.Buffer(totalSize),
-            ResourceStates.GenericRead);
-        GraphicsDevice.DestroyResource(resourceUpload);
-
         // Create the texture resource with mip levels
         texture.Resource = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
             HeapProperties.DefaultHeapProperties,
@@ -128,8 +92,75 @@ public sealed partial class GraphicsContext : IDisposable
             ResourceDescription.Texture2D(texture.Format, texture.Width, texture.Height, arraySize: 1, mipLevels: (ushort)mipLevels),
             ResourceStates.CopyDest);
 
-        // Upload the texture data
-        UpdateSubresources(CommandList, texture.Resource, resourceUpload, 0, 0, mipLevels, subresources.ToArray());
+        // Get copyable footprints
+        var device = GraphicsDevice.Device;
+        var resourceDesc = texture.Resource.Description;
+
+        ulong totalSize = 0;
+        ulong[] rowSizesInBytes = new ulong[mipLevels];
+        uint[] numRows = new uint[mipLevels];
+        var layouts = new PlacedSubresourceFootPrint[mipLevels];
+
+        device.GetCopyableFootprints(
+            resourceDesc,
+            0,
+            mipLevels,
+            0,
+            layouts,
+            numRows,
+            rowSizesInBytes,
+            out totalSize);
+
+        // Create the upload buffer
+        ID3D12Resource resourceUpload = device.CreateCommittedResource<ID3D12Resource>(
+            new HeapProperties(HeapType.Upload),
+            HeapFlags.None,
+            ResourceDescription.Buffer(totalSize),
+            ResourceStates.GenericRead);
+
+        // Map the resource and obtain a Span<byte>
+        Span<byte> mappedData = resourceUpload.Map<byte>(0, (int)totalSize);
+
+        // Copy data into the mapped span
+        for (uint i = 0; i < mipLevels; i++)
+        {
+            var footprint = layouts[i];
+            ulong offset = footprint.Offset;
+            uint numRow = numRows[i];
+            ulong rowSizeInBytes = rowSizesInBytes[i];
+            uint rowPitch = footprint.Footprint.RowPitch;
+
+            byte[] srcData = mipData[(int)i];
+            uint mipWidth = Math.Max(1, texture.Width >> (int)i);
+            uint bpp = GraphicsDevice.GetBitsPerPixel(texture.Format);
+            uint srcRowPitch = (mipWidth * bpp + 7) / 8;
+
+            for (uint row = 0; row < numRow; row++)
+            {
+                int destOffset = (int)(offset + row * rowPitch);
+                int srcOffset = (int)(row * srcRowPitch);
+                int copySize = (int)MathF.Min(rowSizeInBytes, srcData.Length - srcOffset);
+
+                // Ensure we don't exceed the bounds of the mapped data
+                if (destOffset + copySize > mappedData.Length)
+                    throw new IndexOutOfRangeException("Attempting to write beyond the mapped data.");
+
+                // Copy the row data into the mapped span
+                srcData.AsSpan(srcOffset, copySize).CopyTo(mappedData.Slice(destOffset, copySize));
+            }
+        }
+
+        // Unmap the resource
+        resourceUpload.Unmap(0);
+
+        // Copy from upload buffer to texture resource
+        for (uint i = 0; i < mipLevels; i++)
+        {
+            TextureCopyLocation dest = new TextureCopyLocation(texture.Resource, i);
+            TextureCopyLocation src = new TextureCopyLocation(resourceUpload, layouts[i]);
+
+            CommandList.CopyTextureRegion(dest, 0, 0, 0, src, null);
+        }
 
         // Transition the texture to the pixel shader resource state
         CommandList.ResourceBarrierTransition(texture.Resource, ResourceStates.CopyDest, ResourceStates.PixelShaderResource);
@@ -262,108 +293,4 @@ public sealed partial class GraphicsContext : IDisposable
 
     public void ClearDepthStencil() =>
         CommandList.ClearDepthStencilView(GraphicsDevice.GetDepthStencilHandle(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
-}
-
-public sealed partial class GraphicsContext : IDisposable
-{
-    private unsafe struct MemoryCopyDestination
-    {
-        public void* Data;
-        public ulong RowPitch;
-        public ulong SlicePitch;
-    }
-
-    private unsafe void MemoryCopySubresource(
-        MemoryCopyDestination* destination,
-        SubresourceData source,
-        ulong rowSizeInBytes,
-        uint numberOfRows,
-        uint numberOfSlices)
-    {
-        for (uint i = 0; i < numberOfSlices; ++i)
-        {
-            byte* destinationSlice = (byte*)destination->Data + destination->SlicePitch * i;
-            byte* sourceSlice = (byte*)source.pData + source.SlicePitch * i;
-
-            for (int y = 0; y < numberOfRows; ++y)
-            {
-                Span<byte> sourceSpan = new(sourceSlice + ((long)source.RowPitch * y), (int)rowSizeInBytes);
-                Span<byte> destinationSpan = new(destinationSlice + (long)destination->RowPitch * y, (int)rowSizeInBytes);
-
-                sourceSpan.CopyTo(destinationSpan);
-            }
-        }
-    }
-
-    private unsafe ulong UpdateSubresources(
-        ID3D12GraphicsCommandList commandList,
-        ID3D12Resource destinationResource,
-        ID3D12Resource intermediate,
-        uint firstSubresource,
-        uint numberOfSubresources,
-        ulong requiredSize,
-        PlacedSubresourceFootPrint[] layouts,
-        uint[] numberOfRows,
-        ulong[] rowSizesInBytes,
-        SubresourceData[] sourceData)
-    {
-        var intermediateDescription = intermediate.Description;
-        var destinationDescription = destinationResource.Description;
-
-        if (intermediateDescription.Dimension != ResourceDimension.Buffer
-         || intermediateDescription.Width < requiredSize + layouts[0].Offset
-         || (destinationDescription.Dimension == ResourceDimension.Buffer
-         && (firstSubresource != 0 || numberOfSubresources != 1)))
-            return 0;
-
-        void* pointer = null;
-        intermediate.Map(0, &pointer);
-        byte* data = (byte*)new IntPtr(pointer);
-
-        for (uint i = 0; i < numberOfSubresources; ++i)
-        {
-            MemoryCopyDestination destinationData = new()
-            {
-                Data = data + layouts[i].Offset,
-                RowPitch = layouts[i].Footprint.RowPitch,
-                SlicePitch = layouts[i].Footprint.RowPitch * numberOfRows[i]
-            };
-            MemoryCopySubresource(&destinationData, sourceData[i], rowSizesInBytes[i], numberOfRows[i], layouts[i].Footprint.Depth);
-        }
-        intermediate.Unmap(0, null);
-
-        if (destinationDescription.Dimension.Equals(ResourceDimension.Buffer))
-            commandList.CopyBufferRegion(destinationResource, 0, intermediate, layouts[0].Offset, layouts[0].Footprint.Width);
-        else
-            for (uint i = 0; i < numberOfSubresources; ++i)
-            {
-                TextureCopyLocation destination = new(destinationResource, i + firstSubresource);
-                TextureCopyLocation source = new(intermediate, layouts[i]);
-
-                commandList.CopyTextureRegion(destination, 0, 0, 0, source, null);
-            }
-
-        return requiredSize;
-    }
-
-    private ulong UpdateSubresources(
-        ID3D12GraphicsCommandList commandList,
-        ID3D12Resource destinationResource,
-        ID3D12Resource intermediate,
-        ulong intermediateOffset,
-        uint firstSubresource,
-        uint numSubresources,
-        SubresourceData[] sourceData)
-    {
-        var layouts = new PlacedSubresourceFootPrint[numSubresources];
-        ulong[] rowSizesInBytes = new ulong[numSubresources];
-        uint[] numRows = new uint[numSubresources];
-
-        destinationResource.GetDevice(out ID3D12Device device);
-        device.GetCopyableFootprints(destinationResource.Description, firstSubresource, numSubresources, intermediateOffset, layouts, numRows, rowSizesInBytes, out ulong RequiredSize);
-        device.Release();
-
-        ulong Result = UpdateSubresources(commandList, destinationResource, intermediate, firstSubresource, numSubresources, RequiredSize, layouts, numRows, rowSizesInBytes, sourceData);
-        return Result;
-    }
 }
