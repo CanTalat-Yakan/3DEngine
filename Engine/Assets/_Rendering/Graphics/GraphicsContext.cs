@@ -32,6 +32,8 @@ public sealed partial class GraphicsContext : IDisposable
     {
         CommandList?.Dispose();
         CommandList = null;
+
+        GC.SuppressFinalize(this);
     }
 }
 

@@ -19,7 +19,12 @@ public sealed class VertexBuffer : IDisposable
     public void Dispose()
     {
         if (Offset == 0)
+        {
             Resource?.Dispose();
+            Resource = null;
+        }
+
+        GC.SuppressFinalize(this);
     }
 }
 
@@ -69,6 +74,9 @@ public sealed class MeshData : IDisposable
         if (Vertices is not null)
             foreach (var pair in Vertices)
                 pair.Value.Dispose();
+
         Vertices?.Clear();
+
+        GC.SuppressFinalize(this);
     }
 }

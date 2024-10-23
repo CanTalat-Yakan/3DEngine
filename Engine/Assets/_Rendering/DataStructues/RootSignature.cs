@@ -27,5 +27,7 @@ public sealed class RootSignature : IDisposable
     {
         Resource?.Dispose();
         Resource = null;
+
+        GC.SuppressFinalize(this);
     }
 }

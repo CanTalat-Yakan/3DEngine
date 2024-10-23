@@ -36,6 +36,8 @@ public sealed partial class EntityManager
             entity.Dispose();
 
         Entities.Clear();
+
+        GC.SuppressFinalize(this);
     }
 }
 

@@ -38,9 +38,13 @@ public sealed class Texture2D : IDisposable
     {
         Resource?.Dispose();
         Resource = null;
+
         RenderTargetView?.Dispose();
         RenderTargetView = null;
+
         DepthStencilView?.Dispose();
         DepthStencilView = null;
+
+        GC.SuppressFinalize(this);
     }
 }

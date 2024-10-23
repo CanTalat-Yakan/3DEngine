@@ -124,8 +124,12 @@ public sealed partial class Entity : ICloneable, IDisposable
     public Entity Clone() =>
         Data.Clone();
 
-    public void Dispose() =>
+    public void Dispose()
+    {
         Data.Dispose();
+
+        GC.SuppressFinalize(this);
+    }
 
     public void Return() =>
         Data.Return();
@@ -226,6 +230,8 @@ public sealed partial class EntityData : ICloneable, IDisposable
         Entity.RemoveComponents();
 
         Parent?.Data.Children.Remove(Entity);
+
+        GC.SuppressFinalize(this);
     }
 
     public void Return()

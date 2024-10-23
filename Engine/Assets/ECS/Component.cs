@@ -28,8 +28,12 @@ public partial class Component : IComponent, IDisposable
 
     [Hide] public ComponentMethods BitFlag = ComponentMethods.All;
 
-    public void Dispose() =>
+    public void Dispose()
+    {
         EventOnDestroy();
+
+        GC.SuppressFinalize(this);
+    }
 
     public void Return() =>
         EventOnDestroy();

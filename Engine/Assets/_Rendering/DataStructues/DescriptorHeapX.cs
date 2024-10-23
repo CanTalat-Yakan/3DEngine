@@ -45,5 +45,7 @@ public sealed class DescriptorHeapX : IDisposable
     {
         Heap?.Dispose();
         Heap = null;
+
+        GC.SuppressFinalize(this);
     }
 }

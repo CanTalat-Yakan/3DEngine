@@ -92,10 +92,12 @@ public sealed class PipelineStateObject : IDisposable
 
     public void Dispose()
     {
-        foreach (var combine in PipelineStateObjectBundles)
-            combine.pipelineState.Dispose();
+        foreach (var bundle in PipelineStateObjectBundles)
+            bundle.pipelineState.Dispose();
 
         PipelineStateObjectBundles.Clear();
+
+        GC.SuppressFinalize(this);
     }
 }
 

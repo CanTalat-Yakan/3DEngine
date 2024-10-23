@@ -103,6 +103,8 @@ public sealed partial class GraphicsDevice : IDisposable
         foreach (var commandAllocator in CommandAllocators)
             commandAllocator.Dispose();
 
+        CommandAllocators.Clear();
+
         Factory?.Dispose();
         CommandQueue?.Dispose();
         ShaderResourcesHeap?.Dispose();
@@ -113,6 +115,8 @@ public sealed partial class GraphicsDevice : IDisposable
         Fence?.Dispose();
         Device?.Dispose();
         Adapter?.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 
     public void DisposeScreenResources()
@@ -120,6 +124,7 @@ public sealed partial class GraphicsDevice : IDisposable
         if (BackBufferRenderTargets is not null)
             foreach (var renderTarget in BackBufferRenderTargets)
                 renderTarget.Dispose();
+
         BackBufferRenderTargets.Clear();
 
         MSAARenderTarget?.Dispose();

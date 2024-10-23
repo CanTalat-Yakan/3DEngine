@@ -84,12 +84,15 @@ public class ShaderIncludeHandler : CallbackBase, IDxcIncludeHandler
 
         public void Dispose()
         {
-            //_blob?.Dispose();
+            _blob?.Dispose();
             _blob = null;
 
             if (_dataPointer.IsAllocated)
                 _dataPointer.Free();
+
             _dataPointer = default;
+
+            GC.SuppressFinalize(this);
         }
     }
 }

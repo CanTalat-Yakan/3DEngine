@@ -161,7 +161,10 @@ public sealed partial class SystemManager
         MeshSystem.Destroy();
 
         MainEntityManager.Dispose();
+
         foreach (var scene in SubEntityManagers)
             scene.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 }

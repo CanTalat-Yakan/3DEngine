@@ -14,6 +14,7 @@ public class UploadBuffer : IDisposable
     public void Dispose()
     {
         Resource?.Dispose();
+
         GC.SuppressFinalize(this);
     }
 }

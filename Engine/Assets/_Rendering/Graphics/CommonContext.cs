@@ -69,6 +69,8 @@ public sealed partial class CommonContext : IDisposable
 
         GraphicsContext.Dispose();
         GraphicsDevice.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 
 }

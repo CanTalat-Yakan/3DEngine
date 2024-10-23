@@ -135,6 +135,8 @@ public sealed partial class Kernel
         Context?.Dispose();
 
         OnDispose?.Invoke();
+
+        GC.SuppressFinalize(this);
     }
 }
 
