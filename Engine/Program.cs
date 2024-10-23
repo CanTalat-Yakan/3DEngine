@@ -7,13 +7,13 @@ public sealed class Program
 
     [STAThread]
     private static void Main() =>
-        new Program().Run(sceneBoot: true);
+        new Program().Run();
 
-    public void Run(bool renderGUI = true, bool sceneBoot = false, Config config = null, Delegate initialization = null, Delegate frame = null)
+    public void Run(Config config = null, Delegate initialization = null, Delegate frame = null)
     {
         HandleExceptions();
 
-        Initialize(renderGUI, sceneBoot, config);
+        Initialize(config);
 
         initialization?.DynamicInvoke();
 
@@ -21,16 +21,9 @@ public sealed class Program
         AppWindow.Dispose(Kernel.Dispose);
     }
 
-    private void Initialize(bool renderGUI, bool sceneBoot, Config config)
+    private void Initialize(Config config)
     {
-        if (config is null)
-        {
-            config = Config.GetDefault();
-            config.SetResolutionScale(1);
-            config.SetMSAA(MultiSample.x4);
-        }
-        config.GUI = renderGUI;
-        config.SceneBoot = sceneBoot;
+        config ??= Config.GetDefault(multiSample: MultiSample.x4, defaultBoot: true);
 
         AppWindow = new(config.WindowData);
         AppWindow.Show(config.WindowCommand);

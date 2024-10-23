@@ -1,6 +1,6 @@
 ﻿namespace Engine.Essentials;
 
-internal sealed class SceneBoot : EditorComponent, IHide
+internal sealed class DefaultBoot : EditorComponent, IHide
 {
     public Camera SceneCamera;
 

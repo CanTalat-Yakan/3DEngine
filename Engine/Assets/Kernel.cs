@@ -78,10 +78,10 @@ public sealed partial class Kernel
 
         Input.Initialize(hwnd);
 
-        if (Config.SceneBoot)
+        if (Config.Boot)
             SystemManager.MainEntityManager
                 .CreateEntity(null, "Boot", "DefaultBoot", hide: true)
-                .AddComponent<SceneBoot>();
+                .AddComponent<DefaultBoot>();
 
         //SceneLoader.Load(SystemManager, AssetsPaths.SCENENES + "teapot.usdz");
         //SceneLoader.Save(AssetsPaths.DIRECTORY + "test.usda", SystemManager);
@@ -150,8 +150,8 @@ public sealed partial class Kernel
 
         Context.GraphicsContext.SetDescriptorHeapDefault();
         Context.GraphicsContext.BeginRender();
-        Context.GraphicsContext.SetMSAARenderTarget();
-        Context.GraphicsContext.ClearMSAARenderTarget();
+        Context.GraphicsContext.SetRenderTarget();
+        Context.GraphicsContext.ClearRenderTarget();
         Context.GraphicsContext.ClearDepthStencil();
     }
 

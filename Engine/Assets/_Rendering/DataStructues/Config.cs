@@ -14,32 +14,42 @@ public class Config
 
     public MultiSample MultiSample = MultiSample.None;
 
-    public uint SampleCount = 0;
+    public uint SampleCount = 1;
     public uint SampleQuality = 0;
 
     public bool Debug = true;
     public bool GUI = true;
-    public bool SceneBoot = true;
+    public bool Boot = true;
 
     public static Config GetDefault(
+        WindowCommand windowCommand = WindowCommand.Show,
         PresentInterval presentInterval = PresentInterval.Immediate,
-        MultiSample multiSample = MultiSample.x2,
+        MultiSample multiSample = MultiSample.None,
         double resolutionScale = 1,
         string title = "3D Engine", 
         int width = 1080, 
-        int height = 720)
+        int height = 720,
+        bool renderGUI = true,
+        bool defaultBoot = false)
     {
         Config config = new();
+        config.SetWindowData(title, width, height);
+        config.SetWindowCommand(windowCommand);
         config.SetVSync(presentInterval);
         config.SetMSAA(multiSample);
         config.SetResolutionScale(resolutionScale);
-        config.SetWindowData(title, width, height);
+
+        config.GUI = renderGUI;
+        config.Boot = defaultBoot;
 
         return config;
     }
 
     public void SetWindowData(string title, int width, int height) =>
         WindowData = new(title, width, height);
+
+    public void SetWindowCommand(WindowCommand windowCommand) =>
+        WindowCommand = windowCommand;
 
     public void SetMSAA(MultiSample multiSample) =>
         MultiSample = multiSample;

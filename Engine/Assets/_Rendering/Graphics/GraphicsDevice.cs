@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Engine.DataStructures;
+using System.Collections.Generic;
 using System.Threading;
 
 using Vortice.Direct3D12;
@@ -282,8 +283,12 @@ public sealed partial class GraphicsDevice : IDisposable
     private void CheckMSAA()
     {
         Config config = Kernel.Instance.Config;
+        MultiSample multiSample = config.MultiSample;
 
-        for (config.SampleCount = (uint)config.MultiSample; config.SampleCount > 1; config.SampleCount /= 2)
+        if (multiSample == MultiSample.None)
+            return;
+
+        for (config.SampleCount = (uint)multiSample; config.SampleCount > 1; config.SampleCount /= 2)
         {
             config.SampleQuality = Device.CheckMultisampleQualityLevels(SwapChainFormat, config.SampleCount);
 
@@ -293,13 +298,17 @@ public sealed partial class GraphicsDevice : IDisposable
 
         config.SampleQuality--;
 
-        if (config.SampleCount < 2 && config.MultiSample != MultiSample.None)
+        if (config.SampleCount < 2)
             Output.Log("MSAA not supported");
     }
 
     private void CreateMSAARenderTargetView()
     {
         Config config = Kernel.Instance.Config;
+        MultiSample multiSample = config.MultiSample;
+
+        if (multiSample == MultiSample.None)
+            return;
 
         ResourceDescription MSAARenderTargetDescription = ResourceDescription.Texture2D(
             SwapChainFormat,
@@ -619,7 +628,7 @@ public sealed partial class GraphicsDevice : IDisposable
     public ID3D12CommandAllocator GetCommandAllocator() =>
         CommandAllocators[(int)ExecuteIndex];
 
-    public ID3D12Resource GetRenderTarget() =>
+    public ID3D12Resource GetBackBufferRenderTarget() =>
         BackBufferRenderTargets[(int)SwapChain.CurrentBackBufferIndex];
 
     public ID3D12Resource GetMSAARenderTarget() =>
@@ -628,7 +637,7 @@ public sealed partial class GraphicsDevice : IDisposable
     public CpuDescriptorHandle GetRenderTargetHandle()
     {
         CpuDescriptorHandle handle = BackBufferRenderTargetsViewHeap.GetTemporaryCPUHandle();
-        Device.CreateRenderTargetView(GetRenderTarget(), null, handle);
+        Device.CreateRenderTargetView(GetBackBufferRenderTarget(), null, handle);
 
         return handle;
     }

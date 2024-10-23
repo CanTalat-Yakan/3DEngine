@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 
 using Vortice.Direct3D;
@@ -145,21 +146,31 @@ public sealed partial class GraphicsContext : IDisposable
 
 public sealed partial class GraphicsContext : IDisposable
 {
-    public void BeginRender() =>
-        CommandList.ResourceBarrierTransition(GraphicsDevice.GetMSAARenderTarget(), ResourceStates.Common, ResourceStates.RenderTarget);
+    public void BeginRender()
+    {
+        if (Kernel.Instance.Config.MultiSample == MultiSample.None)
+            CommandList.ResourceBarrierTransition(GraphicsDevice.GetBackBufferRenderTarget(), ResourceStates.Present, ResourceStates.RenderTarget);
+        else
+            CommandList.ResourceBarrierTransition(GraphicsDevice.GetMSAARenderTarget(), ResourceStates.Common, ResourceStates.RenderTarget);
+    }
 
     public void EndRender()
     {
-        // Transition MSAA render target to ResolveSource and transition back buffer to ResolveDestination
-        CommandList.ResourceBarrierTransition(GraphicsDevice.GetMSAARenderTarget(), ResourceStates.RenderTarget, ResourceStates.ResolveSource);
-        CommandList.ResourceBarrierTransition(GraphicsDevice.GetRenderTarget(), ResourceStates.Present, ResourceStates.ResolveDest);
+        if (Kernel.Instance.Config.MultiSample == MultiSample.None)
+            CommandList.ResourceBarrierTransition(GraphicsDevice.GetBackBufferRenderTarget(), ResourceStates.RenderTarget, ResourceStates.Present);
+        else
+        {
+            // Transition MSAA render target to ResolveSource and transition back buffer to ResolveDestination
+            CommandList.ResourceBarrierTransition(GraphicsDevice.GetMSAARenderTarget(), ResourceStates.RenderTarget, ResourceStates.ResolveSource);
+            CommandList.ResourceBarrierTransition(GraphicsDevice.GetBackBufferRenderTarget(), ResourceStates.Present, ResourceStates.ResolveDest);
 
-        // Resolve MSAA render target to back buffer
-        CommandList.ResolveSubresource(GraphicsDevice.GetRenderTarget(), 0, GraphicsDevice.GetMSAARenderTarget(), 0, GraphicsDevice.SwapChainFormat);
+            // Resolve MSAA render target to back buffer
+            CommandList.ResolveSubresource(GraphicsDevice.GetBackBufferRenderTarget(), 0, GraphicsDevice.GetMSAARenderTarget(), 0, GraphicsDevice.SwapChainFormat);
 
-        // Transition MSAA render target back to Common and transition back buffer to Present
-        CommandList.ResourceBarrierTransition(GraphicsDevice.GetMSAARenderTarget(), ResourceStates.ResolveSource, ResourceStates.Common);
-        CommandList.ResourceBarrierTransition(GraphicsDevice.GetRenderTarget(), ResourceStates.ResolveDest, ResourceStates.Present);
+            // Transition MSAA render target back to Common and transition back buffer to Present
+            CommandList.ResourceBarrierTransition(GraphicsDevice.GetMSAARenderTarget(), ResourceStates.ResolveSource, ResourceStates.Common);
+            CommandList.ResourceBarrierTransition(GraphicsDevice.GetBackBufferRenderTarget(), ResourceStates.ResolveDest, ResourceStates.Present);
+        }
     }
 
     public void BeginCommand() =>
@@ -174,6 +185,12 @@ public sealed partial class GraphicsContext : IDisposable
     public void SetDescriptorHeapDefault() =>
         CommandList.SetDescriptorHeaps(1, new[] { GraphicsDevice.ShaderResourcesHeap.Heap });
 
+    public void SetPipelineState(PipelineStateObject pipelineStateObject, PipelineStateObjectDescription pipelineStateObjectDescription)
+    {
+        PipelineStateObject = pipelineStateObject;
+        PipelineStateObjectDescription = pipelineStateObjectDescription;
+    }
+
     public void SetRootSignature(RootSignature rootSignature)
     {
         CurrentRootSignature = rootSignature;
@@ -185,6 +202,9 @@ public sealed partial class GraphicsContext : IDisposable
         CurrentRootSignature = rootSignature;
         CommandList.SetComputeRootSignature(rootSignature.Resource);
     }
+
+    public void SetConstantBufferView(UploadBuffer uploadBuffer, uint offset, uint slot) =>
+        CommandList.SetGraphicsRootConstantBufferView(CurrentRootSignature.ConstantBufferView[slot], uploadBuffer.Resource.GPUVirtualAddress + offset);
 
     public void SetShaderResourceView(Texture2D texture, uint slot)
     {
@@ -206,27 +226,29 @@ public sealed partial class GraphicsContext : IDisposable
         CommandList.SetGraphicsRootDescriptorTable(CurrentRootSignature.ShaderResourceView[slot], GPUHandle);
     }
 
-    public void SetMSAARenderTarget()
+    public void SetRenderTarget()
     {
         CommandList.RSSetViewport(new Viewport(0, 0, GraphicsDevice.Size.Width, GraphicsDevice.Size.Height, 0.0f, 1.0f));
         CommandList.RSSetScissorRect(new RectI(0, 0, GraphicsDevice.Size.Width, GraphicsDevice.Size.Height));
-        CommandList.OMSetRenderTargets(GraphicsDevice.GetMSAARenderTargetHandle(), GraphicsDevice.GetDepthStencilHandle());
+
+        if (Kernel.Instance.Config.MultiSample == MultiSample.None)
+            CommandList.OMSetRenderTargets(GraphicsDevice.GetRenderTargetHandle(), GraphicsDevice.GetDepthStencilHandle());
+        else
+            CommandList.OMSetRenderTargets(GraphicsDevice.GetMSAARenderTargetHandle(), GraphicsDevice.GetDepthStencilHandle());
     }
 
-    public void SetConstantBufferView(UploadBuffer uploadBuffer, uint offset, uint slot) =>
-        CommandList.SetGraphicsRootConstantBufferView(CurrentRootSignature.ConstantBufferView[slot], uploadBuffer.Resource.GPUVirtualAddress + offset);
-
-    public void SetPipelineState(PipelineStateObject pipelineStateObject, PipelineStateObjectDescription pipelineStateObjectDescription)
-    {
-        PipelineStateObject = pipelineStateObject;
-        PipelineStateObjectDescription = pipelineStateObjectDescription;
-    }
-
-    public void ClearRenderTarget(Texture2D texture2D) =>
+    public void ClearTexture2D(Texture2D texture2D) =>
         CommandList.ClearRenderTargetView(texture2D.RenderTargetView.GetCPUDescriptorHandleForHeapStart(), new Color4(0, 0, 0, 0));
 
-    public void ClearMSAARenderTarget(Color4? color = null) =>
-        CommandList.ClearRenderTargetView(GraphicsDevice.GetMSAARenderTargetHandle(), color is not null ? color.Value : new Color4(0.15f, 0.15f, 0.15f, 1));
+    public void ClearRenderTarget(Color4? color = null)
+    {
+        color ??= new Color4(0.15f, 0.15f, 0.15f, 1);
+
+        if (Kernel.Instance.Config.MultiSample == MultiSample.None)
+            CommandList.ClearRenderTargetView(GraphicsDevice.GetRenderTargetHandle(), color.Value);
+        else
+            CommandList.ClearRenderTargetView(GraphicsDevice.GetMSAARenderTargetHandle(), color.Value);
+    }
 
     public void ClearDepthStencil() =>
         CommandList.ClearDepthStencilView(GraphicsDevice.GetDepthStencilHandle(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
