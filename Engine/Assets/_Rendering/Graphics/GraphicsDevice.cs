@@ -38,15 +38,15 @@ public sealed partial class GraphicsDevice : IDisposable
     public Queue<ResourceDelayDestroy> DelayDestroy = new();
 
     public uint ExecuteIndex = 0;
-    public ulong ExecuteCount = 2; // Greater equal than 'bufferCount'.
+    public ulong ExecuteCount = 2; // Greater equal than bufferCount.
+
+    public uint BufferCount = 2;
 
     public static Format SwapChainFormat = Format.R8G8B8A8_UNorm;
     public static Format DepthStencilFormat = Format.D32_Float;
     public List<ID3D12Resource> RenderTargets;
     public ID3D12Resource MSAARenderTarget;
     public ID3D12Resource DepthStencil;
-
-    public uint BufferCount = 3;
 
     public void Initialize(SizeI size, bool win32Window)
     {
@@ -277,26 +277,31 @@ public sealed partial class GraphicsDevice : IDisposable
 
     private void CreateMSAARenderTargetView()
     {
-        uint multiSample = (uint)Kernel.Instance.Config.MultiSample;
-        uint qualityLevels = 0;
         uint sampleCount;
+        uint sampleQuality = 0;
+        uint multiSample = (uint)Kernel.Instance.Config.MultiSample;
+
         for (sampleCount = multiSample; sampleCount > 1; sampleCount /= 2)
         {
-            qualityLevels = Device.CheckMultisampleQualityLevels(SwapChainFormat, sampleCount);
+            sampleQuality = Device.CheckMultisampleQualityLevels(SwapChainFormat, sampleCount);
 
-            if (qualityLevels > 0)
+            if (sampleQuality > 0)
                 break;
         }
 
         if (sampleCount < 2 && multiSample != (uint)MultiSample.None)
+        {
             Output.Log("MSAA not supported");
+
+            return;
+        }
 
         ResourceDescription MSAARenderTargetDescription = ResourceDescription.Texture2D(
             SwapChainFormat,
             (uint)Size.Width,
             (uint)Size.Height,
             sampleCount: sampleCount,
-            sampleQuality: qualityLevels - 1,
+            sampleQuality: sampleQuality - 1,
             arraySize: 1,
             mipLevels: 1);
         MSAARenderTargetDescription.Flags |= ResourceFlags.AllowRenderTarget;
