@@ -148,6 +148,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
             texture.ResourceStates = ResourceStates.CopyDest;
         }
 
+        // Upload data
         int totalSize = (int)(layouts[mipData.Count - 1].Offset + layouts[mipData.Count - 1].Footprint.RowPitch * rowCounts[mipData.Count - 1]);
         UploadData(defaultAllignment: false, totalSize, out var mappedData, out var offset);
         CopyMipDataToMappedData(new(mappedData, totalSize), mipData, layouts, rowCounts, rowSizesInBytes);
