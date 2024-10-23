@@ -1,7 +1,3 @@
-Certainly! Below is the updated README.md for your **3D Engine** project with a new **Sample Projects** section added. This section showcases your existing sample project, **Voxel Sandbox**, providing visitors with a clear example of what can be built using your engine.
-
----
-
 ![Logo](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/main/Images/3DEngine_Logo_BG.png)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/CanTalat-Yakan/3DEngine/blob/main/LICENSE) 
 
@@ -256,7 +252,3 @@ To compile the 3D Engine, ensure you have [Visual Studio 2022](https://visualstu
 ![9](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/main/Images/Screenshot_9.png)
 ![10](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/main/Images/Screenshot_10.png)
 ![13](https://raw.githubusercontent.com/CanTalat-Yakan/3DEngine/main/Images/Screenshot_Folder.png)
-
----
-
-Feel free to further customize the **Sample Projects** section as you add more projects in the future. This structure helps potential users and contributors understand the practical applications of your engine and provides clear examples to get started.
