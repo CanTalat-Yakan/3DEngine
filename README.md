@@ -43,7 +43,7 @@ A 3D Engine sample project demonstrating the capabilities of the 3D Engine. **Vo
 - **Noise Sampling**: Utilizes noise algorithms to create realistic terrain variations.
 - **Mesh Generation**: Dynamically generates meshes based on voxel data for efficient rendering.
 - **Character Controller**: Implements a responsive character controller for player movement and interaction.
-- **Optimized Shader**: Features custom shaders optimized for performance and visual fidelity.
+- **Optimized Shader**: Features custom shaders optimized for performance and and targeted for voxels and low memory usage.
 
 All components are written in C#, showcasing how to leverage the 3D Engine's functionalities to build a fully-featured application.
 
