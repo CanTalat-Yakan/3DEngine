@@ -44,7 +44,7 @@ public sealed partial class ImageLoader
 
     private static List<byte[]> ProcessWIC(ID3D12Device device, string filePath, out Format format, out SizeI size, out uint mipLevels)
     {
-        List<byte[]> mipData = new List<byte[]>();
+        List<byte[]> mipData = new();
 
         using IWICImagingFactory wicFactory = new();
         using IWICBitmapDecoder decoder = wicFactory.CreateDecoderFromFileName(filePath);
@@ -185,9 +185,8 @@ public sealed partial class ImageLoader
             if (mipSource != source)
             {
                 if (source != frame)
-                {
                     source.Dispose();
-                }
+
                 source = mipSource;
             }
         }
@@ -196,9 +195,7 @@ public sealed partial class ImageLoader
         converter?.Dispose();
         scaler?.Dispose();
         if (source != frame && source != null)
-        {
             source.Dispose();
-        }
 
         return mipData;
     }
