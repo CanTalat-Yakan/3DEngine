@@ -6,7 +6,7 @@ using Microsoft.UI.Xaml;
 
 using SharpGen.Runtime;
 
-using Engine.DataStructures;
+using Engine;
 using Engine.Editor;
 using Engine.Essentials;
 using Engine.Utilities;

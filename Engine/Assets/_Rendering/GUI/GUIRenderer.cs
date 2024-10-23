@@ -105,11 +105,11 @@ public unsafe sealed partial class GUIRenderer
         GPUUpload upload = new()
         {
             Texture2D = FontTexture,
-            TextureData = new byte[width * height * bytesPerPixel],
+            TextureData = [new byte[width * height * bytesPerPixel]],
         };
-
-        Span<byte> data = new(pixels, upload.TextureData.Length);
-        data.CopyTo(upload.TextureData);
+        
+        Span<byte> data = new(pixels, upload.TextureData[0].Length);
+        data.CopyTo(upload.TextureData[0]);
 
         Context.UploadQueue.Enqueue(upload);
     }

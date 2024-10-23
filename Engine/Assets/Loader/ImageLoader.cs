@@ -6,6 +6,7 @@ using Vortice.Direct3D12;
 using Vortice.DXGI;
 using Vortice.WIC;
 using Vortice.Mathematics;
+using Vortice.Direct2D1.Effects;
 
 namespace Engine.Loader;
 
@@ -20,13 +21,13 @@ public sealed partial class ImageLoader
         if (Assets.RenderTargets.ContainsKey(textureName))
             return Assets.RenderTargets[textureName];
 
-        var pixels = ProcessWIC(Context.GraphicsDevice.Device, filePath, out var format, out var size);
+        var mipData = ProcessWIC(Context.GraphicsDevice.Device, filePath, out var format, out var size, out uint mipLevels);
 
         Texture2D texture = new()
         {
             Width = (uint)size.Width,
             Height = (uint)size.Height,
-            MipLevels = 1,
+            MipLevels = mipLevels,
             Format = format,
         };
         Assets.RenderTargets[textureName] = texture;
@@ -34,16 +35,17 @@ public sealed partial class ImageLoader
         GPUUpload upload = new()
         {
             Texture2D = texture,
-            TextureData = pixels,
+            TextureData = mipData,
         };
         Context.UploadQueue.Enqueue(upload);
 
         return texture;
     }
 
-    private static byte[] ProcessWIC(ID3D12Device device, string filePath, out Format format, out SizeI size)
+    private static List<byte[]> ProcessWIC(ID3D12Device device, string filePath, out Format format, out SizeI size, out uint mipLevels)
     {
-        // Loading images using Vortice.WIC
+        List<byte[]> mipData = new List<byte[]>();
+
         using IWICImagingFactory wicFactory = new();
         using IWICBitmapDecoder decoder = wicFactory.CreateDecoderFromFileName(filePath);
         using IWICBitmapFrameDecode frame = decoder.GetFrame(0);
@@ -134,52 +136,71 @@ public sealed partial class ImageLoader
         uint rowPitch = (uint)((size.Width * bpp + 7) / 8);
         uint sizeInBytes = rowPitch * (uint)size.Height;
 
-        byte[] pixels = new byte[sizeInBytes];
-
         uint width = (uint)size.Width;
         uint height = (uint)size.Height;
 
-        // Load image data
-        if (convertGUID == pixelFormat && size.Width == width && size.Height == height)
-            // No format conversion or resize needed
-            frame.CopyPixels(rowPitch, pixels);
-        else if (size.Width != width || size.Height != height)
+        // Calculate mip levels
+        mipLevels = (uint)Math.Floor(Math.Log(Math.Max(width, height), 2)) + 1;
+
+        // Create the initial bitmap source
+        IWICBitmapSource source = frame;
+        IWICBitmapScaler scaler = null;
+        IWICFormatConverter converter = null;
+
+        for (uint level = 0; level < mipLevels; level++)
         {
-            // Resize
-            using IWICBitmapScaler scaler = wicFactory.CreateBitmapScaler();
-            scaler.Initialize(frame, width, height, BitmapInterpolationMode.Fant);
+            uint mipWidth = Math.Max(1, width >> (int)level);
+            uint mipHeight = Math.Max(1, height >> (int)level);
 
-            Guid pixelFormatScaler = scaler.PixelFormat;
+            IWICBitmapSource mipSource = source;
 
-            if (convertGUID == pixelFormatScaler)
-                // No format conversion needed
-                scaler.CopyPixels(rowPitch, pixels);
-            else
+            // Resize the image if not the first level
+            if (level > 0)
             {
-                using IWICFormatConverter converter = wicFactory.CreateFormatConverter();
+                scaler?.Dispose(); // Dispose of the previous scaler if it exists
+                scaler = wicFactory.CreateBitmapScaler();
+                scaler.Initialize(source, mipWidth, mipHeight, BitmapInterpolationMode.Fant);
+                mipSource = scaler;
+            }
 
-                bool canConvert = converter.CanConvert(pixelFormatScaler, convertGUID);
-                if (!canConvert)
-                    return pixels;
+            // Convert the format if necessary
+            if (convertGUID != pixelFormat)
+            {
+                converter?.Dispose(); // Dispose of the previous converter if it exists
+                converter = wicFactory.CreateFormatConverter();
+                converter.Initialize(mipSource, convertGUID, BitmapDitherType.None, null, 0.0, BitmapPaletteType.MedianCut);
+                mipSource = converter;
+            }
 
-                converter.Initialize(scaler, convertGUID, BitmapDitherType.ErrorDiffusion, null, 0, BitmapPaletteType.MedianCut);
-                converter.CopyPixels(rowPitch, pixels);
+            uint imageSize = rowPitch * mipHeight;
+
+            byte[] pixels = new byte[imageSize];
+
+            // Copy the pixels from the current mipSource
+            mipSource.CopyPixels(rowPitch, pixels);
+
+            mipData.Add(pixels);
+
+            // Prepare for the next level
+            if (mipSource != source)
+            {
+                if (source != frame)
+                {
+                    source.Dispose();
+                }
+                source = mipSource;
             }
         }
-        else
+
+        // Dispose of any remaining resources
+        converter?.Dispose();
+        scaler?.Dispose();
+        if (source != frame && source != null)
         {
-            // Format conversion but no resize
-            using IWICFormatConverter converter = wicFactory.CreateFormatConverter();
-
-            bool canConvert = converter.CanConvert(pixelFormat, convertGUID);
-            if (!canConvert)
-                return pixels;
-
-            converter.Initialize(frame, convertGUID, BitmapDitherType.ErrorDiffusion, null, 0, BitmapPaletteType.MedianCut);
-            converter.CopyPixels(rowPitch, pixels);
+            source.Dispose();
         }
 
-        return pixels;
+        return mipData;
     }
 }
 

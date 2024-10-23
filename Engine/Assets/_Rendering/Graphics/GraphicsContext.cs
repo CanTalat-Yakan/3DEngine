@@ -6,6 +6,7 @@ using Vortice.Direct3D;
 using Vortice.Direct3D12;
 using Vortice.DXGI;
 using Vortice.Mathematics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Engine.Graphics;
 
@@ -83,47 +84,56 @@ public sealed partial class GraphicsContext : IDisposable
         Kernel.Instance.Context.UploadBuffer.UploadIndexBuffer(mesh, indexByteSpan, indexFormat);
     }
 
-    public void UploadTexture(Texture2D texture, byte[] data)
+    public void UploadTexture(Texture2D texture, List<byte[]> mipData)
     {
+        uint mipLevels = texture.MipLevels;
+
+        // Calculate total size needed for all mip levels
+        ulong totalSize = 0;
+        List<SubresourceData> subresources = new List<SubresourceData>();
+
+        for (uint level = 0; level < mipLevels; level++)
+        {
+            uint mipWidth = Math.Max(1, texture.Width >> (int)level);
+            uint mipHeight = Math.Max(1, texture.Height >> (int)level);
+            uint rowPitch = (mipWidth * GraphicsDevice.GetBitsPerPixel(texture.Format) + 7) / 8;
+            uint imageSize = rowPitch * mipHeight;
+
+            unsafe
+            {
+                SubresourceData subresource = new SubresourceData
+                {
+                    pData = (void*)Marshal.UnsafeAddrOfPinnedArrayElement(mipData[(int)level], 0),
+                    RowPitch = (IntPtr)rowPitch,
+                    SlicePitch = (IntPtr)imageSize,
+                };
+                subresources.Add(subresource);
+            }
+
+            totalSize += imageSize;
+        }
+
+        // Create the upload buffer
         ID3D12Resource resourceUpload = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
             new HeapProperties(HeapType.Upload),
             HeapFlags.None,
-            ResourceDescription.Buffer((ulong)data.Length),
+            ResourceDescription.Buffer(totalSize),
             ResourceStates.GenericRead);
         GraphicsDevice.DestroyResource(resourceUpload);
 
-        GraphicsDevice.DestroyResource(texture.Resource);
+        // Create the texture resource with mip levels
         texture.Resource = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
             HeapProperties.DefaultHeapProperties,
             HeapFlags.None,
-            ResourceDescription.Texture2D(texture.Format, texture.Width, texture.Height, arraySize: 1, mipLevels: 1),
+            ResourceDescription.Texture2D(texture.Format, texture.Width, texture.Height, arraySize: 1, mipLevels: (ushort)mipLevels),
             ResourceStates.CopyDest);
 
-        uint bitsPerPixel = GraphicsDevice.GetBitsPerPixel(texture.Format);
-        uint alignment = 4; // Adjust alignment value if needed
+        // Upload the texture data
+        UpdateSubresources(CommandList, texture.Resource, resourceUpload, 0, 0, mipLevels, subresources.ToArray());
 
-        // Ensure row pitch is aligned
-        uint rowPitch = texture.Width * (bitsPerPixel / 8);
-        if (rowPitch % alignment != 0)
-            rowPitch += alignment - (rowPitch % alignment);
-
-        unsafe
-        {
-            SubresourceData subresourcedata = new()
-            {
-                pData = (void*)Marshal.UnsafeAddrOfPinnedArrayElement(data, 0),
-                RowPitch = (IntPtr)rowPitch,
-                SlicePitch = (IntPtr)(rowPitch * texture.Height), // Recalculate slice pitch
-            };
-
-            UpdateSubresources(CommandList, texture.Resource, resourceUpload, 0, 0, 1, [subresourcedata]);
-        }
-
-        GCHandle gcHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-        gcHandle.Free();
-
-        CommandList.ResourceBarrierTransition(texture.Resource, ResourceStates.CopyDest, ResourceStates.GenericRead);
-        texture.ResourceStates = ResourceStates.GenericRead;
+        // Transition the texture to the pixel shader resource state
+        CommandList.ResourceBarrierTransition(texture.Resource, ResourceStates.CopyDest, ResourceStates.PixelShaderResource);
+        texture.ResourceStates = ResourceStates.PixelShaderResource;
     }
 
     public ReadOnlyMemory<byte> LoadShader(DxcShaderStage shaderStage, string filePath, string entryPoint, bool fromResources = false)
