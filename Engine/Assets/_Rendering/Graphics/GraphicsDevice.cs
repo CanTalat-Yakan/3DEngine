@@ -1,5 +1,4 @@
-﻿using Engine.DataStructures;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 
 using Vortice.Direct3D12;
