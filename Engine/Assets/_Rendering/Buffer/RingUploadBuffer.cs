@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 
 using Vortice.Direct3D12;
 using Vortice.DXGI;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Engine.Buffer;
 
@@ -45,22 +46,24 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 
     public void Upload<T>(Span<T> data, out uint offset) where T : struct
     {
-        int size = data.Length * Unsafe.SizeOf<T>();
-
-        if (!AllocateUploadMemory(size, DefaultAlignment, out offset))
-            throw new InvalidOperationException("Not enough space in the RingUploadBuffer.");
-
-        data.CopyTo(new Span<T>((CPUResourcePointer + (int)offset).ToPointer(), data.Length));
+        UploadData(defaultAllignment: true, data.Length * Unsafe.SizeOf<T>(), out var mappedData, out offset);
+        data.CopyTo(new Span<T>(mappedData, data.Length));
     }
 
     public void Upload<T>(T data, out uint offset)
     {
-        int size = Unsafe.SizeOf<T>();
+        UploadData(defaultAllignment: true, Unsafe.SizeOf<T>(), out var mappedData, out offset);
+        Unsafe.Copy(mappedData, ref data);
+    }
 
-        if (!AllocateUploadMemory(size, DefaultAlignment, out offset))
+    public void UploadData(bool defaultAllignment, int size, out void* mappedData, out uint offset)
+    {
+        if (defaultAllignment && !AllocateUploadMemory(size, DefaultAlignment, out offset))
+            throw new InvalidOperationException("Not enough space in the RingUploadBuffer.");
+        else if (!AllocateUploadMemory(AlignUp(size, TextureAlignment), TextureAlignment, out offset))
             throw new InvalidOperationException("Not enough space in the RingUploadBuffer.");
 
-        Unsafe.Copy((void*)(CPUResourcePointer + (int)offset), ref data);
+        mappedData = (CPUResourcePointer + (int)offset).ToPointer();
     }
 }
 
@@ -78,12 +81,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         mesh.IndexSizeInByte = indexSizeInByte;
         mesh.IndexCount = indexCount;
 
-        UploadBuffer(
-            ref mesh.IndexBufferResource,
-            ref mesh.IndexBufferState,
-            index,
-            indexSizeInByte,
-            out _);
+        UploadBuffer(ref mesh.IndexBufferResource, ref mesh.IndexBufferState, index, indexSizeInByte, out _);
     }
 
     public void UploadVertexBuffer(MeshData mesh, Span<byte> vertex, uint? overrideSizeInByte = null)
@@ -91,12 +89,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         uint vertexSizeInByte = overrideSizeInByte ?? (uint)vertex.Length;
         mesh.VertexSizeInByte = vertexSizeInByte;
 
-        UploadBuffer(
-            ref mesh.VertexBufferResource,
-            ref mesh.VertexBufferState,
-            vertex,
-            vertexSizeInByte,
-            out _);
+        UploadBuffer(ref mesh.VertexBufferResource, ref mesh.VertexBufferState, vertex, vertexSizeInByte, out _);
     }
 
     private void UploadBuffer(ref ID3D12Resource resource, ref ResourceStates resourceState, Span<byte> data, uint sizeInBytes, out uint offset)
@@ -127,26 +120,15 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         Upload(data, out offset);
 
         // Copy data from the upload buffer to the GPU resource
-        GraphicsContext.CommandList.CopyBufferRegion(
-            resource, 0, Resource, offset, sizeInBytes);
+        GraphicsContext.CommandList.CopyBufferRegion(resource, 0, Resource, offset, sizeInBytes);
 
         // Transition to GenericRead state
-        GraphicsContext.CommandList.ResourceBarrierTransition(
-            resource, ResourceStates.CopyDest, ResourceStates.GenericRead);
+        GraphicsContext.CommandList.ResourceBarrierTransition(resource, ResourceStates.CopyDest, ResourceStates.GenericRead);
         resourceState = ResourceStates.GenericRead;
     }
 
     public void UploadTexture(Texture2D texture, List<byte[]> mipData, PlacedSubresourceFootPrint[] layouts, uint[] rowCounts, ulong[] rowSizesInBytes)
     {
-        // Calculate total size
-        int totalSize = (int)(layouts[mipData.Count - 1].Offset + layouts[mipData.Count - 1].Footprint.RowPitch * rowCounts[mipData.Count - 1]);
-
-        // Allocate space in the ring buffer
-        if (!AllocateUploadMemory(AlignUp(totalSize, TextureAlignment), TextureAlignment, out uint offset))
-            throw new InvalidOperationException("Not enough space in the RingUploadBuffer.");
-
-        ulong uploadBufferOffset = offset;
-
         // Create or reuse the texture resource
         if (texture.Resource is null
          || texture.Width != layouts[0].Footprint.Width
@@ -166,9 +148,31 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
             texture.ResourceStates = ResourceStates.CopyDest;
         }
 
-        // Copy data into the ring buffer
-        Span<byte> mappedData = new((byte*)CPUResourcePointer + (int)uploadBufferOffset, totalSize);
+        int totalSize = (int)(layouts[mipData.Count - 1].Offset + layouts[mipData.Count - 1].Footprint.RowPitch * rowCounts[mipData.Count - 1]);
+        UploadData(defaultAllignment: false, totalSize, out var mappedData, out var offset);
+        CopyMipDataToMappedData(new(mappedData, totalSize), mipData, layouts, rowCounts, rowSizesInBytes);
 
+        // Copy from upload buffer to texture resource
+        for (uint i = 0; i < texture.MipLevels; i++)
+        {
+            TextureCopyLocation destination = new(texture.Resource, i);
+
+            // Adjust the source location to include the uploadBufferOffset
+            PlacedSubresourceFootPrint adjustedLayout = layouts[i];
+            adjustedLayout.Offset += offset;
+
+            TextureCopyLocation source = new(Resource, adjustedLayout);
+
+            GraphicsContext.CommandList.CopyTextureRegion(destination, 0, 0, 0, source, null);
+        }
+
+        // Transition to PixelShaderResource state
+        GraphicsContext.CommandList.ResourceBarrierTransition(texture.Resource, ResourceStates.CopyDest, ResourceStates.PixelShaderResource);
+        texture.ResourceStates = ResourceStates.PixelShaderResource;
+    }
+
+    private void CopyMipDataToMappedData(Span<byte> mappedData, List<byte[]> mipData, PlacedSubresourceFootPrint[] layouts, uint[] rowCounts, ulong[] rowSizesInBytes)
+    {
         for (int i = 0; i < mipData.Count; i++)
         {
             var footprint = layouts[i];
@@ -189,25 +193,8 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
                 sourceData.AsSpan(sourceOffset, copySize).CopyTo(mappedData.Slice(destiantionOffset, copySize));
             }
         }
-
-        // Copy from upload buffer to texture resource
-        for (uint i = 0; i < texture.MipLevels; i++)
-        {
-            TextureCopyLocation destination = new(texture.Resource, i);
-
-            // Adjust the source location to include the uploadBufferOffset
-            PlacedSubresourceFootPrint adjustedLayout = layouts[i];
-            adjustedLayout.Offset += uploadBufferOffset;
-
-            TextureCopyLocation source = new(Resource, adjustedLayout);
-
-            GraphicsContext.CommandList.CopyTextureRegion(destination, 0, 0, 0, source, null);
-        }
-
-        // Transition to PixelShaderResource state
-        GraphicsContext.CommandList.ResourceBarrierTransition(texture.Resource, ResourceStates.CopyDest, ResourceStates.PixelShaderResource);
-        texture.ResourceStates = ResourceStates.PixelShaderResource;
     }
+
 }
 
 public unsafe sealed partial class RingUploadBuffer : UploadBuffer
