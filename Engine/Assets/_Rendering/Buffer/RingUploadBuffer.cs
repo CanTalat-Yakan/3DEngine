@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 
 using Vortice.Direct3D12;
 using Vortice.DXGI;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Engine.Buffer;
 
