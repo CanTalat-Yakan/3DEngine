@@ -38,7 +38,7 @@ public sealed partial class GraphicsDevice : IDisposable
     public Queue<ResourceDelayDestroy> DelayDestroy = new();
 
     public uint ExecuteIndex = 0;
-    public ulong ExecuteCount = 3; // Greater equal than 'bufferCount'.
+    public ulong ExecuteCount = 2; // Greater equal than 'bufferCount'.
 
     public static Format SwapChainFormat = Format.R8G8B8A8_UNorm;
     public static Format DepthStencilFormat = Format.D32_Float;
@@ -116,8 +116,8 @@ public sealed partial class GraphicsDevice : IDisposable
     public void DisposeScreenResources()
     {
         if (RenderTargets is not null)
-            foreach (var screenResource in RenderTargets)
-                screenResource.Dispose();
+            foreach (var renderTarget in RenderTargets)
+                renderTarget.Dispose();
 
         MSAARenderTarget?.Dispose();
         DepthStencil?.Dispose();

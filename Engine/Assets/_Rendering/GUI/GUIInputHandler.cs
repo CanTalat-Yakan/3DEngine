@@ -77,9 +77,7 @@ public sealed class GUIInputHandler
 
         var requestedCursor = ImGui.GetMouseCursor();
         if (requestedCursor == ImGuiMouseCursor.None || io.MouseDrawCursor)
-        {
-            //User32.SetCursor(IntPtr.Zero);
-        }
+            User32.SetCursor(0);
         else
         {
             var cursor = SystemCursor.IDC_ARROW;
@@ -95,7 +93,7 @@ public sealed class GUIInputHandler
                 case ImGuiMouseCursor.Hand: cursor = SystemCursor.IDC_HAND; break;
                 case ImGuiMouseCursor.NotAllowed: cursor = SystemCursor.IDC_NO; break;
             }
-            //User32.SetCursor(User32.LoadCursor(IntPtr.Zero, cursor));
+            User32.SetCursor(User32.LoadCursor(0, cursor));
         }
 
         return true;
@@ -107,9 +105,9 @@ public sealed class GUIInputHandler
 
         if (io.WantSetMousePos)
         {
-            var pos = new POINT((int)io.MousePos.X, (int)io.MousePos.Y);
-            User32.ClientToScreen(WindowHandle, ref pos);
-            User32.SetCursorPos(pos.X, pos.Y);
+            POINT position = new((int)io.MousePos.X, (int)io.MousePos.Y);
+            User32.ClientToScreen(WindowHandle, ref position);
+            User32.SetCursorPos(position.X, position.Y);
         }
 
         //io.MousePos = new System.Numerics.Vector2(-FLT_MAX, -FLT_MAX);
@@ -117,10 +115,10 @@ public sealed class GUIInputHandler
         var foregroundWindow = User32.GetForegroundWindow();
         if (foregroundWindow == WindowHandle || User32.IsChild(foregroundWindow, WindowHandle))
         {
-            POINT pos;
-            if (User32.GetCursorPos(out pos) && User32.ScreenToClient(WindowHandle, ref pos))
+            POINT position;
+            if (User32.GetCursorPos(out position) && User32.ScreenToClient(WindowHandle, ref position))
             {
-                io.MousePos = new Vector2(pos.X, pos.Y);
+                io.MousePos = new Vector2(position.X, position.Y);
 
                 if (Kernel.Instance.Config.ResolutionScale < 1)
                     io.MousePos *= (float)Kernel.Instance.Config.ResolutionScale; // <--- SCALING
@@ -130,7 +128,7 @@ public sealed class GUIInputHandler
 
     public bool ProcessMessage(WindowMessage msg, UIntPtr wParam, IntPtr lParam)
     {
-        if (ImGui.GetCurrentContext() == IntPtr.Zero)
+        if (ImGui.GetCurrentContext() == 0)
             return false;
 
         var io = ImGui.GetIO();
@@ -150,7 +148,7 @@ public sealed class GUIInputHandler
                     if (msg == WindowMessage.RButtonDown || msg == WindowMessage.RButtonDoubleClick) { button = 1; }
                     if (msg == WindowMessage.MButtonDown || msg == WindowMessage.MButtonDoubleClick) { button = 2; }
                     if (msg == WindowMessage.XButtonDown || msg == WindowMessage.XButtonDoubleClick) { button = (GET_XBUTTON_WPARAM(wParam) == 1) ? 3 : 4; }
-                    if (!ImGui.IsAnyMouseDown() && User32.GetCapture() == IntPtr.Zero)
+                    if (!ImGui.IsAnyMouseDown() && User32.GetCapture() == 0)
                         User32.SetCapture(WindowHandle);
                     io.MouseDown[button] = true;
                     return false;
