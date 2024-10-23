@@ -70,6 +70,17 @@ public sealed partial class Input
         };
     }
 
+    public static void Update()
+    {
+        if (!AppWindow.IsFocused()) 
+            return;
+
+        Fetch();
+
+        ProcessMouseLockState();
+        ProcessInputStates();
+    }
+
     public static void Fetch()
     {
         s_mouse?.Acquire();
@@ -88,17 +99,6 @@ public sealed partial class Input
         s_keyboard?.Dispose();
         s_mouse?.Dispose();
         s_joystick?.Dispose();
-    }
-}
-
-public sealed partial class Input
-{
-    public static void Update()
-    {
-        Fetch();
-
-        ProcessMouseLockState();
-        ProcessInputStates();
     }
 }
 
