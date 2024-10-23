@@ -23,8 +23,12 @@ public sealed class Program
 
     private void Initialize(bool renderGUI, bool sceneBoot, Config config)
     {
-        config ??= Config.GetDefault();
-        config.SetResolutionScale(1);
+        if (config is null)
+        {
+            config = Config.GetDefault();
+            config.SetResolutionScale(1);
+            config.SetMSAA(MultiSample.x4);
+        }
         config.GUI = renderGUI;
         config.SceneBoot = sceneBoot;
 

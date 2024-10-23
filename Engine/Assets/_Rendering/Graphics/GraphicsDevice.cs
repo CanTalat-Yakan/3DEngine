@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Engine.DataStructures;
+using System.Collections.Generic;
 using System.Threading;
 
 using Vortice.Direct3D12;
@@ -59,6 +60,7 @@ public sealed partial class GraphicsDevice : IDisposable
         CreateCommandAllocator();
         CreateSwapChain(win32Window);
         CreateRenderTargets();
+        CheckMSAA();
         CreateMSAARenderTargetView();
         CreateDepthStencil();
 
@@ -119,8 +121,13 @@ public sealed partial class GraphicsDevice : IDisposable
             foreach (var renderTarget in RenderTargets)
                 renderTarget.Dispose();
 
+        RenderTargets.Clear();
+
         MSAARenderTarget?.Dispose();
+        MSAARenderTarget = null;
+
         DepthStencil?.Dispose();
+        DepthStencil = null;
     }
 }
 
@@ -193,7 +200,7 @@ public sealed partial class GraphicsDevice : IDisposable
 
     private void CreateDescriptorHeaps()
     {
-        const int CONSTANTBUFFERVIEW_VIEWSHADERRESOURCEVIEW_UNORDEREDACCESSVIEW_DESCRIPTORCOUNT = 65536;
+        const uint CONSTANTBUFFERVIEW_VIEWSHADERRESOURCEVIEW_UNORDEREDACCESSVIEW_DESCRIPTORCOUNT = 65536;
         DescriptorHeapDescription descriptorHeapDescription = new()
         {
             DescriptorCount = CONSTANTBUFFERVIEW_VIEWSHADERRESOURCEVIEW_UNORDEREDACCESSVIEW_DESCRIPTORCOUNT,
@@ -275,33 +282,34 @@ public sealed partial class GraphicsDevice : IDisposable
         }
     }
 
-    private void CreateMSAARenderTargetView()
+    private void CheckMSAA()
     {
-        uint sampleCount;
-        uint sampleQuality = 0;
-        uint multiSample = (uint)Kernel.Instance.Config.MultiSample;
+        Config config = Kernel.Instance.Config;
 
-        for (sampleCount = multiSample; sampleCount > 1; sampleCount /= 2)
+        for (config.SampleCount = (uint)config.MultiSample; config.SampleCount > 1; config.SampleCount /= 2)
         {
-            sampleQuality = Device.CheckMultisampleQualityLevels(SwapChainFormat, sampleCount);
+            config.SampleQuality = Device.CheckMultisampleQualityLevels(SwapChainFormat, config.SampleCount);
 
-            if (sampleQuality > 0)
+            if (config.SampleQuality > 0)
                 break;
         }
 
-        if (sampleCount < 2 && multiSample != (uint)MultiSample.None)
-        {
-            Output.Log("MSAA not supported");
+        config.SampleQuality--;
 
-            return;
-        }
+        if (config.SampleCount < 2 && config.MultiSample != MultiSample.None)
+            Output.Log("MSAA not supported");
+    }
+
+    private void CreateMSAARenderTargetView()
+    {
+        Config config = Kernel.Instance.Config;
 
         ResourceDescription MSAARenderTargetDescription = ResourceDescription.Texture2D(
             SwapChainFormat,
             (uint)Size.Width,
             (uint)Size.Height,
-            sampleCount: sampleCount,
-            sampleQuality: sampleQuality - 1,
+            sampleCount: config.SampleCount,
+            sampleQuality: config.SampleQuality,
             arraySize: 1,
             mipLevels: 1);
         MSAARenderTargetDescription.Flags |= ResourceFlags.AllowRenderTarget;
@@ -316,10 +324,14 @@ public sealed partial class GraphicsDevice : IDisposable
 
     public void CreateDepthStencil()
     {
+        Config config = Kernel.Instance.Config;
+
         ResourceDescription depthStencilDescription = ResourceDescription.Texture2D(
             DepthStencilFormat,
             (uint)Size.Width,
             (uint)Size.Height,
+            sampleCount: config.SampleCount,
+            sampleQuality: config.SampleQuality,
             arraySize: 1,
             mipLevels: 1);
         depthStencilDescription.Flags |= ResourceFlags.AllowDepthStencil;
@@ -612,14 +624,17 @@ public sealed partial class GraphicsDevice : IDisposable
     public ID3D12Resource GetRenderTarget() =>
         RenderTargets[(int)SwapChain.CurrentBackBufferIndex];
 
+    public ID3D12Resource GetMSAARenderTarget() =>
+        MSAARenderTarget;
+
     public CpuDescriptorHandle GetRenderTargetHandle()
     {
         CpuDescriptorHandle handle = RenderTargetsViewHeap.GetTemporaryCPUHandle();
-        Device.CreateRenderTargetView(RenderTargets[(int)SwapChain.CurrentBackBufferIndex], null, handle);
+        Device.CreateRenderTargetView(GetRenderTarget(), null, handle);
 
         return handle;
     }
-
+    
     public CpuDescriptorHandle GetMSAARenderTargetHandle()
     {
         CpuDescriptorHandle handle = MSAARenderTargetViewHeap.GetTemporaryCPUHandle();

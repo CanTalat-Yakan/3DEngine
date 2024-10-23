@@ -14,6 +14,9 @@ public class Config
 
     public MultiSample MultiSample = MultiSample.None;
 
+    public uint SampleCount = 0;
+    public uint SampleQuality = 0;
+
     public bool Debug = true;
     public bool GUI = true;
     public bool SceneBoot = true;
@@ -79,7 +82,7 @@ public enum PresentInterval
     Four
 }
 
-public enum MultiSample
+public enum MultiSample : uint
 {
     None = 1,
     x2 = 2,

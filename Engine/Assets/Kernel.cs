@@ -149,15 +149,15 @@ public sealed partial class Kernel
         Context.GPUUploadData();
 
         Context.GraphicsContext.SetDescriptorHeapDefault();
-        Context.GraphicsContext.ScreenBeginRender();
-        Context.GraphicsContext.SetRenderTargetScreen();
-        Context.GraphicsContext.ClearRenderTargetScreen();
-        Context.GraphicsContext.ClearDepthStencilScreen();
+        Context.GraphicsContext.BeginRender();
+        Context.GraphicsContext.SetMSAARenderTarget();
+        Context.GraphicsContext.ClearMSAARenderTarget();
+        Context.GraphicsContext.ClearDepthStencil();
     }
 
     public void EndRender()
     {
-        Context.GraphicsContext.ScreenEndRender();
+        Context.GraphicsContext.EndRender();
         Context.GraphicsContext.EndCommand();
         Context.GraphicsContext.Execute();
 

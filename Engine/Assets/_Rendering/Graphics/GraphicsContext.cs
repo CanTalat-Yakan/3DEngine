@@ -1,5 +1,4 @@
-﻿using SharpGen.Runtime;
-using System.IO;
+﻿using System.IO;
 using System.Runtime.InteropServices;
 
 using Vortice.Direct3D;
@@ -38,6 +37,12 @@ public sealed partial class GraphicsContext : IDisposable
 
 public sealed partial class GraphicsContext : IDisposable
 {
+    public void DrawIndexedInstanced(uint indexCountPerInstance, uint instanceCount, uint startIndexLocation, uint baseVertexLocation, uint startInstanceLocation)
+    {
+        CommandList.SetPipelineState(PipelineStateObject.GetState(GraphicsDevice, PipelineStateObjectDescription, CurrentRootSignature, InputLayoutDescription));
+        CommandList.DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, (int)baseVertexLocation, startInstanceLocation);
+    }
+
     public void SetMesh(MeshData mesh, PrimitiveTopology topology = PrimitiveTopology.TriangleList)
     {
         CommandList.IASetPrimitiveTopology(topology);
@@ -60,47 +65,6 @@ public sealed partial class GraphicsContext : IDisposable
         InputLayoutDescription = mesh.InputLayoutDescription;
 
         mesh.LastTimeUsed = DateTime.Now;
-    }
-
-    public void DrawIndexedInstanced(uint indexCountPerInstance, uint instanceCount, uint startIndexLocation, uint baseVertexLocation, uint startInstanceLocation)
-    {
-        CommandList.SetPipelineState(PipelineStateObject.GetState(GraphicsDevice, PipelineStateObjectDescription, CurrentRootSignature, InputLayoutDescription));
-        CommandList.DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, (int)baseVertexLocation, startInstanceLocation);
-    }
-
-    public void ScreenBeginRender() =>
-        CommandList.ResourceBarrierTransition(GraphicsDevice.GetRenderTarget(), ResourceStates.Present, ResourceStates.RenderTarget);
-
-    public void ScreenEndRender() =>
-        CommandList.ResourceBarrierTransition(GraphicsDevice.GetRenderTarget(), ResourceStates.RenderTarget, ResourceStates.Present);
-
-    public void BeginCommand() =>
-        CommandList.Reset(GraphicsDevice.GetCommandAllocator());
-
-    public void EndCommand() =>
-        CommandList.Close();
-
-    public void Execute() =>
-        GraphicsDevice.CommandQueue.ExecuteCommandList(CommandList);
-}
-
-public sealed partial class GraphicsContext : IDisposable
-{
-    public ReadOnlyMemory<byte> LoadShader(DxcShaderStage shaderStage, string filePath, string entryPoint, bool fromResources = false)
-    {
-        filePath = fromResources ? AssetPaths.SHADERS + filePath : filePath;
-
-        string directory = Path.GetDirectoryName(filePath);
-        string shaderSource = File.ReadAllText(filePath);
-
-        using (ShaderIncludeHandler includeHandler = new(directory))
-        {
-            using IDxcResult results = DxcCompiler.Compile(shaderStage, shaderSource, entryPoint, includeHandler: includeHandler);
-            if (results.GetStatus().Failure)
-                throw new Exception(results.GetErrors());
-
-            return results.GetObjectBytecodeMemory();
-        }
     }
 
     public void UploadMesh(MeshData mesh, float[] vertexData, int[] indexData, Format indexFormat)
@@ -160,11 +124,53 @@ public sealed partial class GraphicsContext : IDisposable
         CommandList.ResourceBarrierTransition(texture.Resource, ResourceStates.CopyDest, ResourceStates.GenericRead);
         texture.ResourceStates = ResourceStates.GenericRead;
     }
-}
 
+    public ReadOnlyMemory<byte> LoadShader(DxcShaderStage shaderStage, string filePath, string entryPoint, bool fromResources = false)
+    {
+        filePath = fromResources ? AssetPaths.SHADERS + filePath : filePath;
+
+        string directory = Path.GetDirectoryName(filePath);
+        string shaderSource = File.ReadAllText(filePath);
+
+        using (ShaderIncludeHandler includeHandler = new(directory))
+        {
+            using IDxcResult results = DxcCompiler.Compile(shaderStage, shaderSource, entryPoint, includeHandler: includeHandler);
+            if (results.GetStatus().Failure)
+                throw new Exception(results.GetErrors());
+
+            return results.GetObjectBytecodeMemory();
+        }
+    }
+}
 
 public sealed partial class GraphicsContext : IDisposable
 {
+    public void BeginRender() =>
+        CommandList.ResourceBarrierTransition(GraphicsDevice.GetMSAARenderTarget(), ResourceStates.Common, ResourceStates.RenderTarget);
+
+    public void EndRender()
+    {
+        // Transition MSAA render target to ResolveSource and transition back buffer to ResolveDestination
+        CommandList.ResourceBarrierTransition(GraphicsDevice.GetMSAARenderTarget(), ResourceStates.RenderTarget, ResourceStates.ResolveSource);
+        CommandList.ResourceBarrierTransition(GraphicsDevice.GetRenderTarget(), ResourceStates.Present, ResourceStates.ResolveDest);
+
+        // Resolve MSAA render target to back buffer
+        CommandList.ResolveSubresource(GraphicsDevice.GetRenderTarget(), 0, GraphicsDevice.GetMSAARenderTarget(), 0, GraphicsDevice.SwapChainFormat);
+
+        // Transition MSAA render target back to Common and transition back buffer to Present
+        CommandList.ResourceBarrierTransition(GraphicsDevice.GetMSAARenderTarget(), ResourceStates.ResolveSource, ResourceStates.Common);
+        CommandList.ResourceBarrierTransition(GraphicsDevice.GetRenderTarget(), ResourceStates.ResolveDest, ResourceStates.Present);
+    }
+
+    public void BeginCommand() =>
+        CommandList.Reset(GraphicsDevice.GetCommandAllocator());
+
+    public void EndCommand() =>
+        CommandList.Close();
+
+    public void Execute() =>
+        GraphicsDevice.CommandQueue.ExecuteCommandList(CommandList);
+
     public void SetDescriptorHeapDefault() =>
         CommandList.SetDescriptorHeaps(1, new[] { GraphicsDevice.ShaderResourcesHeap.Heap });
 
@@ -182,7 +188,7 @@ public sealed partial class GraphicsContext : IDisposable
 
     public void SetShaderResourceView(Texture2D texture, uint slot)
     {
-        const int D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING = 5768;
+        const uint D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING = 5768;
         ShaderResourceViewDescription shaderResourceViewDescription = new()
         {
             ViewDimension = Vortice.Direct3D12.ShaderResourceViewDimension.Texture2D,
@@ -200,11 +206,11 @@ public sealed partial class GraphicsContext : IDisposable
         CommandList.SetGraphicsRootDescriptorTable(CurrentRootSignature.ShaderResourceView[slot], GPUHandle);
     }
 
-    public void SetRenderTargetScreen()
+    public void SetMSAARenderTarget()
     {
         CommandList.RSSetViewport(new Viewport(0, 0, GraphicsDevice.Size.Width, GraphicsDevice.Size.Height, 0.0f, 1.0f));
         CommandList.RSSetScissorRect(new RectI(0, 0, GraphicsDevice.Size.Width, GraphicsDevice.Size.Height));
-        CommandList.OMSetRenderTargets(GraphicsDevice.GetRenderTargetHandle(), GraphicsDevice.GetDepthStencilHandle());
+        CommandList.OMSetRenderTargets(GraphicsDevice.GetMSAARenderTargetHandle(), GraphicsDevice.GetDepthStencilHandle());
     }
 
     public void SetConstantBufferView(UploadBuffer uploadBuffer, uint offset, uint slot) =>
@@ -219,10 +225,10 @@ public sealed partial class GraphicsContext : IDisposable
     public void ClearRenderTarget(Texture2D texture2D) =>
         CommandList.ClearRenderTargetView(texture2D.RenderTargetView.GetCPUDescriptorHandleForHeapStart(), new Color4(0, 0, 0, 0));
 
-    public void ClearRenderTargetScreen(Color4? color = null) =>
-        CommandList.ClearRenderTargetView(GraphicsDevice.GetRenderTargetHandle(), color is not null ? color.Value : new Color4(0.15f, 0.15f, 0.15f, 1));
+    public void ClearMSAARenderTarget(Color4? color = null) =>
+        CommandList.ClearRenderTargetView(GraphicsDevice.GetMSAARenderTargetHandle(), color is not null ? color.Value : new Color4(0.15f, 0.15f, 0.15f, 1));
 
-    public void ClearDepthStencilScreen() =>
+    public void ClearDepthStencil() =>
         CommandList.ClearDepthStencilView(GraphicsDevice.GetDepthStencilHandle(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
 }
 
