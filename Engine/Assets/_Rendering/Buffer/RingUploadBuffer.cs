@@ -1,5 +1,5 @@
-﻿using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 using Vortice.Direct3D12;
 using Vortice.DXGI;
@@ -11,19 +11,25 @@ public class UploadBuffer : IDisposable
     public ID3D12Resource Resource;
     public int Size;
 
-    public void Dispose() =>
+    public void Dispose()
+    {
         Resource?.Dispose();
+        GC.SuppressFinalize(this);
+    }
 }
 
 public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 {
-    public IntPtr CPUResourcePointer;
-    public ulong GPUResourcePointer;
+    private IntPtr CPUResourcePointer;
+    private ulong GPUResourcePointer;
 
-    public int AllocateIndex = 0;
+    private int AllocateIndex = 0;
 
+    private const int DefaultAlignment = 256;
+    private const int TextureAlignment = D3D12.TextureDataPlacementAlignment;
+
+    private GraphicsContext _graphicsContext;
     public GraphicsContext GraphicsContext => _graphicsContext ??= Kernel.Instance.Context.GraphicsContext;
-    public GraphicsContext _graphicsContext;
 
     public void Initialize(GraphicsDevice device, int size)
     {
@@ -31,7 +37,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         device.CreateUploadBuffer(this, size);
 
         void* pointer = null;
-        Resource.Map(0, &pointer);
+        Resource.Map(0, null, &pointer).CheckError();
 
         CPUResourcePointer = new IntPtr(pointer);
         GPUResourcePointer = Resource.GPUVirtualAddress;
@@ -39,34 +45,22 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 
     public void Upload<T>(Span<T> data, out uint offset) where T : struct
     {
-        int size = data.Length * Marshal.SizeOf(typeof(T));
-        int afterAllocateIndex = AllocateIndex + ((size + 255) & ~255);
-        if (afterAllocateIndex > Size)
-        {
-            AllocateIndex = 0;
-            afterAllocateIndex = AllocateIndex + ((size + 255) & ~255);
-        }
+        int size = data.Length * Unsafe.SizeOf<T>();
 
-        data.CopyTo(new Span<T>((CPUResourcePointer + AllocateIndex).ToPointer(), data.Length));
+        if (!AllocateUploadMemory(size, DefaultAlignment, out offset))
+            throw new InvalidOperationException("Not enough space in the RingUploadBuffer.");
 
-        offset = (uint)AllocateIndex;
-        AllocateIndex = afterAllocateIndex % Size;
+        data.CopyTo(new Span<T>((CPUResourcePointer + (int)offset).ToPointer(), data.Length));
     }
 
     public void Upload<T>(T data, out uint offset)
     {
-        int size = Marshal.SizeOf(typeof(T));
-        int afterAllocateIndex = AllocateIndex + ((size + 255) & ~255);
-        if (afterAllocateIndex > Size)
-        {
-            AllocateIndex = 0;
-            afterAllocateIndex = AllocateIndex + ((size + 255) & ~255);
-        }
+        int size = Unsafe.SizeOf<T>();
 
-        Unsafe.Copy((void*)(CPUResourcePointer + AllocateIndex), ref data);
+        if (!AllocateUploadMemory(size, DefaultAlignment, out offset))
+            throw new InvalidOperationException("Not enough space in the RingUploadBuffer.");
 
-        offset = (uint)AllocateIndex;
-        AllocateIndex = afterAllocateIndex % Size;
+        Unsafe.Copy((void*)(CPUResourcePointer + (int)offset), ref data);
     }
 }
 
@@ -80,85 +74,167 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         uint indexSizeInByte = overrideSizeInByte ?? (uint)index.Length;
         uint indexCount = indexSizeInByte / (uint)GraphicsDevice.GetSizeInByte(indexFormat);
 
-        bool needRecreateResource = 
-            mesh.IndexBufferResource is null 
-         || mesh.IndexFormat != indexFormat 
-         || indexSizeInByte > mesh.IndexSizeInByte;
-
-        if (needRecreateResource)
-        {
-            mesh.IndexFormat = indexFormat;
-            mesh.IndexSizeInByte = indexSizeInByte;
-
-            GraphicsContext.GraphicsDevice.DestroyResource(mesh.IndexBufferResource);
-
-            mesh.IndexBufferResource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
-                HeapProperties.DefaultHeapProperties,
-                HeapFlags.None,
-                ResourceDescription.Buffer(indexSizeInByte),
-                ResourceStates.CopyDest);
-
-            mesh.IndexBufferState = ResourceStates.CopyDest;
-        }
-        else if (mesh.IndexBufferState != ResourceStates.CopyDest)
-        {
-            // Transition to CopyDest state
-            GraphicsContext.CommandList.ResourceBarrierTransition(
-                mesh.IndexBufferResource, mesh.IndexBufferState, ResourceStates.CopyDest);
-            mesh.IndexBufferState = ResourceStates.CopyDest;
-        }
-
+        mesh.IndexFormat = indexFormat;
+        mesh.IndexSizeInByte = indexSizeInByte;
         mesh.IndexCount = indexCount;
 
-        Upload(index, out var offset);
-
-        GraphicsContext.CommandList.CopyBufferRegion(
-            mesh.IndexBufferResource, 0, Resource, offset, indexSizeInByte);
-
-        // Transition to GenericRead state
-        GraphicsContext.CommandList.ResourceBarrierTransition(
-            mesh.IndexBufferResource, ResourceStates.CopyDest, ResourceStates.GenericRead);
-        mesh.IndexBufferState = ResourceStates.GenericRead;
+        UploadBuffer(
+            ref mesh.IndexBufferResource,
+            ref mesh.IndexBufferState,
+            index,
+            indexSizeInByte,
+            out _);
     }
 
     public void UploadVertexBuffer(MeshData mesh, Span<byte> vertex, uint? overrideSizeInByte = null)
     {
         uint vertexSizeInByte = overrideSizeInByte ?? (uint)vertex.Length;
+        mesh.VertexSizeInByte = vertexSizeInByte;
 
-        bool needRecreateResource = 
-            mesh.VertexBufferResource is null 
-         || vertexSizeInByte > mesh.VertexSizeInByte;
+        UploadBuffer(
+            ref mesh.VertexBufferResource,
+            ref mesh.VertexBufferState,
+            vertex,
+            vertexSizeInByte,
+            out _);
+    }
 
-        if (needRecreateResource)
+    private void UploadBuffer(ref ID3D12Resource resource, ref ResourceStates resourceState, Span<byte> data, uint sizeInBytes, out uint offset)
+    {
+        if (resource is null || sizeInBytes > resource.Description.Width)
         {
-            mesh.VertexSizeInByte = vertexSizeInByte;
+            // Destroy old resource if it exists
+            GraphicsContext.GraphicsDevice.DestroyResource(resource);
 
-            GraphicsContext.GraphicsDevice.DestroyResource(mesh.VertexBufferResource);
-
-            mesh.VertexBufferResource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
+            // Create new resource
+            resource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
                 HeapProperties.DefaultHeapProperties,
                 HeapFlags.None,
-                ResourceDescription.Buffer(vertexSizeInByte),
+                ResourceDescription.Buffer(sizeInBytes),
                 ResourceStates.CopyDest);
 
-            mesh.VertexBufferState = ResourceStates.CopyDest;
+            resourceState = ResourceStates.CopyDest;
         }
-        else if (mesh.VertexBufferState != ResourceStates.CopyDest)
+        else if (resourceState != ResourceStates.CopyDest)
         {
             // Transition to CopyDest state
             GraphicsContext.CommandList.ResourceBarrierTransition(
-                mesh.VertexBufferResource, mesh.VertexBufferState, ResourceStates.CopyDest);
-            mesh.VertexBufferState = ResourceStates.CopyDest;
+                resource, resourceState, ResourceStates.CopyDest);
+            resourceState = ResourceStates.CopyDest;
         }
 
-        Upload(vertex, out var offset);
+        // Upload data
+        Upload(data, out offset);
 
+        // Copy data from the upload buffer to the GPU resource
         GraphicsContext.CommandList.CopyBufferRegion(
-            mesh.VertexBufferResource, 0, Resource, offset, vertexSizeInByte);
+            resource, 0, Resource, offset, sizeInBytes);
 
         // Transition to GenericRead state
         GraphicsContext.CommandList.ResourceBarrierTransition(
-            mesh.VertexBufferResource, ResourceStates.CopyDest, ResourceStates.GenericRead);
-        mesh.VertexBufferState = ResourceStates.GenericRead;
+            resource, ResourceStates.CopyDest, ResourceStates.GenericRead);
+        resourceState = ResourceStates.GenericRead;
     }
+
+    public void UploadTexture(Texture2D texture, List<byte[]> mipData, PlacedSubresourceFootPrint[] layouts, uint[] rowCounts, ulong[] rowSizesInBytes)
+    {
+        // Calculate total size
+        int totalSize = (int)(layouts[mipData.Count - 1].Offset + layouts[mipData.Count - 1].Footprint.RowPitch * rowCounts[mipData.Count - 1]);
+
+        // Allocate space in the ring buffer
+        if (!AllocateUploadMemory(AlignUp(totalSize, TextureAlignment), TextureAlignment, out uint offset))
+            throw new InvalidOperationException("Not enough space in the RingUploadBuffer.");
+
+        ulong uploadBufferOffset = offset;
+
+        // Create or reuse the texture resource
+        if (texture.Resource is null
+         || texture.Width != layouts[0].Footprint.Width
+         || texture.Height != layouts[0].Footprint.Height)
+        {
+            texture.Resource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
+                HeapProperties.DefaultHeapProperties,
+                HeapFlags.None,
+                ResourceDescription.Texture2D(texture.Format, texture.Width, texture.Height, arraySize: 1, mipLevels: (ushort)texture.MipLevels),
+                ResourceStates.CopyDest);
+
+            texture.ResourceStates = ResourceStates.CopyDest;
+        }
+        else if (texture.ResourceStates != ResourceStates.CopyDest)
+        {
+            GraphicsContext.CommandList.ResourceBarrierTransition(texture.Resource, texture.ResourceStates, ResourceStates.CopyDest);
+            texture.ResourceStates = ResourceStates.CopyDest;
+        }
+
+        // Copy data into the ring buffer
+        Span<byte> mappedData = new((byte*)CPUResourcePointer + (int)uploadBufferOffset, totalSize);
+
+        for (int i = 0; i < mipData.Count; i++)
+        {
+            var footprint = layouts[i];
+            ulong subresourceOffset = footprint.Offset;
+            uint rowCount = rowCounts[i];
+            ulong rowSizeInBytes = rowSizesInBytes[i];
+            uint rowPitch = footprint.Footprint.RowPitch;
+
+            byte[] sourceData = mipData[i];
+            uint sourceRowPitch = (uint)(sourceData.Length / rowCount);
+
+            for (uint row = 0; row < rowCount; row++)
+            {
+                int destiantionOffset = (int)(subresourceOffset + row * rowPitch);
+                int sourceOffset = (int)(row * sourceRowPitch);
+                int copySize = (int)MathF.Min(rowSizeInBytes, sourceData.Length - sourceOffset);
+
+                sourceData.AsSpan(sourceOffset, copySize).CopyTo(mappedData.Slice(destiantionOffset, copySize));
+            }
+        }
+
+        // Copy from upload buffer to texture resource
+        for (uint i = 0; i < texture.MipLevels; i++)
+        {
+            TextureCopyLocation destination = new(texture.Resource, i);
+
+            // Adjust the source location to include the uploadBufferOffset
+            PlacedSubresourceFootPrint adjustedLayout = layouts[i];
+            adjustedLayout.Offset += uploadBufferOffset;
+
+            TextureCopyLocation source = new(Resource, adjustedLayout);
+
+            GraphicsContext.CommandList.CopyTextureRegion(destination, 0, 0, 0, source, null);
+        }
+
+        // Transition to PixelShaderResource state
+        GraphicsContext.CommandList.ResourceBarrierTransition(texture.Resource, ResourceStates.CopyDest, ResourceStates.PixelShaderResource);
+        texture.ResourceStates = ResourceStates.PixelShaderResource;
+    }
+}
+
+public unsafe sealed partial class RingUploadBuffer : UploadBuffer
+{
+    private bool AllocateUploadMemory(int size, int alignment, out uint offset)
+    {
+        int alignedSize = AlignUp(size, alignment);
+        int alignedAllocateIndex = AlignUp(AllocateIndex, alignment);
+
+        if (alignedAllocateIndex + alignedSize > Size)
+        {
+            // Wrap around if not enough space
+            AllocateIndex = 0;
+            alignedAllocateIndex = AlignUp(AllocateIndex, alignment);
+
+            if (alignedAllocateIndex + alignedSize > Size)
+            {
+                offset = 0;
+                return false; // Not enough space even after wrap-around
+            }
+        }
+
+        offset = (uint)alignedAllocateIndex;
+        AllocateIndex = (alignedAllocateIndex + alignedSize) % Size;
+        return true;
+    }
+
+    private int AlignUp(int value, int alignment) =>
+        (value + alignment - 1) & ~(alignment - 1);
 }

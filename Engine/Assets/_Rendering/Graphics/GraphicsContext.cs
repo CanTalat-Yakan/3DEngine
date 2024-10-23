@@ -66,6 +66,7 @@ public sealed partial class GraphicsContext : IDisposable
 
         mesh.LastTimeUsed = DateTime.Now;
     }
+
     public void UploadMesh(MeshData mesh, float[] vertexData, int[] indexData, Format indexFormat)
     {
         var vertexFormat = Format.R32_Float;
@@ -85,86 +86,17 @@ public sealed partial class GraphicsContext : IDisposable
     {
         uint mipLevels = texture.MipLevels;
 
-        // Create the texture resource with mip levels
-        texture.Resource = GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
-            HeapProperties.DefaultHeapProperties,
-            HeapFlags.None,
-            ResourceDescription.Texture2D(texture.Format, texture.Width, texture.Height, arraySize: 1, mipLevels: (ushort)mipLevels),
-            ResourceStates.CopyDest);
-
-        // Get copyable footprints
-        var device = GraphicsDevice.Device;
-        var resourceDesc = texture.Resource.Description;
+        // Calculate the total size and get copyable footprints
+        var resourceDescription = ResourceDescription.Texture2D(texture.Format, texture.Width, texture.Height, arraySize: 1, mipLevels: (ushort)mipLevels);
 
         ulong totalSize = 0;
         ulong[] rowSizesInBytes = new ulong[mipLevels];
         uint[] numRows = new uint[mipLevels];
         var layouts = new PlacedSubresourceFootPrint[mipLevels];
 
-        device.GetCopyableFootprints(
-            resourceDesc,
-            0,
-            mipLevels,
-            0,
-            layouts,
-            numRows,
-            rowSizesInBytes,
-            out totalSize);
+        GraphicsDevice.Device.GetCopyableFootprints(resourceDescription, 0, mipLevels, 0, layouts, numRows, rowSizesInBytes, out totalSize);
 
-        // Create the upload buffer
-        ID3D12Resource resourceUpload = device.CreateCommittedResource<ID3D12Resource>(
-            new HeapProperties(HeapType.Upload),
-            HeapFlags.None,
-            ResourceDescription.Buffer(totalSize),
-            ResourceStates.GenericRead);
-
-        // Map the resource and obtain a Span<byte>
-        Span<byte> mappedData = resourceUpload.Map<byte>(0, (int)totalSize);
-
-        // Copy data into the mapped span
-        for (uint i = 0; i < mipLevels; i++)
-        {
-            var footprint = layouts[i];
-            ulong offset = footprint.Offset;
-            uint numRow = numRows[i];
-            ulong rowSizeInBytes = rowSizesInBytes[i];
-            uint rowPitch = footprint.Footprint.RowPitch;
-
-            byte[] srcData = mipData[(int)i];
-            uint mipWidth = Math.Max(1, texture.Width >> (int)i);
-            uint bpp = GraphicsDevice.GetBitsPerPixel(texture.Format);
-            uint srcRowPitch = (mipWidth * bpp + 7) / 8;
-
-            for (uint row = 0; row < numRow; row++)
-            {
-                int destOffset = (int)(offset + row * rowPitch);
-                int srcOffset = (int)(row * srcRowPitch);
-                int copySize = (int)MathF.Min(rowSizeInBytes, srcData.Length - srcOffset);
-
-                // Ensure we don't exceed the bounds of the mapped data
-                if (destOffset + copySize > mappedData.Length)
-                    throw new IndexOutOfRangeException("Attempting to write beyond the mapped data.");
-
-                // Copy the row data into the mapped span
-                srcData.AsSpan(srcOffset, copySize).CopyTo(mappedData.Slice(destOffset, copySize));
-            }
-        }
-
-        // Unmap the resource
-        resourceUpload.Unmap(0);
-
-        // Copy from upload buffer to texture resource
-        for (uint i = 0; i < mipLevels; i++)
-        {
-            TextureCopyLocation dest = new TextureCopyLocation(texture.Resource, i);
-            TextureCopyLocation src = new TextureCopyLocation(resourceUpload, layouts[i]);
-
-            CommandList.CopyTextureRegion(dest, 0, 0, 0, src, null);
-        }
-
-        // Transition the texture to the pixel shader resource state
-        CommandList.ResourceBarrierTransition(texture.Resource, ResourceStates.CopyDest, ResourceStates.PixelShaderResource);
-        texture.ResourceStates = ResourceStates.PixelShaderResource;
+        Kernel.Instance.Context.UploadBuffer.UploadTexture(texture, mipData, layouts, numRows, rowSizesInBytes);
     }
 
     public ReadOnlyMemory<byte> LoadShader(DxcShaderStage shaderStage, string filePath, string entryPoint, bool fromResources = false)
