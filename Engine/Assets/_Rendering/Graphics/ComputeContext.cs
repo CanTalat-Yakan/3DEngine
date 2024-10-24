@@ -31,8 +31,11 @@ public sealed partial class ComputeContext : IDisposable
 
 public sealed partial class ComputeContext : IDisposable
 {
-    public void BeginCommand() =>
+    public void BeginCommand()
+    {
+        GraphicsDevice.GetComputeCommandAllocator().Reset();
         CommandList.Reset(GraphicsDevice.GetComputeCommandAllocator());
+    }
 
     public void EndCommand() =>
         CommandList.Close();
@@ -66,7 +69,7 @@ public sealed partial class ComputeContext : IDisposable
         const uint D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING = 5768;
         ShaderResourceViewDescription shaderResourceViewDescription = new()
         {
-            ViewDimension = Vortice.Direct3D12.ShaderResourceViewDimension.Texture2D,
+            ViewDimension = ShaderResourceViewDimension.Texture2D,
             Format = texture.Format,
             Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
         };
