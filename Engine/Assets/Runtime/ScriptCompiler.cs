@@ -22,7 +22,7 @@ public sealed class ScriptCompiler
     private List<Assembly> _allAssemblies = new();
     private List<Assembly> _ignoreAssemblies = new();
 
-    public void CompileProjectScripts(string assetsPath = null)
+    public void Compile(string assetsPath = null)
     {
         if (assetsPath is null)
             return;

@@ -20,7 +20,7 @@ public sealed class MaterialEntry(FileInfo fileInfo)
 
         var shaderName = ShaderName;
 
-        Kernel.Instance.Context.CreateShader(shaderName);
+        Kernel.Instance.Context.CreateShader(fromResources: false, shaderName);
         Assets.SerializableConstantBuffers[shaderName].SafeToSerializableConstantBuffer();
 
         MaterialCompiler.SetConstantBuffer(this, new() { ShaderName = shaderName });
@@ -30,7 +30,7 @@ public sealed class MaterialEntry(FileInfo fileInfo)
 
 public class MaterialCompiler
 {
-    public void CompileProjectMaterials(string assetsPath = null)
+    public void Compile(string assetsPath = null)
     {
         if (assetsPath is null)
             return;
@@ -79,7 +79,7 @@ public class MaterialCompiler
 
     public static void SetConstantBuffer(MaterialEntry materialEntry, SerializableConstantBuffer constantBuffer)
     {
-        var shaderEntry = Assets.Shaders[constantBuffer.ShaderName];
+        var shaderEntry = Assets.ShaderEntries[constantBuffer.ShaderName];
 
         materialEntry.ShaderEntry = shaderEntry;
 

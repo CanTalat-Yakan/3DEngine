@@ -14,6 +14,7 @@ public sealed class AssetPaths
     public static readonly string SCENENES = RESOURCES + @"Scenes\";
     public static readonly string TEMPLATES = RESOURCES + @"Templates\";
     public static readonly string SHADERS = RESOURCES + @"Shaders\";
+    public static readonly string COMPUTE = RESOURCES + @"ComputeShaders\";
     public static readonly string TEXTURES = RESOURCES + @"Textures\";
     public static readonly string MODELS = RESOURCES + @"Models\";
 
@@ -33,14 +34,17 @@ public sealed partial class Assets
     public static Dictionary<string, ScriptEntry> Scripts = new();
 
     public static Dictionary<string, MaterialEntry> Materials = new();
-    public static Dictionary<string, ShaderEntry> Shaders = new();
+    public static Dictionary<string, ShaderEntry> ShaderEntries = new();
+    public static Dictionary<string, ComputeShaderEntry> ComputeShaderEntries = new();
 
     public static Dictionary<string, ReadOnlyMemory<byte>> VertexShaders = new();
     public static Dictionary<string, ReadOnlyMemory<byte>> PixelShaders = new();
+    public static Dictionary<string, ReadOnlyMemory<byte>> ComputeShaders = new();
 
     public static Dictionary<string, RootSignature> RootSignatures = new();
     public static Dictionary<string, InputLayoutDescription> InputLayoutDescriptions = new();
     public static Dictionary<string, PipelineStateObject> PipelineStateObjects = new();
+    public static Dictionary<string, PipelineStateObjectCompute> ComputePipelineStateObjects = new();
 
     public static Dictionary<string, Texture2D> RenderTargets = new();
     public static Dictionary<string, MeshData> Meshes = new();
@@ -59,7 +63,7 @@ public sealed partial class Assets
         Components.Clear();
         Scripts.Clear();
         Materials.Clear();
-        Shaders.Clear();
+        ShaderEntries.Clear();
         VertexShaders.Clear();
         PixelShaders.Clear();
         InputLayoutDescriptions.Clear();

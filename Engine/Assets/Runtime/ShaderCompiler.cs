@@ -16,7 +16,7 @@ public sealed class ShaderCompiler
     public CommonContext Context => _context ??= Kernel.Instance.Context;
     public CommonContext _context;
 
-    public void CompileProjectShaders(string assetsPath = null)
+    public void Compile(string assetsPath = null)
     {
         if (assetsPath is null)
             return;
@@ -38,19 +38,16 @@ public sealed class ShaderCompiler
         if (fileInfo.Extension != ".hlsl")
             return;
 
-        if (!Assets.Shaders.TryGetValue(fileInfo.Name.RemoveExtension(), out var shaderEntry))
+        if (!Assets.ShaderEntries.TryGetValue(fileInfo.Name.RemoveExtension(), out var shaderEntry))
         {
-            shaderEntry = new ShaderEntry()
+            shaderEntry = new()
             {
                 FileInfo = fileInfo,
                 ConstantBufferType = CreateMaterialPropertyBufferStruct(fileInfo.FullName)
             };
-            Assets.Shaders.Add(fileInfo.Name.RemoveExtension(), shaderEntry);
+            Assets.ShaderEntries.Add(fileInfo.Name.RemoveExtension(), shaderEntry);
 
-            var shader = fileInfo.Name.RemoveExtension();
-            Assets.VertexShaders[shader] = Context.GraphicsContext.LoadShader(DxcShaderStage.Vertex, AssetPaths.SHADERS + shader + ".hlsl", "VS");
-            Assets.PixelShaders[shader] = Context.GraphicsContext.LoadShader(DxcShaderStage.Pixel, AssetPaths.SHADERS + shader + ".hlsl", "PS");
-            Assets.PipelineStateObjects[shader] = new PipelineStateObject(Assets.VertexShaders[shader], Assets.PixelShaders[shader]);
+            Context.CreateShader(false, fileInfo.FullName);
 
             Output.Log("Read new Shader");
         }
@@ -63,15 +60,12 @@ public sealed class ShaderCompiler
             foreach (var materialEntry in Assets.Materials.Values)
                 if (materialEntry.ShaderEntry.FileInfo == fileInfo)
                 {
-                    Kernel.Instance.Context.CreateShader(shaderEntry.FileInfo.FullName);
+                    Kernel.Instance.Context.CreateShader(fromResources: false, shaderEntry.FileInfo.FullName);
 
                     materialEntry.OnShaderUpdate?.Invoke();
                 }
 
-            var shader = fileInfo.Name.RemoveExtension();
-            Assets.VertexShaders[shader] = Context.GraphicsContext.LoadShader(DxcShaderStage.Vertex, AssetPaths.SHADERS + shader + ".hlsl", "VS");
-            Assets.PixelShaders[shader] = Context.GraphicsContext.LoadShader(DxcShaderStage.Pixel, AssetPaths.SHADERS + shader + ".hlsl", "PS");
-            Assets.PipelineStateObjects[shader] = new PipelineStateObject(Assets.VertexShaders[shader], Assets.PixelShaders[shader]);
+            Context.CreateShader(false, fileInfo.FullName);
 
             Output.Log("Updated Shader");
         }

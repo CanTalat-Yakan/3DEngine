@@ -51,7 +51,7 @@ public sealed partial class CommonContext : IDisposable
 
     public void LoadDefaultResources()
     {
-        CreateShaderFromResources(["Unlit", "SimpleLit", "Sky"]);
+        CreateShader(fromResources: true, ["Unlit", "SimpleLit", "Sky"]);
 
         ModelLoader.LoadFile(AssetPaths.PRIMITIVES + "Cube.obj");
         ModelLoader.LoadFile(AssetPaths.PRIMITIVES + "Sphere.obj");
@@ -110,24 +110,30 @@ public sealed partial class CommonContext : IDisposable
 
 public sealed partial class CommonContext : IDisposable
 {
-    public void CreateShaderFromResources(params string[] shaderNameList)
-    {
-        foreach (string shaderName in shaderNameList)
-        {
-            Assets.VertexShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, shaderName + ".hlsl", "VS", fromResources: true);
-            Assets.PixelShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, shaderName + ".hlsl", "PS", fromResources: true);
-            Assets.PipelineStateObjects[shaderName] = new PipelineStateObject(Assets.VertexShaders[shaderName], Assets.PixelShaders[shaderName]);
-        }
-    }
-
-    public void CreateShader(params string[] shaderPathList)
+    public void CreateShader(bool fromResources, params string[] shaderPathList)
     {
         foreach (string shaderPath in shaderPathList)
         {
-            string shaderName = shaderPath.SplitLast('\\').SplitFirst('.');
-            Assets.VertexShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, shaderPath + ".hlsl", "VS");
-            Assets.PixelShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, shaderPath + ".hlsl", "PS");
-            Assets.PipelineStateObjects[shaderName] = new PipelineStateObject(Assets.VertexShaders[shaderName], Assets.PixelShaders[shaderName]);
+            string shaderName = shaderPath;
+            if (fromResources)
+                shaderName = shaderPath.SplitLast('\\').SplitFirst('.');
+
+            Assets.VertexShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, shaderPath + ".hlsl", "VS", fromResources);
+            Assets.PixelShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, shaderPath + ".hlsl", "PS", fromResources);
+            Assets.PipelineStateObjects[shaderName] = new(Assets.VertexShaders[shaderName], Assets.PixelShaders[shaderName]);
+        }
+    }
+
+    public void CreateComputeShader(bool fromResources, params string[] computeShaderPathList)
+    {
+        foreach (string computeShaderPath in computeShaderPathList)
+        {
+            string computeShaderName = computeShaderPath;
+            if (fromResources)
+                computeShaderName = computeShaderPath.SplitLast('\\').SplitFirst('.');
+
+            Assets.ComputeShaders[computeShaderName] = GraphicsContext.LoadShader(DxcShaderStage.Compute, computeShaderPath + ".hlsl", "CS");
+            Assets.ComputePipelineStateObjects[computeShaderName] = new(Assets.ComputeShaders[computeShaderName]);
         }
     }
 

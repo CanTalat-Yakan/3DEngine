@@ -41,6 +41,7 @@ public sealed partial class Kernel
     public ScriptCompiler ScriptCompiler = new();
     public ShaderCompiler ShaderCompiler = new();
     public MaterialCompiler MaterialCompiler = new();
+    public ComputeShaderCompiler ComputeShaderCompiler = new();
 
     public GUIRenderer GUIRenderer = new();
     public GUIInputHandler GUIInputHandler;
@@ -180,9 +181,15 @@ public sealed partial class Kernel
 
     public void Compile()
     {
-        ScriptCompiler.CompileProjectScripts(EditorState.AssetsPath);
-        ShaderCompiler.CompileProjectShaders(EditorState.AssetsPath);
-        MaterialCompiler.CompileProjectMaterials(EditorState.AssetsPath);
+        ScriptCompiler.Compile(EditorState.AssetsPath);
+        ShaderCompiler.Compile(EditorState.AssetsPath);
+        MaterialCompiler.Compile(EditorState.AssetsPath);
+        ComputeShaderCompiler.Compile(EditorState.AssetsPath);
+
+        ScriptCompiler.Compile(AssetPaths.ASSETS);
+        ShaderCompiler.Compile(AssetPaths.ASSETS);
+        MaterialCompiler.Compile(AssetPaths.ASSETS);
+        ComputeShaderCompiler.Compile(AssetPaths.ASSETS);
 
         SystemManager.ProcessSystems();
 

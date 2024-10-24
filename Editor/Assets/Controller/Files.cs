@@ -265,9 +265,9 @@ internal sealed partial class Files
         // Set the breadcrumb bar with the correct values.
         SetBreadcrumbBar();
 
-        Kernel.Instance?.ShaderCompiler.CompileProjectShaders(AssetsPath);
-        Kernel.Instance?.MaterialCompiler.CompileProjectMaterials(AssetsPath);
-        Kernel.Instance?.ScriptCompiler.CompileProjectScripts(AssetsPath);
+        Kernel.Instance?.ShaderCompiler.Compile(AssetsPath);
+        Kernel.Instance?.MaterialCompiler.Compile(AssetsPath);
+        Kernel.Instance?.ScriptCompiler.Compile(AssetsPath);
     }
 
     public void ValidateCategoriesExist()

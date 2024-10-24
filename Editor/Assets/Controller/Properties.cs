@@ -198,7 +198,7 @@ internal sealed partial class Properties
                 {
                     string newShaderName = e.SelectedItem.ToString();
 
-                    var newShaderEntry = Assets.Shaders[newShaderName];
+                    var newShaderEntry = Assets.ShaderEntries[newShaderName];
 
                     if (newShaderEntry is null)
                     {
@@ -357,7 +357,7 @@ internal sealed partial class Properties
             // only listen to changes caused by user entering text.
             if (e.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
-                string[] itemSource = Assets.Shaders.Values.Select(shader => shader.FileInfo.Name).ToArray();
+                string[] itemSource = Assets.ShaderEntries.Values.Select(shader => shader.FileInfo.Name).ToArray();
 
                 List<string> suitableItems = new();
 
