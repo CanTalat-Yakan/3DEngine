@@ -98,7 +98,9 @@ public sealed partial class AppWindow
         switch ((WindowMessage)msg)
         {
             case WindowMessage.SetCursor:
-                return IntPtr.Zero;
+                if (Input.IsMouseLocked())
+                    return IntPtr.Zero;
+                else break;
             case WindowMessage.Destroy:
                 PostQuitMessage(0);
                 break;

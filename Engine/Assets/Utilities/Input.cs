@@ -72,7 +72,7 @@ public sealed partial class Input
 
     public static void Update()
     {
-        if (!AppWindow.IsFocused()) 
+        if (!AppWindow.IsFocused())
             return;
 
         Fetch();
@@ -229,6 +229,10 @@ public sealed partial class Input
 
     public static int GetMouseWheel() =>
         s_currentSnapshot.MouseWheel;
+
+    public static bool IsMouseLocked() =>
+        s_currentSnapshot.MouseLockState == MouseLockState.Locked
+     || s_currentSnapshot.MouseLockState == MouseLockState.LockedInvisible;
 }
 
 public sealed partial class Input
@@ -261,7 +265,7 @@ public sealed partial class Input
 
     public static void SetCursorIcon(SystemCursor? cursorIcon = null) =>
         User32.SetCursor(cursorIcon is null ? 0 : User32.LoadCursor(0, cursorIcon.Value));
-    
+
     public static void SetMousePosition(int x, int y) =>
         User32.SetCursorPos(x, y);
 

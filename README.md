@@ -103,9 +103,14 @@ class Program
     [STAThread]
     private static void Main() =>
         new Engine.Program().Run(
-            renderGUI: true,
-            sceneBoot: true,
-            config: Engine.DataStructures.Config.GetDefault(),
+            config: Engine.Config.GetDefault(
+              windowCommand: Engine.WindowCommand.Show,
+              presentInterval: Engine.PresentInterval.Immediate,
+              multiSample: Engine.MultiSample.x4,
+              resolutionScale: 1,
+              title: "3D Engine",
+              width: 2560, height: 1440,
+              renderGUI: true, defaultBoot: true),
             initialization: () => 
               Engine.Kernel.Instance.SystemManager.MainEntityManager.CreateEntity().AddComponent<GameManager>(),
             frame: () => { });

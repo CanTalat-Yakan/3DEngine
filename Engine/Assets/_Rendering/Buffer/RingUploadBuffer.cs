@@ -6,19 +6,6 @@ using Vortice.DXGI;
 
 namespace Engine.Buffer;
 
-public class UploadBuffer : IDisposable
-{
-    public ID3D12Resource Resource;
-    public int Size;
-
-    public void Dispose()
-    {
-        Resource?.Dispose();
-
-        GC.SuppressFinalize(this);
-    }
-}
-
 public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 {
     private IntPtr CPUResourcePointer;
@@ -58,10 +45,16 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 
     public void UploadData(bool defaultAllignment, int size, out void* mappedData, out uint offset)
     {
-        if (defaultAllignment && !AllocateUploadMemory(size, DefaultAlignment, out offset))
-            throw new InvalidOperationException("Not enough space in the RingUploadBuffer.");
-        else if (!AllocateUploadMemory(AlignUp(size, TextureAlignment), TextureAlignment, out offset))
-            throw new InvalidOperationException("Not enough space in the RingUploadBuffer.");
+        if (defaultAllignment)
+        {
+            if (!AllocateUploadMemory(size, DefaultAlignment, out offset))
+                throw new InvalidOperationException("Not enough space in the RingUploadBuffer.");
+        }
+        else
+        {
+            if (!AllocateUploadMemory(AlignUp(size, TextureAlignment), TextureAlignment, out offset))
+                throw new InvalidOperationException("Not enough space in the RingUploadBuffer.");
+        }
 
         mappedData = (CPUResourcePointer + (int)offset).ToPointer();
     }

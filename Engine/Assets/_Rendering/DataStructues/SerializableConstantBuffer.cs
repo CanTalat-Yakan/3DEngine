@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 
+namespace Engine.DataStructures;
+
 [XmlInclude(typeof(Vector2))]
 [XmlInclude(typeof(Vector3))]
 [XmlInclude(typeof(Vector4))]
@@ -18,8 +20,6 @@ public class SerializeEntry
         Value = value;
     }
 }
-
-public interface IMaterialBuffer { }
 
 public sealed class SerializableConstantBuffer
 {

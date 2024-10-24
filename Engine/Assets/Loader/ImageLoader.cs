@@ -204,7 +204,7 @@ public sealed partial class ImageLoader
         // Dispose of any remaining resources
         converter?.Dispose();
         scaler?.Dispose();
-        if (source != frame && source != null)
+        if (source != frame && source is not null)
             source.Dispose();
 
         return mipData;
