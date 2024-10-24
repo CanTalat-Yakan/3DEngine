@@ -185,11 +185,6 @@ public sealed partial class Kernel
         MaterialCompiler.Compile(EditorState.AssetsPath);
         ComputeShaderCompiler.Compile(EditorState.AssetsPath);
 
-        ScriptCompiler.Compile(AssetPaths.ASSETS);
-        ShaderCompiler.Compile(AssetPaths.ASSETS);
-        MaterialCompiler.Compile(AssetPaths.ASSETS);
-        ComputeShaderCompiler.Compile(AssetPaths.ASSETS);
-
         SystemManager.ProcessSystems();
 
         SystemManager.Awake();

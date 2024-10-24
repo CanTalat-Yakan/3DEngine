@@ -117,13 +117,11 @@ public sealed partial class CommonContext : IDisposable
 
 public sealed partial class CommonContext : IDisposable
 {
-    public void CreateShader(bool fromResources, params string[] shaderPathList)
+    public void CreateShader(bool fromResources = false, params string[] shaderPathList)
     {
         foreach (string shaderPath in shaderPathList)
         {
-            string shaderName = shaderPath;
-            if (fromResources)
-                shaderName = shaderPath.SplitLast('\\').SplitFirst('.');
+            string shaderName = shaderPath.SplitLast('\\').SplitFirst('.');
 
             Assets.VertexShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, shaderPath + ".hlsl", "VS", fromResources);
             Assets.PixelShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, shaderPath + ".hlsl", "PS", fromResources);
