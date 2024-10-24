@@ -148,8 +148,11 @@ public sealed partial class GraphicsContext : IDisposable
         }
     }
 
-    public void BeginCommand() =>
+    public void BeginCommand()
+    {
+        GraphicsDevice.GetGraphicsCommandAllocator().Reset();
         CommandList.Reset(GraphicsDevice.GetGraphicsCommandAllocator());
+    }
 
     public void EndCommand() =>
         CommandList.Close();
@@ -165,7 +168,7 @@ public sealed partial class GraphicsContext : IDisposable
         PipelineStateObject = pipelineStateObject;
         PipelineStateObjectDescription = pipelineStateObjectDescription;
     }
-    
+
     public void SetRootSignature(RootSignature rootSignature)
     {
         CurrentRootSignature = rootSignature;
@@ -174,7 +177,7 @@ public sealed partial class GraphicsContext : IDisposable
 
     public void SetConstantBufferView(uint offset, uint slot) =>
         CommandList.SetGraphicsRootConstantBufferView(CurrentRootSignature.ConstantBufferView[slot], Kernel.Instance.Context.UploadBuffer.Resource.GPUVirtualAddress + offset);
-    
+
     public void SetUnorderedAccessView(uint offset, uint slot) =>
         CommandList.SetGraphicsRootUnorderedAccessView(CurrentRootSignature.ConstantBufferView[slot], Kernel.Instance.Context.UploadBuffer.Resource.GPUVirtualAddress + offset);
 
