@@ -44,7 +44,7 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
         }
     }
 
-    public void Dispatch(uint threadGroupsX, uint threadGroupsY, uint threadGroupsZ) =>
+    public void Dispatch(uint threadGroupsX = 1, uint threadGroupsY = 1, uint threadGroupsZ = 1) =>
         Context.GraphicsContext.ComputeCommandList.Dispatch(threadGroupsX, threadGroupsY, threadGroupsZ);
 
     public bool Equals(Compute other) =>
