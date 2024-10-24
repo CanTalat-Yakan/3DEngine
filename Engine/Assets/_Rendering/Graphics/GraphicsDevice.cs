@@ -646,7 +646,7 @@ public sealed partial class GraphicsDevice : IDisposable
 
         return handle;
     }
-    
+
     public CpuDescriptorHandle GetMSAARenderTargetHandle()
     {
         CpuDescriptorHandle handle = MSAARenderTargetViewHeap.GetTemporaryCPUHandle();
