@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 
-using Vortice.Direct3D12;
-
 namespace Engine.Components;
 
 public struct ComputeTextureEntry(string name, uint slot)
