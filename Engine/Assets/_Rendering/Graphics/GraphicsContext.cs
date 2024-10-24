@@ -189,6 +189,9 @@ public sealed partial class GraphicsContext : IDisposable
 
     public void SetConstantBufferView(UploadBuffer uploadBuffer, uint offset, uint slot) =>
         CommandList.SetGraphicsRootConstantBufferView(CurrentRootSignature.ConstantBufferView[slot], uploadBuffer.Resource.GPUVirtualAddress + offset);
+    
+    public void SetUnorderedAccessView(UploadBuffer uploadBuffer, uint offset, uint slot) =>
+        CommandList.SetGraphicsRootUnorderedAccessView(CurrentRootSignature.ConstantBufferView[slot], uploadBuffer.Resource.GPUVirtualAddress + offset);
 
     public void SetShaderResourceView(Texture2D texture, uint slot)
     {

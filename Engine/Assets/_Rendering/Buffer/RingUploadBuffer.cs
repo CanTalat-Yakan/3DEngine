@@ -64,6 +64,9 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 {
     public void SetConstantBufferView(uint offset, uint slot) =>
         GraphicsContext.SetConstantBufferView(this, offset, slot);
+    
+    public void SetUnorderedAccessView(uint offset, uint slot) =>
+        GraphicsContext.SetConstantBufferView(this, offset, slot);
 
     public void UploadIndexBuffer(MeshData mesh, Span<byte> index, Format indexFormat, uint? overrideSizeInByte = null)
     {

@@ -39,10 +39,10 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
         foreach (var texture in ComputeTextures)
             Context.GraphicsContext.SetShaderResourceView(Context.GetTextureByString(texture.Name), texture.Slot);
 
-        if (Assets.SerializableConstantBuffers.ContainsKey(ComputePipelineStateObjectName))
+        if (data is not null)
         {
             Context.UploadBuffer.Upload(data, out var offset);
-            Context.UploadBuffer.SetConstantBufferView(offset, 0);
+            Context.UploadBuffer.SetUnorderedAccessView(offset, 0);
         }
     }
 
