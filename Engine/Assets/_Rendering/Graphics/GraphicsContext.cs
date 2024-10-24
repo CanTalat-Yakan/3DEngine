@@ -10,13 +10,16 @@ namespace Engine.Graphics;
 
 public sealed partial class GraphicsContext : IDisposable
 {
-    public ID3D12GraphicsCommandList5 GraphicsCommandList;
     public GraphicsDevice GraphicsDevice;
 
-    public RootSignature CurrentRootSignature;
+    public ID3D12GraphicsCommandList5 GraphicsCommandList;
+    public RootSignature CurrentGraphicsRootSignature;
 
     public PipelineStateObject PipelineStateObject;
     public PipelineStateObjectDescription PipelineStateObjectDescription;
+
+    public ID3D12GraphicsCommandList5 ComputeCommandList;
+    public RootSignature CurrentComputeRootSignature;
 
     public ComputePipelineStateObject ComputePipelineStateObject;
     public ComputePipelineStateObjectDescription ComputePipelineStateObjectDescription;
@@ -27,14 +30,19 @@ public sealed partial class GraphicsContext : IDisposable
     {
         GraphicsDevice = graphicsDevice;
 
-        GraphicsDevice.Device.CreateCommandList(0, CommandListType.Direct, graphicsDevice.GetCommandAllocator(), null, out GraphicsCommandList).ThrowIfFailed();
+        GraphicsDevice.Device.CreateCommandList(0, CommandListType.Direct, GraphicsDevice.GetGraphicsCommandAllocator(), null, out GraphicsCommandList).ThrowIfFailed();
         GraphicsCommandList.Close();
+
+        GraphicsDevice.Device.CreateCommandList(0, CommandListType.Compute, GraphicsDevice.GetComputeCommandAllocator(), null, out ComputeCommandList).ThrowIfFailed();
     }
 
     public void Dispose()
     {
         GraphicsCommandList?.Dispose();
         GraphicsCommandList = null;
+
+        ComputeCommandList?.Dispose();
+        ComputeCommandList = null;
 
         GC.SuppressFinalize(this);
     }
@@ -44,7 +52,7 @@ public sealed partial class GraphicsContext : IDisposable
 {
     public void DrawIndexedInstanced(uint indexCountPerInstance, uint instanceCount, uint startIndexLocation, uint baseVertexLocation, uint startInstanceLocation)
     {
-        GraphicsCommandList.SetPipelineState(PipelineStateObject.GetState(GraphicsDevice, PipelineStateObjectDescription, CurrentRootSignature, InputLayoutDescription));
+        GraphicsCommandList.SetPipelineState(PipelineStateObject.GetState(GraphicsDevice, PipelineStateObjectDescription, CurrentGraphicsRootSignature, InputLayoutDescription));
         GraphicsCommandList.DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, (int)baseVertexLocation, startInstanceLocation);
     }
 
@@ -152,7 +160,7 @@ public sealed partial class GraphicsContext : IDisposable
     }
 
     public void BeginCommand() =>
-        GraphicsCommandList.Reset(GraphicsDevice.GetCommandAllocator());
+        GraphicsCommandList.Reset(GraphicsDevice.GetGraphicsCommandAllocator());
 
     public void EndCommand() =>
         GraphicsCommandList.Close();
@@ -177,21 +185,21 @@ public sealed partial class GraphicsContext : IDisposable
 
     public void SetRootSignature(RootSignature rootSignature)
     {
-        CurrentRootSignature = rootSignature;
+        CurrentGraphicsRootSignature = rootSignature;
         GraphicsCommandList.SetGraphicsRootSignature(rootSignature.Resource);
     }
 
     public void SetComputeRootSignature(RootSignature rootSignature)
     {
-        CurrentRootSignature = rootSignature;
-        GraphicsCommandList.SetComputeRootSignature(rootSignature.Resource);
+        CurrentComputeRootSignature = rootSignature;
+        ComputeCommandList.SetComputeRootSignature(rootSignature.Resource);
     }
 
     public void SetConstantBufferView(UploadBuffer uploadBuffer, uint offset, uint slot) =>
-        GraphicsCommandList.SetGraphicsRootConstantBufferView(CurrentRootSignature.ConstantBufferView[slot], uploadBuffer.Resource.GPUVirtualAddress + offset);
+        GraphicsCommandList.SetGraphicsRootConstantBufferView(CurrentGraphicsRootSignature.ConstantBufferView[slot], uploadBuffer.Resource.GPUVirtualAddress + offset);
     
     public void SetUnorderedAccessView(UploadBuffer uploadBuffer, uint offset, uint slot) =>
-        GraphicsCommandList.SetGraphicsRootUnorderedAccessView(CurrentRootSignature.ConstantBufferView[slot], uploadBuffer.Resource.GPUVirtualAddress + offset);
+        GraphicsCommandList.SetGraphicsRootUnorderedAccessView(CurrentGraphicsRootSignature.ConstantBufferView[slot], uploadBuffer.Resource.GPUVirtualAddress + offset);
 
     public void SetShaderResourceView(Texture2D texture, uint slot)
     {
@@ -210,7 +218,7 @@ public sealed partial class GraphicsContext : IDisposable
 
         GraphicsDevice.Device.CreateShaderResourceView(texture.Resource, shaderResourceViewDescription, CPUHandle);
 
-        GraphicsCommandList.SetGraphicsRootDescriptorTable(CurrentRootSignature.ShaderResourceView[slot], GPUHandle);
+        GraphicsCommandList.SetGraphicsRootDescriptorTable(CurrentGraphicsRootSignature.ShaderResourceView[slot], GPUHandle);
     }
 
     public void SetRenderTarget()

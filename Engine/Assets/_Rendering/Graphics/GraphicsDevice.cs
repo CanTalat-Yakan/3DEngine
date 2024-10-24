@@ -25,7 +25,8 @@ public sealed partial class GraphicsDevice : IDisposable
 
     public IDXGISwapChain3 SwapChain;
     public ID3D12CommandQueue CommandQueue;
-    public List<ID3D12CommandAllocator> CommandAllocators;
+    public List<ID3D12CommandAllocator> GraphicCommandAllocators;
+    public ID3D12CommandAllocator ComputeCommandAllocator;
 
     public ID3D12Fence Fence;
     public EventWaitHandle WaitHandle;
@@ -99,10 +100,13 @@ public sealed partial class GraphicsDevice : IDisposable
         while (DelayDestroy.Count > 0)
             DelayDestroy.Dequeue().Resource?.Dispose();
 
-        foreach (var commandAllocator in CommandAllocators)
+        foreach (var commandAllocator in GraphicCommandAllocators)
             commandAllocator.Dispose();
 
-        CommandAllocators.Clear();
+        GraphicCommandAllocators.Clear();
+
+        ComputeCommandAllocator?.Dispose();
+        ComputeCommandAllocator = null;
 
         Factory?.Dispose();
         CommandQueue?.Dispose();
@@ -115,6 +119,17 @@ public sealed partial class GraphicsDevice : IDisposable
         Device?.Dispose();
         Adapter?.Dispose();
 
+        Factory = null;
+        CommandQueue = null;
+        ShaderResourcesHeap = null;
+        BackBufferRenderTargetsViewHeap = null;
+        MSAARenderTargetViewHeap = null;
+        DepthStencilViewHeap = null;
+        SwapChain = null;
+        Fence = null;
+        Device = null;
+        Adapter = null;
+        
         GC.SuppressFinalize(this);
     }
 
@@ -137,7 +152,7 @@ public sealed partial class GraphicsDevice : IDisposable
 public sealed partial class GraphicsDevice : IDisposable
 {
     public void Begin() =>
-        GetCommandAllocator().Reset();
+        GetGraphicsCommandAllocator().Reset();
 
     public void Present()
     {
@@ -240,14 +255,17 @@ public sealed partial class GraphicsDevice : IDisposable
 
     private void CreateCommandAllocator()
     {
-        CommandAllocators = new();
+        GraphicCommandAllocators = new();
         for (int i = 0; i < BufferCount; i++)
         {
-            Device.CreateCommandAllocator(CommandListType.Direct, out ID3D12CommandAllocator commandAllocator).ThrowIfFailed();
-            commandAllocator.Name = "CommandAllocator " + i;
+            Device.CreateCommandAllocator(CommandListType.Direct, out var graphicsCommandAllocator).ThrowIfFailed();
+            graphicsCommandAllocator.Name = "GraphicsCommandAllocator " + i;
 
-            CommandAllocators.Add(commandAllocator);
+            GraphicCommandAllocators.Add(graphicsCommandAllocator);
         }
+
+        Device.CreateCommandAllocator(CommandListType.Compute, out ComputeCommandAllocator).ThrowIfFailed();
+        ComputeCommandAllocator.Name = "ComputeCommandAllocator";
     }
 
     private void CreateSwapChain(bool forHwnd)
@@ -629,8 +647,11 @@ public sealed partial class GraphicsDevice : IDisposable
             _ => 0,
         };
 
-    public ID3D12CommandAllocator GetCommandAllocator() =>
-        CommandAllocators[(int)ExecuteIndex];
+    public ID3D12CommandAllocator GetGraphicsCommandAllocator() =>
+        GraphicCommandAllocators[(int)ExecuteIndex];
+
+    public ID3D12CommandAllocator GetComputeCommandAllocator() =>
+        ComputeCommandAllocator;
 
     public ID3D12Resource GetBackBufferRenderTarget() =>
         BackBufferRenderTargets[(int)SwapChain.CurrentBackBufferIndex];
