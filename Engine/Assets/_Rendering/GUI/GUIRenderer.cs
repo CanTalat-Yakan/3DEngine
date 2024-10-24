@@ -12,7 +12,7 @@ public unsafe sealed partial class GUIRenderer
     public CommonContext Context => _context ??= Kernel.Instance.Context;
     public CommonContext _context;
 
-    public ComputePipelineStateObjectDescription PipelineStateObjectDescription = new()
+    public PipelineStateObjectDescription PipelineStateObjectDescription = new()
     {
         InputLayout = "ImGui",
         BlendState = "Alpha",

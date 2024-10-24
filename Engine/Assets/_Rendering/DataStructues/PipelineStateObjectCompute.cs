@@ -4,7 +4,7 @@ using Vortice.Direct3D12;
 
 namespace Engine.DataStructures;
 
-public sealed class PipelineStateObjectCompute : IDisposable
+public sealed class ComputePipelineStateObject : IDisposable
 {
     public List<ComputePipelineStateObjectBundle> ComputePipelineStateObjectBundles = new();
 
@@ -12,7 +12,7 @@ public sealed class PipelineStateObjectCompute : IDisposable
 
     public string Name;
 
-    public PipelineStateObjectCompute(ReadOnlyMemory<byte> computeShader) =>
+    public ComputePipelineStateObject(ReadOnlyMemory<byte> computeShader) =>
         ComputeShader = computeShader;
 
     public ID3D12PipelineState GetState(GraphicsDevice device, RootSignature rootSignature)

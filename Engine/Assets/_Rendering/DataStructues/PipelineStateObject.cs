@@ -21,7 +21,7 @@ public sealed class PipelineStateObject : IDisposable
         PixelShader = pixelShader;
     }
 
-    public ID3D12PipelineState GetState(GraphicsDevice device, ComputePipelineStateObjectDescription description, RootSignature rootSignature, InputLayoutDescription inputLayout)
+    public ID3D12PipelineState GetState(GraphicsDevice device, PipelineStateObjectDescription description, RootSignature rootSignature, InputLayoutDescription inputLayout)
     {
         description.CullMode ??= CullMode.None;
         description.RenderTargetCount ??= 1;

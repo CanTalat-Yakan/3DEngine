@@ -20,15 +20,12 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
     public CommonContext Context => _context ??= Kernel.Instance.Context;
     public CommonContext _context;
 
-    public ComputePipelineStateObjectDescription ComputePipelineStateObjectDescription = new()
-    {
-        RootSignatureName
-    };
+    public ComputePipelineStateObjectDescription ComputePipelineStateObjectDescription = new();
 
     public override void OnDestroy() =>
         RootSignature?.Dispose();
 
-    public void Setup()
+    public void Setup<T>(T data)
     {
         if (!Context.IsRendering)
             return;
@@ -36,25 +33,16 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
         if (string.IsNullOrEmpty(ComputePipelineStateObjectName))
             throw new NotImplementedException("error pipeline state object not set in material");
 
-        ComputePipelineStateObjectDescription.Wireframe = Camera.Main?.RenderMode switch
-        {
-            RenderMode.Shaded => false,
-            RenderMode.Wireframe => true,
-            _ => false
-        };
-
-        ComputePipelineStateObjectDescription.InputLayout = ComputePipelineStateObjectName;
-
-        Context.GraphicsContext.SetPipelineState(Assets.PipelineStateObjects[ComputePipelineStateObjectName], ComputePipelineStateObjectDescription);
-        Context.GraphicsContext.SetRootSignature(RootSignature);
+        Context.GraphicsContext.SetComputePipelineState(Assets.ComputePipelineStateObjects[ComputePipelineStateObjectName], ComputePipelineStateObjectDescription);
+        Context.GraphicsContext.SetComputeRootSignature(RootSignature);
 
         foreach (var texture in ComputeTextures)
             Context.GraphicsContext.SetShaderResourceView(Context.GetTextureByString(texture.Name), texture.Slot);
 
         if (Assets.SerializableConstantBuffers.ContainsKey(ComputePipelineStateObjectName))
         {
-            Context.UploadBuffer.Upload(Assets.SerializableConstantBuffers[ComputePipelineStateObjectName], out var offset);
-            Context.UploadBuffer.SetConstantBufferView(offset, 10);
+            Context.UploadBuffer.Upload(data, out var offset);
+            Context.UploadBuffer.SetConstantBufferView(offset, 0);
         }
     }
 

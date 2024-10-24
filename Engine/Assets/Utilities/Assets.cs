@@ -44,7 +44,7 @@ public sealed partial class Assets
     public static Dictionary<string, RootSignature> RootSignatures = new();
     public static Dictionary<string, InputLayoutDescription> InputLayoutDescriptions = new();
     public static Dictionary<string, PipelineStateObject> PipelineStateObjects = new();
-    public static Dictionary<string, PipelineStateObjectCompute> ComputePipelineStateObjects = new();
+    public static Dictionary<string, ComputePipelineStateObject> ComputePipelineStateObjects = new();
 
     public static Dictionary<string, Texture2D> RenderTargets = new();
     public static Dictionary<string, MeshData> Meshes = new();

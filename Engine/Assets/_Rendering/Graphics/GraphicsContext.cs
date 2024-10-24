@@ -16,7 +16,10 @@ public sealed partial class GraphicsContext : IDisposable
     public RootSignature CurrentRootSignature;
 
     public PipelineStateObject PipelineStateObject;
-    public ComputePipelineStateObjectDescription PipelineStateObjectDescription;
+    public PipelineStateObjectDescription PipelineStateObjectDescription;
+
+    public ComputePipelineStateObject ComputePipelineStateObject;
+    public ComputePipelineStateObjectDescription ComputePipelineStateObjectDescription;
 
     public InputLayoutDescription InputLayoutDescription;
 
@@ -160,10 +163,16 @@ public sealed partial class GraphicsContext : IDisposable
     public void SetDescriptorHeapDefault() =>
         CommandList.SetDescriptorHeaps(1, new[] { GraphicsDevice.ShaderResourcesHeap.Heap });
 
-    public void SetPipelineState(PipelineStateObject pipelineStateObject, ComputePipelineStateObjectDescription pipelineStateObjectDescription)
+    public void SetPipelineState(PipelineStateObject pipelineStateObject, PipelineStateObjectDescription pipelineStateObjectDescription)
     {
         PipelineStateObject = pipelineStateObject;
         PipelineStateObjectDescription = pipelineStateObjectDescription;
+    }
+    
+    public void SetComputePipelineState(ComputePipelineStateObject computePipelineStateObject, ComputePipelineStateObjectDescription computePipelineStateObjectDescription)
+    {
+        ComputePipelineStateObject = computePipelineStateObject;
+        ComputePipelineStateObjectDescription = computePipelineStateObjectDescription;
     }
 
     public void SetRootSignature(RootSignature rootSignature)
