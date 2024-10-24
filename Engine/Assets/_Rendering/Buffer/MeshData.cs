@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
-
 using Vortice.Direct3D12;
 using Vortice.DXGI;
 using Vortice.Mathematics;
 
-namespace Engine.DataStructures;
+namespace Engine.Buffer;
 
 public record Vertex(Vector3 position, Vector3 normal, Vector3 tangent, Vector2 uv);
 

@@ -1,10 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
-using System.Text;
 
 using Vortice.Mathematics;
-
-using Engine.Helper;
 
 namespace Engine.Components;
 

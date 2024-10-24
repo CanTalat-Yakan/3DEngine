@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+
 using Vortice.Direct3D12;
 using Vortice.DXGI;
 
