@@ -62,8 +62,9 @@ public sealed partial class Kernel
         EditorState.AssetsPath = assetsPath;
 
         Context.GraphicsDevice.Initialize(size, win32Window);
-        Context.UploadBuffer.Initialize(Context.GraphicsDevice, GraphicsDevice.GetMegabytesInByte(64));
         Context.GraphicsContext.Initialize(Context.GraphicsDevice);
+        Context.ComputeContext.Initialize(Context.GraphicsDevice);
+        Context.UploadBuffer.Initialize(Context.GraphicsDevice, GraphicsDevice.GetMegabytesInByte(64));
 
         Context.LoadAssets();
         Context.LoadDefaultResources();
