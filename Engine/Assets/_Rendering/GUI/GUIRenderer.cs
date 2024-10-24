@@ -125,7 +125,7 @@ public unsafe sealed partial class GUIRenderer
         Context.GraphicsContext.SetRootSignature(RootSignature);
         Context.GraphicsContext.SetPipelineState(Assets.PipelineStateObjects["ImGui"], PipelineStateObjectDescription);
 
-        Context.GraphicsContext.CommandList.IASetPrimitiveTopology(Vortice.Direct3D.PrimitiveTopology.TriangleList);
+        Context.GraphicsContext.GraphicsCommandList.IASetPrimitiveTopology(Vortice.Direct3D.PrimitiveTopology.TriangleList);
 
         if (Kernel.Instance.Config.ResolutionScale > 1)
             data.DisplaySize /= (float)Kernel.Instance.Config.ResolutionScale; // <--- SCALING
@@ -170,7 +170,7 @@ public unsafe sealed partial class GUIRenderer
                     if (Kernel.Instance.Config.ResolutionScale > 1)
                         cmd.ClipRect *= (float)Kernel.Instance.Config.ResolutionScale; // <--- SCALING
 
-                    Context.GraphicsContext.CommandList.RSSetScissorRects(new Vortice.RawRect(
+                    Context.GraphicsContext.GraphicsCommandList.RSSetScissorRects(new Vortice.RawRect(
                         (int)(cmd.ClipRect.X - clipOffset.X),
                         (int)(cmd.ClipRect.Y - clipOffset.Y),
                         (int)(cmd.ClipRect.Z - clipOffset.X),

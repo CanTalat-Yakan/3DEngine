@@ -107,7 +107,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         else if (resourceState != ResourceStates.CopyDest)
         {
             // Transition to CopyDest state
-            GraphicsContext.CommandList.ResourceBarrierTransition(
+            GraphicsContext.GraphicsCommandList.ResourceBarrierTransition(
                 resource, resourceState, ResourceStates.CopyDest);
             resourceState = ResourceStates.CopyDest;
         }
@@ -116,10 +116,10 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         Upload(data, out offset);
 
         // Copy data from the upload buffer to the GPU resource
-        GraphicsContext.CommandList.CopyBufferRegion(resource, 0, Resource, offset, sizeInBytes);
+        GraphicsContext.GraphicsCommandList.CopyBufferRegion(resource, 0, Resource, offset, sizeInBytes);
 
         // Transition to GenericRead state
-        GraphicsContext.CommandList.ResourceBarrierTransition(resource, ResourceStates.CopyDest, ResourceStates.GenericRead);
+        GraphicsContext.GraphicsCommandList.ResourceBarrierTransition(resource, ResourceStates.CopyDest, ResourceStates.GenericRead);
         resourceState = ResourceStates.GenericRead;
     }
 
@@ -140,7 +140,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         }
         else if (texture.ResourceStates != ResourceStates.CopyDest)
         {
-            GraphicsContext.CommandList.ResourceBarrierTransition(texture.Resource, texture.ResourceStates, ResourceStates.CopyDest);
+            GraphicsContext.GraphicsCommandList.ResourceBarrierTransition(texture.Resource, texture.ResourceStates, ResourceStates.CopyDest);
             texture.ResourceStates = ResourceStates.CopyDest;
         }
 
@@ -160,11 +160,11 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 
             TextureCopyLocation source = new(Resource, adjustedLayout);
 
-            GraphicsContext.CommandList.CopyTextureRegion(destination, 0, 0, 0, source, null);
+            GraphicsContext.GraphicsCommandList.CopyTextureRegion(destination, 0, 0, 0, source, null);
         }
 
         // Transition to PixelShaderResource state
-        GraphicsContext.CommandList.ResourceBarrierTransition(texture.Resource, ResourceStates.CopyDest, ResourceStates.PixelShaderResource);
+        GraphicsContext.GraphicsCommandList.ResourceBarrierTransition(texture.Resource, ResourceStates.CopyDest, ResourceStates.PixelShaderResource);
         texture.ResourceStates = ResourceStates.PixelShaderResource;
     }
 
