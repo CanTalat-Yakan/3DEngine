@@ -11,7 +11,7 @@ public struct ComputeTextureEntry(string name, uint slot)
 public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute>
 {
     public string ComputePipelineStateObjectName { get; private set; }
-    public RootSignature RootSignature { get; private set; }
+    public RootSignature ComputeRootSignature { get; private set; }
 
     public List<ComputeTextureEntry> ComputeTextures { get; private set; } = new();
 
@@ -21,7 +21,7 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
     public ComputePipelineStateObjectDescription ComputePipelineStateObjectDescription = new();
 
     public override void OnDestroy() =>
-        RootSignature?.Dispose();
+        ComputeRootSignature?.Dispose();
 
     public void Setup<T>(T data)
     {
@@ -32,10 +32,10 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
             throw new NotImplementedException("error pipeline state object not set in material");
 
         Context.GraphicsContext.SetComputePipelineState(Assets.ComputePipelineStateObjects[ComputePipelineStateObjectName], ComputePipelineStateObjectDescription);
-        Context.GraphicsContext.SetComputeRootSignature(RootSignature);
+        Context.GraphicsContext.SetComputeRootSignature(ComputeRootSignature);
 
-        foreach (var texture in ComputeTextures)
-            Context.GraphicsContext.SetShaderResourceView(Context.GetTextureByString(texture.Name), texture.Slot);
+        foreach (var computeTexture in ComputeTextures)
+            Context.GraphicsContext.SetShaderResourceView(Context.GetTextureByString(computeTexture.Name), computeTexture.Slot);
 
         if (data is not null)
         {
@@ -47,7 +47,7 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
     public bool Equals(Compute other) =>
         ComputePipelineStateObjectName == other.ComputePipelineStateObjectName
      && ComputeTextures.Count == other.ComputeTextures.Count
-     && RootSignature == other.RootSignature;
+     && ComputeRootSignature == other.ComputeRootSignature;
 
     public void SetComputePipelineStateObject(string computePipelineStateObject)
     {
@@ -59,12 +59,12 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
         else throw new NotImplementedException("error compute pipeline state object not found in material");
     }
 
-    public void SetRootSignature(string rootSignatureParameters)
+    public void SetRootSignature(string computeRootSignatureParameters)
     {
         if (!Context.IsRendering)
             return;
 
-        RootSignature?.Dispose();
-        RootSignature = Context.CreateRootSignatureFromString(rootSignatureParameters);
+        ComputeRootSignature?.Dispose();
+        ComputeRootSignature = Context.CreateRootSignatureFromString(computeRootSignatureParameters);
     }
 }
