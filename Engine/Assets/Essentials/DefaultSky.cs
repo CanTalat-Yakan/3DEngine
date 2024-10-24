@@ -8,15 +8,12 @@ public sealed partial class DefaultSky : EditorComponent, IHide
     public Texture2D SkyGradientTexture;
     public Texture2D SkyGradientLightTexture;
 
-    public CommonContext Context => _context ??= Kernel.Instance.Context;
-    public CommonContext _context;
-
     public override void OnUpdate()
     {
         var camera = Camera.CurrentRenderingCamera;
 
         Entity.Transform.LocalPosition = camera.Entity.Transform.LocalPosition;
-        Entity.Transform.LocalScale = new Vector3(-1, 1, 1) * 1.5f * camera.Clipping.Y;
+        Entity.Transform.LocalScale = new Vector3(-1, 1, 1) * camera.Clipping.Y;
     }
 
     public void Initialize()
@@ -26,9 +23,10 @@ public sealed partial class DefaultSky : EditorComponent, IHide
         Entity.Data.IsHidden = true;
 
         var mesh = Entity.AddComponent<Mesh>();
-        mesh.SetMeshData(Assets.Meshes["Sphere.obj"]);
+        mesh.SetMeshData(Assets.Meshes["Cube.obj"]);
         mesh.SetMaterialTextures([new("Default.png", 0)]);
         mesh.SetRootSignature();
         mesh.SetMaterialPipeline("Sky");
+        mesh.Order = 0;
     }
 }

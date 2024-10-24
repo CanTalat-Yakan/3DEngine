@@ -53,7 +53,7 @@ public sealed partial class Mesh : EditorComponent
         if (!InBounds)
             return;
 
-        if (MeshData.Equals(CurrentMeshDataOnGPU))
+        if (MeshData.Equals(CurrentMeshDataOnGPU) && Material.Equals(CurrentMaterialOnGPU))
         {
             Context.UploadBuffer.Upload(Entity.Transform.GetConstantBuffer(), out var offset);
             Context.GraphicsContext.SetConstantBufferView(offset, 1);
