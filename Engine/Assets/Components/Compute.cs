@@ -44,6 +44,9 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
         }
     }
 
+    public void Dispatch(uint threadGroupsX, uint threadGroupsY, uint threadGroupsZ) =>
+        Context.GraphicsContext.ComputeCommandList.Dispatch(threadGroupsX, threadGroupsY, threadGroupsZ);
+
     public bool Equals(Compute other) =>
         ComputePipelineStateObjectName == other.ComputePipelineStateObjectName
      && ComputeTextures.Count == other.ComputeTextures.Count
