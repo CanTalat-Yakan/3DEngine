@@ -12,17 +12,11 @@ public sealed partial class GraphicsContext : IDisposable
 {
     public GraphicsDevice GraphicsDevice;
 
-    public ID3D12GraphicsCommandList5 GraphicsCommandList;
-    public RootSignature CurrentGraphicsRootSignature;
+    public ID3D12GraphicsCommandList5 CommandList;
+    public RootSignature CurrentRootSignature;
 
     public PipelineStateObject PipelineStateObject;
     public PipelineStateObjectDescription PipelineStateObjectDescription;
-
-    public ID3D12GraphicsCommandList5 ComputeCommandList;
-    public RootSignature CurrentComputeRootSignature;
-
-    public ComputePipelineStateObject ComputePipelineStateObject;
-    public ComputePipelineStateObjectDescription ComputePipelineStateObjectDescription;
 
     public InputLayoutDescription InputLayoutDescription;
 
@@ -30,19 +24,14 @@ public sealed partial class GraphicsContext : IDisposable
     {
         GraphicsDevice = graphicsDevice;
 
-        GraphicsDevice.Device.CreateCommandList(0, CommandListType.Direct, GraphicsDevice.GetGraphicsCommandAllocator(), null, out GraphicsCommandList).ThrowIfFailed();
-        GraphicsCommandList.Close();
-
-        GraphicsDevice.Device.CreateCommandList(0, CommandListType.Compute, GraphicsDevice.GetComputeCommandAllocator(), null, out ComputeCommandList).ThrowIfFailed();
+        GraphicsDevice.Device.CreateCommandList(0, CommandListType.Direct, GraphicsDevice.GetGraphicsCommandAllocator(), null, out CommandList).ThrowIfFailed();
+        CommandList.Close();
     }
 
     public void Dispose()
     {
-        GraphicsCommandList?.Dispose();
-        GraphicsCommandList = null;
-
-        ComputeCommandList?.Dispose();
-        ComputeCommandList = null;
+        CommandList?.Dispose();
+        CommandList = null;
 
         GC.SuppressFinalize(this);
     }
@@ -52,13 +41,13 @@ public sealed partial class GraphicsContext : IDisposable
 {
     public void DrawIndexedInstanced(uint indexCountPerInstance, uint instanceCount, uint startIndexLocation, uint baseVertexLocation, uint startInstanceLocation)
     {
-        GraphicsCommandList.SetPipelineState(PipelineStateObject.GetState(GraphicsDevice, PipelineStateObjectDescription, CurrentGraphicsRootSignature, InputLayoutDescription));
-        GraphicsCommandList.DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, (int)baseVertexLocation, startInstanceLocation);
+        CommandList.SetPipelineState(PipelineStateObject.GetState(GraphicsDevice, PipelineStateObjectDescription, CurrentRootSignature, InputLayoutDescription));
+        CommandList.DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, (int)baseVertexLocation, startInstanceLocation);
     }
 
     public void SetMesh(MeshData mesh, PrimitiveTopology topology = PrimitiveTopology.TriangleList)
     {
-        GraphicsCommandList.IASetPrimitiveTopology(topology);
+        CommandList.IASetPrimitiveTopology(topology);
 
         mesh.SetVertexBuffers();
 
@@ -67,13 +56,13 @@ public sealed partial class GraphicsContext : IDisposable
             if (inputElementDescription.Slot != previousInputSlot)
             {
                 if (mesh.Vertices?.TryGetValue(inputElementDescription.SemanticName, out var vertex) ?? false)
-                    GraphicsCommandList.IASetVertexBuffers(inputElementDescription.Slot, new VertexBufferView(vertex.Resource.GPUVirtualAddress + vertex.Offset, vertex.SizeInByte - vertex.Offset, vertex.Stride));
+                    CommandList.IASetVertexBuffers(inputElementDescription.Slot, new VertexBufferView(vertex.Resource.GPUVirtualAddress + vertex.Offset, vertex.SizeInByte - vertex.Offset, vertex.Stride));
 
                 previousInputSlot = (int)inputElementDescription.Slot;
             }
 
         if (mesh.IndexBufferResource is not null)
-            GraphicsCommandList.IASetIndexBuffer(new IndexBufferView(mesh.IndexBufferResource.GPUVirtualAddress, mesh.IndexSizeInByte, mesh.IndexFormat));
+            CommandList.IASetIndexBuffer(new IndexBufferView(mesh.IndexBufferResource.GPUVirtualAddress, mesh.IndexSizeInByte, mesh.IndexFormat));
 
         InputLayoutDescription = mesh.InputLayoutDescription;
 
@@ -135,41 +124,41 @@ public sealed partial class GraphicsContext : IDisposable
     public void BeginRender()
     {
         if (Kernel.Instance.Config.MultiSample == MultiSample.None)
-            GraphicsCommandList.ResourceBarrierTransition(GraphicsDevice.GetBackBufferRenderTarget(), ResourceStates.Present, ResourceStates.RenderTarget);
+            CommandList.ResourceBarrierTransition(GraphicsDevice.GetBackBufferRenderTarget(), ResourceStates.Present, ResourceStates.RenderTarget);
         else
-            GraphicsCommandList.ResourceBarrierTransition(GraphicsDevice.GetMSAARenderTarget(), ResourceStates.Common, ResourceStates.RenderTarget);
+            CommandList.ResourceBarrierTransition(GraphicsDevice.GetMSAARenderTarget(), ResourceStates.Common, ResourceStates.RenderTarget);
     }
 
     public void EndRender()
     {
         if (Kernel.Instance.Config.MultiSample == MultiSample.None)
-            GraphicsCommandList.ResourceBarrierTransition(GraphicsDevice.GetBackBufferRenderTarget(), ResourceStates.RenderTarget, ResourceStates.Present);
+            CommandList.ResourceBarrierTransition(GraphicsDevice.GetBackBufferRenderTarget(), ResourceStates.RenderTarget, ResourceStates.Present);
         else
         {
             // Transition MSAA render target to ResolveSource and transition back buffer to ResolveDestination
-            GraphicsCommandList.ResourceBarrierTransition(GraphicsDevice.GetMSAARenderTarget(), ResourceStates.RenderTarget, ResourceStates.ResolveSource);
-            GraphicsCommandList.ResourceBarrierTransition(GraphicsDevice.GetBackBufferRenderTarget(), ResourceStates.Present, ResourceStates.ResolveDest);
+            CommandList.ResourceBarrierTransition(GraphicsDevice.GetMSAARenderTarget(), ResourceStates.RenderTarget, ResourceStates.ResolveSource);
+            CommandList.ResourceBarrierTransition(GraphicsDevice.GetBackBufferRenderTarget(), ResourceStates.Present, ResourceStates.ResolveDest);
 
             // Resolve MSAA render target to back buffer
-            GraphicsCommandList.ResolveSubresource(GraphicsDevice.GetBackBufferRenderTarget(), 0, GraphicsDevice.GetMSAARenderTarget(), 0, GraphicsDevice.SwapChainFormat);
+            CommandList.ResolveSubresource(GraphicsDevice.GetBackBufferRenderTarget(), 0, GraphicsDevice.GetMSAARenderTarget(), 0, GraphicsDevice.SwapChainFormat);
 
             // Transition MSAA render target back to Common and transition back buffer to Present
-            GraphicsCommandList.ResourceBarrierTransition(GraphicsDevice.GetMSAARenderTarget(), ResourceStates.ResolveSource, ResourceStates.Common);
-            GraphicsCommandList.ResourceBarrierTransition(GraphicsDevice.GetBackBufferRenderTarget(), ResourceStates.ResolveDest, ResourceStates.Present);
+            CommandList.ResourceBarrierTransition(GraphicsDevice.GetMSAARenderTarget(), ResourceStates.ResolveSource, ResourceStates.Common);
+            CommandList.ResourceBarrierTransition(GraphicsDevice.GetBackBufferRenderTarget(), ResourceStates.ResolveDest, ResourceStates.Present);
         }
     }
 
     public void BeginCommand() =>
-        GraphicsCommandList.Reset(GraphicsDevice.GetGraphicsCommandAllocator());
+        CommandList.Reset(GraphicsDevice.GetGraphicsCommandAllocator());
 
     public void EndCommand() =>
-        GraphicsCommandList.Close();
+        CommandList.Close();
 
     public void Execute() =>
-        GraphicsDevice.CommandQueue.ExecuteCommandList(GraphicsCommandList);
+        GraphicsDevice.CommandQueue.ExecuteCommandList(CommandList);
 
     public void SetDescriptorHeapDefault() =>
-        GraphicsCommandList.SetDescriptorHeaps(1, new[] { GraphicsDevice.ShaderResourcesHeap.Heap });
+        CommandList.SetDescriptorHeaps(1, new[] { GraphicsDevice.ShaderResourcesHeap.Heap });
 
     public void SetPipelineState(PipelineStateObject pipelineStateObject, PipelineStateObjectDescription pipelineStateObjectDescription)
     {
@@ -177,29 +166,17 @@ public sealed partial class GraphicsContext : IDisposable
         PipelineStateObjectDescription = pipelineStateObjectDescription;
     }
     
-    public void SetComputePipelineState(ComputePipelineStateObject computePipelineStateObject, ComputePipelineStateObjectDescription computePipelineStateObjectDescription)
-    {
-        ComputePipelineStateObject = computePipelineStateObject;
-        ComputePipelineStateObjectDescription = computePipelineStateObjectDescription;
-    }
-
     public void SetRootSignature(RootSignature rootSignature)
     {
-        CurrentGraphicsRootSignature = rootSignature;
-        GraphicsCommandList.SetGraphicsRootSignature(rootSignature.Resource);
+        CurrentRootSignature = rootSignature;
+        CommandList.SetGraphicsRootSignature(rootSignature.Resource);
     }
 
-    public void SetComputeRootSignature(RootSignature rootSignature)
-    {
-        CurrentComputeRootSignature = rootSignature;
-        ComputeCommandList.SetComputeRootSignature(rootSignature.Resource);
-    }
-
-    public void SetConstantBufferView(UploadBuffer uploadBuffer, uint offset, uint slot) =>
-        GraphicsCommandList.SetGraphicsRootConstantBufferView(CurrentGraphicsRootSignature.ConstantBufferView[slot], uploadBuffer.Resource.GPUVirtualAddress + offset);
+    public void SetConstantBufferView(uint offset, uint slot) =>
+        CommandList.SetGraphicsRootConstantBufferView(CurrentRootSignature.ConstantBufferView[slot], Kernel.Instance.Context.UploadBuffer.Resource.GPUVirtualAddress + offset);
     
-    public void SetUnorderedAccessView(UploadBuffer uploadBuffer, uint offset, uint slot) =>
-        GraphicsCommandList.SetGraphicsRootUnorderedAccessView(CurrentGraphicsRootSignature.ConstantBufferView[slot], uploadBuffer.Resource.GPUVirtualAddress + offset);
+    public void SetUnorderedAccessView(uint offset, uint slot) =>
+        CommandList.SetGraphicsRootUnorderedAccessView(CurrentRootSignature.ConstantBufferView[slot], Kernel.Instance.Context.UploadBuffer.Resource.GPUVirtualAddress + offset);
 
     public void SetShaderResourceView(Texture2D texture, uint slot)
     {
@@ -212,39 +189,39 @@ public sealed partial class GraphicsContext : IDisposable
         };
         shaderResourceViewDescription.Texture2D.MipLevels = texture.MipLevels;
 
-        texture.StateChange(GraphicsCommandList, ResourceStates.GenericRead);
+        texture.StateChange(CommandList, ResourceStates.GenericRead);
 
         GraphicsDevice.ShaderResourcesHeap.GetTemporaryHandle(out var CPUHandle, out var GPUHandle);
 
         GraphicsDevice.Device.CreateShaderResourceView(texture.Resource, shaderResourceViewDescription, CPUHandle);
 
-        GraphicsCommandList.SetGraphicsRootDescriptorTable(CurrentGraphicsRootSignature.ShaderResourceView[slot], GPUHandle);
+        CommandList.SetGraphicsRootDescriptorTable(CurrentRootSignature.ShaderResourceView[slot], GPUHandle);
     }
 
     public void SetRenderTarget()
     {
-        GraphicsCommandList.RSSetViewport(new Viewport(0, 0, GraphicsDevice.Size.Width, GraphicsDevice.Size.Height, 0.0f, 1.0f));
-        GraphicsCommandList.RSSetScissorRect(new RectI(0, 0, GraphicsDevice.Size.Width, GraphicsDevice.Size.Height));
+        CommandList.RSSetViewport(new Viewport(0, 0, GraphicsDevice.Size.Width, GraphicsDevice.Size.Height, 0.0f, 1.0f));
+        CommandList.RSSetScissorRect(new RectI(0, 0, GraphicsDevice.Size.Width, GraphicsDevice.Size.Height));
 
         if (Kernel.Instance.Config.MultiSample == MultiSample.None)
-            GraphicsCommandList.OMSetRenderTargets(GraphicsDevice.GetRenderTargetHandle(), GraphicsDevice.GetDepthStencilHandle());
+            CommandList.OMSetRenderTargets(GraphicsDevice.GetRenderTargetHandle(), GraphicsDevice.GetDepthStencilHandle());
         else
-            GraphicsCommandList.OMSetRenderTargets(GraphicsDevice.GetMSAARenderTargetHandle(), GraphicsDevice.GetDepthStencilHandle());
+            CommandList.OMSetRenderTargets(GraphicsDevice.GetMSAARenderTargetHandle(), GraphicsDevice.GetDepthStencilHandle());
     }
 
     public void ClearTexture2D(Texture2D texture2D) =>
-        GraphicsCommandList.ClearRenderTargetView(texture2D.RenderTargetView.GetCPUDescriptorHandleForHeapStart(), new Color4(0, 0, 0, 0));
+        CommandList.ClearRenderTargetView(texture2D.RenderTargetView.GetCPUDescriptorHandleForHeapStart(), new Color4(0, 0, 0, 0));
 
     public void ClearRenderTarget(Color4? color = null)
     {
         color ??= new Color4(0.15f, 0.15f, 0.15f, 1);
 
         if (Kernel.Instance.Config.MultiSample == MultiSample.None)
-            GraphicsCommandList.ClearRenderTargetView(GraphicsDevice.GetRenderTargetHandle(), color.Value);
+            CommandList.ClearRenderTargetView(GraphicsDevice.GetRenderTargetHandle(), color.Value);
         else
-            GraphicsCommandList.ClearRenderTargetView(GraphicsDevice.GetMSAARenderTargetHandle(), color.Value);
+            CommandList.ClearRenderTargetView(GraphicsDevice.GetMSAARenderTargetHandle(), color.Value);
     }
 
     public void ClearDepthStencil() =>
-        GraphicsCommandList.ClearDepthStencilView(GraphicsDevice.GetDepthStencilHandle(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
+        CommandList.ClearDepthStencilView(GraphicsDevice.GetDepthStencilHandle(), ClearFlags.Depth | ClearFlags.Stencil, 1.0f, 0);
 }

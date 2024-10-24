@@ -151,9 +151,6 @@ public sealed partial class GraphicsDevice : IDisposable
 
 public sealed partial class GraphicsDevice : IDisposable
 {
-    public void Begin() =>
-        GetGraphicsCommandAllocator().Reset();
-
     public void Present()
     {
         uint syncInterval = (uint)Kernel.Instance.Config.VSync;

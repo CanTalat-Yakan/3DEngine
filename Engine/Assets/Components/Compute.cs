@@ -29,23 +29,27 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
             return;
 
         if (string.IsNullOrEmpty(ComputePipelineStateObjectName))
-            throw new NotImplementedException("error pipeline state object not set in material");
-
-        Context.GraphicsContext.SetComputePipelineState(Assets.ComputePipelineStateObjects[ComputePipelineStateObjectName], ComputePipelineStateObjectDescription);
-        Context.GraphicsContext.SetComputeRootSignature(ComputeRootSignature);
-
-        foreach (var computeTexture in ComputeTextures)
-            Context.GraphicsContext.SetShaderResourceView(Context.GetTextureByString(computeTexture.Name), computeTexture.Slot);
+            throw new NotImplementedException("error compute pipeline state object not set in compute");
 
         if (data is not null)
         {
             Context.UploadBuffer.Upload(data, out var offset);
-            Context.UploadBuffer.SetUnorderedAccessView(offset, 0);
+            Context.ComputeContext.SetUnorderedAccessView(offset, 0);
         }
+
+        Context.ComputeContext.BeginCommand();
+
+        Context.ComputeContext.SetPipelineState(Assets.ComputePipelineStateObjects[ComputePipelineStateObjectName], ComputePipelineStateObjectDescription);
+        Context.ComputeContext.SetRootSignature(ComputeRootSignature);
+
+        foreach (var computeTexture in ComputeTextures)
+            Context.ComputeContext.SetShaderResourceView(Context.GetTextureByString(computeTexture.Name), computeTexture.Slot);
+
+        Context.ComputeContext.EndCommand();
     }
 
     public void Dispatch(uint threadGroupsX = 1, uint threadGroupsY = 1, uint threadGroupsZ = 1) =>
-        Context.GraphicsContext.ComputeCommandList.Dispatch(threadGroupsX, threadGroupsY, threadGroupsZ);
+        Context.ComputeContext.CommandList.Dispatch(threadGroupsX, threadGroupsY, threadGroupsZ);
 
     public bool Equals(Compute other) =>
         ComputePipelineStateObjectName == other.ComputePipelineStateObjectName

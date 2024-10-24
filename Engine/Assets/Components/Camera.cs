@@ -138,6 +138,6 @@ public sealed class Camera : EditorComponent
         Context.GraphicsContext.SetRootSignature(RootSignature);
 
         Context.UploadBuffer.Upload(ViewBuffer, out var offset);
-        Context.UploadBuffer.SetConstantBufferView(offset, 0);
+        Context.GraphicsContext.SetConstantBufferView(offset, 0);
     }
 }

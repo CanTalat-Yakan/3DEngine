@@ -56,7 +56,7 @@ public sealed partial class Material : EditorComponent, IHide, IEquatable<Materi
         if (Assets.SerializableConstantBuffers.ContainsKey(PipelineStateObjectName))
         {
             Context.UploadBuffer.Upload(Assets.SerializableConstantBuffers[PipelineStateObjectName], out var offset);
-            Context.UploadBuffer.SetConstantBufferView(offset, 10);
+            Context.GraphicsContext.SetConstantBufferView(offset, 10);
         }
     }
 

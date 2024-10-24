@@ -125,7 +125,7 @@ public unsafe sealed partial class GUIRenderer
         Context.GraphicsContext.SetRootSignature(RootSignature);
         Context.GraphicsContext.SetPipelineState(Assets.PipelineStateObjects["ImGui"], PipelineStateObjectDescription);
 
-        Context.GraphicsContext.GraphicsCommandList.IASetPrimitiveTopology(Vortice.Direct3D.PrimitiveTopology.TriangleList);
+        Context.GraphicsContext.CommandList.IASetPrimitiveTopology(Vortice.Direct3D.PrimitiveTopology.TriangleList);
 
         if (Kernel.Instance.Config.ResolutionScale > 1)
             data.DisplaySize /= (float)Kernel.Instance.Config.ResolutionScale; // <--- SCALING
@@ -142,7 +142,7 @@ public unsafe sealed partial class GUIRenderer
             (R+L)/(L-R),  (T+B)/(B-T),    0.5f,       1.0f,
         };
         Context.UploadBuffer.Upload<float>(mvp, out var offset);
-        Context.UploadBuffer.SetConstantBufferView(offset, 0);
+        Context.GraphicsContext.SetConstantBufferView(offset, 0);
 
         Vector2 clipOffset = data.DisplayPos;
         for (int i = 0; i < data.CmdListsCount; i++)
@@ -170,7 +170,7 @@ public unsafe sealed partial class GUIRenderer
                     if (Kernel.Instance.Config.ResolutionScale > 1)
                         cmd.ClipRect *= (float)Kernel.Instance.Config.ResolutionScale; // <--- SCALING
 
-                    Context.GraphicsContext.GraphicsCommandList.RSSetScissorRects(new Vortice.RawRect(
+                    Context.GraphicsContext.CommandList.RSSetScissorRects(new Vortice.RawRect(
                         (int)(cmd.ClipRect.X - clipOffset.X),
                         (int)(cmd.ClipRect.Y - clipOffset.Y),
                         (int)(cmd.ClipRect.Z - clipOffset.X),

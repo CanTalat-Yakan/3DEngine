@@ -145,8 +145,6 @@ public sealed partial class Kernel
 {
     public void BeginRender()
     {
-        Context.GraphicsDevice.Begin();
-
         Context.GraphicsContext.BeginCommand();
 
         Context.GPUUploadData();

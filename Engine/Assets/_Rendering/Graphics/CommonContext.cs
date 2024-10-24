@@ -18,6 +18,7 @@ public sealed partial class CommonContext : IDisposable
 
     public GraphicsDevice GraphicsDevice = new();
     public GraphicsContext GraphicsContext = new();
+    public ComputeContext ComputeContext = new();
 
     public Dictionary<IntPtr, string> PointerToString = new();
     public Dictionary<string, IntPtr> StringToPointer = new();
@@ -65,10 +66,16 @@ public sealed partial class CommonContext : IDisposable
     {
         Assets.Dispose();
 
-        UploadBuffer?.Dispose();
-
         GraphicsContext.Dispose();
         GraphicsDevice.Dispose();
+        ComputeContext.Dispose();
+
+        UploadBuffer?.Dispose();
+
+        foreach (var gpuUpload in UploadQueue)
+            gpuUpload.Texture2D?.Dispose();
+
+        UploadQueue?.Clear();
 
         GC.SuppressFinalize(this);
     }

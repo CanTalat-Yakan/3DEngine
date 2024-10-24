@@ -56,7 +56,7 @@ public sealed partial class Mesh : EditorComponent
         if (MeshData.Equals(CurrentMeshDataOnGPU))
         {
             Context.UploadBuffer.Upload(Entity.Transform.GetConstantBuffer(), out var offset);
-            Context.UploadBuffer.SetConstantBufferView(offset, 1);
+            Context.GraphicsContext.SetConstantBufferView(offset, 1);
 
             Context.GraphicsContext.DrawIndexedInstanced(MeshData.IndexCount, 1, 0, 0, 0);
         }
@@ -68,7 +68,7 @@ public sealed partial class Mesh : EditorComponent
             Context.GraphicsContext.SetMesh(MeshData);
 
             Context.UploadBuffer.Upload(Entity.Transform.GetConstantBuffer(), out var offset);
-            Context.UploadBuffer.SetConstantBufferView(offset, 1);
+            Context.GraphicsContext.SetConstantBufferView(offset, 1);
 
             Context.GraphicsContext.DrawIndexedInstanced(MeshData.IndexCount, 1, 0, 0, 0);
 
