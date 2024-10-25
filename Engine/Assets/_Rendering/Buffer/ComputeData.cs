@@ -104,7 +104,6 @@ public sealed class ComputeData : IDisposable
         return readbackData;
     }
 
-    // Dispose resources to prevent memory leaks
     public void Dispose()
     {
         _texture2D?.Dispose();
