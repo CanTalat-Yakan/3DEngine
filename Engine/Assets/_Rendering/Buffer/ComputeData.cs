@@ -12,6 +12,7 @@ public sealed class ComputeData : IDisposable
     private Texture2D _texture2D;
     private ID3D12Resource _bufferResource;
     private ID3D12Resource _readbackBuffer;
+
     public CommonContext Context => _commonContext ??= Kernel.Instance.Context;
     private CommonContext _commonContext;
 
