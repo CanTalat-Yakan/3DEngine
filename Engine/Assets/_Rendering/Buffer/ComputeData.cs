@@ -27,10 +27,18 @@ public sealed class ComputeData : IDisposable
         byte[] textureData = new byte[_texture2D.Width * _texture2D.Height * 4]; // Assuming RGBA 8 bits per channel
         Context.UploadBuffer.Upload(textureData, out uint textureUploadOffset);
 
-        Context.ComputeContext.CommandList.CopyBufferRegion(_texture2D.Resource, 0, Context.UploadBuffer.Resource, textureUploadOffset, (ulong)textureData.Length);
+        Context.GraphicsDevice.Device.CreateCommandList(0, CommandListType.Compute, Context.GraphicsDevice.GetComputeCommandAllocator(), null,
+            out ID3D12GraphicsCommandList5 commandList).ThrowIfFailed();
+
+        commandList.CopyBufferRegion(_texture2D.Resource, 0, Context.UploadBuffer.Resource, textureUploadOffset, (ulong)textureData.Length);
 
         // Use the StateChange method to transition the resource state for compute usage
         _texture2D.StateChange(Context.ComputeContext.CommandList, ResourceStates.UnorderedAccess);
+
+        commandList.Close();
+        Context.GraphicsDevice.CommandQueue.ExecuteCommandList(commandList);
+
+        commandList.Dispose();
     }
 
     // Method to set or upload data for general-purpose buffers
@@ -48,8 +56,17 @@ public sealed class ComputeData : IDisposable
         // Use RingUploadBuffer to upload the data to the GPU
         Context.UploadBuffer.Upload(data, out uint bufferUploadOffset);
 
-        Context.ComputeContext.CommandList.CopyBufferRegion(_bufferResource, 0, Context.UploadBuffer.Resource, bufferUploadOffset, (ulong)sizeInBytes);
-        Context.ComputeContext.CommandList.ResourceBarrierTransition(_bufferResource, ResourceStates.CopyDest, ResourceStates.UnorderedAccess);
+        Context.GraphicsDevice.Device.CreateCommandList(0, CommandListType.Compute, Context.GraphicsDevice.GetComputeCommandAllocator(), null,
+            out ID3D12GraphicsCommandList5 commandList).ThrowIfFailed();
+
+        commandList.CopyBufferRegion(_bufferResource, 0, Context.UploadBuffer.Resource, bufferUploadOffset, (ulong)sizeInBytes);
+        commandList.ResourceBarrierTransition(_bufferResource, ResourceStates.CopyDest, ResourceStates.UnorderedAccess);
+
+        commandList.Close();
+        Context.GraphicsDevice.CommandQueue.ExecuteCommandList(commandList);
+
+        commandList.Dispose();
+
     }
 
     // Method to read back data from a buffer (e.g., a structured buffer)
@@ -57,8 +74,8 @@ public sealed class ComputeData : IDisposable
     {
         int sizeInBytes = Marshal.SizeOf<T>() * elementCount;
 
-        // Transition the buffer resource to copy source state
-        Context.ComputeContext.CommandList.ResourceBarrierTransition(_bufferResource, ResourceStates.UnorderedAccess, ResourceStates.CopySource);
+        Context.GraphicsDevice.Device.CreateCommandList(0, CommandListType.Compute, Context.GraphicsDevice.GetComputeCommandAllocator(), null, 
+            out ID3D12GraphicsCommandList5 commandList).ThrowIfFailed();
 
         // Create a readback buffer
         _readbackBuffer = Context.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
@@ -69,7 +86,12 @@ public sealed class ComputeData : IDisposable
         );
 
         // Copy the buffer resource to the readback buffer
-        Context.ComputeContext.CommandList.CopyResource(_readbackBuffer, _bufferResource);
+        commandList.CopyResource(_readbackBuffer, _bufferResource);
+
+        commandList.Close();
+        Context.GraphicsDevice.CommandQueue.ExecuteCommandList(commandList);
+
+        commandList.Dispose();
 
         // Map and read data from the readback buffer
         T[] readbackData = new T[elementCount];
@@ -78,8 +100,6 @@ public sealed class ComputeData : IDisposable
         {
             Context.UploadBuffer.UploadData(true, sizeInBytes, out var mappedData, out var offset);
             Unsafe.Copy(mappedData, ref readbackData);
-            for (int i = 0; i < elementCount; i++)
-                readbackData[i] = Marshal.PtrToStructure<T>((IntPtr)mappedData + i * Marshal.SizeOf<T>());
         }
 
         return readbackData;
