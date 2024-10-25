@@ -66,21 +66,8 @@ public sealed partial class ComputeContext : IDisposable
 
     public void SetShaderResourceView(Texture2D texture, uint slot)
     {
-        const uint D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING = 5768;
-        ShaderResourceViewDescription shaderResourceViewDescription = new()
-        {
-            ViewDimension = ShaderResourceViewDimension.Texture2D,
-            Format = texture.Format,
-            Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
-        };
-        shaderResourceViewDescription.Texture2D.MipLevels = texture.MipLevels;
+        texture.StateChange(CommandList, ResourceStates.UnorderedAccess);
 
-        texture.StateChange(CommandList, ResourceStates.GenericRead);
-
-        GraphicsDevice.ShaderResourcesHeap.GetTemporaryHandle(out var CPUHandle, out var GPUHandle);
-
-        GraphicsDevice.Device.CreateShaderResourceView(texture.Resource, shaderResourceViewDescription, CPUHandle);
-
-        CommandList.SetGraphicsRootDescriptorTable(CurrentRootSignature.ShaderResourceView[slot], GPUHandle);
+        CommandList.SetGraphicsRootDescriptorTable(CurrentRootSignature.ShaderResourceView[slot], GraphicsDevice.GetShaderResourceHandle(texture));
     }
 }

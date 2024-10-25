@@ -124,10 +124,20 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
          || texture.Width != layouts[0].Footprint.Width
          || texture.Height != layouts[0].Footprint.Height)
         {
+            var textureDescription = ResourceDescription.Texture2D(
+                texture.Format,
+                texture.Width,
+                texture.Height,
+                arraySize: 1,
+                mipLevels: (ushort)texture.MipLevels);
+
+            if (texture.AllowUnorderedAccess)
+                textureDescription.Flags = ResourceFlags.AllowUnorderedAccess;
+
             texture.Resource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
                 HeapProperties.DefaultHeapProperties,
-                HeapFlags.None,
-                ResourceDescription.Texture2D(texture.Format, texture.Width, texture.Height, arraySize: 1, mipLevels: (ushort)texture.MipLevels),
+                HeapFlags.None, 
+                textureDescription,
                 ResourceStates.CopyDest);
 
             texture.ResourceStates = ResourceStates.CopyDest;

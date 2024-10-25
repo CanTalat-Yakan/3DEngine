@@ -679,4 +679,21 @@ public sealed partial class GraphicsDevice : IDisposable
 
         return handle;
     }
+
+    public GpuDescriptorHandle GetShaderResourceHandle(Texture2D texture)
+    {
+        const uint D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING = 5768;
+        ShaderResourceViewDescription shaderResourceViewDescription = new()
+        {
+            ViewDimension = ShaderResourceViewDimension.Texture2D,
+            Format = texture.Format,
+            Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
+        };
+        shaderResourceViewDescription.Texture2D.MipLevels = texture.MipLevels;
+
+        ShaderResourcesHeap.GetTemporaryHandle(out var handleCPU, out var handleGPU);
+        Device.CreateShaderResourceView(texture.Resource, shaderResourceViewDescription, handleCPU);
+
+        return handleGPU;
+    }
 }

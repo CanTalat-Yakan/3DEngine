@@ -8,10 +8,13 @@ public sealed class Texture2D : IDisposable
     public ID3D12Resource Resource;
     public string Name;
 
+    public bool AllowUnorderedAccess = false;
+
     public ResourceStates ResourceStates;
 
     public ID3D12DescriptorHeap RenderTargetView;
     public ID3D12DescriptorHeap DepthStencilView;
+    public ID3D12DescriptorHeap UnorderedAccessView;
 
     public uint Width;
     public uint Height;
@@ -44,6 +47,9 @@ public sealed class Texture2D : IDisposable
 
         DepthStencilView?.Dispose();
         DepthStencilView = null;
+
+        UnorderedAccessView?.Dispose();
+        UnorderedAccessView = null;
 
         GC.SuppressFinalize(this);
     }
