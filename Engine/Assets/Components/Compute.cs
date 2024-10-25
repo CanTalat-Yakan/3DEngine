@@ -45,12 +45,15 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
         foreach (var computeTexture in ComputeTextures)
             Context.ComputeContext.SetShaderResourceView(Context.GetTextureByString(computeTexture.Name), computeTexture.Slot);
 
+    }
+
+    public void Dispatch(uint threadGroupsX = 1, uint threadGroupsY = 1, uint threadGroupsZ = 1)
+    {
+        Context.ComputeContext.CommandList.Dispatch(threadGroupsX, threadGroupsY, threadGroupsZ);
+
         Context.ComputeContext.EndCommand();
         Context.ComputeContext.Execute();
     }
-
-    public void Dispatch(uint threadGroupsX = 1, uint threadGroupsY = 1, uint threadGroupsZ = 1) =>
-        Context.ComputeContext.CommandList.Dispatch(threadGroupsX, threadGroupsY, threadGroupsZ);
 
     public bool Equals(Compute other) =>
         ComputePipelineStateObjectName == other.ComputePipelineStateObjectName
