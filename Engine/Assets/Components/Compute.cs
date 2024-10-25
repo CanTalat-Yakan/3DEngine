@@ -31,20 +31,19 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
         if (string.IsNullOrEmpty(ComputePipelineStateObjectName))
             throw new NotImplementedException("error compute pipeline state object not set in compute");
 
+        Context.ComputeContext.BeginCommand();
+
+        Context.ComputeContext.SetPipelineState(Assets.ComputePipelineStateObjects[ComputePipelineStateObjectName], ComputePipelineStateObjectDescription);
+        Context.ComputeContext.SetRootSignature(ComputeRootSignature);
+
         if (data is not null)
         {
             Context.UploadBuffer.Upload(data, out var offset);
             Context.ComputeContext.SetUnorderedAccessView(offset, 0);
         }
 
-        Context.ComputeContext.BeginCommand();
-
-        Context.ComputeContext.SetPipelineState(Assets.ComputePipelineStateObjects[ComputePipelineStateObjectName], ComputePipelineStateObjectDescription);
-        Context.ComputeContext.SetRootSignature(ComputeRootSignature);
-
         foreach (var computeTexture in ComputeTextures)
-            Context.ComputeContext.SetShaderResourceView(Context.GetTextureByString(computeTexture.Name), computeTexture.Slot);
-
+            Context.ComputeContext.SetUnorderedAccessView(Context.GetTextureByString(computeTexture.Name), computeTexture.Slot);
     }
 
     public void Dispatch(uint threadGroupsX = 1, uint threadGroupsY = 1, uint threadGroupsZ = 1)

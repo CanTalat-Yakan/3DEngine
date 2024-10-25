@@ -189,13 +189,20 @@ public sealed partial class GraphicsContext : IDisposable
         CommandList.SetGraphicsRootConstantBufferView(CurrentRootSignature.ConstantBufferView[slot], Kernel.Instance.Context.UploadBuffer.Resource.GPUVirtualAddress + offset);
 
     public void SetUnorderedAccessView(uint offset, uint slot) =>
-        CommandList.SetGraphicsRootUnorderedAccessView(CurrentRootSignature.ConstantBufferView[slot], Kernel.Instance.Context.UploadBuffer.Resource.GPUVirtualAddress + offset);
+        CommandList.SetGraphicsRootUnorderedAccessView(CurrentRootSignature.UnorderedAccessView[slot], Kernel.Instance.Context.UploadBuffer.Resource.GPUVirtualAddress + offset);
 
     public void SetShaderResourceView(Texture2D texture2D, uint slot)
     {
         texture2D.StateChange(CommandList, ResourceStates.GenericRead);
 
         CommandList.SetGraphicsRootDescriptorTable(CurrentRootSignature.ShaderResourceView[slot], GraphicsDevice.GetShaderResourceHandleGPU(texture2D));
+    }
+
+    public void SetUnorderedAccessView(Texture2D texture2D, uint slot)
+    {
+        texture2D.StateChange(CommandList, ResourceStates.UnorderedAccess);
+
+        CommandList.SetComputeRootDescriptorTable(CurrentRootSignature.UnorderedAccessView[slot], GraphicsDevice.GetShaderResourceHandleGPU(texture2D));
     }
 
     public void ClearTexture2D(Texture2D texture2D) =>

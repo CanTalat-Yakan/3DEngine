@@ -56,10 +56,10 @@ public sealed partial class ComputeContext : IDisposable
         CurrentRootSignature = rootSignature;
         CommandList.SetComputeRootSignature(rootSignature.Resource);
     }
-    
+
     public void SetConstantBufferView(uint offset, uint slot) =>
         CommandList.SetGraphicsRootConstantBufferView(CurrentRootSignature.ConstantBufferView[slot], Kernel.Instance.Context.UploadBuffer.Resource.GPUVirtualAddress + offset);
-    
+
     public void SetUnorderedAccessView(uint offset, uint slot) =>
         CommandList.SetGraphicsRootUnorderedAccessView(CurrentRootSignature.ConstantBufferView[slot], Kernel.Instance.Context.UploadBuffer.Resource.GPUVirtualAddress + offset);
 
@@ -68,5 +68,12 @@ public sealed partial class ComputeContext : IDisposable
         texture2D.StateChange(CommandList, ResourceStates.UnorderedAccess);
 
         CommandList.SetGraphicsRootDescriptorTable(CurrentRootSignature.ShaderResourceView[slot], GraphicsDevice.GetShaderResourceHandleGPU(texture2D));
+    }
+
+    public void SetUnorderedAccessView(Texture2D texture2D, uint slot)
+    {
+        texture2D.StateChange(CommandList, ResourceStates.UnorderedAccess);
+
+        CommandList.SetComputeRootDescriptorTable(CurrentRootSignature.UnorderedAccessView[slot], GraphicsDevice.GetShaderResourceHandleGPU(texture2D));
     }
 }

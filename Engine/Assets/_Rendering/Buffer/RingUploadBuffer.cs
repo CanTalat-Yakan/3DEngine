@@ -82,7 +82,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         UploadBuffer(ref mesh.VertexBufferResource, ref mesh.VertexBufferState, vertex, vertexSizeInByte, out _);
     }
 
-    private void UploadBuffer(ref ID3D12Resource resource, ref ResourceStates resourceState, Span<byte> data, uint sizeInBytes, out uint offset)
+    public void UploadBuffer(ref ID3D12Resource resource, ref ResourceStates resourceState, Span<byte> data, uint sizeInBytes, out uint offset)
     {
         if (resource is null || sizeInBytes > resource.Description.Width)
         {
