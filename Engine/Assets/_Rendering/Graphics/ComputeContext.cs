@@ -63,13 +63,6 @@ public sealed partial class ComputeContext : IDisposable
     public void SetUnorderedAccessView(uint offset, uint slot) =>
         CommandList.SetGraphicsRootUnorderedAccessView(CurrentRootSignature.ConstantBufferView[slot], Kernel.Instance.Context.UploadBuffer.Resource.GPUVirtualAddress + offset);
 
-    public void SetShaderResourceView(Texture2D texture2D, uint slot)
-    {
-        texture2D.StateChange(CommandList, ResourceStates.UnorderedAccess);
-
-        CommandList.SetGraphicsRootDescriptorTable(CurrentRootSignature.ShaderResourceView[slot], GraphicsDevice.GetShaderResourceHandleGPU(texture2D));
-    }
-
     public void SetUnorderedAccessView(Texture2D texture2D, uint slot)
     {
         texture2D.StateChange(CommandList, ResourceStates.UnorderedAccess);

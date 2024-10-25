@@ -23,7 +23,13 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
     public override void OnDestroy() =>
         ComputeRootSignature?.Dispose();
 
-    public void Setup<T>(T data)
+    public void Initialize(string pipelineStateObjectName, RootSignatureHelper rootSignatureHelper = null)
+    {
+        SetRootSignature(rootSignatureHelper?.GetString() ?? RootSignatureHelper.GetDefault());
+        SetComputePipelineStateObject(pipelineStateObjectName);
+    }
+
+    public void Setup<T>(T data, params ComputeTextureEntry[] computeTextures)
     {
         if (!Context.IsRendering)
             return;
@@ -42,7 +48,7 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
             Context.ComputeContext.SetUnorderedAccessView(offset, 0);
         }
 
-        foreach (var computeTexture in ComputeTextures)
+        foreach (var computeTexture in computeTextures)
             Context.ComputeContext.SetUnorderedAccessView(Context.GetTextureByString(computeTexture.Name), computeTexture.Slot);
     }
 
