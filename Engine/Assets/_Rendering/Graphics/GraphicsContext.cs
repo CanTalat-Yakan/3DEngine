@@ -84,12 +84,12 @@ public sealed partial class GraphicsContext : IDisposable
         Kernel.Instance.Context.UploadBuffer.UploadIndexBuffer(mesh, indexByteSpan, indexFormat);
     }
 
-    public void UploadTexture(Texture2D texture, List<byte[]> mipData)
+    public void UploadTexture(Texture2D texture2D, List<byte[]> mipData)
     {
-        uint mipLevels = texture.MipLevels;
+        uint mipLevels = texture2D.MipLevels;
 
         // Calculate the total size and get copyable footprints
-        var resourceDescription = ResourceDescription.Texture2D(texture.Format, texture.Width, texture.Height, arraySize: 1, mipLevels: (ushort)mipLevels);
+        var resourceDescription = ResourceDescription.Texture2D(texture2D.Format, texture2D.Width, texture2D.Height, arraySize: 1, mipLevels: (ushort)mipLevels);
 
         ulong totalSize = 0;
         ulong[] rowSizesInBytes = new ulong[mipLevels];
@@ -98,7 +98,7 @@ public sealed partial class GraphicsContext : IDisposable
 
         GraphicsDevice.Device.GetCopyableFootprints(resourceDescription, 0, mipLevels, 0, layouts, numRows, rowSizesInBytes, out totalSize);
 
-        Kernel.Instance.Context.UploadBuffer.UploadTexture(texture, mipData, layouts, numRows, rowSizesInBytes);
+        Kernel.Instance.Context.UploadBuffer.UploadTexture(texture2D, mipData, layouts, numRows, rowSizesInBytes);
     }
 
     public ReadOnlyMemory<byte> LoadShader(DxcShaderStage shaderStage, string filePath, string entryPoint, bool fromResources = false)
@@ -152,6 +152,8 @@ public sealed partial class GraphicsContext : IDisposable
     {
         GraphicsDevice.GetGraphicsCommandAllocator().Reset();
         CommandList.Reset(GraphicsDevice.GetGraphicsCommandAllocator());
+
+        CommandList.SetDescriptorHeaps(1, [GraphicsDevice.ShaderResourcesHeap.Heap]);
     }
 
     public void EndCommand() =>
@@ -160,8 +162,16 @@ public sealed partial class GraphicsContext : IDisposable
     public void Execute() =>
         GraphicsDevice.CommandQueue.ExecuteCommandList(CommandList);
 
-    public void SetDescriptorHeapDefault() =>
-        CommandList.SetDescriptorHeaps(1, new[] { GraphicsDevice.ShaderResourcesHeap.Heap });
+    public void SetRenderTarget()
+    {
+        CommandList.RSSetViewport(new Viewport(0, 0, GraphicsDevice.Size.Width, GraphicsDevice.Size.Height, 0.0f, 1.0f));
+        CommandList.RSSetScissorRect(new RectI(0, 0, GraphicsDevice.Size.Width, GraphicsDevice.Size.Height));
+
+        if (Kernel.Instance.Config.MultiSample == MultiSample.None)
+            CommandList.OMSetRenderTargets(GraphicsDevice.GetRenderTargetHandle(), GraphicsDevice.GetDepthStencilHandle());
+        else
+            CommandList.OMSetRenderTargets(GraphicsDevice.GetMSAARenderTargetHandle(), GraphicsDevice.GetDepthStencilHandle());
+    }
 
     public void SetPipelineState(PipelineStateObject pipelineStateObject, PipelineStateObjectDescription pipelineStateObjectDescription)
     {
@@ -181,26 +191,15 @@ public sealed partial class GraphicsContext : IDisposable
     public void SetUnorderedAccessView(uint offset, uint slot) =>
         CommandList.SetGraphicsRootUnorderedAccessView(CurrentRootSignature.ConstantBufferView[slot], Kernel.Instance.Context.UploadBuffer.Resource.GPUVirtualAddress + offset);
 
-    public void SetShaderResourceView(Texture2D texture, uint slot)
+    public void SetShaderResourceView(Texture2D texture2D, uint slot)
     {
-        texture.StateChange(CommandList, ResourceStates.GenericRead);
+        texture2D.StateChange(CommandList, ResourceStates.GenericRead);
 
-        CommandList.SetGraphicsRootDescriptorTable(CurrentRootSignature.ShaderResourceView[slot], GraphicsDevice.GetShaderResourceHandle(texture));
-    }
-
-    public void SetRenderTarget()
-    {
-        CommandList.RSSetViewport(new Viewport(0, 0, GraphicsDevice.Size.Width, GraphicsDevice.Size.Height, 0.0f, 1.0f));
-        CommandList.RSSetScissorRect(new RectI(0, 0, GraphicsDevice.Size.Width, GraphicsDevice.Size.Height));
-
-        if (Kernel.Instance.Config.MultiSample == MultiSample.None)
-            CommandList.OMSetRenderTargets(GraphicsDevice.GetRenderTargetHandle(), GraphicsDevice.GetDepthStencilHandle());
-        else
-            CommandList.OMSetRenderTargets(GraphicsDevice.GetMSAARenderTargetHandle(), GraphicsDevice.GetDepthStencilHandle());
+        CommandList.SetGraphicsRootDescriptorTable(CurrentRootSignature.ShaderResourceView[slot], GraphicsDevice.GetShaderResourceHandleGPU(texture2D));
     }
 
     public void ClearTexture2D(Texture2D texture2D) =>
-        CommandList.ClearRenderTargetView(texture2D.RenderTargetView.GetCPUDescriptorHandleForHeapStart(), new Color4(0, 0, 0, 0));
+        CommandList.ClearRenderTargetView(GraphicsDevice.GetShaderResourceHandle(texture2D), new Color4(0, 0, 0, 0));
 
     public void ClearRenderTarget(Color4? color = null)
     {

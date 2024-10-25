@@ -33,6 +33,8 @@ public sealed partial class ComputeContext : IDisposable
 {
     public void BeginCommand()
     {
+        CommandList.SetDescriptorHeaps(1, [GraphicsDevice.ShaderResourcesHeap.Heap]);
+
         GraphicsDevice.GetComputeCommandAllocator().Reset();
         CommandList.Reset(GraphicsDevice.GetComputeCommandAllocator());
     }
@@ -42,9 +44,6 @@ public sealed partial class ComputeContext : IDisposable
 
     public void Execute() =>
         GraphicsDevice.CommandQueue.ExecuteCommandList(CommandList);
-
-    public void SetDescriptorHeapDefault() =>
-        CommandList.SetDescriptorHeaps(1, [GraphicsDevice.ShaderResourcesHeap.Heap]);
 
     public void SetPipelineState(ComputePipelineStateObject computePipelineStateObject, ComputePipelineStateObjectDescription computePipelineStateObjectDescription)
     {
@@ -64,10 +63,10 @@ public sealed partial class ComputeContext : IDisposable
     public void SetUnorderedAccessView(uint offset, uint slot) =>
         CommandList.SetGraphicsRootUnorderedAccessView(CurrentRootSignature.ConstantBufferView[slot], Kernel.Instance.Context.UploadBuffer.Resource.GPUVirtualAddress + offset);
 
-    public void SetShaderResourceView(Texture2D texture, uint slot)
+    public void SetShaderResourceView(Texture2D texture2D, uint slot)
     {
-        texture.StateChange(CommandList, ResourceStates.UnorderedAccess);
+        texture2D.StateChange(CommandList, ResourceStates.UnorderedAccess);
 
-        CommandList.SetGraphicsRootDescriptorTable(CurrentRootSignature.ShaderResourceView[slot], GraphicsDevice.GetShaderResourceHandle(texture));
+        CommandList.SetGraphicsRootDescriptorTable(CurrentRootSignature.ShaderResourceView[slot], GraphicsDevice.GetShaderResourceHandleGPU(texture2D));
     }
 }

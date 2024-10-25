@@ -46,6 +46,7 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
             Context.ComputeContext.SetShaderResourceView(Context.GetTextureByString(computeTexture.Name), computeTexture.Slot);
 
         Context.ComputeContext.EndCommand();
+        Context.ComputeContext.Execute();
     }
 
     public void Dispatch(uint threadGroupsX = 1, uint threadGroupsY = 1, uint threadGroupsZ = 1) =>

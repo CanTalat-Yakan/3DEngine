@@ -6,24 +6,17 @@ namespace Engine.Buffer;
 public sealed class Texture2D : IDisposable
 {
     public ID3D12Resource Resource;
-    public string Name;
+    public ResourceStates ResourceStates;
+
+    public Format Format;
 
     public bool AllowUnorderedAccess = false;
 
-    public ResourceStates ResourceStates;
-
-    public ID3D12DescriptorHeap RenderTargetView;
-    public ID3D12DescriptorHeap DepthStencilView;
-    public ID3D12DescriptorHeap UnorderedAccessView;
+    public string Name;
 
     public uint Width;
     public uint Height;
     public uint MipLevels;
-
-    public Format Format;
-    public Format RenderTextureViewFormat;
-    public Format DepthStencilViewFormat;
-    public Format UnorderedAccessViewFormat;
 
     public void StateChange(ID3D12GraphicsCommandList commandList, ResourceStates states)
     {
@@ -41,15 +34,6 @@ public sealed class Texture2D : IDisposable
     {
         Resource?.Dispose();
         Resource = null;
-
-        RenderTargetView?.Dispose();
-        RenderTargetView = null;
-
-        DepthStencilView?.Dispose();
-        DepthStencilView = null;
-
-        UnorderedAccessView?.Dispose();
-        UnorderedAccessView = null;
 
         GC.SuppressFinalize(this);
     }
