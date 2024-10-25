@@ -93,7 +93,6 @@ public sealed class ComputeData : IDisposable
 
         commandList.Dispose();
 
-        // Map and read data from the readback buffer
         T[] readbackData = new T[elementCount];
 
         unsafe
