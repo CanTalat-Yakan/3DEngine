@@ -201,12 +201,18 @@ mesh.SetMaterialPipeline("VoxelShader");
 
 Engine.Utilities.Output.Log(Entity.Transform.Position);
 
-if (Engine.Utilities.Input.GetKey(Key.Escape, InputState.Down))
-    LOCKED = !LOCKED;
+if (Input.GetKey(Key.Escape, InputState.Down))
+{
+    PAUSED = !PAUSED;
 
-if (!LOCKED)
-    Engine.Utilities.Input.SetMouseRelativePosition(0.5f, 0.5f);
-Engine.Utilities.Input.SetMouseLockState(!LOCKED);
+    if (PAUSED)
+        Input.SetMouseLockState(MouseLockState.Unlocked);
+    else
+        Input.SetMouseLockState(MouseLockState.LockedInvisible, 0.5, 0.5);
+}
+
+if (!PAUSED)
+    Input.SetCursorIcon(SystemCursor.IDC_CROSS);
 ```
 
 ## Solution Structure
