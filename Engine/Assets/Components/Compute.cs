@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Engine.Components;
+﻿namespace Engine.Components;
 
 public struct ComputeTextureEntry(string name, uint slot)
 {
@@ -13,12 +11,10 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
     public string ComputePipelineStateObjectName { get; private set; }
     public RootSignature ComputeRootSignature { get; private set; }
 
-    public List<ComputeTextureEntry> ComputeTextures { get; private set; } = new();
+    public ComputePipelineStateObjectDescription ComputePipelineStateObjectDescription = new();
 
     public CommonContext Context => _context ??= Kernel.Instance.Context;
     public CommonContext _context;
-
-    public ComputePipelineStateObjectDescription ComputePipelineStateObjectDescription = new();
 
     public override void OnDestroy() =>
         ComputeRootSignature?.Dispose();
@@ -29,7 +25,7 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
         SetComputePipelineStateObject(pipelineStateObjectName);
     }
 
-    public void Setup<T>(T data, params ComputeTextureEntry[] computeTextures)
+    public void Setup()
     {
         if (!Context.IsRendering)
             return;
@@ -41,15 +37,6 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
 
         Context.ComputeContext.SetPipelineState(Assets.ComputePipelineStateObjects[ComputePipelineStateObjectName], ComputePipelineStateObjectDescription);
         Context.ComputeContext.SetRootSignature(ComputeRootSignature);
-
-        if (data is not null)
-        {
-            Context.UploadBuffer.Upload(data, out var offset);
-            Context.ComputeContext.SetUnorderedAccessView(offset, 0);
-        }
-
-        foreach (var computeTexture in computeTextures)
-            Context.ComputeContext.SetUnorderedAccessView(Context.GetTextureByString(computeTexture.Name), computeTexture.Slot);
     }
 
     public void Dispatch(uint threadGroupsX = 1, uint threadGroupsY = 1, uint threadGroupsZ = 1)
@@ -62,7 +49,6 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
 
     public bool Equals(Compute other) =>
         ComputePipelineStateObjectName == other.ComputePipelineStateObjectName
-     && ComputeTextures.Count == other.ComputeTextures.Count
      && ComputeRootSignature == other.ComputeRootSignature;
 
     public void SetComputePipelineStateObject(string computePipelineStateObject)
