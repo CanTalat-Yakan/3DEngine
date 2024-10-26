@@ -117,9 +117,9 @@ public sealed partial class CommonContext : IDisposable
 
 public sealed partial class CommonContext : IDisposable
 {
-    public void CreateShader(bool fromResources = false, params string[] shaderPathList)
+    public void CreateShader(bool fromResources = false, params string[] paths)
     {
-        foreach (string shaderPath in shaderPathList)
+        foreach (string shaderPath in paths)
         {
             string shaderName = shaderPath.SplitLast('\\').SplitFirst('.');
 
@@ -129,13 +129,11 @@ public sealed partial class CommonContext : IDisposable
         }
     }
 
-    public void CreateComputeShader(bool fromResources, params string[] computeShaderPathList)
+    public void CreateComputeShader(bool fromResources = false, params string[] paths)
     {
-        foreach (string computeShaderPath in computeShaderPathList)
+        foreach (string computeShaderPath in paths)
         {
-            string computeShaderName = computeShaderPath;
-            if (fromResources)
-                computeShaderName = computeShaderPath.SplitLast('\\').SplitFirst('.');
+            string computeShaderName = computeShaderPath.SplitLast('\\').SplitFirst('.');
 
             Assets.ComputeShaders[computeShaderName] = GraphicsContext.LoadShader(DxcShaderStage.Compute, computeShaderPath + ".hlsl", "CS");
             Assets.ComputePipelineStateObjects[computeShaderName] = new(Assets.ComputeShaders[computeShaderName]);
