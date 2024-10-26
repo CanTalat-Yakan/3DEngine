@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+
 using Vortice.Direct3D12;
 
 namespace Engine.Buffer;
@@ -7,7 +8,8 @@ namespace Engine.Buffer;
 public sealed class ComputeData : IDisposable
 {
     public UploadBuffer UploadBuffer = new();
-    public ID3D12Resource UavBufferResource;
+
+    public ID3D12Resource BufferResource;
     public Texture2D TextureResource;
 
     private CommonContext _context;
@@ -19,7 +21,7 @@ public sealed class ComputeData : IDisposable
         // Step 1: Create UAV buffer for compute operations
         int bufferSize = Unsafe.SizeOf<T>() * data.Length;
 
-        UavBufferResource = Context.GraphicsDevice.Device.CreateCommittedResource(
+        BufferResource = Context.GraphicsDevice.Device.CreateCommittedResource(
             new HeapProperties(HeapType.Default),
             HeapFlags.None,
             ResourceDescription.Buffer((ulong)bufferSize, ResourceFlags.AllowUnorderedAccess),
@@ -32,8 +34,8 @@ public sealed class ComputeData : IDisposable
 
         // Step 3: Copy data from UploadBuffer to the UAV buffer
         var commandList = Context.GraphicsDevice.Device.CreateCommandList<ID3D12GraphicsCommandList5>(0, CommandListType.Compute, Context.GraphicsDevice.GetComputeCommandAllocator(), null);
-        commandList.CopyBufferRegion(UavBufferResource, 0, UploadBuffer.Resource, offset, (ulong)bufferSize);
-        commandList.ResourceBarrierTransition(UavBufferResource, ResourceStates.CopyDest, ResourceStates.UnorderedAccess);
+        commandList.CopyBufferRegion(BufferResource, 0, UploadBuffer.Resource, offset, (ulong)bufferSize);
+        commandList.ResourceBarrierTransition(BufferResource, ResourceStates.CopyDest, ResourceStates.UnorderedAccess);
         commandList.Close();
         Context.GraphicsDevice.CommandQueue.ExecuteCommandList(commandList);
         commandList.Dispose();
@@ -42,10 +44,8 @@ public sealed class ComputeData : IDisposable
     // Method to set Texture2D for compute shader usage
     public void SetTexture(Texture2D texture2D)
     {
-        if (texture2D == null || texture2D.Resource == null)
-        {
+        if (texture2D is null || texture2D.Resource is null)
             throw new ArgumentNullException(nameof(texture2D), "The provided Texture2D must be initialized and have a valid resource.");
-        }
 
         TextureResource = texture2D;
         TextureResource.StateChange(Context.ComputeContext.CommandList, ResourceStates.UnorderedAccess);
@@ -66,8 +66,8 @@ public sealed class ComputeData : IDisposable
 
         // Step 2: Copy from UAV buffer to readback buffer
         var commandList = Context.GraphicsDevice.Device.CreateCommandList<ID3D12GraphicsCommandList5>(0, CommandListType.Compute, Context.GraphicsDevice.GetComputeCommandAllocator(), null);
-        commandList.ResourceBarrierTransition(UavBufferResource, ResourceStates.UnorderedAccess, ResourceStates.CopySource);
-        commandList.CopyResource(readbackBuffer, UavBufferResource);
+        commandList.ResourceBarrierTransition(BufferResource, ResourceStates.UnorderedAccess, ResourceStates.CopySource);
+        commandList.CopyResource(readbackBuffer, BufferResource);
         commandList.Close();
         Context.GraphicsDevice.CommandQueue.ExecuteCommandList(commandList);
         commandList.Dispose();
@@ -92,8 +92,8 @@ public sealed class ComputeData : IDisposable
         UploadBuffer?.Dispose();
         UploadBuffer = null;
 
-        UavBufferResource?.Dispose();
-        UavBufferResource = null;
+        BufferResource?.Dispose();
+        BufferResource = null;
 
         TextureResource?.Dispose();
         TextureResource = null;
