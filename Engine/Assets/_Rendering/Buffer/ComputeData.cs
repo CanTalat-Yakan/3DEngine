@@ -38,7 +38,7 @@ public sealed class ComputeData : IDisposable
         commandList.ResourceBarrierTransition(BufferResource, ResourceStates.CopyDest, ResourceStates.UnorderedAccess);
         commandList.Close();
         Context.GraphicsDevice.CommandQueue.ExecuteCommandList(commandList);
-        Context.ComputeContext.SetUnorderedAccessView(UploadBuffer, offset, slot);
+        Context.ComputeContext.SetUnorderedAccessView(BufferResource, offset, slot);
         commandList.Dispose();
     }
 

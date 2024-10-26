@@ -198,13 +198,6 @@ public sealed partial class GraphicsContext : IDisposable
         CommandList.SetGraphicsRootDescriptorTable(CurrentRootSignature.ShaderResourceView[slot], GraphicsDevice.GetShaderResourceHandleGPU(texture2D));
     }
 
-    public void SetUnorderedAccessView(Texture2D texture2D, uint slot)
-    {
-        texture2D.StateChange(CommandList, ResourceStates.UnorderedAccess);
-
-        CommandList.SetComputeRootDescriptorTable(CurrentRootSignature.UnorderedAccessView[slot], GraphicsDevice.GetShaderResourceHandleGPU(texture2D));
-    }
-
     public void ClearTexture2D(Texture2D texture2D) =>
         CommandList.ClearRenderTargetView(GraphicsDevice.GetShaderResourceHandle(texture2D), new Color4(0, 0, 0, 0));
 

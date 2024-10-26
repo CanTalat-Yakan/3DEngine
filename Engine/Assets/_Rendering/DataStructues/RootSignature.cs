@@ -17,8 +17,8 @@ public enum RootSignatureParameters
 public sealed class RootSignature : IDisposable
 {
     public Dictionary<uint, uint> ConstantBufferView = new();
-    public Dictionary<uint, uint> ShaderResourceView = new();
     public Dictionary<uint, uint> UnorderedAccessView = new();
+    public Dictionary<uint, uint> ShaderResourceView = new();
 
     public ID3D12RootSignature Resource;
     public string Name;
