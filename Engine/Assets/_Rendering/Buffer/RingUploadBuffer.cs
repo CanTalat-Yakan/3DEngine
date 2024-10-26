@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Engine.Graphics;
+using System.Collections.Generic;
 
 using Vortice.Direct3D12;
 using Vortice.DXGI;
@@ -20,7 +21,7 @@ public sealed class GPUUpload
 
 public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 {
-    public void UploadIndexBuffer(MeshData mesh, Span<byte> index, Format indexFormat, uint? overrideSizeInByte = null)
+    public void UploadIndexBuffer(GraphicsContext graphicsContext, MeshData mesh, Span<byte> index, Format indexFormat, uint? overrideSizeInByte = null)
     {
         uint indexSizeInByte = overrideSizeInByte ?? (uint)index.Length;
         uint indexCount = indexSizeInByte / (uint)GraphicsDevice.GetSizeInByte(indexFormat);
@@ -29,26 +30,26 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         mesh.IndexSizeInByte = indexSizeInByte;
         mesh.IndexCount = indexCount;
 
-        UploadBuffer(ref mesh.IndexBufferResource, ref mesh.IndexBufferState, index, indexSizeInByte, out _);
+        UploadBuffer(graphicsContext, ref mesh.IndexBufferResource, ref mesh.IndexBufferState, index, indexSizeInByte, out _);
     }
 
-    public void UploadVertexBuffer(MeshData mesh, Span<byte> vertex, uint? overrideSizeInByte = null)
+    public void UploadVertexBuffer(GraphicsContext graphicsContext, MeshData mesh, Span<byte> vertex, uint? overrideSizeInByte = null)
     {
         uint vertexSizeInByte = overrideSizeInByte ?? (uint)vertex.Length;
         mesh.VertexSizeInByte = vertexSizeInByte;
 
-        UploadBuffer(ref mesh.VertexBufferResource, ref mesh.VertexBufferState, vertex, vertexSizeInByte, out _);
+        UploadBuffer(graphicsContext, ref mesh.VertexBufferResource, ref mesh.VertexBufferState, vertex, vertexSizeInByte, out _);
     }
 
-    public void UploadBuffer(ref ID3D12Resource resource, ref ResourceStates resourceState, Span<byte> data, uint sizeInBytes, out uint offset)
+    public void UploadBuffer(GraphicsContext graphicsContext, ref ID3D12Resource resource, ref ResourceStates resourceState, Span<byte> data, uint sizeInBytes, out uint offset)
     {
         if (resource is null || sizeInBytes > resource.Description.Width)
         {
             // Destroy old resource if it exists
-            GraphicsContext.GraphicsDevice.DestroyResource(resource);
+            graphicsContext.GraphicsDevice.DestroyResource(resource);
 
             // Create new resource
-            resource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
+            resource = graphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
                 HeapProperties.DefaultHeapProperties,
                 HeapFlags.None,
                 ResourceDescription.Buffer(sizeInBytes),
@@ -59,7 +60,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         else if (resourceState != ResourceStates.CopyDest)
         {
             // Transition to CopyDest state
-            GraphicsContext.CommandList.ResourceBarrierTransition(
+            graphicsContext.CommandList.ResourceBarrierTransition(
                 resource, resourceState, ResourceStates.CopyDest);
             resourceState = ResourceStates.CopyDest;
         }
@@ -68,14 +69,14 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         Upload(data, out offset);
 
         // Copy data from the upload buffer to the GPU resource
-        GraphicsContext.CommandList.CopyBufferRegion(resource, 0, Resource, offset, sizeInBytes);
+        graphicsContext.CommandList.CopyBufferRegion(resource, 0, Resource, offset, sizeInBytes);
 
         // Transition to GenericRead state
-        GraphicsContext.CommandList.ResourceBarrierTransition(resource, ResourceStates.CopyDest, ResourceStates.GenericRead);
+        graphicsContext.CommandList.ResourceBarrierTransition(resource, ResourceStates.CopyDest, ResourceStates.GenericRead);
         resourceState = ResourceStates.GenericRead;
     }
 
-    public void UploadTexture(Texture2D texture2D, List<byte[]> mipData, PlacedSubresourceFootPrint[] layouts, uint[] rowCounts, ulong[] rowSizesInBytes)
+    public void UploadTexture(GraphicsContext graphicsContext, Texture2D texture2D, List<byte[]> mipData, PlacedSubresourceFootPrint[] layouts, uint[] rowCounts, ulong[] rowSizesInBytes)
     {
         // Create or reuse the texture resource
         if (texture2D.Resource is null
@@ -92,7 +93,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
             if (texture2D.AllowUnorderedAccess)
                 textureDescription.Flags = ResourceFlags.AllowUnorderedAccess;
 
-            texture2D.Resource = GraphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
+            texture2D.Resource = graphicsContext.GraphicsDevice.Device.CreateCommittedResource<ID3D12Resource>(
                 HeapProperties.DefaultHeapProperties,
                 HeapFlags.None,
                 textureDescription,
@@ -102,7 +103,7 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
         }
         else if (texture2D.ResourceStates != ResourceStates.CopyDest)
         {
-            GraphicsContext.CommandList.ResourceBarrierTransition(texture2D.Resource, texture2D.ResourceStates, ResourceStates.CopyDest);
+            graphicsContext.CommandList.ResourceBarrierTransition(texture2D.Resource, texture2D.ResourceStates, ResourceStates.CopyDest);
             texture2D.ResourceStates = ResourceStates.CopyDest;
         }
 
@@ -122,11 +123,11 @@ public unsafe sealed partial class RingUploadBuffer : UploadBuffer
 
             TextureCopyLocation source = new(Resource, adjustedLayout);
 
-            GraphicsContext.CommandList.CopyTextureRegion(destination, 0, 0, 0, source, null);
+            graphicsContext.CommandList.CopyTextureRegion(destination, 0, 0, 0, source, null);
         }
 
         // Transition to PixelShaderResource state
-        GraphicsContext.CommandList.ResourceBarrierTransition(texture2D.Resource, ResourceStates.CopyDest, ResourceStates.PixelShaderResource);
+        graphicsContext.CommandList.ResourceBarrierTransition(texture2D.Resource, ResourceStates.CopyDest, ResourceStates.PixelShaderResource);
         texture2D.ResourceStates = ResourceStates.PixelShaderResource;
     }
 

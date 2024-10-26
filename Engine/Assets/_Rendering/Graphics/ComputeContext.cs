@@ -61,12 +61,12 @@ public sealed partial class ComputeContext : IDisposable
         CommandList.SetGraphicsRootConstantBufferView(CurrentRootSignature.ConstantBufferView[slot], uploadBuffer.Resource.GPUVirtualAddress + offset);
 
     public void SetUnorderedAccessView(UploadBuffer uploadBuffer, uint offset, uint slot) =>
-        CommandList.SetGraphicsRootUnorderedAccessView(CurrentRootSignature.ConstantBufferView[slot], uploadBuffer.Resource.GPUVirtualAddress + offset);
+        CommandList.SetGraphicsRootUnorderedAccessView(CurrentRootSignature.UnorderedAccessView[slot], uploadBuffer.Resource.GPUVirtualAddress + offset);
 
-    public void SetUnorderedAccessView(Texture2D texture2D, uint slot)
+    public void SetShaderResourceView(Texture2D texture2D, uint slot)
     {
         texture2D.StateChange(CommandList, ResourceStates.UnorderedAccess);
 
-        CommandList.SetComputeRootDescriptorTable(CurrentRootSignature.UnorderedAccessView[slot], GraphicsDevice.GetShaderResourceHandleGPU(texture2D));
+        CommandList.SetGraphicsRootDescriptorTable(CurrentRootSignature.ShaderResourceView[slot], GraphicsDevice.GetShaderResourceHandleGPU(texture2D));
     }
 }

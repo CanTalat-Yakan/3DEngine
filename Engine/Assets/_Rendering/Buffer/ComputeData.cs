@@ -16,7 +16,7 @@ public sealed class ComputeData : IDisposable
     public CommonContext Context => _context ??= Kernel.Instance.Context;
 
     // Method to set the data buffer and upload using UploadBuffer
-    public void SetData<T>(T[] data) where T : struct
+    public void SetData<T>(T[] data, uint slot = 0) where T : struct
     {
         // Step 1: Create UAV buffer for compute operations
         int bufferSize = Unsafe.SizeOf<T>() * data.Length;
@@ -38,17 +38,19 @@ public sealed class ComputeData : IDisposable
         commandList.ResourceBarrierTransition(BufferResource, ResourceStates.CopyDest, ResourceStates.UnorderedAccess);
         commandList.Close();
         Context.GraphicsDevice.CommandQueue.ExecuteCommandList(commandList);
+        Context.ComputeContext.SetUnorderedAccessView(UploadBuffer, offset, slot);
         commandList.Dispose();
     }
 
     // Method to set Texture2D for compute shader usage
-    public void SetTexture(Texture2D texture2D)
+    public void SetTexture(Texture2D texture2D, uint slot)
     {
         if (texture2D is null || texture2D.Resource is null)
             throw new ArgumentNullException(nameof(texture2D), "The provided Texture2D must be initialized and have a valid resource.");
 
         TextureResource = texture2D;
         TextureResource.StateChange(Context.ComputeContext.CommandList, ResourceStates.UnorderedAccess);
+        Context.ComputeContext.SetShaderResourceView(texture2D, slot);
     }
 
     // Method to read data back from the UAV buffer

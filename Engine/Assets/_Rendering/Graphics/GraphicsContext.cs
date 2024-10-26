@@ -80,8 +80,8 @@ public sealed partial class GraphicsContext : IDisposable
         byte[] indexByteSpan = new byte[indexData.Length * indexSizeInByte];
         System.Buffer.BlockCopy(indexData, 0, indexByteSpan, 0, indexByteSpan.Length);
 
-        Kernel.Instance.Context.UploadBuffer.UploadVertexBuffer(mesh, vertexByteSpan);
-        Kernel.Instance.Context.UploadBuffer.UploadIndexBuffer(mesh, indexByteSpan, indexFormat);
+        Kernel.Instance.Context.UploadBuffer.UploadVertexBuffer(this, mesh, vertexByteSpan);
+        Kernel.Instance.Context.UploadBuffer.UploadIndexBuffer(this, mesh, indexByteSpan, indexFormat);
     }
 
     public void UploadTexture(Texture2D texture2D, List<byte[]> mipData)
@@ -98,7 +98,7 @@ public sealed partial class GraphicsContext : IDisposable
 
         GraphicsDevice.Device.GetCopyableFootprints(resourceDescription, 0, mipLevels, 0, layouts, numRows, rowSizesInBytes, out totalSize);
 
-        Kernel.Instance.Context.UploadBuffer.UploadTexture(texture2D, mipData, layouts, numRows, rowSizesInBytes);
+        Kernel.Instance.Context.UploadBuffer.UploadTexture(this, texture2D, mipData, layouts, numRows, rowSizesInBytes);
     }
 
     public ReadOnlyMemory<byte> LoadShader(DxcShaderStage shaderStage, string filePath, string entryPoint, bool fromResources = false)

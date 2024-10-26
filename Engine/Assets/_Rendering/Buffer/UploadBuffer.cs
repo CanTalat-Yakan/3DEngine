@@ -18,9 +18,6 @@ public unsafe partial class UploadBuffer : IDisposable
     private const int DefaultAlignment = 256;
     private const int TextureAlignment = D3D12.TextureDataPlacementAlignment;
 
-    public GraphicsContext GraphicsContext => _graphicsContext ??= Kernel.Instance.Context.GraphicsContext;
-    private GraphicsContext _graphicsContext;
-
     public void Initialize(GraphicsDevice device, int size)
     {
         Size = size;
