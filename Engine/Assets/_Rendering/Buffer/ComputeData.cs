@@ -7,8 +7,6 @@ namespace Engine.Buffer;
 
 public sealed class ComputeData : IDisposable
 {
-    public UploadBuffer UploadBuffer = new();
-
     public ID3D12Resource BufferResource;
     public Texture2D TextureResource;
 
@@ -29,12 +27,12 @@ public sealed class ComputeData : IDisposable
         );
 
         // Step 2: Upload data using UploadBuffer
-        UploadBuffer.Initialize(Context.GraphicsDevice, bufferSize);
-        UploadBuffer.Upload(data, out uint offset);
+        var uploadBuffer =Kernel.Instance.Context.UploadBuffer;
+        uploadBuffer.Upload(data, out uint offset);
 
         // Step 3: Copy data from UploadBuffer to the UAV buffer
         var commandList = Context.GraphicsDevice.Device.CreateCommandList<ID3D12GraphicsCommandList5>(0, CommandListType.Compute, Context.GraphicsDevice.GetComputeCommandAllocator(), null);
-        commandList.CopyBufferRegion(BufferResource, 0, UploadBuffer.Resource, offset, (ulong)bufferSize);
+        commandList.CopyBufferRegion(BufferResource, 0, uploadBuffer.Resource, offset, (ulong)bufferSize);
         commandList.ResourceBarrierTransition(BufferResource, ResourceStates.CopyDest, ResourceStates.UnorderedAccess);
         commandList.Close();
         Context.GraphicsDevice.CommandQueue.ExecuteCommandList(commandList);
@@ -91,9 +89,6 @@ public sealed class ComputeData : IDisposable
     // Dispose resources to prevent memory leaks
     public void Dispose()
     {
-        UploadBuffer?.Dispose();
-        UploadBuffer = null;
-
         BufferResource?.Dispose();
         BufferResource = null;
 
