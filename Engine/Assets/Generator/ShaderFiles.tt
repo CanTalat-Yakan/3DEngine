@@ -1,0 +1,113 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+
+<#
+    // Get the directory of the .tt file
+    string templateDirectory = Path.GetDirectoryName(this.Host.TemplateFile);
+
+    // Go up one directory to get the project directory
+    string projectDirectory = Path.GetFullPath(Path.Combine(templateDirectory, ".."));
+
+    // Define paths relative to the project directory
+    string RESOURCES = Path.Combine(projectDirectory, "Resources");
+
+    string SHADERS = Path.Combine(RESOURCES, "Shaders");
+    string COMPUTE = Path.Combine(RESOURCES, "ComputeShaders");
+
+    // Escape strings for use in C# code
+    string escaped_PROJECT_DIRECTORY = EscapeStringLiteral(projectDirectory + @"\");
+    string escaped_RESOURCES = EscapeStringLiteral(RESOURCES + @"\");
+    string escaped_SHADERS = EscapeStringLiteral(SHADERS + @"\");
+    string escaped_COMPUTE = EscapeStringLiteral(COMPUTE + @"\");
+#>
+
+namespace Engine
+{
+    public static class T4AssetPaths
+    {
+        public static readonly string DIRECTORY = @"<#= escaped_PROJECT_DIRECTORY #>";
+        public static readonly string RESOURCES = @"<#= escaped_RESOURCES #>";
+        public static readonly string SHADERS = @"<#= escaped_SHADERS #>";
+        public static readonly string COMPUTE = @"<#= escaped_COMPUTE #>";
+    }
+
+    public enum ShaderFiles
+    {
+<# 
+    // Use the SHADERS path defined in the template code
+    if (Directory.Exists(SHADERS))
+    {
+        var shaderFiles = Directory.GetFiles(SHADERS, "*.hlsl")
+                                   .Select(Path.GetFileNameWithoutExtension)
+                                   .Distinct(); // Ensure no duplicates
+
+        foreach (var file in shaderFiles)
+        {
+            // Sanitize the file name to make it a valid enum member
+            string enumMember = SanitizeEnumMember(file);
+#>
+        <#= enumMember #>,
+<#
+        }
+    }
+    else
+    {
+#>
+        // No shaders found in the specified directory.
+<#
+    }
+#>
+    }
+
+    public static class ShaderFileHelper
+    {
+        public static string SanitizeEnumMember(string name)
+        {
+            var sb = new StringBuilder();
+            foreach (char c in name)
+            {
+                if (char.IsLetterOrDigit(c) || c == '_')
+                    sb.Append(c);
+                else
+                    sb.Append('_'); // Replace invalid characters with underscore
+            }
+            // Ensure the name doesn't start with a digit
+            if (sb.Length > 0 && char.IsDigit(sb[0]))
+                sb.Insert(0, '_');
+
+            return sb.ToString();
+        }
+    }
+}
+
+<#+
+    // Helper method to escape string literals
+    public string EscapeStringLiteral(string str)
+    {
+        return str.Replace("\\", "\\\\").Replace("\"", "\\\"");
+    }
+
+    // Shared method between template and generated code
+    public string SanitizeEnumMember(string name)
+    {
+        var sb = new StringBuilder();
+        foreach (char c in name)
+        {
+            if (char.IsLetterOrDigit(c) || c == '_')
+                sb.Append(c);
+            else
+                sb.Append('_'); // Replace invalid characters with underscore
+        }
+        // Ensure the name doesn't start with a digit
+        if (sb.Length > 0 && char.IsDigit(sb[0]))
+            sb.Insert(0, '_');
+
+        return sb.ToString();
+    }
+#>
