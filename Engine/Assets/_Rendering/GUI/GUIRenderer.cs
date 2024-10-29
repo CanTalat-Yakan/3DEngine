@@ -76,7 +76,7 @@ public unsafe sealed partial class GUIRenderer
 {
     public void LoadResources()
     {
-        Kernel.Instance.Context.CreateShader(true, ShaderFiles.ImGui.ToString());
+        Context.CreateShader(true, ShaderFiles.ImGui.ToString());
 
         RootSignature = Context.CreateRootSignatureFromString("Cs");
     }
