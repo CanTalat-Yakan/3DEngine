@@ -14,14 +14,14 @@ public sealed class AssetPaths
     public static readonly string SCENENES = ASSETS + @"Scenes\";
     public static readonly string TEMPLATES = ASSETS + @"Templates\";
     public static readonly string SHADERS = ASSETS + @"Shaders\";
-    public static readonly string COMPUTE = ASSETS + @"ComputeShaders\";
+    public static readonly string COMPUTESHADER = ASSETS + @"ComputeShaders\";
     public static readonly string TEXTURES = ASSETS + @"Textures\";
     public static readonly string MODELS = ASSETS + @"Models\";
     
     public static readonly string RESOURCESCENENES = RESOURCES + @"Scenes\";
     public static readonly string RESOURCETEMPLATES = RESOURCES + @"Templates\";
     public static readonly string RESOURCESHADERS = RESOURCES + @"Shaders\";
-    public static readonly string RESOURCECOMPUTE = RESOURCES + @"ComputeShaders\";
+    public static readonly string RESOURCECOMPUTESHADER = RESOURCES + @"ComputeShaders\";
     public static readonly string RESOURCETEXTURES = RESOURCES + @"Textures\";
     public static readonly string RESOURCEMODELS = RESOURCES + @"Models\";
 

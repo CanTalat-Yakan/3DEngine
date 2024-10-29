@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Engine.Helper;
+namespace Engine.Helpers;
 
 public class ExceptionHandler
 {

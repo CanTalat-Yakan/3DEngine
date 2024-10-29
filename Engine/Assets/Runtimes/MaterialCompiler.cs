@@ -2,7 +2,7 @@
 using System.IO;
 using System.Xml.Serialization;
 
-namespace Engine.Runtime;
+namespace Engine.Runtimes;
 
 public sealed class MaterialEntry(FileInfo fileInfo)
 {

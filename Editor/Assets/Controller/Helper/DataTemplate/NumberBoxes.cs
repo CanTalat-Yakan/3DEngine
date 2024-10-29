@@ -8,7 +8,7 @@ using Microsoft.UI.Xaml;
 
 using Vortice.Mathematics;
 
-using Engine.Helper;
+using Engine.Helpers;
 
 using Colors = Microsoft.UI.Colors;
 

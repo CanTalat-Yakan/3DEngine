@@ -29,12 +29,12 @@ public partial class App : Application
         var rootPath = Path.Combine(documentsDir, "3DEngine");
         var logFilePath = Path.Combine(rootPath, "Application.log");
 
-        Engine.Helper.ExceptionHandler.CreateTraceLog(rootPath, logFilePath);
+        Engine.Helpers.ExceptionHandler.CreateTraceLog(rootPath, logFilePath);
 
         this.UnhandledException += (s, e) =>
         {
             if (Main.Instance is not null)
-                Engine.Helper.ExceptionHandler.HandleException(e.Exception);
+                Engine.Helpers.ExceptionHandler.HandleException(e.Exception);
 
             // Mark the event as handled to prevent it from being processed further.
             e.Handled = true;

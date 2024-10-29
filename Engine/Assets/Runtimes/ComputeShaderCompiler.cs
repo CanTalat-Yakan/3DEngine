@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Engine.Runtime;
+namespace Engine.Runtimes;
 
 public sealed class ComputeShaderEntry
 {

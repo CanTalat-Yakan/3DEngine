@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Xml.Serialization;
 
-namespace Engine.Helper;
+namespace Engine.Helpers;
 
 public enum DataType
 {

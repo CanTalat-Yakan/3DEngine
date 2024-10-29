@@ -21,7 +21,7 @@
 		<PackageIcon>3DEngine_Logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>3D Game Engine .Net8 C#12</PackageTags>
-		<Version>3.0.88</Version>
+		<Version>3.0.90</Version>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -164,34 +164,24 @@
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
-		<None Include="Assets\Generator\FileNamesEnumGenerator.cs">
-		  <DesignTime>True</DesignTime>
-		  <AutoGen>True</AutoGen>
-		  <DependentUpon>FileNamesEnumGenerator.tt</DependentUpon>
-		</None>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Assets\Generator\FileNamesEnumGenerator.tt">
-	    <Generator>TextTemplatingFileGenerator</Generator>
-	    <LastGenOutput>FileNamesEnumGenerator.cs</LastGenOutput>
-	  </None>
+		<None Update="Assets\Generators\FileNamesEnumGenerator.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>FileNamesEnumGenerator.cs</LastGenOutput>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>
 	  <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
 	</ItemGroup>
-
+	
 	<ItemGroup>
-	  <Compile Update="Assets\Generator\FileNamesEnumGenerator.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>FileNamesEnumGenerator.tt</DependentUpon>
-	  </Compile>
-	  <Compile Update="Assets\Generator\ShaderFiles.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>ShaderFiles.tt</DependentUpon>
-	  </Compile>
+		<Compile Update="Assets\Generators\FileNamesEnumGenerator.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>FileNamesEnumGenerator.tt</DependentUpon>
+		</Compile>
 	</ItemGroup>
 </Project>

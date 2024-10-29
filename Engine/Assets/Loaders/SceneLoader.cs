@@ -3,7 +3,7 @@
 using static pxr.UsdGeom;
 using static pxr.UsdShade;
 
-namespace Engine.Loader;
+namespace Engine.Loaders;
 
 public sealed class SceneLoader
 {

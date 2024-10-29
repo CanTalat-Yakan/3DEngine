@@ -1,4 +1,5 @@
-﻿using Vortice.Direct3D12;
+﻿using System.IO;
+using Vortice.Direct3D12;
 
 namespace Engine.Graphics;
 
@@ -26,6 +27,26 @@ public sealed partial class ComputeContext : IDisposable
         CommandList = null;
 
         GC.SuppressFinalize(this);
+    }
+}
+
+public sealed partial class ComputeContext : IDisposable
+{
+    public ReadOnlyMemory<byte> LoadComputeShader(DxcShaderStage shaderStage, string localPath, string entryPoint, bool fromResources = false)
+    {
+        localPath = fromResources ? AssetPaths.RESOURCECOMPUTESHADER + localPath : AssetPaths.COMPUTESHADER + localPath;
+
+        string directory = Path.GetDirectoryName(localPath);
+        string shaderSource = File.ReadAllText(localPath);
+
+        using (ShaderIncludeHandler includeHandler = new(directory))
+        {
+            using IDxcResult results = DxcCompiler.Compile(shaderStage, shaderSource, entryPoint, includeHandler: includeHandler);
+            if (results.GetStatus().Failure)
+                throw new Exception(results.GetErrors());
+
+            return results.GetObjectBytecodeMemory();
+        }
     }
 }
 

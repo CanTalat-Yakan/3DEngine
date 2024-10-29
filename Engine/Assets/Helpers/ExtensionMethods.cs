@@ -7,7 +7,7 @@ using SharpGen.Runtime;
 using Vortice.Direct3D12;
 using Vortice.Mathematics;
 
-namespace Engine.Helper;
+namespace Engine.Helpers;
 
 public static class ExtensionMethods
 {

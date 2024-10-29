@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using SharpGen.Runtime;
 
-namespace Engine.Helper;
+namespace Engine.Helpers;
 
 public class ShaderIncludeHandler : CallbackBase, IDxcIncludeHandler
 {

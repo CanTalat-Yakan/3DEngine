@@ -4,7 +4,7 @@ using System.IO;
 using static pxr.UsdGeom;
 using static pxr.UsdShade;
 
-namespace Engine.Loader;
+namespace Engine.Loaders;
 
 public sealed partial class ModelLoader
 {

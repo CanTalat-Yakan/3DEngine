@@ -7,7 +7,7 @@ using Vortice.DXGI;
 using Vortice.WIC;
 using Vortice.Mathematics;
 
-namespace Engine.Loader;
+namespace Engine.Loaders;
 
 public sealed partial class ImageLoader
 {

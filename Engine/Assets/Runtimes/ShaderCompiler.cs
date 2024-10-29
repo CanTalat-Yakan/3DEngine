@@ -3,7 +3,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Text;
 
-namespace Engine.Runtime;
+namespace Engine.Runtimes;
 
 public sealed class ShaderEntry
 {

@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CodeAnalysis;
 
-namespace Engine.Runtime;
+namespace Engine.Runtimes;
 
 public sealed class ScriptEntry
 {

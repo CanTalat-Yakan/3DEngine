@@ -135,7 +135,7 @@ public sealed partial class CommonContext : IDisposable
         {
             string computeShaderName = computeShaderPath.GetFileNameWithoutExtension();
 
-            Assets.ComputeShaders[computeShaderName] = GraphicsContext.LoadShader(DxcShaderStage.Compute, computeShaderPath + ".hlsl", "CS", fromResources);
+            Assets.ComputeShaders[computeShaderName] = ComputeContext.LoadComputeShader(DxcShaderStage.Compute, computeShaderPath + ".hlsl", "CS", fromResources);
             Assets.ComputePipelineStateObjects[computeShaderName] = new(Assets.ComputeShaders[computeShaderName]);
         }
     }

@@ -13,8 +13,8 @@ using Microsoft.UI.Xaml;
 using Engine.Components;
 using Engine.ECS;
 using Engine.Editor;
-using Engine.Helper;
-using Engine.Runtime;
+using Engine.Helpers;
+using Engine.Runtimes;
 using Engine.Utilities;
 
 using static Editor.Controller.Helper;

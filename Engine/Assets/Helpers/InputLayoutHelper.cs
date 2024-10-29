@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Engine.Helper;
+namespace Engine.Helpers;
 
 public enum InputLayoutElementTypes
 {

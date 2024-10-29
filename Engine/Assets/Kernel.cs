@@ -16,9 +16,9 @@ global using Engine.Essentials;
 global using Engine.Framework;
 global using Engine.Graphics;
 global using Engine.GUI;
-global using Engine.Helper;
-global using Engine.Loader;
-global using Engine.Runtime;
+global using Engine.Helpers;
+global using Engine.Loaders;
+global using Engine.Runtimes;
 global using Engine.Utilities;
 
 namespace Engine;

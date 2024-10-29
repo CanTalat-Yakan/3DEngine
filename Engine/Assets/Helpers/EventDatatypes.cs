@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Engine.Helper;
+namespace Engine.Helpers;
 
 public sealed class EventList<T> : List<T>
 {
