@@ -90,6 +90,25 @@ dotnet add package Costura.Fody
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Assets\Generators\FileNamesEnumGenerator.tt">
+        <Generator>TextTemplatingFileGenerator</Generator>
+        <LastGenOutput>FileNamesEnumGenerator.cs</LastGenOutput>
+      </None>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Compile Update="Assets\Generators\FileNamesEnumGenerator.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>FileNamesEnumGenerator.tt</DependentUpon>
+      </Compile>
+    </ItemGroup>
 </Project>
 ```
 
@@ -185,19 +204,34 @@ public class Example : Component
 ### Example usage:
 
 ```csharp
-Engine.Loader.ModelLoader.LoadFile(Engine.Utilities.AssetPaths.ASSETS + "Meshes\\Model.obj");
-Engine.Loader.ImageLoader.LoadFile(Engine.Utilities.AssetPaths.ASSETS + "Textures\\TextureAtlas.png");
-Engine.Kernel.Instance.Context.CreateShader(Engine.Utilities.AssetPaths.ASSETS + "Shaders\\VoxelShader");
+Engine.Loader.ModelLoader.LoadFile(Engine.ModelFiles.Model);
+Engine.Loader.ModelLoader.LoadFile(Engine.Utilities.AssetPaths.MESHES + "Model.obj");
+
+Engine.Loader.ImageLoader.LoadFile(Engine.TextureFiles.TextureAtlas);
+Engine.Loader.ImageLoader.LoadFile(Engine.Utilities.AssetPaths.TEXTURES + "Texture.png");
+
+Engine.Kernel.Instance.Context.CreateShader(Engine.Utilities.AssetPaths.SHADERS + "Shader");
+Engine.Kernel.Instance.Context.CreateComputeShader(Engine.Utilities.AssetPaths.COMPUTESHADERS + "ComputeShader");
+
+Entity.AddComponent<Example>();
 
 Entity.Manager.CreateEntity(name: "Controller").AddComponent<PlayerController>().Initialize(this);
 Entity.Manager.CreateEntity(name: "Sky").AddComponent<DefaultSky>().Initialize();
 
 var mesh = Entity.Manager.CreateEntity().AddComponent<Mesh>();
+
+mesh.SetMeshData(ModelFiles.Model);
 mesh.SetMeshData(Assets.Meshes["Model.obj"]);
 mesh.SetMeshData(vertices, indices, positions, InputLayoutHelper.AddPosition3D().AddUV());
+
+mesh.SetRootSignature();
 mesh.SetRootSignature(new RootSignatureHelper().AddConstantBufferView(2).AddShaderResourceViewTable());
-mesh.SetMaterialTextures([new("TextureAtlas.png", 0)]);
-mesh.SetMaterialPipeline("VoxelShader");
+
+mesh.SetMaterialTextures(TextureFiles.Texture);
+mesh.SetMaterialTextures(textureEntries: [new("Texture.png", 0)]);
+
+mesh.SetMaterialPipeline(ShaderFiles.Shader);
+mesh.SetMaterialPipeline("Shader");
 
 Engine.Utilities.Output.Log(Entity.Transform.Position);
 
