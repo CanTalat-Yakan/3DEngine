@@ -43,7 +43,7 @@ namespace Engine
     // Use the SHADERS path defined in the template code
     if (Directory.Exists(SHADERS))
     {
-        var shaderFiles = Directory.GetFiles(SHADERS, "*.hlsl")
+        var shaderFiles = Directory.GetFiles(SHADERS, "*.hlsl", SearchOption.AllDirectories)
                                    .Select(Path.GetFileNameWithoutExtension)
                                    .Distinct(); // Ensure no duplicates
 
@@ -65,11 +65,39 @@ namespace Engine
 #>
     }
 
-    public static class ShaderFileHelper
+    public enum ComputeShaderFiles
+    {
+<# 
+    // Use the COMPUTE path defined in the template code
+    if (Directory.Exists(COMPUTE))
+    {
+        var computeShaderFiles = Directory.GetFiles(COMPUTE, "*.hlsl", SearchOption.AllDirectories)
+                                   .Select(Path.GetFileNameWithoutExtension)
+                                   .Distinct(); // Ensure no duplicates
+
+        foreach (var file in computeShaderFiles)
+        {
+            // Sanitize the file name to make it a valid enum member
+            string enumMember = SanitizeEnumMember(file);
+#>
+        <#= enumMember #>,
+<#
+        }
+    }
+    else
+    {
+#>
+        // No shaders found in the specified directory.
+<#
+    }
+#>
+    }
+
+    public static class T4FileHelper
     {
         public static string SanitizeEnumMember(string name)
         {
-            var sb = new StringBuilder();
+            var sb = new System.Text.StringBuilder();
             foreach (char c in name)
             {
                 if (char.IsLetterOrDigit(c) || c == '_')

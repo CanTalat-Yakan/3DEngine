@@ -18,11 +18,16 @@ namespace Engine
         Unlit,
     }
 
-    public static class ShaderFileHelper
+    public enum ComputeShaderFiles
+    {
+        // No shaders found in the specified directory.
+    }
+
+    public static class T4FileHelper
     {
         public static string SanitizeEnumMember(string name)
         {
-            var sb = new StringBuilder();
+            var sb = new System.Text.StringBuilder();
             foreach (char c in name)
             {
                 if (char.IsLetterOrDigit(c) || c == '_')
