@@ -96,9 +96,15 @@ public static class ExtensionMethods
     public static string FirstCharToUpper(this string input) =>
         string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1));
 
-    public static string GetFileNameWithoutExtension(this string text) =>
-        text.Split('\\').Last().Split('.').First();
-    
+    public static string GetFileNameWithoutExtension(this string path) =>
+        Path.GetFileNameWithoutExtension(path);
+
+    public static string GetFileNameWithExtension(this string path) =>
+        Path.GetFileName(path);
+
+    public static string GetPathWithoutExtension(this string path) =>
+        Path.ChangeExtension(path, null);
+
     public static string GetFileNameFromTemplate(this string text)
     {
         var splits = Path.GetFileName(text).Split('.');

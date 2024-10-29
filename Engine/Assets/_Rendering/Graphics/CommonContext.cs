@@ -123,8 +123,8 @@ public sealed partial class CommonContext : IDisposable
         {
             string shaderName = shaderPath.GetFileNameWithoutExtension();
 
-            Assets.VertexShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, shaderPath.RemoveExtension() + ".hlsl", "VS", fromResources);
-            Assets.PixelShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, shaderPath.RemoveExtension() + ".hlsl", "PS", fromResources);
+            Assets.VertexShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, shaderPath.GetPathWithoutExtension() + ".hlsl", "VS", fromResources);
+            Assets.PixelShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, shaderPath.GetPathWithoutExtension() + ".hlsl", "PS", fromResources);
             Assets.PipelineStateObjects[shaderName] = new(Assets.VertexShaders[shaderName], Assets.PixelShaders[shaderName]);
         }
     }
