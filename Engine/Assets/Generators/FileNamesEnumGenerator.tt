@@ -33,7 +33,7 @@ string escaped_MODELS = EscapeStringLiteral(MODELS + @"\");
 string escaped_PRIMITIVES = EscapeStringLiteral(PRIMITIVES + @"\");
 
 // Helper methods for template processing
-void GenerateEnumMembers(string directoryPath, string searchPattern, bool searchAllDirectories = true)
+void GenerateEnumMembers(string directoryPath, string searchPattern, bool searchAllDirectories = false)
 {
     if (!Directory.Exists(directoryPath))
         return;
