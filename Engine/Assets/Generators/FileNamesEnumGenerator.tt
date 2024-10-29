@@ -11,10 +11,10 @@
 string templateDirectory = Path.GetDirectoryName(this.Host.TemplateFile);
 
 // Go up one directory to get the project directory
-string projectDirectory = Path.GetFullPath(Path.Combine(templateDirectory, ".."));
+string ASSETS = Path.GetFullPath(Path.Combine(templateDirectory, ".."));
 
 // Define paths relative to the base directory
-string RESOURCES = Path.Combine(projectDirectory, "Resources");
+string RESOURCES = Path.Combine(ASSETS, "Resources");
 
 string SCENES = Path.Combine(RESOURCES, "Scenes");
 string SHADERS = Path.Combine(RESOURCES, "Shaders");
@@ -24,7 +24,6 @@ string MODELS = Path.Combine(RESOURCES, "Models");
 string PRIMITIVES = Path.Combine(MODELS, "Primitives");
 
 // Escape strings for use in C# code
-string escaped_DIRECTORY = EscapeStringLiteral(projectDirectory + @"\");
 string escaped_RESOURCES = EscapeStringLiteral(RESOURCES + @"\");
 string escaped_SCENES = EscapeStringLiteral(SCENES + @"\");
 string escaped_SHADERS = EscapeStringLiteral(SHADERS + @"\");
@@ -75,7 +74,6 @@ string EscapeStringLiteral(string str) =>
 #>
 namespace Engine;
 
-// Enum for Scene files
 public enum SceneFiles
 {
 <#
@@ -83,7 +81,6 @@ public enum SceneFiles
 #>
 }
 
-// Enum for Shader files
 public enum ShaderFiles
 {
 <#
@@ -91,7 +88,6 @@ public enum ShaderFiles
 #>
 }
 
-// Enum for Compute Shader files
 public enum ComputeShaderFiles
 {
 <#
@@ -99,7 +95,6 @@ public enum ComputeShaderFiles
 #>
 }
 
-// Enum for Texture files
 public enum TextureFiles
 {
 <#
@@ -107,7 +102,6 @@ public enum TextureFiles
 #>
 }
 
-// Enum for Model files
 public enum ModelFiles
 {
 <#
@@ -115,7 +109,6 @@ public enum ModelFiles
 #>
 }
 
-// Enum for Primitive files
 public enum PrimitiveFiles
 {
 <#

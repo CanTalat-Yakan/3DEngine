@@ -1,12 +1,10 @@
 ﻿namespace Engine;
 
-// Enum for Scene files
 public enum SceneFiles
 {
     teapot,
 }
 
-// Enum for Shader files
 public enum ShaderFiles
 {
     ImGui,
@@ -15,12 +13,10 @@ public enum ShaderFiles
     Unlit,
 }
 
-// Enum for Compute Shader files
 public enum ComputeShaderFiles
 {
 }
 
-// Enum for Texture files
 public enum TextureFiles
 {
     Default,
@@ -28,7 +24,6 @@ public enum TextureFiles
     UVMap,
 }
 
-// Enum for Model files
 public enum ModelFiles
 {
     Cube,
@@ -43,7 +38,6 @@ public enum ModelFiles
     Tree,
 }
 
-// Enum for Primitive files
 public enum PrimitiveFiles
 {
     Cube,
