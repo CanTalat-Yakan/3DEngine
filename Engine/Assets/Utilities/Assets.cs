@@ -11,14 +11,21 @@ public sealed class AssetPaths
     public static readonly string ASSETS = DIRECTORY + @"Assets\";
     public static readonly string RESOURCES = ASSETS + @"Resources\";
 
-    public static readonly string SCENENES = RESOURCES + @"Scenes\";
-    public static readonly string TEMPLATES = RESOURCES + @"Templates\";
-    public static readonly string SHADERS = RESOURCES + @"Shaders\";
-    public static readonly string COMPUTE = RESOURCES + @"ComputeShaders\";
-    public static readonly string TEXTURES = RESOURCES + @"Textures\";
-    public static readonly string MODELS = RESOURCES + @"Models\";
+    public static readonly string SCENENES = ASSETS + @"Scenes\";
+    public static readonly string TEMPLATES = ASSETS + @"Templates\";
+    public static readonly string SHADERS = ASSETS + @"Shaders\";
+    public static readonly string COMPUTE = ASSETS + @"ComputeShaders\";
+    public static readonly string TEXTURES = ASSETS + @"Textures\";
+    public static readonly string MODELS = ASSETS + @"Models\";
+    
+    public static readonly string RESOURCESCENENES = RESOURCES + @"Scenes\";
+    public static readonly string RESOURCETEMPLATES = RESOURCES + @"Templates\";
+    public static readonly string RESOURCESHADERS = RESOURCES + @"Shaders\";
+    public static readonly string RESOURCECOMPUTE = RESOURCES + @"ComputeShaders\";
+    public static readonly string RESOURCETEXTURES = RESOURCES + @"Textures\";
+    public static readonly string RESOURCEMODELS = RESOURCES + @"Models\";
 
-    public static readonly string PRIMITIVES = MODELS + @"Primitives\";
+    public static readonly string PRIMITIVES = RESOURCEMODELS + @"Primitives\";
 }
 
 public struct AssetEntry(string name, string extension, string localPath)

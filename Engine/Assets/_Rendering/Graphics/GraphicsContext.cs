@@ -101,12 +101,12 @@ public sealed partial class GraphicsContext : IDisposable
         Kernel.Instance.Context.UploadBuffer.UploadTexture(this, texture2D, mipData, layouts, numRows, rowSizesInBytes);
     }
 
-    public ReadOnlyMemory<byte> LoadShader(DxcShaderStage shaderStage, string filePath, string entryPoint, bool fromResources = false)
+    public ReadOnlyMemory<byte> LoadShader(DxcShaderStage shaderStage, string localPath, string entryPoint, bool fromResources = false)
     {
-        filePath = fromResources ? AssetPaths.SHADERS + filePath : filePath;
+        localPath = fromResources ? AssetPaths.RESOURCESHADERS + localPath : AssetPaths.SHADERS + localPath;
 
-        string directory = Path.GetDirectoryName(filePath);
-        string shaderSource = File.ReadAllText(filePath);
+        string directory = Path.GetDirectoryName(localPath);
+        string shaderSource = File.ReadAllText(localPath);
 
         using (ShaderIncludeHandler includeHandler = new(directory))
         {

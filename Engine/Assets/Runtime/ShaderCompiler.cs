@@ -25,7 +25,7 @@ public sealed class ShaderCompiler
         if (!Directory.Exists(shadersFolderPath))
             return;
 
-        CheckShaderEntry(AssetPaths.SHADERS + "SimpleLit.hlsl");
+        CheckShaderEntry(AssetPaths.RESOURCESHADERS + "SimpleLit.hlsl");
 
         foreach (var shaderFilePath in Directory.GetFiles(shadersFolderPath, "*", SearchOption.AllDirectories))
             CheckShaderEntry(shaderFilePath);

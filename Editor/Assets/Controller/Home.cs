@@ -190,7 +190,7 @@ public sealed partial class Home
             Directory.CreateDirectory(path);
             Directory.CreateDirectory(Path.Combine(path, AssetPaths.ASSETS));
 
-            string zipPath = Path.Combine(AppContext.BaseDirectory, AssetPaths.TEMPLATES, "Project", "Project.zip");
+            string zipPath = Path.Combine(AppContext.BaseDirectory, AssetPaths.RESOURCETEMPLATES, "Project", "Project.zip");
             if (File.Exists(zipPath))
                 ZipFile.ExtractToDirectory(zipPath, path);
 

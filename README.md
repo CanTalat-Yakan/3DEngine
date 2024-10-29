@@ -79,21 +79,21 @@ dotnet add package Costura.Fody
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="3DEngine" Version="3.0.84" />
+        <PackageReference Include="3DEngine" Version="3.0.87" />
         <PackageReference Include="Costura.Fody" Version="5.7.0">
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
-        <Content Update="$(NuGetPackageRoot)\3dengine\3.0.84\contentFiles\any\net8.0-windows10.0.22621\Assets\Resources\**\*">
+        <Content Update="$(NuGetPackageRoot)\3dengine\3.0.87\contentFiles\any\net8.0-windows10.0.22621\Assets\Resources\**\*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
 </Project>
 ```
 
-Ensure "PreserveNewest" is set for files in the Assets folder in Visual Studio. Replace the Path to the NuGet Package 3DEngine\3.0.84
+Ensure "PreserveNewest" is set for files in the Assets folder in Visual Studio. Replace the Path to the NuGet Package 3DEngine\3.0.87
 
 ### Setup program:
 

@@ -60,7 +60,7 @@ internal sealed partial class Files
 
         // Assign the ProjectPath value from static property in "Home".
         AssetsPath = Path.Combine(Home.ProjectPath, "Assets");
-        TemplatesPath = AssetPaths.TEMPLATES;
+        TemplatesPath = AssetPaths.RESOURCETEMPLATES;
 
         // Call the method to initialize and populate the files categories with a DataTemplate.
         PopulateFilesCategories();
@@ -100,7 +100,7 @@ internal sealed partial class Files
 
             foreach (var exampleTemplatePath in Directory.GetFiles(categoryDirectory))
                 WriteFileFromTemplates(
-                    Path.Combine(AssetsPath, categoryName, exampleTemplatePath.GetFileName()),
+                    Path.Combine(AssetsPath, categoryName, exampleTemplatePath.GetFileNameFromTemplate()),
                     exampleTemplatePath);
 
             foreach (var subPathDirectory in Directory.GetDirectories(categoryDirectory))
@@ -110,7 +110,7 @@ internal sealed partial class Files
 
                 foreach (var exampleTemplatePath in Directory.GetFiles(subPathDirectory))
                     WriteFileFromTemplates(
-                        Path.Combine(targetSubPath, exampleTemplatePath.GetFileName()),
+                        Path.Combine(targetSubPath, exampleTemplatePath.GetFileNameFromTemplate()),
                         exampleTemplatePath);
             }
         }

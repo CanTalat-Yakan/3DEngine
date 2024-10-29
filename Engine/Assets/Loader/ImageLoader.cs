@@ -15,7 +15,7 @@ public sealed partial class ImageLoader
     public static CommonContext _context;
 
     public static Texture2D LoadFile(TextureFiles textureFile) =>
-        LoadFile(AssetPaths.TEXTURES + textureFile + ".png");
+        LoadFile(AssetPaths.RESOURCETEXTURES + textureFile + ".png");
 
     public static Texture2D LoadFile(string filePath)
     {

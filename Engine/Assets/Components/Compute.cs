@@ -19,6 +19,9 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
     public override void OnDestroy() =>
         ComputeRootSignature?.Dispose();
 
+    public void Initialize(ComputeShaderFiles computeShaderFile, RootSignatureHelper rootSignatureHelper = null) =>
+        Initialize(computeShaderFile, rootSignatureHelper);
+
     public void Initialize(string pipelineStateObjectName, RootSignatureHelper rootSignatureHelper = null)
     {
         SetRootSignature(rootSignatureHelper?.GetString() ?? RootSignatureHelper.GetDefault());

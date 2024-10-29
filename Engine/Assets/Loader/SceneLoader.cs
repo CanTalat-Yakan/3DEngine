@@ -47,7 +47,7 @@ public sealed class SceneLoader
     }
 
     public static void Load(SystemManager systemManager, SceneFiles sceneFile) =>
-        Load(systemManager, AssetPaths.SCENENES + sceneFile + ".usdz");
+        Load(systemManager, AssetPaths.RESOURCESCENENES + sceneFile + ".usdz");
 
     public static void Load(SystemManager systemManager, string localPath)
     {

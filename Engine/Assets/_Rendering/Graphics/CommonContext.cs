@@ -57,9 +57,9 @@ public sealed partial class CommonContext : IDisposable
         ModelLoader.LoadFile(AssetPaths.PRIMITIVES + "Cube.obj");
         ModelLoader.LoadFile(AssetPaths.PRIMITIVES + "Sphere.obj");
 
-        ImageLoader.LoadFile(AssetPaths.TEXTURES + "Default.png");
-        ImageLoader.LoadFile(AssetPaths.TEXTURES + "Transparent.png");
-        ImageLoader.LoadFile(AssetPaths.TEXTURES + "UVMap.png");
+        ImageLoader.LoadFile(AssetPaths.RESOURCETEXTURES + "Default.png");
+        ImageLoader.LoadFile(AssetPaths.RESOURCETEXTURES + "Transparent.png");
+        ImageLoader.LoadFile(AssetPaths.RESOURCETEXTURES + "UVMap.png");
     }
 
     public void Dispose()
@@ -117,11 +117,11 @@ public sealed partial class CommonContext : IDisposable
 
 public sealed partial class CommonContext : IDisposable
 {
-    public void CreateShader(bool fromResources = false, params string[] paths)
+    public void CreateShader(bool fromResources = false, params string[] localPaths)
     {
-        foreach (string shaderPath in paths)
+        foreach (string shaderPath in localPaths)
         {
-            string shaderName = shaderPath.SplitLast('\\').SplitFirst('.');
+            string shaderName = shaderPath.GetFileNameWithoutExtension();
 
             Assets.VertexShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, shaderPath + ".hlsl", "VS", fromResources);
             Assets.PixelShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, shaderPath + ".hlsl", "PS", fromResources);
@@ -129,13 +129,13 @@ public sealed partial class CommonContext : IDisposable
         }
     }
 
-    public void CreateComputeShader(bool fromResources = false, params string[] paths)
+    public void CreateComputeShader(bool fromResources = false, params string[] localPaths)
     {
-        foreach (string computeShaderPath in paths)
+        foreach (string computeShaderPath in localPaths)
         {
-            string computeShaderName = computeShaderPath.SplitLast('\\').SplitFirst('.');
+            string computeShaderName = computeShaderPath.GetFileNameWithoutExtension();
 
-            Assets.ComputeShaders[computeShaderName] = GraphicsContext.LoadShader(DxcShaderStage.Compute, computeShaderPath + ".hlsl", "CS");
+            Assets.ComputeShaders[computeShaderName] = GraphicsContext.LoadShader(DxcShaderStage.Compute, computeShaderPath + ".hlsl", "CS", fromResources);
             Assets.ComputePipelineStateObjects[computeShaderName] = new(Assets.ComputeShaders[computeShaderName]);
         }
     }

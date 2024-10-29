@@ -76,10 +76,7 @@ public unsafe sealed partial class GUIRenderer
 {
     public void LoadResources()
     {
-        Assets.VertexShaders["ImGui"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Vertex, AssetPaths.SHADERS + "ImGui.hlsl", "VS");
-        Assets.PixelShaders["ImGui"] = Context.GraphicsContext.LoadShader(DxcShaderStage.Pixel, AssetPaths.SHADERS + "ImGui.hlsl", "PS");
-
-        Assets.PipelineStateObjects["ImGui"] = new PipelineStateObject(Assets.VertexShaders["ImGui"], Assets.PixelShaders["ImGui"]);
+        Kernel.Instance.Context.CreateShader(true, ShaderFiles.ImGui.ToString());
 
         RootSignature = Context.CreateRootSignatureFromString("Cs");
     }

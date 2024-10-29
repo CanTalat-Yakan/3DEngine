@@ -12,7 +12,7 @@ public sealed partial class ModelLoader
     public static CommonContext _context;
 
     public static MeshData LoadFile(ModelFiles modelFile, InputLayoutHelper inputLayoutElementsHelper = null) =>
-        LoadFile(AssetPaths.MODELS + modelFile + ".obj", inputLayoutElementsHelper);
+        LoadFile(AssetPaths.RESOURCEMODELS + modelFile + ".obj", inputLayoutElementsHelper);
 
     public static MeshData LoadFile(string filePath, InputLayoutHelper inputLayoutElementsHelper = null)
     {
