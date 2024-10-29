@@ -47,7 +47,7 @@ internal sealed class DefaultBoot : EditorComponent, IHide
         Empty = Entity.Manager.CreateEntity(null, "Empty", hide: true);
 
         Cubes = Entity.Manager.CreateEntity(null, "Cubes");
-        Entity.Manager.CreatePrimitive(PrimitiveTypes.Cube, parent: Cubes);
+        Entity.Manager.CreatePrimitive(parent: Cubes);
 
         Output.Log("Press 'C' to spawn 1000 Cubes");
         Output.Log("Press 'T' to spawn 1000 Simple Entities");
@@ -69,7 +69,7 @@ internal sealed class DefaultBoot : EditorComponent, IHide
 
             for (int i = 0; i < 1000; i++)
             {
-                var newCube = Entity.Manager.CreatePrimitive(PrimitiveTypes.Cube, parent: Cubes, hide: true).Entity;
+                var newCube = Entity.Manager.CreatePrimitive(parent: Cubes, hide: true).Entity;
 
                 newCube.Transform.LocalPosition = new(rnd.Next(-250, 250), rnd.Next(-250, 250), rnd.Next(-250, 250));
                 newCube.Transform.EulerAngles = new(rnd.Next(1, 360), rnd.Next(1, 360), rnd.Next(1, 360));
