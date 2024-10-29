@@ -34,27 +34,21 @@ string escaped_MODELS = EscapeStringLiteral(MODELS + @"\");
 string escaped_PRIMITIVES = EscapeStringLiteral(PRIMITIVES + @"\");
 
 // Helper methods for template processing
-void GenerateEnumMembers(string directoryPath, string searchPattern)
+void GenerateEnumMembers(string directoryPath, string searchPattern, bool searchAllDirectories = false)
 {
-    if (Directory.Exists(directoryPath))
-    {
-        var patterns = searchPattern.Split(';');
-        var files = patterns.SelectMany(pattern => Directory.GetFiles(directoryPath, pattern, SearchOption.AllDirectories))
-                            .Select(Path.GetFileNameWithoutExtension)
-                            .Distinct();
+    if (!Directory.Exists(directoryPath))
+        return;
 
-        foreach (var file in files)
-        {
-            string enumMember = SanitizeEnumMember(file);
+    var patterns = searchPattern.Split(';');
+    var files = patterns.SelectMany(pattern => Directory.GetFiles(directoryPath, pattern, searchAllDirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly))
+                        .Select(Path.GetFileNameWithoutExtension)
+                        .Distinct();
+
+    foreach (var file in files)
+    {
+        string enumMember = SanitizeEnumMember(file);
 #>
     <#= enumMember #>,
-<#
-        }
-    }
-    else
-    {
-#>
-    // No files found
 <#
     }
 }
@@ -76,10 +70,8 @@ string SanitizeEnumMember(string name)
     return sb.ToString();
 }
 
-string EscapeStringLiteral(string str)
-{
-    return str.Replace("\\", "\\\\").Replace("\"", "\\\"");
-}
+string EscapeStringLiteral(string str) =>
+    str.Replace("\\", "\\\\").Replace("\"", "\\\"");
 #>
 namespace Engine;
 

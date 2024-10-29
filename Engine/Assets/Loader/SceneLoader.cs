@@ -46,6 +46,9 @@ public sealed class SceneLoader
         }
     }
 
+    public static void Load(SystemManager systemManager, SceneFiles sceneFile) =>
+        Load(systemManager, AssetPaths.SCENENES + sceneFile + ".usdz");
+
     public static void Load(SystemManager systemManager, string localPath)
     {
         var scene = Scene.Open(localPath);

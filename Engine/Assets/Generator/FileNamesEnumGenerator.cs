@@ -18,7 +18,6 @@ public enum ShaderFiles
 // Enum for Compute Shader files
 public enum ComputeShaderFiles
 {
-    // No files found
 }
 
 // Enum for Texture files
@@ -32,16 +31,6 @@ public enum TextureFiles
 // Enum for Model files
 public enum ModelFiles
 {
-    Cube,
-    Cylinder,
-    Duck,
-    Icosphere,
-    Plane,
-    Quad,
-    Sphere,
-    Suzanne,
-    Torus,
-    Tree,
 }
 
 // Enum for Primitive files

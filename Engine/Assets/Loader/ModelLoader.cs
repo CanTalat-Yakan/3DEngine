@@ -11,6 +11,9 @@ public sealed partial class ModelLoader
     public static CommonContext Context => _context ??= Kernel.Instance.Context;
     public static CommonContext _context;
 
+    public static MeshData LoadFile(ModelFiles modelFile, InputLayoutHelper inputLayoutElementsHelper = null) =>
+        LoadFile(AssetPaths.MODELS + modelFile + ".obj", inputLayoutElementsHelper);
+
     public static MeshData LoadFile(string filePath, InputLayoutHelper inputLayoutElementsHelper = null)
     {
         var meshName = new FileInfo(filePath).Name;
