@@ -1,21 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Engine.ECS;
-
-public enum PrimitiveTypes
-{
-    Plane,
-    Quad,
-    Cube,
-    Sphere,
-    IcoSphere,
-    Cylinder,
-    Torus,
-    Tree,
-    Suzanne,
-    Duck,
-}
 
 public sealed partial class EntityManager
 {
@@ -151,7 +136,7 @@ public sealed partial class EntityManager
         return CreateEntity(newEntityData, parent);
     }
 
-    public Mesh CreatePrimitive(PrimitiveTypes type = PrimitiveTypes.Cube, Entity parent = null, bool hide = false)
+    public Mesh CreatePrimitive(PrimitiveFiles type = PrimitiveFiles.Cube, Entity parent = null, bool hide = false)
     {
         EntityData newEntityData = new()
         {

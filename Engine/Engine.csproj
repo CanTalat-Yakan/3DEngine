@@ -164,17 +164,17 @@
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
-		<None Include="Assets\Generator\ShaderFiles.cs">
+		<None Include="Assets\Generator\FileNamesEnumGenerator.cs">
 		  <DesignTime>True</DesignTime>
 		  <AutoGen>True</AutoGen>
-		  <DependentUpon>ShaderFiles.tt</DependentUpon>
+		  <DependentUpon>FileNamesEnumGenerator.tt</DependentUpon>
 		</None>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Assets\Generator\ShaderFiles.tt">
+	  <None Update="Assets\Generator\FileNamesEnumGenerator.tt">
 	    <Generator>TextTemplatingFileGenerator</Generator>
-	    <LastGenOutput>ShaderFiles.cs</LastGenOutput>
+	    <LastGenOutput>FileNamesEnumGenerator.cs</LastGenOutput>
 	  </None>
 	</ItemGroup>
 
@@ -183,6 +183,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Assets\Generator\FileNamesEnumGenerator.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>FileNamesEnumGenerator.tt</DependentUpon>
+	  </Compile>
 	  <Compile Update="Assets\Generator\ShaderFiles.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
