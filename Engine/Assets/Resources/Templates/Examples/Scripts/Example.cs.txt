@@ -3,16 +3,17 @@ using System.Collections;
 using System.Numerics;
 
 using Engine;
-using Engine.Buffer;
+using Engine.Buffers;
 using Engine.Components;
 using Engine.DataStructures;
 using Engine.ECS;
 using Engine.Editor;
+using Engine.Essentials;
 using Engine.Framework;
 using Engine.Graphics;
 using Engine.GUI;
-using Engine.Helper;
-using Engine.Runtime;
+using Engine.Helpers;
+using Engine.Runtimes;
 using Engine.Utilities;
 
 public class Example : Component

@@ -113,7 +113,6 @@ public unsafe sealed partial class GUIRenderer
 
     private void RenderImDrawData()
     {
-        var graphicsContext = Context.GraphicsContext;
         var data = ImGui.GetDrawData();
 
         if (data.DisplaySize.X < 1
@@ -152,8 +151,8 @@ public unsafe sealed partial class GUIRenderer
             var indexBytes = commandList.IdxBuffer.Size * meshData.IndexStride;
             var vertexBytes = commandList.VtxBuffer.Size * meshData.VertexStride;
 
-            Context.UploadBuffer.UploadIndexBuffer(graphicsContext, meshData, new Span<byte>(commandList.IdxBuffer.Data.ToPointer(), (int)indexBytes), meshData.IndexFormat);
-            Context.UploadBuffer.UploadVertexBuffer(graphicsContext, meshData, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), (int)vertexBytes));
+            Context.UploadBuffer.UploadIndexBuffer(meshData, new Span<byte>(commandList.IdxBuffer.Data.ToPointer(), (int)indexBytes), meshData.IndexFormat);
+            Context.UploadBuffer.UploadVertexBuffer(meshData, new Span<byte>(commandList.VtxBuffer.Data.ToPointer(), (int)vertexBytes));
 
             Context.GraphicsContext.SetMesh(meshData);
 

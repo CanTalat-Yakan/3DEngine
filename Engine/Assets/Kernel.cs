@@ -7,7 +7,7 @@ global using Vortice.Dxc;
 global using USD.NET;
 global using pxr;
 
-global using Engine.Buffer;
+global using Engine.Buffers;
 global using Engine.Components;
 global using Engine.DataStructures;
 global using Engine.ECS;

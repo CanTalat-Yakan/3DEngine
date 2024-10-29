@@ -25,7 +25,7 @@ public sealed partial class ImageLoader
 
         var mipData = ProcessWIC(Context.GraphicsDevice.Device, filePath, out var format, out var size, out uint mipLevels);
 
-        Texture2D texture = new()
+        Texture2D texture2D = new()
         {
             Width = (uint)size.Width,
             Height = (uint)size.Height,
@@ -34,16 +34,16 @@ public sealed partial class ImageLoader
             Name = textureName,
         };
 
-        Assets.RenderTargets[textureName] = texture;
+        Assets.RenderTargets[textureName] = texture2D;
 
         GPUUpload upload = new()
         {
-            Texture2D = texture,
+            Texture2D = texture2D,
             TextureData = mipData,
         };
         Context.UploadQueue.Enqueue(upload);
 
-        return texture;
+        return texture2D;
     }
 
     private static List<byte[]> ProcessWIC(ID3D12Device device, string filePath, out Format format, out SizeI size, out uint mipLevels)

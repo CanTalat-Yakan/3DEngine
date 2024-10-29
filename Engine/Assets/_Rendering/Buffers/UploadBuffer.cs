@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 using Vortice.Direct3D12;
 
-namespace Engine.Buffer;
+namespace Engine.Buffers;
 
 public unsafe partial class UploadBuffer : IDisposable
 {
