@@ -97,7 +97,7 @@ public sealed partial class ComputeContext : IDisposable
 
     public ReadOnlyMemory<byte> LoadComputeShader(DxcShaderStage shaderStage, string localPath, string entryPoint, bool fromResources = false)
     {
-        localPath = fromResources ? AssetPaths.RESOURCECOMPUTESHADER + localPath : AssetPaths.COMPUTESHADER + localPath;
+        localPath = fromResources ? AssetPaths.RESOURCECOMPUTESHADER + localPath : AssetPaths.ASSETS + localPath;
 
         string directory = Path.GetDirectoryName(localPath);
         string shaderSource = File.ReadAllText(localPath);

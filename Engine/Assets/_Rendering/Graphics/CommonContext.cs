@@ -123,8 +123,8 @@ public sealed partial class CommonContext : IDisposable
         {
             string shaderName = shaderPath.GetFileNameWithoutExtension();
 
-            Assets.VertexShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, shaderPath + ".hlsl", "VS", fromResources);
-            Assets.PixelShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, shaderPath + ".hlsl", "PS", fromResources);
+            Assets.VertexShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Vertex, shaderName + ".hlsl", "VS", fromResources);
+            Assets.PixelShaders[shaderName] = GraphicsContext.LoadShader(DxcShaderStage.Pixel, shaderName + ".hlsl", "PS", fromResources);
             Assets.PipelineStateObjects[shaderName] = new(Assets.VertexShaders[shaderName], Assets.PixelShaders[shaderName]);
         }
     }
@@ -135,7 +135,7 @@ public sealed partial class CommonContext : IDisposable
         {
             string computeShaderName = computeShaderPath.GetFileNameWithoutExtension();
 
-            Assets.ComputeShaders[computeShaderName] = ComputeContext.LoadComputeShader(DxcShaderStage.Compute, computeShaderPath + ".hlsl", "CS", fromResources);
+            Assets.ComputeShaders[computeShaderName] = ComputeContext.LoadComputeShader(DxcShaderStage.Compute, computeShaderName + ".hlsl", "CS", fromResources);
             Assets.ComputePipelineStateObjects[computeShaderName] = new(Assets.ComputeShaders[computeShaderName]);
         }
     }

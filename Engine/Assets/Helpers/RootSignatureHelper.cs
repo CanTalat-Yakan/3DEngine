@@ -20,6 +20,7 @@ public class RootSignatureHelper
         new RootSignatureHelper().CreateRootSignatureParameters(
             RootSignatureParameterTypes.ConstantBufferView,
             RootSignatureParameterTypes.ConstantBufferView,
+            RootSignatureParameterTypes.ConstantBufferView,
             RootSignatureParameterTypes.ShaderResourceViewTable);
 
     public string GetString() =>

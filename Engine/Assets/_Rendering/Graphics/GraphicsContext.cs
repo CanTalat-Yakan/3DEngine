@@ -103,7 +103,7 @@ public sealed partial class GraphicsContext : IDisposable
 
     public ReadOnlyMemory<byte> LoadShader(DxcShaderStage shaderStage, string localPath, string entryPoint, bool fromResources = false)
     {
-        localPath = fromResources ? AssetPaths.RESOURCESHADERS + localPath : AssetPaths.SHADERS + localPath;
+        localPath = fromResources ? AssetPaths.RESOURCESHADERS + localPath : AssetPaths.ASSETS + localPath;
 
         string directory = Path.GetDirectoryName(localPath);
         string shaderSource = File.ReadAllText(localPath);
