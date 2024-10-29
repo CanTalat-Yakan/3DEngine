@@ -93,7 +93,10 @@ public sealed partial class Mesh : EditorComponent
 {
     public void SetMeshData(float[] vertices, int[] indices, Vector3[] positions, InputLayoutHelper inputLayoutElements, string meshName = null, bool unsignedInt32IndexFormat = true) =>
         SetMeshData(Context.CreateMeshData(vertices, indices, positions, inputLayoutElements, meshName, unsignedInt32IndexFormat));
-    
+
+    public void SetMeshData(ModelFiles modelFile) =>
+        SetMeshData(Assets.Meshes[modelFile + ".obj"]);
+
     public void SetMeshData(MeshData meshData)
     {
         if (meshData is null)
@@ -106,12 +109,24 @@ public sealed partial class Mesh : EditorComponent
         SubscribeCheckBounds();
     }
 
+    public void SetMaterialTextures(params TextureFiles[] textureFiles)
+    {
+        var materialTextureEntries = new MaterialTextureEntry[textureFiles.Length];
+        for (uint i = 0; i < textureFiles.Length; i++)
+            materialTextureEntries[i] = new(textureFiles[i] + ".png", i);
+
+        SetMaterialTextures(materialTextureEntries);
+    }
+
     public void SetMaterialTextures(params MaterialTextureEntry[] textureEntries) =>
         Material.MaterialTextures.AddRange(textureEntries);
 
     public void SetRootSignature(RootSignatureHelper rootSignatureHelper = null) =>
         Material.SetRootSignature(rootSignatureHelper?.GetString() ?? RootSignatureHelper.GetDefault());
 
+    public void SetMaterialPipeline(ShaderFiles shaderFile) =>
+        Material.SetPipelineStateObject(shaderFile.ToString());
+    
     public void SetMaterialPipeline(string pipelineStateObjectName) =>
         Material.SetPipelineStateObject(pipelineStateObjectName);
 

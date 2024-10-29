@@ -31,6 +31,16 @@ public enum TextureFiles
 // Enum for Model files
 public enum ModelFiles
 {
+    Cube,
+    Cylinder,
+    Duck,
+    Icosphere,
+    Plane,
+    Quad,
+    Sphere,
+    Suzanne,
+    Torus,
+    Tree,
 }
 
 // Enum for Primitive files

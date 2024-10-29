@@ -92,8 +92,8 @@ public sealed class SceneLoader
 
                 var mesh = entity.AddComponent<Mesh>();
                 mesh.SetMeshData(meshData);
-                mesh.SetMaterialTextures([new("Default.png", 0)]);
-                mesh.SetMaterialPipeline("SimpleLit");
+                mesh.SetMaterialTextures(TextureFiles.Default);
+                mesh.SetMaterialPipeline(ShaderFiles.SimpleLit);
             }
 
             if (type.ToString().Equals("Xform"))
