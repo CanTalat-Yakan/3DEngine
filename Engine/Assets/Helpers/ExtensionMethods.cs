@@ -97,11 +97,8 @@ public static class ExtensionMethods
         string.Concat(input[0].ToString().ToUpper(), input.AsSpan(1));
 
     public static string GetFileNameWithoutExtension(this string text) =>
-        text.Split('.').First();
+        text.Split('\\').Last().Split('.').First();
     
-    public static string GetFileNameWithoutExstension(this string text) =>
-        Path.GetFileNameWithoutExtension(text);
-
     public static string GetFileNameFromTemplate(this string text)
     {
         var splits = Path.GetFileName(text).Split('.');
@@ -110,7 +107,7 @@ public static class ExtensionMethods
     }
 
     public static string RemoveExtension(this string text) =>
-        text.Split('.').FirstOrDefault();
+        text.Split('.').First();
 
     public static string FormatString(this string text) =>
         text.SplitLast('_').SplitLast('.').SplitLast('+').FirstCharToUpper().AddSpacesToSentence();
