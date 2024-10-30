@@ -68,18 +68,6 @@ public sealed partial class Material : EditorComponent, IHide, IEquatable<Materi
      && MaterialTextures.Count == other.MaterialTextures.Count
      && RootSignature == other.RootSignature;
 
-    public void SetTextures(params TextureFiles[] textureFiles)
-    {
-        var materialTextureEntries = new MaterialTextureEntry[textureFiles.Length];
-        for (uint i = 0; i < textureFiles.Length; i++)
-            materialTextureEntries[i] = new(textureFiles[i] + ".png", i);
-
-        SetTextures(materialTextureEntries);
-    }
-
-    public void SetTextures(params MaterialTextureEntry[] textureEntries) =>
-        MaterialTextures.AddRange(textureEntries);
-
     public void SetRootSignature(RootSignatureHelper rootSignatureHelper = null) =>
         SetRootSignature(rootSignatureHelper?.GetString() ?? RootSignatureHelper.GetDefault());
 
@@ -110,4 +98,25 @@ public sealed partial class Material : EditorComponent, IHide, IEquatable<Materi
             PipelineStateObjectName = pipelineStateObject;
         else throw new NotImplementedException("error pipeline state object not found in material");
     }
+
+    public void SetTextures<T>(params T[] textureEntries) where T : Enum
+    {
+        var materialTextureEntries = new MaterialTextureEntry[textureEntries.Length];
+        for (uint i = 0; i < textureEntries.Length; i++)
+            materialTextureEntries[i] = new(textureEntries[i].ToString() + ".png", i);
+
+        MaterialTextures.AddRange(materialTextureEntries);
+    }
+
+    public void SetTextures(params TextureFiles[] textureFiles)
+    {
+        var materialTextureEntries = new MaterialTextureEntry[textureFiles.Length];
+        for (uint i = 0; i < textureFiles.Length; i++)
+            materialTextureEntries[i] = new(textureFiles[i] + ".png", i);
+
+        SetTextures(materialTextureEntries);
+    }
+
+    public void SetTextures(params MaterialTextureEntry[] textureEntries) =>
+        MaterialTextures.AddRange(textureEntries);
 }

@@ -27,7 +27,7 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
 
     public void Initialize(string pipelineStateObjectName, RootSignatureHelper rootSignatureHelper = null)
     {
-        SetRootSignature(rootSignatureHelper?.GetString() ?? RootSignatureHelper.GetDefault());
+        SetComputeRootSignature(rootSignatureHelper?.GetString() ?? RootSignatureHelper.GetDefault());
         SetComputePipelineStateObject(pipelineStateObjectName);
     }
 
@@ -60,7 +60,7 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
         ComputePipelineStateObjectName == other.ComputePipelineStateObjectName
      && ComputeRootSignature == other.ComputeRootSignature;
 
-    private void SetRootSignature(string computeRootSignatureParameters)
+    private void SetComputeRootSignature(string computeRootSignatureParameters)
     {
         if (!Context.IsRendering)
             return;
