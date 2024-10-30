@@ -146,10 +146,10 @@ public sealed partial class EntityManager
         Entity newEntity = CreateEntity(newEntityData, parent);
 
         var mesh = newEntity.AddComponent<Mesh>();
-        mesh.SetRootSignature();
         mesh.SetMeshData(ModelLoader.LoadFile(AssetPaths.PRIMITIVES + type + ".obj"));
-        mesh.SetMaterialTextures(TextureFiles.Default);
-        mesh.SetMaterialPipeline(ShaderFiles.SimpleLit);
+        mesh.Material.SetRootSignature();
+        mesh.Material.SetTextures(TextureFiles.Default);
+        mesh.Material.SetPipeline(ShaderFiles.SimpleLit);
 
         return mesh;
     }

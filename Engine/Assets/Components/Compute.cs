@@ -19,8 +19,11 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
     public override void OnDestroy() =>
         ComputeRootSignature?.Dispose();
 
+    public void Initialize<T>(T computeShaderFile, RootSignatureHelper rootSignatureHelper = null) where T : Enum =>
+        Initialize(computeShaderFile.ToString(), rootSignatureHelper);
+    
     public void Initialize(ComputeShaderFiles computeShaderFile, RootSignatureHelper rootSignatureHelper = null) =>
-        Initialize(computeShaderFile, rootSignatureHelper);
+        Initialize(computeShaderFile.ToString(), rootSignatureHelper);
 
     public void Initialize(string pipelineStateObjectName, RootSignatureHelper rootSignatureHelper = null)
     {
@@ -49,12 +52,24 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
         Context.ComputeContext.EndCommand();
         Context.ComputeContext.Execute();
     }
+}
 
+public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute>
+{
     public bool Equals(Compute other) =>
         ComputePipelineStateObjectName == other.ComputePipelineStateObjectName
      && ComputeRootSignature == other.ComputeRootSignature;
 
-    public void SetComputePipelineStateObject(string computePipelineStateObject)
+    private void SetRootSignature(string computeRootSignatureParameters)
+    {
+        if (!Context.IsRendering)
+            return;
+
+        ComputeRootSignature?.Dispose();
+        ComputeRootSignature = Context.CreateRootSignatureFromString(computeRootSignatureParameters);
+    }
+
+    private void SetComputePipelineStateObject(string computePipelineStateObject)
     {
         if (!Context.IsRendering)
             return;
@@ -64,12 +79,4 @@ public sealed partial class Compute : EditorComponent, IHide, IEquatable<Compute
         else throw new NotImplementedException("error compute pipeline state object not found in material");
     }
 
-    public void SetRootSignature(string computeRootSignatureParameters)
-    {
-        if (!Context.IsRendering)
-            return;
-
-        ComputeRootSignature?.Dispose();
-        ComputeRootSignature = Context.CreateRootSignatureFromString(computeRootSignatureParameters);
-    }
 }

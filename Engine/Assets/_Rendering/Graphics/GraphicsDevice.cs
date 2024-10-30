@@ -26,7 +26,6 @@ public sealed partial class GraphicsDevice : IDisposable
     public IDXGISwapChain3 SwapChain;
     public ID3D12CommandQueue CommandQueue;
     public List<ID3D12CommandAllocator> GraphicCommandAllocators;
-    public ID3D12CommandAllocator ComputeCommandAllocator;
 
     public ID3D12Fence Fence;
     public EventWaitHandle WaitHandle;
@@ -104,9 +103,6 @@ public sealed partial class GraphicsDevice : IDisposable
             commandAllocator.Dispose();
 
         GraphicCommandAllocators.Clear();
-
-        ComputeCommandAllocator?.Dispose();
-        ComputeCommandAllocator = null;
 
         Factory?.Dispose();
         CommandQueue?.Dispose();
@@ -260,9 +256,6 @@ public sealed partial class GraphicsDevice : IDisposable
 
             GraphicCommandAllocators.Add(graphicsCommandAllocator);
         }
-
-        Device.CreateCommandAllocator(CommandListType.Compute, out ComputeCommandAllocator).ThrowIfFailed();
-        ComputeCommandAllocator.Name = "ComputeCommandAllocator";
     }
 
     private void CreateSwapChain(bool forHwnd)
@@ -646,9 +639,6 @@ public sealed partial class GraphicsDevice : IDisposable
 
     public ID3D12CommandAllocator GetGraphicsCommandAllocator() =>
         GraphicCommandAllocators[(int)ExecuteIndex];
-
-    public ID3D12CommandAllocator GetComputeCommandAllocator() =>
-        ComputeCommandAllocator;
 
     public ID3D12Resource GetBackBufferRenderTarget() =>
         BackBufferRenderTargets[(int)SwapChain.CurrentBackBufferIndex];

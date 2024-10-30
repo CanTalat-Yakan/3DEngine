@@ -23,10 +23,10 @@ public sealed partial class DefaultSky : EditorComponent, IHide
         Entity.Data.IsHidden = true;
 
         var mesh = Entity.AddComponent<Mesh>();
-        mesh.SetRootSignature();
         mesh.SetMeshData(ModelFiles.Cube);
-        mesh.SetMaterialTextures(TextureFiles.Default);
-        mesh.SetMaterialPipeline(ShaderFiles.Sky);
+        mesh.Material.SetRootSignature();
+        mesh.Material.SetTextures(TextureFiles.Default);
+        mesh.Material.SetPipeline(ShaderFiles.Sky);
         mesh.Order = 0;
     }
 }

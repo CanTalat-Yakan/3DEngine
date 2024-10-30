@@ -26,7 +26,7 @@ public sealed class ComputeData : IDisposable
         );
 
         // Step 2: Copy from UAV buffer to readback buffer
-        var commandList = Context.GraphicsDevice.Device.CreateCommandList<ID3D12GraphicsCommandList5>(0, CommandListType.Compute, Context.GraphicsDevice.GetComputeCommandAllocator(), null);
+        var commandList = Context.GraphicsDevice.Device.CreateCommandList<ID3D12GraphicsCommandList5>(0, CommandListType.Compute, Context.ComputeContext.ComputeCommandAllocator, null);
         commandList.ResourceBarrierTransition(BufferResource, ResourceStates.UnorderedAccess, ResourceStates.CopySource);
         commandList.CopyResource(readbackBuffer, BufferResource);
         commandList.Close();

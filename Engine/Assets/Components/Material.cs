@@ -59,11 +59,47 @@ public sealed partial class Material : EditorComponent, IHide, IEquatable<Materi
             Context.GraphicsContext.SetConstantBufferView(offset, 10);
         }
     }
+}
 
+public sealed partial class Material : EditorComponent, IHide, IEquatable<Material>
+{
     public bool Equals(Material other) =>
         PipelineStateObjectName == other.PipelineStateObjectName
      && MaterialTextures.Count == other.MaterialTextures.Count
      && RootSignature == other.RootSignature;
+
+    public void SetTextures(params TextureFiles[] textureFiles)
+    {
+        var materialTextureEntries = new MaterialTextureEntry[textureFiles.Length];
+        for (uint i = 0; i < textureFiles.Length; i++)
+            materialTextureEntries[i] = new(textureFiles[i] + ".png", i);
+
+        SetTextures(materialTextureEntries);
+    }
+
+    public void SetTextures(params MaterialTextureEntry[] textureEntries) =>
+        MaterialTextures.AddRange(textureEntries);
+
+    public void SetRootSignature(RootSignatureHelper rootSignatureHelper = null) =>
+        SetRootSignature(rootSignatureHelper?.GetString() ?? RootSignatureHelper.GetDefault());
+
+    public void SetRootSignature(string rootSignatureParameters)
+    {
+        if (!Context.IsRendering)
+            return;
+
+        RootSignature?.Dispose();
+        RootSignature = Context.CreateRootSignatureFromString(rootSignatureParameters);
+    }
+
+    public void SetPipeline<T>(T shaderFile) where T : Enum =>
+        SetPipelineStateObject(shaderFile.ToString());
+
+    public void SetPipeline(ShaderFiles shaderFile) =>
+        SetPipelineStateObject(shaderFile.ToString());
+
+    public void SetPipeline(string pipelineStateObjectName) =>
+        SetPipelineStateObject(pipelineStateObjectName);
 
     public void SetPipelineStateObject(string pipelineStateObject)
     {
@@ -73,14 +109,5 @@ public sealed partial class Material : EditorComponent, IHide, IEquatable<Materi
         if (Assets.PipelineStateObjects.ContainsKey(pipelineStateObject))
             PipelineStateObjectName = pipelineStateObject;
         else throw new NotImplementedException("error pipeline state object not found in material");
-    }
-
-    public void SetRootSignature(string rootSignatureParameters)
-    {
-        if (!Context.IsRendering)
-            return;
-
-        RootSignature?.Dispose();
-        RootSignature = Context.CreateRootSignatureFromString(rootSignatureParameters);
     }
 }

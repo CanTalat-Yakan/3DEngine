@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using Vortice.Direct3D12;
 
 namespace Engine.Graphics;
@@ -9,17 +10,30 @@ public sealed partial class ComputeContext : IDisposable
     public GraphicsDevice GraphicsDevice;
 
     public ID3D12GraphicsCommandList5 CommandList;
+    public ID3D12CommandAllocator ComputeCommandAllocator;
+
     public RootSignature CurrentRootSignature;
 
     public ComputePipelineStateObject ComputePipelineStateObject;
     public ComputePipelineStateObjectDescription ComputePipelineStateObjectDescription;
 
+    private ID3D12Fence ComputeFence;
+    private EventWaitHandle WaitHandle = new(false, EventResetMode.AutoReset);
+
+    private ulong computeFenceValue = 1;
+
     public void Initialize(GraphicsDevice graphicsDevice)
     {
         GraphicsDevice = graphicsDevice;
 
-        GraphicsDevice.Device.CreateCommandList(0, CommandListType.Compute, GraphicsDevice.GetComputeCommandAllocator(), null, out CommandList).ThrowIfFailed();
+        GraphicsDevice.Device.CreateCommandAllocator(CommandListType.Compute, out ComputeCommandAllocator).ThrowIfFailed();
+        ComputeCommandAllocator.Name = "ComputeCommandAllocator";
+
+        GraphicsDevice.Device.CreateCommandList(0, CommandListType.Compute, ComputeCommandAllocator, null, out CommandList).ThrowIfFailed();
         CommandList.Close();
+
+        // Create the fence for synchronization
+        GraphicsDevice.Device.CreateFence(0, FenceFlags.None, out ComputeFence).ThrowIfFailed();
     }
 
     public void Dispose()
@@ -51,7 +65,7 @@ public sealed partial class ComputeContext : IDisposable
         uploadBuffer.Upload(data, out uint offset);
 
         // Step 3: Copy data from UploadBuffer to the UAV buffer
-        var commandList = GraphicsDevice.Device.CreateCommandList<ID3D12GraphicsCommandList5>(0, CommandListType.Compute, GraphicsDevice.GetComputeCommandAllocator(), null);
+        var commandList = GraphicsDevice.Device.CreateCommandList<ID3D12GraphicsCommandList5>(0, CommandListType.Compute, ComputeCommandAllocator, null);
         commandList.CopyBufferRegion(computeData.BufferResource, 0, uploadBuffer.Resource, offset, (ulong)bufferSize);
         commandList.ResourceBarrierTransition(computeData.BufferResource, ResourceStates.CopyDest, ResourceStates.UnorderedAccess);
         commandList.Close();
@@ -117,17 +131,37 @@ public sealed partial class ComputeContext : IDisposable
 {
     public void BeginCommand()
     {
-        CommandList.SetDescriptorHeaps(1, [GraphicsDevice.ShaderResourcesHeap.Heap]);
+        // Wait for previous compute commands to finish
+        WaitForCompute();
 
-        GraphicsDevice.GetComputeCommandAllocator().Reset();
-        CommandList.Reset(GraphicsDevice.GetComputeCommandAllocator());
+        ComputeCommandAllocator.Reset();
+        CommandList.Reset(ComputeCommandAllocator);
     }
 
     public void EndCommand() =>
         CommandList.Close();
 
-    public void Execute() =>
+    public void WaitForCompute()
+    {
+        // Check if GPU has completed the compute work
+        if (ComputeFence.CompletedValue < computeFenceValue)
+        {
+            // Wait until the GPU completes work
+            ComputeFence.SetEventOnCompletion(computeFenceValue, WaitHandle.SafeWaitHandle.DangerousGetHandle());
+            WaitHandle.WaitOne();
+        }
+
+        // Increment fence value for the next set of compute commands
+        computeFenceValue++;
+    }
+
+    public void Execute()
+    {
         GraphicsDevice.CommandQueue.ExecuteCommandList(CommandList);
+
+        // Signal the fence for synchronization
+        GraphicsDevice.CommandQueue.Signal(ComputeFence, computeFenceValue);
+    }
 
     public void SetPipelineState(ComputePipelineStateObject computePipelineStateObject, ComputePipelineStateObjectDescription computePipelineStateObjectDescription)
     {

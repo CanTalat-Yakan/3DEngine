@@ -35,7 +35,7 @@ public sealed partial class Mesh : EditorComponent
                 finally { MeshPath = null; }
 
         if (!string.IsNullOrEmpty(ShaderName))
-            try { SetMaterialPipeline(ShaderName); }
+            try { Material.SetPipeline(ShaderName); }
             finally { ShaderName = null; }
     }
 
@@ -108,27 +108,6 @@ public sealed partial class Mesh : EditorComponent
         InstantiateBounds(meshData.BoundingBox);
         SubscribeCheckBounds();
     }
-
-    public void SetMaterialTextures(params TextureFiles[] textureFiles)
-    {
-        var materialTextureEntries = new MaterialTextureEntry[textureFiles.Length];
-        for (uint i = 0; i < textureFiles.Length; i++)
-            materialTextureEntries[i] = new(textureFiles[i] + ".png", i);
-
-        SetMaterialTextures(materialTextureEntries);
-    }
-
-    public void SetMaterialTextures(params MaterialTextureEntry[] textureEntries) =>
-        Material.MaterialTextures.AddRange(textureEntries);
-
-    public void SetRootSignature(RootSignatureHelper rootSignatureHelper = null) =>
-        Material.SetRootSignature(rootSignatureHelper?.GetString() ?? RootSignatureHelper.GetDefault());
-
-    public void SetMaterialPipeline(ShaderFiles shaderFile) =>
-        Material.SetPipelineStateObject(shaderFile.ToString());
-    
-    public void SetMaterialPipeline(string pipelineStateObjectName) =>
-        Material.SetPipelineStateObject(pipelineStateObjectName);
 
     private void InstantiateBounds(BoundingBox boundingBox)
     {
