@@ -154,4 +154,6 @@ A formal guideline will be added once the editor and initial subsystems land.
 
 ## License
 
-The license will be finalized before the first tagged release. Until then, treat the code as work‑in‑progress with no implied warranty.
+Code: MIT license. See [LICENSE](./LICENSE) for the full text.
+
+Contributions: By submitting a contribution, you agree to license your contribution under the same license as this repository.
