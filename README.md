@@ -13,8 +13,6 @@
   <img alt="Platforms" src="https://img.shields.io/badge/Platforms-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey">
 </p>
 
----
-
 <!-- TOC -->
 - [Overview](#overview)
 - [Current Status](#current-status)
