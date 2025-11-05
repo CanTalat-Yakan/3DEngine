@@ -66,14 +66,10 @@ Prerequisites:
 Build and run:
 
 ```bash
-# Clone
-git clone https://github.com/<your-account>/3DEngine.git
-cd 3DEngine
-
-# Restore, build, run (Debug)
-dotnet restore
-dotnet build -c Debug
-dotnet run -c Debug
+dotnet new console -n Project
+cd Project
+dotnet add package 3DEngine
+./Project.csproj
 ```
 
 Notes:
