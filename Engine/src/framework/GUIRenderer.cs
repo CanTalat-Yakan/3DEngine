@@ -15,7 +15,7 @@ namespace Engine;
 /// - This renderer targets SDL's 2D renderer (not a GPU backend like Vulkan/Direct3D).
 /// - Not thread-safe; call methods from the same thread that owns the SDL renderer.
 /// </remarks>
-public sealed class ImGuiSdlRenderer : IDisposable
+public sealed class GUIRenderer : IDisposable
 {
     // SDL renderer handle used for all draw calls.
     private readonly nint _renderer;
@@ -33,7 +33,7 @@ public sealed class ImGuiSdlRenderer : IDisposable
     /// <remarks>
     /// The constructor uploads ImGui device objects (font texture) immediately.
     /// </remarks>
-    public ImGuiSdlRenderer(nint renderer)
+    public GUIRenderer(nint renderer)
     {
         _renderer = renderer;
         CreateDeviceObjects();

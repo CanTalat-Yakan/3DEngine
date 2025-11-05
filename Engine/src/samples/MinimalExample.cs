@@ -1,17 +1,14 @@
-﻿using System.Numerics;
-using ImGuiNET;
-using SDL3;
-
 namespace Engine;
 
-public sealed class Program
+public static class MinimalExampleProgram
 {
-    [STAThread]
-    private static void Main()
+    public static void Run()
     {
         var config = Config.GetDefault(multiSample: MultiSample.x4, defaultBoot: true);
         new App(config)
             .AddPlugins(new DefaultPlugins())
+            .AddPlugin(new MinimalExample())
             .Run();
     }
 }
+
