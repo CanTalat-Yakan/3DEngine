@@ -27,15 +27,11 @@
 - [License](#license)
 <!-- /TOC -->
 
----
-
 ## Overview
 
 This repository is the restart of a cross‑platform 3D engine written in C#. The runtime is being built on Vulkan for rendering and SDL3 for windowing/input. An editor built with Avalonia UI is planned but not implemented yet.
 
 At the moment, the solution is intentionally minimal — a small SDL3 window loop to validate the toolchain and native dependencies. The goal is to iterate rapidly toward a modern, data‑driven engine and editor.
-
----
 
 ## Current Status
 
@@ -44,8 +40,6 @@ At the moment, the solution is intentionally minimal — a small SDL3 window loo
 - No editor/UI, no gameplay framework yet. Public APIs are not stable.
 
 See `Program.cs` for the current entry point and loop.
-
----
 
 ## Tech Stack (in this repo)
 
@@ -57,15 +51,11 @@ See `Program.cs` for the current entry point and loop.
 - USD.NET / UniversalSceneDescription: scene and asset interchange (planned integration).
 - Newtonsoft.Json: configuration and serialization utilities.
 
----
-
 ## Supported Platforms
 
 - Linux: X11 and Wayland supported via SDL3. Ensure recent Vulkan drivers (Mesa/NVIDIA/AMD).
 - Windows: Vulkan-capable GPU + drivers. No WinUI/WinAppSDK dependency; editor will use Avalonia.
 - macOS: via Vulkan portability (MoltenVK) as available through dependencies. Status: experimental.
-
----
 
 ## Quickstart
 
@@ -89,8 +79,6 @@ dotnet run -c Debug
 Notes:
 - Native binaries for SDL3 and related libraries are bundled via NuGet. On Linux you still need standard system libs (X11/Wayland, audio, etc.) and up‑to‑date GPU drivers.
 - If Vulkan initialization fails, verify your driver installation and ensure validation layers are either installed or disabled.
-
----
 
 ## Minimal example (current state)
 
@@ -116,16 +104,12 @@ SDL.DestroyWindow(window);
 SDL.Quit();
 ```
 
----
-
 ## Project Layout
 
 - `3DEngine.sln` — Solution file.
 - `Engine.csproj` — Project file targeting .NET 10.0 with Vulkan/SDL3 dependencies.
 - `Program.cs` — Minimal SDL3 window loop entry point.
 - `img/` — Branding assets (local only; no external image hotlinks).
-
----
 
 ## Roadmap (high-level)
 
@@ -150,8 +134,6 @@ SDL.Quit();
 
 Items are aspirational and subject to change as the project evolves.
 
----
-
 ## Troubleshooting
 
 - SDL3 fails to load on Linux:
@@ -163,8 +145,6 @@ Items are aspirational and subject to change as the project evolves.
 - macOS portability:
   - MoltenVK support may be required; check your Vulkan loader and SDK installation.
 
----
-
 ## Contributing
 
 Early days! If you want to help:
@@ -173,8 +153,6 @@ Early days! If you want to help:
 - Keep changes platform‑agnostic when possible.
 
 A formal guideline will be added once the editor and initial subsystems land.
-
----
 
 ## License
 
