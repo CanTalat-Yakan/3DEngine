@@ -152,6 +152,8 @@ Early days! If you want to help:
 - Propose small, well‑scoped PRs (build scripts, docs, samples, or isolated subsystems).
 - Keep changes platform‑agnostic when possible.
 
+By participating, you agree to abide by our [Code of Conduct](./CODE_OF_CONDUCT.md).
+
 A formal guideline will be added once the editor and initial subsystems land.
 
 ## License
