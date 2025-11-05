@@ -1,5 +1,5 @@
 <p style="text-align:center">
-  <img src="img/3DEngine_logo.png" alt="3D Engine logo"/>
+  <img src="img/3DEngine_logo.png" alt="3D Engine logo" width="256"/>
 </p>
 
 <h1 style="text-align:center">3D Engine</h1>
