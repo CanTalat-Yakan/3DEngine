@@ -10,6 +10,7 @@
 
     <ItemGroup>
         <None Remove="FodyWeavers.xml" />
+        <None Remove="imgui.ini" />
     </ItemGroup>
 
     <ItemGroup>
@@ -30,6 +31,10 @@
         <PackageReference Include="Vortice.SpirvCross" Version="1.5.3" />
         <PackageReference Include="Vortice.Vulkan" Version="3.0.3" />
         <PackageReference Include="Vortice.VulkanMemoryAllocator" Version="1.6.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="src\framework\" />
     </ItemGroup>
 
 </Project>
