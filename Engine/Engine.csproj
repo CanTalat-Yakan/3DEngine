@@ -33,8 +33,4 @@
         <PackageReference Include="Vortice.VulkanMemoryAllocator" Version="1.6.3" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="src\framework\" />
-    </ItemGroup>
-
 </Project>
