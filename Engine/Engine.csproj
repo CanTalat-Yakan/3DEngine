@@ -9,7 +9,14 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <None Remove="FodyWeavers.xml" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
+        <PackageReference Include="Costura.Fody" Version="5.7.0">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
         <PackageReference Include="SDL3-CS" Version="3.3.2.1" />
         <PackageReference Include="SDL3-CS.Native" Version="3.3.2" />
