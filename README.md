@@ -1,2 +1,2 @@
-![3dengine-Logo.png](img/3dengine-Logo.png)
+![3DEngine_Icon.png](img/3DEngine_Icon.png)
 3D Engine
