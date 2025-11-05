@@ -1,11 +1,11 @@
-<p style="text-align:center">
+<p align="center" style="text-align:center">
   <img src="img/3DEngine_logo.png" alt="3D Engine logo" width="256"/>
 </p>
 
-<h1 style="text-align:center">3D Engine</h1>
-<h4 style="text-align:center">C# 3D engine (Vulkan + SDL3). Editor planned with Avalonia UI.</h4>
+<h1 align="center" style="text-align:center">3D Engine</h1>
+<h4 align="center" style="text-align:center">C# 3D engine (Vulkan + SDL3). Editor planned with Avalonia UI.</h4>
 
-<p style="text-align:center">
+<p align="center" style="text-align:center">
   <img alt=".NET" src="https://img.shields.io/badge/.NET-10.0-512BD4">
   <img alt="Graphics API" src="https://img.shields.io/badge/Graphics-Vulkan-AC162C">
   <img alt="Windowing" src="https://img.shields.io/badge/Windowing-SDL3-0B7BB2">
