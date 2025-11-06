@@ -33,7 +33,7 @@
     - [Behavior System (Attribute-based ECS)](#behavior-system-attribute-based-ecs)
     - [Native ECS Style (Manual Systems)](#native-ecs-style-manual-systems)
     - [Source Generator](#source-generator)
-    - [FAQ: Static vs Instance, Local Methods, Partial](#faq-static-vs-instance-local-methods-partial)
+    - [FAQ](#faq-static-vs-instance-local-methods-partial)
 - [Roadmap (high-level)](#roadmap-high-level)
 - [Contributing](#contributing)
 - [License](#license)
@@ -309,13 +309,10 @@ alongside them.
 `DefaultPlugins` includes `GeneratedBehaviorsPlugin`, so behaviors are picked up automatically at build time—no manual
 registration required.
 
-### FAQ: Static vs Instance, Local Methods, Partial
+### FAQ
 
 - Static vs Instance: Static methods run once per stage and are great for global logic/UI; instance methods run per
   entity and can use fields/properties on the component.
-- Local methods: Not supported by the generator because they are not type members and don’t have a stable lifetime
-  across frames. Prefer instance methods on the behavior struct if you need state.
-- `partial` keyword: Not required. The generator emits separate helper types and a plugin; it doesn’t inject into your
   structs.
 - Struct lifetimes and disposal: Structs are value types; they aren't “destroyed” with a finalizer. If your struct holds
   class references with unmanaged resources, implement `IDisposable` on the struct and dispose those references in
