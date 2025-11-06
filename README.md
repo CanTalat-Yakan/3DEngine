@@ -214,6 +214,43 @@ public struct Spawner
         Console.WriteLine($"Spawner running. a={a}, b={b}");
     }
 }
+
+public class SomeDisposable : IDisposable
+{
+    private float num = 2;
+
+    public string Log() => num.ToString();
+    
+    public void Dispose()
+    {
+        // Cleanup resources
+    }
+}
+
+[Behavior]
+public struct HeavyBehavior : IDisposable
+{
+    private SomeDisposable _handle;
+
+    [OnStartup]
+    public static void Init(BehaviorContext ctx)
+    {
+        var e = ctx.Ecs.Spawn();
+        ctx.Ecs.Add(e, new HeavyBehavior { _handle = new SomeDisposable() });
+    }
+
+    [OnUpdate]
+    public void Tick(BehaviorContext ctx)
+    {
+        Console.WriteLine(_handle.Log());
+    }
+
+    public void Dispose()
+    {
+        _handle?.Dispose();
+        _handle = null;
+    }
+}
 ```
 
 ### Native ECS Style (Manual Systems)
