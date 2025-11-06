@@ -1,16 +1,11 @@
-﻿using System.Numerics;
-using ImGuiNET;
-using SDL3;
-
-namespace Engine;
+﻿namespace Engine;
 
 public sealed class Program
 {
     [STAThread]
     private static void Main()
     {
-        var config = Config.GetDefault();
-        new App(config)
+        new App(Config.GetDefault())
             .AddPlugins(new DefaultPlugins())
             .Run();
     }

@@ -2,7 +2,7 @@ using SDL3;
 
 namespace Engine;
 
-public sealed partial class AppWindow
+public sealed class AppWindow
 {
     public SDLWindow SdlWindow { get; private set; }
 
