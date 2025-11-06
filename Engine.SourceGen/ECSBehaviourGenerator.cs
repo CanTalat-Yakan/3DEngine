@@ -146,7 +146,7 @@ public sealed class ECSBehaviorGenerator : IIncrementalGenerator
             sb.AppendLine(loopHeader);
             // Filters: Without / Changed
             sb.Append(GenFilterChecks(m.Filters));
-            sb.AppendLine("            ctx.EntityId = entity;");
+            sb.AppendLine("            ctx.EntityID = entity;");
             sb.AppendLine($"            behv.{m.MethodName}(ctx);");
             sb.AppendLine($"            ecs.Update<{b.BehaviorFqn}>(entity, behv);");
             sb.AppendLine("        }");

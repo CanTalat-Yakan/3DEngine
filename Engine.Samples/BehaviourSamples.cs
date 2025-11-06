@@ -58,16 +58,16 @@ namespace Engine
         public void Bounce(BehaviorContext ctx)
         {
             var ecs = ctx.Ecs;
-            if (ecs.TryGet<Position>(ctx.EntityId, out var pos))
+            if (ecs.TryGet<Position>(ctx.EntityID, out var pos))
             {
                 var p = pos;
                 if (p.X < MinX || p.X > MaxX)
                 {
-                    if (ecs.TryGet<Mover>(ctx.EntityId, out var mover))
+                    if (ecs.TryGet<Mover>(ctx.EntityID, out var mover))
                     {
                         var m = mover;
                         m.Speed *= -1f;
-                        ecs.Update(ctx.EntityId, m);
+                        ecs.Update(ctx.EntityID, m);
                     }
                 }
             }
@@ -84,11 +84,11 @@ namespace Engine
             var input = ctx.Res<Input>();
             if (input.KeyPressed(SDL.Scancode.Space))
             {
-                if (ctx.Ecs.TryGet<Mover>(ctx.EntityId, out var mover))
+                if (ctx.Ecs.TryGet<Mover>(ctx.EntityID, out var mover))
                 {
                     var m = mover;
                     m.Speed *= -1f;
-                    ctx.Ecs.Update(ctx.EntityId, m);
+                    ctx.Ecs.Update(ctx.EntityID, m);
                 }
             }
         }
@@ -114,19 +114,19 @@ namespace Engine
         public void Apply(BehaviorContext ctx)
         {
             var dt = (float)ctx.Res<Time>().DeltaSeconds;
-            if (ctx.Ecs.TryGet<Velocity>(ctx.EntityId, out var vel))
+            if (ctx.Ecs.TryGet<Velocity>(ctx.EntityID, out var vel))
             {
                 var v = vel;
                 v.Y += Strength * dt;
-                ctx.Ecs.Update(ctx.EntityId, v);
+                ctx.Ecs.Update(ctx.EntityID, v);
             }
-            if (ctx.Ecs.TryGet<Position>(ctx.EntityId, out var pos))
+            if (ctx.Ecs.TryGet<Position>(ctx.EntityID, out var pos))
             {
                 var p = pos;
-                if (ctx.Ecs.TryGet<Velocity>(ctx.EntityId, out var vel2))
+                if (ctx.Ecs.TryGet<Velocity>(ctx.EntityID, out var vel2))
                 {
                     p.Y += vel2.Y * dt;
-                    ctx.Ecs.Update(ctx.EntityId, p);
+                    ctx.Ecs.Update(ctx.EntityID, p);
                 }
             }
         }
@@ -140,12 +140,12 @@ namespace Engine
         public void Dampen(BehaviorContext ctx)
         {
             var dt = (float)ctx.Res<Time>().DeltaSeconds;
-            if (ctx.Ecs.TryGet<Velocity>(ctx.EntityId, out var vel))
+            if (ctx.Ecs.TryGet<Velocity>(ctx.EntityID, out var vel))
             {
                 var v = vel;
                 v.X *= 1f - Coefficient * dt;
                 v.Y *= 1f - Coefficient * dt;
-                ctx.Ecs.Update(ctx.EntityId, v);
+                ctx.Ecs.Update(ctx.EntityID, v);
             }
         }
     }
@@ -162,7 +162,7 @@ namespace Engine
             _accum += (float)ctx.Res<Time>().DeltaSeconds;
             if (_accum >= Seconds)
             {
-                ctx.Cmd.Despawn(ctx.EntityId);
+                ctx.Cmd.Despawn(ctx.EntityID);
             }
         }
     }
@@ -173,10 +173,10 @@ namespace Engine
         [OnUpdate, With(typeof(Position))]
         public void Log(BehaviorContext ctx)
         {
-            if (ctx.Ecs.Changed<Position>(ctx.EntityId))
+            if (ctx.Ecs.Changed<Position>(ctx.EntityID))
             {
-                var p = ctx.Ecs.TryGet<Position>(ctx.EntityId, out var pos) ? pos : default;
-                System.Console.WriteLine($"Entity {ctx.EntityId} moved to ({p.X:0.00},{p.Y:0.00})");
+                var p = ctx.Ecs.TryGet<Position>(ctx.EntityID, out var pos) ? pos : default;
+                System.Console.WriteLine($"Entity {ctx.EntityID} moved to ({p.X:0.00},{p.Y:0.00})");
             }
         }
     }

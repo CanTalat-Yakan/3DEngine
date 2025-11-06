@@ -7,7 +7,7 @@ namespace Engine
         public ECSCommands Cmd { get; }
 
         // Set by the behavior runner per invocation
-        public int EntityId { get; internal set; }
+        public int EntityID { get; internal set; }
 
         public BehaviorContext(World world)
         {

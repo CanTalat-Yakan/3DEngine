@@ -23,16 +23,39 @@ public sealed class Program
             ImGui.End();
         }
     }
+
     [Behavior]
-    public partial struct Spawner
+    public struct StaticLog
     {
-        public float Interval;
-        private float _accum;
+        public float a;
+        private float b { get; set; }
 
         [OnUpdate]
         public static void Tick(BehaviorContext ctx)
         {
-            Console.WriteLine("Test");
+            Console.WriteLine("Log");
+        }
+    }
+
+    [Behavior]
+    public struct Spawner
+    {
+        public float a;
+        private float b { get; set; }
+
+        [OnStartup]
+        public static void Init(BehaviorContext ctx)
+        {
+            var e = ctx.Ecs.Spawn();
+            ctx.Ecs.Add(e, new Spawner { a = 1.0f });
+        }
+
+        [OnUpdate]
+        public void Tick(BehaviorContext ctx)
+        {
+            // Use instance state
+            b += (float)ctx.Res<Time>().DeltaSeconds;
+            Console.WriteLine($"Spawner running. a={a}, b={b}");
         }
     }
 }

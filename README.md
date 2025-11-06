@@ -3,7 +3,7 @@
 </p>
 
 <h1 align="center" style="text-align:center">3D Engine</h1>
-<h4 align="center" style="text-align:center">C# 3D engine (Vulkan + SDL3).</h4>
+<h4 align="center" style="text-align:center">C# 3D Game Engine (Vulkan + SDL3).</h4>
 <h4 align="center" style="text-align:center">Editor planned with Avalonia UI.</h4>
 
 <p align="center" style="text-align:center">
@@ -20,10 +20,7 @@
 - [Tech Stack (in this repo)](#tech-stack-in-this-repo)
 - [Supported Platforms](#supported-platforms)
 - [Quickstart](#quickstart)
-- [Minimal example (current state)](#minimal-example-current-state)
-- [Project Layout](#project-layout)
 - [Roadmap (high-level)](#roadmap-high-level)
-- [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
 - [License](#license)
 <!-- /TOC -->
