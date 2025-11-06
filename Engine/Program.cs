@@ -12,6 +12,7 @@ public sealed class Program
         var config = Config.GetDefault(multiSample: MultiSample.x4, defaultBoot: true);
         new App(config)
             .AddPlugins(new DefaultPlugins())
+            .AddPlugins(new MinimalExample())
             .Run();
     }
 }

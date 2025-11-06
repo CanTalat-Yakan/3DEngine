@@ -6,7 +6,18 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="Program.cs" />
+        <Compile Include="src/**/*.cs" />
+        <Compile Remove="src/ecs/ECSWorld.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="../Engine.SourceGen/Engine.SourceGen.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    </ItemGroup>
 
     <ItemGroup>
         <None Remove="FodyWeavers.xml" />
@@ -31,10 +42,6 @@
         <PackageReference Include="Vortice.SpirvCross" Version="1.5.3" />
         <PackageReference Include="Vortice.Vulkan" Version="3.0.3" />
         <PackageReference Include="Vortice.VulkanMemoryAllocator" Version="1.6.3" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="src\resources\" />
     </ItemGroup>
 
 </Project>

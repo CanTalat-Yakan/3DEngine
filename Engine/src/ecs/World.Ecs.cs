@@ -3,10 +3,11 @@ using System.Collections.Generic;
 
 namespace Engine;
 
-public sealed class EcsWorld
+public sealed partial class EcsWorld
 {
     private int _nextEntity = 1;
     private readonly Dictionary<Type, Dictionary<int, object>> _components = new();
+    private readonly HashSet<(Type Type, int Entity)> _changed = new();
 
     public int Spawn() => _nextEntity++;
 
@@ -30,6 +31,28 @@ public sealed class EcsWorld
     {
         if (_components.TryGetValue(typeof(T), out var map))
             map[entity] = component!;
+        else
+        {
+            map = new Dictionary<int, object>();
+            _components[typeof(T)] = map;
+            map[entity] = component!;
+        }
+        _changed.Add((typeof(T), entity));
+    }
+
+    public bool Has<T>(int entity)
+    {
+        return _components.TryGetValue(typeof(T), out var map) && map.ContainsKey(entity);
+    }
+
+    public bool Changed<T>(int entity)
+    {
+        return _changed.Contains((typeof(T), entity));
+    }
+
+    public void BeginFrame()
+    {
+        _changed.Clear();
     }
 
     public bool TryGet<T>(int entity, out T? component)
@@ -71,6 +94,27 @@ public sealed class EcsWorld
         }
     }
 
+    public IEnumerable<(int Entity, T1 C1, T2 C2, T3 C3)> Query<T1, T2, T3>()
+    {
+        if (!_components.TryGetValue(typeof(T1), out var map1) ||
+            !_components.TryGetValue(typeof(T2), out var map2) ||
+            !_components.TryGetValue(typeof(T3), out var map3))
+            yield break;
+
+        // pick smallest map for iteration
+        var maps = new List<(Type t, Dictionary<int, object> m)> {
+            (typeof(T1), map1), (typeof(T2), map2), (typeof(T3), map3)
+        };
+        maps.Sort((a,b) => a.m.Count.CompareTo(b.m.Count));
+        var small = maps[0];
+        foreach (var (entity, objSmall) in small.m.ToArray())
+        {
+            if (!map1.TryGetValue(entity, out var o1) || !map2.TryGetValue(entity, out var o2) || !map3.TryGetValue(entity, out var o3))
+                continue;
+            yield return (entity, (T1)o1, (T2)o2, (T3)o3);
+        }
+    }
+
     public IEnumerable<(int Entity, T Component)> QueryWhere<T>(Func<T, bool> predicate)
     {
         foreach (var (entity, comp) in Query<T>())
@@ -88,4 +132,3 @@ public sealed class EcsWorld
         }
     }
 }
-

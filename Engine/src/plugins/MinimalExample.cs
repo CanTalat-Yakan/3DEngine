@@ -1,5 +1,7 @@
 namespace Engine;
 
+public struct MinimalComponent { public float X, Y; }
+
 public sealed class MinimalExample : IPlugin
 {
     public void Build(App app)
@@ -12,7 +14,7 @@ public sealed class MinimalExample : IPlugin
             var cmds = w.Resource<EcsCommands>();
             cmds.Spawn((e, world) =>
             {
-                world.Add(e, new Position { X = 0, Y = 0 });
+                world.Add(e, new MinimalComponent { X = 0, Y = 0 });
             });
         });
 
@@ -21,12 +23,12 @@ public sealed class MinimalExample : IPlugin
             var t = w.Resource<Time>();
             var ecs = w.Resource<EcsWorld>();
             var cmds = w.Resource<EcsCommands>();
-            foreach (var (entity, p) in ecs.Query<Position>())
+            foreach (var (entity, c) in ecs.Query<MinimalComponent>())
             {
-                var pos = p;
-                pos.X += (float)(10 * t.DeltaSeconds);
-                pos.Y += (float)(5 * t.DeltaSeconds);
-                cmds.Add(entity, pos);
+                var comp = c;
+                comp.X += (float)(10 * t.DeltaSeconds);
+                comp.Y += (float)(5 * t.DeltaSeconds);
+                cmds.Add(entity, comp);
             }
         });
     }

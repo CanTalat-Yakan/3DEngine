@@ -9,9 +9,6 @@ public interface IPlugin
     void Build(App app);
 }
 
-/// <summary>
-/// Bevy-like application builder: holds a World, a Schedule, plugins, and runs the main loop.
-/// </summary>
 public sealed class App
 {
     public World World { get; } = new();
@@ -71,7 +68,6 @@ public sealed class App
             Schedule.RunStage(Stage.Last, World);
         }));
 
-        // Cleanup (best-effort)
         try
         {
             if (World.TryResource<GUIRenderer>() is { } imguiRenderer)
@@ -96,5 +92,3 @@ public sealed class App
         appWindow.Dispose(null);
     }
 }
-
-// Plugins moved to src/plugins
