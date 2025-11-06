@@ -1,46 +1,55 @@
-<p style="text-align:center">
+<p align="center" style="text-align:center">
   <img src="Images/3DEngine_Icon.png" alt="3D Engine Icon" width="256"/>
 </p>
 
 <h1 style="text-align:center">3D Engine</h1>
 <h4 style="text-align:center">C# 3D Game Engine (Vulkan + SDL3).</h4>
-<h4 style="text-align:center">Editor planned with Avalonia UI.</h4>
+<p style="text-align:center">Editor planned with Avalonia UI.</p>
 
-<p style="text-align:center">
+<p align="center" style="text-align:center">
   <img alt=".NET" src="https://img.shields.io/badge/.NET-10.0-512BD4">
   <img alt="Graphics API" src="https://img.shields.io/badge/Graphics-Vulkan-AC162C">
   <img alt="Windowing" src="https://img.shields.io/badge/Windowing-SDL3-0B7BB2">
+</p>
+
+<p align="center" style="text-align:center">
   <img alt="Status" src="https://img.shields.io/badge/Status-Early%20Preview-yellow">
   <img alt="Platforms" src="https://img.shields.io/badge/Platforms-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey">
 </p>
 
 <!-- TOC -->
+
 - [Overview](#overview)
 - [Current Status](#current-status)
-- [Tech Stack (in this repo)](#tech-stack-in-this-repo)
+- [Tech Stack](#tech-stack-in-this-repo)
 - [Supported Platforms](#supported-platforms)
 - [Build and Run](#build-and-run)
 - [Project Layout](#project-layout)
 - [How It Works](#how-it-works)
-  - [Stages and the Schedule](#stages-and-the-schedule)
-  - [Plugins](#plugins)
-  - [Resources](#resources)
-  - [ECS: Entities, Components, and Commands](#ecs-entities-components-and-commands)
-  - [Behavior System (Attribute-based ECS)](#behavior-system-attribute-based-ecs)
-  - [Native ECS Style (Manual Systems)](#native-ecs-style-manual-systems)
-  - [Source Generator](#source-generator)
-  - [FAQ: Static vs Instance, Local Methods, Partial](#faq-static-vs-instance-local-methods-partial)
+    - [Stages and the Schedule](#stages-and-the-schedule)
+    - [Plugins](#plugins)
+    - [Resources](#resources)
+    - [ECS: Entities, Components, and Commands](#ecs-entities-components-and-commands)
+    - [Behavior System (Attribute-based ECS)](#behavior-system-attribute-based-ecs)
+    - [Native ECS Style (Manual Systems)](#native-ecs-style-manual-systems)
+    - [Source Generator](#source-generator)
+    - [FAQ: Static vs Instance, Local Methods, Partial](#faq-static-vs-instance-local-methods-partial)
 - [Roadmap (high-level)](#roadmap-high-level)
 - [Contributing](#contributing)
 - [License](#license)
+
 <!-- /TOC -->
 
 ## Overview
 
-This repository is the restart of a cross‑platform 3D engine written in C#. The runtime is being built on Vulkan for rendering and SDL3 for windowing/input. An editor built with Avalonia UI is planned but not implemented yet.
+This repository is the restart of a cross‑platform 3D engine written in C#. The runtime is being built on Vulkan for
+rendering and SDL3 for windowing/input. An editor built with Avalonia UI is planned but not implemented yet.
 
-The runtime already includes a minimal ECS and a behavior system powered by a Roslyn source generator. You can author gameplay logic in two ways:
-- Behavior system (attribute-based): mark a struct with `[Behavior]`, add methods with stage attributes like `[OnUpdate]`, and the generator wires them into the schedule.
+The runtime already includes a minimal ECS and a behavior system powered by a Roslyn source generator. You can author
+gameplay logic in two ways:
+
+- Behavior system (attribute-based): mark a struct with `[Behavior]`, add methods with stage attributes like
+  `[OnUpdate]`, and the generator wires them into the schedule.
 - Native ECS style: manually add systems to stages and work with `ECSWorld` queries and `ECSCommands`.
 
 ## Current Status
@@ -53,7 +62,7 @@ The runtime already includes a minimal ECS and a behavior system powered by a Ro
 
 See `Engine/Program.cs` for usage examples.
 
-## Tech Stack (in this repo)
+## Tech Stack
 
 - SDL3 + SDL3‑CS: cross‑platform windowing, input, and basic rendering bootstrap.
 - Vulkan via Vortice.Vulkan and VMA: modern, explicit GPU API and memory allocator.
@@ -72,6 +81,7 @@ See `Engine/Program.cs` for usage examples.
 ## Build and Run
 
 Prerequisites:
+
 - .NET SDK matching `TargetFramework` (see `Engine/Engine.csproj`, currently `net10.0`).
 - A working Vulkan driver/runtime for your GPU.
 
@@ -87,16 +97,19 @@ dotnet run --project Engine
 Open in an IDE (Rider/VS/VSCode) using `3DEngine.sln` if you prefer.
 
 Notes:
-- Native binaries for SDL3 and related libraries are bundled via NuGet. On Linux you still need standard system libs (X11/Wayland, audio, etc.) and up‑to‑date GPU drivers.
-- If Vulkan initialization fails, verify your driver installation and ensure validation layers are either installed or disabled.
+
+- Native binaries for SDL3 and related libraries are bundled via NuGet. On Linux you still need standard system libs (
+  X11/Wayland, audio, etc.) and up‑to‑date GPU drivers.
+- If Vulkan initialization fails, verify your driver installation and ensure validation layers are either installed or
+  disabled.
 
 ## Project Layout
 
 - `Engine/` – runtime and example usage (entry point in `Program.cs`).
-  - `Source/App` – world, schedule, stages, config, events.
-  - `Source/ECS` – minimal ECS (world, commands, queries) and behavior attributes/context.
-  - `Source/Plugins` – default plugins (window, time, input, ECS wiring, ImGui, etc.).
-  - `Source/Window` – SDL3 window integration and GUI renderer glue.
+    - `Source/App` – world, schedule, stages, config, events.
+    - `Source/ECS` – minimal ECS (world, commands, queries) and behavior attributes/context.
+    - `Source/Plugins` – default plugins (window, time, input, ECS wiring, ImGui, etc.).
+    - `Source/Window` – SDL3 window integration and GUI renderer glue.
 - `Engine.SourceGen/` – Roslyn source generator for behaviors and auto-registration.
 - `Engine.Renderer/`, `Engine.Editor/`, `Engine.Samples/` – stubs and future work.
 
@@ -107,7 +120,8 @@ Notes:
 The engine drives a Bevy-like staged loop (`Source/App/Stage.cs`):
 
 - `Startup` (once), then per frame: `First` → `PreUpdate` → `Update` → `PostUpdate` → `Render` → `Last`.
-- Systems are `SystemFn(World world)` delegates added to stages via `App.AddSystem(stage, system)` and executed by `Schedule`.
+- Systems are `SystemFn(World world)` delegates added to stages via `App.AddSystem(stage, system)` and executed by
+  `Schedule`.
 
 ### Plugins
 
@@ -136,15 +150,18 @@ Common resources used by systems/behaviors:
 
 - Entities are `int` IDs managed by `ECSWorld`.
 - Components are plain structs or classes stored by type.
-- Mutations can be immediate (`ECSWorld.Add/Update/Despawn`) or queued via `ECSCommands` to avoid in-frame structural changes:
-  - Queue with `ctx.Cmd.Add(...)`, `ctx.Cmd.Spawn(...)`, etc.
-  - Applied automatically in `PostUpdate` by the `ECSPlugin`.
+- Mutations can be immediate (`ECSWorld.Add/Update/Despawn`) or queued via `ECSCommands` to avoid in-frame structural
+  changes:
+    - Queue with `ctx.Cmd.Add(...)`, `ctx.Cmd.Spawn(...)`, etc.
+    - Applied automatically in `PostUpdate` by the `ECSPlugin`.
 - Queries:
-  - `foreach (var (entity, comp) in ecs.Query<T>()) { ... }`
-  - `Query<T1,T2>()` and `Query<T1,T2,T3>()` exist for small joins.
-  - `Has<T>(entity)`, `Changed<T>(entity)` helpers are available.
+    - `foreach (var (entity, comp) in ecs.Query<T>()) { ... }`
+    - `Query<T1,T2>()` and `Query<T1,T2,T3>()` exist for small joins.
+    - `Has<T>(entity)`, `Changed<T>(entity)` helpers are available.
 - Note: Per-frame `Changed<...>` flags are cleared at stage `First`.
-- Disposal: When an entity is despawned, any component that implements `IDisposable` is disposed automatically. Prefer implementing `IDisposable` on components (including behavior structs) if they hold disposable references, and release them in `Dispose()`.
+- Disposal: When an entity is despawned, any component that implements `IDisposable` is disposed automatically. Prefer
+  implementing `IDisposable` on components (including behavior structs) if they hold disposable references, and release
+  them in `Dispose()`.
 
 ### Behavior System (Attribute-based ECS)
 
@@ -152,30 +169,39 @@ Author gameplay in a script-like way:
 
 1) Mark a struct with `[Behavior]`.
 2) Add methods and mark when they should run using attributes:
-   - `[OnStartup]`, `[OnFirst]`, `[OnPreUpdate]`, `[OnUpdate]`, `[OnPostUpdate]`, `[OnRender]`, `[OnLast]`.
+    - `[OnStartup]`, `[OnFirst]`, `[OnPreUpdate]`, `[OnUpdate]`, `[OnPostUpdate]`, `[OnRender]`, `[OnLast]`.
 3) Optionally add filters on instance methods:
-   - `[With(typeof(Position), typeof(Velocity))]`
-   - `[Without(typeof(Disabled))]`
-   - `[Changed(typeof(Transform))]`
-- Note: The current generator supports `With` joins of up to two component types. If more are specified, it falls back to querying only the behavior component and applies `Without`/`Changed` checks inside the loop.
+    - `[With(typeof(Position), typeof(Velocity))]`
+    - `[Without(typeof(Disabled))]`
+    - `[Changed(typeof(Transform))]`
+
+- Note: The current generator supports `With` joins of up to two component types. If more are specified, it falls back
+  to querying only the behavior component and applies `Without`/`Changed` checks inside the loop.
 
 Static vs Instance methods:
+
 - Static methods run once per stage invocation and receive `BehaviorContext`.
-- Instance methods run per entity that has this behavior component. They can use fields/properties on `this`. The generator:
-  - Iterates `ecs.Query<YourBehavior>()`
-  - Sets `ctx.EntityId`
-  - Calls your method
-  - Writes back the component with `ecs.Update`
+- Instance methods run per entity that has this behavior component. They can use fields/properties on `this`. The
+  generator:
+    - Iterates `ecs.Query<YourBehavior>()`
+    - Sets `ctx.EntityId`
+    - Calls your method
+    - Writes back the component with `ecs.Update`
 
 Creating entities for instance behaviors:
-- Instance methods only run if at least one entity has that behavior. A common pattern is a static `[OnStartup]` to spawn and add the behavior component.
+
+- Instance methods only run if at least one entity has that behavior. A common pattern is a static `[OnStartup]` to
+  spawn and add the behavior component.
 
 Access to engine services:
+
 - Use `ctx.Res<T>()` for other resources (e.g., `Time`, `Input`, etc.).
 - `ctx.Ecs` and `ctx.Cmd` provide ECS access.
 
 Reference types inside behavior structs:
-- Safe and supported. Storing a class reference in your behavior struct allows complex per-entity state without copying large data. Initialize lazily or in `[OnStartup]` as needed.
+
+- Safe and supported. Storing a class reference in your behavior struct allows complex per-entity state without copying
+  large data. Initialize lazily or in `[OnStartup]` as needed.
 
 Examples:
 
@@ -269,50 +295,59 @@ app.AddSystem(Stage.Update, (World w) =>
 });
 ```
 
-You can mix and match: the behavior generator emits systems under the hood; you can still register hand-written systems alongside them.
+You can mix and match: the behavior generator emits systems under the hood; you can still register hand-written systems
+alongside them.
 
 ### Source Generator
 
 `Engine.SourceGen` scans for `[Behavior]` structs and methods with stage attributes, then emits:
 
-- Per-behavior static classes with stage entry points that call your methods (static or per-entity loops for instance methods).
+- Per-behavior static classes with stage entry points that call your methods (static or per-entity loops for instance
+  methods).
 - A `GeneratedBehaviorsPlugin` that registers those systems into the app.
 
-`DefaultPlugins` includes `GeneratedBehaviorsPlugin`, so behaviors are picked up automatically at build time—no manual registration required.
+`DefaultPlugins` includes `GeneratedBehaviorsPlugin`, so behaviors are picked up automatically at build time—no manual
+registration required.
 
 ### FAQ: Static vs Instance, Local Methods, Partial
 
-- Static vs Instance: Static methods run once per stage and are great for global logic/UI; instance methods run per entity and can use fields/properties on the component.
-- Local methods: Not supported by the generator because they are not type members and don’t have a stable lifetime across frames. Prefer instance methods on the behavior struct if you need state.
-- `partial` keyword: Not required. The generator emits separate helper types and a plugin; it doesn’t inject into your structs.
-- Struct lifetimes and disposal: Structs are value types; they aren't “destroyed” with a finalizer. If your struct holds class references with unmanaged resources, implement `IDisposable` on the struct and dispose those references in `Dispose()`. The ECS will invoke `Dispose()` for components on `Despawn`.
+- Static vs Instance: Static methods run once per stage and are great for global logic/UI; instance methods run per
+  entity and can use fields/properties on the component.
+- Local methods: Not supported by the generator because they are not type members and don’t have a stable lifetime
+  across frames. Prefer instance methods on the behavior struct if you need state.
+- `partial` keyword: Not required. The generator emits separate helper types and a plugin; it doesn’t inject into your
+  structs.
+- Struct lifetimes and disposal: Structs are value types; they aren't “destroyed” with a finalizer. If your struct holds
+  class references with unmanaged resources, implement `IDisposable` on the struct and dispose those references in
+  `Dispose()`. The ECS will invoke `Dispose()` for components on `Despawn`.
 
 ## Roadmap (high-level)
 
 - Core
-  - Robust platform layer (windowing, input, timing) on SDL3
-  - Vulkan renderer: swapchain, command submission, synchronization, VMA allocations
-  - Shader pipeline: SPIR‑V compilation, reflection, hot‑reload
-  - Asset pipeline: import (Assimp), packaging, and caching
-  - Scene graph and serialization (USD integration)
-  - ECS and job system
+    - Robust platform layer (windowing, input, timing) on SDL3
+    - Vulkan renderer: swapchain, command submission, synchronization, VMA allocations
+    - Shader pipeline: SPIR‑V compilation, reflection, hot‑reload
+    - Asset pipeline: import (Assimp), packaging, and caching
+    - Scene graph and serialization (USD integration)
+    - ECS and job system
 - Tooling
-  - Editor built with Avalonia UI (dockable panes, inspectors, scene view)
-  - ImGui runtime overlay for debugging
-  - Live reload for assets and scripts
+    - Editor built with Avalonia UI (dockable panes, inspectors, scene view)
+    - ImGui runtime overlay for debugging
+    - Live reload for assets and scripts
 - Systems
-  - Material system and PBR
-  - Compute workloads (culling, particles, post‑processing)
-  - Audio, physics, and networking (research and vendor selection TBD)
+    - Material system and PBR
+    - Compute workloads (culling, particles, post‑processing)
+    - Audio, physics, and networking (research and vendor selection TBD)
 - CI/DevX
-  - Cross‑platform builds (Linux/Windows/macOS)
-  - Automated formatting, linting, and basic tests
+    - Cross‑platform builds (Linux/Windows/macOS)
+    - Automated formatting, linting, and basic tests
 
 Items are aspirational and subject to change as the project evolves.
 
 ## Contributing
 
 Early days! If you want to help:
+
 - Try building/running on your platform and open issues for any rough edges.
 - Propose small, well‑scoped PRs (build scripts, docs, samples, or isolated subsystems).
 - Keep changes platform‑agnostic when possible.
@@ -325,4 +360,5 @@ A formal guideline will be added once the editor and initial subsystems land.
 
 Code: MIT license. See [LICENSE](./LICENSE) for the full text.
 
-Contributions: By submitting a contribution, you agree to license your contribution under the same license as this repository.
+Contributions: By submitting a contribution, you agree to license your contribution under the same license as this
+repository.
