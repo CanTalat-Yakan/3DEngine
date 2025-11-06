@@ -12,7 +12,6 @@
     <ItemGroup>
         <Compile Include="Program.cs" />
         <Compile Include="src/**/*.cs" />
-        <Compile Remove="src/ecs/ECSWorld.cs" />
     </ItemGroup>
 
     <ItemGroup>

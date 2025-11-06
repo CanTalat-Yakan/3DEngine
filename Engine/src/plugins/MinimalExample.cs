@@ -11,7 +11,7 @@ public sealed class MinimalExample : IPlugin
         app.AddSystem(Stage.Startup, (World w) =>
         {
             Console.WriteLine("[Startup] MinimalExample initialized");
-            var cmds = w.Resource<EcsCommands>();
+            var cmds = w.Resource<ECSCommands>();
             cmds.Spawn((e, world) =>
             {
                 world.Add(e, new MinimalComponent { X = 0, Y = 0 });
@@ -21,8 +21,8 @@ public sealed class MinimalExample : IPlugin
         app.AddSystem(Stage.Update, (World w) =>
         {
             var t = w.Resource<Time>();
-            var ecs = w.Resource<EcsWorld>();
-            var cmds = w.Resource<EcsCommands>();
+            var ecs = w.Resource<ECSWorld>();
+            var cmds = w.Resource<ECSCommands>();
             foreach (var (entity, c) in ecs.Query<MinimalComponent>())
             {
                 var comp = c;

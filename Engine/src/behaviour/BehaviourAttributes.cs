@@ -1,5 +1,3 @@
-using System;
-
 namespace Engine.Behaviour
 {
     [AttributeUsage(AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]

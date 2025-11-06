@@ -1,6 +1,4 @@
-using System.Numerics;
 using ImGuiNET;
-using SDL3;
 
 namespace Engine;
 

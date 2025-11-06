@@ -1,8 +1,3 @@
-using System;
-using System.Numerics;
-using ImGuiNET;
-using SDL3;
-
 namespace Engine;
 
 public sealed class DefaultPlugins : IPlugin
@@ -22,6 +17,6 @@ public sealed class DefaultPlugins : IPlugin
            .AddPlugin(new ClearColorPlugin());
 
         // Clear per-frame changed flags in EcsWorld at stage First
-        app.AddSystem(Stage.First, (World w) => w.Resource<EcsWorld>().BeginFrame());
+        app.AddSystem(Stage.First, (World w) => w.Resource<ECSWorld>().BeginFrame());
     }
 }

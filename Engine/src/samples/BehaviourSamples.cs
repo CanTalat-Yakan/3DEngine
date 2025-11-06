@@ -216,7 +216,7 @@ namespace Engine.Samples
         public static void Draw(BehaviourContext ctx)
         {
             ImGui.Begin("HUD");
-            ImGui.Text($"Entities: approx {ctx.Res<EcsWorld>().Query<Position>().Count()}");
+            ImGui.Text($"Entities: approx {ctx.Res<ECSWorld>().Query<Position>().Count()}");
             ImGui.Text($"FPS: {(1.0/ctx.Res<Time>().DeltaSeconds):0}");
             ImGui.End();
         }

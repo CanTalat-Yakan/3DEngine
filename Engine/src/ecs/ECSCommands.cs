@@ -1,21 +1,18 @@
-using System;
-using System.Collections.Generic;
-
 namespace Engine;
 
-public sealed class EcsCommands
+public sealed class ECSCommands
 {
-    private readonly Queue<Action<EcsWorld>> _queue = new();
-    public EcsCommands Spawn(Action<int, EcsWorld> builder)
+    private readonly Queue<Action<ECSWorld>> _queue = new();
+    public ECSCommands Spawn(Action<int, ECSWorld> builder)
     { _queue.Enqueue(world => { var e = world.Spawn(); builder(e, world); }); return this; }
 
-    public EcsCommands Despawn(int entity)
+    public ECSCommands Despawn(int entity)
     { _queue.Enqueue(world => world.Despawn(entity)); return this; }
 
-    public EcsCommands Add<T>(int entity, T component)
+    public ECSCommands Add<T>(int entity, T component)
     { _queue.Enqueue(world => world.Add(entity, component)); return this; }
 
-    public void Apply(EcsWorld world)
+    public void Apply(ECSWorld world)
     {
         while (_queue.Count > 0)
         {
