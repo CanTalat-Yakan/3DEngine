@@ -11,6 +11,8 @@
 
     <ItemGroup>
         <Compile Include="Program.cs" />
+        <Compile Include="Source\ECS\BehaviourAttributes.cs" />
+        <Compile Include="Source\ECS\BehaviourContext.cs" />
         <Compile Include="src/**/*.cs" />
     </ItemGroup>
 
@@ -41,6 +43,10 @@
         <PackageReference Include="Vortice.SpirvCross" Version="1.5.3" />
         <PackageReference Include="Vortice.Vulkan" Version="3.0.3" />
         <PackageReference Include="Vortice.VulkanMemoryAllocator" Version="1.6.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Source\Samples\" />
     </ItemGroup>
 
 </Project>
