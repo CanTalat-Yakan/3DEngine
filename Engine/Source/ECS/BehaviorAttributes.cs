@@ -1,7 +1,7 @@
-namespace Engine.Behaviour
+namespace Engine
 {
     [AttributeUsage(AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-    public sealed class BehaviourAttribute : Attribute { }
+    public sealed class BehaviorAttribute : Attribute { }
 
     [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
     public sealed class OnStartupAttribute : Attribute { }

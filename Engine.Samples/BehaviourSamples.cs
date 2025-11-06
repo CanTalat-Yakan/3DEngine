@@ -1,20 +1,19 @@
-using Engine.Behaviour;
 using SDL3;
 using ImGuiNET;
 
-namespace Engine.Samples
+namespace Engine
 {
     public struct Position { public float X, Y; }
     public struct Velocity { public float X, Y; }
     
-    // Minimal behaviour that increments X every frame using Time.DeltaSeconds
-    [Behaviour]
+    // Minimal behavior that increments X every frame using Time.DeltaSeconds
+    [Behavior]
     public partial struct Mover
     {
         public float Speed;
 
         [OnStartup]
-        public void Init(BehaviourContext ctx)
+        public void Init(BehaviorContext ctx)
         {
             if (Speed <= 0) Speed = 50f;
             var baseSpeed = Speed; // avoid capturing 'this' inside lambda
@@ -34,7 +33,7 @@ namespace Engine.Samples
         }
 
         [OnUpdate]
-        public void Tick(BehaviourContext ctx)
+        public void Tick(BehaviorContext ctx)
         {
             var ecs = ctx.Ecs;
             var dt = (float)ctx.Res<Time>().DeltaSeconds;
@@ -49,14 +48,14 @@ namespace Engine.Samples
     }
 
     // Reacts only when both Mover and Position exist on an entity
-    [Behaviour]
+    [Behavior]
     public partial struct BounceOnEdges
     {
         public float MinX;
         public float MaxX;
 
         [OnUpdate, With(typeof(Position))]
-        public void Bounce(BehaviourContext ctx)
+        public void Bounce(BehaviorContext ctx)
         {
             var ecs = ctx.Ecs;
             if (ecs.TryGet<Position>(ctx.EntityId, out var pos))
@@ -75,12 +74,12 @@ namespace Engine.Samples
         }
     }
 
-    // Input driven behaviour: toggles direction on Space key
-    [Behaviour]
+    // Input driven behavior: toggles direction on Space key
+    [Behavior]
     public partial struct InputController
     {
         [OnUpdate, With(typeof(Mover))]
-        public void HandleInput(BehaviourContext ctx)
+        public void HandleInput(BehaviorContext ctx)
         {
             var input = ctx.Res<Input>();
             if (input.KeyPressed(SDL.Scancode.Space))
@@ -96,23 +95,23 @@ namespace Engine.Samples
     }
 
     // Window resize feedback
-    [Behaviour]
+    [Behavior]
     public partial struct ResizeLogger
     {
         [OnUpdate]
-        public static void PumpResizeEvents(BehaviourContext ctx)
+        public static void PumpResizeEvents(BehaviorContext ctx)
         {
             foreach (var evt in Events.Get<WindowResized>(ctx.World).Drain())
                 System.Console.WriteLine($"[Resize] {evt.Width}x{evt.Height}");
         }
     }
 
-    [Behaviour]
+    [Behavior]
     public partial struct Gravity
     {
         public float Strength;
         [OnUpdate, With(typeof(Velocity))]
-        public void Apply(BehaviourContext ctx)
+        public void Apply(BehaviorContext ctx)
         {
             var dt = (float)ctx.Res<Time>().DeltaSeconds;
             if (ctx.Ecs.TryGet<Velocity>(ctx.EntityId, out var vel))
@@ -133,12 +132,12 @@ namespace Engine.Samples
         }
     }
 
-    [Behaviour]
+    [Behavior]
     public partial struct Friction
     {
         public float Coefficient;
         [OnUpdate, With(typeof(Velocity))]
-        public void Dampen(BehaviourContext ctx)
+        public void Dampen(BehaviorContext ctx)
         {
             var dt = (float)ctx.Res<Time>().DeltaSeconds;
             if (ctx.Ecs.TryGet<Velocity>(ctx.EntityId, out var vel))
@@ -151,14 +150,14 @@ namespace Engine.Samples
         }
     }
 
-    [Behaviour]
+    [Behavior]
     public partial struct Lifetime
     {
         public float Seconds;
         private float _accum;
 
         [OnUpdate]
-        public void Tick(BehaviourContext ctx)
+        public void Tick(BehaviorContext ctx)
         {
             _accum += (float)ctx.Res<Time>().DeltaSeconds;
             if (_accum >= Seconds)
@@ -168,11 +167,11 @@ namespace Engine.Samples
         }
     }
 
-    [Behaviour]
+    [Behavior]
     public partial struct ChangedPositionLogger
     {
         [OnUpdate, With(typeof(Position))]
-        public void Log(BehaviourContext ctx)
+        public void Log(BehaviorContext ctx)
         {
             if (ctx.Ecs.Changed<Position>(ctx.EntityId))
             {
@@ -182,14 +181,14 @@ namespace Engine.Samples
         }
     }
 
-    [Behaviour]
+    [Behavior]
     public partial struct Spawner
     {
         public float Interval;
         private float _accum;
 
         [OnUpdate]
-        public void Tick(BehaviourContext ctx)
+        public void Tick(BehaviorContext ctx)
         {
             _accum += (float)ctx.Res<Time>().DeltaSeconds;
             if (_accum >= Interval)
@@ -209,11 +208,11 @@ namespace Engine.Samples
         }
     }
 
-    [Behaviour]
+    [Behavior]
     public partial struct HUDOverlay
     {
         [OnRender]
-        public static void Draw(BehaviourContext ctx)
+        public static void Draw(BehaviorContext ctx)
         {
             ImGui.Begin("HUD");
             ImGui.Text($"Entities: approx {ctx.Res<ECSWorld>().Query<Position>().Count()}");

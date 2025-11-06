@@ -1,15 +1,15 @@
-namespace Engine.Behaviour
+namespace Engine
 {
-    public sealed class BehaviourContext
+    public sealed class BehaviorContext
     {
         public World World { get; }
         public ECSWorld Ecs { get; }
         public ECSCommands Cmd { get; }
 
-        // Set by the behaviour runner per invocation
+        // Set by the behavior runner per invocation
         public int EntityId { get; internal set; }
 
-        public BehaviourContext(World world)
+        public BehaviorContext(World world)
         {
             World = world;
             Ecs = world.Resource<ECSWorld>();

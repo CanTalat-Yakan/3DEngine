@@ -4,14 +4,14 @@ public sealed class DefaultPlugins : IPlugin
 {
     public void Build(App app)
     {
-        app.AddPlugin(new ExceptionsPlugin())
-           .AddPlugin(new WindowPlugin())
-           .AddPlugin(new TimePlugin())
-           .AddPlugin(new EventsPlugin())
-           .AddPlugin(new InputPlugin())
+        app.AddPlugin(new WindowPlugin())
+           .AddPlugin(new ExceptionsPlugin())
            .AddPlugin(new AppExitPlugin())
+           .AddPlugin(new TimePlugin())
+           .AddPlugin(new InputPlugin())
+           .AddPlugin(new EventsPlugin())
            .AddPlugin(new ECSPlugin())
-           .AddPlugin(new Generated.GeneratedBehavioursPlugin())
+           .AddPlugin(new GeneratedBehaviorsPlugin())
            .AddPlugin(new KernelPlugin())
            .AddPlugin(new ImGuiPlugin())
            .AddPlugin(new ClearColorPlugin());

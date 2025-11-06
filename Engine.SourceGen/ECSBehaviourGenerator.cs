@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Engine.SourceGen;
 
 [Generator(LanguageNames.CSharp)]
-public sealed class EcsBehaviourGenerator : IIncrementalGenerator
+public sealed class ECSBehaviorGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext ctx)
     {
@@ -18,7 +18,7 @@ public sealed class EcsBehaviourGenerator : IIncrementalGenerator
                 var type = context.SemanticModel.GetDeclaredSymbol(sds) as INamedTypeSymbol;
                 if (type is null) return null;
                 foreach (var a in type.GetAttributes())
-                    if (a.AttributeClass?.ToDisplayString() == "Engine.Behaviour.BehaviourAttribute")
+                    if (a.AttributeClass?.ToDisplayString() == "Engine.BehaviorAttribute")
                         return type;
                 return null;
             })
@@ -29,25 +29,25 @@ public sealed class EcsBehaviourGenerator : IIncrementalGenerator
         ctx.RegisterSourceOutput(compilationAndTypes, (spc, pair) =>
         {
             var (compilation, types) = pair;
-            var behaviours = new List<BehaviourModel>();
+            var behaviors = new List<BehaviorModel>();
             foreach (INamedTypeSymbol t in types.OfType<INamedTypeSymbol>().Distinct(SymbolEqualityComparer.Default))
             {
                 var model = BuildModel(compilation, t);
-                if (model is not null) behaviours.Add(model);
+                if (model is not null) behaviors.Add(model);
             }
 
-            // Emit per-behaviour systems
-            foreach (var b in behaviours)
-                spc.AddSource($"{b.SafeName}.g.cs", GenBehaviourSystems(b));
+            // Emit per-behavior systems
+            foreach (var b in behaviors)
+                spc.AddSource($"{b.SafeName}.g.cs", GenBehaviorSystems(b));
 
             // Emit registration plugin
-            spc.AddSource("GeneratedBehavioursPlugin.g.cs", GenPlugin(behaviours));
+            spc.AddSource("GeneratedBehaviorsPlugin.g.cs", GenPlugin(behaviors));
         });
     }
 
-    private static BehaviourModel? BuildModel(Compilation compilation, INamedTypeSymbol type)
+    private static BehaviorModel? BuildModel(Compilation compilation, INamedTypeSymbol type)
     {
-        var ns = type.ContainingNamespace.IsGlobalNamespace ? "Engine.Generated" : type.ContainingNamespace.ToDisplayString();
+        var ns = type.ContainingNamespace.IsGlobalNamespace ? "Engine" : type.ContainingNamespace.ToDisplayString();
         var name = type.Name;
         var safe = name + "_Generated";
         var methods = new List<StageMethod>();
@@ -68,12 +68,12 @@ public sealed class EcsBehaviourGenerator : IIncrementalGenerator
             });
         }
 
-        return new BehaviourModel
+        return new BehaviorModel
         {
             Namespace = ns,
             Name = name,
             SafeName = safe,
-            BehaviourFqn = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+            BehaviorFqn = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
             StageMethods = methods
         };
     }
@@ -83,13 +83,13 @@ public sealed class EcsBehaviourGenerator : IIncrementalGenerator
         foreach (var a in m.GetAttributes())
         {
             var n = a.AttributeClass?.ToDisplayString();
-            if (n == "Engine.Behaviour.OnStartupAttribute") return Stage.Startup;
-            if (n == "Engine.Behaviour.OnFirstAttribute") return Stage.First;
-            if (n == "Engine.Behaviour.OnPreUpdateAttribute") return Stage.PreUpdate;
-            if (n == "Engine.Behaviour.OnUpdateAttribute") return Stage.Update;
-            if (n == "Engine.Behaviour.OnPostUpdateAttribute") return Stage.PostUpdate;
-            if (n == "Engine.Behaviour.OnRenderAttribute") return Stage.Render;
-            if (n == "Engine.Behaviour.OnLastAttribute") return Stage.Last;
+            if (n == "Engine.OnStartupAttribute") return Stage.Startup;
+            if (n == "Engine.OnFirstAttribute") return Stage.First;
+            if (n == "Engine.OnPreUpdateAttribute") return Stage.PreUpdate;
+            if (n == "Engine.OnUpdateAttribute") return Stage.Update;
+            if (n == "Engine.OnPostUpdateAttribute") return Stage.PostUpdate;
+            if (n == "Engine.OnRenderAttribute") return Stage.Render;
+            if (n == "Engine.OnLastAttribute") return Stage.Last;
         }
         return null;
     }
@@ -102,17 +102,17 @@ public sealed class EcsBehaviourGenerator : IIncrementalGenerator
         foreach (var a in m.GetAttributes())
         {
             var n = a.AttributeClass?.ToDisplayString();
-            if (n == "Engine.Behaviour.WithAttribute")
+            if (n == "Engine.WithAttribute")
                 with.AddRange(a.ConstructorArguments[0].Values.Select(v => v.Value!.ToString()!));
-            else if (n == "Engine.Behaviour.WithoutAttribute")
+            else if (n == "Engine.WithoutAttribute")
                 without.AddRange(a.ConstructorArguments[0].Values.Select(v => v.Value!.ToString()!));
-            else if (n == "Engine.Behaviour.ChangedAttribute")
+            else if (n == "Engine.ChangedAttribute")
                 changed.AddRange(a.ConstructorArguments[0].Values.Select(v => v.Value!.ToString()!));
         }
         return new Filters(with, without, changed);
     }
 
-    private static string GenBehaviourSystems(BehaviourModel b)
+    private static string GenBehaviorSystems(BehaviorModel b)
     {
         var sb = new StringBuilder();
         sb.AppendLine("// <auto-generated />");
@@ -132,8 +132,8 @@ public sealed class EcsBehaviourGenerator : IIncrementalGenerator
             sb.AppendLine();
             sb.AppendLine($"    private static void {b.SafeName}_{m.Stage}(Engine.World world)");
             sb.AppendLine("    {");
-            sb.AppendLine("        var ecs = world.Resource<Engine.EcsWorld>();");
-            sb.AppendLine("        var ctx = new Engine.Behaviour.BehaviourContext(world);");
+            sb.AppendLine("        var ecs = world.Resource<Engine.ECSWorld>();");
+            sb.AppendLine("        var ctx = new Engine.BehaviorContext(world);");
             if (m.IsStatic)
             {
                 sb.AppendLine($"        {m.MethodContainer}.{m.MethodName}(ctx);");
@@ -142,13 +142,13 @@ public sealed class EcsBehaviourGenerator : IIncrementalGenerator
                 continue;
             }
             // non-static: iterate entities
-            var loopHeader = GenForeachHeader(b.BehaviourFqn, m.Filters.With);
+            var loopHeader = GenForeachHeader(b.BehaviorFqn, m.Filters.With);
             sb.AppendLine(loopHeader);
             // Filters: Without / Changed
             sb.Append(GenFilterChecks(m.Filters));
             sb.AppendLine("            ctx.EntityId = entity;");
             sb.AppendLine($"            behv.{m.MethodName}(ctx);");
-            sb.AppendLine($"            ecs.Update<{b.BehaviourFqn}>(entity, behv);");
+            sb.AppendLine($"            ecs.Update<{b.BehaviorFqn}>(entity, behv);");
             sb.AppendLine("        }");
             sb.AppendLine("    }");
         }
@@ -156,14 +156,14 @@ public sealed class EcsBehaviourGenerator : IIncrementalGenerator
         return sb.ToString();
     }
 
-    private static string GenForeachHeader(string behaviourFqn, IReadOnlyList<string> with)
+    private static string GenForeachHeader(string behaviorFqn, IReadOnlyList<string> with)
     {
         return with.Count switch
         {
-            0 => $"        foreach (var (entity, behv) in ecs.Query<{behaviourFqn}>())\n        {{",
-            1 => $"        foreach (var (entity, behv, __w1) in ecs.Query<{behaviourFqn}, {with[0]}>())\n        {{",
-            2 => $"        foreach (var (entity, behv, __w1, __w2) in ecs.Query<{behaviourFqn}, {with[0]}, {with[1]}>())\n        {{",
-            _ => $"        foreach (var (entity, behv) in ecs.Query<{behaviourFqn}>())\n        {{",
+            0 => $"        foreach (var (entity, behv) in ecs.Query<{behaviorFqn}>())\n        {{",
+            1 => $"        foreach (var (entity, behv, __w1) in ecs.Query<{behaviorFqn}, {with[0]}>())\n        {{",
+            2 => $"        foreach (var (entity, behv, __w1, __w2) in ecs.Query<{behaviorFqn}, {with[0]}, {with[1]}>())\n        {{",
+            _ => $"        foreach (var (entity, behv) in ecs.Query<{behaviorFqn}>())\n        {{",
         };
     }
 
@@ -177,16 +177,16 @@ public sealed class EcsBehaviourGenerator : IIncrementalGenerator
         return sb.ToString();
     }
 
-    private static string GenPlugin(IEnumerable<BehaviourModel> behaviours)
+    private static string GenPlugin(IEnumerable<BehaviorModel> behaviors)
     {
         var sb = new StringBuilder();
         sb.AppendLine("// <auto-generated />");
-        sb.AppendLine("namespace Engine.Generated;");
-        sb.AppendLine("public sealed class GeneratedBehavioursPlugin : Engine.IPlugin");
+        sb.AppendLine("namespace Engine;");
+        sb.AppendLine("public sealed class GeneratedBehaviorsPlugin : Engine.IPlugin");
         sb.AppendLine("{");
         sb.AppendLine("    public void Build(Engine.App app)");
         sb.AppendLine("    {");
-        foreach (var b in behaviours)
+        foreach (var b in behaviors)
             sb.AppendLine($"        global::{b.Namespace}.{b.SafeName}.Register(app);");
         sb.AppendLine("    }");
         sb.AppendLine("}");
@@ -203,12 +203,12 @@ public sealed class EcsBehaviourGenerator : IIncrementalGenerator
         public string MethodName { get; init; } = string.Empty;
         public Filters Filters { get; init; } = new Filters(Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>());
     }
-    private sealed record BehaviourModel
+    private sealed record BehaviorModel
     {
-        public string Namespace { get; init; } = "Engine.Generated";
+        public string Namespace { get; init; } = "Engine";
         public string Name { get; init; } = string.Empty;
         public string SafeName { get; init; } = string.Empty;
-        public string BehaviourFqn { get; init; } = string.Empty;
+        public string BehaviorFqn { get; init; } = string.Empty;
         public List<StageMethod> StageMethods { get; init; } = new();
     }
 }
