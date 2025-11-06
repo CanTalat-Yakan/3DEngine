@@ -9,10 +9,9 @@ public sealed class Program
     [STAThread]
     private static void Main()
     {
-        var config = Config.GetDefault(multiSample: MultiSample.x4, defaultBoot: true);
+        var config = Config.GetDefault();
         new App(config)
             .AddPlugins(new DefaultPlugins())
-            .AddPlugins(new MinimalExample())
             .Run();
     }
 }

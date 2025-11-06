@@ -18,7 +18,7 @@ public sealed class App
 
     public App(Config? config = null)
     {
-        World.InsertResource(config ?? Config.GetDefault(multiSample: MultiSample.x4, defaultBoot: true));
+        World.InsertResource(config ?? Config.GetDefault());
     }
 
     public App AddPlugin(IPlugin plugin)

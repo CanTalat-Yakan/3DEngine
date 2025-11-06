@@ -9,7 +9,7 @@ public sealed class DefaultPlugins : IPlugin
 {
     public void Build(App app)
     {
-        app.AddPlugin(new ExceptionHandlingPlugin())
+        app.AddPlugin(new ExceptionsPlugin())
            .AddPlugin(new WindowPlugin())
            .AddPlugin(new TimePlugin())
            .AddPlugin(new EventsPlugin())

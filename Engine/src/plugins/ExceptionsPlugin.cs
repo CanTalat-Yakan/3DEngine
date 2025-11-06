@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Engine;
 
-public sealed class ExceptionHandlingPlugin : IPlugin
+public sealed class ExceptionsPlugin : IPlugin
 {
     public void Build(App app)
     {
@@ -33,7 +33,7 @@ public sealed class ExceptionHandlingPlugin : IPlugin
 
 public sealed class ExceptionHandlerInstalled { }
 
-internal static class ExceptionHandler
+public static class ExceptionHandler
 {
     public static void CreateTraceLog(string rootPath, string logFilePath)
     {
