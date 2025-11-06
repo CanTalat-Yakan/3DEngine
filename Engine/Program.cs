@@ -15,7 +15,7 @@ public sealed class Program
     [Behavior]
     public struct HUDOverlay
     {
-        [OnUpdate]
+        [OnRender]
         public static void Draw(BehaviorContext ctx)
         {
             ImGui.Begin("HUD");
@@ -27,13 +27,10 @@ public sealed class Program
     [Behavior]
     public struct StaticLog
     {
-        public float a;
-        private float b { get; set; }
-
         [OnUpdate]
         public static void Tick(BehaviorContext ctx)
         {
-            Console.WriteLine("Log");
+            // Console.WriteLine("Log");
         }
     }
 
@@ -55,7 +52,45 @@ public sealed class Program
         {
             // Use instance state
             b += (float)ctx.Res<Time>().DeltaSeconds;
-            Console.WriteLine($"Spawner running. a={a}, b={b}");
+            // Console.WriteLine($"Spawner running. a={a}, b={b}");
+        }
+    }
+
+    public class SomeDisposable : IDisposable
+    {
+        private float num = 2;
+
+        public string Log() => num.ToString();
+        
+        public void Dispose()
+        {
+            // Cleanup resources
+        }
+    }
+
+    [Behavior]
+    public struct HeavyBehavior : IDisposable
+    {
+        private SomeDisposable? _handle;
+
+        [OnStartup]
+        public static void Init(BehaviorContext ctx)
+        {
+            var e = ctx.Ecs.Spawn();
+            ctx.Ecs.Add(e, new HeavyBehavior { _handle = new SomeDisposable() });
+        }
+
+        [OnUpdate]
+        public void Tick(BehaviorContext ctx)
+        {
+            Console.WriteLine(_handle.Log());
+            // use _handle...
+        }
+
+        public void Dispose()
+        {
+            _handle?.Dispose();
+            _handle = null;
         }
     }
 }

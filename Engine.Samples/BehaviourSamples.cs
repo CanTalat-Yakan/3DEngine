@@ -8,7 +8,7 @@ namespace Engine
     
     // Minimal behavior that increments X every frame using Time.DeltaSeconds
     [Behavior]
-    public partial struct Mover
+    public struct Mover
     {
         public float Speed;
 
@@ -49,7 +49,7 @@ namespace Engine
 
     // Reacts only when both Mover and Position exist on an entity
     [Behavior]
-    public partial struct BounceOnEdges
+    public struct BounceOnEdges
     {
         public float MinX;
         public float MaxX;
@@ -76,7 +76,7 @@ namespace Engine
 
     // Input driven behavior: toggles direction on Space key
     [Behavior]
-    public partial struct InputController
+    public struct InputController
     {
         [OnUpdate, With(typeof(Mover))]
         public void HandleInput(BehaviorContext ctx)
@@ -96,7 +96,7 @@ namespace Engine
 
     // Window resize feedback
     [Behavior]
-    public partial struct ResizeLogger
+    public struct ResizeLogger
     {
         [OnUpdate]
         public static void PumpResizeEvents(BehaviorContext ctx)
@@ -107,7 +107,7 @@ namespace Engine
     }
 
     [Behavior]
-    public partial struct Gravity
+    public struct Gravity
     {
         public float Strength;
         [OnUpdate, With(typeof(Velocity))]
@@ -133,7 +133,7 @@ namespace Engine
     }
 
     [Behavior]
-    public partial struct Friction
+    public struct Friction
     {
         public float Coefficient;
         [OnUpdate, With(typeof(Velocity))]
@@ -151,7 +151,7 @@ namespace Engine
     }
 
     [Behavior]
-    public partial struct Lifetime
+    public struct Lifetime
     {
         public float Seconds;
         private float _accum;
@@ -168,7 +168,7 @@ namespace Engine
     }
 
     [Behavior]
-    public partial struct ChangedPositionLogger
+    public struct ChangedPositionLogger
     {
         [OnUpdate, With(typeof(Position))]
         public void Log(BehaviorContext ctx)
@@ -182,7 +182,7 @@ namespace Engine
     }
 
     [Behavior]
-    public partial struct Spawner
+    public struct Spawner
     {
         public float Interval;
         private float _accum;
@@ -209,7 +209,7 @@ namespace Engine
     }
 
     [Behavior]
-    public partial struct HUDOverlay
+    public struct HUDOverlay
     {
         [OnRender]
         public static void Draw(BehaviorContext ctx)

@@ -144,6 +144,7 @@ Common resources used by systems/behaviors:
   - `Query<T1,T2>()` and `Query<T1,T2,T3>()` exist for small joins.
   - `Has<T>(entity)`, `Changed<T>(entity)` helpers are available.
 - Note: Per-frame `Changed<...>` flags are cleared at stage `First`.
+- Disposal: When an entity is despawned, any component that implements `IDisposable` is disposed automatically. Prefer implementing `IDisposable` on components (including behavior structs) if they hold disposable references, and release them in `Dispose()`.
 
 ### Behavior System (Attribute-based ECS)
 
@@ -247,6 +248,7 @@ You can mix and match: the behavior generator emits systems under the hood; you 
 - Static vs Instance: Static methods run once per stage and are great for global logic/UI; instance methods run per entity and can use fields/properties on the component.
 - Local methods: Not supported by the generator because they are not type members and don’t have a stable lifetime across frames. Prefer instance methods on the behavior struct if you need state.
 - `partial` keyword: Not required. The generator emits separate helper types and a plugin; it doesn’t inject into your structs.
+- Struct lifetimes and disposal: Structs are value types; they aren't “destroyed” with a finalizer. If your struct holds class references with unmanaged resources, implement `IDisposable` on the struct and dispose those references in `Dispose()`. The ECS will invoke `Dispose()` for components on `Despawn`.
 
 ## Roadmap (high-level)
 

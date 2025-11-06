@@ -10,8 +10,33 @@ public sealed class ECSWorld
 
     public void Despawn(int entity)
     {
-        foreach (var map in _components.Values)
-            map.Remove(entity);
+        // Dispose any IDisposable components for this entity before removal
+        foreach (var kv in _components.ToArray())
+        {
+            var type = kv.Key;
+            var map = kv.Value;
+            if (!map.TryGetValue(entity, out var obj))
+            {
+                // Ensure any stale changed flag is cleared even if the map lacks the entity
+                _changed.Remove((type, entity));
+                continue;
+            }
+
+            try
+            {
+                if (obj is IDisposable d)
+                    d.Dispose();
+            }
+            catch
+            {
+                // Swallow disposal exceptions to avoid tearing down the world mid-frame
+            }
+            finally
+            {
+                map.Remove(entity);
+                _changed.Remove((type, entity));
+            }
+        }
     }
 
     public void Add<T>(int entity, T component)

@@ -11,7 +11,6 @@
 
     <ItemGroup>
         <Compile Include="Program.cs" />
-        <Compile Include="../README.md" />
         <Compile Include="Source/**/*.cs" />
     </ItemGroup>
 

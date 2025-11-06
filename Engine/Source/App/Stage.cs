@@ -1,4 +1,4 @@
-namespace Engine;
+  namespace Engine;
 
 /// <summary>
 /// Bevy-like fixed stage labels to order systems.
