@@ -2,9 +2,11 @@
   <img src="Images/3DEngine_Icon.png" alt="3D Engine Icon" width="256"/>
 </p>
 
-<h1 style="text-align:center">3D Engine</h1>
-<h4 style="text-align:center">C# 3D Game Engine (Vulkan + SDL3).</h4>
-<p style="text-align:center">Editor planned with Avalonia UI.</p>
+<p align="center" style="text-align:center">
+  <h1 style="text-align:center">3D Engine</h1>
+  <h4 style="text-align:center">C# 3D Game Engine (Vulkan + SDL3).</h4>
+  <p style="text-align:center">Editor planned with Avalonia UI.</p>
+</p>
 
 <p align="center" style="text-align:center">
   <img alt=".NET" src="https://img.shields.io/badge/.NET-10.0-512BD4">
