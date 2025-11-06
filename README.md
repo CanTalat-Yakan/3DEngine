@@ -3,7 +3,8 @@
 </p>
 
 <h1 align="center" style="text-align:center">3D Engine</h1>
-<h4 align="center" style="text-align:center">C# 3D engine (Vulkan + SDL3). Editor planned with Avalonia UI.</h4>
+<h4 align="center" style="text-align:center">C# 3D engine (Vulkan + SDL3).</h4>
+<h4 align="center" style="text-align:center">Editor planned with Avalonia UI.</h4>
 
 <p align="center" style="text-align:center">
   <img alt=".NET" src="https://img.shields.io/badge/.NET-10.0-512BD4">
@@ -31,7 +32,7 @@
 
 This repository is the restart of a cross‑platform 3D engine written in C#. The runtime is being built on Vulkan for rendering and SDL3 for windowing/input. An editor built with Avalonia UI is planned but not implemented yet.
 
-At the moment, the solution is intentionally minimal — a small SDL3 window loop to validate the toolchain and native dependencies. The goal is to iterate rapidly toward a modern, data‑driven engine and editor.
+At the moment, the solution is intentionally minimal - a small SDL3 window loop to validate the toolchain and native dependencies. The goal is to iterate rapidly toward a modern, data‑driven engine and editor.
 
 ## Current Status
 
@@ -76,37 +77,6 @@ Notes:
 - Native binaries for SDL3 and related libraries are bundled via NuGet. On Linux you still need standard system libs (X11/Wayland, audio, etc.) and up‑to‑date GPU drivers.
 - If Vulkan initialization fails, verify your driver installation and ensure validation layers are either installed or disabled.
 
-## Minimal example (current state)
-
-This is essentially what `Program.cs` does today:
-
-```csharp
-using SDL3;
-
-if (!SDL.Init(SDL.InitFlags.Video)) return;
-if (!SDL.CreateWindowAndRenderer("SDL3 Create Window", 800, 600, 0, out var window, out var renderer)) return;
-SDL.SetRenderDrawColor(renderer, 100, 149, 237, 0);
-var running = true;
-while (running)
-{
-    while (SDL.PollEvent(out var e))
-        if ((SDL.EventType)e.Type == SDL.EventType.Quit) running = false;
-
-    SDL.RenderClear(renderer);
-    SDL.RenderPresent(renderer);
-}
-SDL.DestroyRenderer(renderer);
-SDL.DestroyWindow(window);
-SDL.Quit();
-```
-
-## Project Layout
-
-- `3DEngine.sln` — Solution file.
-- `Engine.csproj` — Project file targeting .NET 10.0 with Vulkan/SDL3 dependencies.
-- `Program.cs` — Minimal SDL3 window loop entry point.
-- `img/` — Branding assets (local only; no external image hotlinks).
-
 ## Roadmap (high-level)
 
 - Core
@@ -129,17 +99,6 @@ SDL.Quit();
   - Automated formatting, linting, and basic tests
 
 Items are aspirational and subject to change as the project evolves.
-
-## Troubleshooting
-
-- SDL3 fails to load on Linux:
-  - Ensure desktop packages for X11 or Wayland are installed (e.g., `libx11`, `wayland`, `xrandr`, audio backends).
-  - On Wayland, SDL may fall back to X11; try setting `SDL_VIDEODRIVER=wayland` or `x11` to test.
-- Vulkan initialization errors:
-  - Confirm your GPU drivers are up to date and Vulkan runtime is present (`vulkaninfo` should work).
-  - Install Vulkan validation layers for better diagnostics, or disable them if unavailable.
-- macOS portability:
-  - MoltenVK support may be required; check your Vulkan loader and SDK installation.
 
 ## Contributing
 
