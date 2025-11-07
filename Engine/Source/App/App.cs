@@ -32,9 +32,6 @@ public sealed class App
         return this;
     }
 
-    /// <summary>Adds a plugin that itself registers multiple plugins (convention).</summary>
-    public App AddPlugins(IPlugin pluginGroup) => AddPlugin(pluginGroup);
-
     /// <summary>Registers a system to a given stage.</summary>
     public App AddSystem(Stage stage, SystemFn system)
     {

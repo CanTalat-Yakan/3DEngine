@@ -10,7 +10,7 @@ public sealed class Program
     {
         // Build app with default configuration and plugins, then start the main loop.
         new App(Config.GetDefault())
-            .AddPlugins(new DefaultPlugins())
+            .AddPlugin(new DefaultPlugins())
             .Run();
     }
  

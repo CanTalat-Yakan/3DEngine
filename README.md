@@ -20,11 +20,13 @@
 <!-- TOC -->
 
 - [Overview](#overview)
+- [Design Goals](#design-goals)
 - [Current Status](#current-status)
-- [Tech Stack](#tech-stack-in-this-repo)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
 - [Supported Platforms](#supported-platforms)
 - [Build and Run](#build-and-run)
-- [Project Layout](#project-layout)
+- [Quick Start](#quick-start)
 - [How It Works](#how-it-works)
     - [Stages and the Schedule](#stages-and-the-schedule)
     - [Plugins](#plugins)
@@ -52,6 +54,15 @@ gameplay logic in two ways:
   `[OnUpdate]`, and the generator wires them into the schedule.
 - Native ECS style: manually add systems to stages and work with `ECSWorld` queries and `ECSCommands`.
 
+## Design Goals
+
+- Ergonomic ECS: Lightweight world + staged schedule inspired by Bevy; attribute-driven behaviors to reduce boilerplate.
+- Explicit Rendering: Vulkan-first with a modern resource and synchronization model; avoid hidden abstractions.
+- Extensibility: Plugins compose engine services; source generation handles repetitive registration tasks.
+- Cross‑Platform: Linux, Windows, macOS (MoltenVK) targeted with minimal platform-specific code in user land.
+- Separation of Concerns: Runtime (game loop, ECS, renderer) separate from future editor (Avalonia UI) tooling layer.
+- Fast Iteration: Hot‑reload ambitions for shaders/assets; clear, inspectable runtime overlay via ImGui.
+
 ## Current Status
 
 - SDL3 bootstrap that creates a window and drives a staged update loop.
@@ -61,6 +72,23 @@ gameplay logic in two ways:
 - APIs are evolving; breaking changes are expected.
 
 See `Engine/Program.cs` for usage examples.
+
+## Features
+
+Implemented (early preview):
+- Staged update loop (Startup → First → PreUpdate → Update → PostUpdate → Render → Last)
+- Minimal ECS (entities, components, queries, changed flags, disposal semantics)
+- Attribute-based behavior system with Roslyn source generator
+- Basic plugin model (`DefaultPlugins`) for window/time/input/ECS/ImGui
+- ImGui runtime overlay integration
+- Vulkan device + window initialization scaffolding (rendering pipeline WIP)
+
+In Progress / Planned (see roadmap for detail):
+- Renderer: swapchain, command buffers, descriptor sets, shader reflection
+- Asset pipeline: import, packaging, caching
+- Scene graph & serialization (USD integration)
+- Editor (Avalonia) with dockable tools & inspectors
+- Job system & parallelism
 
 ## Tech Stack
 
@@ -82,15 +110,20 @@ See `Engine/Program.cs` for usage examples.
 
 Prerequisites:
 
-- .NET SDK matching `TargetFramework` (see `Engine/Engine.csproj`, currently `net10.0`).
+- .NET SDK matching `TargetFramework` (see `Engine/Engine.csproj`, currently `net10.0`). Preview SDK may be required.
 - A working Vulkan driver/runtime for your GPU.
 
-Build and run the sample app in `Engine/`:
+Clone + build:
 
 ```bash
-# from repo root
+# Clone
+git clone https://github.com/CanTalat-Yakan/3DEngine.git
+cd 3DEngine
+
+# Restore & build all projects
 dotnet build
-# run the engine app
+
+# Run the engine sample (runtime entry point)
 dotnet run --project Engine
 ```
 
@@ -103,15 +136,75 @@ Notes:
 - If Vulkan initialization fails, verify your driver installation and ensure validation layers are either installed or
   disabled.
 
-## Project Layout
+## Quick Start
 
-- `Engine/` – runtime and example usage (entry point in `Program.cs`).
-    - `Source/App` – world, schedule, stages, config, events.
-    - `Source/ECS` – minimal ECS (world, commands, queries) and behavior attributes/context.
-    - `Source/Plugins` – default plugins (window, time, input, ECS wiring, ImGui, etc.).
-    - `Source/Window` – SDL3 window integration and GUI renderer glue.
-- `Engine.SourceGen/` – Roslyn source generator for behaviors and auto-registration.
-- `Engine.Renderer/`, `Engine.Editor/`, `Engine.Samples/` – stubs and future work.
+An automatic minimal behavior + system example:
+
+```csharp
+[Behavior]
+public struct Spinner
+{
+    public float Angle;
+
+    [OnStartup]
+    public static void Spawn(BehaviorContext ctx)
+    {
+        var e = ctx.Ecs.Spawn();
+        ctx.Ecs.Add(e, new Spinner { Angle = 0f });
+    }
+
+    [OnUpdate]
+    public void Tick(BehaviorContext ctx)
+    {
+        Angle += (float)ctx.Res<Time>().DeltaSeconds * 90f; // 90 deg/s
+        Console.WriteLine($"Entity {ctx.EntityID} angle now {Angle:0.00}");
+    }
+}
+```
+
+1. Add the struct in any runtime project.
+2. Build: the source generator emits systems automatically.
+3. Run: the console prints per-frame updates from the behavior.
+
+To add a manual system instead:
+
+```csharp
+public sealed class Program
+{
+    [STAThread]
+    private static void Main()
+    {
+        new App(Config.GetDefault())
+            .AddPlugin(new DefaultPlugins())
+            .AddPlugin(new SamplePlugin())
+            .Run();
+    }
+}
+
+public sealed class SamplePlugin : IPlugin
+{
+    public void Build(App app)
+    {
+        app.AddSystem(Stage.Startup, (world) =>
+        {
+            var ecs = world.Resource<EcsWorld>();
+            var e = ecs.Spawn();
+            ecs.Add(e, new Spinner { Angle = 0f });
+        });
+        
+        app.AddSystem(Stage.Update, (world) =>
+        {
+            var ecs = world.Resource<EcsWorld>();
+            foreach (var (e, spinner) in ecs.Query<Spinner>())
+            {
+                var newSpinner = spinner;
+                newSpinner.Angle += (float)world.Resource<Time>().DeltaSeconds * 45f;
+                ecs.Update(e, newSpinner);
+            }
+        });
+    }
+}
+```
 
 ## How It Works
 
