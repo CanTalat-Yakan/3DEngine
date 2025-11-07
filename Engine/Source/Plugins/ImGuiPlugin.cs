@@ -4,10 +4,12 @@ using SDL3;
 
 namespace Engine;
 
+/// <summary> Sets up ImGui, schedules NewFrame/Render systems, and renders via ImGuiRenderer. </summary>
 public sealed class ImGuiPlugin : IPlugin
 {
-    private sealed class ImGuiState { public bool ShowDemo = false; }
+    private sealed class ImGuiState { public bool ShowDemo; }
 
+    /// <summary> Creates ImGui context/resources and wires per-frame new-frame/render systems. </summary>
     public void Build(App app)
     {
         ImGui.CreateContext();
@@ -20,20 +22,20 @@ public sealed class ImGuiPlugin : IPlugin
         app.World.InsertResource(renderer);
         app.World.InsertResource(new ImGuiState());
 
-        app.AddSystem(Stage.PreUpdate, (World w) =>
+        app.AddSystem(Stage.PreUpdate, w =>
         {
             var aw = w.Resource<AppWindow>();
             w.Resource<ImGuiRenderer>().NewFrame(aw.SdlWindow.Window);
             ImGui.NewFrame();
         });
 
-        app.AddSystem(Stage.Update, (World w) =>
+        app.AddSystem(Stage.Update, w =>
         {
             var state = w.Resource<ImGuiState>();
             if (state.ShowDemo) ImGui.ShowDemoWindow(ref state.ShowDemo);
         });
 
-        app.AddSystem(Stage.Render, (World w) =>
+        app.AddSystem(Stage.Render, w =>
         {
             var sdl = w.Resource<AppWindow>().SdlWindow;
             var imguiRenderer = w.Resource<ImGuiRenderer>();
@@ -55,8 +57,10 @@ public sealed class ImGuiPlugin : IPlugin
     }
 }
 
+/// <summary> Ensures a default ClearColor resource exists. </summary>
 public sealed class ClearColorPlugin : IPlugin
 {
+    /// <summary> Inserts a default ClearColor resource if missing. </summary>
     public void Build(App app)
     {
         if (!app.World.ContainsResource<ClearColor>())
@@ -64,9 +68,10 @@ public sealed class ClearColorPlugin : IPlugin
     }
 }
 
+/// <summary> RGBA clear color used for SDL renderer background. </summary>
 public readonly struct ClearColor
 {
+    /// <summary> RGBA color as Vector4 (0..1). </summary>
     public readonly Vector4 Value;
     public ClearColor(Vector4 value) { Value = value; }
 }
-

@@ -4,38 +4,34 @@ using SDL3;
 
 namespace Engine;
 
-/// <summary>
-/// Provides functionality to process SDL events and translate them into ImGui input events.
-/// </summary>
+/// <summary> Translates SDL input events into ImGui IO events (keys, mouse, text, wheel). </summary>
 public static class ImGuiInput
 {
-    /// <summary>
-    /// Processes an SDL event and updates the ImGui input state accordingly.
-    /// </summary>
-    /// <param name="e">The SDL event to process.</param>
+    /// <summary> Processes an SDL event and updates the ImGui input state accordingly. </summary>
+    /// <param name="e"> The SDL event to process. </param>
     public static void ProcessEvent(SDL.Event e)
     {
         var io = ImGui.GetIO();
         switch ((SDL.EventType)e.Type)
         {
             case SDL.EventType.MouseMotion:
-                // Updates the mouse position in ImGui.
+                // Update mouse position.
                 io.AddMousePosEvent(e.Motion.X, e.Motion.Y);
                 break;
             case SDL.EventType.MouseButtonDown:
             case SDL.EventType.MouseButtonUp:
-                // Updates the mouse button state in ImGui.
+                // Map SDL button 1..5 to ImGui mouse buttons 0..4.
                 bool down = (SDL.EventType)e.Type == SDL.EventType.MouseButtonDown;
                 int button = e.Button.Button;
                 if (button >= 1 && button <= 5)
                     io.AddMouseButtonEvent(button - 1, down);
                 break;
             case SDL.EventType.MouseWheel:
-                // Updates the mouse wheel scroll state in ImGui.
+                // Scroll delta.
                 io.AddMouseWheelEvent(e.Wheel.X, e.Wheel.Y);
                 break;
             case SDL.EventType.TextInput:
-                // Adds UTF-8 text input to ImGui.
+                // UTF-8 text input for ImGui.
                 if (e.Text.Text != IntPtr.Zero)
                 {
                     string? s = Marshal.PtrToStringUTF8(e.Text.Text);
@@ -45,14 +41,13 @@ public static class ImGuiInput
                 break;
             case SDL.EventType.KeyDown:
             case SDL.EventType.KeyUp:
-                // Updates the keyboard key state in ImGui.
+                // Key press/release + modifier keys.
                 bool isDown = (SDL.EventType)e.Type == SDL.EventType.KeyDown;
                 var sc = e.Key.Scancode;
                 ImGuiKey imguiKey = SdlKeyToImGuiKey(sc);
                 if (imguiKey != ImGuiKey.None)
                     io.AddKeyEvent(imguiKey, isDown);
 
-                // Updates the modifier key states (Shift, Ctrl, Alt) in ImGui.
                 var mods = SDL.GetModState();
                 io.AddKeyEvent(ImGuiKey.ModShift, mods.HasFlag(SDL.Keymod.Shift));
                 io.AddKeyEvent(ImGuiKey.ModCtrl, mods.HasFlag(SDL.Keymod.Ctrl));
@@ -61,11 +56,7 @@ public static class ImGuiInput
         }
     }
 
-    /// <summary>
-    /// Maps SDL scancodes to ImGui keys.
-    /// </summary>
-    /// <param name="sc">The SDL scancode to map.</param>
-    /// <returns>The corresponding ImGui key, or <see cref="ImGuiKey.None"/> if no mapping exists.</returns>
+    /// <summary> Maps SDL scancodes to ImGui keys. Keep minimal mapping covering common UI navigation and shortcuts. </summary>
     private static ImGuiKey SdlKeyToImGuiKey(SDL.Scancode sc)
     {
         return sc switch

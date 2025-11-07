@@ -1,5 +1,6 @@
 namespace Engine;
 
+/// <summary> Tracks time since start and per-frame delta using a Stopwatch; updates during the First stage. </summary>
 public sealed class TimePlugin : IPlugin
 {
     private sealed class TimeState
@@ -8,6 +9,7 @@ public sealed class TimePlugin : IPlugin
         public double LastElapsedSeconds;
     }
 
+    /// <summary> Inserts Time resources and updates them each First stage. </summary>
     public void Build(App app)
     {
         app.World.InsertResource(new Time());
@@ -27,9 +29,11 @@ public sealed class TimePlugin : IPlugin
     }
 }
 
+/// <summary> Frame timing data resource. </summary>
 public sealed class Time
 {
+    /// <summary> Total seconds since the app started. </summary>
     public double ElapsedSeconds { get; internal set; }
+    /// <summary> Seconds since previous frame. </summary>
     public double DeltaSeconds { get; internal set; }
 }
-

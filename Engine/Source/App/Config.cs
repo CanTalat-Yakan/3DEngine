@@ -1,10 +1,14 @@
 namespace Engine;
 
-public sealed record class Config
+/// <summary> Application configuration: window data and initial window command. </summary>
+public sealed record Config
 {
+    /// <summary> Initial window properties. </summary>
     public WindowData WindowData { get; init; }
+    /// <summary> Whether to show, minimize, maximize, etc. on startup. </summary>
     public WindowCommand WindowCommand { get; init; } = WindowCommand.Show;
 
+    /// <summary> Builds a default configuration. </summary>
     public static Config GetDefault(
         string title = "3D Engine",
         int width = 600,
@@ -18,14 +22,17 @@ public sealed record class Config
         };
     }
 
+    /// <summary> Returns a copy with the provided window properties. </summary>
     public Config WithWindow(string title, int width, int height) => this with
     {
         WindowData = new WindowData(title, width, height)
     };
 
+    /// <summary> Returns a copy with a different startup window command. </summary>
     public Config WithCommand(WindowCommand command) => this with { WindowCommand = command };
 }
 
+/// <summary> Immutable window properties. </summary>
 public readonly struct WindowData
 {
     public string Title { get; }
@@ -40,6 +47,7 @@ public readonly struct WindowData
     }
 }
 
+/// <summary> Initial window action to apply. </summary>
 public enum WindowCommand
 {
     Hide = 0,

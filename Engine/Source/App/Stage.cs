@@ -1,19 +1,18 @@
-  namespace Engine;
+namespace Engine;
 
-/// <summary>
-/// Bevy-like fixed stage labels to order systems.
-/// </summary>
+/// <summary> Fixed execution phases processed in a strict order each frame. </summary>
 public enum Stage
 {
-    Startup,      // runs once before first frame
-    First,        // very early per-frame systems
-    PreUpdate,    // input, time, events
-    Update,       // main gameplay logic
-    PostUpdate,   // transform sync, housekeeping
-    Render,       // rendering & UI submission
-    Last,         // very late per-frame systems
+    Startup,
+    First,
+    PreUpdate,
+    Update,
+    PostUpdate,
+    Render,
+    Last,
 }
 
+/// <summary> Provides ordered list of stages for iteration. </summary>
 public static class StageOrder
 {
     private static readonly Stage[] Ordered = new Stage[]
@@ -27,5 +26,6 @@ public static class StageOrder
         Stage.Last,
     };
 
+    /// <summary> Returns enumerable of stages in execution order. </summary>
     public static IEnumerable<Stage> AllInOrder() => Ordered;
 }

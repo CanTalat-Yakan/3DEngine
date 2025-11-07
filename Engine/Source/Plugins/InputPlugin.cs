@@ -2,14 +2,22 @@ using SDL3;
 
 namespace Engine;
 
+/// <summary> Event: a key transitioned to down this frame. </summary>
+public readonly record struct KeyPressed(SDL.Scancode Scancode);
+
+/// <summary> Event: window size changed. </summary>
+public readonly record struct WindowResized(int Width, int Height);
+
+/// <summary> Installs Input resource, wires SDL events to it, and publishes key/resize events. </summary>
 public sealed class InputPlugin : IPlugin
 {
+    /// <summary> Inserts the Input resource and connects SDL event handlers and per-frame hooks. </summary>
     public void Build(App app)
     {
         var input = new Input();
         app.World.InsertResource(input);
 
-        app.World.Resource<AppWindow>().SDLEvent += (e) =>
+        app.World.Resource<AppWindow>().SDLEvent += e =>
         {
             if ((SDL.EventType)e.Type == SDL.EventType.KeyDown)
             {
@@ -21,11 +29,12 @@ public sealed class InputPlugin : IPlugin
         };
         app.World.Resource<AppWindow>().ResizeEvent += (w, h) => Events.Get<WindowResized>(app.World).Send(new WindowResized(w, h));
 
-        app.AddSystem(Stage.First, (World w) => w.Resource<Input>().BeginFrame());
-        app.AddSystem(Stage.Last, (World w) => w.Resource<Input>().EndFrame());
+        app.AddSystem(Stage.First, w => w.Resource<Input>().BeginFrame());
+        app.AddSystem(Stage.Last, w => w.Resource<Input>().EndFrame());
     }
 }
 
+/// <summary> Frame-based input state (keys, mouse, deltas) derived from SDL events. </summary>
 public sealed class Input
 {
     private readonly HashSet<SDL.Scancode> _down = new();

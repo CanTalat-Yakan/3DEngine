@@ -2,6 +2,7 @@ using SDL3;
 
 namespace Engine;
 
+/// <summary> Owns an SDL window and renderer and provides creation/destruction lifecycle. </summary>
 public sealed class SdlWindow
 {
     public string Title { get; private set; }
@@ -13,6 +14,7 @@ public sealed class SdlWindow
 
     public (int W, int H) Size => (Width, Height);
 
+    /// <summary> Creates a new SDL window and matching renderer. Initializes SDL if needed. </summary>
     public SdlWindow(string title, int width, int height)
     {
         Title = title;
@@ -35,6 +37,7 @@ public sealed class SdlWindow
         Renderer = renderer;
     }
 
+    /// <summary> Destroys the SDL renderer and window and quits SDL. </summary>
     public void Destroy()
     {
         if (Renderer != IntPtr.Zero)

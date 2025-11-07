@@ -2,17 +2,20 @@ using SDL3;
 
 namespace Engine;
 
+/// <summary> Thin wrapper over SDL window and event loop with hooks for resize, quit, and raw event forwarding. </summary>
 public sealed class AppWindow
 {
+    /// <summary> The underlying SDL window/renderer pair wrapper. </summary>
     public SdlWindow SdlWindow { get; private set; }
 
     public delegate void ResizeEventHandler(int width, int height);
+    /// <summary> Raised when this window is resized. </summary>
     public event ResizeEventHandler? ResizeEvent;
 
-    // Fired when an SDL Quit or this window is closed
+    /// <summary> Raised when an SDL Quit or this window is closed. </summary>
     public event Action? QuitEvent;
 
-    // Broadcast each SDL event to subscribers (input, custom handlers)
+    /// <summary> Raised for every SDL event polled; allows input systems to consume events. </summary>
     public event Action<SDL.Event>? SDLEvent;
 
     private volatile bool _shouldClose;
@@ -22,11 +25,15 @@ public sealed class AppWindow
         SdlWindow = new(windowData.Title, windowData.Width, windowData.Height);
     }
 
+    /// <summary> Returns true if this window has keyboard focus. </summary>
     public bool IsFocused()
     {
         return SDL.GetKeyboardFocus() == SdlWindow.Window;
     }
 
+    /// <summary> 
+    /// Shows the window and applies an initial command (Show/Maximize/Minimize/etc.).
+    /// </summary>
     public void Show(WindowCommand command = WindowCommand.Normal)
     {
         SDL.ShowWindow(SdlWindow.Window);
@@ -50,8 +57,12 @@ public sealed class AppWindow
         }
     }
 
+    /// <summary> Requests the main loop to exit after the current iteration. </summary>
     public void RequestClose() => _shouldClose = true;
 
+    /// <summary> 
+    /// Pumps SDL events and calls the supplied per-frame delegates until quit is requested.
+    /// </summary>
     public void Looping(params Delegate[] onFrame)
     {
         bool running = true;
@@ -90,6 +101,7 @@ public sealed class AppWindow
         }
     }
 
+    /// <summary> Disposes the underlying SDL resources, optionally invoking a callback before return. </summary>
     public void Dispose(Action? onDispose)
     {
         SdlWindow.Destroy();
