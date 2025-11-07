@@ -1,6 +1,6 @@
 namespace Engine;
 
-public sealed class ECSWorld
+public sealed class EcsWorld
 {
     private int _nextEntity = 1;
     private readonly Dictionary<Type, Dictionary<int, object>> _components = new();

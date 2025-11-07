@@ -7,7 +7,7 @@ namespace Engine;
 /// <summary>
 /// Provides functionality to process SDL events and translate them into ImGui input events.
 /// </summary>
-public static class GUIInput
+public static class ImGuiInput
 {
     /// <summary>
     /// Processes an SDL event and updates the ImGui input state accordingly.

@@ -2,7 +2,7 @@ using SDL3;
 
 namespace Engine;
 
-public sealed class SDLWindow
+public sealed class SdlWindow
 {
     public string Title { get; private set; }
     public int Width { get; internal set; }
@@ -13,7 +13,7 @@ public sealed class SDLWindow
 
     public (int W, int H) Size => (Width, Height);
 
-    public SDLWindow(string title, int width, int height)
+    public SdlWindow(string title, int width, int height)
     {
         Title = title;
         Width = width;

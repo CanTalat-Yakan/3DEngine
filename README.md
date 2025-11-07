@@ -304,9 +304,9 @@ alongside them.
 
 - Per-behavior static classes with stage entry points that call your methods (static or per-entity loops for instance
   methods).
-- A `GeneratedBehaviorsPlugin` that registers those systems into the app.
+- A `BehaviorsPlugin` that registers those systems into the app.
 
-`DefaultPlugins` includes `GeneratedBehaviorsPlugin`, so behaviors are picked up automatically at build time—no manual
+`DefaultPlugins` includes `BehaviorsPlugin`, so behaviors are picked up automatically at build time—no manual
 registration required.
 
 ### FAQ

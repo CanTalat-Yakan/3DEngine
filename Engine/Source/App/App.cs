@@ -68,22 +68,12 @@ public sealed class App
 
         try
         {
-            if (World.TryResource<GUIRenderer>() is { } imguiRenderer)
+            if (World.TryResource<ImGuiRenderer>() is { } imguiRenderer)
             {
                 imguiRenderer.Dispose();
-                World.RemoveResource<GUIRenderer>();
+                World.RemoveResource<ImGuiRenderer>();
             }
             ImGui.DestroyContext();
-        }
-        catch { }
-
-        try
-        {
-            if (World.TryResource<Kernel>() is { } kernel)
-            {
-                kernel.Dispose();
-                World.RemoveResource<Kernel>();
-            }
         }
         catch { }
 

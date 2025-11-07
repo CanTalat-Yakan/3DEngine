@@ -7,8 +7,8 @@ public sealed record class Config
 
     public static Config GetDefault(
         string title = "3D Engine",
-        int width = 1080,
-        int height = 720,
+        int width = 600,
+        int height = 400,
         WindowCommand windowCommand = WindowCommand.Show)
     {
         return new Config

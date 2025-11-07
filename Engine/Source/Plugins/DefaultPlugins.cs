@@ -10,13 +10,12 @@ public sealed class DefaultPlugins : IPlugin
            .AddPlugin(new TimePlugin())
            .AddPlugin(new InputPlugin())
            .AddPlugin(new EventsPlugin())
-           .AddPlugin(new ECSPlugin())
-           .AddPlugin(new GeneratedBehaviorsPlugin())
-           .AddPlugin(new KernelPlugin())
-           .AddPlugin(new GUIPlugin())
+           .AddPlugin(new EcsPlugin())
+           .AddPlugin(new BehaviorsPlugin())
+           .AddPlugin(new ImGuiPlugin())
            .AddPlugin(new ClearColorPlugin());
 
         // Clear per-frame changed flags in EcsWorld at stage First
-        app.AddSystem(Stage.First, (World w) => w.Resource<ECSWorld>().BeginFrame());
+        app.AddSystem(Stage.First, (World w) => w.Resource<EcsWorld>().BeginFrame());
     }
 }

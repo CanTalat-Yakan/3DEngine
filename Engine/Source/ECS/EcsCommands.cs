@@ -1,10 +1,10 @@
 namespace Engine;
 
-public sealed class ECSCommands
+public sealed class EcsCommands
 {
-    private readonly Queue<Action<ECSWorld>> _queue = new();
+    private readonly Queue<Action<EcsWorld>> _queue = new();
 
-    public ECSCommands Spawn(Action<int, ECSWorld> builder)
+    public EcsCommands Spawn(Action<int, EcsWorld> builder)
     {
         _queue.Enqueue(world =>
         {
@@ -14,19 +14,19 @@ public sealed class ECSCommands
         return this;
     }
 
-    public ECSCommands Despawn(int entity)
+    public EcsCommands Despawn(int entity)
     {
         _queue.Enqueue(world => world.Despawn(entity));
         return this;
     }
 
-    public ECSCommands Add<T>(int entity, T component)
+    public EcsCommands Add<T>(int entity, T component)
     {
         _queue.Enqueue(world => world.Add(entity, component));
         return this;
     }
 
-    public void Apply(ECSWorld world)
+    public void Apply(EcsWorld world)
     {
         while (_queue.Count > 0)
         {
