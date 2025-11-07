@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+using SDL3;
 
 namespace Engine;
 
@@ -13,13 +14,13 @@ public sealed class Program
             .AddPlugin(new DefaultPlugins())
             .Run();
     }
- 
+
     /// <summary>Simple HUD overlay that displays current and peak FPS for the last second.</summary>
     [Behavior]
     public struct FpsOverlay
     {
-        private static double _highestFps;        
-        
+        private static double _highestFps;
+
         /// <summary>Draws the FPS overlay in an ImGui window each render frame.</summary>
         [OnRender]
         public static void Draw(BehaviorContext ctx)
@@ -33,6 +34,58 @@ public sealed class Program
             ImGui.Text($"HighestFPS: {_highestFps:0}");
             if (time.ElapsedSeconds % 1.0 < delta) _highestFps = 0; // Reset peak roughly once per second
             ImGui.End();
+        }
+    }
+
+    [Behavior]
+    public struct CounterComponent()
+    {
+        private static int _count;
+
+        [OnUpdate]
+        public void Tick(BehaviorContext ctx)
+        {
+            _count++;
+        }
+
+        [OnRender]
+        public static void Draw(BehaviorContext ctx)
+        {
+            ImGui.Begin("HUD");
+            ImGui.Text($"Count: {_count}");
+            ImGui.Text($"Entities: {ctx.Ecs.Query<CounterComponent>().Count()}");
+            ImGui.End();
+        }
+    }
+
+    [Behavior]
+    public struct SpawnEntitiesOnSpace
+    {
+        private static bool _spawned;
+
+        [OnUpdate]
+        public static void Update(BehaviorContext ctx)
+        {
+            var input = ctx.Res<Input>();
+            if (!input.KeyDown(SDL.Scancode.Space) || _spawned)
+                return;
+
+            _spawned = true;
+
+            var ecs = ctx.Res<EcsWorld>();
+            for (int i = 0; i < 100_000; i++)
+            {
+                var e = ecs.Spawn();
+                ecs.Add(e, new CounterComponent());
+            }
+        }
+
+        [OnPostUpdate]
+        public static void LateUpdate(BehaviorContext ctx)
+        {
+            var time = ctx.Res<Time>();
+            if (time.ElapsedSeconds % 1.0 < time.DeltaSeconds)
+                _spawned = false;
         }
     }
 }

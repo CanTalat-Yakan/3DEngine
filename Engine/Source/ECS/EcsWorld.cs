@@ -4,8 +4,8 @@ namespace Engine;
 public sealed class EcsWorld
 {
     private int _nextEntity = 1;
-    private readonly Dictionary<Type, Dictionary<int, object>> _components = new();
-    private readonly HashSet<(Type Type, int Entity)> _changed = new();
+    private readonly Dictionary<Type, IComponentStore> _stores = new();
+    private int _currentTick = 0;
 
     /// <summary>Spawns a new entity id.</summary>
     public int Spawn() => _nextEntity++;
@@ -13,136 +13,138 @@ public sealed class EcsWorld
     /// <summary>Removes an entity and all of its components, disposing IDisposable components.</summary>
     public void Despawn(int entity)
     {
-        foreach (var kv in _components.ToArray())
+        foreach (var store in _stores.Values)
         {
-            var type = kv.Key;
-            var map = kv.Value;
-            if (!map.TryGetValue(entity, out var obj))
+            if (store.TryRemove(entity, out var obj) && obj is IDisposable d)
             {
-                _changed.Remove((type, entity));
-                continue;
-            }
-
-            try
-            {
-                if (obj is IDisposable d)
-                    d.Dispose();
-            }
-            catch
-            {
-                // Swallow disposal exceptions to avoid tearing down the world mid-frame
-            }
-            finally
-            {
-                map.Remove(entity);
-                _changed.Remove((type, entity));
+                try { d.Dispose(); } catch { /* swallow disposal exceptions */ }
             }
         }
     }
 
     /// <summary>Adds a component to an entity (overwrites if existing).</summary>
-    public void Add<T>(int entity, T component)
-    {
-        if (!_components.TryGetValue(typeof(T), out var map))
-        {
-            map = new Dictionary<int, object>();
-            _components[typeof(T)] = map;
-        }
-        map[entity] = component!;
-    }
+    public void Add<T>(int entity, T component) => GetStore<T>().Add(entity, component);
 
     /// <summary>Updates an existing component (or adds if missing) and marks it changed for this frame.</summary>
-    public void Update<T>(int entity, T component)
+    public void Update<T>(int entity, T component) => GetStore<T>().Update(entity, component, _currentTick);
+
+    /// <summary>Updates an existing component via transformer and marks it changed; no-op if missing.</summary>
+    public void Mutate<T>(int entity, Func<T, T> mutate)
     {
-        if (_components.TryGetValue(typeof(T), out var map))
-            map[entity] = component!;
-        else
+        var store = GetStore<T>(create: false);
+        if (store is null) return;
+        if (store.TryGet(entity, out var value))
         {
-            map = new Dictionary<int, object>();
-            _components[typeof(T)] = map;
-            map[entity] = component!;
+            var next = mutate(value);
+            store.Update(entity, next, _currentTick);
         }
-        _changed.Add((typeof(T), entity));
     }
 
     /// <summary>Checks if entity has component T.</summary>
     public bool Has<T>(int entity)
     {
-        return _components.TryGetValue(typeof(T), out var map) && map.ContainsKey(entity);
+        var store = GetStore<T>(create: false);
+        return store != null && store.Has(entity);
     }
 
     /// <summary>Checks if component T on entity was updated this frame.</summary>
     public bool Changed<T>(int entity)
     {
-        return _changed.Contains((typeof(T), entity));
+        var store = GetStore<T>(create: false);
+        return store != null && store.ChangedThisFrame(entity, _currentTick);
     }
 
-    /// <summary>Clears changed markers at frame start.</summary>
+    /// <summary>Advances frame tick; used for per-frame change tracking.</summary>
     public void BeginFrame()
     {
-        _changed.Clear();
+        _currentTick++;
+        // Extremely long-running sessions: handle wrap-around defensively
+        if (_currentTick == int.MaxValue)
+        {
+            _currentTick = 1;
+            foreach (var s in _stores.Values) s.ClearChangedTicks();
+        }
     }
 
     /// <summary>Attempts to get component T for entity.</summary>
     public bool TryGet<T>(int entity, out T? component)
     {
-        component = default;
-        if (_components.TryGetValue(typeof(T), out var map) && map.TryGetValue(entity, out var obj))
+        var store = GetStore<T>(create: false);
+        if (store != null && store.TryGet(entity, out var value))
         {
-            component = (T)obj;
+            component = value;
             return true;
         }
+        component = default;
         return false;
     }
 
     /// <summary>Enumerates all entities with component T.</summary>
     public IEnumerable<(int Entity, T Component)> Query<T>()
     {
-        if (_components.TryGetValue(typeof(T), out var map))
-        {
-            foreach (var kv in map.ToArray())
-                yield return (kv.Key, (T)kv.Value);
-        }
+        var store = GetStore<T>(create: false);
+        if (store == null) yield break;
+        foreach (var (entity, comp) in store.Enumerate())
+            yield return (entity, comp);
     }
 
     /// <summary>Enumerates entities having both components T1 and T2.</summary>
     public IEnumerable<(int Entity, T1 C1, T2 C2)> Query<T1, T2>()
     {
-        if (!_components.TryGetValue(typeof(T1), out var map1) || !_components.TryGetValue(typeof(T2), out var map2))
-            yield break;
+        var s1 = GetStore<T1>(create: false);
+        var s2 = GetStore<T2>(create: false);
+        if (s1 == null || s2 == null) yield break;
 
-        var (smallMap, otherMap, otherIsFirst) = map1.Count <= map2.Count
-            ? (map1, map2, true)
-            : (map2, map1, false);
-
-        foreach (var (entity, objSmall) in smallMap.ToArray())
+        if (s1.Count <= s2.Count)
         {
-            if (!otherMap.TryGetValue(entity, out var objOther)) continue;
-            if (otherIsFirst)
-                yield return (entity, (T1)objOther, (T2)objSmall);
-            else
-                yield return (entity, (T1)objSmall, (T2)objOther);
+            foreach (var (entity, c1) in s1.Enumerate())
+                if (s2.TryGet(entity, out var c2))
+                    yield return (entity, c1, c2);
+        }
+        else
+        {
+            foreach (var (entity, c2) in s2.Enumerate())
+                if (s1.TryGet(entity, out var c1))
+                    yield return (entity, c1, c2);
         }
     }
 
     /// <summary>Enumerates entities having components T1, T2 and T3.</summary>
     public IEnumerable<(int Entity, T1 C1, T2 C2, T3 C3)> Query<T1, T2, T3>()
     {
-        if (!_components.TryGetValue(typeof(T1), out var map1) ||
-            !_components.TryGetValue(typeof(T2), out var map2) ||
-            !_components.TryGetValue(typeof(T3), out var map3))
-            yield break;
+        var s1 = GetStore<T1>(create: false);
+        var s2 = GetStore<T2>(create: false);
+        var s3 = GetStore<T3>(create: false);
+        if (s1 == null || s2 == null || s3 == null) yield break;
 
-        var maps = new List<(Type t, Dictionary<int, object> m)> {
-            (typeof(T1), map1), (typeof(T2), map2), (typeof(T3), map3)
-        };
-        maps.Sort((a,b) => a.m.Count.CompareTo(b.m.Count)); // iterate smallest map for perf
-        var small = maps[0];
-        foreach (var (entity, objSmall) in small.m.ToArray())
+        int smallest = 1;
+        var c1 = s1.Count; var c2 = s2.Count; var c3 = s3.Count;
+        if (c2 <= c1 && c2 <= c3) smallest = 2;
+        else if (c3 < c1 && c3 < c2) smallest = 3;
+
+        if (smallest == 1)
         {
-            if (!map1.TryGetValue(entity, out var o1) || !map2.TryGetValue(entity, out var o2) || !map3.TryGetValue(entity, out var o3))
-                continue;
-            yield return (entity, (T1)o1, (T2)o2, (T3)o3);
+            foreach (var (e, comp1) in s1.Enumerate())
+            {
+                if (!s2.TryGet(e, out var comp2) || !s3.TryGet(e, out var comp3)) continue;
+                yield return (e, comp1, comp2, comp3);
+            }
+        }
+        else if (smallest == 2)
+        {
+            foreach (var (e, comp2) in s2.Enumerate())
+            {
+                if (!s1.TryGet(e, out var comp1) || !s3.TryGet(e, out var comp3)) continue;
+                yield return (e, comp1, comp2, comp3);
+            }
+        }
+        else
+        {
+            foreach (var (e, comp3) in s3.Enumerate())
+            {
+                if (!s1.TryGet(e, out var comp1) || !s2.TryGet(e, out var comp2)) continue;
+                yield return (e, comp1, comp2, comp3);
+            }
         }
     }
 
@@ -154,14 +156,86 @@ public sealed class EcsWorld
                 yield return (entity, comp);
     }
 
-    /// <summary>Transforms each component of type T in place via provided function.</summary>
+    /// <summary>Transforms each component of type T via provided function and marks it changed.</summary>
     public void TransformEach<T>(Func<int, T, T> transform)
     {
-        if (!_components.TryGetValue(typeof(T), out var map)) return;
-        foreach (var (entity, obj) in map.ToArray())
+        var store = GetStore<T>(create: false);
+        if (store == null) return;
+        foreach (var (entity, comp) in store.Enumerate())
         {
-            var newVal = transform(entity, (T)obj);
-            map[entity] = newVal!;
+            var newVal = transform(entity, comp);
+            store.Update(entity, newVal, _currentTick);
         }
+    }
+
+    // Internal typed store plumbing
+    private ComponentStore<T> GetStore<T>(bool create = true)
+    {
+        var type = typeof(T);
+        if (_stores.TryGetValue(type, out var s))
+            return (ComponentStore<T>)s;
+        if (!create) return null!;
+        var created = new ComponentStore<T>();
+        _stores[type] = created;
+        return created;
+    }
+
+    private interface IComponentStore
+    {
+        int Count { get; }
+        bool TryRemove(int entity, out object? previous);
+        void ClearChangedTicks();
+    }
+
+    private sealed class ComponentStore<T> : IComponentStore
+    {
+        private readonly Dictionary<int, T> _values = new();
+        private readonly Dictionary<int, int> _changedTick = new();
+
+        public int Count => _values.Count;
+
+        public void Add(int entity, T component) => _values[entity] = component!;
+
+        public void Update(int entity, T component, int currentTick)
+        {
+            _values[entity] = component!;
+            _changedTick[entity] = currentTick;
+        }
+
+        public bool Has(int entity) => _values.ContainsKey(entity);
+
+        public bool TryGet(int entity, out T value) => _values.TryGetValue(entity, out value!);
+
+        public bool ChangedThisFrame(int entity, int currentTick)
+        {
+            return _changedTick.TryGetValue(entity, out var t) && t == currentTick;
+        }
+
+        public IEnumerable<(int Entity, T Component)> Enumerate()
+        {
+            // Snapshot keys to allow safe updates during iteration
+            var keys = new int[_values.Count];
+            _values.Keys.CopyTo(keys, 0);
+            foreach (var e in keys)
+            {
+                if (_values.TryGetValue(e, out var v))
+                    yield return (e, v);
+            }
+        }
+
+        public bool TryRemove(int entity, out object? previous)
+        {
+            if (_values.TryGetValue(entity, out var v))
+            {
+                previous = v!; // box if struct; only on removal
+                _values.Remove(entity);
+                _changedTick.Remove(entity);
+                return true;
+            }
+            previous = null;
+            return false;
+        }
+
+        public void ClearChangedTicks() => _changedTick.Clear();
     }
 }
