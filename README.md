@@ -142,18 +142,18 @@ Plugins configure the app and register systems. `DefaultPlugins` wires everythin
 
 Common resources used by systems/behaviors:
 
-- `ECSWorld` – entity/component storage and queries
-- `ECSCommands` – queued mutations applied after `Update` (at `PostUpdate`)
+- `EcsWorld` – entity/component storage and queries
+- `EcsCommands` – queued mutations applied after `Update` (at `PostUpdate`)
 - `AppWindow`, `Time`, `GUIRenderer`, etc.
 
 ### ECS: Entities, Components, and Commands
 
-- Entities are `int` IDs managed by `ECSWorld`.
+- Entities are `int` IDs managed by `EcsWorld`.
 - Components are plain structs or classes stored by type.
-- Mutations can be immediate (`ECSWorld.Add/Update/Despawn`) or queued via `ECSCommands` to avoid in-frame structural
+- Mutations can be immediate (`EcsWorld.Add/Update/Despawn`) or queued via `ECSCommands` to avoid in-frame structural
   changes:
     - Queue with `ctx.Cmd.Add(...)`, `ctx.Cmd.Spawn(...)`, etc.
-    - Applied automatically in `PostUpdate` by the `ECSPlugin`.
+    - Applied automatically in `PostUpdate` by the `EcsPlugin`.
 - Queries:
     - `foreach (var (entity, comp) in ecs.Query<T>()) { ... }`
     - `Query<T1,T2>()` and `Query<T1,T2,T3>()` exist for small joins.
@@ -281,12 +281,12 @@ public struct HeavyBehavior : IDisposable
 
 ### Native ECS Style (Manual Systems)
 
-Prefer writing systems directly? Use `App.AddSystem` and operate on `ECSWorld`:
+Prefer writing systems directly? Use `App.AddSystem` and operate on `EcsWorld`:
 
 ```csharp
 app.AddSystem(Stage.Update, (World w) =>
 {
-    var ecs = w.Resource<ECSWorld>();
+    var ecs = w.Resource<EcsWorld>();
     foreach (var (e, comp) in ecs.Query<MyComponent>())
     {
         // mutate comp and write back
