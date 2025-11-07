@@ -2,7 +2,7 @@ namespace Engine;
 
 public delegate void SystemFn(World world);
 
-/// <summary> Schedules systems into Bevy-like stages and executes them (optionally in parallel). </summary>
+/// <summary>Schedules systems into Bevy-like stages and executes them (optionally in parallel).</summary>
 public sealed class Schedule
 {
     private readonly Dictionary<Stage, List<SystemFn>> _systemsByStage = new();
@@ -14,21 +14,21 @@ public sealed class Schedule
             _systemsByStage[stage] = new();
     }
 
-    /// <summary> Adds a system to the specified stage. </summary>
+    /// <summary>Adds a system to the specified stage.</summary>
     public Schedule AddSystem(Stage stage, SystemFn system)
     {
         _systemsByStage[stage].Add(system);
         return this;
     }
 
-    /// <summary> Marks a stage systems list for parallel execution (naive Parallel.ForEach). </summary>
+    /// <summary>Marks a stage systems list for parallel execution (naive Parallel.ForEach).</summary>
     public Schedule SetParallel(Stage stage, bool parallel = true)
     {
         if (parallel) _parallelStages.Add(stage); else _parallelStages.Remove(stage);
         return this;
     }
 
-    /// <summary> Runs all systems registered to a stage (in parallel if enabled). </summary>
+    /// <summary>Runs all systems registered to a stage (in parallel if enabled).</summary>
     public void RunStage(Stage stage, World world)
     {
         var list = _systemsByStage[stage];
@@ -45,7 +45,7 @@ public sealed class Schedule
         }
     }
 
-    /// <summary> Runs all stages in fixed order. </summary>
+    /// <summary>Runs all stages in fixed order.</summary>
     public void Run(World world)
     {
         foreach (var stage in StageOrder.AllInOrder())

@@ -3,10 +3,10 @@ using System.Text;
 
 namespace Engine;
 
-/// <summary> Installs a simple exception handler that logs to Application.log and writes to Debug/Console. </summary>
+/// <summary>Installs a simple exception handler that logs to Application.log and writes to Debug/Console.</summary>
 public sealed class ExceptionsPlugin : IPlugin
 {
-    /// <summary> Configures global unhandled exception logging and stores a marker resource to avoid reinstallation. </summary>
+    /// <summary>Configures global unhandled exception logging and stores a marker resource to avoid reinstallation.</summary>
     public void Build(App app)
     {
         if (!app.World.ContainsResource<ExceptionHandlerInstalled>())
@@ -31,13 +31,13 @@ public sealed class ExceptionsPlugin : IPlugin
     }
 }
 
-/// <summary> Marker resource indicating exception handler has been installed. </summary>
+/// <summary>Marker resource indicating exception handler has been installed.</summary>
 public sealed class ExceptionHandlerInstalled { }
 
-/// <summary> Utility for creating a trace log and formatting/printing unhandled exceptions. </summary>
+/// <summary>Utility for creating a trace log and formatting/printing unhandled exceptions.</summary>
 public static class ExceptionHandler
 {
-    /// <summary> Creates/rotates the log file and hooks up a TextWriterTraceListener. </summary>
+    /// <summary>Creates/rotates the log file and hooks up a TextWriterTraceListener.</summary>
     public static void CreateTraceLog(string rootPath, string logFilePath)
     {
         // Create directory.
@@ -69,7 +69,7 @@ public static class ExceptionHandler
         Trace.AutoFlush = true;
     }
 
-    /// <summary> Formats and prints an exception with file/line/method when available. </summary>
+    /// <summary>Formats and prints an exception with file/line/method when available.</summary>
     public static void HandleException(Exception exception)
     {
         // Write file name, line number, and method name.

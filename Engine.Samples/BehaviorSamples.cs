@@ -3,13 +3,13 @@ using ImGuiNET;
 
 namespace Engine;
 
-/// <summary> Position component used in samples. </summary>
+/// <summary>Position component used in samples.</summary>
 public struct Position
 {
     public float X, Y;
 }
 
-/// <summary> Velocity component used in samples. </summary>
+/// <summary>Velocity component used in samples.</summary>
 public struct Velocity
 {
     public float X, Y;
@@ -21,7 +21,7 @@ public struct Mover
 {
     public float Speed;
 
-    /// <summary> One-time setup: spawn demo entities. </summary>
+    /// <summary>One-time setup: spawn demo entities.</summary>
     [OnStartup]
     public void Init(BehaviorContext ctx)
     {
@@ -42,7 +42,7 @@ public struct Mover
         }
     }
 
-    /// <summary> Move positions along X based on Speed and delta time. </summary>
+    /// <summary>Move positions along X based on Speed and delta time.</summary>
     [OnUpdate]
     public void Tick(BehaviorContext ctx)
     {
@@ -64,7 +64,7 @@ public struct BounceOnEdges
     public float MinX;
     public float MaxX;
 
-    /// <summary> Flips Mover.Speed when Position moves outside [MinX, MaxX]. </summary>
+    /// <summary>Flips Mover.Speed when Position moves outside [MinX, MaxX].</summary>
     [OnUpdate, With(typeof(Position))]
     public void Bounce(BehaviorContext ctx)
     {
@@ -89,7 +89,7 @@ public struct BounceOnEdges
 [Behavior]
 public struct InputController
 {
-    /// <summary> On Space pressed, invert Mover.Speed. </summary>
+    /// <summary>On Space pressed, invert Mover.Speed.</summary>
     [OnUpdate, With(typeof(Mover))]
     public void HandleInput(BehaviorContext ctx)
     {
@@ -110,7 +110,7 @@ public struct InputController
 [Behavior]
 public struct ResizeLogger
 {
-    /// <summary> Prints window resize events to stdout. </summary>
+    /// <summary>Prints window resize events to stdout.</summary>
     [OnUpdate]
     public static void PumpResizeEvents(BehaviorContext ctx)
     {
@@ -124,7 +124,7 @@ public struct Gravity
 {
     public float Strength;
 
-    /// <summary> Applies gravity to Velocity and integrates Position. </summary>
+    /// <summary>Applies gravity to Velocity and integrates Position.</summary>
     [OnUpdate, With(typeof(Velocity))]
     public void Apply(BehaviorContext ctx)
     {
@@ -153,7 +153,7 @@ public struct Friction
 {
     public float Coefficient;
 
-    /// <summary> Scales velocity by (1 - k*dt). </summary>
+    /// <summary>Scales velocity by (1 - k*dt).</summary>
     [OnUpdate, With(typeof(Velocity))]
     public void Dampen(BehaviorContext ctx)
     {
@@ -174,7 +174,7 @@ public struct Lifetime
     public float Seconds;
     private float _accum;
 
-    /// <summary> Despawns the entity after Seconds elapse. </summary>
+    /// <summary>Despawns the entity after Seconds elapse.</summary>
     [OnUpdate]
     public void Tick(BehaviorContext ctx)
     {
@@ -189,7 +189,7 @@ public struct Lifetime
 [Behavior]
 public struct ChangedPositionLogger
 {
-    /// <summary> Logs Position when it changes this frame. </summary>
+    /// <summary>Logs Position when it changes this frame.</summary>
     [OnUpdate, With(typeof(Position))]
     public void Log(BehaviorContext ctx)
     {
@@ -207,7 +207,7 @@ public struct Spawner
     public float Interval;
     private float _accum;
 
-    /// <summary> Spawns a new demo entity every Interval seconds. </summary>
+    /// <summary>Spawns a new demo entity every Interval seconds.</summary>
     [OnUpdate]
     public void Tick(BehaviorContext ctx)
     {
@@ -232,7 +232,7 @@ public struct Spawner
 [Behavior]
 public struct HUDOverlay
 {
-    /// <summary> Shows a simple HUD with entity count and FPS. </summary>
+    /// <summary>Shows a simple HUD with entity count and FPS.</summary>
     [OnRender]
     public static void Draw(BehaviorContext ctx)
     {

@@ -1,6 +1,6 @@
 namespace Engine;
 
-/// <summary> Fixed execution phases processed in a strict order each frame. </summary>
+/// <summary>Fixed execution phases processed in a strict order each frame.</summary>
 public enum Stage
 {
     Startup,
@@ -12,7 +12,7 @@ public enum Stage
     Last,
 }
 
-/// <summary> Provides ordered list of stages for iteration. </summary>
+/// <summary>Provides ordered list of stages for iteration.</summary>
 public static class StageOrder
 {
     private static readonly Stage[] Ordered = new Stage[]
@@ -26,6 +26,6 @@ public static class StageOrder
         Stage.Last,
     };
 
-    /// <summary> Returns enumerable of stages in execution order. </summary>
+    /// <summary>Returns enumerable of stages in execution order.</summary>
     public static IEnumerable<Stage> AllInOrder() => Ordered;
 }

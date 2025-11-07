@@ -4,12 +4,12 @@ using SDL3;
 
 namespace Engine;
 
-/// <summary> Sets up ImGui, schedules NewFrame/Render systems, and renders via ImGuiRenderer. </summary>
+/// <summary>Sets up ImGui, schedules NewFrame/Render systems, and renders via ImGuiRenderer.</summary>
 public sealed class ImGuiPlugin : IPlugin
 {
     private sealed class ImGuiState { public bool ShowDemo; }
 
-    /// <summary> Creates ImGui context/resources and wires per-frame new-frame/render systems. </summary>
+    /// <summary>Creates ImGui context/resources and wires per-frame new-frame/render systems.</summary>
     public void Build(App app)
     {
         ImGui.CreateContext();
@@ -57,10 +57,10 @@ public sealed class ImGuiPlugin : IPlugin
     }
 }
 
-/// <summary> Ensures a default ClearColor resource exists. </summary>
+/// <summary>Ensures a default ClearColor resource exists.</summary>
 public sealed class ClearColorPlugin : IPlugin
 {
-    /// <summary> Inserts a default ClearColor resource if missing. </summary>
+    /// <summary>Inserts a default ClearColor resource if missing.</summary>
     public void Build(App app)
     {
         if (!app.World.ContainsResource<ClearColor>())
@@ -68,10 +68,10 @@ public sealed class ClearColorPlugin : IPlugin
     }
 }
 
-/// <summary> RGBA clear color used for SDL renderer background. </summary>
+/// <summary>RGBA clear color used for SDL renderer background.</summary>
 public readonly struct ClearColor
 {
-    /// <summary> RGBA color as Vector4 (0..1). </summary>
+    /// <summary>RGBA color as Vector4 (0..1).</summary>
     public readonly Vector4 Value;
     public ClearColor(Vector4 value) { Value = value; }
 }

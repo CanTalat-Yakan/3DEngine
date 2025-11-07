@@ -2,20 +2,20 @@ using SDL3;
 
 namespace Engine;
 
-/// <summary> Thin wrapper over SDL window and event loop with hooks for resize, quit, and raw event forwarding. </summary>
+/// <summary>Thin wrapper over SDL window and event loop with hooks for resize, quit, and raw event forwarding.</summary>
 public sealed class AppWindow
 {
-    /// <summary> The underlying SDL window/renderer pair wrapper. </summary>
+    /// <summary>The underlying SDL window/renderer pair wrapper.</summary>
     public SdlWindow SdlWindow { get; private set; }
 
     public delegate void ResizeEventHandler(int width, int height);
-    /// <summary> Raised when this window is resized. </summary>
+    /// <summary>Raised when this window is resized.</summary>
     public event ResizeEventHandler? ResizeEvent;
 
-    /// <summary> Raised when an SDL Quit or this window is closed. </summary>
+    /// <summary>Raised when an SDL Quit or this window is closed.</summary>
     public event Action? QuitEvent;
 
-    /// <summary> Raised for every SDL event polled; allows input systems to consume events. </summary>
+    /// <summary>Raised for every SDL event polled; allows input systems to consume events.</summary>
     public event Action<SDL.Event>? SDLEvent;
 
     private volatile bool _shouldClose;
@@ -25,15 +25,15 @@ public sealed class AppWindow
         SdlWindow = new(windowData.Title, windowData.Width, windowData.Height);
     }
 
-    /// <summary> Returns true if this window has keyboard focus. </summary>
+    /// <summary>Returns true if this window has keyboard focus.</summary>
     public bool IsFocused()
     {
         return SDL.GetKeyboardFocus() == SdlWindow.Window;
     }
 
-    /// <summary> 
+    /// <summary>
     /// Shows the window and applies an initial command (Show/Maximize/Minimize/etc.).
-    /// </summary>
+    ///</summary>
     public void Show(WindowCommand command = WindowCommand.Normal)
     {
         SDL.ShowWindow(SdlWindow.Window);
@@ -57,12 +57,12 @@ public sealed class AppWindow
         }
     }
 
-    /// <summary> Requests the main loop to exit after the current iteration. </summary>
+    /// <summary>Requests the main loop to exit after the current iteration.</summary>
     public void RequestClose() => _shouldClose = true;
 
-    /// <summary> 
+    /// <summary>
     /// Pumps SDL events and calls the supplied per-frame delegates until quit is requested.
-    /// </summary>
+    ///</summary>
     public void Looping(params Delegate[] onFrame)
     {
         bool running = true;
@@ -101,7 +101,7 @@ public sealed class AppWindow
         }
     }
 
-    /// <summary> Disposes the underlying SDL resources, optionally invoking a callback before return. </summary>
+    /// <summary>Disposes the underlying SDL resources, optionally invoking a callback before return.</summary>
     public void Dispose(Action? onDispose)
     {
         SdlWindow.Destroy();

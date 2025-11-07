@@ -5,11 +5,11 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Engine.SourceGen;
 
-/// <summary> Roslyn incremental generator scanning [Engine.Behavior] structs and emitting stage systems plus a registration plugin. </summary>
+/// <summary>Roslyn incremental generator scanning [Engine.Behavior] structs and emitting stage systems plus a registration plugin.</summary>
 [Generator(LanguageNames.CSharp)]
 public sealed class EcsBehaviorGenerator : IIncrementalGenerator
 {
-    /// <summary> Configures syntax providers, collects candidate structs, and registers source outputs. </summary>
+    /// <summary>Configures syntax providers, collects candidate structs, and registers source outputs.</summary>
     public void Initialize(IncrementalGeneratorInitializationContext ctx)
     {
         var candidates = ctx.SyntaxProvider.CreateSyntaxProvider(
@@ -48,7 +48,7 @@ public sealed class EcsBehaviorGenerator : IIncrementalGenerator
         });
     }
 
-    /// <summary> Builds a behavior model (namespace, name, stage methods, filters) from a type symbol. </summary>
+    /// <summary>Builds a behavior model (namespace, name, stage methods, filters) from a type symbol.</summary>
     private static BehaviorModel BuildModel(INamedTypeSymbol type)
     {
         var ns = type.ContainingNamespace.IsGlobalNamespace ? "Engine" : type.ContainingNamespace.ToDisplayString();
@@ -82,7 +82,7 @@ public sealed class EcsBehaviorGenerator : IIncrementalGenerator
         };
     }
 
-    /// <summary> Maps method attributes to a scheduling stage if present. </summary>
+    /// <summary>Maps method attributes to a scheduling stage if present.</summary>
     private static Stage? GetStage(IMethodSymbol m)
     {
         foreach (var a in m.GetAttributes())
@@ -99,7 +99,7 @@ public sealed class EcsBehaviorGenerator : IIncrementalGenerator
         return null;
     }
 
-    /// <summary> Extracts With/Without/Changed filters from method attributes. </summary>
+    /// <summary>Extracts With/Without/Changed filters from method attributes.</summary>
     private static Filters GetFilters(IMethodSymbol m)
     {
         var with = new List<string>();
@@ -118,7 +118,7 @@ public sealed class EcsBehaviorGenerator : IIncrementalGenerator
         return new Filters(with, without, changed);
     }
 
-    /// <summary> Generates per-stage system functions and a static Register helper for one behavior. </summary>
+    /// <summary>Generates per-stage system functions and a static Register helper for one behavior.</summary>
     private static string GenBehaviorSystems(BehaviorModel b)
     {
         var sb = new StringBuilder();
@@ -184,7 +184,7 @@ public sealed class EcsBehaviorGenerator : IIncrementalGenerator
         return sb.ToString();
     }
 
-    /// <summary> Emits the partial BehaviorsPlugin implementation registering all discovered behaviors. </summary>
+    /// <summary>Emits the partial BehaviorsPlugin implementation registering all discovered behaviors.</summary>
     private static string GenPlugin(IEnumerable<BehaviorModel> behaviors)
     {
         var sb = new StringBuilder();

@@ -1,11 +1,11 @@
 namespace Engine;
 
-/// <summary> Buffers mutating ECS operations (spawn/despawn/add) to apply safely after system execution. </summary>
+/// <summary>Buffers mutating ECS operations (spawn/despawn/add) to apply safely after system execution.</summary>
 public sealed class EcsCommands
 {
     private readonly Queue<Action<EcsWorld>> _queue = new();
 
-    /// <summary> Queues a spawn of a new entity built by provided action. </summary>
+    /// <summary>Queues a spawn of a new entity built by provided action.</summary>
     public EcsCommands Spawn(Action<int, EcsWorld> builder)
     {
         _queue.Enqueue(world =>
@@ -16,21 +16,21 @@ public sealed class EcsCommands
         return this;
     }
 
-    /// <summary> Queues entity despawn. </summary>
+    /// <summary>Queues entity despawn.</summary>
     public EcsCommands Despawn(int entity)
     {
         _queue.Enqueue(world => world.Despawn(entity));
         return this;
     }
 
-    /// <summary> Queues adding a component to an entity. </summary>
+    /// <summary>Queues adding a component to an entity.</summary>
     public EcsCommands Add<T>(int entity, T component)
     {
         _queue.Enqueue(world => world.Add(entity, component));
         return this;
     }
 
-    /// <summary> Applies all queued commands to the ECS world, emptying the buffer. </summary>
+    /// <summary>Applies all queued commands to the ECS world, emptying the buffer.</summary>
     public void Apply(EcsWorld world)
     {
         while (_queue.Count > 0)

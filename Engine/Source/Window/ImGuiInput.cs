@@ -4,11 +4,11 @@ using SDL3;
 
 namespace Engine;
 
-/// <summary> Translates SDL input events into ImGui IO events (keys, mouse, text, wheel). </summary>
+/// <summary>Translates SDL input events into ImGui IO events (keys, mouse, text, wheel).</summary>
 public static class ImGuiInput
 {
-    /// <summary> Processes an SDL event and updates the ImGui input state accordingly. </summary>
-    /// <param name="e"> The SDL event to process. </param>
+    /// <summary>Processes an SDL event and updates the ImGui input state accordingly.</summary>
+    /// <param name="e">The SDL event to process.</param>
     public static void ProcessEvent(SDL.Event e)
     {
         var io = ImGui.GetIO();
@@ -56,7 +56,7 @@ public static class ImGuiInput
         }
     }
 
-    /// <summary> Maps SDL scancodes to ImGui keys. Keep minimal mapping covering common UI navigation and shortcuts. </summary>
+    /// <summary>Maps SDL scancodes to ImGui keys. Keep minimal mapping covering common UI navigation and shortcuts.</summary>
     private static ImGuiKey SdlKeyToImGuiKey(SDL.Scancode sc)
     {
         return sc switch

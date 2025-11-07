@@ -2,7 +2,7 @@
 
 namespace Engine;
 
-/// <summary> Application entry point. Configures and runs the engine with default plugins. </summary>
+/// <summary>Application entry point. Configures and runs the engine with default plugins.</summary>
 public sealed class Program
 {
     [STAThread]
@@ -14,13 +14,13 @@ public sealed class Program
             .Run();
     }
  
-    /// <summary> Simple HUD overlay that displays current and peak FPS for the last second. </summary>
+    /// <summary>Simple HUD overlay that displays current and peak FPS for the last second.</summary>
     [Behavior]
     public struct FpsOverlay
     {
         private static double _highestFps;        
         
-        /// <summary> Draws the FPS overlay in an ImGui window each render frame. </summary>
+        /// <summary>Draws the FPS overlay in an ImGui window each render frame.</summary>
         [OnRender]
         public static void Draw(BehaviorContext ctx)
         {

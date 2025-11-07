@@ -1,6 +1,6 @@
 namespace Engine;
 
-/// <summary> Event: example event struct representing damage dealt. </summary>
+/// <summary>Event: example event struct representing damage dealt.</summary>
 public readonly record struct DamageEvent(int entityId, int amount);
 
 [Behavior]

@@ -2,39 +2,39 @@ using SDL3;
 
 namespace Engine;
 
-/// <summary> Event: a key transitioned to down this frame. </summary>
+/// <summary>Event: a key transitioned to down this frame.</summary>
 public readonly record struct KeyPressed(SDL.Scancode Scancode);
 
-/// <summary> Event: window size changed. </summary>
+/// <summary>Event: window size changed.</summary>
 public readonly record struct WindowResized(int Width, int Height);
 
-/// <summary> Installs Input resource, wires SDL events to it, and publishes key/resize events. </summary>
+/// <summary>Installs Input resource, wires SDL events to it, and publishes key/resize events.</summary>
 public sealed class InputPlugin : IPlugin
 {
-    /// <summary> Inserts the Input resource and connects SDL event handlers and per-frame hooks. </summary>
+    /// <summary>Inserts the Input resource and connects SDL event handlers and per-frame hooks.</summary>
     public void Build(App app)
     {
         var input = new Input();
         app.World.InsertResource(input);
 
-        app.World.Resource<AppWindow>().SDLEvent += e =>
+        app.World.Resource<AppWindow>().SDLEvent += (evt) =>
         {
-            if ((SDL.EventType)e.Type == SDL.EventType.KeyDown)
+            if ((SDL.EventType)evt.Type == SDL.EventType.KeyDown)
             {
-                var kd = e.Key;
+                var kd = evt.Key;
                 if (!input.KeyDown(kd.Scancode))
                     Events.Get<KeyPressed>(app.World).Send(new KeyPressed(kd.Scancode));
             }
-            input.Process(e);
+            input.Process(evt);
         };
         app.World.Resource<AppWindow>().ResizeEvent += (w, h) => Events.Get<WindowResized>(app.World).Send(new WindowResized(w, h));
 
-        app.AddSystem(Stage.First, w => w.Resource<Input>().BeginFrame());
-        app.AddSystem(Stage.Last, w => w.Resource<Input>().EndFrame());
+        app.AddSystem(Stage.First, (world) => world.Resource<Input>().BeginFrame());
+        app.AddSystem(Stage.Last, (world) => world.Resource<Input>().EndFrame());
     }
 }
 
-/// <summary> Frame-based input state (keys, mouse, deltas) derived from SDL events. </summary>
+/// <summary>Frame-based input state (keys, mouse, deltas) derived from SDL events.</summary>
 public sealed class Input
 {
     private readonly HashSet<SDL.Scancode> _down = new();
@@ -60,25 +60,25 @@ public sealed class Input
 
     internal void EndFrame() { }
 
-    internal void Process(SDL.Event e)
+    internal void Process(SDL.Event evt)
     {
-        switch ((SDL.EventType)e.Type)
+        switch ((SDL.EventType)evt.Type)
         {
             case SDL.EventType.KeyDown:
-                var kd = e.Key;
-                if (!_down.Contains(kd.Scancode)) _pressed.Add(kd.Scancode);
-                _down.Add(kd.Scancode);
+                var keyDown = evt.Key;
+                if (!_down.Contains(keyDown.Scancode)) _pressed.Add(keyDown.Scancode);
+                _down.Add(keyDown.Scancode);
                 break;
             case SDL.EventType.KeyUp:
-                var ku = e.Key;
-                _down.Remove(ku.Scancode);
-                _released.Add(ku.Scancode);
+                var keyUp = evt.Key;
+                _down.Remove(keyUp.Scancode);
+                _released.Add(keyUp.Scancode);
                 break;
             case SDL.EventType.MouseMotion:
-                MouseDeltaX += (int)e.Motion.XRel;
-                MouseDeltaY += (int)e.Motion.YRel;
-                MouseX = (int)e.Motion.X;
-                MouseY = (int)e.Motion.Y;
+                MouseDeltaX += (int)evt.Motion.XRel;
+                MouseDeltaY += (int)evt.Motion.YRel;
+                MouseX = (int)evt.Motion.X;
+                MouseY = (int)evt.Motion.Y;
                 break;
             case SDL.EventType.MouseButtonDown:
             case SDL.EventType.MouseButtonUp:
