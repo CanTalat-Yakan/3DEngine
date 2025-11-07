@@ -4,7 +4,7 @@ namespace Engine;
 
 public sealed class AppWindow
 {
-    public SDLWindow SdlWindow { get; private set; }
+    public SDLWindow SDLWindow { get; private set; }
 
     public delegate void ResizeEventHandler(int width, int height);
     public event ResizeEventHandler? ResizeEvent;
@@ -13,37 +13,37 @@ public sealed class AppWindow
     public event Action? QuitEvent;
 
     // Broadcast each SDL event to subscribers (input, custom handlers)
-    public event Action<SDL.Event>? SdlEvent;
+    public event Action<SDL.Event>? SDLEvent;
 
     private volatile bool _shouldClose;
 
     public AppWindow(WindowData windowData)
     {
-        SdlWindow = new(windowData.Title, windowData.Width, windowData.Height);
+        SDLWindow = new(windowData.Title, windowData.Width, windowData.Height);
     }
 
     public bool IsFocused()
     {
-        return SDL.GetKeyboardFocus() == SdlWindow.Window;
+        return SDL.GetKeyboardFocus() == SDLWindow.Window;
     }
 
     public void Show(WindowCommand command = WindowCommand.Normal)
     {
-        SDL.ShowWindow(SdlWindow.Window);
+        SDL.ShowWindow(SDLWindow.Window);
         // Map WindowCommand to SDL; avoid duplicate labels with same enum value.
         switch (command)
         {
             case WindowCommand.Maximize:
-                SDL.MaximizeWindow(SdlWindow.Window);
+                SDL.MaximizeWindow(SDLWindow.Window);
                 break;
             case WindowCommand.Minimize:
-                SDL.MinimizeWindow(SdlWindow.Window);
+                SDL.MinimizeWindow(SDLWindow.Window);
                 break;
             case WindowCommand.Restore:
-                SDL.RestoreWindow(SdlWindow.Window);
+                SDL.RestoreWindow(SDLWindow.Window);
                 break;
             case WindowCommand.Hide:
-                SDL.HideWindow(SdlWindow.Window);
+                SDL.HideWindow(SDLWindow.Window);
                 break;
             default:
                 break;
@@ -62,7 +62,7 @@ public sealed class AppWindow
             while (SDL.PollEvent(out var e))
             {
                 // Broadcast raw event
-                SdlEvent?.Invoke(e);
+                SDLEvent?.Invoke(e);
 
                 // Forward events to ImGui input adapter
                 GUIInput.ProcessEvent(e);
@@ -72,15 +72,15 @@ public sealed class AppWindow
                     QuitEvent?.Invoke();
                     running = false;
                 }
-                if ((SDL.EventType)e.Type == SDL.EventType.WindowCloseRequested && e.Window.WindowID == SDL.GetWindowID(SdlWindow.Window))
+                if ((SDL.EventType)e.Type == SDL.EventType.WindowCloseRequested && e.Window.WindowID == SDL.GetWindowID(SDLWindow.Window))
                 {
                     QuitEvent?.Invoke();
                     running = false;
                 }
-                if ((SDL.EventType)e.Type == SDL.EventType.WindowResized && e.Window.WindowID == SDL.GetWindowID(SdlWindow.Window))
+                if ((SDL.EventType)e.Type == SDL.EventType.WindowResized && e.Window.WindowID == SDL.GetWindowID(SDLWindow.Window))
                 {
-                    SDL.GetWindowSize(SdlWindow.Window, out int w, out int h);
-                    SdlWindow.Width = w; SdlWindow.Height = h;
+                    SDL.GetWindowSize(SDLWindow.Window, out int w, out int h);
+                    SDLWindow.Width = w; SDLWindow.Height = h;
                     ResizeEvent?.Invoke(w, h);
                 }
             }
@@ -92,7 +92,7 @@ public sealed class AppWindow
 
     public void Dispose(Action? onDispose)
     {
-        SdlWindow.Destroy();
+        SDLWindow.Destroy();
         onDispose?.Invoke();
     }
 }

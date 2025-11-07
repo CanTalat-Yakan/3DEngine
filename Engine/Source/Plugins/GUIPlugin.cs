@@ -4,7 +4,7 @@ using SDL3;
 
 namespace Engine;
 
-public sealed class ImGuiPlugin : IPlugin
+public sealed class GUIPlugin : IPlugin
 {
     private sealed class ImGuiState { public bool ShowDemo = true; }
 
@@ -15,7 +15,7 @@ public sealed class ImGuiPlugin : IPlugin
         io.ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard | ImGuiConfigFlags.NavEnableGamepad;
         ImGui.StyleColorsDark();
 
-        var sdlWindow = app.World.Resource<AppWindow>().SdlWindow;
+        var sdlWindow = app.World.Resource<AppWindow>().SDLWindow;
         var renderer = new GUIRenderer(sdlWindow.Renderer);
         app.World.InsertResource(renderer);
         app.World.InsertResource(new ImGuiState());
@@ -23,7 +23,7 @@ public sealed class ImGuiPlugin : IPlugin
         app.AddSystem(Stage.PreUpdate, (World w) =>
         {
             var aw = w.Resource<AppWindow>();
-            w.Resource<GUIRenderer>().NewFrame(aw.SdlWindow.Window);
+            w.Resource<GUIRenderer>().NewFrame(aw.SDLWindow.Window);
             ImGui.NewFrame();
         });
 
@@ -35,7 +35,7 @@ public sealed class ImGuiPlugin : IPlugin
 
         app.AddSystem(Stage.Render, (World w) =>
         {
-            var sdl = w.Resource<AppWindow>().SdlWindow;
+            var sdl = w.Resource<AppWindow>().SDLWindow;
             var imguiRenderer = w.Resource<GUIRenderer>();
             var clear = w.Resource<ClearColor>().Value;
 

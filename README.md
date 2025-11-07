@@ -33,7 +33,7 @@
     - [Behavior System (Attribute-based ECS)](#behavior-system-attribute-based-ecs)
     - [Native ECS Style (Manual Systems)](#native-ecs-style-manual-systems)
     - [Source Generator](#source-generator)
-    - [FAQ](#faq-static-vs-instance-local-methods-partial)
+    - [FAQ](#faq)
 - [Roadmap (high-level)](#roadmap-high-level)
 - [Contributing](#contributing)
 - [License](#license)
@@ -184,7 +184,7 @@ Static vs Instance methods:
 - Instance methods run per entity that has this behavior component. They can use fields/properties on `this`. The
   generator:
     - Iterates `ecs.Query<YourBehavior>()`
-    - Sets `ctx.EntityId`
+    - Sets `ctx.EntityID`
     - Calls your method
     - Writes back the component with `ecs.Update`
 
@@ -243,9 +243,9 @@ public struct Spawner
 
 public class SomeDisposable : IDisposable
 {
-    private float num = 2;
+    private float _num = 2;
 
-    public string Log() => num.ToString();
+    public string Log() => _num.ToString();
     
     public void Dispose()
     {

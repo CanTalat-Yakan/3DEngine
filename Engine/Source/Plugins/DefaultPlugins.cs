@@ -13,7 +13,7 @@ public sealed class DefaultPlugins : IPlugin
            .AddPlugin(new ECSPlugin())
            .AddPlugin(new GeneratedBehaviorsPlugin())
            .AddPlugin(new KernelPlugin())
-           .AddPlugin(new ImGuiPlugin())
+           .AddPlugin(new GUIPlugin())
            .AddPlugin(new ClearColorPlugin());
 
         // Clear per-frame changed flags in EcsWorld at stage First

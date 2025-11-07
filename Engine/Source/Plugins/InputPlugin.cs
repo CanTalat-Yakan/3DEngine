@@ -9,7 +9,7 @@ public sealed class InputPlugin : IPlugin
         var input = new Input();
         app.World.InsertResource(input);
 
-        app.World.Resource<AppWindow>().SdlEvent += (e) =>
+        app.World.Resource<AppWindow>().SDLEvent += (e) =>
         {
             if ((SDL.EventType)e.Type == SDL.EventType.KeyDown)
             {

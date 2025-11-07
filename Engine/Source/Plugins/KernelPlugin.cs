@@ -5,7 +5,7 @@ public sealed class KernelPlugin : IPlugin
     public void Build(App app)
     {
         var cfg = app.World.Resource<Config>();
-        var window = app.World.Resource<AppWindow>().SdlWindow;
+        var window = app.World.Resource<AppWindow>().SDLWindow;
 
         var kernel = new Kernel(cfg);
         kernel.Initialize(window.Window, (window.Width, window.Height));
