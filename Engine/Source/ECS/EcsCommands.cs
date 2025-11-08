@@ -1,6 +1,6 @@
 namespace Engine;
 
-/// <summary>Buffers mutating ECS operations (spawn/despawn/add) to apply safely after system execution.</summary>
+/// <summary>Buffers mutating ECS operations (spawn/despawn/add,remove) to apply safely after system execution.</summary>
 public sealed class EcsCommands
 {
     private readonly Queue<Action<EcsWorld>> _queue = new();
@@ -27,6 +27,13 @@ public sealed class EcsCommands
     public EcsCommands Add<T>(int entity, T component)
     {
         _queue.Enqueue(world => world.Add(entity, component));
+        return this;
+    }
+
+    /// <summary>Queues remving a component to an entity by id.</summary>
+    public EcsCommands Remove<T>(int entity)
+    {
+        _queue.Enqueue(world => world.Remove<T>(entity));
         return this;
     }
 
