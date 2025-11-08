@@ -25,14 +25,14 @@ public sealed class Program
         [OnRender]
         public static void Draw(BehaviorContext ctx)
         {
-            ImGui.Begin("HUD");
-            var time = ctx.Res<Time>();
-            var delta = time.DeltaSeconds;
+            var delta = ctx.Time.DeltaSeconds;
             var fps = 1.0 / delta;
+            if (ctx.Time.ElapsedSeconds % 1.0 < delta) _highestFps = 0; // Reset peak roughly once per second
             if (fps > _highestFps) _highestFps = fps; // Track peak FPS within the rolling one-second window
+            ImGui.Begin("HUD");
             ImGui.Text($"FPS: {fps:0}");
+            ImGui.Text($"Delta: {delta:0.000}");
             ImGui.Text($"HighestFPS: {_highestFps:0}");
-            if (time.ElapsedSeconds % 1.0 < delta) _highestFps = 0; // Reset peak roughly once per second
             ImGui.End();
         }
     }
@@ -66,25 +66,22 @@ public sealed class Program
         [OnUpdate]
         public static void Update(BehaviorContext ctx)
         {
-            var input = ctx.Res<Input>();
-            if (!input.KeyDown(SDL.Scancode.Space) || _spawned)
+            if (!ctx.Input.KeyDown(SDL.Scancode.Space) || _spawned)
                 return;
 
             _spawned = true;
 
-            var ecs = ctx.Res<EcsWorld>();
             for (int i = 0; i < 100_000; i++)
             {
-                var e = ecs.Spawn();
-                ecs.Add(e, new CounterComponent());
+                var e = ctx.Ecs.Spawn();
+                ctx.Ecs.Add(e, new CounterComponent());
             }
         }
 
         [OnPostUpdate]
         public static void LateUpdate(BehaviorContext ctx)
         {
-            var time = ctx.Res<Time>();
-            if (time.ElapsedSeconds % 1.0 < time.DeltaSeconds)
+            if (ctx.Time.ElapsedSeconds % 1.0 < ctx.Time.DeltaSeconds)
                 _spawned = false;
         }
     }

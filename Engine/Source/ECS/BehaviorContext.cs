@@ -11,6 +11,10 @@ public sealed class BehaviorContext
 
     /// <summary>Buffered ECS commands applied after systems run.</summary>
     public EcsCommands Cmd { get; }
+    
+    public Time Time { get; }
+    
+    public Input Input { get; }
 
     /// <summary>Entity being processed for instance methods; 0 if not applicable.</summary>
     public int EntityId { get; internal set; }
@@ -20,6 +24,8 @@ public sealed class BehaviorContext
         World = world;
         Ecs = world.Resource<EcsWorld>();
         Cmd = world.Resource<EcsCommands>();
+        Time = world.Resource<Time>();
+        Input = world.Resource<Input>();
     }
 
     /// <summary>Gets a typed resource from the world.</summary>
