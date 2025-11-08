@@ -222,21 +222,17 @@ public sealed class EcsWorld
         store.Reserve(componentCapacity, maxEntityIdHint);
     }
 
-    // Internal typed store plumbing with static generic cache for fast lookup
+    // Internal typed store plumbing with per-world dictionary
     private ComponentStore<T> GetStore<T>(bool create = true)
     {
-        var cached = StoreCache<T>.Store;
-        if (cached != null || !create) return cached!;
+        if (_stores.TryGetValue(typeof(T), out var existing))
+            return (ComponentStore<T>)existing;
+        if (!create) return null!;
         var created = new ComponentStore<T>();
-        StoreCache<T>.Store = created;
         _stores[typeof(T)] = created;
         return created;
     }
 
-    private static class StoreCache<T>
-    {
-        public static ComponentStore<T>? Store;
-    }
 
     private interface IComponentStore
     {

@@ -111,6 +111,110 @@ public class EcsWorldTests
         Assert.Equal(9, q3[0].C3.C);
     }
 
+    // New tests for ref/span APIs and disposal/free list behavior
+
+    [Fact]
+    public void GetRef_ModifyComponent_ReflectsInQuery()
+    {
+        var ecs = new Engine.EcsWorld();
+        var e = ecs.Spawn();
+        ecs.Add(e, new TestComp { A = 10 });
+        ref var comp = ref ecs.GetRef<TestComp>(e);
+        comp.A += 5; // mutate via ref
+        Assert.Equal(15, ecs.Query<TestComp>().Single().Component.A);
+        Assert.True(ecs.TryGet<TestComp>(e, out var c2) && c2.A == 15);
+    }
+
+    [Fact]
+    public void GetRef_Throws_For_Missing_Component()
+    {
+        var ecs = new Engine.EcsWorld();
+        var e = ecs.Spawn();
+        Assert.Throws<KeyNotFoundException>(() => { ref var _ = ref ecs.GetRef<TestComp>(e); });
+    }
+
+    [Fact]
+    public void GetSpan_MutateAll_MarksChanged()
+    {
+        var ecs = new Engine.EcsWorld();
+        int e1 = ecs.Spawn();
+        int e2 = ecs.Spawn();
+        ecs.Add(e1, new TestComp { A = 2 });
+        ecs.Add(e2, new TestComp { A = 3 });
+        ecs.BeginFrame();
+        var span = ecs.GetSpan<TestComp>();
+        Assert.True(span.IsValid);
+        for (int i = 0; i < span.Entities.Length; i++)
+        {
+            span.Components[i].A *= 2;
+        }
+        // Mark changes manually via TransformEach or Update - direct span mutation does not auto mark changed
+        ecs.TransformEach<TestComp>((id, c) => c); // apply tick marking without changing values
+        Assert.True(ecs.Changed<TestComp>(e1));
+        Assert.True(ecs.Changed<TestComp>(e2));
+        var arr = ecs.Query<TestComp>().OrderBy(t => t.Entity).ToArray();
+        Assert.Equal(4, arr[0].Component.A);
+        Assert.Equal(6, arr[1].Component.A);
+    }
+
+    private sealed class DisposableComp : IDisposable
+    {
+        public int DisposedCount;
+        public bool IsDisposed => DisposedCount > 0;
+        public void Dispose() => DisposedCount++;
+    }
+
+    [Fact]
+    public void Despawn_Disposes_Disposable_Components_And_Reuses_EntityId()
+    {
+        var ecs = new Engine.EcsWorld();
+        int e1 = ecs.Spawn();
+        var disp = new DisposableComp();
+        ecs.Add(e1, disp);
+        ecs.Despawn(e1);
+        Assert.True(disp.IsDisposed);
+        int e2 = ecs.Spawn();
+        Assert.Equal(e1, e2); // free list reuse
+    }
+
+    [Fact]
+    public void QueryWhere_Filters_Correctly()
+    {
+        var ecs = new Engine.EcsWorld();
+        int e1 = ecs.Spawn();
+        int e2 = ecs.Spawn();
+        int e3 = ecs.Spawn();
+        ecs.Add(e1, new TestComp { A = 1 });
+        ecs.Add(e2, new TestComp { A = 5 });
+        ecs.Add(e3, new TestComp { A = 10 });
+        var filtered = ecs.QueryWhere<TestComp>(c => c.A >= 5).OrderBy(t => t.Entity).ToArray();
+        Assert.Equal(2, filtered.Length);
+        Assert.Equal(e2, filtered[0].Entity);
+        Assert.Equal(e3, filtered[1].Entity);
+    }
+
+    [Fact]
+    public void Changed_Reset_After_Frame_When_ModifiedViaUpdate()
+    {
+        var ecs = new Engine.EcsWorld();
+        int e = ecs.Spawn();
+        ecs.Add(e, new TestComp { A = 7 });
+        ecs.BeginFrame();
+        ecs.Update(e, new TestComp { A = 8 });
+        Assert.True(ecs.Changed<TestComp>(e));
+        ecs.BeginFrame();
+        Assert.False(ecs.Changed<TestComp>(e));
+    }
+
+    [Fact]
+    public void Mutate_NoOp_On_Missing_Component_Does_Not_Throw()
+    {
+        var ecs = new Engine.EcsWorld();
+        int e = ecs.Spawn();
+        ecs.Mutate<TestComp>(e, c => { c.A++; return c; }); // should silently do nothing
+        Assert.False(ecs.TryGet<TestComp>(e, out _));
+    }
+
     public struct OtherComp { public int B; }
     public struct ThirdComp { public int C; }
 }
