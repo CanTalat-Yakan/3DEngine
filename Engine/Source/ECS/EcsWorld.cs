@@ -12,6 +12,23 @@ public sealed class EcsWorld
     private readonly Dictionary<Type, IComponentStore> _stores = new();
     private int _currentTick; // default 0
     private readonly Stack<int> _free = new();
+    private int[] _entityGenerations = Array.Empty<int>(); // generation per entity id (index == entity id)
+    private const int FirstGeneration = 1;
+
+    // Strong entity handle carrying generation
+    public readonly record struct Entity(int Id, int Generation)
+    {
+        public override string ToString() => $"Entity(Id={Id},Gen={Generation})";
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void EnsureGenerationCapacity(int id)
+    {
+        if (id < _entityGenerations.Length) return;
+        int newSize = _entityGenerations.Length == 0 ? Math.Max(128, id + 1) : _entityGenerations.Length;
+        while (id >= newSize) newSize *= 2;
+        Array.Resize(ref _entityGenerations, newSize);
+    }
 
     /// <summary>Provides direct span access to entities and components of a given type.</summary>
     public readonly ref struct ComponentSpan<T>
@@ -27,23 +44,49 @@ public sealed class EcsWorld
         }
     }
  
-    /// <summary>Spawns a new entity id (reuses from free list if available).</summary>
-    public int Spawn() => _free.Count > 0 ? _free.Pop() : _nextEntity++;
+    /// <summary>Spawns and returns a rich Entity handle (id + generation).</summary>
+    public Entity SpawnEntity()
+    {
+        int id;
+        if (_free.Count > 0)
+        {
+            id = _free.Pop();
+            // reuse existing generation value (already incremented on despawn)
+        }
+        else
+        {
+            id = _nextEntity++;
+            EnsureGenerationCapacity(id);
+            if (_entityGenerations[id] == 0) _entityGenerations[id] = FirstGeneration; // first time
+        }
+        return new Entity(id, _entityGenerations[id]);
+    }
+
+    /// <summary>Back-compat: spawn returning only entity id (for existing codepaths).</summary>
+    public int Spawn() => SpawnEntity().Id;
+
+    /// <summary>Returns current generation for an entity id (0 if never used).</summary>
+    public int CurrentGeneration(int entityId)
+    {
+        if ((uint)entityId >= (uint)_entityGenerations.Length) return 0;
+        return _entityGenerations[entityId];
+    }
+
+    /// <summary>Checks if an Entity handle is still alive (generation matches).</summary>
+    public bool IsAlive(Entity e) => e.Id > 0 && e.Id < _entityGenerations.Length && _entityGenerations[e.Id] == e.Generation;
 
     /// <summary>Removes an entity and all of its components, disposing IDisposable components.</summary>
     public void Despawn(int entity)
     {
         foreach (var store in _stores.Values)
             if (store.TryRemove(entity, out var disposable) && disposable is not null)
-                try
-                {
-                    disposable.Dispose();
-                }
-                catch
-                {
-                    /* swallow disposal exceptions */
-                }
+                try { disposable.Dispose(); } catch { }
 
+        EnsureGenerationCapacity(entity);
+        // bump generation (avoid overflow zero) - wrap skipped minimal; if int.MaxValue reached, wrap to FirstGeneration
+        int g = _entityGenerations[entity];
+        g = g == int.MaxValue ? FirstGeneration : g + 1;
+        _entityGenerations[entity] = g;
         _free.Push(entity);
     }
 
@@ -685,4 +728,25 @@ public sealed class EcsWorld
          if (s1 == null || s2 == null) return RefEnumerable<T1, T2>.Empty();
          return RefEnumerable<T1, T2>.From(s1, s2, markOnIterate: true);
      }
+
+    // Overloads that accept Entity handles ------------------------------------
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void ValidateAlive(Entity e)
+    {
+        if (!IsAlive(e)) throw new InvalidOperationException($"Stale or invalid entity handle {e}");
+    }
+
+    public void Add<T>(Entity e, T component) { ValidateAlive(e); Add(e.Id, component); }
+    public void Update<T>(Entity e, T component) { ValidateAlive(e); Update(e.Id, component); }
+    public void Mutate<T>(Entity e, Func<T,T> mutate) { if (IsAlive(e)) Mutate(e.Id, mutate); }
+    public bool Has<T>(Entity e) => IsAlive(e) && Has<T>(e.Id);
+    public bool Changed<T>(Entity e) => IsAlive(e) && Changed<T>(e.Id);
+    public bool TryGet<T>(Entity e, out T? component)
+    {
+        if (IsAlive(e)) return TryGet(e.Id, out component);
+        component = default; return false;
+    }
+    public ref T GetRef<T>(Entity e) { ValidateAlive(e); return ref GetRef<T>(e.Id); }
+    public void Despawn(Entity e) { if (IsAlive(e)) Despawn(e.Id); }
 }

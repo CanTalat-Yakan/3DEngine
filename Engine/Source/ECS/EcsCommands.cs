@@ -6,7 +6,18 @@ public sealed class EcsCommands
     private readonly Queue<Action<EcsWorld>> _queue = new();
 
     /// <summary>Queues a spawn of a new entity built by provided action.</summary>
-    public EcsCommands Spawn(Action<int, EcsWorld> builder)
+    public EcsCommands Spawn(Action<EcsWorld.Entity, EcsWorld> builder)
+    {
+        _queue.Enqueue(world =>
+        {
+            var e = world.SpawnEntity();
+            builder(e, world);
+        });
+        return this;
+    }
+
+    // Preserve legacy int-based spawn API for backward compatibility
+    public EcsCommands SpawnInt(Action<int, EcsWorld> builder)
     {
         _queue.Enqueue(world =>
         {
