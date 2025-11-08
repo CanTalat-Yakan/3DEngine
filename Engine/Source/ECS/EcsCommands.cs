@@ -5,19 +5,8 @@ public sealed class EcsCommands
 {
     private readonly Queue<Action<EcsWorld>> _queue = new();
 
-    /// <summary>Queues a spawn of a new entity built by provided action.</summary>
-    public EcsCommands Spawn(Action<EcsWorld.Entity, EcsWorld> builder)
-    {
-        _queue.Enqueue(world =>
-        {
-            var e = world.SpawnEntity();
-            builder(e, world);
-        });
-        return this;
-    }
-
-    // Preserve legacy int-based spawn API for backward compatibility
-    public EcsCommands SpawnInt(Action<int, EcsWorld> builder)
+    /// <summary>Queues a spawn of a new entity built by provided action (id-only).</summary>
+    public EcsCommands Spawn(Action<int, EcsWorld> builder)
     {
         _queue.Enqueue(world =>
         {
@@ -27,14 +16,14 @@ public sealed class EcsCommands
         return this;
     }
 
-    /// <summary>Queues entity despawn.</summary>
+    /// <summary>Queues entity despawn by id.</summary>
     public EcsCommands Despawn(int entity)
     {
         _queue.Enqueue(world => world.Despawn(entity));
         return this;
     }
 
-    /// <summary>Queues adding a component to an entity.</summary>
+    /// <summary>Queues adding a component to an entity by id.</summary>
     public EcsCommands Add<T>(int entity, T component)
     {
         _queue.Enqueue(world => world.Add(entity, component));

@@ -76,8 +76,8 @@ public sealed class Program
 
             for (int i = 0; i < 100_000; i++)
             {
-                var e = ctx.Ecs.SpawnEntity();
-                ctx.Ecs.Add(e.Id, new CounterComponent()); // keep Add(int, ...) for now
+                var e = ctx.Ecs.Spawn();
+                ctx.Ecs.Add(e, new CounterComponent());
             }
         }
 

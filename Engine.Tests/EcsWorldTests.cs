@@ -9,6 +9,23 @@ public struct TestComp
     public int A;
 }
 
+public struct OtherComp
+{
+    public int B;
+}
+
+public struct ThirdComp
+{
+    public int C;
+}
+
+public sealed class DisposableComp : IDisposable
+{
+    public int DisposedCount;
+    public bool IsDisposed => DisposedCount > 0;
+    public void Dispose() => DisposedCount++;
+}
+
 public class EcsWorldTests
 {
     [Fact]
@@ -52,7 +69,11 @@ public class EcsWorldTests
         ecs.Add(e, new TestComp { A = 5 });
 
         ecs.BeginFrame();
-        ecs.Mutate<TestComp>(e, c => { c.A += 3; return c; });
+        ecs.Mutate<TestComp>(e, c =>
+        {
+            c.A += 3;
+            return c;
+        });
         Assert.True(ecs.Changed<TestComp>(e));
         Assert.Equal(8, ecs.Query<TestComp>().Single().Component.A);
     }
@@ -67,7 +88,11 @@ public class EcsWorldTests
         ecs.Add(e2, new TestComp { A = 2 });
 
         ecs.BeginFrame();
-        ecs.TransformEach<TestComp>((id, c) => { c.A += id == e1 ? 10 : 20; return c; });
+        ecs.TransformEach<TestComp>((id, c) =>
+        {
+            c.A += id == e1 ? 10 : 20;
+            return c;
+        });
 
         var dict = ecs.Query<TestComp>().ToDictionary(t => t.Entity, t => t.Component.A);
         Assert.Equal(11, dict[e1]);
@@ -111,8 +136,6 @@ public class EcsWorldTests
         Assert.Equal(9, q3[0].C3.C);
     }
 
-    // New tests for ref/span APIs and disposal/free list behavior
-
     [Fact]
     public void GetRef_ModifyComponent_ReflectsInQuery()
     {
@@ -130,7 +153,10 @@ public class EcsWorldTests
     {
         var ecs = new Engine.EcsWorld();
         var e = ecs.Spawn();
-        Assert.Throws<KeyNotFoundException>(() => { ref var _ = ref ecs.GetRef<TestComp>(e); });
+        Assert.Throws<KeyNotFoundException>(() =>
+        {
+            ref var _ = ref ecs.GetRef<TestComp>(e);
+        });
     }
 
     [Fact]
@@ -148,6 +174,7 @@ public class EcsWorldTests
         {
             span.Components[i].A *= 2;
         }
+
         // Mark changes manually via TransformEach or Update - direct span mutation does not auto mark changed
         ecs.TransformEach<TestComp>((id, c) => c); // apply tick marking without changing values
         Assert.True(ecs.Changed<TestComp>(e1));
@@ -156,14 +183,7 @@ public class EcsWorldTests
         Assert.Equal(4, arr[0].Component.A);
         Assert.Equal(6, arr[1].Component.A);
     }
-
-    private sealed class DisposableComp : IDisposable
-    {
-        public int DisposedCount;
-        public bool IsDisposed => DisposedCount > 0;
-        public void Dispose() => DisposedCount++;
-    }
-
+    
     [Fact]
     public void Despawn_Disposes_Disposable_Components_And_Reuses_EntityId()
     {
@@ -211,7 +231,11 @@ public class EcsWorldTests
     {
         var ecs = new Engine.EcsWorld();
         int e = ecs.Spawn();
-        ecs.Mutate<TestComp>(e, c => { c.A++; return c; }); // should silently do nothing
+        ecs.Mutate<TestComp>(e, c =>
+        {
+            c.A++;
+            return c;
+        }); // should silently do nothing
         Assert.False(ecs.TryGet<TestComp>(e, out _));
     }
 
@@ -228,6 +252,7 @@ public class EcsWorldTests
         {
             rc.Component.A += 5;
         }
+
         Assert.True(ecs.Changed<TestComp>(e1));
         Assert.True(ecs.Changed<TestComp>(e2));
         var values = ecs.Query<TestComp>().OrderBy(x => x.Entity).Select(x => x.Component.A).ToArray();
@@ -250,6 +275,7 @@ public class EcsWorldTests
             rc.C1.A += rc.C2.B * 10; // 10+1*10=20, 20+2*10=40
             rc.C2.B += 3; // mutate second component
         }
+
         var q = ecs.Query<TestComp, OtherComp>().OrderBy(t => t.Entity).ToArray();
         Assert.Equal(2, q.Length);
         Assert.Equal(20, q[0].C1.A);
@@ -271,8 +297,13 @@ public class EcsWorldTests
             int e = ecs.Spawn();
             ecs.Add(e, new TestComp { A = i });
         }
+
         ecs.BeginFrame();
-        ecs.ParallelTransformEach<TestComp>((e, c) => { c.A += 1; return c; });
+        ecs.ParallelTransformEach<TestComp>((e, c) =>
+        {
+            c.A += 1;
+            return c;
+        });
         // spot check
         Assert.True(ecs.Changed<TestComp>(1));
         Assert.True(ecs.Changed<TestComp>(500));
@@ -362,7 +393,41 @@ public class EcsWorldTests
         ecs.TransformEach<TestComp>((id, c) => c); // mark
         Assert.True(ecs.Changed<TestComp>(e));
     }
+    
+    [Fact]
+    public void Spawn_Assigns_FirstGeneration()
+    {
+        var ecs = new Engine.EcsWorld();
+        var id = ecs.Spawn();
+        Assert.True(ecs.GetGeneration(id) >= 1);
+    }
 
-    public struct OtherComp { public int B; }
-    public struct ThirdComp { public int C; }
+    [Fact]
+    public void Despawn_Increments_Generation()
+    {
+        var ecs = new Engine.EcsWorld();
+        var id = ecs.Spawn();
+        var g1 = ecs.GetGeneration(id);
+        ecs.Despawn(id);
+        var g2 = ecs.GetGeneration(id);
+        Assert.NotEqual(g1, g2);
+        // ID is reused
+        var id2 = ecs.Spawn();
+        Assert.Equal(id, id2);
+        Assert.Equal(g2, ecs.GetGeneration(id2));
+    }
+
+    [Fact]
+    public void GetRef_By_Id_Works_After_Spawn_But_Not_After_Remove()
+    {
+        var ecs = new Engine.EcsWorld();
+        var id = ecs.Spawn();
+        ecs.Add(id, new TestComp { A = 1 });
+        ref var c = ref ecs.GetRef<TestComp>(id);
+        c.A = 5;
+        Assert.True(ecs.TryGet<TestComp>(id, out var v) && v.A == 5);
+        ecs.Despawn(id);
+        // component gone; GetRef should throw missing component
+        Assert.Throws<KeyNotFoundException>(() => { ref var _ = ref ecs.GetRef<TestComp>(id); });
+    }
 }
