@@ -44,9 +44,9 @@ public static class ImGuiInput
                 // Key press/release + modifier keys.
                 bool isDown = (SDL.EventType)e.Type == SDL.EventType.KeyDown;
                 var sc = e.Key.Scancode;
-                ImGuiKey imguiKey = SdlKeyToImGuiKey(sc);
-                if (imguiKey != ImGuiKey.None)
-                    io.AddKeyEvent(imguiKey, isDown);
+                ImGuiKey imGuiKey = SdlKeyToImGuiKey(sc);
+                if (imGuiKey != ImGuiKey.None)
+                    io.AddKeyEvent(imGuiKey, isDown);
 
                 var mods = SDL.GetModState();
                 io.AddKeyEvent(ImGuiKey.ModShift, mods.HasFlag(SDL.Keymod.Shift));

@@ -22,24 +22,24 @@ public sealed class ImGuiPlugin : IPlugin
         app.World.InsertResource(renderer);
         app.World.InsertResource(new ImGuiState());
 
-        app.AddSystem(Stage.PreUpdate, w =>
+        app.AddSystem(Stage.PreUpdate, (world) =>
         {
-            var aw = w.Resource<AppWindow>();
-            w.Resource<ImGuiRenderer>().NewFrame(aw.SdlWindow.Window);
+            var appWindow = world.Resource<AppWindow>();
+            world.Resource<ImGuiRenderer>().NewFrame(appWindow.SdlWindow.Window);
             ImGui.NewFrame();
         });
 
-        app.AddSystem(Stage.Update, w =>
+        app.AddSystem(Stage.Update, (world) =>
         {
-            var state = w.Resource<ImGuiState>();
+            var state = world.Resource<ImGuiState>();
             if (state.ShowDemo) ImGui.ShowDemoWindow(ref state.ShowDemo);
         });
 
-        app.AddSystem(Stage.Render, w =>
+        app.AddSystem(Stage.Render, (world) =>
         {
-            var sdl = w.Resource<AppWindow>().SdlWindow;
-            var imguiRenderer = w.Resource<ImGuiRenderer>();
-            var clear = w.Resource<ClearColor>().Value;
+            var sdl = world.Resource<AppWindow>().SdlWindow;
+            var imGuiRenderer = world.Resource<ImGuiRenderer>();
+            var clear = world.Resource<ClearColor>().Value;
 
             ImGui.Render();
             var drawData = ImGui.GetDrawData();
@@ -51,7 +51,7 @@ public sealed class ImGuiPlugin : IPlugin
                 (byte)(clear.W * 255));
             SDL.RenderClear(sdl.Renderer);
 
-            imguiRenderer.RenderDrawData(drawData);
+            imGuiRenderer.RenderDrawData(drawData);
             SDL.RenderPresent(sdl.Renderer);
         });
     }

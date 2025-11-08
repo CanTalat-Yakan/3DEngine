@@ -72,9 +72,9 @@ public sealed class App
 
         try
         {
-            if (World.TryResource<ImGuiRenderer>() is { } imguiRenderer)
+            if (World.TryResource<ImGuiRenderer>() is { } imGuiRenderer)
             {
-                imguiRenderer.Dispose();
+                imGuiRenderer.Dispose();
                 World.RemoveResource<ImGuiRenderer>();
             }
             ImGui.DestroyContext();
