@@ -215,6 +215,154 @@ public class EcsWorldTests
         Assert.False(ecs.TryGet<TestComp>(e, out _));
     }
 
+    [Fact]
+    public void IterateRef_ModifiesComponents()
+    {
+        var ecs = new Engine.EcsWorld();
+        int e1 = ecs.Spawn();
+        int e2 = ecs.Spawn();
+        ecs.Add(e1, new TestComp { A = 1 });
+        ecs.Add(e2, new TestComp { A = 2 });
+        ecs.BeginFrame();
+        foreach (var rc in ecs.IterateRef<TestComp>())
+        {
+            rc.Component.A += 5;
+        }
+        Assert.True(ecs.Changed<TestComp>(e1));
+        Assert.True(ecs.Changed<TestComp>(e2));
+        var values = ecs.Query<TestComp>().OrderBy(x => x.Entity).Select(x => x.Component.A).ToArray();
+        Assert.Equal(new[] { 6, 7 }, values);
+    }
+
+    [Fact]
+    public void IterateRef_TwoComponents_ModifiesBoth()
+    {
+        var ecs = new Engine.EcsWorld();
+        int e1 = ecs.Spawn();
+        int e2 = ecs.Spawn();
+        ecs.Add(e1, new TestComp { A = 10 });
+        ecs.Add(e1, new OtherComp { B = 1 });
+        ecs.Add(e2, new TestComp { A = 20 });
+        ecs.Add(e2, new OtherComp { B = 2 });
+        ecs.BeginFrame();
+        foreach (var rc in ecs.IterateRef<TestComp, OtherComp>())
+        {
+            rc.C1.A += rc.C2.B * 10; // 10+1*10=20, 20+2*10=40
+            rc.C2.B += 3; // mutate second component
+        }
+        var q = ecs.Query<TestComp, OtherComp>().OrderBy(t => t.Entity).ToArray();
+        Assert.Equal(2, q.Length);
+        Assert.Equal(20, q[0].C1.A);
+        Assert.Equal(4, q[0].C2.B); // 1+3
+        Assert.Equal(40, q[1].C1.A);
+        Assert.Equal(5, q[1].C2.B); // 2+3
+        Assert.True(ecs.Changed<TestComp>(e1));
+        Assert.True(ecs.Changed<TestComp>(e2));
+        Assert.True(ecs.Changed<OtherComp>(e1));
+        Assert.True(ecs.Changed<OtherComp>(e2));
+    }
+
+    [Fact]
+    public void ParallelTransformEach_MarksChanged()
+    {
+        var ecs = new Engine.EcsWorld();
+        for (int i = 0; i < 1000; i++)
+        {
+            int e = ecs.Spawn();
+            ecs.Add(e, new TestComp { A = i });
+        }
+        ecs.BeginFrame();
+        ecs.ParallelTransformEach<TestComp>((e, c) => { c.A += 1; return c; });
+        // spot check
+        Assert.True(ecs.Changed<TestComp>(1));
+        Assert.True(ecs.Changed<TestComp>(500));
+        // ensure update happened
+        var first = ecs.Query<TestComp>().First(t => t.Component.A == 1); // original 0 + 1
+        Assert.Equal(1, first.Component.A);
+    }
+
+    [Fact]
+    public void Remove_Component_RemovesOnlyThatComponent()
+    {
+        var ecs = new Engine.EcsWorld();
+        int e = ecs.Spawn();
+        ecs.Add(e, new TestComp { A = 5 });
+        ecs.Add(e, new OtherComp { B = 9 });
+        Assert.True(ecs.Has<TestComp>(e));
+        Assert.True(ecs.Has<OtherComp>(e));
+        Assert.True(ecs.Remove<OtherComp>(e));
+        Assert.True(ecs.Has<TestComp>(e));
+        Assert.False(ecs.Has<OtherComp>(e));
+    }
+
+    [Fact]
+    public void EntitiesWith_Returns_All_Component_Entities()
+    {
+        var ecs = new Engine.EcsWorld();
+        int e1 = ecs.Spawn();
+        int e2 = ecs.Spawn();
+        int e3 = ecs.Spawn();
+        ecs.Add(e1, new TestComp { A = 1 });
+        ecs.Add(e3, new TestComp { A = 3 });
+        var entities = ecs.EntitiesWith<TestComp>().ToArray();
+        Array.Sort(entities);
+        Assert.Equal(new[] { e1, e3 }, entities);
+    }
+
+    [Fact]
+    public void Changed_Reset_After_Remove_And_ReAdd()
+    {
+        var ecs = new Engine.EcsWorld();
+        int e = ecs.Spawn();
+        ecs.Add(e, new TestComp { A = 1 });
+        ecs.BeginFrame();
+        ecs.Update(e, new TestComp { A = 2 });
+        Assert.True(ecs.Changed<TestComp>(e));
+        ecs.BeginFrame();
+        Assert.False(ecs.Changed<TestComp>(e));
+        ecs.Remove<TestComp>(e);
+        ecs.Add(e, new TestComp { A = 3 });
+        ecs.BeginFrame();
+        ecs.Update(e, new TestComp { A = 4 });
+        Assert.True(ecs.Changed<TestComp>(e));
+    }
+
+    [Fact]
+    public void SwapBackRemoval_Preserves_ChangedFlag_ForMovedComponent()
+    {
+        var ecs = new Engine.EcsWorld();
+        int e1 = ecs.Spawn();
+        int e2 = ecs.Spawn();
+        ecs.Add(e1, new TestComp { A = 1 });
+        ecs.Add(e2, new TestComp { A = 2 });
+        ecs.BeginFrame();
+        ecs.Update(e2, new TestComp { A = 3 }); // mark e2 changed
+        Assert.True(ecs.Changed<TestComp>(e2));
+        ecs.BeginFrame(); // clear change flags
+        Assert.False(ecs.Changed<TestComp>(e2));
+        ecs.Update(e2, new TestComp { A = 4 }); // mark again
+        Assert.True(ecs.Changed<TestComp>(e2));
+        // Remove e1 causing swap-back of e2 to index0
+        ecs.Remove<TestComp>(e1);
+        // e2 should still have its changed bit
+        Assert.True(ecs.Changed<TestComp>(e2));
+    }
+
+    [Fact]
+    public void SpanMutation_Without_Marking_Does_Not_Set_Changed()
+    {
+        var ecs = new Engine.EcsWorld();
+        int e = ecs.Spawn();
+        ecs.Add(e, new TestComp { A = 10 });
+        ecs.BeginFrame();
+        var span = ecs.GetSpan<TestComp>();
+        span.Components[0].A = 99; // direct memory write without marking
+        // Changed should still be false until explicit marking
+        Assert.False(ecs.Changed<TestComp>(e));
+        ecs.TransformEach<TestComp>((id, c) => c); // mark
+        Assert.True(ecs.Changed<TestComp>(e));
+    }
+
     public struct OtherComp { public int B; }
     public struct ThirdComp { public int C; }
 }
