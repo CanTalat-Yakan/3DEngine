@@ -32,6 +32,10 @@
     - [Plugins](#plugins)
     - [Resources](#resources)
     - [ECS: Entities, Components, and Commands](#ecs-entities-components-and-commands)
+    - [ECS Iteration Modes: Query vs IterateRef vs GetSpan](#ecs-iteration-modes-query-vs-iterateref-vs-getspan)
+    - [Change Tracking](#change-tracking)
+    - [Entity Generations](#entity-generations)
+    - [ECS Internals and File Layout](#ecs-internals-and-file-layout)
     - [Behavior System (Attribute-based ECS)](#behavior-system-attribute-based-ecs)
     - [Native ECS Style (Manual Systems)](#native-ecs-style-manual-systems)
     - [Source Generator](#source-generator)
@@ -77,7 +81,7 @@ See `Engine/Program.cs` for usage examples.
 
 Implemented (early preview):
 - Staged update loop (Startup → First → PreUpdate → Update → PostUpdate → Render → Last)
-- Minimal ECS (entities, components, queries, changed flags, disposal semantics)
+- Cache-friendly ECS (sparse-set storage, per-frame bitset change tracking, zero-allocation ref iterators)
 - Attribute-based behavior system with Roslyn source generator
 - Basic plugin model (`DefaultPlugins`) for window/time/input/ECS/ImGui
 - ImGui runtime overlay integration
@@ -241,20 +245,89 @@ Common resources used by systems/behaviors:
 
 ### ECS: Entities, Components, and Commands
 
-- Entities are `int` IDs managed by `EcsWorld`.
-- Components are plain structs or classes stored by type.
-- Mutations can be immediate (`EcsWorld.Add/Update/Despawn`) or queued via `ECSCommands` to avoid in-frame structural
-  changes:
-    - Queue with `ctx.Cmd.Add(...)`, `ctx.Cmd.Spawn(...)`, etc.
-    - Applied automatically in `PostUpdate` by the `EcsPlugin`.
-- Queries:
-    - `foreach (var (entity, comp) in ecs.Query<T>()) { ... }`
-    - `Query<T1,T2>()` and `Query<T1,T2,T3>()` exist for small joins.
-    - `Has<T>(entity)`, `Changed<T>(entity)` helpers are available.
-- Note: Per-frame `Changed<...>` flags are cleared at stage `First`.
-- Disposal: When an entity is despawned, any component that implements `IDisposable` is disposed automatically. Prefer
-  implementing `IDisposable` on components (including behavior structs) if they hold disposable references, and release
-  them in `Dispose()`.
+- Entities are `int` IDs only (no public handle type). Create with `var id = ecs.Spawn();` and remove with `ecs.Despawn(id);`.
+- Component APIs (ID-only): `Add<T>(id, comp)`, `Update<T>(id, comp)`, `TryGet<T>(id, out comp)`, `Has<T>(id)`, `Remove<T>(id)`.
+- Queries: `ecs.Query<T>()`, `ecs.Query<T1,T2>()`, `ecs.Query<T1,T2,T3>()` iterate matching entities. Joins walk the smallest set for speed.
+- Mutations can be immediate or queued via `EcsCommands` (ID-only): `Spawn`, `Add<T>`, `Despawn`. Commands are applied in `PostUpdate`.
+- Disposal: On `Despawn`, components that implement `IDisposable` are disposed.
+
+Beyond `Query`, the ECS exposes zero-allocation iteration and transforms for hot loops:
+
+- In-place ref iteration: `foreach (var rc in ecs.IterateRef<T>()) { rc.Component ... }` (marks changed automatically).
+- Transform helpers:
+  - `TransformEach<T>((id, c) => { /* mutate */ return c; })`
+  - `ParallelTransformEach<T>((id, c) => { /* mutate */ return c; })`
+- Span access: `var span = ecs.GetSpan<T>();` returns entities/components spans for tight loops (manual marking recommended).
+
+See also: [ECS Iteration Modes](#ecs-iteration-modes-query-vs-iterateref-vs-getspan), [Change Tracking](#change-tracking), and [Entity Generations](#entity-generations).
+
+### ECS Iteration Modes: Query vs IterateRef vs GetSpan
+
+- Query<T>/Query<T1,T2[,T3]>:
+  - Returns value tuples; component structs are copied when iterating.
+  - Easy and LINQ-friendly; good for read-only scans or when you call `Update` after changing a local copy.
+  - Does not mark components as changed.
+- IterateRef<T>/IterateRef<T1,T2>:
+  - Zero-allocation ref enumerators; returns refs to live component storage for in-place mutation.
+  - Marks components as changed while iterating (suitable for systems that mutate frequently).
+  - Ref structs can’t be stored/escaped; use immediately inside the loop.
+- GetSpan<T>:
+  - Returns `(ReadOnlySpan<int> Entities, Span<T> Components)` for manual indexed loops.
+  - Doesn’t mark changed by itself; combine with `TransformEach<T>` (no-op transform) to mark, or call `Update`.
+
+Examples:
+
+```csharp
+// Read-only query
+foreach (var (e, comp) in ecs.Query<Position>())
+{
+    // inspect comp
+}
+
+// In-place mutation with IterateRef (marks changed)
+foreach (var rc in ecs.IterateRef<Velocity>())
+{
+    rc.Component.dx += 1;
+}
+
+// Transform helper (marks changed)
+ecs.TransformEach<Position>((e, p) => { p.x += 1; return p; });
+
+// Parallel transform (marks changed)
+ecs.ParallelTransformEach<Position>((e, p) => { p.x += 1; return p; });
+
+// Spans (manual marking)
+var span = ecs.GetSpan<Mass>();
+for (int i = 0; i < span.Entities.Length; i++)
+{
+    span.Components[i].value *= 2;
+}
+// mark all as changed without altering values
+ecs.TransformEach<Mass>((e, m) => m);
+```
+
+### Change Tracking
+
+- Each component store maintains a per-entity “changed this frame” bitset.
+- The bit is set when you `Update`, when a `TransformEach` writes, or as you iterate via `IterateRef`.
+- `Changed<T>(id)` reads the bit; bits are cleared at `BeginFrame()` (stage `First`).
+
+### Entity Generations
+
+- The world tracks a generation counter per entity ID internally to guard against stale IDs.
+- On `Despawn(id)`, the generation for that ID is incremented and the ID is added to a free list for reuse.
+- Public API remains ID-only. For diagnostics or tooling, you can inspect the current generation via `ecs.GetGeneration(id)`.
+
+### ECS Internals and File Layout
+
+- Storage: Sparse-set layout (sparse index + dense arrays for entities and components) — cache-friendly, O(1) lookups.
+- Changed flags: Compact bitset aligned to dense storage; cleared per frame.
+- Type lookup: One store per component type with direct casting (no interfaces in hot loops).
+- File split (partial class):
+  - `EcsWorld.cs` – entity lifecycle (spawn/despawn), frame management, counts, and entity lists
+  - `EcsWorld.Components.cs` – component storage, CRUD, spans, and single-type query
+  - `EcsWorld.Queries.cs` – multi-type queries and predicates
+  - `EcsWorld.RefIterators.cs` – ref iterators, transforms, and parallel transforms
 
 ### Behavior System (Attribute-based ECS)
 
