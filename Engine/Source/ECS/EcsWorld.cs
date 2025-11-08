@@ -1,5 +1,3 @@
-// ReSharper disable once CheckNamespace
-
 namespace Engine;
 
 using System;
@@ -344,7 +342,7 @@ public sealed class EcsWorld
             return false;
         }
 
-        public bool ChangedThisFrame(int entity, int currentTick) => 
+        public bool ChangedThisFrame(int entity, int currentTick) =>
             entity < _sparse.Length && _sparse[entity] >= 0 && _changedTicks[_sparse[entity]] == currentTick;
 
         // Struct enumerable to avoid iterator allocations
@@ -354,8 +352,7 @@ public sealed class EcsWorld
         {
             private readonly ComponentStore<T> _store;
 
-            public ComponentEnumerable(ComponentStore<T> store) =>
-                _store = store;
+            public ComponentEnumerable(ComponentStore<T> store) => _store = store;
 
             public Enumerator GetEnumerator() => new(_store);
 
@@ -400,7 +397,7 @@ public sealed class EcsWorld
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void MarkChangedByDenseIndex(int denseIndex, int tick) => _changedTicks[denseIndex] = tick;
 
-        public ComponentSpan<T> AsSpan() => 
+        public ComponentSpan<T> AsSpan() =>
             new(_denseEntities.AsSpan(0, _count), _denseComponents.AsSpan(0, _count));
 
         public bool TryRemove(int entity, out IDisposable? disposable)
@@ -428,10 +425,7 @@ public sealed class EcsWorld
             return true;
         }
 
-        public void ClearChangedTicks()
-        {
-            // Reset only used portion
-            Array.Clear(_changedTicks, 0, _count);
-        }
+        // Reset only used portion
+        public void ClearChangedTicks() => Array.Clear(_changedTicks, 0, _count);
     }
 }
