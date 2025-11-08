@@ -3,9 +3,8 @@ namespace Engine;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
-/// <summary>Lightweight ECS storage managing entities, components, and per-frame change tracking.
-/// Optimized with sparse-set component stores for cache-friendly iteration and O(1) lookups.</summary>
 public sealed class EcsWorld
 {
     private int _nextEntity = 1;
@@ -26,7 +25,7 @@ public sealed class EcsWorld
             Components = components;
         }
     }
-
+ 
     /// <summary>Spawns a new entity id (reuses from free list if available).</summary>
     public int Spawn() => _free.Count > 0 ? _free.Pop() : _nextEntity++;
 
@@ -239,7 +238,7 @@ public sealed class EcsWorld
         void ClearChangedTicks();
     }
 
-    private sealed class ComponentStore<T> : IComponentStore
+    internal sealed class ComponentStore<T> : IComponentStore
     {
         private int[] _denseEntities = Array.Empty<int>();
         private T[] _denseComponents = Array.Empty<T>();
@@ -248,6 +247,12 @@ public sealed class EcsWorld
         private int _count;
 
         public int Count => _count;
+
+        // Expose spans/arrays for advanced iteration (internal)
+        internal ReadOnlySpan<int> EntitiesSpan() => _denseEntities.AsSpan(0, _count);
+        internal int[] EntitiesArray => _denseEntities; // used in parallel ops
+        internal T[] ComponentsArray => _denseComponents; // used in parallel ops
+        internal int[] ChangedTicksArray => _changedTicks; // used in parallel ops
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void EnsureSparseCapacity(int entity)
@@ -425,7 +430,174 @@ public sealed class EcsWorld
             return true;
         }
 
+        // Non-disposing remove for explicit component removal
+        public bool Remove(int entity)
+        {
+            if (entity >= _sparse.Length) return false;
+            int idx = _sparse[entity];
+            if (idx < 0) return false;
+            int lastIdx = _count - 1;
+            if (idx != lastIdx)
+            {
+                _denseComponents[idx] = _denseComponents[lastIdx];
+                _denseEntities[idx] = _denseEntities[lastIdx];
+                _changedTicks[idx] = _changedTicks[lastIdx];
+                _sparse[_denseEntities[idx]] = idx;
+            }
+            _sparse[entity] = -1;
+            _count--;
+            return true;
+        }
+
         // Reset only used portion
         public void ClearChangedTicks() => Array.Clear(_changedTicks, 0, _count);
+    }
+
+    // ==========================
+    // Convenience APIs
+    // ==========================
+
+    public int Count<T>() => GetStore<T>(create: false)?.Count ?? 0;
+
+    public bool Remove<T>(int entity)
+    {
+        var store = GetStore<T>(create: false);
+        return store != null && store.Remove(entity);
+    }
+
+    public ReadOnlySpan<int> EntitiesWith<T>()
+    {
+        var store = GetStore<T>(create: false);
+        return store == null ? ReadOnlySpan<int>.Empty : store.EntitiesSpan();
+    }
+
+    /// <summary>Parallel version of TransformEach; safe when transform is independent per element.</summary>
+    public void ParallelTransformEach<T>(Func<int, T, T> transform)
+    {
+        var store = GetStore<T>(create: false);
+        if (store == null || store.Count == 0) return;
+        var count = store.Count;
+        var ents = store.EntitiesArray;
+        var comps = store.ComponentsArray;
+        var ticks = store.ChangedTicksArray;
+        Parallel.For(0, count, i =>
+        {
+            var newVal = transform(ents[i], comps[i]);
+            comps[i] = newVal;
+            ticks[i] = _currentTick;
+        });
+    }
+
+    // ==========================
+    // Zero-allocation ref iterators
+    // ==========================
+
+    public readonly ref struct RefComponent<T>
+    {
+        public readonly int Entity;
+        private readonly Span<T> _components;
+        private readonly int _index;
+        public ref T Component => ref _components[_index];
+        private RefComponent(int entity, Span<T> components, int index)
+        { Entity = entity; _components = components; _index = index; }
+        internal static RefComponent<T> Create(int entity, Span<T> comps, int index) => new(entity, comps, index);
+    }
+
+    public readonly ref struct RefEnumerable<T>
+    {
+        private readonly ReadOnlySpan<int> _entities;
+        private readonly Span<T> _components;
+        private RefEnumerable(ReadOnlySpan<int> entities, Span<T> components)
+        { _entities = entities; _components = components; }
+        public static RefEnumerable<T> From(ComponentSpan<T> span) => new(span.Entities, span.Components);
+        public RefEnumerator GetEnumerator() => new(_entities, _components);
+        public ref struct RefEnumerator
+        {
+            private ReadOnlySpan<int> _entities;
+            private Span<T> _components;
+            private int _index;
+            internal RefEnumerator(ReadOnlySpan<int> entities, Span<T> components)
+            { _entities = entities; _components = components; _index = -1; }
+            public RefComponent<T> Current => RefComponent<T>.Create(_entities[_index], _components, _index);
+            public bool MoveNext() { _index++; return _index < _entities.Length; }
+        }
+    }
+
+    public readonly ref struct RefComponents<T1, T2>
+    {
+        public readonly int Entity;
+        private readonly ComponentStore<T1> _s1;
+        private readonly ComponentStore<T2> _s2;
+        private readonly int _e;
+        private RefComponents(int entity, ComponentStore<T1> s1, ComponentStore<T2> s2)
+        { Entity = entity; _s1 = s1; _s2 = s2; _e = entity; }
+        internal static RefComponents<T1, T2> Create(int entity, ComponentStore<T1> s1, ComponentStore<T2> s2) => new(entity, s1, s2);
+        public ref T1 C1 => ref _s1.GetRef(_e);
+        public ref T2 C2 => ref _s2.GetRef(_e);
+    }
+
+    public readonly ref struct RefEnumerable<T1, T2>
+    {
+        private readonly ComponentStore<T1>? _a;
+        private readonly ComponentStore<T2>? _b;
+        private readonly int _which; // 0 = empty, 1 = iterate a, 2 = iterate b
+        private RefEnumerable(ComponentStore<T1>? a, ComponentStore<T2>? b, int which)
+        { _a = a; _b = b; _which = which; }
+        internal static RefEnumerable<T1, T2> Empty() => new(null, null, 0);
+        internal static RefEnumerable<T1, T2> From(ComponentStore<T1> a, ComponentStore<T2> b)
+            => new(a, b, a.Count <= b.Count ? 1 : 2);
+        public RefEnumerator GetEnumerator() => new(_a, _b, _which);
+        public ref struct RefEnumerator
+        {
+            private readonly ComponentStore<T1>? _a;
+            private readonly ComponentStore<T2>? _b;
+            private readonly int _which;
+            private int _i;
+            internal RefEnumerator(ComponentStore<T1>? a, ComponentStore<T2>? b, int which)
+            { _a = a; _b = b; _which = which; _i = -1; }
+            public RefComponents<T1, T2> Current
+            {
+                get
+                {
+                    int e = _which == 1 ? _a!.EntityByDenseIndex(_i) : _b!.EntityByDenseIndex(_i);
+                    return RefComponents<T1, T2>.Create(e, _a!, _b!);
+                }
+            }
+            public bool MoveNext()
+            {
+                if (_which == 0 || _a == null || _b == null) return false;
+                do
+                {
+                    _i++;
+                    if (_which == 1)
+                    {
+                        if (_i >= _a.Count) return false;
+                        int e = _a.EntityByDenseIndex(_i);
+                        if (_b.Has(e)) return true;
+                    }
+                    else
+                    {
+                        if (_i >= _b.Count) return false;
+                        int e = _b.EntityByDenseIndex(_i);
+                        if (_a.Has(e)) return true;
+                    }
+                } while (true);
+            }
+        }
+    }
+
+    public RefEnumerable<T> IterateRef<T>()
+    {
+        var store = GetStore<T>(create: false);
+        if (store == null || store.Count == 0) return RefEnumerable<T>.From(default);
+        return RefEnumerable<T>.From(store.AsSpan());
+    }
+
+    public RefEnumerable<T1, T2> IterateRef<T1, T2>()
+    {
+        var s1 = GetStore<T1>(create: false);
+        var s2 = GetStore<T2>(create: false);
+        if (s1 == null || s2 == null) return RefEnumerable<T1, T2>.Empty();
+        return RefEnumerable<T1, T2>.From(s1, s2);
     }
 }

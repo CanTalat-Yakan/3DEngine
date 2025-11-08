@@ -53,8 +53,11 @@ public sealed class Program
         {
             ImGui.Begin("HUD");
             ImGui.Text($"Count: {_count}");
-            ImGui.Text($"Entities: {ctx.Ecs.Query<CounterComponent>().Count()}");
+            ImGui.Text($"Entities: {ctx.Ecs.Count<CounterComponent>()}");
             ImGui.End();
+            // foreach (var rc in ctx.Ecs.IterateRef<CounterComponent>()) { }
+            // int posCount = ctx.Ecs.Count<CounterComponent>();
+            // var posEntities = ctx.Ecs.EntitiesWith<position>();
         }
     }
 
