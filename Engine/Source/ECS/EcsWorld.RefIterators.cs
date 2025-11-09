@@ -27,8 +27,7 @@ public sealed partial class EcsWorld
         private readonly ComponentStore<T>? _store;
         private readonly bool _markOnIterate;
 
-        private RefEnumerable(ReadOnlySpan<int> entities, Span<T> components, ComponentStore<T>? store,
-            bool markOnIterate)
+        private RefEnumerable(ReadOnlySpan<int> entities, Span<T> components, ComponentStore<T>? store, bool markOnIterate)
         {
             _entities = entities;
             _components = components;

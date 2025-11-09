@@ -4,21 +4,13 @@ namespace Engine;
 
 public sealed partial class EcsWorld
 {
+    private int _currentTick; // frame counter for change tracking
+    
     /// <summary>Spawns a new entity and returns its integer ID.</summary>
-    public int Spawn()
-    {
-        int id = _free.Count > 0 ? _free.Pop() : _nextEntity++;
-        EnsureGenerationCapacity(id);
-        if (_entityGenerations[id] == 0) _entityGenerations[id] = FirstGeneration; // initialize first time
-        return id;
-    }
+    public int Spawn() => _entities.Spawn();
 
     /// <summary>Returns current generation for an entity id (0 if never used).</summary>
-    public int GetGeneration(int entityId)
-    {
-        if ((uint)entityId >= (uint)_entityGenerations.Length) return 0;
-        return _entityGenerations[entityId];
-    }
+    public int GetGeneration(int entityId) => _entities.GetGeneration(entityId);
 
     /// <summary>Removes an entity and all of its components, disposing IDisposable components.</summary>
     public void Despawn(int entity)
@@ -27,11 +19,7 @@ public sealed partial class EcsWorld
             if (store.TryRemove(entity, out var disposable) && disposable is not null)
                 try { disposable.Dispose(); } catch { }
 
-        EnsureGenerationCapacity(entity);
-        int g = _entityGenerations[entity];
-        g = g == int.MaxValue ? FirstGeneration : g + 1;
-        _entityGenerations[entity] = g;
-        _free.Push(entity);
+        _entities.Despawn(entity);
     }
 
     /// <summary>Advances frame tick; used for per-frame change tracking (clears changed bitsets).</summary>
@@ -65,15 +53,7 @@ public sealed partial class EcsWorld
         store.Reserve(componentCapacity, maxEntityIdHint);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void EnsureGenerationCapacity(int id)
-    {
-        if (id < _entityGenerations.Length) return;
-        int newSize = _entityGenerations.Length == 0 ? Math.Max(128, id + 1) : _entityGenerations.Length;
-        while (id >= newSize) newSize *= 2;
-        Array.Resize(ref _entityGenerations, newSize);
-    }
-    
+
     /// <summary>Adds a component to an entity (overwrites if existing) without marking changed.</summary>
     public void Add<T>(int entity, T component) => GetStore<T>().Add(entity, component);
 

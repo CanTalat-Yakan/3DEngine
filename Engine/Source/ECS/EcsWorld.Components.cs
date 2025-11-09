@@ -16,134 +16,22 @@ public sealed partial class EcsWorld
 
     internal sealed class ComponentStore<T> : IComponentStore
     {
-        private int[] _denseEntities = Array.Empty<int>();
-        private T[] _denseComponents = Array.Empty<T>();
-        private long[] _changedBits = Array.Empty<long>();
-        private int[] _sparse = Array.Empty<int>();
-        private int _count;
-        public int Count => _count;
+        private readonly SparseSet<T> _set = new();
+        public int Count => _set.Count;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void EnsureBitCapacity(int denseCapacity)
-        {
-            int words = (denseCapacity + 63) >> 6;
-            if (_changedBits.Length < words)
-                Array.Resize(ref _changedBits, words);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void SetBit(int index)
-        {
-            _changedBits[index >> 6] |= 1L << (index & 63);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ClearBit(int index)
-        {
-            _changedBits[index >> 6] &= ~(1L << (index & 63));
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool GetBit(int index)
-        {
-            return ((_changedBits[index >> 6] >> (index & 63)) & 1L) != 0;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void EnsureSparseCapacity(int entity)
-        {
-            if (entity < _sparse.Length) return;
-            int newSize = _sparse.Length == 0 ? Math.Max(entity + 1, 128) : _sparse.Length;
-            while (entity >= newSize) newSize *= 2;
-            int oldLen = _sparse.Length;
-            Array.Resize(ref _sparse, newSize);
-            for (int i = oldLen; i < newSize; i++) _sparse[i] = -1;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void EnsureDenseCapacity()
-        {
-            if (_count < _denseEntities.Length) return;
-            int newCap = _count == 0 ? 128 : _count * 2;
-            Array.Resize(ref _denseEntities, newCap);
-            Array.Resize(ref _denseComponents, newCap);
-            EnsureBitCapacity(newCap);
-        }
-
         public void Reserve(int componentCapacity, int maxEntityIdHint)
-        {
-            if (componentCapacity > _denseEntities.Length)
-            {
-                Array.Resize(ref _denseEntities, componentCapacity);
-                Array.Resize(ref _denseComponents, componentCapacity);
-                EnsureBitCapacity(componentCapacity);
-            }
+            => _set.Reserve(componentCapacity, maxEntityIdHint);
 
-            if (maxEntityIdHint > _sparse.Length)
-            {
-                int oldLen = _sparse.Length;
-                Array.Resize(ref _sparse, maxEntityIdHint + 1);
-                for (int i = oldLen; i < _sparse.Length; i++) _sparse[i] = -1;
-            }
-        }
+        public void Add(int entity, T component) => _set.Add(entity, component);
 
-        public void Add(int entity, T component)
-        {
-            EnsureSparseCapacity(entity);
-            int idx = _sparse[entity];
-            if (idx >= 0)
-            {
-                _denseComponents[idx] = component!;
-                return;
-            }
+        public void Update(int entity, T component, int currentTick) => _set.Update(entity, component);
 
-            EnsureDenseCapacity();
-            idx = _count++;
-            _denseEntities[idx] = entity;
-            _denseComponents[idx] = component!;
-            ClearBit(idx);
-            _sparse[entity] = idx;
-        }
+        public bool Has(int entity) => _set.Has(entity);
 
-        public void Update(int entity, T component, int currentTick)
-        {
-            EnsureSparseCapacity(entity);
-            int idx = _sparse[entity];
-            if (idx >= 0)
-            {
-                _denseComponents[idx] = component!;
-                SetBit(idx);
-                return;
-            }
+        public bool TryGet(int entity, out T value) => _set.TryGet(entity, out value!);
 
-            EnsureDenseCapacity();
-            idx = _count++;
-            _denseEntities[idx] = entity;
-            _denseComponents[idx] = component!;
-            SetBit(idx);
-            _sparse[entity] = idx;
-        }
-
-        public bool Has(int entity) => entity < _sparse.Length && _sparse[entity] >= 0;
-
-        public bool TryGet(int entity, out T value)
-        {
-            if (entity < _sparse.Length)
-            {
-                int idx = _sparse[entity];
-                if (idx >= 0)
-                {
-                    value = _denseComponents[idx];
-                    return true;
-                }
-            }
-
-            value = default!;
-            return false;
-        }
-
-        public bool ChangedThisFrame(int entity, int currentTick) =>
-            entity < _sparse.Length && _sparse[entity] >= 0 && GetBit(_sparse[entity]);
+        public bool ChangedThisFrame(int entity, int currentTick) => _set.ChangedThisFrame(entity);
 
         public ComponentEnumerable Enumerate() => new(this);
 
@@ -165,101 +53,48 @@ public sealed partial class EcsWorld
                 }
 
                 public (int Entity, T Component) Current =>
-                    (_store._denseEntities[_index], _store._denseComponents[_index]);
+                    (_store._set.EntityByDenseIndex(_index), _store._set.ComponentRefByDenseIndex(_index));
 
                 public bool MoveNext()
                 {
                     _index++;
-                    return _index < _store._count;
+                    return _index < _store.Count;
                 }
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ref T GetRef(int entity)
-        {
-            if (entity >= _sparse.Length)
-                throw new KeyNotFoundException($"Entity {entity} does not have component {typeof(T).Name}.");
-            int idx = _sparse[entity];
-            if (idx < 0) throw new KeyNotFoundException($"Entity {entity} does not have component {typeof(T).Name}.");
-            return ref _denseComponents[idx];
-        }
+        public ref T GetRef(int entity) => ref _set.GetRef(entity);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int EntityByDenseIndex(int denseIndex) => _denseEntities[denseIndex];
+        public int EntityByDenseIndex(int denseIndex) => _set.EntityByDenseIndex(denseIndex);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ref T ComponentRefByDenseIndex(int denseIndex) => ref _denseComponents[denseIndex];
+        public ref T ComponentRefByDenseIndex(int denseIndex) => ref _set.ComponentRefByDenseIndex(denseIndex);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void MarkChangedByDenseIndex(int denseIndex, int tick) => SetBit(denseIndex);
+        public void MarkChangedByDenseIndex(int denseIndex, int tick) => _set.MarkChangedByDenseIndex(denseIndex);
 
-        public void MarkChangedByDenseIndexThreadSafe(int denseIndex)
+        public void MarkChangedByDenseIndexThreadSafe(int denseIndex) => _set.MarkChangedByDenseIndexThreadSafe(denseIndex);
+
+        public ComponentSpan<T> AsSpan()
         {
-            int word = denseIndex >> 6;
-            int bit = denseIndex & 63;
-            Interlocked.Or(ref _changedBits[word], 1L << bit);
+            _set.GetSpan(out var e, out var c);
+            return new ComponentSpan<T>(e, c);
         }
 
-        public ComponentSpan<T> AsSpan() => new(_denseEntities.AsSpan(0, _count), _denseComponents.AsSpan(0, _count));
+        public bool TryRemove(int entity, out IDisposable? disposable) => _set.TryRemove(entity, out disposable);
 
-        public bool TryRemove(int entity, out IDisposable? disposable)
-        {
-            disposable = null;
-            if (entity >= _sparse.Length) return false;
-            int idx = _sparse[entity];
-            if (idx < 0) return false;
-            var comp = _denseComponents[idx];
-            if (comp is IDisposable d) disposable = d;
-            int lastIdx = _count - 1;
-            if (idx != lastIdx)
-            {
-                _denseComponents[idx] = _denseComponents[lastIdx];
-                _denseEntities[idx] = _denseEntities[lastIdx];
-                if (GetBit(lastIdx)) SetBit(idx);
-                else ClearBit(idx);
-                ClearBit(lastIdx);
-                _sparse[_denseEntities[idx]] = idx;
-            }
+        public bool Remove(int entity) => _set.Remove(entity);
 
-            _sparse[entity] = -1;
-            _count--;
-            return true;
-        }
-
-        public bool Remove(int entity)
-        {
-            if (entity >= _sparse.Length) return false;
-            int idx = _sparse[entity];
-            if (idx < 0) return false;
-            int lastIdx = _count - 1;
-            if (idx != lastIdx)
-            {
-                _denseComponents[idx] = _denseComponents[lastIdx];
-                _denseEntities[idx] = _denseEntities[lastIdx];
-                if (GetBit(lastIdx)) SetBit(idx);
-                else ClearBit(idx);
-                ClearBit(lastIdx);
-                _sparse[_denseEntities[idx]] = idx;
-            }
-
-            _sparse[entity] = -1;
-            _count--;
-            return true;
-        }
-
-        public void ClearChangedTicks() => Array.Clear(_changedBits, 0, _changedBits.Length);
+        public void ClearChangedTicks() => _set.ClearChangedTicks();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal int DenseIndexOf(int entity)
-        {
-            if ((uint)entity >= (uint)_sparse.Length) return -1;
-            return _sparse[entity];
-        }
+        internal int DenseIndexOf(int entity) => _set.DenseIndexOf(entity);
 
-        internal ReadOnlySpan<int> EntitiesSpan() => _denseEntities.AsSpan(0, _count);
-        internal int[] EntitiesArray => _denseEntities;
-        internal T[] ComponentsArray => _denseComponents;
+        internal ReadOnlySpan<int> EntitiesSpan() => _set.EntitiesSpan();
+        internal int[] EntitiesArray => _set.EntitiesArray;
+        internal T[] ComponentsArray => _set.ComponentsArray;
     }
 
     // Span struct used externally for high-performance iteration
