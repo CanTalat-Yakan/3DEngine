@@ -12,8 +12,10 @@ public sealed class BehaviorContext
     /// <summary>Buffered ECS commands applied after systems run.</summary>
     public EcsCommands Cmd { get; }
     
+    /// <summary>Frame timing data.</summary>
     public Time Time { get; }
     
+    /// <summary>Input state.</summary>
     public Input Input { get; }
 
     /// <summary>Entity being processed for instance methods; 0 if not applicable.</summary>
