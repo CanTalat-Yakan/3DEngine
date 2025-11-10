@@ -160,7 +160,7 @@ public struct Spinner
     [OnUpdate]
     public void Tick(BehaviorContext ctx)
     {
-        Angle += (float)ctx.Res<Time>().DeltaSeconds * 90f; // 90 deg/s
+        Angle += (float)ctx.Time.DeltaSeconds * 90f; // 90 deg/s
         Console.WriteLine($"Entity {ctx.EntityID} angle now {Angle:0.00}");
     }
 }
@@ -381,7 +381,7 @@ public struct HUDOverlay
     public static void Draw(BehaviorContext ctx)
     {
         ImGui.Begin("HUD");
-        ImGui.Text($"FPS: {(1.0 / ctx.Res<Time>().DeltaSeconds):0}");
+        ImGui.Text($"FPS: {(1.0 / ctx.Time.DeltaSeconds):0}");
         ImGui.End();
     }
 }
@@ -402,7 +402,7 @@ public struct Spawner
     [OnUpdate]
     public void Tick(BehaviorContext ctx)
     {
-        b += (float)ctx.Res<Time>().DeltaSeconds;
+        b += (float)ctx.Time.DeltaSeconds;
         Console.WriteLine($"Spawner running. a={a}, b={b}");
     }
 }

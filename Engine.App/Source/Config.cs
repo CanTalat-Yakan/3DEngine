@@ -7,18 +7,22 @@ public sealed record Config
     public WindowData WindowData { get; init; }
     /// <summary>Whether to show, minimize, maximize, etc. on startup.</summary>
     public WindowCommand WindowCommand { get; init; } = WindowCommand.Show;
+    /// <summary>Desired graphics backend for the window (SDL software renderer or Vulkan surface).</summary>
+    public GraphicsBackend Graphics { get; init; } = GraphicsBackend.SdlRenderer;
 
     /// <summary>Builds a default configuration.</summary>
     public static Config GetDefault(
         string title = "3D Engine",
         int width = 600,
         int height = 400,
-        WindowCommand windowCommand = WindowCommand.Show)
+        WindowCommand windowCommand = WindowCommand.Show,
+        GraphicsBackend graphics = GraphicsBackend.SdlRenderer)
     {
         return new Config
         {
             WindowData = new WindowData(title, width, height),
             WindowCommand = windowCommand,
+            Graphics = graphics,
         };
     }
 
@@ -30,6 +34,9 @@ public sealed record Config
 
     /// <summary>Returns a copy with a different startup window command.</summary>
     public Config WithCommand(WindowCommand command) => this with { WindowCommand = command };
+
+    /// <summary>Returns a copy with a different graphics backend.</summary>
+    public Config WithGraphics(GraphicsBackend backend) => this with { Graphics = backend };
 }
 
 /// <summary>Immutable window properties.</summary>
@@ -56,4 +63,11 @@ public enum WindowCommand
     Maximize = 3,
     Show = 4,
     Restore = 5,
+}
+
+/// <summary>Graphics backend selector for the application window.</summary>
+public enum GraphicsBackend
+{
+    SdlRenderer = 0,
+    Vulkan = 1,
 }

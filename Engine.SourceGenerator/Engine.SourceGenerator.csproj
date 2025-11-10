@@ -8,6 +8,7 @@
         <LangVersion>preview</LangVersion>
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <RootNamespace>Engine.SourceGen</RootNamespace>
     </PropertyGroup>
     
     <ItemGroup>

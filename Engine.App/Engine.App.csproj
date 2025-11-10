@@ -6,8 +6,4 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Engine.Renderer\Engine.Renderer.csproj" />
-    </ItemGroup>
-
 </Project>

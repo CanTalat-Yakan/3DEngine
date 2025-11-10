@@ -7,7 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Engine.Renderer\Engine.Renderer.csproj" />
+      <ProjectReference Include="..\Engine.Core\Engine.Core.csproj" />
+      <ProjectReference Include="..\Engine.SourceGenerator\Engine.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
 </Project>

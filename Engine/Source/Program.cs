@@ -1,5 +1,4 @@
 ﻿using ImGuiNET;
-using SDL3;
 
 namespace Engine;
 
@@ -31,8 +30,8 @@ public sealed class Program
             if (fps > _highestFps) _highestFps = fps; // Track peak FPS within the rolling one-second window
             ImGui.Begin("HUD");
             ImGui.Text($"FPS: {fps:0}");
-            ImGui.Text($"Delta: {delta:0.000}");
             ImGui.Text($"HighestFPS: {_highestFps:0}");
+            ImGui.Text($"Delta: {delta:0.000}");
             ImGui.End();
         }
     }
@@ -66,7 +65,7 @@ public sealed class Program
         [OnUpdate]
         public static void Update(BehaviorContext ctx)
         {
-            if (!ctx.Input.KeyDown(SDL.Scancode.Space) || _spawned)
+            if (!ctx.Input.KeyDown(Key.Space) || _spawned)
                 return;
 
             _spawned = true;

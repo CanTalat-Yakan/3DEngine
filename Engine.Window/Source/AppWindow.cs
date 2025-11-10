@@ -6,7 +6,7 @@ namespace Engine;
 public sealed class AppWindow
 {
     /// <summary>The underlying SDL window/renderer pair wrapper.</summary>
-    public SdlWindow SdlWindow { get; private set; }
+    public SdlWindow Sdl { get; private set; }
 
     public delegate void ResizeEventHandler(int width, int height);
     /// <summary>Raised when this window is resized.</summary>
@@ -20,15 +20,18 @@ public sealed class AppWindow
 
     private volatile bool _shouldClose;
 
-    public AppWindow(WindowData windowData)
+    public AppWindow(WindowData windowData, GraphicsBackend backend)
     {
-        SdlWindow = new(windowData.Title, windowData.Width, windowData.Height);
+        var useVulkan = backend == GraphicsBackend.Vulkan;
+        Sdl = new(windowData.Title, windowData.Width, windowData.Height, useVulkan);
     }
+
+    public AppWindow(WindowData windowData) : this(windowData, GraphicsBackend.SdlRenderer) {}
 
     /// <summary>Returns true if this window has keyboard focus.</summary>
     public bool IsFocused()
     {
-        return SDL.GetKeyboardFocus() == SdlWindow.Window;
+        return SDL.GetKeyboardFocus() == Sdl.Window;
     }
 
     /// <summary>
@@ -36,21 +39,21 @@ public sealed class AppWindow
     ///</summary>
     public void Show(WindowCommand command = WindowCommand.Normal)
     {
-        SDL.ShowWindow(SdlWindow.Window);
+        SDL.ShowWindow(Sdl.Window);
         // Map WindowCommand to SDL; avoid duplicate labels with same enum value.
         switch (command)
         {
             case WindowCommand.Maximize:
-                SDL.MaximizeWindow(SdlWindow.Window);
+                SDL.MaximizeWindow(Sdl.Window);
                 break;
             case WindowCommand.Minimize:
-                SDL.MinimizeWindow(SdlWindow.Window);
+                SDL.MinimizeWindow(Sdl.Window);
                 break;
             case WindowCommand.Restore:
-                SDL.RestoreWindow(SdlWindow.Window);
+                SDL.RestoreWindow(Sdl.Window);
                 break;
             case WindowCommand.Hide:
-                SDL.HideWindow(SdlWindow.Window);
+                SDL.HideWindow(Sdl.Window);
                 break;
             default:
                 break;
@@ -83,15 +86,15 @@ public sealed class AppWindow
                     QuitEvent?.Invoke();
                     running = false;
                 }
-                if ((SDL.EventType)e.Type == SDL.EventType.WindowCloseRequested && e.Window.WindowID == SDL.GetWindowID(SdlWindow.Window))
+                if ((SDL.EventType)e.Type == SDL.EventType.WindowCloseRequested && e.Window.WindowID == SDL.GetWindowID(Sdl.Window))
                 {
                     QuitEvent?.Invoke();
                     running = false;
                 }
-                if ((SDL.EventType)e.Type == SDL.EventType.WindowResized && e.Window.WindowID == SDL.GetWindowID(SdlWindow.Window))
+                if ((SDL.EventType)e.Type == SDL.EventType.WindowResized && e.Window.WindowID == SDL.GetWindowID(Sdl.Window))
                 {
-                    SDL.GetWindowSize(SdlWindow.Window, out int w, out int h);
-                    SdlWindow.Width = w; SdlWindow.Height = h;
+                    SDL.GetWindowSize(Sdl.Window, out int w, out int h);
+                    Sdl.Width = w; Sdl.Height = h;
                     ResizeEvent?.Invoke(w, h);
                 }
             }
@@ -104,7 +107,7 @@ public sealed class AppWindow
     /// <summary>Disposes the underlying SDL resources, optionally invoking a callback before return.</summary>
     public void Dispose(Action? onDispose)
     {
-        SdlWindow.Destroy();
+        Sdl.Destroy();
         onDispose?.Invoke();
     }
 }

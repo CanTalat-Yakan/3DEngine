@@ -7,7 +7,7 @@ public sealed class DefaultPlugins : IPlugin
     public void Build(App app)
     {
         // Compose common plugins in conventional order (window -> diagnostics -> lifecycle -> frame services -> UI)
-        app.AddPlugin(new WindowPlugin())
+        app.AddPlugin(new AppWindowPlugin())
            .AddPlugin(new AppExitPlugin())
            .AddPlugin(new ExceptionsPlugin())
            .AddPlugin(new TimePlugin())
@@ -15,7 +15,8 @@ public sealed class DefaultPlugins : IPlugin
            .AddPlugin(new EcsPlugin())
            .AddPlugin(new BehaviorsPlugin())
            .AddPlugin(new ImGuiPlugin())
-           .AddPlugin(new ClearColorPlugin());
+           .AddPlugin(new ClearColorPlugin())
+           .AddPlugin(new VulkanRendererPlugin());
 
         // Clear per-frame changed flags in EcsWorld at stage First (pre update logic)
         app.AddSystem(Stage.First, (World world) => world.Resource<EcsWorld>().BeginFrame());

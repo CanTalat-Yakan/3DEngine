@@ -1,5 +1,3 @@
-using ImGuiNET;
-
 namespace Engine;
 
 /// <summary>Plugin contract for extending the application (insert resources, add systems, etc.).</summary>
@@ -7,6 +5,13 @@ public interface IPlugin
 {
     /// <summary>Called once during app setup to configure the app/world.</summary>
     void Build(App app);
+}
+
+/// <summary>Abstraction for driving the main loop. Implemented by window backends (e.g., SDL) or editors.</summary>
+public interface IMainLoopDriver
+{
+    /// <summary>Runs the application loop, invoking frameStep once per frame until the loop ends.</summary>
+    void Run(Action frameStep);
 }
 
 /// <summary>Central application object holding the World and execution Schedule; supports plugin composition.</summary>
@@ -46,21 +51,15 @@ public sealed class App
         return this;
     }
 
-    /// <summary>Runs Startup once, then per-frame stages in the window loop; cleans up ImGui and window on exit.</summary>
+    /// <summary>Runs Startup once, then per-frame stages using the injected main loop driver.</summary>
     public void Run()
     {
-        var window = World.TryResource<AppWindow>();
-        if (window is null)
-        {
-            new WindowPlugin().Build(this);
-            window = World.Resource<AppWindow>();
-        }
+        // The loop driver is provided by a window/editor plugin (e.g., Engine.Window's AppWindowPlugin)
+        var loop = World.Resource<IMainLoopDriver>();
 
         Schedule.RunStage(Stage.Startup, World);
 
-        var appWindow = window;
-
-        appWindow.Looping((Action)(() =>
+        loop.Run(() =>
         {
             Schedule.RunStage(Stage.First, World);
             Schedule.RunStage(Stage.PreUpdate, World);
@@ -68,19 +67,8 @@ public sealed class App
             Schedule.RunStage(Stage.PostUpdate, World);
             Schedule.RunStage(Stage.Render, World);
             Schedule.RunStage(Stage.Last, World);
-        }));
+        });
 
-        try
-        {
-            if (World.TryResource<ImGuiRenderer>() is { } imGuiRenderer)
-            {
-                imGuiRenderer.Dispose();
-                World.RemoveResource<ImGuiRenderer>();
-            }
-            ImGui.DestroyContext();
-        }
-        catch { }
-
-        appWindow.Dispose(null);
+        // App no longer disposes window-specific resources; window/editors own their lifecycles.
     }
 }

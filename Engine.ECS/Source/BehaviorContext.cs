@@ -19,7 +19,7 @@ public sealed class BehaviorContext
     public Input Input { get; }
 
     /// <summary>Entity being processed for instance methods; 0 if not applicable.</summary>
-    public int EntityId { get; internal set; }
+    public int EntityId { get; set; }
 
     public BehaviorContext(World world)
     {
@@ -31,5 +31,5 @@ public sealed class BehaviorContext
     }
 
     /// <summary>Gets a typed resource from the world.</summary>
-    public T Res<T>() => World.Resource<T>();
+    public T Res<T>() where T : notnull => World.Resource<T>();
 }

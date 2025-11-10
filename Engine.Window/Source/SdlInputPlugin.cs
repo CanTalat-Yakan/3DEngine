@@ -2,40 +2,8 @@ using SDL3;
 
 namespace Engine;
 
-/// <summary>Event: a key transitioned to down this frame.</summary>
-public readonly record struct KeyPressed(SDL.Scancode Scancode);
-
-/// <summary>Event: window size changed.</summary>
-public readonly record struct WindowResized(int Width, int Height);
-
-/// <summary>Installs Input resource, wires SDL events to it, and publishes key/resize events.</summary>
-public sealed class InputPlugin : IPlugin
-{
-    /// <summary>Inserts the Input resource and connects SDL event handlers and per-frame hooks.</summary>
-    public void Build(App app)
-    {
-        var input = new Input();
-        app.World.InsertResource(input);
-
-        app.World.Resource<AppWindow>().SDLEvent += (evt) =>
-        {
-            if ((SDL.EventType)evt.Type == SDL.EventType.KeyDown)
-            {
-                var kd = evt.Key;
-                if (!input.KeyDown(kd.Scancode))
-                    Events.Get<KeyPressed>(app.World).Send(new KeyPressed(kd.Scancode));
-            }
-            input.Process(evt);
-        };
-        app.World.Resource<AppWindow>().ResizeEvent += (w, h) => Events.Get<WindowResized>(app.World).Send(new WindowResized(w, h));
-
-        app.AddSystem(Stage.First, (world) => world.Resource<Input>().BeginFrame());
-        app.AddSystem(Stage.Last, (world) => world.Resource<Input>().EndFrame());
-    }
-}
-
 /// <summary>Frame-based input state (keys, mouse, deltas) derived from SDL events.</summary>
-public sealed class Input
+public sealed class SdlInput
 {
     private readonly HashSet<SDL.Scancode> _down = new();
     private readonly HashSet<SDL.Scancode> _pressed = new();
@@ -47,20 +15,20 @@ public sealed class Input
     public int MouseDeltaY { get; private set; }
     public SDL.MouseButtonFlags MouseButtons { get; private set; }
 
-    public bool KeyDown(SDL.Scancode code) => _down.Contains(code);
-    public bool KeyPressed(SDL.Scancode code) => _pressed.Contains(code);
-    public bool KeyReleased(SDL.Scancode code) => _released.Contains(code);
+    public bool KeyDown(Key code) => _down.Contains((SDL.Scancode)code);
+    public bool KeyPressed(Key code) => _pressed.Contains((SDL.Scancode)code);
+    public bool KeyReleased(Key code) => _released.Contains((SDL.Scancode)code);
 
-    internal void BeginFrame()
+    public void BeginFrame()
     {
         _pressed.Clear();
         _released.Clear();
         MouseDeltaX = 0; MouseDeltaY = 0;
     }
 
-    internal void EndFrame() { }
+    public void EndFrame() { }
 
-    internal void Process(SDL.Event evt)
+    public void Process(SDL.Event evt)
     {
         switch ((SDL.EventType)evt.Type)
         {

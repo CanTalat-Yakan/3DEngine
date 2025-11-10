@@ -17,16 +17,32 @@ public sealed class ImGuiPlugin : IPlugin
         io.ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard | ImGuiConfigFlags.NavEnableGamepad;
         ImGui.StyleColorsDark();
 
-        var sdlWindow = app.World.Resource<AppWindow>().SdlWindow;
-        var renderer = new ImGuiRenderer(sdlWindow.Renderer);
-        app.World.InsertResource(renderer);
+        var sdlWindow = app.World.Resource<AppWindow>().Sdl;
+        // Initialize IO display size immediately to avoid ImGui assertion before first NewFrame
+        io.DisplaySize = new Vector2(Math.Max(1, sdlWindow.Width), Math.Max(1, sdlWindow.Height));
+        io.DeltaTime = 1f / 60f;
+        // Only create the SDL-based ImGuiRenderer if an SDL renderer exists (non-Vulkan mode)
+        if (sdlWindow.Renderer != IntPtr.Zero)
+        {
+            var renderer = new ImGuiRenderer(sdlWindow.Renderer);
+            app.World.InsertResource(renderer);
+        }
         app.World.InsertResource(new ImGuiState());
 
         app.AddSystem(Stage.PreUpdate, (world) =>
         {
             var appWindow = world.Resource<AppWindow>();
-            world.Resource<ImGuiRenderer>().NewFrame(appWindow.SdlWindow.Window);
+            var io = ImGui.GetIO();
+            // Safeguard: ensure non-zero display size to avoid ImGui assertion
+            int w = Math.Max(1, appWindow.Sdl.Width);
+            int h = Math.Max(1, appWindow.Sdl.Height);
+            io.DisplaySize = new Vector2(w, h);
+            io.DeltaTime = world.Resource<Time>().DeltaSeconds > 0 ? (float)world.Resource<Time>().DeltaSeconds : 1f / 60f;
             ImGui.NewFrame();
+            if (world.TryResource<ImGuiRenderer>() is { } imguiRenderer)
+            {
+                imguiRenderer.NewFrame(appWindow.Sdl.Window);
+            }
         });
 
         app.AddSystem(Stage.Update, (world) =>
@@ -37,7 +53,8 @@ public sealed class ImGuiPlugin : IPlugin
 
         app.AddSystem(Stage.Render, (world) =>
         {
-            var sdl = world.Resource<AppWindow>().SdlWindow;
+            var sdl = world.Resource<AppWindow>().Sdl;
+            if (sdl.Renderer == IntPtr.Zero) return; // Vulkan mode: don't use SDL renderer path
             var imGuiRenderer = world.Resource<ImGuiRenderer>();
             var clear = world.Resource<ClearColor>().Value;
 

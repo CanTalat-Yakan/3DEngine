@@ -7,28 +7,30 @@
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Program.cs" />
         <Compile Include="Source/**/*.cs" />
         <None Include="../README.md" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="../Engine.SourceGen/Engine.SourceGen.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\Engine.SourceGenerator\Engine.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\Engine.App\Engine.App.csproj" />
+        <ProjectReference Include="..\Engine.Core\Engine.Core.csproj" />
+        <ProjectReference Include="..\Engine.ECS\Engine.ECS.csproj" />
+        <ProjectReference Include="..\Engine.Editor\Engine.Editor.csproj" />
+        <ProjectReference Include="..\Engine.Renderer\Engine.Renderer.csproj" />
+        <ProjectReference Include="..\Engine.Vulkan\Engine.Vulkan.csproj" />
+        <ProjectReference Include="..\Engine.Window\Engine.Window.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="FodyWeavers.xml" />
         <None Remove="imgui.ini" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
-        <PackageReference Include="Costura.Fody" Version="5.7.0">
-            <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
         <PackageReference Include="SDL3-CS" Version="3.3.2.1" />
         <PackageReference Include="SDL3-CS.Native" Version="3.3.2" />
@@ -36,12 +38,6 @@
         <PackageReference Include="SDL3-CS.Native.Mixer" Version="2.8.1.1" />
         <PackageReference Include="SDL3-CS.Native.TTF" Version="3.2.2" />
         <PackageReference Include="Twizzle.ImGui-Bundle.NET" Version="1.91.5.2" />
-        <PackageReference Include="UniversalSceneDescription" Version="6.0.0" />
-        <PackageReference Include="Vortice.Mathematics" Version="1.9.3" />
-        <PackageReference Include="Vortice.SPIRV" Version="1.0.4" />
-        <PackageReference Include="Vortice.SpirvCross" Version="1.5.3" />
-        <PackageReference Include="Vortice.Vulkan" Version="3.0.3" />
-        <PackageReference Include="Vortice.VulkanMemoryAllocator" Version="1.6.3" />
     </ItemGroup>
 
 </Project>

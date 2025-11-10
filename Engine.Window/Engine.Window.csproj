@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="SDL3-CS" Version="3.3.2.1" />
+        <PackageReference Include="SDL3-CS.Native" Version="3.3.2" />
+        <PackageReference Include="SDL3-CS.Native.Image" Version="3.2.4" />
+        <PackageReference Include="SDL3-CS.Native.Mixer" Version="2.8.1.1" />
+        <PackageReference Include="SDL3-CS.Native.TTF" Version="3.2.2" />
+        <PackageReference Include="Twizzle.ImGui-Bundle.NET" Version="1.91.5.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Engine.App\Engine.App.csproj" />
+      <ProjectReference Include="..\Engine.Core\Engine.Core.csproj" />
+    </ItemGroup>
+    
+</Project>

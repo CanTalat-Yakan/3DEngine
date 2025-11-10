@@ -150,8 +150,8 @@ public sealed partial class EcsWorld
                     {
                         if (_which == 1)
                         {
-                            _a.MarkChangedByDenseIndex(_i, 0);
-                            int j = _b.DenseIndexOf(e);
+                            _a!.MarkChangedByDenseIndex(_i, 0);
+                            int j = _b!.DenseIndexOf(e);
                             if (j >= 0) _b.MarkChangedByDenseIndex(j, 0);
                         }
                         else
