@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Engine.SourceGen;
+namespace Engine;
 
 /// <summary>Roslyn incremental generator scanning [Engine.Behavior] structs and emitting stage systems plus a registration function discoverable at runtime.</summary>
 [Generator(LanguageNames.CSharp)]
@@ -60,7 +60,6 @@ public sealed class EcsBehaviorGenerator : IIncrementalGenerator
         {
             Stage? stage = GetStage(m);
             if (stage is null) continue;
-            // Support instance and static methods
             methods.Add(new StageMethod
             {
                 Stage = stage.Value,

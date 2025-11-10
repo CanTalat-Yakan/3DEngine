@@ -4,6 +4,35 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <RootNamespace>Engine</RootNamespace>
+
+        <Title>3DEngine App</Title>
+        <PackageId>3DEngine.App</PackageId>
+        <Version>1.0.0</Version>
+        <Authors>CanTalat-Yakan</Authors>
+        <Company>3DEngine</Company>
+        <Description>3D Game Engine - Vulkan - SDL3 - .NET 10 - C# 14</Description>
+        <PackageTags>3D;Game;Engine;.Net10;C#14</PackageTags>
+        <PackageIcon>3DEngineSymbol.png</PackageIcon>
+        <PackageProjectUrl>https://github.com/CanTalat-Yakan/3DEngine</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/CanTalat-Yakan/3DEngine</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <LicenseExpression>MIT</LicenseExpression>
+        <PublishToNuGet>true</PublishToNuGet>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\Images\3DEngineSymbol.png" Link="Assets\3DEngineSymbol.png">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+        <None Include="..\README.md" Link="Assets\README.md">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+    </ItemGroup>
 
 </Project>

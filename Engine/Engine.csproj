@@ -6,38 +6,64 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <RootNamespace>Engine</RootNamespace>
+
+        <Title>3DEngine</Title>
+        <PackageId>3DEngine</PackageId>
+        <Version>1.0.0</Version>
+        <Authors>CanTalat-Yakan</Authors>
+        <Company>3DEngine</Company>
+        <Description>3D Game Engine - Vulkan - SDL3 - .NET 10 - C# 14</Description>
+        <PackageTags>3D;Game;Engine;.Net10;C#14</PackageTags>
+        <PackageIcon>3DEngineSymbol.png</PackageIcon>
+        <PackageProjectUrl>https://github.com/CanTalat-Yakan/3DEngine</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/CanTalat-Yakan/3DEngine</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <LicenseExpression>MIT</LicenseExpression>
+        <PublishToNuGet>true</PublishToNuGet>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Source/**/*.cs" />
-        <None Include="../README.md" />
+        <ProjectReference Include="..\Engine.Generator\Engine.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+        <ProjectReference Include="..\Engine.App\Engine.App.csproj"/>
+        <ProjectReference Include="..\Engine.Core\Engine.Core.csproj"/>
+        <ProjectReference Include="..\Engine.ECS\Engine.ECS.csproj"/>
+        <ProjectReference Include="..\Engine.Renderer\Engine.Renderer.csproj"/>
+        <ProjectReference Include="..\Engine.Vulkan\Engine.Vulkan.csproj"/>
+        <ProjectReference Include="..\Engine.Window\Engine.Window.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Engine.Generator\Engine.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-        <ProjectReference Include="..\Engine.App\Engine.App.csproj" />
-        <ProjectReference Include="..\Engine.Core\Engine.Core.csproj" />
-        <ProjectReference Include="..\Engine.ECS\Engine.ECS.csproj" />
-        <ProjectReference Include="..\Engine.Editor\Engine.Editor.csproj" />
-        <ProjectReference Include="..\Engine.Renderer\Engine.Renderer.csproj" />
-        <ProjectReference Include="..\Engine.Vulkan\Engine.Vulkan.csproj" />
-        <ProjectReference Include="..\Engine.Window\Engine.Window.csproj" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.4"/>
+        <PackageReference Include="SDL3-CS" Version="3.3.2.1"/>
+        <PackageReference Include="SDL3-CS.Native" Version="3.3.2"/>
+        <PackageReference Include="SDL3-CS.Native.Image" Version="3.2.4"/>
+        <PackageReference Include="SDL3-CS.Native.Mixer" Version="2.8.1.1"/>
+        <PackageReference Include="SDL3-CS.Native.TTF" Version="3.2.2"/>
+        <PackageReference Include="Twizzle.ImGui-Bundle.NET" Version="1.91.5.2"/>
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="imgui.ini" />
+        <None Include="..\Images\3DEngineSymbol.png" Link="Assets\3DEngineSymbol.png">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+        <None Include="..\README.md" Link="Assets\README.md">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-        <PackageReference Include="SDL3-CS" Version="3.3.2.1" />
-        <PackageReference Include="SDL3-CS.Native" Version="3.3.2" />
-        <PackageReference Include="SDL3-CS.Native.Image" Version="3.2.4" />
-        <PackageReference Include="SDL3-CS.Native.Mixer" Version="2.8.1.1" />
-        <PackageReference Include="SDL3-CS.Native.TTF" Version="3.2.2" />
-        <PackageReference Include="Twizzle.ImGui-Bundle.NET" Version="1.91.5.2" />
+        <None Include="..\.gitignore"/>
+        <None Include="..\.github/workflows\*"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="imgui.ini"/>
     </ItemGroup>
 
 </Project>

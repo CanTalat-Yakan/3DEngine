@@ -5,18 +5,30 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
+        <RootNamespace>Engine</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-        <PackageReference Include="xunit" Version="2.6.6" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7" />
+        <ProjectReference Include="..\Engine\Engine.csproj"/>
+        <ProjectReference Include="..\Engine.App\Engine.App.csproj"/>
+        <ProjectReference Include="..\Engine.ECS\Engine.ECS.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Engine.ECS\Engine.ECS.csproj" />
-      <ProjectReference Include="..\Engine\Engine.csproj" />
-      <ProjectReference Include="..\Engine.App\Engine.App.csproj" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1"/>
+        <PackageReference Include="xunit" Version="2.6.6"/>
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\Images\3DEngineSymbol.png" Link="Assets\3DEngineSymbol.png">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+        <None Include="..\README.md" Link="Assets\README.md">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
     </ItemGroup>
 
 </Project>
