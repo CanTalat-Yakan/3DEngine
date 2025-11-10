@@ -23,7 +23,7 @@
         <PublishToNuGet>true</PublishToNuGet>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+<!--        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>-->
     </PropertyGroup>
 
     <ItemGroup>
