@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine", "Engine\Engine.csproj", "{D4E42531-4008-40C6-BD94-95F02FC0DFE2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.SourceGenerator", "Engine.SourceGenerator\Engine.SourceGenerator.csproj", "{94F2B6CE-07CE-48FD-A818-23949CD47A15}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Generator", "Engine.Generator\Engine.Generator.csproj", "{94F2B6CE-07CE-48FD-A818-23949CD47A15}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Renderer", "Engine.Renderer\Engine.Renderer.csproj", "{257FF756-DF85-4994-9BEF-5CB316F39BBD}"
 EndProject

@@ -7,7 +7,10 @@ namespace Engine;
 /// <summary>Sets up ImGui, schedules NewFrame/Render systems, and renders via ImGuiRenderer.</summary>
 public sealed class ImGuiPlugin : IPlugin
 {
-    private sealed class ImGuiState { public bool ShowDemo; }
+    private sealed class ImGuiState
+    {
+        public bool ShowDemo;
+    }
 
     /// <summary>Creates ImGui context/resources and wires per-frame new-frame/render systems.</summary>
     public void Build(App app)
@@ -27,6 +30,7 @@ public sealed class ImGuiPlugin : IPlugin
             var renderer = new ImGuiRenderer(sdlWindow.Renderer);
             app.World.InsertResource(renderer);
         }
+
         app.World.InsertResource(new ImGuiState());
 
         app.AddSystem(Stage.PreUpdate, (world) =>
@@ -37,7 +41,9 @@ public sealed class ImGuiPlugin : IPlugin
             int w = Math.Max(1, appWindow.Sdl.Width);
             int h = Math.Max(1, appWindow.Sdl.Height);
             io.DisplaySize = new Vector2(w, h);
-            io.DeltaTime = world.Resource<Time>().DeltaSeconds > 0 ? (float)world.Resource<Time>().DeltaSeconds : 1f / 60f;
+            io.DeltaTime = world.Resource<Time>().DeltaSeconds > 0
+                ? (float)world.Resource<Time>().DeltaSeconds
+                : 1f / 60f;
             ImGui.NewFrame();
             if (world.TryResource<ImGuiRenderer>() is { } imguiRenderer)
             {
@@ -71,6 +77,17 @@ public sealed class ImGuiPlugin : IPlugin
             imGuiRenderer.RenderDrawData(drawData);
             SDL.RenderPresent(sdl.Renderer);
         });
+        
+        app.AddSystem(Stage.Cleanup, (world) =>
+        {
+            if (world.TryResource<ImGuiRenderer>() is { } imguiRenderer)
+            {
+                imguiRenderer.Dispose();
+                world.RemoveResource<ImGuiRenderer>();
+            }
+
+            ImGui.DestroyContext();
+        });
     }
 }
 
@@ -90,5 +107,9 @@ public readonly struct ClearColor
 {
     /// <summary>RGBA color as Vector4 (0..1).</summary>
     public readonly Vector4 Value;
-    public ClearColor(Vector4 value) { Value = value; }
+
+    public ClearColor(Vector4 value)
+    {
+        Value = value;
+    }
 }

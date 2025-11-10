@@ -10,6 +10,7 @@ public enum Stage
     PostUpdate,
     Render,
     Last,
+    Cleanup,
 }
 
 /// <summary>Provides ordered list of stages for iteration.</summary>
@@ -24,6 +25,7 @@ public static class StageOrder
         Stage.PostUpdate,
         Stage.Render,
         Stage.Last,
+        Stage.Cleanup,
     };
 
     /// <summary>Returns enumerable of stages in execution order.</summary>

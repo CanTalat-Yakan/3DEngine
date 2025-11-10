@@ -69,6 +69,6 @@ public sealed class App
             Schedule.RunStage(Stage.Last, World);
         });
 
-        // App no longer disposes window-specific resources; window/editors own their lifecycles.
+        Schedule.RunStage(Stage.Cleanup, World);
     }
 }

@@ -99,6 +99,7 @@ public sealed class EcsBehaviorGenerator : IIncrementalGenerator
             if (n == "Engine.OnPostUpdateAttribute") return Stage.PostUpdate;
             if (n == "Engine.OnRenderAttribute") return Stage.Render;
             if (n == "Engine.OnLastAttribute") return Stage.Last;
+            if (n == "Engine.OnCleanupAttribute") return Stage.Cleanup;
         }
         return null;
     }
@@ -205,7 +206,7 @@ public sealed class EcsBehaviorGenerator : IIncrementalGenerator
         return sb.ToString();
     }
 
-    private enum Stage { Startup, First, PreUpdate, Update, PostUpdate, Render, Last }
+    private enum Stage { Startup, First, PreUpdate, Update, PostUpdate, Render, Last, Cleanup }
     private sealed record Filters(IReadOnlyList<string> With, IReadOnlyList<string> Without, IReadOnlyList<string> Changed);
     private sealed record StageMethod
     {

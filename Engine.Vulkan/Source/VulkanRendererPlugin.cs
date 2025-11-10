@@ -99,8 +99,8 @@ public sealed class VulkanRendererPlugin : IPlugin
             renderer.RenderFrame(world);
         });
 
-        // Ensure disposal at app exit (Last stage)
-        app.AddSystem(Stage.Last, (world) =>
+        // Ensure disposal at app exit (Cleanup stage)
+        app.AddSystem(Stage.Cleanup, (world) =>
         {
             if (world.TryResource<Renderer>() is { } r)
             {
