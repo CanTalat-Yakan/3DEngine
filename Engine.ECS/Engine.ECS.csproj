@@ -14,10 +14,10 @@
         <Description>3D Game Engine - Vulkan - SDL3 - .NET 10 - C# 14</Description>
         <PackageTags>3D;Game;Engine;.Net10;C#14</PackageTags>
         <PackageIcon>3DEngineSymbol.png</PackageIcon>
-        <PackageProjectUrl>https://github.com/CanTalat-Yakan/3DEngine</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/CanTalat-Yakan/3DEngine</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <LicenseExpression>MIT</LicenseExpression>
+        <RepositoryUrl>https://github.com/CanTalat-Yakan/3DEngine</RepositoryUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
         <PublishToNuGet>true</PublishToNuGet>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
