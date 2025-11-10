@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Engine.SourceGen;
 
-/// <summary>Roslyn incremental generator scanning [Engine.Behavior] structs and emitting stage systems plus a registration plugin.</summary>
+/// <summary>Roslyn incremental generator scanning [Engine.Behavior] structs and emitting stage systems plus a registration function discoverable at runtime.</summary>
 [Generator(LanguageNames.CSharp)]
 public sealed class EcsBehaviorGenerator : IIncrementalGenerator
 {
@@ -43,12 +43,9 @@ public sealed class EcsBehaviorGenerator : IIncrementalGenerator
             foreach (var b in behaviors)
                 spc.AddSource($"{b.SafeName}.g.cs", GenBehaviorSystems(b));
 
-            // Only emit the plugin if this compilation contains the BehaviorsPlugin type.
-            var pluginSymbol = compilation.GetTypeByMetadataName("Engine.BehaviorsPlugin") ?? compilation.GetTypeByMetadataName("Engine.Source.BehaviorsPlugin");
-            if (pluginSymbol is not null && pluginSymbol.Locations.Any(l => l.IsInSource))
-            {
-                spc.AddSource("BehaviorsPlugin.g.cs", GenPlugin(behaviors));
-            }
+            // Emit a single registration function discoverable by BehaviorsPlugin via attribute.
+            if (behaviors.Count > 0)
+                spc.AddSource("BehaviorsRegistration.g.cs", GenRegistration(behaviors));
         });
     }
 
@@ -114,11 +111,38 @@ public sealed class EcsBehaviorGenerator : IIncrementalGenerator
         {
             var n = a.AttributeClass?.ToDisplayString();
             if (n == "Engine.WithAttribute")
-                with.AddRange(a.ConstructorArguments[0].Values.Select(v => v.Value!.ToString()!));
+            {
+                if (a.ConstructorArguments.Length > 0)
+                {
+                    foreach (var v in a.ConstructorArguments[0].Values)
+                    {
+                        if (v.Value is ITypeSymbol ts)
+                            with.Add(ts.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+                    }
+                }
+            }
             else if (n == "Engine.WithoutAttribute")
-                without.AddRange(a.ConstructorArguments[0].Values.Select(v => v.Value!.ToString()!));
+            {
+                if (a.ConstructorArguments.Length > 0)
+                {
+                    foreach (var v in a.ConstructorArguments[0].Values)
+                    {
+                        if (v.Value is ITypeSymbol ts)
+                            without.Add(ts.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+                    }
+                }
+            }
             else if (n == "Engine.ChangedAttribute")
-                changed.AddRange(a.ConstructorArguments[0].Values.Select(v => v.Value!.ToString()!));
+            {
+                if (a.ConstructorArguments.Length > 0)
+                {
+                    foreach (var v in a.ConstructorArguments[0].Values)
+                    {
+                        if (v.Value is ITypeSymbol ts)
+                            changed.Add(ts.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+                    }
+                }
+            }
         }
         return new Filters(with, without, changed);
     }
@@ -156,7 +180,7 @@ public sealed class EcsBehaviorGenerator : IIncrementalGenerator
             // non-static: iterate entities
             var loopHeader = GenForeachHeader(b.BehaviorFqn, m.Filters.With);
             sb.AppendLine(loopHeader);
-            // Filters: Without / Changed
+            // Filters: With / Without / Changed
             sb.Append(GenFilterChecks(m.Filters));
             sb.AppendLine("            ctx.EntityId = entity;");
             sb.AppendLine($"            behv.{m.MethodName}(ctx);");
@@ -170,11 +194,13 @@ public sealed class EcsBehaviorGenerator : IIncrementalGenerator
 
     private static string GenForeachHeader(string behaviorFqn, IReadOnlyList<string> with)
     {
+        // Prefer joining via typed queries when up to 3 with-filters are present, else fallback to single-type scan.
         return with.Count switch
         {
             0 => $"        foreach (var (entity, behv) in ecs.Query<{behaviorFqn}>())\n        {{",
             1 => $"        foreach (var (entity, behv, __w1) in ecs.Query<{behaviorFqn}, {with[0]}>())\n        {{",
             2 => $"        foreach (var (entity, behv, __w1, __w2) in ecs.Query<{behaviorFqn}, {with[0]}, {with[1]}>())\n        {{",
+            3 => $"        foreach (var (entity, behv, __w1, __w2, __w3) in ecs.Query<{behaviorFqn}, {with[0]}, {with[1]}, {with[2]}>())\n        {{",
             _ => $"        foreach (var (entity, behv) in ecs.Query<{behaviorFqn}>())\n        {{",
         };
     }
@@ -182,6 +208,9 @@ public sealed class EcsBehaviorGenerator : IIncrementalGenerator
     private static string GenFilterChecks(Filters f)
     {
         var sb = new StringBuilder();
+        // Always enforce With as guards to cover the fallback iteration paths (and as a cheap safety-net otherwise).
+        foreach (var w in f.With)
+            sb.AppendLine($"            if (!ecs.Has<{w}>(entity)) continue;");
         foreach (var wout in f.Without)
             sb.AppendLine($"            if (ecs.Has<{wout}>(entity)) continue;");
         foreach (var ch in f.Changed)
@@ -189,15 +218,16 @@ public sealed class EcsBehaviorGenerator : IIncrementalGenerator
         return sb.ToString();
     }
 
-    /// <summary>Emits the partial BehaviorsPlugin implementation registering all discovered behaviors.</summary>
-    private static string GenPlugin(IEnumerable<BehaviorModel> behaviors)
+    /// <summary>Emits a registration method marked with [GeneratedBehaviorRegistration] that registers all discovered behaviors.</summary>
+    private static string GenRegistration(IEnumerable<BehaviorModel> behaviors)
     {
         var sb = new StringBuilder();
         sb.AppendLine("// <auto-generated />");
         sb.AppendLine("namespace Engine;");
-        sb.AppendLine("public sealed partial class BehaviorsPlugin");
+        sb.AppendLine("public static class BehaviorRegistration");
         sb.AppendLine("{");
-        sb.AppendLine("    static partial void BuildGenerated(App app)");
+        sb.AppendLine("    [global::Engine.GeneratedBehaviorRegistration]");
+        sb.AppendLine("    public static void Register(global::Engine.App app)");
         sb.AppendLine("    {");
         foreach (var b in behaviors)
             sb.AppendLine($"        global::{b.Namespace}.{b.SafeName}.Register(app);");

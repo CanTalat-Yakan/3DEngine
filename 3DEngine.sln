@@ -8,8 +8,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Renderer", "Engine.R
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Editor", "Engine.Editor\Engine.Editor.csproj", "{210010CD-B94D-4166-BCBD-E79D7F8E8986}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Samples", "Engine.Samples\Engine.Samples.csproj", "{5F8FB8A4-7D1C-44E1-9DCD-3E7EC5649DE7}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Tests", "Engine.Tests\Engine.Tests.csproj", "{03F7F5A7-B6A6-4A2B-905B-311580296CCB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.ECS", "Engine.ECS\Engine.ECS.csproj", "{24790B1A-7C5A-4D71-8E7B-413184BF9121}"
@@ -44,10 +42,6 @@ Global
 		{210010CD-B94D-4166-BCBD-E79D7F8E8986}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{210010CD-B94D-4166-BCBD-E79D7F8E8986}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{210010CD-B94D-4166-BCBD-E79D7F8E8986}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5F8FB8A4-7D1C-44E1-9DCD-3E7EC5649DE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5F8FB8A4-7D1C-44E1-9DCD-3E7EC5649DE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5F8FB8A4-7D1C-44E1-9DCD-3E7EC5649DE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5F8FB8A4-7D1C-44E1-9DCD-3E7EC5649DE7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{03F7F5A7-B6A6-4A2B-905B-311580296CCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{03F7F5A7-B6A6-4A2B-905B-311580296CCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03F7F5A7-B6A6-4A2B-905B-311580296CCB}.Release|Any CPU.ActiveCfg = Release|Any CPU

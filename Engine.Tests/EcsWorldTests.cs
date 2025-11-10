@@ -2,28 +2,6 @@ using Xunit;
 
 namespace Engine.Tests;
 
-public struct TestComp
-{
-    public int A;
-}
-
-public struct OtherComp
-{
-    public int B;
-}
-
-public struct ThirdComp
-{
-    public int C;
-}
-
-public sealed class DisposableComp : IDisposable
-{
-    public int DisposedCount;
-    public bool IsDisposed => DisposedCount > 0;
-    public void Dispose() => DisposedCount++;
-}
-
 public class EcsWorldTests
 {
     [Fact]
@@ -428,4 +406,26 @@ public class EcsWorldTests
         // component gone; GetRef should throw missing component
         Assert.Throws<KeyNotFoundException>(() => { ref var _ = ref ecs.GetRef<TestComp>(id); });
     }
+}
+
+public struct TestComp
+{
+    public int A;
+}
+
+public struct OtherComp
+{
+    public int B;
+}
+
+public struct ThirdComp
+{
+    public int C;
+}
+
+public sealed class DisposableComp : IDisposable
+{
+    public int DisposedCount;
+    public bool IsDisposed => DisposedCount > 0;
+    public void Dispose() => DisposedCount++;
 }
