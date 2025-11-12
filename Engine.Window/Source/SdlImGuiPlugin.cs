@@ -5,7 +5,7 @@ using SDL3;
 namespace Engine;
 
 /// <summary>Sets up ImGui, schedules NewFrame/Render systems, and renders via ImGuiRenderer.</summary>
-public sealed class ImGuiPlugin : IPlugin
+public sealed class SdlImGuiPlugin : IPlugin
 {
     private sealed class ImGuiState
     {
@@ -27,7 +27,7 @@ public sealed class ImGuiPlugin : IPlugin
         // Only create the SDL-based ImGuiRenderer if an SDL renderer exists (non-Vulkan mode)
         if (sdlWindow.Renderer != IntPtr.Zero)
         {
-            var renderer = new ImGuiRenderer(sdlWindow.Renderer);
+            var renderer = new SdlImGuiRenderer(sdlWindow.Renderer);
             app.World.InsertResource(renderer);
         }
 
@@ -45,7 +45,7 @@ public sealed class ImGuiPlugin : IPlugin
                 ? (float)world.Resource<Time>().DeltaSeconds
                 : 1f / 60f;
             ImGui.NewFrame();
-            if (world.TryResource<ImGuiRenderer>() is { } imguiRenderer)
+            if (world.TryResource<SdlImGuiRenderer>() is { } imguiRenderer)
             {
                 imguiRenderer.NewFrame(appWindow.Sdl.Window);
             }
@@ -61,7 +61,7 @@ public sealed class ImGuiPlugin : IPlugin
         {
             var sdl = world.Resource<AppWindow>().Sdl;
             if (sdl.Renderer == IntPtr.Zero) return; // Vulkan mode: don't use SDL renderer path
-            var imGuiRenderer = world.Resource<ImGuiRenderer>();
+            var imGuiRenderer = world.Resource<SdlImGuiRenderer>();
             var clear = world.Resource<ClearColor>().Value;
 
             ImGui.Render();
@@ -80,36 +80,13 @@ public sealed class ImGuiPlugin : IPlugin
         
         app.AddSystem(Stage.Cleanup, (world) =>
         {
-            if (world.TryResource<ImGuiRenderer>() is { } imguiRenderer)
+            if (world.TryResource<SdlImGuiRenderer>() is { } imguiRenderer)
             {
                 imguiRenderer.Dispose();
-                world.RemoveResource<ImGuiRenderer>();
+                world.RemoveResource<SdlImGuiRenderer>();
             }
 
             ImGui.DestroyContext();
         });
-    }
-}
-
-/// <summary>Ensures a default ClearColor resource exists.</summary>
-public sealed class ClearColorPlugin : IPlugin
-{
-    /// <summary>Inserts a default ClearColor resource if missing.</summary>
-    public void Build(App app)
-    {
-        if (!app.World.ContainsResource<ClearColor>())
-            app.World.InsertResource(new ClearColor(new Vector4(0.45f, 0.55f, 0.60f, 1.00f)));
-    }
-}
-
-/// <summary>RGBA clear color used for SDL renderer background.</summary>
-public readonly struct ClearColor
-{
-    /// <summary>RGBA color as Vector4 (0..1).</summary>
-    public readonly Vector4 Value;
-
-    public ClearColor(Vector4 value)
-    {
-        Value = value;
     }
 }

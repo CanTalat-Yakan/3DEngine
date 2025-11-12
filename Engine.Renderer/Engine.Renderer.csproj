@@ -4,6 +4,7 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <RootNamespace>Engine</RootNamespace>
 
         <Title>3DEngine Renderer</Title>
@@ -44,6 +45,16 @@
             <Pack>True</Pack>
             <PackagePath>\</PackagePath>
         </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Engine.ECS\Engine.ECS.csproj" />
+    </ItemGroup>
+
+    <!-- Exclude sample-based renderer files not used by this engine integration -->
+    <ItemGroup>
+      <Compile Remove="Source/GraphicsDevice.cs" />
+      <Compile Remove="Source/Swapchain.cs" />
     </ItemGroup>
 
 </Project>

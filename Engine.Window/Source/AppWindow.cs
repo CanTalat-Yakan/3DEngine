@@ -79,7 +79,7 @@ public sealed class AppWindow
                 SDLEvent?.Invoke(e);
 
                 // Forward events to ImGui input adapter
-                ImGuiInput.ProcessEvent(e);
+                SdlImGuiInput.ProcessEvent(e);
 
                 if ((SDL.EventType)e.Type == SDL.EventType.Quit)
                 {

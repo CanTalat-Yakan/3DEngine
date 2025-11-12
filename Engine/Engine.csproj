@@ -32,7 +32,6 @@
         <ProjectReference Include="..\Engine.Core\Engine.Core.csproj"/>
         <ProjectReference Include="..\Engine.ECS\Engine.ECS.csproj"/>
         <ProjectReference Include="..\Engine.Renderer\Engine.Renderer.csproj"/>
-        <ProjectReference Include="..\Engine.Vulkan\Engine.Vulkan.csproj"/>
         <ProjectReference Include="..\Engine.Window\Engine.Window.csproj"/>
     </ItemGroup>
 

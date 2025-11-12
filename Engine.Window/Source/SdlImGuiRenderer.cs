@@ -6,7 +6,7 @@ using SDL3;
 namespace Engine;
 
 /// <summary>Renders ImGui draw data using the SDL3 renderer API.</summary>
-public sealed class ImGuiRenderer : IDisposable
+public sealed class SdlImGuiRenderer : IDisposable
 {
     // SDL renderer handle used for all draw calls.
     private readonly nint _renderer;
@@ -20,7 +20,7 @@ public sealed class ImGuiRenderer : IDisposable
     /// <summary>Creates a new ImGui renderer bound to an existing SDL renderer.</summary>
     /// <param name="renderer">The SDL renderer handle created alongside a window.</param>
     /// <remarks>The constructor uploads ImGui device objects (font texture) immediately.</remarks>
-    public ImGuiRenderer(nint renderer)
+    public SdlImGuiRenderer(nint renderer)
     {
         _renderer = renderer;
         CreateDeviceObjects();
