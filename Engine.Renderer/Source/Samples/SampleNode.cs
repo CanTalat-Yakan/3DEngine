@@ -7,6 +7,12 @@ public sealed class SampleNode : IRenderNode
 
     public void Execute(RendererContext ctx, CommandRecordingContext cmds, RenderWorld renderWorld)
     {
-        _ = ctx; _ = cmds; _ = renderWorld;
+        // Forward-pass placeholder: ensure the camera descriptor set has been prepared
+        // by SamplePrepare so that future pipeline binding/draw logic can consume it here.
+        _ = ctx;
+        _ = cmds;
+
+        var cameraSet = renderWorld.TryGet<IDescriptorSet>();
+        _ = cameraSet;
     }
 }

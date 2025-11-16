@@ -3,7 +3,7 @@ using Vortice.Vulkan;
 
 namespace Engine;
 
-public sealed partial class GraphicsDevice : IGraphicsDevice
+public sealed unsafe partial class GraphicsDevice : IGraphicsDevice
 {
     private const int MaxFramesInFlight = 3;
     private const int MaxPhysicalDeviceNameSize = 256;
@@ -24,6 +24,10 @@ public sealed partial class GraphicsDevice : IGraphicsDevice
         CreateLogicalDevice();
         CreateSwapchainResources();
         CreateSyncObjects();
+        CreateDescriptorResources();
+
+        Log.Category("Engine.Graphics").Info($"Graphics device initialized: {_adapterInfo.Name} (Vendor=0x{_adapterInfo.VendorId:X4}, Device=0x{_adapterInfo.DeviceId:X4}, Type={_adapterInfo.DeviceType})");
+
         IsInitialized = true;
     }
 
@@ -34,6 +38,8 @@ public sealed partial class GraphicsDevice : IGraphicsDevice
         DestroySwapchainResources();
         CreateSwapchainResources();
         _resizeVersion++;
+
+        Log.Category("Engine.Graphics").Info($"Swapchain resized to {_swapchainExtent.width}x{_swapchainExtent.height}, revision={_resizeVersion}");
     }
 
     public IFrameContext BeginFrame(ClearColor? clearOverride = null) => BeginFrameInternal(clearOverride ?? ClearColor.Black);
@@ -50,6 +56,7 @@ public sealed partial class GraphicsDevice : IGraphicsDevice
         _deviceApi.vkDeviceWaitIdle(_device);
         DestroySyncObjects();
         DestroySwapchainResources();
+        DestroyDescriptorResources();
         DestroyLogicalDevice();
         DestroySurface();
         DestroyInstance();
@@ -87,6 +94,9 @@ public sealed partial class GraphicsDevice : IGraphicsDevice
     private VkDebugUtilsMessengerEXT _debugMessenger;
     private bool _validationEnabled;
     private GraphicsAdapterInfo _adapterInfo = GraphicsAdapterInfo.Unknown;
+    private VkImage _depthImage;
+    private VkDeviceMemory _depthImageMemory;
+    private VkImageView _depthImageView;
 
     private static string Utf8(ReadOnlySpan<byte> value)
     {

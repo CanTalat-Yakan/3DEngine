@@ -2,6 +2,9 @@ namespace Engine;
 
 public sealed class Pipeline : IPipeline
 {
-    // Placeholder pipeline abstraction
+    public void Dispose()
+    {
+        // Legacy placeholder; real Vulkan-backed pipelines are implemented
+        // in GraphicsDevice.Pipeline.cs via IPipeline.
+    }
 }
-

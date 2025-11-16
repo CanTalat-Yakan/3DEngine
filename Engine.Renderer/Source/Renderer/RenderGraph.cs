@@ -11,6 +11,8 @@ public sealed class RenderGraph
             throw new InvalidOperationException($"Node '{node.Name}' already exists.");
         _nodes[node.Name] = node;
         _edges[node.Name] = new HashSet<string>(node.Dependencies);
+        // Dependencies may refer to nodes that are added later; we only enforce cycle detection
+        // during topological ordering.
     }
 
     public IEnumerable<IRenderNode> TopologicalOrder()

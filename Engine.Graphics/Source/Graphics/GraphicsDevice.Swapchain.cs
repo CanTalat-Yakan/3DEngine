@@ -14,7 +14,7 @@ public sealed unsafe partial class GraphicsDevice
         var support = QuerySwapchainSupport(_physicalDevice);
         var surfaceFormat = ChooseSwapchainFormat(support.Formats);
         var presentMode = ChoosePresentMode(support.PresentModes);
-        var extent = ChooseSwapExtent(support.Capabilities, drawable.Width, drawable.Height);
+        var extent = ChooseSwapExtent(support.Capabilities, (uint)drawable.Width, (uint)drawable.Height);
 
         _swapchainFormat = surfaceFormat.format;
         _swapchainExtent = extent;
@@ -61,6 +61,7 @@ public sealed unsafe partial class GraphicsDevice
         _swapchainImages = images.ToArray();
 
         CreateImageViews();
+        CreateDepthResources();
         CreateRenderPass();
         CreateFramebuffers();
         CreateCommandPoolAndBuffers();
@@ -72,6 +73,12 @@ public sealed unsafe partial class GraphicsDevice
             if (fb.Handle != 0) _deviceApi.vkDestroyFramebuffer(_device, fb);
         foreach (var iv in _swapchainImageViews)
             if (iv.Handle != 0) _deviceApi.vkDestroyImageView(_device, iv);
+        if (_depthImageView.Handle != 0)
+            _deviceApi.vkDestroyImageView(_device, _depthImageView);
+        if (_depthImage.Handle != 0)
+            _deviceApi.vkDestroyImage(_device, _depthImage);
+        if (_depthImageMemory.Handle != 0)
+            _deviceApi.vkFreeMemory(_device, _depthImageMemory);
         if (_renderPass.Handle != 0)
             _deviceApi.vkDestroyRenderPass(_device, _renderPass);
         if (_swapchain.Handle != 0)
@@ -86,6 +93,9 @@ public sealed unsafe partial class GraphicsDevice
         _renderPass = default;
         _swapchain = default;
         _commandPool = default;
+        _depthImage = default;
+        _depthImageMemory = default;
+        _depthImageView = default;
     }
 
     private (VkSurfaceCapabilitiesKHR Capabilities, VkSurfaceFormatKHR[] Formats, VkPresentModeKHR[] PresentModes) QuerySwapchainSupport(VkPhysicalDevice device)
@@ -135,6 +145,48 @@ public sealed unsafe partial class GraphicsDevice
         };
     }
 
+    private void CreateDepthResources()
+    {
+        // For now always use a 32-bit float depth buffer.
+        VkFormat depthFormat = VkFormat.D32Sfloat;
+
+        VkImageCreateInfo imageInfo = new()
+        {
+            imageType = VkImageType.Image2D,
+            format = depthFormat,
+            extent = new VkExtent3D(_swapchainExtent.width, _swapchainExtent.height, 1),
+            mipLevels = 1,
+            arrayLayers = 1,
+            samples = VkSampleCountFlags.Count1,
+            tiling = VkImageTiling.Optimal,
+            usage = VkImageUsageFlags.DepthStencilAttachment,
+            sharingMode = VkSharingMode.Exclusive,
+            initialLayout = VkImageLayout.Undefined
+        };
+
+        _deviceApi.vkCreateImage(_device, &imageInfo, null, out _depthImage).CheckResult();
+        _deviceApi.vkGetImageMemoryRequirements(_device, _depthImage, out VkMemoryRequirements req);
+
+        VkMemoryAllocateInfo allocInfo = new()
+        {
+            allocationSize = req.size,
+            memoryTypeIndex = FindMemoryType(req.memoryTypeBits, VkMemoryPropertyFlags.DeviceLocal)
+        };
+
+        _deviceApi.vkAllocateMemory(_device, &allocInfo, null, out _depthImageMemory).CheckResult();
+        _deviceApi.vkBindImageMemory(_device, _depthImage, _depthImageMemory, 0).CheckResult();
+
+        VkImageViewCreateInfo viewInfo = new()
+        {
+            image = _depthImage,
+            viewType = VkImageViewType.Image2D,
+            format = depthFormat,
+            subresourceRange = new VkImageSubresourceRange(VkImageAspectFlags.Depth, 0, 1, 0, 1)
+        };
+
+        _deviceApi.vkCreateImageView(_device, &viewInfo, null, out _depthImageView).CheckResult();
+    }
+
     private void CreateImageViews()
     {
         _swapchainImageViews = new VkImageView[_swapchainImages.Length];
@@ -166,29 +218,47 @@ public sealed unsafe partial class GraphicsDevice
             finalLayout = VkImageLayout.PresentSrcKHR
         };
 
+        var depthAttachment = new VkAttachmentDescription
+        {
+            format = VkFormat.D32Sfloat,
+            samples = VkSampleCountFlags.Count1,
+            loadOp = VkAttachmentLoadOp.Clear,
+            storeOp = VkAttachmentStoreOp.DontCare,
+            stencilLoadOp = VkAttachmentLoadOp.DontCare,
+            stencilStoreOp = VkAttachmentStoreOp.DontCare,
+            initialLayout = VkImageLayout.Undefined,
+            finalLayout = VkImageLayout.DepthStencilAttachmentOptimal
+        };
+
+        VkAttachmentDescription* attachments = stackalloc VkAttachmentDescription[2];
+        attachments[0] = colorAttachment;
+        attachments[1] = depthAttachment;
+
         var colorAttachmentRef = new VkAttachmentReference { attachment = 0, layout = VkImageLayout.ColorAttachmentOptimal };
+        var depthAttachmentRef = new VkAttachmentReference { attachment = 1, layout = VkImageLayout.DepthStencilAttachmentOptimal };
 
         var subpass = new VkSubpassDescription
         {
             pipelineBindPoint = VkPipelineBindPoint.Graphics,
             colorAttachmentCount = 1,
-            pColorAttachments = &colorAttachmentRef
+            pColorAttachments = &colorAttachmentRef,
+            pDepthStencilAttachment = &depthAttachmentRef
         };
 
         var dependency = new VkSubpassDependency
         {
             srcSubpass = uint.MaxValue,
             dstSubpass = 0,
-            srcStageMask = VkPipelineStageFlags.ColorAttachmentOutput,
-            dstStageMask = VkPipelineStageFlags.ColorAttachmentOutput,
+            srcStageMask = VkPipelineStageFlags.ColorAttachmentOutput | VkPipelineStageFlags.EarlyFragmentTests,
+            dstStageMask = VkPipelineStageFlags.ColorAttachmentOutput | VkPipelineStageFlags.EarlyFragmentTests,
             srcAccessMask = 0,
-            dstAccessMask = VkAccessFlags.ColorAttachmentWrite
+            dstAccessMask = VkAccessFlags.ColorAttachmentWrite | VkAccessFlags.DepthStencilAttachmentWrite
         };
 
         VkRenderPassCreateInfo renderPassInfo = new()
         {
-            attachmentCount = 1,
-            pAttachments = &colorAttachment,
+            attachmentCount = 2,
+            pAttachments = attachments,
             subpassCount = 1,
             pSubpasses = &subpass,
             dependencyCount = 1,
@@ -203,20 +273,21 @@ public sealed unsafe partial class GraphicsDevice
         _framebuffers = new VkFramebuffer[_swapchainImageViews.Length];
         for (int i = 0; i < _swapchainImageViews.Length; i++)
         {
-            fixed (VkImageView* attachment = &_swapchainImageViews[i])
-            {
-                VkFramebufferCreateInfo framebufferInfo = new()
-                {
-                    renderPass = _renderPass,
-                    attachmentCount = 1,
-                    pAttachments = attachment,
-                    width = _swapchainExtent.width,
-                    height = _swapchainExtent.height,
-                    layers = 1
-                };
+            VkImageView* attachments = stackalloc VkImageView[2];
+            attachments[0] = _swapchainImageViews[i];
+            attachments[1] = _depthImageView;
 
-                _deviceApi.vkCreateFramebuffer(_device, &framebufferInfo, null, out _framebuffers[i]).CheckResult();
-            }
+            VkFramebufferCreateInfo framebufferInfo = new()
+            {
+                renderPass = _renderPass,
+                attachmentCount = 2,
+                pAttachments = attachments,
+                width = _swapchainExtent.width,
+                height = _swapchainExtent.height,
+                layers = 1
+            };
+
+            _deviceApi.vkCreateFramebuffer(_device, &framebufferInfo, null, out _framebuffers[i]).CheckResult();
         }
     }
 

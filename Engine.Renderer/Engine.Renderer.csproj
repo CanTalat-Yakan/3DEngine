@@ -50,4 +50,10 @@
       <ProjectReference Include="..\Engine.Graphics\Engine.Graphics.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Include="Source\Shaders\triangle.vert.glsl" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="Source\Shaders\triangle.frag.glsl" CopyToOutputDirectory="PreserveNewest" />
+        <!-- Future: compiled SPIR-V can be added here as content as well -->
+    </ItemGroup>
+
 </Project>
