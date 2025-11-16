@@ -13,80 +13,19 @@ internal sealed class SdlSurfaceSource : ISurfaceSource
 
     public IReadOnlyList<string> GetRequiredInstanceExtensions()
     {
-        var sdlType = typeof(SDL);
-        var m1 = sdlType.GetMethod("VulkanGetInstanceExtensions", new[] { typeof(nint), typeof(string[]).MakeByRefType() });
-        if (m1 != null)
-        {
-            object[] args = { _sdl.Window, null! };
-            var ok = (bool)m1.Invoke(null, args)!;
-            var names = (string[]?)args[1];
-            if (!ok || names == null || names.Length == 0)
-                throw new InvalidOperationException($"SDL.VulkanGetInstanceExtensions failed: {SDL.GetError()}");
-            return names;
-        }
-        var m2 = sdlType.GetMethod("VulkanGetInstanceExtensions", new[] { typeof(string[]).MakeByRefType() });
-        if (m2 != null)
-        {
-            object[] args = { null! };
-            var ok = (bool)m2.Invoke(null, args)!;
-            var names = (string[]?)args[0];
-            if (!ok || names == null || names.Length == 0)
-                throw new InvalidOperationException($"SDL.VulkanGetInstanceExtensions failed: {SDL.GetError()}");
-            return names;
-        }
-        var m3 = sdlType.GetMethod("VulkanGetInstanceExtensions", new[] { typeof(nint) });
-        if (m3 != null)
-        {
-            var names = (string[]?)m3.Invoke(null, new object[] { _sdl.Window });
-            if (names == null || names.Length == 0)
-                throw new InvalidOperationException($"SDL.VulkanGetInstanceExtensions failed: {SDL.GetError()}");
-            return names;
-        }
-        throw new MissingMethodException("SDL.VulkanGetInstanceExtensions signature not found.");
+        var names = SDL.VulkanGetInstanceExtensions(out var count);
+        if (names is null || count == 0)
+            throw new InvalidOperationException($"SDL.VulkanGetInstanceExtensions failed: {SDL.GetError()}");
+        return names;
     }
 
     public nint CreateSurfaceHandle(nint instanceHandle)
     {
-        var sdlType = typeof(SDL);
-        var m1 = sdlType.GetMethod("VulkanCreateSurface", new[] { typeof(nint), typeof(nint), typeof(ulong).MakeByRefType(), typeof(IntPtr) });
-        if (m1 != null)
-        {
-            object[] args = { _sdl.Window, instanceHandle, 0UL, IntPtr.Zero };
-            var ok = (bool)m1.Invoke(null, args)!;
-            var surface = (ulong)args[2];
-            if (!ok || surface == 0)
-                throw new InvalidOperationException($"SDL.VulkanCreateSurface failed: {SDL.GetError()}");
-            return (nint)surface;
-        }
-        var m2 = sdlType.GetMethod("VulkanCreateSurface", new[] { typeof(nint), typeof(nint), typeof(ulong).MakeByRefType() });
-        if (m2 != null)
-        {
-            object[] args = { _sdl.Window, instanceHandle, 0UL };
-            var ok = (bool)m2.Invoke(null, args)!;
-            var surface = (ulong)args[2];
-            if (!ok || surface == 0)
-                throw new InvalidOperationException($"SDL.VulkanCreateSurface failed: {SDL.GetError()}");
-            return (nint)surface;
-        }
-        var m3 = sdlType.GetMethod("VulkanCreateSurface", new[] { typeof(nint), typeof(nint), typeof(IntPtr) });
-        if (m3 != null)
-        {
-            var surface = (ulong)(m3.Invoke(null, new object[] { _sdl.Window, instanceHandle, IntPtr.Zero }) ?? 0UL);
-            if (surface == 0)
-                throw new InvalidOperationException($"SDL.VulkanCreateSurface failed: {SDL.GetError()}");
-            return (nint)surface;
-        }
-        var m4 = sdlType.GetMethod("VulkanCreateSurface", new[] { typeof(nint), typeof(nint) });
-        if (m4 != null)
-        {
-            var surface = (ulong)(m4.Invoke(null, new object[] { _sdl.Window, instanceHandle }) ?? 0UL);
-            if (surface == 0)
-                throw new InvalidOperationException($"SDL.VulkanCreateSurface failed: {SDL.GetError()}");
-            return (nint)surface;
-        }
-        throw new MissingMethodException("SDL.VulkanCreateSurface signature not found.");
+        if(!SDL.VulkanCreateSurface(_sdl.Window, instanceHandle, IntPtr.Zero, out var surface))
+            throw new InvalidOperationException($"SDL.VulkanCreateSurface failed: {SDL.GetError()}");
+        return surface;
     }
-
+    
     public (uint Width, uint Height) GetDrawableSize()
     {
         uint w = (uint)Math.Max(1, _sdl.Width);

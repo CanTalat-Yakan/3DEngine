@@ -271,9 +271,9 @@ public sealed unsafe partial class GraphicsDevice
     private void CreateFramebuffers()
     {
         _framebuffers = new VkFramebuffer[_swapchainImageViews.Length];
+        VkImageView* attachments = stackalloc VkImageView[2];
         for (int i = 0; i < _swapchainImageViews.Length; i++)
         {
-            VkImageView* attachments = stackalloc VkImageView[2];
             attachments[0] = _swapchainImageViews[i];
             attachments[1] = _depthImageView;
 

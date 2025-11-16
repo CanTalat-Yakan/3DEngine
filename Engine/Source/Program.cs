@@ -9,7 +9,7 @@ public sealed class Program
     private static void Main()
     {
         // Build app with default configuration and plugins, then start the main loop.
-        new App(Config.GetDefault())
+        new App(Config.GetDefault(graphics: GraphicsBackend.Vulkan))
             .AddPlugin(new DefaultPlugins())
             .Run();
     }

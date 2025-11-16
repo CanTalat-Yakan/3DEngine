@@ -51,7 +51,11 @@ public sealed class SdlRendererPlugin : IPlugin
         // Run Vulkan renderer after other Render stage systems
         app.AddSystem(Stage.Render, (world) =>
         {
-            renderer.RenderFrame(world);
+            // Only render when the graphics device has been initialized (e.g., Vulkan selected and initialized).
+            if (world.TryResource<Renderer>() is { } r && r.Context.IsInitialized)
+            {
+                r.RenderFrame(world);
+            }
         });
 
         // Ensure disposal at app exit (Cleanup stage)

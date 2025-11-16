@@ -34,7 +34,7 @@ public sealed class SamplePrepare : IPrepareSystem
 
         // Upload camera data into the uniform buffer.
         var span = ctx.Graphics.Map(_cameraBuffer);
-        System.Runtime.InteropServices.MemoryMarshal.Write(span, ref uniform);
+        System.Runtime.InteropServices.MemoryMarshal.Write(span, in uniform);
         ctx.Graphics.Unmap(_cameraBuffer);
 
         // Bind the camera UBO at binding 0 on the descriptor set.

@@ -4,30 +4,43 @@ namespace Engine;
 public sealed class RendererContext : IDisposable
 {
     private static readonly ILogger Logger = Log.For<RendererContext>();
-    private readonly IGraphicsDevice _graphics;
+    private IGraphicsDevice? _graphics;
+    private readonly Func<IGraphicsDevice>? _graphicsFactory;
 
     // Per-frame camera uniform buffers and descriptor sets, sized to the swapchain image count.
     private IBuffer[]? _cameraBuffers;
     private IDescriptorSet[]? _cameraDescriptorSets;
 
     // Expose the underlying graphics device for internal systems that need advanced access.
-    public IGraphicsDevice Graphics => _graphics;
+    public IGraphicsDevice Graphics => _graphics ?? throw new InvalidOperationException("Graphics device not created. Call Initialize first.");
 
-    // Default constructor uses Vulkan backend; callers can inject a different IGraphicsDevice if desired.
-    public RendererContext() : this(new GraphicsDevice()) { }
+    // Default constructor defers backend creation until Initialize to avoid early assembly loads.
+    public RendererContext()
+    {
+        _graphicsFactory = static () => new GraphicsDevice();
+    }
 
     public RendererContext(IGraphicsDevice graphics)
     {
         _graphics = graphics;
     }
 
-    public bool IsInitialized => _graphics.IsInitialized;
+    public RendererContext(Func<IGraphicsDevice> graphicsFactory)
+    {
+        _graphicsFactory = graphicsFactory;
+    }
 
-    public GraphicsAdapterInfo AdapterInfo => _graphics.AdapterInfo;
+    public bool IsInitialized => _graphics?.IsInitialized ?? false;
+
+    public GraphicsAdapterInfo AdapterInfo => _graphics?.AdapterInfo ?? throw new InvalidOperationException("RendererContext not initialized.");
 
     public void Initialize(ISurfaceSource surfaceSource, string appName = "3DEngine")
     {
         if (IsInitialized) return;
+
+        // Lazily create the backend if not supplied via ctor.
+        _graphics ??= _graphicsFactory?.Invoke() ?? new GraphicsDevice();
+
         _graphics.Initialize(surfaceSource, appName);
 
         CreateCameraResources();
@@ -47,7 +60,14 @@ public sealed class RendererContext : IDisposable
                 set.Dispose();
         }
 
-        var imageCount = (int)_graphics.Swapchain.ImageCount;
+        if (!IsInitialized)
+        {
+            _cameraBuffers = null;
+            _cameraDescriptorSets = null;
+            return;
+        }
+
+        var imageCount = (int)_graphics!.Swapchain.ImageCount;
         if (imageCount <= 0)
         {
             _cameraBuffers = null;
@@ -62,7 +82,7 @@ public sealed class RendererContext : IDisposable
         for (int i = 0; i < imageCount; i++)
         {
             var desc = new BufferDesc(cameraSize, BufferUsage.Uniform | BufferUsage.TransferDst);
-            var buffer = _graphics.CreateBuffer(desc);
+            var buffer = _graphics!.CreateBuffer(desc);
             _cameraBuffers[i] = buffer;
 
             var set = _graphics.CreateDescriptorSet();
@@ -76,11 +96,13 @@ public sealed class RendererContext : IDisposable
 
     public CommandRecordingContext BeginFrame(RenderWorld world, out uint imageIndex)
     {
+        if (!IsInitialized) throw new InvalidOperationException("RendererContext not initialized.");
+
         var clear = world.TryGet<RenderClearColor>() is { } cc
             ? new ClearColor(cc.R, cc.G, cc.B, cc.A)
             : ClearColor.Black;
 
-        var frame = _graphics.BeginFrame(clear);
+        var frame = _graphics!.BeginFrame(clear);
         imageIndex = frame.FrameIndex; // treat frame index as swapchain image index
 
         // Update per-frame camera UBO for the current image index, if available.
@@ -108,8 +130,7 @@ public sealed class RendererContext : IDisposable
 
     private void UploadCameraUniform(IBuffer buffer, in CameraUniform camera)
     {
-        // For now, use the generic Map/Unmap path exposed by IGraphicsDevice.
-        var span = _graphics.Map(buffer);
+        var span = _graphics!.Map(buffer);
         System.Runtime.InteropServices.MemoryMarshal.Write(span, in camera);
         _graphics.Unmap(buffer);
     }
@@ -118,7 +139,7 @@ public sealed class RendererContext : IDisposable
 
     public void EndFrame(CommandRecordingContext ctx, uint imageIndex)
     {
-        _graphics.EndFrame(ctx.FrameContext);
+        _graphics!.EndFrame(ctx.FrameContext);
         ctx.Dispose();
     }
 
@@ -126,11 +147,10 @@ public sealed class RendererContext : IDisposable
 
     public void OnResize()
     {
-        _graphics.OnResize();
-
         if (!IsInitialized)
             return;
 
+        _graphics!.OnResize();
         CreateCameraResources();
     }
 
@@ -149,6 +169,6 @@ public sealed class RendererContext : IDisposable
             _cameraDescriptorSets = null;
         }
 
-        _graphics.Dispose();
+        _graphics?.Dispose();
     }
 }
