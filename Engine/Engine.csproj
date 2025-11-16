@@ -27,9 +27,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Engine.App\Engine.App.csproj" />
+        <ProjectReference Include="..\Engine.Core\Engine.Core.csproj" />
         <ProjectReference Include="..\Engine.Generator\Engine.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
-        <ProjectReference Include="..\Engine.App\Engine.App.csproj"/>
-        <ProjectReference Include="..\Engine.Core\Engine.Core.csproj"/>
         <ProjectReference Include="..\Engine.ECS\Engine.ECS.csproj"/>
         <ProjectReference Include="..\Engine.Renderer\Engine.Renderer.csproj"/>
         <ProjectReference Include="..\Engine.Window\Engine.Window.csproj"/>

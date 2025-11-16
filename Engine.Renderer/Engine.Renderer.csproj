@@ -12,8 +12,8 @@
         <Version>1.0.0</Version>
         <Authors>CanTalat-Yakan</Authors>
         <Company>3DEngine</Company>
-        <Description>3D Game Engine - Vulkan - SDL3 - .NET 10 - C# 14</Description>
-        <PackageTags>3D;Game;Engine;.Net10;C#14</PackageTags>
+        <Description>3D Game Engine - High-Level Rendering Pipeline - .NET 10 - C# 14</Description>
+        <PackageTags>3D;Game;Engine;.Net10;C#14;Renderer</PackageTags>
         <PackageIcon>3DEngineSymbol.png</PackageIcon>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/CanTalat-Yakan/3DEngine</RepositoryUrl>
@@ -26,14 +26,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AssimpNet" Version="5.0.0-beta1"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.4"/>
-        <PackageReference Include="UniversalSceneDescription" Version="6.0.0"/>
-        <PackageReference Include="Vortice.Mathematics" Version="1.9.3"/>
-        <PackageReference Include="Vortice.SPIRV" Version="1.0.4"/>
-        <PackageReference Include="Vortice.SpirvCross" Version="1.5.3"/>
-        <PackageReference Include="Vortice.Vulkan" Version="3.0.3"/>
-        <PackageReference Include="Vortice.VulkanMemoryAllocator" Version="1.6.3"/>
+        <!-- Non-Vulkan dependencies retained for higher-level systems (asset import, serialization, scene description) -->
+        <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+        <PackageReference Include="UniversalSceneDescription" Version="6.0.0" />
+        <!-- Removed: Vortice.* (moved to Engine.Graphics) -->
     </ItemGroup>
 
     <ItemGroup>
@@ -48,13 +45,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Engine.Debug\Engine.Debug.csproj" />
       <ProjectReference Include="..\Engine.ECS\Engine.ECS.csproj" />
-    </ItemGroup>
-
-    <!-- Exclude sample-based renderer files not used by this engine integration -->
-    <ItemGroup>
-      <Compile Remove="Source/GraphicsDevice.cs" />
-      <Compile Remove="Source/Swapchain.cs" />
+      <ProjectReference Include="..\Engine.Graphics\Engine.Graphics.csproj" />
     </ItemGroup>
 
 </Project>

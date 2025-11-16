@@ -29,6 +29,7 @@
         <ProjectReference Include="..\Engine.App\Engine.App.csproj"/>
         <ProjectReference Include="..\Engine.Core\Engine.Core.csproj"/>
         <ProjectReference Include="..\Engine.Renderer\Engine.Renderer.csproj"/>
+        <ProjectReference Include="..\Engine.Graphics\Engine.Graphics.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -38,7 +39,6 @@
         <PackageReference Include="SDL3-CS.Native.Mixer" Version="2.8.1.1"/>
         <PackageReference Include="SDL3-CS.Native.TTF" Version="3.2.2"/>
         <PackageReference Include="Twizzle.ImGui-Bundle.NET" Version="1.91.5.2"/>
-        <PackageReference Include="Vortice.Vulkan" Version="3.0.3"/>
     </ItemGroup>
 
     <ItemGroup>

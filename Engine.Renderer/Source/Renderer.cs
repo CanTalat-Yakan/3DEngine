@@ -9,16 +9,25 @@ public sealed class Renderer : IDisposable
     public RenderWorld RenderWorld { get; } = new();
     public RenderGraph Graph { get; } = new();
     public RendererContext Context { get; } = new();
+    public RendererDiagnostics Diagnostics { get; } = new();
 
     private bool _initialized;
+    private Extent2D _cachedSurfaceExtent;
+
+    public Renderer() { }
+    public Renderer(RendererContext context)
+    {
+        Context = context;
+    }
 
     public void Initialize()
     {
         if (_initialized) return;
-        // Vulkan should be initialized by the backend plugin with an ISurfaceSource.
+        Diagnostics.Initialize(Context.AdapterInfo);
+        // Graphics backend (Vulkan) is initialized by supplying an ISurfaceSource externally before first frame.
 
-        // Register a default clear node
-        Graph.AddNode(new ClearNode());
+        // Register a node
+        Graph.AddNode(new SampleNode());
 
         _initialized = true;
     }
@@ -39,6 +48,8 @@ public sealed class Renderer : IDisposable
             sys.Run(RenderWorld, Context);
 
         var ctx = Context.BeginFrame(RenderWorld, out var imageIndex);
+        SyncSurfaceInfo(ctx.FrameContext.Extent);
+        UpdateDiagnostics(ctx.FrameContext.Extent);
 
         foreach (var sys in _queueSystems)
             sys.Run(RenderWorld, Context, ctx);
@@ -47,6 +58,36 @@ public sealed class Renderer : IDisposable
             node.Execute(Context, ctx, RenderWorld);
 
         Context.EndFrame(ctx, imageIndex);
+    }
+
+    private void SyncSurfaceInfo(Extent2D extent)
+    {
+        var surface = RenderWorld.TryGet<RenderSurfaceInfo>();
+        if (surface is null)
+        {
+            surface = new RenderSurfaceInfo();
+            RenderWorld.Set(surface);
+        }
+
+        if (surface.Apply(ToIntDimension(extent.Width), ToIntDimension(extent.Height)))
+        {
+            _cachedSurfaceExtent = new Extent2D((uint)surface.Width, (uint)surface.Height);
+            Log.For<Renderer>().Info($"Surface resized to {surface.Width}x{surface.Height}");
+        }
+    }
+
+    private void UpdateDiagnostics(Extent2D extent)
+    {
+        var surface = RenderWorld.TryGet<RenderSurfaceInfo>();
+        var effectiveExtent = _cachedSurfaceExtent.Width == 0 ? extent : _cachedSurfaceExtent;
+        Diagnostics.RecordFrame(Context.AdapterInfo, effectiveExtent, surface?.Revision ?? 0);
+    }
+
+    private static int ToIntDimension(uint value)
+    {
+        if (value == 0) return 1;
+        if (value > int.MaxValue) return int.MaxValue;
+        return (int)value;
     }
 
     public void Dispose()

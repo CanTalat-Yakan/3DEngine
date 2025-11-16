@@ -1,8 +1,8 @@
 namespace Engine;
 
-public sealed class PreparePlaceholder : IPrepareSystem
+public sealed class SamplePrepare : IPrepareSystem
 {
-    public void Run(Engine.RenderWorld renderWorld, RendererContext ctx)
+    public void Run(RenderWorld renderWorld, RendererContext ctx)
     {
         // TODO: Upload/allocate GPU buffers & descriptor sets once Vulkan backend is implemented.
     }

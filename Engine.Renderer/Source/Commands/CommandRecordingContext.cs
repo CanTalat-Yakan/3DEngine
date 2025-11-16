@@ -1,12 +1,16 @@
-using Vortice.Vulkan;
-
 namespace Engine;
 
-public sealed class CommandRecordingContext
+public sealed class CommandRecordingContext : IDisposable
 {
-    // Minimal Vulkan handles required to record into the current swapchain image
-    public VkCommandBuffer CommandBuffer { get; internal set; }
-    public VkExtent2D SwapchainExtent { get; internal set; }
-    public VkRenderPass RenderPass { get; internal set; }
-    public VkFramebuffer Framebuffer { get; internal set; }
+    public IFrameContext FrameContext { get; }
+
+    internal CommandRecordingContext(IFrameContext frameContext)
+    {
+        FrameContext = frameContext;
+    }
+
+    public void Dispose()
+    {
+        // FrameContext disposal handled by RendererContext after EndFrame; no-op here.
+    }
 }

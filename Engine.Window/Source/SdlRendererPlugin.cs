@@ -1,16 +1,15 @@
 namespace Engine;
 
 /// <summary>Plugin that initializes the Vulkan renderer and drives it each Render stage.</summary>
-public sealed class SdlVulkanRendererPlugin : IPlugin
+public sealed class SdlRendererPlugin : IPlugin
 {
     private sealed class ClearColorExtract : IExtractSystem
     {
         public void Run(object appWorld, RenderWorld renderWorld)
         {
-            if (appWorld is World w && w.TryResource<ClearColor>() is { } cc)
+            if (appWorld is World w && w.TryResource<RenderClearColor>() is { } cc)
             {
-                var v = cc.Value;
-                renderWorld.Set(new RenderClearColor(v.X, v.Y, v.Z, v.W));
+                renderWorld.Set(cc);
             }
         }
     }
@@ -21,8 +20,8 @@ public sealed class SdlVulkanRendererPlugin : IPlugin
         renderer.AddExtractSystem(new ClearColorExtract());
         renderer.AddExtractSystem(new CameraExtract());
         renderer.AddExtractSystem(new MeshMaterialExtract());
-        renderer.AddPrepareSystem(new PreparePlaceholder());
-        renderer.AddQueueSystem(new QueuePlaceholder());
+        renderer.AddPrepareSystem(new SamplePrepare());
+        renderer.AddQueueSystem(new SampleQueue());
         app.World.InsertResource(renderer);
         
         // Initialize Vulkan against SDL window if configured

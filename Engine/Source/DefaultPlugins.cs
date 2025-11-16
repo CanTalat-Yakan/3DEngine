@@ -15,8 +15,8 @@ public sealed class DefaultPlugins : IPlugin
            .AddPlugin(new EcsPlugin())
            .AddPlugin(new BehaviorsPlugin())
            .AddPlugin(new SdlImGuiPlugin())
-           .AddPlugin(new ClearColorPlugin())
-           .AddPlugin(new SdlVulkanRendererPlugin());
+           .AddPlugin(new ClearColorPlugin());
+           // .AddPlugin(new SdlRendererPlugin())
 
         // Clear per-frame changed flags in EcsWorld at stage First (pre update logic)
         app.AddSystem(Stage.First, (World world) => world.Resource<EcsWorld>().BeginFrame());

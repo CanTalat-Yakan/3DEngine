@@ -7,13 +7,13 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <RootNamespace>Engine</RootNamespace>
 
-        <Title>3DEngine Vulkan</Title>
-        <PackageId>3DEngine.Vulkan</PackageId>
+        <Title>3DEngine Vulkan Graphics</Title>
+        <PackageId>3DEngine.Graphics</PackageId>
         <Version>1.0.0</Version>
         <Authors>CanTalat-Yakan</Authors>
         <Company>3DEngine</Company>
-        <Description>3D Game Engine - Vulkan - SDL3 - .NET 10 - C# 14</Description>
-        <PackageTags>3D;Game;Engine;.Net10;C#14</PackageTags>
+        <Description>3D Game Engine - Low-Level Vulkan Graphics Abstractions - .NET 10 - C# 14</Description>
+        <PackageTags>3D;Game;Engine;.Net10;C#14;Vulkan;Graphics</PackageTags>
         <PackageIcon>3DEngineSymbol.png</PackageIcon>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/CanTalat-Yakan/3DEngine</RepositoryUrl>
@@ -26,10 +26,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Engine.Core\Engine.Core.csproj"/>
-        <ProjectReference Include="..\Engine.ECS\Engine.ECS.csproj"/>
-        <ProjectReference Include="..\Engine.Renderer\Engine.Renderer.csproj"/>
-        <ProjectReference Include="..\Engine.Window\Engine.Window.csproj"/>
+        <!-- Vulkan / SPIR-V dependencies located exclusively in Graphics layer -->
+        <PackageReference Include="Vortice.Mathematics" Version="1.9.3" />
+        <PackageReference Include="Vortice.SPIRV" Version="1.0.4" />
+        <PackageReference Include="Vortice.SpirvCross" Version="1.5.3" />
+        <PackageReference Include="Vortice.Vulkan" Version="3.0.3" />
+        <PackageReference Include="Vortice.VulkanMemoryAllocator" Version="1.6.3" />
     </ItemGroup>
 
     <ItemGroup>
@@ -44,7 +46,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Source\" />
+      <ProjectReference Include="..\Engine.Debug\Engine.Debug.csproj" />
     </ItemGroup>
 
 </Project>
