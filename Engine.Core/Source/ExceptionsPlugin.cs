@@ -113,7 +113,7 @@ internal static class ExceptionHandlingExtensions
 
     public static string IncrementPathIfExists(this string path, string[] list)
     {
-        var name = Path.GetFileNameWithoutExtension(path)!; // never null
+        var name = Path.GetFileNameWithoutExtension(path); 
 
         name = name.IncrementNameIfExists(list);
 

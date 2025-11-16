@@ -9,7 +9,7 @@
 
         <Title>3DEngine Window</Title>
         <PackageId>3DEngine.Window</PackageId>
-        <Version>1.0.0</Version>
+        <Version>1.0.2</Version>
         <Authors>CanTalat-Yakan</Authors>
         <Company>3DEngine</Company>
         <Description>3D Game Engine - Vulkan - SDL3 - .NET 10 - C# 14</Description>
@@ -26,13 +26,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Engine.App\Engine.App.csproj"/>
-        <ProjectReference Include="..\Engine.Core\Engine.Core.csproj"/>
-        <ProjectReference Include="..\Engine.Renderer\Engine.Renderer.csproj"/>
-        <ProjectReference Include="..\Engine.Graphics\Engine.Graphics.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="3DEngine.App" Version="1.0.1" />
+        <PackageReference Include="3DEngine.Core" Version="1.0.1" />
+        <PackageReference Include="3DEngine.Graphics" Version="1.0.0" />
+        <PackageReference Include="3DEngine.Renderer" Version="1.0.2" />
         <PackageReference Include="SDL3-CS" Version="3.3.2.1"/>
         <PackageReference Include="SDL3-CS.Native" Version="3.3.2"/>
         <PackageReference Include="SDL3-CS.Native.Image" Version="3.2.4"/>

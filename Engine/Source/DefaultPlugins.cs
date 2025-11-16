@@ -14,7 +14,7 @@ public sealed class DefaultPlugins : IPlugin
             .AddPlugin(new InputPlugin())
             .AddPlugin(new EcsPlugin())
             .AddPlugin(new BehaviorsPlugin())
-            .AddPlugin(new SdlImGuiPlugin())
+            // .AddPlugin(new SdlImGuiPlugin())
             .AddPlugin(new ClearColorPlugin())
             .AddPlugin(new SdlRendererPlugin());
 

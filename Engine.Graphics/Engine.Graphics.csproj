@@ -27,6 +27,7 @@
 
     <ItemGroup>
         <!-- Vulkan / SPIR-V dependencies located exclusively in Graphics layer -->
+        <PackageReference Include="3DEngine.Debug" Version="1.0.1" />
         <PackageReference Include="Vortice.Mathematics" Version="1.9.3" />
         <PackageReference Include="Vortice.SPIRV" Version="1.0.4" />
         <PackageReference Include="Vortice.SpirvCross" Version="1.5.3" />
@@ -43,10 +44,6 @@
             <Pack>True</Pack>
             <PackagePath>\</PackagePath>
         </None>
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Engine.Debug\Engine.Debug.csproj" />
     </ItemGroup>
 
 </Project>

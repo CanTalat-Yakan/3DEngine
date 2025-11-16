@@ -47,6 +47,7 @@ public sealed class AppWindowPlugin : IPlugin
                         var s = Marshal.PtrToStringUTF8(e.Text.Text);
                         if (!string.IsNullOrEmpty(s)) input.AddText(s);
                     }
+
                     break;
                 case SDL.EventType.KeyDown:
                 case SDL.EventType.KeyUp:
@@ -70,6 +71,18 @@ public sealed class AppWindowPlugin : IPlugin
         app.World.InsertResource<IMainLoopDriver>(new SdlMainLoopDriver(window));
         // Provide SDL input backend for core InputPlugin to initialize.
         app.World.InsertResource<IInputBackend>(new SdlInputBackend());
+        
+    }
+}
+
+/// <summary>Ensures a default RenderClearColor resource exists.</summary>
+public sealed class ClearColorPlugin : IPlugin
+{
+    /// <summary>Inserts a default clear color resource if missing.</summary>
+    public void Build(App app)
+    {
+        if (!app.World.ContainsResource<RenderClearColor>())
+            app.World.InsertResource(new RenderClearColor(0.45f, 0.55f, 0.60f, 1.00f));
     }
 }
 
