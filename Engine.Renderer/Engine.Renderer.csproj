@@ -1,52 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <RootNamespace>Engine</RootNamespace>
 
         <Title>3DEngine Renderer</Title>
         <PackageId>3DEngine.Renderer</PackageId>
         <Version>1.0.2</Version>
-        <Authors>CanTalat-Yakan</Authors>
-        <Company>3DEngine</Company>
-        <Description>3D Game Engine - High-Level Rendering Pipeline - .NET 10 - C# 14</Description>
-        <PackageTags>3D;Game;Engine;.Net10;C#14;Renderer</PackageTags>
-        <PackageIcon>3DEngineSymbol.png</PackageIcon>
-        <RepositoryType>git</RepositoryType>
-        <RepositoryUrl>https://github.com/CanTalat-Yakan/3DEngine</RepositoryUrl>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PublishToNuGet>true</PublishToNuGet>
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>
-        <!-- Non-Vulkan dependencies retained for higher-level systems (asset import, serialization, scene description) -->
-        <PackageReference Include="3DEngine.App" Version="1.0.1" />
-        <PackageReference Include="3DEngine.Debug" Version="1.0.1" />
-        <PackageReference Include="3DEngine.ECS" Version="1.0.0" />
-        <PackageReference Include="3DEngine.Graphics" Version="1.0.0" />
-        <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
-        <PackageReference Include="System.Net.Http" Version="4.3.4" />
-        <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
-        <PackageReference Include="UniversalSceneDescription" Version="6.0.0" />
-        <!-- Removed: Vortice.* (moved to Engine.Graphics) -->
+        <ProjectReference Include="..\Engine.Core\Engine.Core.csproj" />
+        <ProjectReference Include="..\Engine.Ecs\Engine.Ecs.csproj" />
+        <ProjectReference Include="..\Engine.Graphics\Engine.Graphics.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="..\Images\3DEngineSymbol.png" Link="Assets\3DEngineSymbol.png">
-            <Pack>True</Pack>
-            <PackagePath>\</PackagePath>
-        </None>
-        <None Include="..\README.md" Link="Assets\README.md">
-            <Pack>True</Pack>
-            <PackagePath>\</PackagePath>
-        </None>
+        <!-- Non-Vulkan dependencies retained for higher-level systems (asset import, serialization, scene description) -->
+        <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
+        <PackageReference Include="UniversalSceneDescription" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>

@@ -2,42 +2,23 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net10.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <RootNamespace>Engine</RootNamespace>
 
         <Title>3DEngine</Title>
         <PackageId>3DEngine</PackageId>
         <Version>4.0.1</Version>
-        <Authors>CanTalat-Yakan</Authors>
-        <Company>3DEngine</Company>
-        <Description>3D Game Engine - Vulkan - SDL3 - .NET 10 - C# 14</Description>
-        <PackageTags>3D;Game;Engine;.Net10;C#14</PackageTags>
-        <PackageIcon>3DEngineSymbol.png</PackageIcon>
-        <RepositoryType>git</RepositoryType>
-        <RepositoryUrl>https://github.com/CanTalat-Yakan/3DEngine</RepositoryUrl>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PublishToNuGet>true</PublishToNuGet>
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Engine.Generator\Engine.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+        <ProjectReference Include="..\Engine.Core\Engine.Core.csproj" />
+        <ProjectReference Include="..\Engine.Ecs\Engine.Ecs.csproj" />
+        <ProjectReference Include="..\Engine.Graphics\Engine.Graphics.csproj" />
+        <ProjectReference Include="..\Engine.Renderer\Engine.Renderer.csproj" />
+        <ProjectReference Include="..\Engine.Window\Engine.Window.csproj" />
+        <ProjectReference Include="..\Engine.Generator\Engine.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="3DEngine.App" Version="1.0.1" />
-        <PackageReference Include="3DEngine.Core" Version="1.0.1" />
-        <PackageReference Include="3DEngine.Debug" Version="1.0.1" />
-        <PackageReference Include="3DEngine.ECS" Version="1.0.0" />
-        <PackageReference Include="3DEngine.Graphics" Version="1.0.0" />
-        <PackageReference Include="3DEngine.Renderer" Version="1.0.2" />
-        <PackageReference Include="3DEngine.Window" Version="1.0.1" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4"/>
         <PackageReference Include="SDL3-CS" Version="3.3.2.1"/>
         <PackageReference Include="SDL3-CS.Native" Version="3.3.2"/>
@@ -45,22 +26,6 @@
         <PackageReference Include="SDL3-CS.Native.Mixer" Version="2.8.1.1"/>
         <PackageReference Include="SDL3-CS.Native.TTF" Version="3.2.2"/>
         <PackageReference Include="Twizzle.ImGui-Bundle.NET" Version="1.91.5.2"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Include="..\Images\3DEngineSymbol.png" Link="Assets\3DEngineSymbol.png">
-            <Pack>True</Pack>
-            <PackagePath>\</PackagePath>
-        </None>
-        <None Include="..\README.md" Link="Assets\README.md">
-            <Pack>True</Pack>
-            <PackagePath>\</PackagePath>
-        </None>
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Include="..\.gitignore"/>
-        <None Include="..\.github/workflows\*"/>
     </ItemGroup>
 
     <ItemGroup>

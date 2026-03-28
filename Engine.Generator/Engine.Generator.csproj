@@ -1,29 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <!-- Source generators MUST target netstandard2.0 — this is a hard Roslyn requirement -->
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>disable</ImplicitUsings>
         <OutputItemType>Analyzer</OutputItemType>
         <IncludeBuildOutput>false</IncludeBuildOutput>
-        <TargetFrameworks>net10.0</TargetFrameworks>
-        <ImplicitUsings>enable</ImplicitUsings>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-        <RootNamespace>Engine</RootNamespace>
+        <IsRoslynComponent>true</IsRoslynComponent>
 
         <Title>3DEngine Generator</Title>
-        <PackageId>3DEngine.ECS</PackageId>
+        <PackageId>3DEngine.Generator</PackageId>
         <Version>1.0.0</Version>
-        <Authors>CanTalat-Yakan</Authors>
-        <Company>3DEngine</Company>
-        <Description>3D Game Engine - Vulkan - SDL3 - .NET 10 - C# 14</Description>
-        <PackageTags>3D;Game;Engine;.Net10;C#14</PackageTags>
-        <PackageIcon>3DEngineSymbol.png</PackageIcon>
-        <RepositoryType>git</RepositoryType>
-        <RepositoryUrl>https://github.com/CanTalat-Yakan/3DEngine</RepositoryUrl>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PublishToNuGet>true</PublishToNuGet>
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-<!--        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>-->
     </PropertyGroup>
 
     <ItemGroup>
@@ -31,18 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="$(OutputPath)\net10.0\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs">
-            <Pack>True</Pack>
-            <PackagePath>\</PackagePath>
-        </None>
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Include="..\Images\3DEngineSymbol.png" Link="Assets\3DEngineSymbol.png">
-            <Pack>True</Pack>
-            <PackagePath>\</PackagePath>
-        </None>
-        <None Include="..\README.md" Link="Assets\README.md">
+        <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs">
             <Pack>True</Pack>
             <PackagePath>\</PackagePath>
         </None>

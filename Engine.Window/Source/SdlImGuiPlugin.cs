@@ -34,6 +34,10 @@ public sealed class SdlImGuiPlugin : IPlugin
 
         app.World.InsertResource(new ImGuiState());
 
+        // Subscribe to SDL events so ImGui receives input only when this plugin is active
+        var appWindow = app.World.Resource<AppWindow>();
+        appWindow.SDLEvent += SdlImGuiInput.ProcessEvent;
+
         app.AddSystem(Stage.PreUpdate, (world) =>
         {
             var appWindow = world.Resource<AppWindow>();
@@ -81,6 +85,9 @@ public sealed class SdlImGuiPlugin : IPlugin
         
         app.AddSystem(Stage.Cleanup, (world) =>
         {
+            // Unsubscribe ImGui input processing
+            world.Resource<AppWindow>().SDLEvent -= SdlImGuiInput.ProcessEvent;
+
             if (world.TryResource<SdlImGuiRenderer>() is { } imguiRenderer)
             {
                 imguiRenderer.Dispose();

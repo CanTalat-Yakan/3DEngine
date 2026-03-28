@@ -71,18 +71,10 @@ public sealed class AppWindowPlugin : IPlugin
         app.World.InsertResource<IMainLoopDriver>(new SdlMainLoopDriver(window));
         // Provide SDL input backend for core InputPlugin to initialize.
         app.World.InsertResource<IInputBackend>(new SdlInputBackend());
-        
-    }
-}
 
-/// <summary>Ensures a default RenderClearColor resource exists.</summary>
-public sealed class ClearColorPlugin : IPlugin
-{
-    /// <summary>Inserts a default clear color resource if missing.</summary>
-    public void Build(App app)
-    {
-        if (!app.World.ContainsResource<RenderClearColor>())
-            app.World.InsertResource(new RenderClearColor(0.45f, 0.55f, 0.60f, 1.00f));
+        // When Vulkan is selected, provide the surface source so the renderer plugin can initialize.
+        if (config.Graphics == GraphicsBackend.Vulkan)
+            app.World.InsertResource<ISurfaceSource>(new SdlSurfaceSource(window.Sdl));
     }
 }
 

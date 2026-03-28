@@ -75,11 +75,9 @@ public sealed class AppWindow
 
             while (SDL.PollEvent(out var e))
             {
-                // Broadcast raw event
+                // Broadcast raw event (plugins like SdlImGuiPlugin subscribe here for input)
                 SDLEvent?.Invoke(e);
 
-                // Forward events to ImGui input adapter
-                SdlImGuiInput.ProcessEvent(e);
 
                 if ((SDL.EventType)e.Type == SDL.EventType.Quit)
                 {

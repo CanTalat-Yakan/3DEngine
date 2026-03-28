@@ -29,11 +29,11 @@ public sealed class Program
             if (ctx.Time.ElapsedSeconds % 1.0 < delta) _highestFps = 0; // Reset peak roughly once per second
             if (fps > _highestFps) _highestFps = fps; // Track peak FPS within the rolling one-second window
             Console.WriteLine($"FPS: {fps}");
-            // ImGui.Begin("HUD");
-            // ImGui.Text($"FPS: {fps:0}");
-            // ImGui.Text($"HighestFPS: {_highestFps:0}");
-            // ImGui.Text($"Delta: {delta:0.000}");
-            // ImGui.End();
+            ImGui.Begin("HUD");
+            ImGui.Text($"FPS: {fps:0}");
+            ImGui.Text($"HighestFPS: {_highestFps:0}");
+            ImGui.Text($"Delta: {delta:0.000}");
+            ImGui.End();
         }
     }
 
@@ -51,10 +51,10 @@ public sealed class Program
         [OnRender]
         public static void Draw(BehaviorContext ctx)
         {
-            // ImGui.Begin("HUD");
-            // ImGui.Text($"Count: {_count}");
-            // ImGui.Text($"Entities: {ctx.Ecs.Count<CounterComponent>()}");
-            // ImGui.End();
+            ImGui.Begin("HUD");
+            ImGui.Text($"Count: {_count}");
+            ImGui.Text($"Entities: {ctx.Ecs.Count<CounterComponent>()}");
+            ImGui.End();
         }
     }
 
