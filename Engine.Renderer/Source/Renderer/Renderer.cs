@@ -24,9 +24,6 @@ public sealed class Renderer : IDisposable
     {
         if (_initialized) return;
         Diagnostics.Initialize(Context.AdapterInfo);
-        // Graphics backend (Vulkan) is initialized by supplying an ISurfaceSource externally before first frame.
-
-        // Register a node
         Graph.AddNode(new SampleNode());
 
         _initialized = true;

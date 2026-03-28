@@ -23,4 +23,3 @@ public class BehaviorRegistrationTests
         Assert.True(DummyRegistration.Calls >= 1);
     }
 }
-

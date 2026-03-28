@@ -3,10 +3,9 @@ using System.Text;
 
 namespace Engine;
 
-/// <summary>Installs a simple exception handler that logs to Application.log and writes to Debug/Console.</summary>
+/// <summary>Installs a global unhandled exception handler that logs to Application.log.</summary>
 public sealed class ExceptionsPlugin : IPlugin
 {
-    /// <summary>Configures global unhandled exception logging and stores a marker resource to avoid reinstallation.</summary>
     public void Build(App app)
     {
         if (!app.World.ContainsResource<ExceptionHandlerInstalled>())
@@ -136,14 +135,9 @@ internal static class ExceptionHandlingExtensions
         }
         catch (IOException)
         {
-            // the file is unavailable because it is:
-            // still being written to
-            // or being processed by another thread
-            // or does not exist (has already been processed)
             return true;
         }
 
-        // file is not locked
         return false;
     }
 }

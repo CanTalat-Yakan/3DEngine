@@ -30,4 +30,3 @@ public sealed class World
     public bool RemoveResource<T>() where T : notnull
         => _resources.TryRemove(typeof(T), out _);
 }
-

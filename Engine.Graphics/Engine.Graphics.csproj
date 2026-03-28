@@ -2,15 +2,17 @@
 
     <PropertyGroup>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-
-        <Title>3DEngine Vulkan Graphics</Title>
+        <Title>3DEngine Graphics</Title>
         <PackageId>3DEngine.Graphics</PackageId>
         <Version>1.0.0</Version>
+        <Description>GPU abstraction layer with Vulkan implementation.</Description>
     </PropertyGroup>
 
     <ItemGroup>
-        <!-- Vulkan / SPIR-V dependencies located exclusively in Graphics layer -->
         <ProjectReference Include="..\Engine.Core\Engine.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Vortice.Mathematics" Version="1.9.3" />
         <PackageReference Include="Vortice.SPIRV" Version="1.0.4" />
         <PackageReference Include="Vortice.SpirvCross" Version="1.5.3" />

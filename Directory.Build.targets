@@ -1,17 +1,11 @@
 <Project>
 
-    <!--
-        NuGet packaging: only auto-pack during CI/release builds.
-        Locally, 'dotnet build' is fast; NuGet pack is triggered via:
-            dotnet build -p:ContinuousIntegrationBuild=true
-        or:
-            dotnet pack
-    -->
+    <!-- Auto-pack only during CI: dotnet build -p:ContinuousIntegrationBuild=true -->
     <PropertyGroup Condition="'$(IsPackable)' != 'false' AND '$(ContinuousIntegrationBuild)' == 'true'">
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
-    <!-- Default package description & tags (override per-project in .csproj when needed) -->
+    <!-- Default package description and tags (override per-project when needed) -->
     <PropertyGroup Condition="'$(IsPackable)' != 'false'">
         <Description Condition="'$(Description)' == ''">3D Game Engine | Vulkan | SDL3 | .NET 10 | C# 14</Description>
         <PackageTags Condition="'$(PackageTags)' == ''">3D;Game;Engine;.Net10;C#14</PackageTags>

@@ -1,5 +1,6 @@
 namespace Engine;
 
+/// <summary>Sample render graph node that consumes camera descriptor data.</summary>
 public sealed class SampleNode : IRenderNode
 {
     public string Name => "sample";
@@ -7,8 +8,6 @@ public sealed class SampleNode : IRenderNode
 
     public void Execute(RendererContext ctx, CommandRecordingContext cmds, RenderWorld renderWorld)
     {
-        // Forward-pass placeholder: ensure the camera descriptor set has been prepared
-        // by SamplePrepare so that future pipeline binding/draw logic can consume it here.
         _ = ctx;
         _ = cmds;
 

@@ -1,8 +1,8 @@
 namespace Engine;
 
-// High-level, API-agnostic graphics abstractions used by Engine.Renderer and other systems.
-// These interfaces must not expose Vulkan (or any specific graphics API) types.
+// API-agnostic graphics abstractions used by Engine.Renderer and higher-level systems.
 
+/// <summary>Primary graphics device interface for resource creation and frame management.</summary>
 public interface IGraphicsDevice : IDisposable
 {
     bool IsInitialized { get; }
@@ -40,6 +40,7 @@ public interface IGraphicsDevice : IDisposable
     void Draw(ICommandBuffer commandBuffer, uint vertexCount, uint instanceCount = 1, uint firstVertex = 0, uint firstInstance = 0);
 }
 
+/// <summary>Swapchain providing image acquisition and resize support.</summary>
 public interface ISwapchain : IDisposable
 {
     Extent2D Extent { get; }
@@ -49,6 +50,7 @@ public interface ISwapchain : IDisposable
     void Resize(Extent2D newExtent);
 }
 
+/// <summary>Per-frame rendering context with command buffer and render pass.</summary>
 public interface IFrameContext : IDisposable
 {
     uint FrameIndex { get; }
@@ -58,14 +60,14 @@ public interface IFrameContext : IDisposable
     Extent2D Extent { get; }
 }
 
+/// <summary>Platform-specific surface provider for Vulkan instance/surface creation.</summary>
 public interface ISurfaceSource
 {
     IReadOnlyList<string> GetRequiredInstanceExtensions();
-    nint CreateSurfaceHandle(nint instanceHandle); // abstract raw surface creation
+    nint CreateSurfaceHandle(nint instanceHandle);
     (uint Width, uint Height) GetDrawableSize();
 }
 
-// Resource/command interfaces kept deliberately minimal for now; they can grow as needed.
 public interface IFramebuffer { }
 public interface IRenderPass { }
 public interface IPipeline { }
@@ -204,9 +206,7 @@ public interface IShader : IDisposable
 
 public readonly record struct GraphicsPipelineDesc(IRenderPass RenderPass, IShader VertexShader, IShader FragmentShader);
 
-// Descriptor abstractions (minimal UBO + combined image sampler)
 public interface IDescriptorSet : IDisposable { }
 
-// Minimal binding descriptions used by internal helpers and higher layers when updating descriptor sets.
 public readonly record struct UniformBufferBinding(IBuffer Buffer, uint Binding, ulong Offset, ulong Size);
 public readonly record struct CombinedImageSamplerBinding(IImageView ImageView, ISampler Sampler, uint Binding);

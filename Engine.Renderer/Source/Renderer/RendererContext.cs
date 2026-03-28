@@ -1,20 +1,17 @@
 namespace Engine;
 
-// High-level facade over the low-level graphics backend (e.g., Vulkan).
+/// <summary>High-level facade over the low-level graphics backend (e.g., Vulkan).</summary>
 public sealed class RendererContext : IDisposable
 {
     private static readonly ILogger Logger = Log.For<RendererContext>();
     private IGraphicsDevice? _graphics;
     private readonly Func<IGraphicsDevice>? _graphicsFactory;
 
-    // Per-frame camera uniform buffers and descriptor sets, sized to the swapchain image count.
     private IBuffer[]? _cameraBuffers;
     private IDescriptorSet[]? _cameraDescriptorSets;
 
-    // Expose the underlying graphics device for internal systems that need advanced access.
     public IGraphicsDevice Graphics => _graphics ?? throw new InvalidOperationException("Graphics device not created. Call Initialize first.");
 
-    // Default constructor defers backend creation until Initialize to avoid early assembly loads.
     public RendererContext()
     {
         _graphicsFactory = static () => new GraphicsDevice();
@@ -38,7 +35,6 @@ public sealed class RendererContext : IDisposable
     {
         if (IsInitialized) return;
 
-        // Lazily create the backend if not supplied via ctor.
         _graphics ??= _graphicsFactory?.Invoke() ?? new GraphicsDevice();
 
         _graphics.Initialize(surfaceSource, appName);
@@ -48,7 +44,6 @@ public sealed class RendererContext : IDisposable
 
     private void CreateCameraResources()
     {
-        // Dispose old resources if present.
         if (_cameraBuffers != null)
         {
             foreach (var buf in _cameraBuffers)
@@ -88,7 +83,6 @@ public sealed class RendererContext : IDisposable
             var set = _graphics.CreateDescriptorSet();
             _cameraDescriptorSets[i] = set;
 
-            // UniformBufferBinding(IBuffer Buffer, uint Binding, ulong Offset, ulong Size)
             var ubBinding = new UniformBufferBinding(buffer, 0, 0, cameraSize);
             _graphics.UpdateDescriptorSet(set, ubBinding, samplerBinding: null);
         }
@@ -103,9 +97,8 @@ public sealed class RendererContext : IDisposable
             : ClearColor.Black;
 
         var frame = _graphics!.BeginFrame(clear);
-        imageIndex = frame.FrameIndex; // treat frame index as swapchain image index
+        imageIndex = frame.FrameIndex;
 
-        // Update per-frame camera UBO for the current image index, if available.
         if (_cameraBuffers is { Length: > 0 } cameraBuffers && _cameraDescriptorSets is { Length: > 0 })
         {
             var cameras = world.TryGet<RenderCameras>();

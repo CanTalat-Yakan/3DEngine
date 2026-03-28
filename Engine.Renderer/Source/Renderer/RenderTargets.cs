@@ -1,5 +1,3 @@
-using System;
-
 namespace Engine;
 
 /// <summary>Describes the size of the primary presentation surface (e.g., swapchain/backbuffer).</summary>

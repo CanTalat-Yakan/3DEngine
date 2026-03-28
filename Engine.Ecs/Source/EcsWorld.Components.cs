@@ -97,7 +97,7 @@ public sealed partial class EcsWorld
         internal T[] ComponentsArray => _set.ComponentsArray;
     }
 
-    // Span struct used externally for high-performance iteration
+    /// <summary>Span view for high-performance iteration over a component type.</summary>
     public readonly ref struct ComponentSpan<T>
     {
         public readonly ReadOnlySpan<int> Entities;

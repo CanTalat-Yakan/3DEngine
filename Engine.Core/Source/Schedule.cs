@@ -58,4 +58,3 @@ public sealed class Schedule
             RunStage(stage, world);
     }
 }
-

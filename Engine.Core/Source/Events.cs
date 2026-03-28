@@ -65,4 +65,3 @@ public readonly ref struct EventReader<T>
     public IEnumerable<T> Drain() => _evt.Drain();
     public static EventReader<T> Get(World world) => new(Events.Get<T>(world));
 }
-

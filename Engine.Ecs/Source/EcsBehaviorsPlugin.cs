@@ -5,11 +5,8 @@ public sealed class BehaviorsPlugin : IPlugin
 {
     public void Build(App app)
     {
-        // Find all methods annotated with [GeneratedBehaviorRegistration] across loaded assemblies
-        // and invoke them with the current App instance.
         foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
         {
-            // Skip dynamic/reflection-only assemblies
             if (asm.IsDynamic) continue;
             try
             {
@@ -28,7 +25,6 @@ public sealed class BehaviorsPlugin : IPlugin
             }
             catch
             {
-                // Ignore type load/reflection issues from unrelated assemblies
             }
         }
     }

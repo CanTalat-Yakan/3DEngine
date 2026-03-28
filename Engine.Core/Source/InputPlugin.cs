@@ -2,25 +2,25 @@ using System.Runtime.InteropServices;
 
 namespace Engine;
 
-// Core input abstractions: independent of SDL. Window backends push events via an implementation of IInputBackend.
-
+/// <summary>Backend contract for platform-specific input event forwarding.</summary>
 public interface IInputBackend
 {
     void Initialize(App app, Input input);
 }
 
+/// <summary>Registers the Input resource and wires up the input backend.</summary>
 public sealed class InputPlugin : IPlugin
 {
     public void Build(App app)
     {
         if (!app.World.ContainsResource<Input>())
             app.World.InsertResource(new Input());
+
         var input = app.World.Resource<Input>();
-        // Allow already-inserted backend (e.g., SDL) to initialize now.
+
         if (app.World.TryResource<IInputBackend>() is { } backend)
             backend.Initialize(app, input);
 
-        // Frame begin housekeeping (clear transient state)
         app.AddSystem(Stage.First, (World world) => world.Resource<Input>().BeginFrame());
     }
 }

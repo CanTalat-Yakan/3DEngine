@@ -21,7 +21,7 @@ internal sealed class SdlSurfaceSource : ISurfaceSource
 
     public nint CreateSurfaceHandle(nint instanceHandle)
     {
-        if(!SDL.VulkanCreateSurface(_sdl.Window, instanceHandle, IntPtr.Zero, out var surface))
+        if (!SDL.VulkanCreateSurface(_sdl.Window, instanceHandle, IntPtr.Zero, out var surface))
             throw new InvalidOperationException($"SDL.VulkanCreateSurface failed: {SDL.GetError()}");
         return surface;
     }

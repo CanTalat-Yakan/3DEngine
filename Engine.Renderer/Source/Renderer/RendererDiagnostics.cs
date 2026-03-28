@@ -1,8 +1,6 @@
 namespace Engine;
 
-/// <summary>
-/// Diagnostic snapshot summarizing adapter, surface, and frame metrics for the renderer.
-/// </summary>
+/// <summary>Diagnostic snapshot summarizing adapter, surface, and frame metrics.</summary>
 public sealed class RendererDiagnostics
 {
     public GraphicsAdapterInfo AdapterInfo { get; private set; } = GraphicsAdapterInfo.Unknown;

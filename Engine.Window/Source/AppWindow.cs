@@ -34,13 +34,10 @@ public sealed class AppWindow
         return SDL.GetKeyboardFocus() == Sdl.Window;
     }
 
-    /// <summary>
-    /// Shows the window and applies an initial command (Show/Maximize/Minimize/etc.).
-    ///</summary>
+    /// <summary>Shows the window and applies an initial command.</summary>
     public void Show(WindowCommand command = WindowCommand.Normal)
     {
         SDL.ShowWindow(Sdl.Window);
-        // Map WindowCommand to SDL; avoid duplicate labels with same enum value.
         switch (command)
         {
             case WindowCommand.Maximize:
@@ -63,9 +60,7 @@ public sealed class AppWindow
     /// <summary>Requests the main loop to exit after the current iteration.</summary>
     public void RequestClose() => _shouldClose = true;
 
-    /// <summary>
-    /// Pumps SDL events and calls the supplied per-frame delegates until quit is requested.
-    ///</summary>
+    /// <summary>Pumps SDL events and calls the supplied per-frame delegates until quit is requested.</summary>
     public void Looping(params Delegate[] onFrame)
     {
         bool running = true;
@@ -75,9 +70,7 @@ public sealed class AppWindow
 
             while (SDL.PollEvent(out var e))
             {
-                // Broadcast raw event (plugins like SdlImGuiPlugin subscribe here for input)
                 SDLEvent?.Invoke(e);
-
 
                 if ((SDL.EventType)e.Type == SDL.EventType.Quit)
                 {

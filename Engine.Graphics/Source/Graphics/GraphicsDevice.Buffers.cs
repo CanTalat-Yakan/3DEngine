@@ -4,11 +4,8 @@ using Vortice.Vulkan;
 
 namespace Engine;
 
-// Buffer abstractions and Vulkan-backed implementation.
 public sealed unsafe partial class GraphicsDevice
 {
-    // In a later step we will introduce a VMA allocator; for now keep the implementation minimal and
-    // use raw Vulkan buffer + device allocation. This already exercises the API surface.
 
     private sealed class VulkanBuffer : IBuffer
     {
@@ -165,7 +162,6 @@ public sealed unsafe partial class GraphicsDevice
         }
     }
 
-    // Generic convenience upload helpers ---------------------------------------------------------
 
     public void Upload<T>(IBuffer destination, ReadOnlySpan<T> data, ulong destinationOffsetBytes = 0)
         where T : unmanaged
@@ -198,7 +194,6 @@ public sealed unsafe partial class GraphicsDevice
         Upload(destination, data.AsSpan(), destinationOffsetBytes);
     }
 
-    // Minimal buffer barrier helper --------------------------------------------------------------
 
     internal void BufferMemoryBarrier(IBuffer buffer,
         VkAccessFlags srcAccess,

@@ -1,22 +1,19 @@
 namespace Engine;
 
-/// <summary>
-/// Internal generational entity id allocator with free list reuse.
-/// Extracted from EcsWorld to separate lifecycle concerns from component logic.
-/// </summary>
+/// <summary>Generational entity ID allocator with free-list reuse.</summary>
 internal sealed class EntityPool
 {
     private const int FirstGeneration = 1;
-    private int _nextEntity = 1; // next id when free list empty
-    private readonly Stack<int> _free = new(); // recycled ids
-    private int[] _generations = System.Array.Empty<int>(); // generation per entity id (0 = never used)
+    private int _nextEntity = 1;
+    private readonly Stack<int> _free = new();
+    private int[] _generations = System.Array.Empty<int>();
 
     /// <summary>Allocates (or reuses) an entity id and returns it. Initializes generation if first time.</summary>
     public int Spawn()
     {
         int id = _free.Count > 0 ? _free.Pop() : _nextEntity++;
         EnsureCapacity(id);
-        if (_generations[id] == 0) _generations[id] = FirstGeneration; // first-time initialization
+        if (_generations[id] == 0) _generations[id] = FirstGeneration;
         return id;
     }
 
@@ -32,8 +29,7 @@ internal sealed class EntityPool
     {
         EnsureCapacity(id);
         int g = _generations[id];
-        // If never allocated before, initialize then increment so reuse semantics still hold.
-        if (g == 0) g = FirstGeneration; // shouldn't typically happen
+        if (g == 0) g = FirstGeneration;
         g = g == int.MaxValue ? FirstGeneration : g + 1;
         _generations[id] = g;
         _free.Push(id);
@@ -47,4 +43,3 @@ internal sealed class EntityPool
         System.Array.Resize(ref _generations, newSize);
     }
 }
-

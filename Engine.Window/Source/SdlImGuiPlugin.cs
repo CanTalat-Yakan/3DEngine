@@ -13,7 +13,6 @@ public sealed class SdlImGuiPlugin : IPlugin
         public bool ShowDemo;
     }
 
-    /// <summary>Creates ImGui context/resources and wires per-frame new-frame/render systems.</summary>
     public void Build(App app)
     {
         ImGui.CreateContext();
@@ -22,10 +21,9 @@ public sealed class SdlImGuiPlugin : IPlugin
         ImGui.StyleColorsDark();
 
         var sdlWindow = app.World.Resource<AppWindow>().Sdl;
-        // Initialize IO display size immediately to avoid ImGui assertion before first NewFrame
         io.DisplaySize = new Vector2(Math.Max(1, sdlWindow.Width), Math.Max(1, sdlWindow.Height));
         io.DeltaTime = 1f / 60f;
-        // Only create the SDL-based ImGuiRenderer if an SDL renderer exists (non-Vulkan mode)
+
         if (sdlWindow.Renderer != IntPtr.Zero)
         {
             var renderer = new SdlImGuiRenderer(sdlWindow.Renderer);
@@ -34,7 +32,6 @@ public sealed class SdlImGuiPlugin : IPlugin
 
         app.World.InsertResource(new ImGuiState());
 
-        // Subscribe to SDL events so ImGui receives input only when this plugin is active
         var appWindow = app.World.Resource<AppWindow>();
         appWindow.SDLEvent += SdlImGuiInput.ProcessEvent;
 
@@ -42,7 +39,6 @@ public sealed class SdlImGuiPlugin : IPlugin
         {
             var appWindow = world.Resource<AppWindow>();
             var io = ImGui.GetIO();
-            // Safeguard: ensure non-zero display size to avoid ImGui assertion
             int w = Math.Max(1, appWindow.Sdl.Width);
             int h = Math.Max(1, appWindow.Sdl.Height);
             io.DisplaySize = new Vector2(w, h);
@@ -85,7 +81,6 @@ public sealed class SdlImGuiPlugin : IPlugin
         
         app.AddSystem(Stage.Cleanup, (world) =>
         {
-            // Unsubscribe ImGui input processing
             world.Resource<AppWindow>().SDLEvent -= SdlImGuiInput.ProcessEvent;
 
             if (world.TryResource<SdlImGuiRenderer>() is { } imguiRenderer)
@@ -102,28 +97,18 @@ public sealed class SdlImGuiPlugin : IPlugin
 /// <summary>Renders ImGui draw data using the SDL3 renderer API.</summary>
 public sealed class SdlImGuiRenderer : IDisposable
 {
-    // SDL renderer handle used for all draw calls.
     private readonly nint _renderer;
-
-    // SDL texture containing the uploaded ImGui font atlas.
     private nint _fontTexture;
-
-    // Tracks whether resources have already been disposed.
     private bool _disposed;
 
     /// <summary>Creates a new ImGui renderer bound to an existing SDL renderer.</summary>
-    /// <param name="renderer">The SDL renderer handle created alongside a window.</param>
-    /// <remarks>The constructor uploads ImGui device objects (font texture) immediately.</remarks>
     public SdlImGuiRenderer(nint renderer)
     {
         _renderer = renderer;
         CreateDeviceObjects();
     }
 
-    /// <summary>Prepares ImGui's IO for a new frame by updating display size and framebuffer scale.</summary>
-    /// <param name="window">The SDL window associated with the renderer.</param>
-    /// <remarks>DisplaySize is set to the logical window size (in points).</remarks>
-    /// <remarks>DisplayFramebufferScale is set based on the renderer output size vs. window size (for HiDPI).</remarks>
+    /// <summary>Updates ImGui IO display size and framebuffer scale for a new frame.</summary>
     public void NewFrame(nint window)
     {
         var io = ImGui.GetIO();
@@ -136,10 +121,7 @@ public sealed class SdlImGuiRenderer : IDisposable
         }
     }
 
-    /// <summary>Renders the provided ImGui draw data using the SDL renderer.</summary>
-    /// <param name="drawData">Aggregated draw lists from ImGui for the current frame.</param>
-    /// <remarks>Enables blending, applies per-command clip rectangles, and draws geometry in batches.</remarks>
-    /// <remarks>Returns early if there is nothing to draw or the framebuffer size is zero.</remarks>
+    /// <summary>Renders ImGui draw data using the SDL renderer with clip rects and blending.</summary>
     public unsafe void RenderDrawData(ImDrawDataPtr drawData)
     {
         if (drawData.CmdListsCount == 0)
@@ -198,14 +180,7 @@ public sealed class SdlImGuiRenderer : IDisposable
         SDL.SetRenderClipRect(_renderer, IntPtr.Zero);
     }
 
-    /// <summary>Converts a portion of ImGui's indexed triangle list into SDL geometry and submits it.</summary>
-    /// <param name="vtx">Pointer to the first ImGui vertex.</param>
-    /// <param name="idx">Pointer to the first ImGui index.</param>
-    /// <param name="baseIdx">Starting index into the <paramref name="idx"/> array.</param>
-    /// <param name="baseVtx">Offset to add to indices to get absolute vertex positions.</param>
-    /// <param name="elemCount">Number of indices to draw (must be a multiple of 3).</param>
-    /// <param name="texture">SDL texture handle to use for this draw batch.</param>
-    /// <remarks>Batches geometry in chunks (MaxBatchIndices) and issues SDL.RenderGeometry per batch.</remarks>
+    /// <summary>Submits a batch of ImGui indexed triangles as SDL geometry.</summary>
     private unsafe void RenderGeometry(ImDrawVert* vtx, ushort* idx, int baseIdx, int baseVtx, uint elemCount, nint texture)
     {
         const int MaxBatchIndices = 2048;
@@ -214,7 +189,6 @@ public sealed class SdlImGuiRenderer : IDisposable
         while (remaining > 0)
         {
             int thisBatch = (int)Math.Min(remaining, (uint)MaxBatchIndices);
-            // ensure triangle multiple
             thisBatch -= thisBatch % 3;
             if (thisBatch <= 0) break;
 
@@ -250,9 +224,7 @@ public sealed class SdlImGuiRenderer : IDisposable
         }
     }
 
-    /// <summary>Converts an ImGui vertex to an SDL vertex, handling position, UV, and packed color.</summary>
-    /// <param name="v"> The ImGui vertex. </param>
-    /// <returns>An SDL vertex with equivalent attributes.</returns>
+    /// <summary>Converts an ImGui vertex to an SDL vertex.</summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static SDL.Vertex ToSdlVertex(ImDrawVert v)
     {
@@ -269,9 +241,7 @@ public sealed class SdlImGuiRenderer : IDisposable
         };
     }
 
-    /// <summary>Creates device resources required by the renderer (font texture).</summary>
-    /// <remarks>Retrieves the ImGui font atlas pixels and uploads them into an SDL texture.</remarks>
-    /// <remarks>Sets the resulting texture as ImGui's font texture ID for subsequent rendering.</remarks>
+    /// <summary>Uploads the ImGui font atlas as an SDL texture.</summary>
     private unsafe void CreateDeviceObjects()
     {
         var io = ImGui.GetIO();
@@ -288,8 +258,7 @@ public sealed class SdlImGuiRenderer : IDisposable
         io.Fonts.ClearTexData();
     }
 
-    /// <summary>Disposes renderer resources owned by this instance.</summary>
-    /// <remarks>Safe to call multiple times; subsequent calls are no-ops. Destroys the font texture if created.</remarks>
+    /// <summary>Disposes renderer resources. Safe to call multiple times.</summary>
     public void Dispose()
     {
         if (_disposed) return;

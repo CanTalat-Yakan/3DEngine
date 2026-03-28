@@ -30,7 +30,7 @@ public sealed class EcsCommands
         return this;
     }
 
-    /// <summary>Queues remving a component to an entity by id.</summary>
+    /// <summary>Queues removing a component from an entity by id.</summary>
     public EcsCommands Remove<T>(int entity)
     {
         _queue.Enqueue(world => world.Remove<T>(entity));

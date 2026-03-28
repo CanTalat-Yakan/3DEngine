@@ -31,4 +31,3 @@ public static class StageOrder
     /// <summary>Returns enumerable of stages in execution order.</summary>
     public static IEnumerable<Stage> AllInOrder() => Ordered;
 }
-

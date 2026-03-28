@@ -1,5 +1,6 @@
 namespace Engine;
 
+/// <summary>Severity levels for log messages.</summary>
 public enum LogLevel
 {
     Trace,
@@ -10,11 +11,13 @@ public enum LogLevel
     Critical
 }
 
+/// <summary>Sink that receives formatted log messages.</summary>
 public interface ILoggerProvider
 {
     void Log(LogLevel level, string category, string message, Exception? exception = null);
 }
 
+/// <summary>Category-scoped logging interface.</summary>
 public interface ILogger
 {
     void Log(LogLevel level, string message, Exception? exception = null);
@@ -26,6 +29,7 @@ public interface ILogger
     void Critical(string message, Exception? exception = null);
 }
 
+/// <summary>Default logger implementation that dispatches to one or more providers.</summary>
 public sealed class Logger : ILogger
 {
     private readonly string _category;
@@ -58,6 +62,7 @@ public sealed class Logger : ILogger
     public void Critical(string message, Exception? exception = null) => Log(LogLevel.Critical, message, exception);
 }
 
+/// <summary>Creates and caches loggers by category name.</summary>
 public sealed class LoggerFactory
 {
     private readonly Dictionary<string, Logger> _loggers = new();
@@ -72,6 +77,7 @@ public sealed class LoggerFactory
     }
 }
 
+/// <summary>Writes log messages to the console with timestamp, level, and category.</summary>
 public sealed class ConsoleLoggerProvider : ILoggerProvider
 {
     public static ConsoleLoggerProvider Instance { get; } = new();
@@ -87,10 +93,10 @@ public sealed class ConsoleLoggerProvider : ILoggerProvider
     }
 }
 
+/// <summary>Static entry point for creating loggers.</summary>
 public static class Log
 {
     public static LoggerFactory Factory { get; } = new();
     public static ILogger Category(string category) => Factory.CreateLogger(category);
     public static ILogger For<T>() => Category(typeof(T).FullName ?? typeof(T).Name);
 }
-

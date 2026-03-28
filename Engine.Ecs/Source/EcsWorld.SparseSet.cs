@@ -2,11 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace Engine;
 
-/// <summary>
-/// A packed sparse set for mapping entity ids to dense component arrays with O(1) add/remove/lookup
-/// and a per-dense-index change bitset for cheap frame-change tracking.
-/// Intended for ECS component storage.
-/// </summary>
+/// <summary>Packed sparse set mapping entity IDs to dense component arrays with O(1) operations and per-index change tracking.</summary>
 internal sealed class SparseSet<T>
 {
     private int[] _denseEntities = Array.Empty<int>();
@@ -81,7 +77,7 @@ internal sealed class SparseSet<T>
         }
     }
 
-    // Add without marking changed (plain set)
+    /// <summary>Adds or overwrites a component without marking it changed.</summary>
     public void Add(int entity, T component)
     {
         EnsureSparseCapacity(entity);
@@ -100,7 +96,7 @@ internal sealed class SparseSet<T>
         _sparse[entity] = idx;
     }
 
-    // Update (or add) and mark changed
+    /// <summary>Updates (or adds) a component and marks it changed.</summary>
     public void Update(int entity, T component)
     {
         EnsureSparseCapacity(entity);

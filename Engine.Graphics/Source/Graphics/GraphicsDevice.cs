@@ -3,6 +3,7 @@ using Vortice.Vulkan;
 
 namespace Engine;
 
+/// <summary>Vulkan-backed graphics device implementing resource creation and frame management.</summary>
 public sealed unsafe partial class GraphicsDevice : IGraphicsDevice
 {
     private const int MaxFramesInFlight = 3;
@@ -105,7 +106,7 @@ public sealed unsafe partial class GraphicsDevice : IGraphicsDevice
         return Encoding.UTF8.GetString(value);
     }
 
-    // Partial contracts implemented across the split files
+    // Partial methods implemented across split files
     private partial void CreateInstance(string appName);
     private partial void DestroyInstance();
     private partial void CreateSurface();

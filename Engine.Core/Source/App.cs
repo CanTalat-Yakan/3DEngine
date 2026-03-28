@@ -72,4 +72,3 @@ public sealed class App
         Schedule.RunStage(Stage.Cleanup, World);
     }
 }
-

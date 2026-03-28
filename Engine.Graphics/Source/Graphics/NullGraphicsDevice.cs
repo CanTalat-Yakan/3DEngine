@@ -1,8 +1,6 @@
-using System;
-
 namespace Engine;
 
-// A no-op graphics device suitable for tests or headless runs.
+/// <summary>No-op graphics device for tests and headless runs.</summary>
 public sealed class NullGraphicsDevice : IGraphicsDevice
 {
     private sealed class NullSwapchain : ISwapchain
@@ -37,21 +35,17 @@ public sealed class NullGraphicsDevice : IGraphicsDevice
     public void Dispose() { }
     public GraphicsAdapterInfo AdapterInfo => GraphicsAdapterInfo.Unknown;
 
-    // Minimal buffer API for tests that use NullGraphicsDevice.
     public IBuffer CreateBuffer(BufferDesc desc) => throw new NotSupportedException("NullGraphicsDevice does not support buffer creation.");
     public Span<byte> Map(IBuffer buffer) => throw new NotSupportedException("NullGraphicsDevice does not support buffer mapping.");
     public void Unmap(IBuffer buffer) { }
 
-    // Images / samplers
     public IImage CreateImage(ImageDesc desc) => throw new NotSupportedException("NullGraphicsDevice does not support images.");
     public IImageView CreateImageView(IImage image) => throw new NotSupportedException("NullGraphicsDevice does not support image views.");
     public ISampler CreateSampler(SamplerDesc desc) => throw new NotSupportedException("NullGraphicsDevice does not support samplers.");
 
-    // Shaders / pipelines
     public IShader CreateShader(ShaderDesc desc) => throw new NotSupportedException("NullGraphicsDevice does not support shaders.");
     public IPipeline CreateGraphicsPipeline(GraphicsPipelineDesc desc) => throw new NotSupportedException("NullGraphicsDevice does not support pipelines.");
 
-    // Descriptors
     public IDescriptorSet CreateDescriptorSet() => throw new NotSupportedException("NullGraphicsDevice does not support descriptors.");
     public void UpdateDescriptorSet(IDescriptorSet descriptorSet, in UniformBufferBinding? uniformBinding, in CombinedImageSamplerBinding? samplerBinding)
         => throw new NotSupportedException("NullGraphicsDevice does not support descriptors.");

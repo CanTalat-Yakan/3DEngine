@@ -2,6 +2,7 @@ using System.Numerics;
 
 namespace Engine;
 
+/// <summary>Extracts camera components into the render world as RenderCameras.</summary>
 public sealed class CameraExtract : IExtractSystem
 {
     public void Run(object appWorld, RenderWorld renderWorld)
@@ -10,7 +11,6 @@ public sealed class CameraExtract : IExtractSystem
         var ecs = w.TryResource<EcsWorld>();
         if (ecs is null) return;
 
-        // Primary surface size provided by the backend plugin (SDL, Avalonia, etc.)
         var surface = renderWorld.TryGet<RenderSurfaceInfo>();
         int surfaceW = surface?.Width > 0 ? surface!.Width : 1;
         int surfaceH = surface?.Height > 0 ? surface!.Height : 1;
@@ -21,7 +21,6 @@ public sealed class CameraExtract : IExtractSystem
 
         foreach (var (entity, cam) in ecs.Query<global::Engine.Camera>())
         {
-            // Resolve render target size: render texture if set and found, else primary surface
             int wPixels = surfaceW, hPixels = surfaceH;
             if (!string.IsNullOrEmpty(cam.TargetName) && textures != null && textures.TryGet(cam.TargetName!, out var desc))
             {

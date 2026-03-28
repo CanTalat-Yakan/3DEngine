@@ -2,10 +2,10 @@
 
     <PropertyGroup>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-
         <Title>3DEngine Renderer</Title>
         <PackageId>3DEngine.Renderer</PackageId>
         <Version>1.0.2</Version>
+        <Description>Render pipeline, render graph, materials, and scene extraction systems.</Description>
     </PropertyGroup>
 
     <ItemGroup>
@@ -15,7 +15,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <!-- Non-Vulkan dependencies retained for higher-level systems (asset import, serialization, scene description) -->
         <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
         <PackageReference Include="UniversalSceneDescription" Version="6.0.0" />
     </ItemGroup>
@@ -23,7 +22,6 @@
     <ItemGroup>
         <None Include="Source\Shaders\triangle.vert.glsl" CopyToOutputDirectory="PreserveNewest" />
         <None Include="Source\Shaders\triangle.frag.glsl" CopyToOutputDirectory="PreserveNewest" />
-        <!-- Future: compiled SPIR-V can be added here as content as well -->
     </ItemGroup>
 
 </Project>

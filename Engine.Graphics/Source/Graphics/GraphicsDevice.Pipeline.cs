@@ -3,7 +3,6 @@ using Vortice.Vulkan;
 
 namespace Engine;
 
-// Shader modules and graphics pipeline creation for Vulkan backend.
 public sealed unsafe partial class GraphicsDevice
 {
     private sealed class VulkanShader : IShader
@@ -150,8 +149,6 @@ public sealed unsafe partial class GraphicsDevice
             pDynamicStates = dynamics
         };
 
-        // Use the global descriptor set layout (camera + sampler) when creating the pipeline layout so
-        // that descriptor sets are compatible with this pipeline.
         VkDescriptorSetLayout* setLayouts = stackalloc VkDescriptorSetLayout[1];
         setLayouts[0] = _cameraSetLayout;
 

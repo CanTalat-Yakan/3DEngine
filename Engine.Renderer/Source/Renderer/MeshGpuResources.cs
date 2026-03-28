@@ -3,10 +3,7 @@ using System.Numerics;
 
 namespace Engine;
 
-/// <summary>
-/// Simple GPU resource registry for meshes: maps logical mesh IDs to vertex buffers.
-/// This is a minimal scaffolding for a future full mesh upload path.
-/// </summary>
+/// <summary>GPU resource registry mapping logical mesh IDs to vertex buffers.</summary>
 public sealed class MeshGpuRegistry
 {
     private readonly ConcurrentDictionary<int, IBuffer> _vertexBuffers = new();
@@ -30,7 +27,6 @@ public sealed class MeshGpuRegistry
         var desc = new BufferDesc(size, BufferUsage.Vertex | BufferUsage.TransferDst, CpuAccessMode.None);
         var buffer = device.CreateBuffer(desc);
 
-        // Upload via staging (using UploadBuffer on GraphicsDevice if available)
         if (device is GraphicsDevice gd)
         {
             Span<byte> temp = stackalloc byte[(int)size];

@@ -2,7 +2,6 @@ using Vortice.Vulkan;
 
 namespace Engine;
 
-// Descriptor pool, sets, and per-frame UBO bindings for Vulkan backend.
 public sealed unsafe partial class GraphicsDevice
 {
     private VkDescriptorPool _descriptorPool;
@@ -103,7 +102,6 @@ public sealed unsafe partial class GraphicsDevice
 
     IDescriptorSet IGraphicsDevice.CreateDescriptorSet() => CreateDescriptorSet();
 
-    // Update a descriptor set with an optional uniform buffer and combined image sampler binding.
     internal void UpdateDescriptorSet(
         IDescriptorSet descriptorSet,
         in UniformBufferBinding? uniformBinding,

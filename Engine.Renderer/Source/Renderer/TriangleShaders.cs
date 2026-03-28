@@ -1,11 +1,6 @@
 namespace Engine;
 
-/// <summary>
-/// Loader for triangle sample SPIR-V shaders. At runtime, this attempts to find precompiled
-/// SPIR-V files next to the GLSL sources; if they are missing, it optionally invokes an
-/// external 'glslc' compiler (if available on PATH) to compile the GLSL files, then caches
-/// the results. Finally, the compiled bytecode is exposed via the Vertex/Fragment properties.
-/// </summary>
+/// <summary>Loads and optionally compiles triangle sample SPIR-V shaders from GLSL sources.</summary>
 public static class TriangleShaders
 {
     private static bool _loaded;
@@ -13,9 +8,7 @@ public static class TriangleShaders
     public static ReadOnlyMemory<byte> Vertex { get; private set; } = ReadOnlyMemory<byte>.Empty;
     public static ReadOnlyMemory<byte> Fragment { get; private set; } = ReadOnlyMemory<byte>.Empty;
 
-    /// <summary>
-    /// Ensure that the triangle shaders are loaded and compiled. This method is idempotent.
-    /// </summary>
+    /// <summary>Ensures that the triangle shaders are loaded and compiled. Idempotent.</summary>
     public static void EnsureLoaded()
     {
         if (_loaded) return;
@@ -26,7 +19,6 @@ public static class TriangleShaders
         var vertSpvPath = Path.ChangeExtension(vertGlslPath, ".vert.spv");
         var fragSpvPath = Path.ChangeExtension(fragGlslPath, ".frag.spv");
 
-        // If precompiled SPIR-V exists, just load it.
         if (File.Exists(vertSpvPath) && File.Exists(fragSpvPath))
         {
             Vertex = File.ReadAllBytes(vertSpvPath);
@@ -35,7 +27,6 @@ public static class TriangleShaders
             return;
         }
 
-        // Fallback: try to compile GLSL to SPIR-V using 'glslc' if available.
         if (File.Exists(vertGlslPath) && File.Exists(fragGlslPath))
         {
             TryCompileWithGlslc(vertGlslPath, vertSpvPath, isVertex: true);
@@ -57,7 +48,7 @@ public static class TriangleShaders
     {
         try
         {
-            var glslc = "glslc"; // assumes glslc is on PATH
+            var glslc = "glslc";
             var argsStage = isVertex ? "-fshader-stage=vert" : "-fshader-stage=frag";
             var psi = new System.Diagnostics.ProcessStartInfo
             {
@@ -73,11 +64,9 @@ public static class TriangleShaders
             if (proc is null)
                 return;
             proc.WaitForExit();
-            // On failure, leave it to EnsureLoaded to throw if SPIR-V is still missing.
         }
         catch
         {
-            // Ignore errors; caller will detect missing SPIR-V.
         }
     }
 }

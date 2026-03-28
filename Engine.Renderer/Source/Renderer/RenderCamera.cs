@@ -17,7 +17,7 @@ public sealed class RenderCameras
     public List<RenderCamera> Items { get; } = new();
 }
 
-// Uniform buffer layout used on the GPU for camera data.
+/// <summary>GPU uniform buffer layout for camera data.</summary>
 public struct CameraUniform
 {
     public Matrix4x4 View;

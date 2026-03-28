@@ -1,10 +1,6 @@
 namespace Engine;
 
-/// <summary>
-/// Composition-root plugin that wires the Vulkan renderer to the platform window.
-/// Lives in the exe project because it bridges Engine.Renderer ↔ Engine.Window — 
-/// neither of those projects depends on the other.
-/// </summary>
+/// <summary>Composition-root plugin that wires the Vulkan renderer to the platform window.</summary>
 public sealed class SdlRendererPlugin : IPlugin
 {
     private sealed class ClearColorExtract : IExtractSystem
@@ -84,4 +80,3 @@ public sealed class ClearColorPlugin : IPlugin
             app.World.InsertResource(new RenderClearColor(0.45f, 0.55f, 0.60f, 1.00f));
     }
 }
-

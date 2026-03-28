@@ -2,13 +2,12 @@
 
 namespace Engine;
 
-/// <summary>Application entry point. Configures and runs the engine with default plugins.</summary>
+/// <summary>Application entry point.</summary>
 public sealed class Program
 {
     [STAThread]
     private static void Main()
     {
-        // Build app with default configuration and plugins, then start the main loop.
         new App(Config.GetDefault())
             .AddPlugin(new DefaultPlugins())
             .Run();

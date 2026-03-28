@@ -2,7 +2,7 @@ namespace Engine;
 
 public sealed partial class EcsWorld
 {
-    // Zero-allocation ref iterator (single component)
+    /// <summary>Zero-allocation ref wrapper for a single component.</summary>
     public readonly ref struct RefComponent<T>
     {
         public readonly int Entity;
@@ -79,7 +79,7 @@ public sealed partial class EcsWorld
         }
     }
 
-    // Zero-allocation ref iterator (two components)
+    /// <summary>Zero-allocation ref wrapper for a pair of components.</summary>
     public readonly ref struct RefComponents<T1, T2>
     {
         public readonly int Entity;

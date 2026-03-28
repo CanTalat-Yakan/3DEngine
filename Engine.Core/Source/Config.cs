@@ -71,4 +71,3 @@ public enum GraphicsBackend
     SdlRenderer = 0,
     Vulkan = 1,
 }
-

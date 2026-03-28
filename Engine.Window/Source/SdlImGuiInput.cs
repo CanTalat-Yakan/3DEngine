@@ -15,23 +15,19 @@ public static class SdlImGuiInput
         switch ((SDL.EventType)e.Type)
         {
             case SDL.EventType.MouseMotion:
-                // Update mouse position.
                 io.AddMousePosEvent(e.Motion.X, e.Motion.Y);
                 break;
             case SDL.EventType.MouseButtonDown:
             case SDL.EventType.MouseButtonUp:
-                // Map SDL button 1..5 to ImGui mouse buttons 0..4.
                 bool down = (SDL.EventType)e.Type == SDL.EventType.MouseButtonDown;
                 int button = e.Button.Button;
                 if (button >= 1 && button <= 5)
                     io.AddMouseButtonEvent(button - 1, down);
                 break;
             case SDL.EventType.MouseWheel:
-                // Scroll delta.
                 io.AddMouseWheelEvent(e.Wheel.X, e.Wheel.Y);
                 break;
             case SDL.EventType.TextInput:
-                // UTF-8 text input for ImGui.
                 if (e.Text.Text != IntPtr.Zero)
                 {
                     string? s = Marshal.PtrToStringUTF8(e.Text.Text);
@@ -41,10 +37,8 @@ public static class SdlImGuiInput
                 break;
             case SDL.EventType.KeyDown:
             case SDL.EventType.KeyUp:
-                // Key press/release + modifier keys.
                 bool isDown = (SDL.EventType)e.Type == SDL.EventType.KeyDown;
-                var sc = e.Key.Scancode;
-                ImGuiKey imGuiKey = SdlKeyToImGuiKey(sc);
+                ImGuiKey imGuiKey = SdlKeyToImGuiKey(e.Key.Scancode);
                 if (imGuiKey != ImGuiKey.None)
                     io.AddKeyEvent(imGuiKey, isDown);
 
@@ -56,7 +50,7 @@ public static class SdlImGuiInput
         }
     }
 
-    /// <summary>Maps SDL scancodes to ImGui keys. Keep minimal mapping covering common UI navigation and shortcuts.</summary>
+    /// <summary>Maps SDL scancodes to ImGui keys.</summary>
     private static ImGuiKey SdlKeyToImGuiKey(SDL.Scancode sc)
     {
         return sc switch

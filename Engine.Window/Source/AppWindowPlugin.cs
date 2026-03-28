@@ -1,6 +1,5 @@
 using System.Runtime.InteropServices;
 using SDL3;
-using static SDL3.SDL;
 
 namespace Engine;
 
@@ -47,13 +46,11 @@ public sealed class AppWindowPlugin : IPlugin
                         var s = Marshal.PtrToStringUTF8(e.Text.Text);
                         if (!string.IsNullOrEmpty(s)) input.AddText(s);
                     }
-
                     break;
                 case SDL.EventType.KeyDown:
                 case SDL.EventType.KeyUp:
                     bool down = (SDL.EventType)e.Type == SDL.EventType.KeyDown;
-                    var sc = e.Key.Scancode;
-                    var mapped = (Key)sc;
+                    var mapped = (Key)e.Key.Scancode;
                     if (mapped != Key.Unknown)
                         input.SetKey(mapped, down);
                     break;
@@ -78,7 +75,7 @@ public sealed class AppWindowPlugin : IPlugin
     }
 }
 
-/// <summary>Provides application exit handling: listens for window quit events and requests closure via a resource flag.</summary>
+/// <summary>Handles application exit: listens for window quit events and requests closure.</summary>
 public sealed class AppExitPlugin : IPlugin
 {
     /// <summary>Inserts the <see cref="AppExit"/> resource (if missing), wires window quit to set its flag, and adds a First-stage system to close the window when requested.</summary>

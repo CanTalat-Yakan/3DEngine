@@ -3,7 +3,6 @@ using Vortice.Vulkan;
 
 namespace Engine;
 
-// Image, image view, and sampler abstractions implemented for Vulkan.
 public sealed unsafe partial class GraphicsDevice
 {
     private sealed class VulkanImage : IImage
@@ -333,7 +332,6 @@ public sealed unsafe partial class GraphicsDevice
         }
     }
 
-    // Convenience texture upload overloads ------------------------------------------------------
 
     internal void UploadTexture2D<TPixel>(IImage image, ReadOnlySpan<TPixel> pixels, uint width, uint height)
         where TPixel : unmanaged
