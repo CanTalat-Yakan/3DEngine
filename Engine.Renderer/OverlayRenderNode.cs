@@ -7,6 +7,8 @@ namespace Engine;
 /// </summary>
 public sealed class OverlayRenderNode : IRenderNode
 {
+    private static readonly ILogger Logger = Log.Category("Engine.Renderer.Overlay");
+
     public string Name => "overlay";
     public IReadOnlyCollection<string> Dependencies { get; } = new[] { "sample" };
 
@@ -20,12 +22,14 @@ public sealed class OverlayRenderNode : IRenderNode
 
         if (_pipeline is null)
         {
+            Logger.Info("Creating overlay graphics pipeline (alpha-blended full-screen quad)...");
             OverlayShaders.EnsureLoaded();
             _pipeline = new OverlayPipeline(
                 ctx.Graphics,
                 cmds.FrameContext.RenderPass,
                 OverlayShaders.Vertex,
                 OverlayShaders.Fragment);
+            Logger.Info("Overlay pipeline created.");
         }
 
         var cmd = cmds.FrameContext.CommandBuffer;
@@ -40,4 +44,3 @@ public sealed class OverlayTexture
 {
     public IDescriptorSet? DescriptorSet { get; set; }
 }
-

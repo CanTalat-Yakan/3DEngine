@@ -7,7 +7,7 @@ namespace Engine;
 /// </summary>
 public sealed class UltralightPlugin : IPlugin
 {
-    private static readonly ILogger Logger = Log.For<UltralightPlugin>();
+    private static readonly ILogger Logger = Log.Category("Editor.Ultralight");
 
     private readonly string _url;
 
@@ -22,6 +22,8 @@ public sealed class UltralightPlugin : IPlugin
 
     public void Build(App app)
     {
+        Logger.Info($"UltralightPlugin: Building — target URL: {_url}");
+
         // ---- GPU resources (lazily created once the renderer is initialized) ----
         IImage? gpuImage = null;
         IImageView? gpuImageView = null;
@@ -35,8 +37,13 @@ public sealed class UltralightPlugin : IPlugin
             var renderer = world.TryResource<Renderer>();
             if (renderer is not null)
             {
+                Logger.Info("Adding OverlayRenderNode to render graph...");
                 renderer.AddNode(new OverlayRenderNode());
-                Logger.Info("[UltralightPlugin] OverlayRenderNode added to render graph.");
+                Logger.Info("OverlayRenderNode registered (depends on 'sample' node).");
+            }
+            else
+            {
+                Logger.Warn("No Renderer resource found — overlay render node not added.");
             }
         });
 
@@ -52,6 +59,7 @@ public sealed class UltralightPlugin : IPlugin
                 uint w = (uint)Math.Max(1, window.Sdl.Width);
                 uint h = (uint)Math.Max(1, window.Sdl.Height);
 
+                Logger.Info($"Initializing UltralightContext ({w}x{h}) — loading {_url}...");
                 var ctx = new UltralightContext(w, h, _url, transparent: true);
                 world.InsertResource(ctx);
 
@@ -70,7 +78,7 @@ public sealed class UltralightPlugin : IPlugin
                     ulCtx?.Resize((uint)newW, (uint)newH);
                 };
 
-                Logger.Info($"[UltralightPlugin] Initialized — loading {_url}");
+                Logger.Info("UltralightContext created — SDL event and resize handlers wired.");
             }
 
             world.TryResource<UltralightContext>()?.Update();
@@ -101,6 +109,7 @@ public sealed class UltralightPlugin : IPlugin
                 // Recreate GPU texture if size changed
                 if (gpuImage is null || texWidth != viewW || texHeight != viewH)
                 {
+                    Logger.Info($"Overlay texture size changed ({texWidth}x{texHeight} → {viewW}x{viewH}) — recreating GPU resources...");
                     gpuImageView?.Dispose();
                     gpuImage?.Dispose();
                     gpuSampler?.Dispose();
@@ -125,7 +134,7 @@ public sealed class UltralightPlugin : IPlugin
                     var samplerBinding = new CombinedImageSamplerBinding(gpuImageView, gpuSampler, 1);
                     gfx.UpdateDescriptorSet(descriptorSet, uniformBinding: null, samplerBinding);
 
-                    Logger.Info($"[UltralightPlugin] Created overlay texture {texWidth}x{texHeight}");
+                    Logger.Info($"Overlay GPU texture created: {texWidth}x{texHeight} B8G8R8A8_UNorm (image + view + sampler + descriptor set).");
                 }
 
                 // Upload the BGRA pixels to the Vulkan image
@@ -169,21 +178,24 @@ public sealed class UltralightPlugin : IPlugin
         // ---- Cleanup: dispose resources ----
         app.AddSystem(Stage.Cleanup, (World world) =>
         {
+            Logger.Info("UltralightPlugin: Cleanup — disposing GPU resources and UltralightContext...");
             gpuImageView?.Dispose();
             gpuImage?.Dispose();
             gpuSampler?.Dispose();
             descriptorSet?.Dispose();
+            Logger.Debug("Overlay GPU resources disposed (image, view, sampler, descriptor set).");
 
             if (world.TryResource<UltralightContext>() is { } ctx)
             {
                 ctx.Dispose();
                 world.RemoveResource<UltralightContext>();
+                Logger.Debug("UltralightContext disposed and removed from world.");
             }
 
-            Logger.Info("[UltralightPlugin] Disposed.");
+            Logger.Info("UltralightPlugin: Cleanup complete.");
         });
+
+        Logger.Info("UltralightPlugin: Build complete — systems registered to Startup, PreUpdate, Render, Cleanup.");
     }
 }
-
-
 

@@ -9,7 +9,7 @@ namespace Engine;
 /// </summary>
 public sealed class UltralightContext : IDisposable
 {
-    private static readonly ILogger Logger = Log.For<UltralightContext>();
+    private static readonly ILogger Logger = Log.Category("Editor.Ultralight");
 
     private UltralightNet.Renderer? _renderer;
     private Session? _session;
@@ -24,14 +24,12 @@ public sealed class UltralightContext : IDisposable
     /// <summary>
     /// Initializes the Ultralight platform and creates a renderer, session, and view.
     /// </summary>
-    /// <param name="width">Initial view width in pixels.</param>
-    /// <param name="height">Initial view height in pixels.</param>
-    /// <param name="url">The URL to load (e.g., http://localhost:5000).</param>
-    /// <param name="transparent">Whether the view background should be transparent.</param>
     public UltralightContext(uint width, uint height, string url, bool transparent = true)
     {
         Width = Math.Max(1, width);
         Height = Math.Max(1, height);
+
+        Logger.Info($"Configuring Ultralight platform (CPU surface, transparent={transparent})...");
 
         // Configure platform handlers
         ULPlatform.ErrorMissingResources = false;
@@ -40,6 +38,7 @@ public sealed class UltralightContext : IDisposable
         ULPlatform.EnableDefaultLogger = true;
         ULPlatform.SetDefaultFileSystem = true;
         ULPlatform.SetDefaultFontLoader = true;
+        Logger.Debug("Ultralight platform flags set (default logger, file system, font loader).");
 
         // Create Ultralight renderer with default config
         var config = new ULConfig
@@ -48,7 +47,10 @@ public sealed class UltralightContext : IDisposable
             ForceRepaint = true,
         };
 
+        Logger.Debug("Creating Ultralight renderer...");
         _renderer = ULPlatform.CreateRenderer(config, dispose: true);
+
+        Logger.Debug("Creating Ultralight session (persistent=false, name='editor')...");
         _session = _renderer.CreateSession(false, "editor");
 
         // Create the view with the desired settings
@@ -62,28 +64,36 @@ public sealed class UltralightContext : IDisposable
             InitialFocus = true,
         };
 
+        Logger.Debug($"Creating Ultralight view ({Width}x{Height}, JS=true, images=true, scale=1.0)...");
         _view = _renderer.CreateView(Width, Height, viewConfig, _session);
 
         // Register console message handler for debugging
         _view.OnAddConsoleMessage += (source, level, message, line, col, sourceId) =>
         {
-            Logger.Info($"[Ultralight JS] [{level}] {message} ({sourceId}:{line}:{col})");
+            var msg = $"[JS {level}] {message} ({sourceId}:{line}:{col})";
+            if (level == ULMessageLevel.Error)
+                Logger.Error(msg);
+            else if (level == ULMessageLevel.Warning)
+                Logger.Warn(msg);
+            else
+                Logger.Debug(msg);
         };
 
         _view.OnFailLoading += (frameId, isMainFrame, urlStr, description, errorDomain, errorCode) =>
         {
-            Logger.Error($"[Ultralight] Load failed: {description} (domain={errorDomain}, code={errorCode}) url={urlStr}");
+            Logger.Error($"Page load failed: {description} (domain={errorDomain}, code={errorCode}, url={urlStr}, frame={frameId}, main={isMainFrame})");
         };
 
         _view.OnFinishLoading += (frameId, isMainFrame, urlStr) =>
         {
-            Logger.Info($"[Ultralight] Finished loading: {urlStr}");
+            Logger.Info($"Page loaded: {urlStr} (frame={frameId}, main={isMainFrame})");
         };
 
         // Navigate to the requested URL
-        Logger.Info($"[Ultralight] Loading URL: {url}");
+        Logger.Info($"Navigating to: {url}");
         _view.URL = url;
         _view.Focus();
+        Logger.Info($"UltralightContext initialized — view {Width}x{Height}, awaiting page load.");
     }
 
     /// <summary>Ticks Ultralight's internal timers and JavaScript execution.</summary>
@@ -145,11 +155,11 @@ public sealed class UltralightContext : IDisposable
 
         if (width == Width && height == Height) return;
 
+        Logger.Info($"Resizing Ultralight view: {Width}x{Height} → {width}x{height}");
         Width = width;
         Height = height;
 
         _view?.Resize(in width, in height);
-        Logger.Info($"[Ultralight] View resized to {Width}x{Height}");
     }
 
     public void Dispose()
@@ -157,6 +167,7 @@ public sealed class UltralightContext : IDisposable
         if (_disposed) return;
         _disposed = true;
 
+        Logger.Info("Disposing UltralightContext (view, session, renderer)...");
         _view?.Dispose();
         _view = null;
 
@@ -165,7 +176,7 @@ public sealed class UltralightContext : IDisposable
 
         _renderer?.Dispose();
         _renderer = null;
+        Logger.Info("UltralightContext disposed.");
     }
 }
-
 
