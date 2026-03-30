@@ -19,8 +19,9 @@ public sealed class Schedule
             _systemsByStage[stage] = new();
             _parallelStages.Add(stage);
         }
+        SetSingleThreaded(Stage.Startup);
         SetSingleThreaded(Stage.Render);
-        Logger.Trace("Schedule created — all stages initialized, Render stage set to single-threaded.");
+        Logger.Trace("Schedule created — all stages initialized, Startup and Render stages set to single-threaded.");
     }
 
     /// <summary>Adds a system to the specified stage.</summary>
