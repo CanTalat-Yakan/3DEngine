@@ -7,10 +7,8 @@ namespace Engine;
 /// Translates SDL events into Ultralight input events (mouse, keyboard, scroll).
 /// Hook this into AppWindow.SDLEvent to forward input to the Ultralight view.
 /// </summary>
-public static class UltralightInputHandler
+public static class UltralightInput
 {
-    private static readonly ILogger Logger = Log.Category("Editor.Ultralight.Input");
-
     /// <summary>Processes an SDL event and forwards it to the Ultralight view.</summary>
     public static void ProcessEvent(SDL.Event e, View view)
     {
@@ -48,7 +46,6 @@ public static class UltralightInputHandler
                         Button = button
                     };
                     view.FireMouseEvent(mouseEvent);
-                    Logger.Trace($"Mouse {(isDown ? "down" : "up")}: button={button} pos=({(int)e.Button.X},{(int)e.Button.Y})");
                     break;
                 }
             case SDL.EventType.MouseWheel:
@@ -60,7 +57,6 @@ public static class UltralightInputHandler
                         DeltaY = (int)(e.Wheel.Y * 32),
                     };
                     view.FireScrollEvent(scrollEvent);
-                    Logger.Trace($"Scroll: dx={scrollEvent.DeltaX} dy={scrollEvent.DeltaY}");
                     break;
                 }
             case SDL.EventType.KeyDown:
@@ -82,7 +78,6 @@ public static class UltralightInputHandler
                         isSystemKey: false);
                     view.FireKeyEvent(keyEvent);
                     keyEvent.Dispose();
-                    Logger.Trace($"Key {(isDown ? "down" : "up")}: scancode={e.Key.Scancode} vk={vk} repeat={e.Key.Repeat}");
                     break;
                 }
             case SDL.EventType.TextInput:
@@ -104,7 +99,6 @@ public static class UltralightInputHandler
                                 isSystemKey: false);
                             view.FireKeyEvent(charEvent);
                             charEvent.Dispose();
-                            Logger.Trace($"Text input: \"{text}\"");
                         }
                     }
                     break;

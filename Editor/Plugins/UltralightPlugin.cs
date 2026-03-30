@@ -68,7 +68,7 @@ public sealed class UltralightPlugin : IPlugin
                 {
                     var ulCtx = world.TryResource<UltralightContext>();
                     if (ulCtx?.View is { } view)
-                        UltralightInputHandler.ProcessEvent(e, view);
+                        UltralightInput.ProcessEvent(e, view);
                 };
 
                 // Handle resize
