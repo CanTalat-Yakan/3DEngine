@@ -10,7 +10,7 @@ namespace Engine;
 
 /// <summary>Roslyn incremental generator scanning [Engine.Behavior] structs and emitting stage systems plus a registration function discoverable at runtime.</summary>
 [Generator(LanguageNames.CSharp)]
-public sealed class EcsBehaviorGenerator : IIncrementalGenerator
+public sealed class BehaviorGenerator : IIncrementalGenerator
 {
     /// <summary>Configures syntax providers, collects candidate structs, and registers source outputs.</summary>
     public void Initialize(IncrementalGeneratorInitializationContext ctx)
