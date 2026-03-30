@@ -31,71 +31,93 @@ public sealed class UltralightContext : IDisposable
 
         Logger.Info($"Configuring Ultralight platform (CPU surface, transparent={transparent})...");
 
-        // Configure platform handlers
-        ULPlatform.ErrorMissingResources = false;
-        ULPlatform.ErrorGPUDriverNotSet = false;
-        ULPlatform.ErrorWrongThread = false;
-        ULPlatform.EnableDefaultLogger = true;
-        ULPlatform.SetDefaultFileSystem = true;
-
-        // Use AppCore's font loader — SetDefaultFontLoader alone is not sufficient
-        AppCoreMethods.SetPlatformFontLoader();
-        Logger.Debug("Ultralight platform flags set (default logger, file system, AppCore font loader).");
-
-        // Create Ultralight renderer with default config
-        var config = new ULConfig
+        try
         {
-            ResourcePathPrefix = "./resources/",
-            ForceRepaint = true,
-        };
+            // Configure platform handlers
+            Logger.Debug("Setting platform flags (ErrorMissingResources=false, ErrorGPUDriverNotSet=false, ErrorWrongThread=false)...");
+            ULPlatform.ErrorMissingResources = false;
+            ULPlatform.ErrorGPUDriverNotSet = false;
+            ULPlatform.ErrorWrongThread = false;
+            ULPlatform.EnableDefaultLogger = true;
+            Logger.Debug("Platform error/logger flags set.");
 
-        Logger.Debug("Creating Ultralight renderer...");
-        _renderer = ULPlatform.CreateRenderer(config, dispose: true);
+            // Use AppCore's font loader (must be set before creating renderer)
+            Logger.Debug("Setting AppCore platform font loader...");
+            AppCoreMethods.SetPlatformFontLoader();
+            Logger.Debug("AppCore font loader set successfully.");
 
-        Logger.Debug("Creating Ultralight session (persistent=false, name='editor')...");
-        _session = _renderer.CreateSession(false, "editor");
+            // Create Ultralight renderer with default config (no custom ResourcePathPrefix)
+            var config = new ULConfig
+            {
+                ForceRepaint = true,
+            };
+            Logger.Debug($"ULConfig created (ForceRepaint={config.ForceRepaint}, ResourcePathPrefix='{config.ResourcePathPrefix}').");
 
-        // Create the view with the desired settings
-        var viewConfig = new ULViewConfig
+            Logger.Debug("Creating Ultralight renderer...");
+            _renderer = ULPlatform.CreateRenderer(config);
+            Logger.Info("Ultralight renderer created successfully.");
+
+            Logger.Debug("Creating Ultralight session (persistent=false, name='editor')...");
+            _session = _renderer.CreateSession(false, "editor");
+            Logger.Debug("Ultralight session created.");
+
+            // Create the view with the desired settings
+            var viewConfig = new ULViewConfig
+            {
+                IsAccelerated = false,   // CPU bitmap surface
+                IsTransparent = transparent,
+                EnableJavaScript = true,
+                EnableImages = true,
+                InitialDeviceScale = 1.0,
+                InitialFocus = true,
+            };
+
+            Logger.Debug($"Creating Ultralight view ({Width}x{Height}, accelerated=false, transparent={transparent}, JS=true, images=true, scale=1.0)...");
+            _view = _renderer.CreateView(Width, Height, viewConfig, _session);
+            Logger.Info($"Ultralight view created ({Width}x{Height}).");
+
+            // Register console message handler for debugging
+            _view.OnAddConsoleMessage += (source, level, message, line, col, sourceId) =>
+            {
+                var msg = $"[JS {level}] {message} ({sourceId}:{line}:{col})";
+                if (level == ULMessageLevel.Error)
+                    Logger.Error(msg);
+                else if (level == ULMessageLevel.Warning)
+                    Logger.Warn(msg);
+                else
+                    Logger.Debug(msg);
+            };
+
+            _view.OnFailLoading += (frameId, isMainFrame, urlStr, description, errorDomain, errorCode) =>
+            {
+                Logger.Error($"Page load failed: {description} (domain={errorDomain}, code={errorCode}, url={urlStr}, frame={frameId}, main={isMainFrame})");
+            };
+
+            _view.OnFinishLoading += (frameId, isMainFrame, urlStr) =>
+            {
+                Logger.Info($"Page loaded: {urlStr} (frame={frameId}, main={isMainFrame})");
+            };
+
+            _view.OnBeginLoading += (frameId, isMainFrame, urlStr) =>
+            {
+                Logger.Debug($"Page begin loading: {urlStr} (frame={frameId}, main={isMainFrame})");
+            };
+
+            // Navigate to the requested URL
+            Logger.Info($"Navigating to: {url}");
+            _view.URL = url;
+            _view.Focus();
+            Logger.Info($"UltralightContext initialized — view {Width}x{Height}, awaiting page load.");
+        }
+        catch (Exception ex)
         {
-            IsAccelerated = false,   // CPU bitmap surface
-            IsTransparent = transparent,
-            EnableJavaScript = true,
-            EnableImages = true,
-            InitialDeviceScale = 1.0,
-            InitialFocus = true,
-        };
-
-        Logger.Debug($"Creating Ultralight view ({Width}x{Height}, JS=true, images=true, scale=1.0)...");
-        _view = _renderer.CreateView(Width, Height, viewConfig, _session);
-
-        // Register console message handler for debugging
-        _view.OnAddConsoleMessage += (source, level, message, line, col, sourceId) =>
-        {
-            var msg = $"[JS {level}] {message} ({sourceId}:{line}:{col})";
-            if (level == ULMessageLevel.Error)
-                Logger.Error(msg);
-            else if (level == ULMessageLevel.Warning)
-                Logger.Warn(msg);
-            else
-                Logger.Debug(msg);
-        };
-
-        _view.OnFailLoading += (frameId, isMainFrame, urlStr, description, errorDomain, errorCode) =>
-        {
-            Logger.Error($"Page load failed: {description} (domain={errorDomain}, code={errorCode}, url={urlStr}, frame={frameId}, main={isMainFrame})");
-        };
-
-        _view.OnFinishLoading += (frameId, isMainFrame, urlStr) =>
-        {
-            Logger.Info($"Page loaded: {urlStr} (frame={frameId}, main={isMainFrame})");
-        };
-
-        // Navigate to the requested URL
-        Logger.Info($"Navigating to: {url}");
-        _view.URL = url;
-        _view.Focus();
-        Logger.Info($"UltralightContext initialized — view {Width}x{Height}, awaiting page load.");
+            Logger.Error($"Failed to initialize UltralightContext: {ex.Message}");
+            Logger.Error($"Exception type: {ex.GetType().FullName}");
+            if (ex.InnerException is not null)
+                Logger.Error($"Inner exception: {ex.InnerException.Message}");
+            Dispose();
+            throw;
+        }
     }
 
     /// <summary>Ticks Ultralight's internal timers and JavaScript execution.</summary>
