@@ -1,7 +1,11 @@
+using System.Diagnostics;
+
 namespace Engine;
 
 public sealed class Renderer : IDisposable
 {
+    private static readonly ILogger Logger = Log.For<Renderer>();
+
     private readonly List<IExtractSystem> _extractSystems = new();
     private readonly List<IPrepareSystem> _prepareSystems = new();
     private readonly List<IQueueSystem> _queueSystems = new();
@@ -23,10 +27,17 @@ public sealed class Renderer : IDisposable
     public void Initialize()
     {
         if (_initialized) return;
+        Logger.Info("Initializing Renderer — setting up diagnostics and render graph...");
+        var sw = Stopwatch.StartNew();
+
         Diagnostics.Initialize(Context.AdapterInfo);
+        Logger.Debug("Renderer diagnostics initialized.");
+
         Graph.AddNode(new SampleNode());
+        Logger.Debug("Default SampleNode added to render graph.");
 
         _initialized = true;
+        Logger.Info($"Renderer initialized in {sw.ElapsedMilliseconds}ms.");
     }
 
     public void AddExtractSystem(IExtractSystem sys) => _extractSystems.Add(sys);
@@ -38,22 +49,28 @@ public sealed class Renderer : IDisposable
     {
         if (!_initialized) Initialize();
 
+        Logger.Trace("RenderFrame: Running extract systems...");
         foreach (var sys in _extractSystems)
             sys.Run(appWorld, RenderWorld);
 
+        Logger.Trace("RenderFrame: Running prepare systems...");
         foreach (var sys in _prepareSystems)
             sys.Run(RenderWorld, Context);
 
+        Logger.Trace("RenderFrame: Beginning frame...");
         var ctx = Context.BeginFrame(RenderWorld, out var imageIndex);
         SyncSurfaceInfo(ctx.FrameContext.Extent);
         UpdateDiagnostics(ctx.FrameContext.Extent);
 
+        Logger.Trace("RenderFrame: Running queue systems...");
         foreach (var sys in _queueSystems)
             sys.Run(RenderWorld, Context, ctx);
 
+        Logger.Trace("RenderFrame: Executing render graph nodes...");
         foreach (var node in Graph.TopologicalOrder())
             node.Execute(Context, ctx, RenderWorld);
 
+        Logger.Trace("RenderFrame: Ending frame...");
         Context.EndFrame(ctx, imageIndex);
     }
 
@@ -89,6 +106,8 @@ public sealed class Renderer : IDisposable
 
     public void Dispose()
     {
+        Logger.Info("Disposing Renderer and underlying graphics context...");
         Context.Dispose();
+        Logger.Info("Renderer disposed.");
     }
 }

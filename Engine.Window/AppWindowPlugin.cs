@@ -61,40 +61,61 @@ public sealed class AppWindowPlugin : IPlugin
     /// <summary>Creates and shows the AppWindow using Config, inserts AppWindow, and provides the main loop driver.</summary>
     public void Build(App app)
     {
+        var logger = Log.Category("Engine.Window");
         var config = app.World.Resource<Config>();
+
+        logger.Info($"AppWindowPlugin: Creating window \"{config.WindowData.Title}\" ({config.WindowData.Width}x{config.WindowData.Height}) with backend={config.Graphics}...");
         var window = new AppWindow(config.WindowData, config.Graphics);
+
+        logger.Info($"Showing window with command: {config.WindowCommand}");
         window.Show(config.WindowCommand);
+
         app.World.InsertResource(window);
         app.World.InsertResource<IMainLoopDriver>(new SdlMainLoopDriver(window));
-        // Provide SDL input backend for core InputPlugin to initialize.
         app.World.InsertResource<IInputBackend>(new SdlInputBackend());
+        logger.Info("AppWindow, IMainLoopDriver, and IInputBackend resources registered.");
 
         // When Vulkan is selected, provide the surface source so the renderer plugin can initialize.
         if (config.Graphics == GraphicsBackend.Vulkan)
+        {
             app.World.InsertResource<ISurfaceSource>(new SdlSurfaceSource(window.Sdl));
+            logger.Info("Vulkan surface source (SdlSurfaceSource) registered for renderer.");
+        }
     }
 }
 
 /// <summary>Handles application exit: listens for window quit events and requests closure.</summary>
 public sealed class AppExitPlugin : IPlugin
 {
+    private static readonly ILogger Logger = Log.Category("Engine.AppExit");
+
     /// <summary>Inserts the <see cref="AppExit"/> resource (if missing), wires window quit to set its flag, and adds a First-stage system to close the window when requested.</summary>
     public void Build(App app)
     {
+        Logger.Info("AppExitPlugin: Registering exit handler...");
         // Ensure exit state resource exists.
         if (!app.World.ContainsResource<AppExit>())
             app.World.InsertResource(new AppExit());
 
         // When the window signals quit, raise the Requested flag.
         var window = app.World.Resource<AppWindow>();
-        window.QuitEvent += () => app.World.Resource<AppExit>().Requested = true;
+        window.QuitEvent += () =>
+        {
+            Logger.Info("Quit event received — flagging application exit.");
+            app.World.Resource<AppExit>().Requested = true;
+        };
 
         // Early frame: if an exit was requested previously, ask window to close (will break main loop).
         app.AddSystem(Stage.First, (World world) =>
         {
             if (world.Resource<AppExit>().Requested)
+            {
+                Logger.Info("Exit requested — closing window to break main loop.");
                 world.Resource<AppWindow>().RequestClose();
+            }
         });
+
+        Logger.Info("AppExitPlugin: Exit handler registered.");
     }
 }
 

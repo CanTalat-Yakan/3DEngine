@@ -16,6 +16,7 @@ public sealed unsafe partial class GraphicsDevice
 
         if (result == VkResult.ErrorOutOfDateKHR)
         {
+            Logger.Warn("Swapchain out-of-date during image acquisition — triggering resize and retry.");
             OnResize();
             return BeginFrameInternal(clearColor);
         }
@@ -92,6 +93,7 @@ public sealed unsafe partial class GraphicsDevice
 
         if (presentResult == VkResult.ErrorOutOfDateKHR || presentResult == VkResult.SuboptimalKHR)
         {
+            Logger.Warn($"Swapchain {presentResult} during present — triggering resize.");
             OnResize();
         }
         else

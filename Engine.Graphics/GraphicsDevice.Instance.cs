@@ -14,10 +14,14 @@ public sealed unsafe partial class GraphicsDevice
 
     private partial void CreateInstance(string appName)
     {
+        Logger.Debug("Loading Vulkan library via vkInitialize()...");
         // Load the Vulkan library — must be called before any other Vulkan API.
         vkInitialize().CheckResult();
+        Logger.Debug("Vulkan library loaded successfully.");
 
+        Logger.Debug("Checking for validation layer support...");
         _validationEnabled = ShouldEnableValidation() && AreValidationLayersAvailable();
+        Logger.Info($"Validation layers: {(_validationEnabled ? "ENABLED" : "DISABLED")}");
 
         VkUtf8ReadOnlyString appNameUtf8 = Encoding.UTF8.GetBytes(appName);
         VkUtf8ReadOnlyString engineNameUtf8 = "3DEngine"u8;
@@ -31,12 +35,16 @@ public sealed unsafe partial class GraphicsDevice
             apiVersion = VkVersion.Version_1_2
         };
 
+        Logger.Debug("Querying required instance extensions from surface source...");
         var requiredExtensions = _surfaceSource!
             .GetRequiredInstanceExtensions()
             .ToList();
         var debugUtils = Utf8(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
         if (_validationEnabled && !requiredExtensions.Contains(debugUtils))
             requiredExtensions.Add(debugUtils);
+
+        foreach (var ext in requiredExtensions)
+            Logger.Debug($"  Required extension: {ext}");
 
         using var extensions = new VkStringArray(requiredExtensions);
         VkInstanceCreateInfo createInfo = new()
@@ -49,6 +57,7 @@ public sealed unsafe partial class GraphicsDevice
         VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo = default;
         if (_validationEnabled)
         {
+            Logger.Debug("Setting up validation layers and debug messenger for VkInstance...");
             using var validation = new VkStringArray(ValidationLayers);
             createInfo.enabledLayerCount = validation.Length;
             createInfo.ppEnabledLayerNames = validation;
@@ -58,14 +67,18 @@ public sealed unsafe partial class GraphicsDevice
         }
         else
         {
+            Logger.Debug("Creating VkInstance without validation layers...");
             vkCreateInstance(&createInfo, null, out _instance).CheckResult();
         }
 
+        Logger.Debug($"VkInstance created (handle=0x{_instance.Handle:X}).");
         _instanceApi = GetApi(_instance);
 
         if (_validationEnabled)
         {
+            Logger.Debug("Attaching Vulkan debug utils messenger for validation callbacks...");
             _instanceApi.vkCreateDebugUtilsMessengerEXT(_instance, &debugCreateInfo, null, out _debugMessenger).CheckResult();
+            Logger.Debug("Debug messenger attached successfully.");
         }
     }
 
@@ -73,12 +86,15 @@ public sealed unsafe partial class GraphicsDevice
     {
         if (_validationEnabled && _debugMessenger.Handle != 0)
         {
+            Logger.Debug("Destroying Vulkan debug utils messenger...");
             _instanceApi.vkDestroyDebugUtilsMessengerEXT(_instance, _debugMessenger, null);
         }
         if (_instance.Handle != 0)
         {
+            Logger.Debug("Destroying VkInstance...");
             _instanceApi.vkDestroyInstance(_instance);
             _instance = default;
+            Logger.Debug("VkInstance destroyed.");
         }
     }
 
@@ -153,7 +169,14 @@ public sealed unsafe partial class GraphicsDevice
         void* userData)
     {
         var message = Marshal.PtrToStringUTF8((nint)data->pMessage) ?? string.Empty;
-        Console.WriteLine($"[VK][{severity}][{type}] {message}");
+        var logger = Log.Category("Vulkan.Validation");
+        var formatted = $"[{type}] {message}";
+        if (severity.HasFlag(VkDebugUtilsMessageSeverityFlagsEXT.Error))
+            logger.Error(formatted);
+        else if (severity.HasFlag(VkDebugUtilsMessageSeverityFlagsEXT.Warning))
+            logger.Warn(formatted);
+        else
+            logger.Debug(formatted);
         return 0;
     }
 }

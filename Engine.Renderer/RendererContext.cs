@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Engine;
 
 /// <summary>High-level facade over the low-level vulkan graphics backend.</summary>
@@ -35,11 +37,18 @@ public sealed class RendererContext : IDisposable
     {
         if (IsInitialized) return;
 
+        Logger.Info("RendererContext: Initializing graphics backend...");
+        var sw = Stopwatch.StartNew();
+
         _graphics ??= _graphicsFactory?.Invoke() ?? new GraphicsDevice();
+        Logger.Debug($"Graphics device type: {_graphics.GetType().Name}");
 
         _graphics.Initialize(surfaceSource, appName);
 
+        Logger.Debug("Creating per-swapchain-image camera uniform buffers and descriptor sets...");
         CreateCameraResources();
+
+        Logger.Info($"RendererContext initialized in {sw.ElapsedMilliseconds}ms.");
     }
 
     private void CreateCameraResources()
@@ -143,12 +152,15 @@ public sealed class RendererContext : IDisposable
         if (!IsInitialized)
             return;
 
+        Logger.Info("RendererContext: Resize triggered — recreating swapchain and camera resources...");
         _graphics!.OnResize();
         CreateCameraResources();
+        Logger.Info("RendererContext: Resize complete.");
     }
 
     public void Dispose()
     {
+        Logger.Info("RendererContext: Disposing camera resources and graphics device...");
         if (_cameraBuffers != null)
         {
             foreach (var buf in _cameraBuffers)
@@ -163,5 +175,6 @@ public sealed class RendererContext : IDisposable
         }
 
         _graphics?.Dispose();
+        Logger.Info("RendererContext disposed.");
     }
 }

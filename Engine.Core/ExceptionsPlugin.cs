@@ -6,12 +6,16 @@ namespace Engine;
 /// <summary>Installs a global unhandled exception handler that logs to Application.log.</summary>
 public sealed class ExceptionsPlugin : IPlugin
 {
+    private static readonly ILogger Logger = Log.Category("Engine.Exceptions");
+
     public void Build(App app)
     {
         if (!app.World.ContainsResource<ExceptionHandlerInstalled>())
         {
+            Logger.Info("ExceptionsPlugin: Installing global unhandled exception handler...");
             Install();
             app.World.InsertResource(new ExceptionHandlerInstalled());
+            Logger.Info("ExceptionsPlugin: Exception handler installed — unhandled exceptions will be logged to Application.log.");
         }
     }
 

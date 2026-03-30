@@ -7,14 +7,20 @@ public sealed unsafe partial class GraphicsDevice
 {
     private partial void CreateSwapchainResources()
     {
+        Logger.Debug("Querying drawable size from surface source...");
         var drawable = _surfaceSource!.GetDrawableSize();
         if (drawable.Width == 0 || drawable.Height == 0)
             drawable = (1, 1);
+        Logger.Debug($"Drawable size: {drawable.Width}x{drawable.Height}");
 
+        Logger.Debug("Querying swapchain support (capabilities, formats, present modes)...");
         var support = QuerySwapchainSupport(_physicalDevice);
         var surfaceFormat = ChooseSwapchainFormat(support.Formats);
         var presentMode = ChoosePresentMode(support.PresentModes);
         var extent = ChooseSwapExtent(support.Capabilities, (uint)drawable.Width, (uint)drawable.Height);
+        Logger.Debug($"Chosen surface format: {surfaceFormat.format}, color space: {surfaceFormat.colorSpace}");
+        Logger.Debug($"Chosen present mode: {presentMode}");
+        Logger.Debug($"Chosen swap extent: {extent.width}x{extent.height}");
 
         _swapchainFormat = surfaceFormat.format;
         _swapchainExtent = extent;
@@ -53,22 +59,32 @@ public sealed unsafe partial class GraphicsDevice
             createInfo.imageSharingMode = VkSharingMode.Exclusive;
         }
 
+        Logger.Debug($"Creating VkSwapchainKHR with {imageCount} images, sharing mode={createInfo.imageSharingMode}...");
         _deviceApi.vkCreateSwapchainKHR(_device, &createInfo, null, out _swapchain).CheckResult();
+        Logger.Debug($"VkSwapchainKHR created (handle=0x{_swapchain.Handle:X}).");
 
         _deviceApi.vkGetSwapchainImagesKHR(_device, _swapchain, out uint count).CheckResult();
         Span<VkImage> images = stackalloc VkImage[(int)count];
         _deviceApi.vkGetSwapchainImagesKHR(_device, _swapchain, images).CheckResult();
         _swapchainImages = images.ToArray();
+        Logger.Debug($"Retrieved {_swapchainImages.Length} swapchain images.");
 
+        Logger.Debug("Creating image views for swapchain images...");
         CreateImageViews();
+        Logger.Debug("Creating depth buffer resources (D32_Sfloat)...");
         CreateDepthResources();
+        Logger.Debug("Creating render pass (color + depth attachments)...");
         CreateRenderPass();
+        Logger.Debug("Creating framebuffers (one per swapchain image)...");
         CreateFramebuffers();
+        Logger.Debug("Creating command pool and allocating command buffers...");
         CreateCommandPoolAndBuffers();
+        Logger.Debug("Swapchain resource creation complete.");
     }
 
     private partial void DestroySwapchainResources()
     {
+        Logger.Debug($"Destroying swapchain resources — {_framebuffers.Length} framebuffers, {_swapchainImageViews.Length} image views...");
         foreach (var fb in _framebuffers)
             if (fb.Handle != 0) _deviceApi.vkDestroyFramebuffer(_device, fb);
         foreach (var iv in _swapchainImageViews)

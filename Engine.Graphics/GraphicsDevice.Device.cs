@@ -13,8 +13,11 @@ public sealed unsafe partial class GraphicsDevice
 
     private partial void CreateLogicalDevice()
     {
+        Logger.Debug("Setting up device queue create infos...");
         float priority = 1.0f;
         var families = UniqueQueueFamilies().ToArray();
+        Logger.Debug($"Unique queue families: [{string.Join(", ", families)}]");
+
         VkDeviceQueueCreateInfo* queueInfos = stackalloc VkDeviceQueueCreateInfo[families.Length];
         for (int i = 0; i < families.Length; i++)
         {
@@ -26,6 +29,7 @@ public sealed unsafe partial class GraphicsDevice
             };
         }
 
+        Logger.Debug($"Enabling device extensions: {string.Join(", ", DeviceExtensions)}");
         using var deviceExts = new VkStringArray(DeviceExtensions);
 
         VkPhysicalDeviceFeatures features = new()
@@ -49,18 +53,26 @@ public sealed unsafe partial class GraphicsDevice
             createInfo.ppEnabledLayerNames = validation;
         }
 
+        Logger.Debug("Calling vkCreateDevice...");
         _instanceApi.vkCreateDevice(_physicalDevice, &createInfo, null, out _device).CheckResult();
+        Logger.Debug($"VkDevice created (handle=0x{_device.Handle:X}).");
+
         _deviceApi = GetApi(_instance, _device);
+
+        Logger.Debug("Retrieving graphics and present device queues...");
         _deviceApi.vkGetDeviceQueue(_device, _graphicsQueueFamily, 0, out _graphicsQueue);
         _deviceApi.vkGetDeviceQueue(_device, _presentQueueFamily, 0, out _presentQueue);
+        Logger.Debug($"Queues retrieved — graphics=family {_graphicsQueueFamily}, present=family {_presentQueueFamily}");
     }
 
     private partial void DestroyLogicalDevice()
     {
         if (_device.Handle != 0)
         {
+            Logger.Debug("Destroying VkDevice...");
             _deviceApi.vkDestroyDevice(_device);
             _device = default;
+            Logger.Debug("VkDevice destroyed.");
         }
     }
 

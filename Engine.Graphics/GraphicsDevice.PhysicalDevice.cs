@@ -13,8 +13,10 @@ public sealed unsafe partial class GraphicsDevice
 
     private partial void SelectPhysicalDevice()
     {
+        Logger.Debug("Enumerating Vulkan physical devices...");
         _instanceApi.vkEnumeratePhysicalDevices(_instance, out uint deviceCount).CheckResult();
         if (deviceCount == 0) throw new InvalidOperationException("No Vulkan physical devices.");
+        Logger.Debug($"Found {deviceCount} physical device(s).");
 
         Span<VkPhysicalDevice> devices = stackalloc VkPhysicalDevice[(int)deviceCount];
         _instanceApi.vkEnumeratePhysicalDevices(_instance, devices).CheckResult();
@@ -30,7 +32,14 @@ public sealed unsafe partial class GraphicsDevice
             _instanceApi.vkGetPhysicalDeviceProperties(device, out var props);
             _instanceApi.vkGetPhysicalDeviceFeatures(device, out var features);
 
-            if (!features.geometryShader) continue;
+            var deviceName = Utf8(new ReadOnlySpan<byte>(props.deviceName, MaxPhysicalDeviceNameSize));
+            Logger.Debug($"  Evaluating GPU: {deviceName} (type={props.deviceType}, vendorId=0x{props.vendorID:X4}, deviceId=0x{props.deviceID:X4})");
+
+            if (!features.geometryShader)
+            {
+                Logger.Debug($"    Rejected — no geometry shader support.");
+                continue;
+            }
 
             var score = props.deviceType switch
             {
@@ -40,6 +49,7 @@ public sealed unsafe partial class GraphicsDevice
             };
 
             score += (int)props.limits.maxImageDimension2D;
+            Logger.Debug($"    Score: {score} (maxImageDim2D={props.limits.maxImageDimension2D}, graphicsQueue={indices.Graphics}, presentQueue={indices.Present})");
 
             if (score > bestScore)
             {
@@ -56,9 +66,13 @@ public sealed unsafe partial class GraphicsDevice
         }
 
         if (best is null)
+        {
+            Logger.Error("Failed to find a suitable Vulkan GPU — no device passed all requirements.");
             throw new InvalidOperationException("Failed to find a suitable GPU for Vulkan.");
+        }
 
         _physicalDevice = best.Value;
+        Logger.Info($"Selected GPU: {_adapterInfo.Name} (score={bestScore})");
     }
 
     private QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device)

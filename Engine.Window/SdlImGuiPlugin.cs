@@ -15,6 +15,8 @@ public sealed class SdlImGuiPlugin : IPlugin
 
     public void Build(App app)
     {
+        var logger = Log.Category("Engine.ImGui");
+        logger.Info("SdlImGuiPlugin: Creating ImGui context...");
         ImGui.CreateContext();
         var io = ImGui.GetIO();
         io.ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard | ImGuiConfigFlags.NavEnableGamepad;
@@ -23,15 +25,18 @@ public sealed class SdlImGuiPlugin : IPlugin
         var sdlWindow = app.World.Resource<AppWindow>().Sdl;
         io.DisplaySize = new Vector2(Math.Max(1, sdlWindow.Width), Math.Max(1, sdlWindow.Height));
         io.DeltaTime = 1f / 60f;
+        logger.Info($"ImGui initialized — display size: {sdlWindow.Width}x{sdlWindow.Height}");
 
         if (sdlWindow.Renderer != IntPtr.Zero)
         {
+            logger.Info("ImGui using SDL software renderer backend.");
             var renderer = new SdlImGuiRenderer(sdlWindow.Renderer);
             app.World.InsertResource(renderer);
         }
         else
         {
             // Vulkan mode: no SDL renderer, but ImGui still needs the font atlas built.
+            logger.Info("ImGui using Vulkan mode — building font atlas only (no SDL renderer).");
             var io2 = ImGui.GetIO();
             io2.Fonts.GetTexDataAsRGBA32(out IntPtr _, out int _, out int _, out _);
             io2.Fonts.ClearTexData();

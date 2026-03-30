@@ -1,3 +1,7 @@
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Text;
+
 namespace Engine;
 
 /// <summary>Severity levels for log messages.</summary>
@@ -39,6 +43,8 @@ public sealed class Logger : ILogger
     {
         _category = category;
         _providers.Add(ConsoleLoggerProvider.Instance);
+        if (FileLoggerProvider.Instance is { } file)
+            _providers.Add(file);
     }
 
     public Logger UseProvider(ILoggerProvider provider)
@@ -50,6 +56,7 @@ public sealed class Logger : ILogger
 
     public void Log(LogLevel level, string message, Exception? exception = null)
     {
+        if (level < LogConfig.MinimumLevel) return;
         foreach (var provider in _providers)
             provider.Log(level, _category, message, exception);
     }
@@ -77,7 +84,17 @@ public sealed class LoggerFactory
     }
 }
 
-/// <summary>Writes log messages to the console with timestamp, level, and category.</summary>
+/// <summary>Global log configuration.</summary>
+public static class LogConfig
+{
+    /// <summary>Minimum severity to emit. Messages below this level are discarded.</summary>
+    public static LogLevel MinimumLevel { get; set; } = LogLevel.Trace;
+
+    /// <summary>Engine-wide stopwatch started at process launch for elapsed timestamps.</summary>
+    internal static readonly Stopwatch EngineTimer = Stopwatch.StartNew();
+}
+
+/// <summary>Writes log messages to the console with elapsed time, level, and category. Flushes after every write for crash safety.</summary>
 public sealed class ConsoleLoggerProvider : ILoggerProvider
 {
     public static ConsoleLoggerProvider Instance { get; } = new();
@@ -85,11 +102,79 @@ public sealed class ConsoleLoggerProvider : ILoggerProvider
 
     public void Log(LogLevel level, string category, string message, Exception? exception = null)
     {
-        var timestamp = DateTime.UtcNow.ToString("O");
-        var levelTag = level.ToString().ToUpperInvariant();
-        Console.WriteLine($"[{timestamp}] [{levelTag}] [{category}] {message}");
+        double elapsed = LogConfig.EngineTimer.Elapsed.TotalSeconds;
+        var levelTag = level switch
+        {
+            LogLevel.Trace    => "TRACE",
+            LogLevel.Debug    => "DEBUG",
+            LogLevel.Info     => "INFO ",
+            LogLevel.Warning  => "WARN ",
+            LogLevel.Error    => "ERROR",
+            LogLevel.Critical => "FATAL",
+            _ => level.ToString().ToUpperInvariant()
+        };
+        Console.WriteLine($"[{elapsed,10:F4}s] [{levelTag}] [{category}] {message}");
         if (exception != null)
             Console.WriteLine(exception);
+        Console.Out.Flush();
+    }
+}
+
+/// <summary>Writes log messages to a file with auto-flush for crash safety. Initialized lazily on first use.</summary>
+public sealed class FileLoggerProvider : ILoggerProvider, IDisposable
+{
+    private static FileLoggerProvider? _instance;
+    public static FileLoggerProvider? Instance => _instance;
+
+    private readonly StreamWriter _writer;
+    private readonly object _lock = new();
+
+    private FileLoggerProvider(StreamWriter writer) => _writer = writer;
+
+    /// <summary>Initializes the file logger writing to the specified path. Safe to call multiple times; subsequent calls are ignored.</summary>
+    public static void Initialize(string logFilePath)
+    {
+        if (_instance != null) return;
+        try
+        {
+            var dir = Path.GetDirectoryName(logFilePath);
+            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+
+            var stream = new FileStream(logFilePath, FileMode.Create, FileAccess.Write, FileShare.Read);
+            var writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true };
+            _instance = new FileLoggerProvider(writer);
+        }
+        catch
+        {
+            // Silently degrade — file logging is best-effort.
+        }
+    }
+
+    public void Log(LogLevel level, string category, string message, Exception? exception = null)
+    {
+        double elapsed = LogConfig.EngineTimer.Elapsed.TotalSeconds;
+        var levelTag = level switch
+        {
+            LogLevel.Trace    => "TRACE",
+            LogLevel.Debug    => "DEBUG",
+            LogLevel.Info     => "INFO ",
+            LogLevel.Warning  => "WARN ",
+            LogLevel.Error    => "ERROR",
+            LogLevel.Critical => "FATAL",
+            _ => level.ToString().ToUpperInvariant()
+        };
+        lock (_lock)
+        {
+            _writer.WriteLine($"[{elapsed,10:F4}s] [{levelTag}] [{category}] {message}");
+            if (exception != null)
+                _writer.WriteLine(exception);
+        }
+    }
+
+    public void Dispose()
+    {
+        lock (_lock) { _writer.Dispose(); }
     }
 }
 
@@ -99,4 +184,22 @@ public static class Log
     public static LoggerFactory Factory { get; } = new();
     public static ILogger Category(string category) => Factory.CreateLogger(category);
     public static ILogger For<T>() => Category(typeof(T).FullName ?? typeof(T).Name);
+
+    /// <summary>Writes a startup banner with runtime, OS, and architecture information.</summary>
+    public static void PrintStartupBanner()
+    {
+        var logger = Category("Engine");
+        logger.Info("========================================================");
+        logger.Info("  3DEngine — Initializing");
+        logger.Info("========================================================");
+        logger.Info($"Runtime:      {RuntimeInformation.FrameworkDescription}");
+        logger.Info($"OS:           {RuntimeInformation.OSDescription}");
+        logger.Info($"Architecture: {RuntimeInformation.ProcessArchitecture}");
+        logger.Info($"Processors:   {Environment.ProcessorCount}");
+        logger.Info($"Working Dir:  {Environment.CurrentDirectory}");
+        logger.Info($"Base Dir:     {AppContext.BaseDirectory}");
+        logger.Info($"Process ID:   {Environment.ProcessId}");
+        logger.Info($"Timestamp:    {DateTime.UtcNow:O}");
+        logger.Info("========================================================");
+    }
 }

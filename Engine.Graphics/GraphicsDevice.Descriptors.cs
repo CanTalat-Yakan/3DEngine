@@ -27,6 +27,7 @@ public sealed unsafe partial class GraphicsDevice
 
     private void CreateDescriptorResources()
     {
+        Logger.Debug("Creating descriptor set layout (binding 0=UBO vertex, binding 1=CombinedImageSampler fragment)...");
         // Simple layout: binding 0 = uniform buffer, binding 1 = combined image sampler.
         VkDescriptorSetLayoutBinding* bindings = stackalloc VkDescriptorSetLayoutBinding[2];
         bindings[0] = new VkDescriptorSetLayoutBinding
@@ -51,7 +52,9 @@ public sealed unsafe partial class GraphicsDevice
         };
 
         _deviceApi.vkCreateDescriptorSetLayout(_device, &layoutInfo, null, out _cameraSetLayout).CheckResult();
+        Logger.Debug("Descriptor set layout created.");
 
+        Logger.Debug("Creating descriptor pool (64 UBOs + 64 samplers, maxSets=64)...");
         VkDescriptorPoolSize* poolSizes = stackalloc VkDescriptorPoolSize[2];
         poolSizes[0] = new VkDescriptorPoolSize(VkDescriptorType.UniformBuffer, 64);
         poolSizes[1] = new VkDescriptorPoolSize(VkDescriptorType.CombinedImageSampler, 64);
@@ -64,10 +67,12 @@ public sealed unsafe partial class GraphicsDevice
         };
 
         _deviceApi.vkCreateDescriptorPool(_device, &poolInfo, null, out _descriptorPool).CheckResult();
+        Logger.Debug("Descriptor pool created successfully.");
     }
 
     private void DestroyDescriptorResources()
     {
+        Logger.Debug("Destroying descriptor resources (pool + layout)...");
         if (_descriptorPool.Handle != 0)
         {
             _deviceApi.vkDestroyDescriptorPool(_device, _descriptorPool);

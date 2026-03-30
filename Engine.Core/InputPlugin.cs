@@ -11,17 +11,28 @@ public interface IInputBackend
 /// <summary>Registers the Input resource and wires up the input backend.</summary>
 public sealed class InputPlugin : IPlugin
 {
+    private static readonly ILogger Logger = Log.Category("Engine.Input");
+
     public void Build(App app)
     {
+        Logger.Info("InputPlugin: Registering Input resource...");
         if (!app.World.ContainsResource<Input>())
             app.World.InsertResource(new Input());
 
         var input = app.World.Resource<Input>();
 
         if (app.World.TryResource<IInputBackend>() is { } backend)
+        {
+            Logger.Info($"InputPlugin: Wiring input backend: {backend.GetType().Name}");
             backend.Initialize(app, input);
+        }
+        else
+        {
+            Logger.Warn("InputPlugin: No IInputBackend resource found — input events will not be forwarded.");
+        }
 
         app.AddSystem(Stage.First, (World world) => world.Resource<Input>().BeginFrame());
+        Logger.Info("InputPlugin: Input system registered to First stage.");
     }
 }
 

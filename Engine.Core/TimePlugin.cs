@@ -3,6 +3,8 @@ namespace Engine;
 /// <summary>Tracks time since start and per-frame delta using a Stopwatch; updates during the First stage.</summary>
 public sealed class TimePlugin : IPlugin
 {
+    private static readonly ILogger Logger = Log.Category("Engine.Time");
+
     private sealed class TimeState
     {
         public System.Diagnostics.Stopwatch Watch = System.Diagnostics.Stopwatch.StartNew();
@@ -12,6 +14,7 @@ public sealed class TimePlugin : IPlugin
     /// <summary>Inserts Time resources and updates them each First stage.</summary>
     public void Build(App app)
     {
+        Logger.Info("TimePlugin: Registering Time resource and frame-timing system.");
         app.World.InsertResource(new Time());
         app.World.InsertResource(new TimeState());
 

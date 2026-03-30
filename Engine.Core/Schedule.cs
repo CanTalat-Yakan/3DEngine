@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Engine;
 
 public delegate void SystemFn(World world);
@@ -5,6 +7,8 @@ public delegate void SystemFn(World world);
 /// <summary>Schedules systems into Bevy-like stages and executes them (parallel by default, with optional single-threaded stages).</summary>
 public sealed class Schedule
 {
+    private static readonly ILogger Logger = Log.Category("Engine.Schedule");
+
     private readonly Dictionary<Stage, List<SystemFn>> _systemsByStage = new();
     private readonly HashSet<Stage> _parallelStages = new();
 
@@ -16,6 +20,7 @@ public sealed class Schedule
             _parallelStages.Add(stage);
         }
         SetSingleThreaded(Stage.Render);
+        Logger.Trace("Schedule created — all stages initialized, Render stage set to single-threaded.");
     }
 
     /// <summary>Adds a system to the specified stage.</summary>
@@ -45,10 +50,17 @@ public sealed class Schedule
         var list = _systemsByStage[stage];
         if (list.Count == 0) return;
 
-        if (_parallelStages.Contains(stage) && list.Count > 1)
+        var isParallel = _parallelStages.Contains(stage) && list.Count > 1;
+        Logger.Trace($"Stage {stage}: executing {list.Count} system(s) [{(isParallel ? "parallel" : "sequential")}]");
+
+        var sw = Stopwatch.StartNew();
+        if (isParallel)
             Parallel.ForEach(list, sys => sys(world));
         else for (int i = 0; i < list.Count; i++)
             list[i](world);
+        sw.Stop();
+
+        Logger.Trace($"Stage {stage}: completed in {sw.Elapsed.TotalMilliseconds:F2}ms");
     }
 
     /// <summary>Runs all stages in fixed order.</summary>
