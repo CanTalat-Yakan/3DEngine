@@ -19,9 +19,4 @@
         <PackageReference Include="UniversalSceneDescription" Version="6.0.0" />
     </ItemGroup>
 
-    <ItemGroup>
-        <None Include="Source\Shaders\triangle.vert.glsl" CopyToOutputDirectory="PreserveNewest" />
-        <None Include="Source\Shaders\triangle.frag.glsl" CopyToOutputDirectory="PreserveNewest" />
-    </ItemGroup>
-
 </Project>
