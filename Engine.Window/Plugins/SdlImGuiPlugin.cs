@@ -79,7 +79,7 @@ public sealed class SdlImGuiPlugin : IPlugin
                 return;
             }
             var imGuiRenderer = world.Resource<SdlImGuiRenderer>();
-            var clear = world.Resource<RenderClearColor>();
+            var clear = world.Resource<ClearColor>();
 
             ImGui.Render();
             var drawData = ImGui.GetDrawData();

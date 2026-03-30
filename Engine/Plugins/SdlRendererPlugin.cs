@@ -9,7 +9,7 @@ public sealed class SdlRendererPlugin : IPlugin
     {
         public void Run(object appWorld, RenderWorld renderWorld)
         {
-            if (appWorld is World w && w.TryResource<RenderClearColor>() is { } cc)
+            if (appWorld is World w && w.TryResource<ClearColor>() is { } cc)
             {
                 renderWorld.Set(cc);
             }

@@ -1,6 +1,6 @@
 namespace Engine;
 
-/// <summary>Ensures a default RenderClearColor resource exists.</summary>
+/// <summary>Ensures a default ClearColor resource exists.</summary>
 public sealed class ClearColorPlugin : IPlugin
 {
     private static readonly ILogger Logger = Log.Category("Engine.ClearColor");
@@ -8,12 +8,12 @@ public sealed class ClearColorPlugin : IPlugin
     /// <summary>Inserts a default clear color resource if missing.</summary>
     public void Build(App app)
     {
-        if (!app.World.ContainsResource<RenderClearColor>())
+        if (!app.World.ContainsResource<ClearColor>())
         {
             var cfg = app.World.Resource<Config>();
             var color = cfg.Graphics == GraphicsBackend.Vulkan
-                ? new RenderClearColor(0.675f, 0.086f, 0.173f, 1f)   // Tamarillo red for Vulkan
-                : new RenderClearColor(0.45f, 0.55f, 0.60f, 1.00f);  // blue-ish for SDL
+                ? new ClearColor(0.675f, 0.086f, 0.173f, 1f)   // Tamarillo red for Vulkan
+                : new ClearColor(0.45f, 0.55f, 0.60f, 1.00f);  // blue-ish for SDL
             app.World.InsertResource(color);
             Logger.Info($"ClearColorPlugin: Default clear color set (R={color.R:F2}, G={color.G:F2}, B={color.B:F2}, A={color.A:F2}) for {cfg.Graphics} backend.");
         }

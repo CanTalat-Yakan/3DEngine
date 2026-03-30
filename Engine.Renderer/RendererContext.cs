@@ -101,8 +101,8 @@ public sealed class RendererContext : IDisposable
     {
         if (!IsInitialized) throw new InvalidOperationException("RendererContext not initialized.");
 
-        var clear = world.TryGet<RenderClearColor>() is { } cc
-            ? new ClearColor(cc.R, cc.G, cc.B, cc.A)
+        var clear = world.TryGet<ClearColor>() is { } cc
+            ? cc
             : ClearColor.Black;
 
         var frame = _graphics!.BeginFrame(clear);
