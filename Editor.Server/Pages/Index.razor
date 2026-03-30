@@ -1,0 +1,182 @@
+@page "/"
+@using System.Reflection
+
+<PageTitle>Home - Editor.Server</PageTitle>
+
+<div class="container py-10">
+    <div class="mx-auto max-w-3xl space-y-8">
+        <!-- Hero Section -->
+        <div class="text-center space-y-4">
+            <div class="flex flex-col items-center gap-2">
+                <BbBadge Variant="BadgeVariant.Secondary">BlazorBlueprint Installed</BbBadge>
+                <p class="text-xs text-muted-foreground">
+                    Components @componentsVersion &middot; Primitives @primitivesVersion
+                </p>
+            </div>
+            <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">
+                Welcome to BlazorBlueprint
+            </h1>
+            <p class="text-xl text-muted-foreground">
+                Your Blazor app is ready with 80+ beautiful components.
+            </p>
+        </div>
+
+        <!-- Quick Demo -->
+        <BbCard>
+            <BbCardHeader>
+                <BbCardTitle>Quick Demo</BbCardTitle>
+                <BbCardDescription>Here are some BlazorBlueprint components in action.</BbCardDescription>
+            </BbCardHeader>
+            <BbCardContent class="space-y-6">
+                <!-- Buttons -->
+                <div class="space-y-2">
+                    <BbLabel>Buttons</BbLabel>
+                    <div class="flex flex-wrap gap-2">
+                        <BbButton>Primary</BbButton>
+                        <BbButton Variant="ButtonVariant.Secondary">Secondary</BbButton>
+                        <BbButton Variant="ButtonVariant.Outline">Outline</BbButton>
+                        <BbButton Variant="ButtonVariant.Ghost">Ghost</BbButton>
+                        <BbButton Variant="ButtonVariant.Destructive">Destructive</BbButton>
+                    </div>
+                </div>
+
+                <BbSeparator/>
+
+                <!-- Input -->
+                <div class="space-y-2">
+                    <BbLabel For="demo-input">Input</BbLabel>
+                    <BbInput id="demo-input" Placeholder="Type something..." @bind-Value="inputValue" UpdateTiming="UpdateTiming.Immediate"/>
+                    @if (!string.IsNullOrEmpty(inputValue))
+                    {
+                        <p class="text-sm text-muted-foreground">You typed: @inputValue</p>
+                    }
+                </div>
+
+                <BbSeparator/>
+
+                <!-- Checkbox and Switch -->
+                <div class="space-y-4">
+                    <BbLabel>Toggle Controls</BbLabel>
+                    <div class="flex items-center space-x-2">
+                        <BbCheckbox id="terms" @bind-Checked="agreeTerms"/>
+                        <BbLabel For="terms" class="font-normal">I agree to the terms and conditions</BbLabel>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <BbSwitch id="notifications" @bind-Checked="notifications"/>
+                        <BbLabel For="notifications" class="font-normal">Enable notifications</BbLabel>
+                    </div>
+                </div>
+
+                <BbSeparator/>
+
+                <!-- Badges -->
+                <div class="space-y-2">
+                    <BbLabel>Badges</BbLabel>
+                    <div class="flex flex-wrap gap-2">
+                        <BbBadge>Default</BbBadge>
+                        <BbBadge Variant="BadgeVariant.Secondary">Secondary</BbBadge>
+                        <BbBadge Variant="BadgeVariant.Outline">Outline</BbBadge>
+                        <BbBadge Variant="BadgeVariant.Destructive">Destructive</BbBadge>
+                    </div>
+                </div>
+
+                <BbSeparator/>
+
+                <!-- Dialog Example -->
+                <div class="space-y-2">
+                    <BbLabel>Dialog</BbLabel>
+                    <BbDialog @bind-Open="dialogOpen">
+                        <BbDialogTrigger>
+                            <BbButton Variant="ButtonVariant.Outline">Open Dialog</BbButton>
+                        </BbDialogTrigger>
+                        <BbDialogContent>
+                            <BbDialogHeader>
+                                <BbDialogTitle>Welcome!</BbDialogTitle>
+                                <BbDialogDescription>
+                                    This is a dialog component. It can contain any content.
+                                </BbDialogDescription>
+                            </BbDialogHeader>
+                            <div class="py-4">
+                                <p>Dialogs are great for confirmations, forms, or displaying important information.</p>
+                            </div>
+                            <BbDialogFooter>
+                                <BbButton Variant="ButtonVariant.Outline" @onclick="() => dialogOpen = false">Cancel</BbButton>
+                                <BbButton @onclick="() => dialogOpen = false">Continue</BbButton>
+                            </BbDialogFooter>
+                        </BbDialogContent>
+                    </BbDialog>
+                </div>
+
+                <BbSeparator/>
+
+                <!-- Alert -->
+                <BbAlert>
+                    <BbAlertTitle>Everything is working!</BbAlertTitle>
+                    <BbAlertDescription>
+                        BlazorBlueprint components are ready to use. Start building something amazing.
+                    </BbAlertDescription>
+                </BbAlert>
+            </BbCardContent>
+        </BbCard>
+
+        <!-- Next Steps -->
+        <BbCard>
+            <BbCardHeader>
+                <BbCardTitle>Next Steps</BbCardTitle>
+                <BbCardDescription>Resources to help you get started.</BbCardDescription>
+            </BbCardHeader>
+            <BbCardContent class="grid gap-4 sm:grid-cols-2">
+                <a href="https://blazorblueprintui.com/docs" target="_blank" class="group block space-y-2 rounded-lg border p-4 hover:bg-accent transition-colors">
+                    <div class="flex items-center gap-2">
+                        <LucideIcon Name="book-open" Size="20" class="text-primary"/>
+                        <h3 class="font-semibold">Documentation</h3>
+                    </div>
+                    <p class="text-sm text-muted-foreground">
+                        Learn how to use all 80+ components.
+                    </p>
+                </a>
+                <a href="https://blazorblueprintui.com/components" target="_blank" class="group block space-y-2 rounded-lg border p-4 hover:bg-accent transition-colors">
+                    <div class="flex items-center gap-2">
+                        <LucideIcon Name="layout-grid" Size="20" class="text-primary"/>
+                        <h3 class="font-semibold">Components</h3>
+                    </div>
+                    <p class="text-sm text-muted-foreground">
+                        Browse the complete component library.
+                    </p>
+                </a>
+                <a href="/showcase/buttons" class="group block space-y-2 rounded-lg border p-4 hover:bg-accent transition-colors">
+                    <div class="flex items-center gap-2">
+                        <LucideIcon Name="eye" Size="20" class="text-primary"/>
+                        <h3 class="font-semibold">Showcase</h3>
+                    </div>
+                    <p class="text-sm text-muted-foreground">
+                        See components in action with examples.
+                    </p>
+                </a>
+                <a href="https://github.com/blazorblueprintui/ui" target="_blank" class="group block space-y-2 rounded-lg border p-4 hover:bg-accent transition-colors">
+                    <div class="flex items-center gap-2">
+                        <LucideIcon Name="github" Size="20" class="text-primary"/>
+                        <h3 class="font-semibold">GitHub</h3>
+                    </div>
+                    <p class="text-sm text-muted-foreground">
+                        Star the repo and contribute.
+                    </p>
+                </a>
+            </BbCardContent>
+        </BbCard>
+    </div>
+</div>
+
+@code {
+    private string? inputValue;
+    private bool agreeTerms;
+    private bool notifications = true;
+    private bool dialogOpen;
+
+    private static string componentsVersion = typeof(BbButton).Assembly
+        .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion?.Split('+')[0] ?? "?";
+
+    private static string primitivesVersion = typeof(IPortalService).Assembly
+        .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion?.Split('+')[0] ?? "?";
+
+}

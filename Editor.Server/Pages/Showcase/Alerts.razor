@@ -1,0 +1,173 @@
+@page "/showcase/alerts"
+@layout _ShowcaseLayout
+@inject ToastService ToastService
+
+<PageTitle>Alerts - Showcase</PageTitle>
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-3xl font-bold tracking-tight">Alerts</h1>
+        <p class="text-muted-foreground mt-2">
+            Alert banners and toast notifications.
+        </p>
+    </div>
+
+    <!-- Alert Variants -->
+    <BbCard>
+        <BbCardHeader>
+            <BbCardTitle>Alert Variants</BbCardTitle>
+            <BbCardDescription>Different alert styles for various contexts.</BbCardDescription>
+        </BbCardHeader>
+        <BbCardContent class="space-y-4">
+            <BbAlert>
+                <Icon>
+                    <LucideIcon Name="terminal" Size="16"/>
+                </Icon>
+                <ChildContent>
+                    <BbAlertTitle>Default Alert</BbAlertTitle>
+                    <BbAlertDescription>
+                        This is a default alert. Use it for general information.
+                    </BbAlertDescription>
+                </ChildContent>
+            </BbAlert>
+
+            <BbAlert Variant="AlertVariant.Danger">
+                <Icon>
+                    <LucideIcon Name="circle-alert" Size="16"/>
+                </Icon>
+                <ChildContent>
+                    <BbAlertTitle>Error</BbAlertTitle>
+                    <BbAlertDescription>
+                        Your session has expired. Please log in again.
+                    </BbAlertDescription>
+                </ChildContent>
+            </BbAlert>
+        </BbCardContent>
+    </BbCard>
+
+    <!-- Alert Examples -->
+    <BbCard>
+        <BbCardHeader>
+            <BbCardTitle>Alert Use Cases</BbCardTitle>
+            <BbCardDescription>Common patterns for using alerts.</BbCardDescription>
+        </BbCardHeader>
+        <BbCardContent class="space-y-4">
+            <BbAlert Variant="AlertVariant.Info">
+                <Icon>
+                    <LucideIcon Name="info" Size="16"/>
+                </Icon>
+                <ChildContent>
+                    <BbAlertTitle>Information</BbAlertTitle>
+                    <BbAlertDescription>
+                        A new version is available. Refresh to update.
+                    </BbAlertDescription>
+                </ChildContent>
+            </BbAlert>
+
+            <BbAlert Variant="AlertVariant.Success">
+                <Icon>
+                    <LucideIcon Name="circle-check" Size="16"/>
+                </Icon>
+                <ChildContent>
+                    <BbAlertTitle>Success</BbAlertTitle>
+                    <BbAlertDescription>
+                        Your changes have been saved successfully.
+                    </BbAlertDescription>
+                </ChildContent>
+            </BbAlert>
+
+            <BbAlert Variant="AlertVariant.Warning">
+                <Icon>
+                    <LucideIcon Name="triangle-alert" Size="16"/>
+                </Icon>
+                <ChildContent>
+                    <BbAlertTitle>Warning</BbAlertTitle>
+                    <BbAlertDescription>
+                        Your subscription will expire in 3 days.
+                    </BbAlertDescription>
+                </ChildContent>
+            </BbAlert>
+        </BbCardContent>
+    </BbCard>
+
+    <!-- Toast Notifications -->
+    <BbCard>
+        <BbCardHeader>
+            <BbCardTitle>Toast Notifications</BbCardTitle>
+            <BbCardDescription>Temporary notifications that appear and auto-dismiss.</BbCardDescription>
+        </BbCardHeader>
+        <BbCardContent>
+            <div class="flex flex-wrap gap-4">
+                <BbButton @onclick="ShowDefaultToast">
+                    Default Toast
+                </BbButton>
+                <BbButton Variant="ButtonVariant.Secondary" @onclick="ShowSuccessToast">
+                    <LucideIcon Name="check" Size="16" class="mr-2"/>
+                    Success Toast
+                </BbButton>
+                <BbButton Variant="ButtonVariant.Destructive" @onclick="ShowErrorToast">
+                    <LucideIcon Name="x" Size="16" class="mr-2"/>
+                    Error Toast
+                </BbButton>
+            </div>
+        </BbCardContent>
+    </BbCard>
+
+    <!-- Toast with Actions -->
+    <BbCard>
+        <BbCardHeader>
+            <BbCardTitle>Toast with Actions</BbCardTitle>
+            <BbCardDescription>Toasts can include action buttons.</BbCardDescription>
+        </BbCardHeader>
+        <BbCardContent>
+            <div class="flex flex-wrap gap-4">
+                <BbButton Variant="ButtonVariant.Outline" @onclick="ShowToastWithAction">
+                    Toast with Action
+                </BbButton>
+                <BbButton Variant="ButtonVariant.Outline" @onclick="ShowPersistentToast">
+                    Persistent Toast
+                </BbButton>
+            </div>
+        </BbCardContent>
+    </BbCard>
+</div>
+
+@code {
+
+    private void ShowDefaultToast()
+    {
+        ToastService.Show("Event has been created", "Notification");
+    }
+
+    private void ShowSuccessToast()
+    {
+        ToastService.Success("Your changes have been saved successfully.", "Profile updated");
+    }
+
+    private void ShowErrorToast()
+    {
+        ToastService.Error("There was a problem with your request.", "Something went wrong");
+    }
+
+    private void ShowToastWithAction()
+    {
+        ToastService.Show(new ToastData
+        {
+            Title = "Undo Action",
+            Description = "The item has been deleted.",
+            ActionText = "Undo",
+            OnAction = () => ToastService.Success("The item has been restored.", "Restored")
+        });
+    }
+
+    private void ShowPersistentToast()
+    {
+        ToastService.Show(new ToastData
+        {
+            Title = "Downloading...",
+            Description = "Your file is being prepared for download.",
+            Duration = 0 // 0 means it won't auto-dismiss
+        });
+    }
+
+}

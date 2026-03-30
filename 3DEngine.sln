@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Graphics", "Engine.G
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editor", "Editor\Editor.csproj", "{C471E21B-7A06-47AE-A98F-9CA0FD5D9154}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editor.Server", "Editor.Server\Editor.Server.csproj", "{130A3BDF-449E-4557-96C0-6E298C331597}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,5 +62,9 @@ Global
 		{C471E21B-7A06-47AE-A98F-9CA0FD5D9154}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C471E21B-7A06-47AE-A98F-9CA0FD5D9154}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C471E21B-7A06-47AE-A98F-9CA0FD5D9154}.Release|Any CPU.Build.0 = Release|Any CPU
+		{130A3BDF-449E-4557-96C0-6E298C331597}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{130A3BDF-449E-4557-96C0-6E298C331597}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{130A3BDF-449E-4557-96C0-6E298C331597}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{130A3BDF-449E-4557-96C0-6E298C331597}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

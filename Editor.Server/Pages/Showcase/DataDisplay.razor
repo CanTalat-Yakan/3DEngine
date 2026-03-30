@@ -1,0 +1,219 @@
+@page "/showcase/data-display"
+@layout _ShowcaseLayout
+
+<PageTitle>Data Display - Showcase</PageTitle>
+
+<div class="space-y-8">
+<div>
+    <h1 class="text-3xl font-bold tracking-tight">Data Display</h1>
+    <p class="text-muted-foreground mt-2">
+        Components for displaying data: tables, avatars, badges, and progress indicators.
+    </p>
+</div>
+
+<!-- Avatar -->
+<BbCard>
+    <BbCardHeader>
+        <BbCardTitle>Avatar</BbCardTitle>
+        <BbCardDescription>Display user profile images with fallbacks.</BbCardDescription>
+    </BbCardHeader>
+    <BbCardContent>
+        <div class="flex items-center gap-4">
+            <BbAvatar>
+                <BbAvatarImage Src="images/avatar.png" Alt="User avatar"/>
+                <BbAvatarFallback>CN</BbAvatarFallback>
+            </BbAvatar>
+            <BbAvatar>
+                <BbAvatarFallback>JD</BbAvatarFallback>
+            </BbAvatar>
+            <BbAvatar>
+                <BbAvatarFallback class="bg-primary text-primary-foreground">AB</BbAvatarFallback>
+            </BbAvatar>
+            <BbAvatar class="h-14 w-14">
+                <BbAvatarFallback class="text-lg">LG</BbAvatarFallback>
+            </BbAvatar>
+        </div>
+    </BbCardContent>
+</BbCard>
+
+<!-- Badge -->
+<BbCard>
+    <BbCardHeader>
+        <BbCardTitle>Badge</BbCardTitle>
+        <BbCardDescription>Small status indicators and labels.</BbCardDescription>
+    </BbCardHeader>
+    <BbCardContent>
+        <div class="flex flex-wrap gap-4">
+            <BbBadge>Default</BbBadge>
+            <BbBadge Variant="BadgeVariant.Secondary">Secondary</BbBadge>
+            <BbBadge Variant="BadgeVariant.Outline">Outline</BbBadge>
+            <BbBadge Variant="BadgeVariant.Destructive">Destructive</BbBadge>
+        </div>
+        <BbSeparator class="my-4"/>
+        <div class="flex flex-wrap gap-4">
+            <BbBadge class="bg-green-500 hover:bg-green-500/80">
+                <LucideIcon Name="check" Size="12" class="mr-1"/>
+                Active
+            </BbBadge>
+            <BbBadge class="bg-yellow-500 hover:bg-yellow-500/80 text-black">
+                <LucideIcon Name="clock" Size="12" class="mr-1"/>
+                Pending
+            </BbBadge>
+            <BbBadge class="bg-blue-500 hover:bg-blue-500/80">
+                <LucideIcon Name="info" Size="12" class="mr-1"/>
+                Info
+            </BbBadge>
+        </div>
+    </BbCardContent>
+</BbCard>
+
+<!-- Progress -->
+<BbCard>
+    <BbCardHeader>
+        <BbCardTitle>Progress</BbCardTitle>
+        <BbCardDescription>Show progress completion with visual indicators.</BbCardDescription>
+    </BbCardHeader>
+    <BbCardContent class="space-y-6">
+        <div class="space-y-2">
+            <div class="flex justify-between text-sm">
+                <span>Loading...</span>
+                <span>25%</span>
+            </div>
+            <BbProgress Value="25"/>
+        </div>
+        <div class="space-y-2">
+            <div class="flex justify-between text-sm">
+                <span>Uploading file</span>
+                <span>66%</span>
+            </div>
+            <BbProgress Value="66"/>
+        </div>
+        <div class="space-y-2">
+            <div class="flex justify-between text-sm">
+                <span>Complete</span>
+                <span>100%</span>
+            </div>
+            <BbProgress Value="100"/>
+        </div>
+    </BbCardContent>
+</BbCard>
+
+<!-- Skeleton -->
+<BbCard>
+    <BbCardHeader>
+        <BbCardTitle>Skeleton</BbCardTitle>
+        <BbCardDescription>Loading placeholders that mimic content structure.</BbCardDescription>
+    </BbCardHeader>
+    <BbCardContent>
+        <div class="flex items-center space-x-4">
+            <BbSkeleton class="h-12 w-12 rounded-full"/>
+            <div class="space-y-2">
+                <BbSkeleton class="h-4 w-[250px]"/>
+                <BbSkeleton class="h-4 w-[200px]"/>
+            </div>
+        </div>
+        <BbSeparator class="my-6"/>
+        <div class="space-y-3">
+            <BbSkeleton class="h-[125px] w-full rounded-xl"/>
+            <div class="space-y-2">
+                <BbSkeleton class="h-4 w-full"/>
+                <BbSkeleton class="h-4 w-4/5"/>
+            </div>
+        </div>
+    </BbCardContent>
+</BbCard>
+
+<!-- Table -->
+<BbCard>
+    <BbCardHeader>
+        <BbCardTitle>Table</BbCardTitle>
+        <BbCardDescription>Display tabular data with consistent styling.</BbCardDescription>
+    </BbCardHeader>
+    <BbCardContent>
+        <div class="relative w-full overflow-auto">
+            <table class="w-full caption-bottom text-sm">
+                <thead class="[&_tr]:border-b">
+                <tr class="border-b transition-colors hover:bg-muted/50">
+                    <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground w-[100px]">Invoice</th>
+                    <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">Status</th>
+                    <th class="h-10 px-2 text-left align-middle font-medium text-muted-foreground">Method</th>
+                    <th class="h-10 px-2 text-right align-middle font-medium text-muted-foreground">Amount</th>
+                </tr>
+                </thead>
+                <tbody class="[&_tr:last-child]:border-0">
+                <tr class="border-b transition-colors hover:bg-muted/50">
+                    <td class="p-2 align-middle font-medium">INV001</td>
+                    <td class="p-2 align-middle">
+                        <BbBadge class="bg-green-500 hover:bg-green-500/80">Paid</BbBadge>
+                    </td>
+                    <td class="p-2 align-middle">Credit Card</td>
+                    <td class="p-2 align-middle text-right">$250.00</td>
+                </tr>
+                <tr class="border-b transition-colors hover:bg-muted/50">
+                    <td class="p-2 align-middle font-medium">INV002</td>
+                    <td class="p-2 align-middle">
+                        <BbBadge class="bg-yellow-500 hover:bg-yellow-500/80 text-black">Pending</BbBadge>
+                    </td>
+                    <td class="p-2 align-middle">PayPal</td>
+                    <td class="p-2 align-middle text-right">$150.00</td>
+                </tr>
+                <tr class="border-b transition-colors hover:bg-muted/50">
+                    <td class="p-2 align-middle font-medium">INV003</td>
+                    <td class="p-2 align-middle">
+                        <BbBadge Variant="BadgeVariant.Destructive">Unpaid</BbBadge>
+                    </td>
+                    <td class="p-2 align-middle">Bank Transfer</td>
+                    <td class="p-2 align-middle text-right">$350.00</td>
+                </tr>
+                <tr class="border-b transition-colors hover:bg-muted/50">
+                    <td class="p-2 align-middle font-medium">INV004</td>
+                    <td class="p-2 align-middle">
+                        <BbBadge class="bg-green-500 hover:bg-green-500/80">Paid</BbBadge>
+                    </td>
+                    <td class="p-2 align-middle">Credit Card</td>
+                    <td class="p-2 align-middle text-right">$450.00</td>
+                </tr>
+                <tr class="border-b transition-colors hover:bg-muted/50">
+                    <td class="p-2 align-middle font-medium">INV005</td>
+                    <td class="p-2 align-middle">
+                        <BbBadge class="bg-green-500 hover:bg-green-500/80">Paid</BbBadge>
+                    </td>
+                    <td class="p-2 align-middle">PayPal</td>
+                    <td class="p-2 align-middle text-right">$550.00</td>
+                </tr>
+                </tbody>
+                <tfoot class="border-t bg-muted/50 font-medium [&>tr]:last:border-b-0">
+                <tr>
+                    <td class="p-2 align-middle" colspan="3">Total</td>
+                    <td class="p-2 align-middle text-right font-bold">$1,750.00</td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </BbCardContent>
+</BbCard>
+
+<!-- Separator -->
+<BbCard>
+    <BbCardHeader>
+        <BbCardTitle>Separator</BbCardTitle>
+        <BbCardDescription>Visual divider between sections.</BbCardDescription>
+    </BbCardHeader>
+    <BbCardContent>
+        <div class="space-y-1">
+            <h4 class="text-sm font-medium leading-none">BlazorBlueprint</h4>
+            <p class="text-sm text-muted-foreground">
+                A beautiful component library for Blazor.
+            </p>
+        </div>
+        <BbSeparator class="my-4"/>
+        <div class="flex h-5 items-center space-x-4 text-sm">
+            <div>Docs</div>
+            <BbSeparator Orientation="SeparatorOrientation.Vertical"/>
+            <div>Source</div>
+            <BbSeparator Orientation="SeparatorOrientation.Vertical"/>
+            <div>GitHub</div>
+        </div>
+    </BbCardContent>
+</BbCard>
+</div>

@@ -1,0 +1,205 @@
+@page "/showcase/navigation"
+@layout _ShowcaseLayout
+
+<PageTitle>Navigation - Showcase</PageTitle>
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-3xl font-bold tracking-tight">Navigation</h1>
+        <p class="text-muted-foreground mt-2">
+            Tabs and collapsible sections for organizing content.
+        </p>
+    </div>
+
+    <!-- Tabs -->
+    <BbCard>
+        <BbCardHeader>
+            <BbCardTitle>Tabs</BbCardTitle>
+            <BbCardDescription>Switch between different views or sections.</BbCardDescription>
+        </BbCardHeader>
+        <BbCardContent>
+            <BbTabs DefaultValue="account" class="w-full">
+                <BbTabsList class="grid w-full grid-cols-3 max-w-md">
+                    <BbTabsTrigger Value="account">Account</BbTabsTrigger>
+                    <BbTabsTrigger Value="password">Password</BbTabsTrigger>
+                    <BbTabsTrigger Value="settings">Settings</BbTabsTrigger>
+                </BbTabsList>
+                <BbTabsContent Value="account">
+                    <BbCard>
+                        <BbCardHeader>
+                            <BbCardTitle>Account</BbCardTitle>
+                            <BbCardDescription>
+                                Make changes to your account here. Click save when you're done.
+                            </BbCardDescription>
+                        </BbCardHeader>
+                        <BbCardContent class="space-y-4">
+                            <div class="space-y-2">
+                                <BbLabel For="tab-name">Name</BbLabel>
+                                <BbInput id="tab-name" Value="John Doe"/>
+                            </div>
+                            <div class="space-y-2">
+                                <BbLabel For="tab-email">Email</BbLabel>
+                                <BbInput id="tab-email" Type="InputType.Email" Value="john@example.com"/>
+                            </div>
+                        </BbCardContent>
+                        <BbCardFooter>
+                            <BbButton>Save changes</BbButton>
+                        </BbCardFooter>
+                    </BbCard>
+                </BbTabsContent>
+                <BbTabsContent Value="password">
+                    <BbCard>
+                        <BbCardHeader>
+                            <BbCardTitle>Password</BbCardTitle>
+                            <BbCardDescription>
+                                Change your password here. After saving, you'll be logged out.
+                            </BbCardDescription>
+                        </BbCardHeader>
+                        <BbCardContent class="space-y-4">
+                            <div class="space-y-2">
+                                <BbLabel For="current-password">Current password</BbLabel>
+                                <BbInput id="current-password" Type="InputType.Password"/>
+                            </div>
+                            <div class="space-y-2">
+                                <BbLabel For="new-password">New password</BbLabel>
+                                <BbInput id="new-password" Type="InputType.Password"/>
+                            </div>
+                        </BbCardContent>
+                        <BbCardFooter>
+                            <BbButton>Change password</BbButton>
+                        </BbCardFooter>
+                    </BbCard>
+                </BbTabsContent>
+                <BbTabsContent Value="settings">
+                    <BbCard>
+                        <BbCardHeader>
+                            <BbCardTitle>Settings</BbCardTitle>
+                            <BbCardDescription>
+                                Manage your application settings and preferences.
+                            </BbCardDescription>
+                        </BbCardHeader>
+                        <BbCardContent class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="space-y-0.5">
+                                    <BbLabel>Dark mode</BbLabel>
+                                    <p class="text-sm text-muted-foreground">Enable dark mode theme.</p>
+                                </div>
+                                <BbSwitch/>
+                            </div>
+                            <BbSeparator/>
+                            <div class="flex items-center justify-between">
+                                <div class="space-y-0.5">
+                                    <BbLabel>Notifications</BbLabel>
+                                    <p class="text-sm text-muted-foreground">Receive email notifications.</p>
+                                </div>
+                                <BbSwitch Checked="true"/>
+                            </div>
+                        </BbCardContent>
+                    </BbCard>
+                </BbTabsContent>
+            </BbTabs>
+        </BbCardContent>
+    </BbCard>
+
+    <!-- Collapsible -->
+    <BbCard>
+        <BbCardHeader>
+            <BbCardTitle>Collapsible</BbCardTitle>
+            <BbCardDescription>A section that can be expanded or collapsed.</BbCardDescription>
+        </BbCardHeader>
+        <BbCardContent>
+            <BbCollapsible @bind-Open="collapsibleOpen" class="w-full max-w-lg space-y-2">
+                <div class="flex items-center justify-between space-x-4 px-4">
+                    <h4 class="text-sm font-semibold">
+                        Recent repositories
+                    </h4>
+                    <BbCollapsibleTrigger>
+                        <BbButton Variant="ButtonVariant.Ghost" Size="ButtonSize.Small" class="w-9 p-0">
+                            <LucideIcon Name="chevrons-up-down" Size="16"/>
+                            <span class="sr-only">Toggle</span>
+                        </BbButton>
+                    </BbCollapsibleTrigger>
+                </div>
+                <div class="rounded-md border px-4 py-2 font-mono text-sm shadow-sm">
+                    blazorblueprint/components
+                </div>
+                <BbCollapsibleContent class="space-y-2">
+                    <div class="rounded-md border px-4 py-2 font-mono text-sm shadow-sm">
+                        blazorblueprint/primitives
+                    </div>
+                    <div class="rounded-md border px-4 py-2 font-mono text-sm shadow-sm">
+                        blazorblueprint/icons
+                    </div>
+                </BbCollapsibleContent>
+            </BbCollapsible>
+        </BbCardContent>
+    </BbCard>
+
+    <!-- Multiple Collapsibles -->
+    <BbCard>
+        <BbCardHeader>
+            <BbCardTitle>FAQ Section</BbCardTitle>
+            <BbCardDescription>Multiple collapsible sections for FAQ-style content.</BbCardDescription>
+        </BbCardHeader>
+        <BbCardContent class="space-y-2 max-w-lg">
+            <BbCollapsible @bind-Open="faq1Open" class="border rounded-lg">
+                <div class="flex items-center justify-between p-4">
+                    <h4 class="text-sm font-semibold">What is BlazorBlueprint?</h4>
+                    <BbCollapsibleTrigger>
+                        <BbButton Variant="ButtonVariant.Ghost" Size="ButtonSize.Small" class="w-9 p-0">
+                            <LucideIcon Name="@(faq1Open ? "chevron-up" : "chevron-down")" Size="16"/>
+                        </BbButton>
+                    </BbCollapsibleTrigger>
+                </div>
+                <BbCollapsibleContent>
+                    <div class="px-4 pb-4 text-sm text-muted-foreground">
+                        BlazorBlueprint is a Blazor component library that provides 80+ pre-styled components
+                        following the shadcn/ui design system. It includes both styled components and
+                        headless primitives.
+                    </div>
+                </BbCollapsibleContent>
+            </BbCollapsible>
+
+            <BbCollapsible @bind-Open="faq2Open" class="border rounded-lg">
+                <div class="flex items-center justify-between p-4">
+                    <h4 class="text-sm font-semibold">How do I install it?</h4>
+                    <BbCollapsibleTrigger>
+                        <BbButton Variant="ButtonVariant.Ghost" Size="ButtonSize.Small" class="w-9 p-0">
+                            <LucideIcon Name="@(faq2Open ? "chevron-up" : "chevron-down")" Size="16"/>
+                        </BbButton>
+                    </BbCollapsibleTrigger>
+                </div>
+                <BbCollapsibleContent>
+                    <div class="px-4 pb-4 text-sm text-muted-foreground">
+                        You can install BlazorBlueprint via NuGet: <code class="bg-muted px-1 rounded">dotnet add package BlazorBlueprint.Components</code>.
+                        Or create a new project with all packages pre-installed using the template.
+                    </div>
+                </BbCollapsibleContent>
+            </BbCollapsible>
+
+            <BbCollapsible @bind-Open="faq3Open" class="border rounded-lg">
+                <div class="flex items-center justify-between p-4">
+                    <h4 class="text-sm font-semibold">Can I customize the styling?</h4>
+                    <BbCollapsibleTrigger>
+                        <BbButton Variant="ButtonVariant.Ghost" Size="ButtonSize.Small" class="w-9 p-0">
+                            <LucideIcon Name="@(faq3Open ? "chevron-up" : "chevron-down")" Size="16"/>
+                        </BbButton>
+                    </BbCollapsibleTrigger>
+                </div>
+                <BbCollapsibleContent>
+                    <div class="px-4 pb-4 text-sm text-muted-foreground">
+                        Yes! BlazorBlueprint uses CSS variables for theming. You can customize colors,
+                        spacing, and other design tokens by modifying the CSS variables in your theme file.
+                    </div>
+                </BbCollapsibleContent>
+            </BbCollapsible>
+        </BbCardContent>
+    </BbCard>
+</div>
+
+@code {
+    private bool collapsibleOpen;
+    private bool faq1Open;
+    private bool faq2Open;
+    private bool faq3Open;
+}

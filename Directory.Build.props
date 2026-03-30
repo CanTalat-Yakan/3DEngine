@@ -5,7 +5,6 @@
         <TargetFramework Condition="'$(TargetFramework)' == ''">net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RootNamespace>Engine</RootNamespace>
     </PropertyGroup>
 
     <!-- NuGet package metadata -->

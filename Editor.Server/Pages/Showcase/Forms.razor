@@ -1,0 +1,295 @@
+@page "/showcase/forms"
+@layout _ShowcaseLayout
+
+<PageTitle>Forms - Showcase</PageTitle>
+
+<div class="space-y-8">
+<div>
+    <h1 class="text-3xl font-bold tracking-tight">Forms</h1>
+    <p class="text-muted-foreground mt-2">
+        Form components for collecting user input.
+    </p>
+</div>
+
+<!-- Input -->
+<BbCard>
+    <BbCardHeader>
+        <BbCardTitle>Input</BbCardTitle>
+        <BbCardDescription>Text input fields with various states.</BbCardDescription>
+    </BbCardHeader>
+    <BbCardContent class="space-y-4 max-w-md">
+        <div class="space-y-2">
+            <BbLabel For="email">Email</BbLabel>
+            <BbInput id="email" Type="InputType.Email" Placeholder="Enter your email"/>
+        </div>
+        <div class="space-y-2">
+            <BbLabel For="password">Password</BbLabel>
+            <BbInput id="password" Type="InputType.Password" Placeholder="Enter your password"/>
+        </div>
+        <div class="space-y-2">
+            <BbLabel For="disabled">Disabled</BbLabel>
+            <BbInput id="disabled" Disabled="true" Placeholder="Disabled input"/>
+        </div>
+    </BbCardContent>
+</BbCard>
+
+<!-- Textarea -->
+<BbCard>
+    <BbCardHeader>
+        <BbCardTitle>Textarea</BbCardTitle>
+        <BbCardDescription>Multi-line text input.</BbCardDescription>
+    </BbCardHeader>
+    <BbCardContent class="max-w-md">
+        <div class="space-y-2">
+            <BbLabel For="bio">Bio</BbLabel>
+            <BbTextarea id="bio" Placeholder="Tell us about yourself..." class="min-h-[100px]"/>
+            <p class="text-sm text-muted-foreground">
+                Write a few sentences about yourself.
+            </p>
+        </div>
+    </BbCardContent>
+</BbCard>
+
+<!-- Select -->
+<BbCard>
+    <BbCardHeader>
+        <BbCardTitle>Select</BbCardTitle>
+        <BbCardDescription>Dropdown selection component.</BbCardDescription>
+    </BbCardHeader>
+    <BbCardContent class="max-w-md">
+        <div class="space-y-2">
+            <BbLabel>Select a framework</BbLabel>
+            <BbSelect @bind-Value="selectedFramework" TValue="string">
+                <BbSelectTrigger>
+                    <BbSelectValue Placeholder="Choose a framework"/>
+                </BbSelectTrigger>
+                <BbSelectContent>
+                    <BbSelectGroup>
+                        <BbSelectLabel>Frameworks</BbSelectLabel>
+                        <BbSelectItem Value="@("blazor")" Text="Blazor" TValue="string">Blazor</BbSelectItem>
+                        <BbSelectItem Value="@("react")" Text="React" TValue="string">React</BbSelectItem>
+                        <BbSelectItem Value="@("vue")" Text="Vue" TValue="string">Vue</BbSelectItem>
+                        <BbSelectItem Value="@("angular")" Text="Angular" TValue="string">Angular</BbSelectItem>
+                        <BbSelectItem Value="@("svelte")" Text="Svelte" TValue="string">Svelte</BbSelectItem>
+                    </BbSelectGroup>
+                </BbSelectContent>
+            </BbSelect>
+            @if (!string.IsNullOrEmpty(selectedFramework))
+            {
+                <p class="text-sm text-muted-foreground">
+                    Selected: @selectedFramework
+                </p>
+            }
+        </div>
+    </BbCardContent>
+</BbCard>
+
+<!-- Combobox -->
+<BbCard>
+    <BbCardHeader>
+        <BbCardTitle>Combobox</BbCardTitle>
+        <BbCardDescription>Searchable dropdown with autocomplete.</BbCardDescription>
+    </BbCardHeader>
+    <BbCardContent class="max-w-md">
+        <div class="space-y-2">
+            <BbLabel>Select a country</BbLabel>
+            <BbCombobox TValue="string"
+                        Options="_countryOptions"
+                        @bind-Value="selectedCountry"
+                        Placeholder="Select country..."
+                        SearchPlaceholder="Search countries..."
+                        EmptyMessage="No country found."
+                        MatchTriggerWidth="true"/>
+            @if (!string.IsNullOrEmpty(selectedCountry))
+            {
+                <p class="text-sm text-muted-foreground">
+                    Selected: @selectedCountry
+                </p>
+            }
+        </div>
+    </BbCardContent>
+</BbCard>
+
+<!-- MultiSelect -->
+<BbCard>
+    <BbCardHeader>
+        <BbCardTitle>Multi Select</BbCardTitle>
+        <BbCardDescription>Select multiple items with search and tags.</BbCardDescription>
+    </BbCardHeader>
+    <BbCardContent class="max-w-md">
+        <div class="space-y-2">
+            <BbLabel>Select technologies</BbLabel>
+            <BbMultiSelect TValue="string"
+                           Options="_technologyOptions"
+                           @bind-Values="selectedTechnologies"
+                           Placeholder="Select technologies..."
+                           SearchPlaceholder="Search technologies..."
+                           EmptyMessage="No technologies found."
+                           MaxDisplayTags="3"
+                           MatchTriggerWidth="true"/>
+            @if (selectedTechnologies?.Any() == true)
+            {
+                <p class="text-sm text-muted-foreground">
+                    Selected: @string.Join(", ", selectedTechnologies)
+                </p>
+            }
+        </div>
+    </BbCardContent>
+</BbCard>
+
+<!-- Checkbox -->
+<BbCard>
+    <BbCardHeader>
+        <BbCardTitle>Checkbox</BbCardTitle>
+        <BbCardDescription>Checkboxes for multiple selections.</BbCardDescription>
+    </BbCardHeader>
+    <BbCardContent class="space-y-4">
+        <div class="flex items-center space-x-2">
+            <BbCheckbox id="terms"/>
+            <BbLabel For="terms">Accept terms and conditions</BbLabel>
+        </div>
+        <div class="flex items-center space-x-2">
+            <BbCheckbox id="marketing" Checked="true"/>
+            <BbLabel For="marketing">Receive marketing emails</BbLabel>
+        </div>
+        <div class="flex items-center space-x-2">
+            <BbCheckbox id="disabled-check" Disabled="true"/>
+            <BbLabel For="disabled-check" class="text-muted-foreground">Disabled checkbox</BbLabel>
+        </div>
+    </BbCardContent>
+</BbCard>
+
+<!-- Radio Group -->
+<BbCard>
+    <BbCardHeader>
+        <BbCardTitle>Radio Group</BbCardTitle>
+        <BbCardDescription>Radio buttons for single selection.</BbCardDescription>
+    </BbCardHeader>
+    <BbCardContent>
+        <BbRadioGroup @bind-Value="selectedPlan" class="space-y-2">
+            <div class="flex items-center space-x-2">
+                <BbRadioGroupItem Value="@("free")" id="radio-free"/>
+                <BbLabel For="radio-free">Free</BbLabel>
+            </div>
+            <div class="flex items-center space-x-2">
+                <BbRadioGroupItem Value="@("pro")" id="radio-pro"/>
+                <BbLabel For="radio-pro">Pro - $9/month</BbLabel>
+            </div>
+            <div class="flex items-center space-x-2">
+                <BbRadioGroupItem Value="@("enterprise")" id="radio-enterprise"/>
+                <BbLabel For="radio-enterprise">Enterprise - Contact us</BbLabel>
+            </div>
+        </BbRadioGroup>
+        @if (!string.IsNullOrEmpty(selectedPlan))
+        {
+            <p class="text-sm text-muted-foreground mt-4">
+                Selected plan: @selectedPlan
+            </p>
+        }
+    </BbCardContent>
+</BbCard>
+
+<!-- Switch -->
+<BbCard>
+    <BbCardHeader>
+        <BbCardTitle>Switch</BbCardTitle>
+        <BbCardDescription>Toggle switches for on/off states.</BbCardDescription>
+    </BbCardHeader>
+    <BbCardContent class="space-y-4">
+        <div class="flex items-center justify-between max-w-md">
+            <div class="space-y-0.5">
+                <BbLabel>Airplane Mode</BbLabel>
+                <p class="text-sm text-muted-foreground">Disable all wireless connections.</p>
+            </div>
+            <BbSwitch @bind-Checked="airplaneMode"/>
+        </div>
+        <BbSeparator class="max-w-md"/>
+        <div class="flex items-center justify-between max-w-md">
+            <div class="space-y-0.5">
+                <BbLabel>Wi-Fi</BbLabel>
+                <p class="text-sm text-muted-foreground">Connect to wireless networks.</p>
+            </div>
+            <BbSwitch Checked="true" Disabled="@airplaneMode"/>
+        </div>
+    </BbCardContent>
+</BbCard>
+
+<!-- Complete Form Example -->
+<BbCard>
+    <BbCardHeader>
+        <BbCardTitle>Complete Form</BbCardTitle>
+        <BbCardDescription>A complete form example with multiple field types.</BbCardDescription>
+    </BbCardHeader>
+    <BbCardContent>
+        <form class="space-y-6 max-w-md">
+            <div class="space-y-2">
+                <BbLabel For="form-name">Name</BbLabel>
+                <BbInput id="form-name" Placeholder="Your name"/>
+            </div>
+            <div class="space-y-2">
+                <BbLabel For="form-email">Email</BbLabel>
+                <BbInput id="form-email" Type="InputType.Email" Placeholder="you@example.com"/>
+            </div>
+            <div class="space-y-2">
+                <BbLabel>Role</BbLabel>
+                <BbSelect TValue="string">
+                    <BbSelectTrigger>
+                        <BbSelectValue Placeholder="Select your role"/>
+                    </BbSelectTrigger>
+                    <BbSelectContent>
+                        <BbSelectItem Value="@("developer")" Text="Developer" TValue="string">Developer</BbSelectItem>
+                        <BbSelectItem Value="@("designer")" Text="Designer" TValue="string">Designer</BbSelectItem>
+                        <BbSelectItem Value="@("manager")" Text="Manager" TValue="string">Manager</BbSelectItem>
+                    </BbSelectContent>
+                </BbSelect>
+            </div>
+            <div class="space-y-2">
+                <BbLabel For="form-message">Message</BbLabel>
+                <BbTextarea id="form-message" Placeholder="Your message..."/>
+            </div>
+            <div class="flex items-center space-x-2">
+                <BbCheckbox id="subscribe"/>
+                <BbLabel For="subscribe">Subscribe to newsletter</BbLabel>
+            </div>
+            <BbButton Type="ButtonType.Submit" class="w-full">Submit</BbButton>
+        </form>
+    </BbCardContent>
+</BbCard>
+</div>
+
+@code {
+    private string? selectedFramework;
+    private string selectedPlan = "free";
+    private bool airplaneMode;
+    private string? selectedCountry;
+    private IEnumerable<string>? selectedTechnologies;
+
+    private readonly SelectOption<string>[] _countryOptions =
+    [
+        new("us", "United States"),
+        new("gb", "United Kingdom"),
+        new("ca", "Canada"),
+        new("au", "Australia"),
+        new("de", "Germany"),
+        new("fr", "France"),
+        new("jp", "Japan"),
+        new("br", "Brazil"),
+        new("in", "India"),
+        new("mx", "Mexico")
+    ];
+
+    private readonly SelectOption<string>[] _technologyOptions =
+    [
+        new("csharp", "C#"),
+        new("blazor", "Blazor"),
+        new("dotnet", ".NET"),
+        new("typescript", "TypeScript"),
+        new("javascript", "JavaScript"),
+        new("react", "React"),
+        new("vue", "Vue"),
+        new("angular", "Angular"),
+        new("tailwind", "Tailwind CSS"),
+        new("postgres", "PostgreSQL")
+    ];
+
+}

@@ -1,0 +1,134 @@
+@page "/showcase/dialogs"
+@layout _ShowcaseLayout
+
+<PageTitle>Dialogs - Showcase</PageTitle>
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-3xl font-bold tracking-tight">Dialogs</h1>
+        <p class="text-muted-foreground mt-2">
+            Modal dialogs and alert dialogs for user interactions.
+        </p>
+    </div>
+
+    <!-- Dialog -->
+    <BbCard>
+        <BbCardHeader>
+            <BbCardTitle>Dialog</BbCardTitle>
+            <BbCardDescription>A modal dialog that interrupts the user with important content.</BbCardDescription>
+        </BbCardHeader>
+        <BbCardContent>
+            <BbDialog @bind-Open="dialogOpen">
+                <BbDialogTrigger>
+                    <BbButton>Open Dialog</BbButton>
+                </BbDialogTrigger>
+                <BbDialogContent>
+                    <BbDialogHeader>
+                        <BbDialogTitle>Edit Profile</BbDialogTitle>
+                        <BbDialogDescription>
+                            Make changes to your profile here. Click save when you're done.
+                        </BbDialogDescription>
+                    </BbDialogHeader>
+                    <div class="space-y-4 py-4">
+                        <div class="space-y-2">
+                            <BbLabel For="dialog-name">Name</BbLabel>
+                            <BbInput id="dialog-name" Value="John Doe"/>
+                        </div>
+                        <div class="space-y-2">
+                            <BbLabel For="dialog-email">Email</BbLabel>
+                            <BbInput id="dialog-email" Type="InputType.Email" Value="john.doe@example.com"/>
+                        </div>
+                    </div>
+                    <BbDialogFooter>
+                        <BbButton Variant="ButtonVariant.Outline" @onclick="() => dialogOpen = false">Cancel</BbButton>
+                        <BbButton @onclick="() => dialogOpen = false">Save changes</BbButton>
+                    </BbDialogFooter>
+                </BbDialogContent>
+            </BbDialog>
+        </BbCardContent>
+    </BbCard>
+
+    <!-- Alert Dialog -->
+    <BbCard>
+        <BbCardHeader>
+            <BbCardTitle>Alert Dialog</BbCardTitle>
+            <BbCardDescription>A modal dialog for important confirmations that requires user action.</BbCardDescription>
+        </BbCardHeader>
+        <BbCardContent>
+            <BbAlertDialog @bind-Open="alertDialogOpen">
+                <BbAlertDialogTrigger>
+                    <BbButton Variant="ButtonVariant.Destructive">Delete Account</BbButton>
+                </BbAlertDialogTrigger>
+                <BbAlertDialogContent>
+                    <BbAlertDialogHeader>
+                        <BbAlertDialogTitle>Are you absolutely sure?</BbAlertDialogTitle>
+                        <BbAlertDialogDescription>
+                            This action cannot be undone. This will permanently delete your account
+                            and remove your data from our servers.
+                        </BbAlertDialogDescription>
+                    </BbAlertDialogHeader>
+                    <BbAlertDialogFooter>
+                        <BbAlertDialogCancel>
+                            <BbButton Variant="ButtonVariant.Outline">Cancel</BbButton>
+                        </BbAlertDialogCancel>
+                        <BbAlertDialogAction>
+                            <BbButton Variant="ButtonVariant.Destructive">Yes, delete account</BbButton>
+                        </BbAlertDialogAction>
+                    </BbAlertDialogFooter>
+                </BbAlertDialogContent>
+            </BbAlertDialog>
+        </BbCardContent>
+    </BbCard>
+
+    <!-- Nested Dialog -->
+    <BbCard>
+        <BbCardHeader>
+            <BbCardTitle>Dialog with Form</BbCardTitle>
+            <BbCardDescription>Dialog containing a complete form.</BbCardDescription>
+        </BbCardHeader>
+        <BbCardContent>
+            <BbDialog @bind-Open="formDialogOpen">
+                <BbDialogTrigger>
+                    <BbButton Variant="ButtonVariant.Outline">Create Account</BbButton>
+                </BbDialogTrigger>
+                <BbDialogContent class="sm:max-w-[425px]">
+                    <BbDialogHeader>
+                        <BbDialogTitle>Create Account</BbDialogTitle>
+                        <BbDialogDescription>
+                            Enter your details below to create a new account.
+                        </BbDialogDescription>
+                    </BbDialogHeader>
+                    <div class="space-y-4 py-4">
+                        <div class="space-y-2">
+                            <BbLabel For="create-name">Full Name</BbLabel>
+                            <BbInput id="create-name" Placeholder="Enter your name"/>
+                        </div>
+                        <div class="space-y-2">
+                            <BbLabel For="create-email">Email</BbLabel>
+                            <BbInput id="create-email" Type="InputType.Email" Placeholder="you@example.com"/>
+                        </div>
+                        <div class="space-y-2">
+                            <BbLabel For="create-password">Password</BbLabel>
+                            <BbInput id="create-password" Type="InputType.Password" Placeholder="Create a password"/>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <BbCheckbox id="terms"/>
+                            <BbLabel For="terms" class="text-sm font-normal">
+                                I agree to the terms and conditions
+                            </BbLabel>
+                        </div>
+                    </div>
+                    <BbDialogFooter>
+                        <BbButton Type="ButtonType.Submit" @onclick="() => formDialogOpen = false">Create Account</BbButton>
+                    </BbDialogFooter>
+                </BbDialogContent>
+            </BbDialog>
+        </BbCardContent>
+    </BbCard>
+</div>
+
+@code {
+    private bool dialogOpen;
+    private bool alertDialogOpen;
+    private bool formDialogOpen;
+}

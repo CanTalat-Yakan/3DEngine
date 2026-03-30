@@ -1,0 +1,111 @@
+@page "/showcase/buttons"
+@layout _ShowcaseLayout
+
+<PageTitle>Buttons - Showcase</PageTitle>
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-3xl font-bold tracking-tight">Buttons</h1>
+        <p class="text-muted-foreground mt-2">
+            Displays a button or a component that looks like a button.
+        </p>
+    </div>
+
+    <!-- Variants -->
+    <BbCard>
+        <BbCardHeader>
+            <BbCardTitle>Variants</BbCardTitle>
+            <BbCardDescription>Different button styles for various use cases.</BbCardDescription>
+        </BbCardHeader>
+        <BbCardContent>
+            <div class="flex flex-wrap gap-4">
+                <BbButton>Default</BbButton>
+                <BbButton Variant="ButtonVariant.Secondary">Secondary</BbButton>
+                <BbButton Variant="ButtonVariant.Outline">Outline</BbButton>
+                <BbButton Variant="ButtonVariant.Ghost">Ghost</BbButton>
+                <BbButton Variant="ButtonVariant.Link">Link</BbButton>
+                <BbButton Variant="ButtonVariant.Destructive">Destructive</BbButton>
+            </div>
+        </BbCardContent>
+    </BbCard>
+
+    <!-- Sizes -->
+    <BbCard>
+        <BbCardHeader>
+            <BbCardTitle>Sizes</BbCardTitle>
+            <BbCardDescription>Buttons come in different sizes.</BbCardDescription>
+        </BbCardHeader>
+        <BbCardContent>
+            <div class="flex flex-wrap items-center gap-4">
+                <BbButton Size="ButtonSize.Small">Small</BbButton>
+                <BbButton Size="ButtonSize.Default">Default</BbButton>
+                <BbButton Size="ButtonSize.Large">Large</BbButton>
+                <BbButton Size="ButtonSize.Icon">
+                    <LucideIcon Name="plus" Size="16"/>
+                </BbButton>
+            </div>
+        </BbCardContent>
+    </BbCard>
+
+    <!-- With Icons -->
+    <BbCard>
+        <BbCardHeader>
+            <BbCardTitle>With Icons</BbCardTitle>
+            <BbCardDescription>Buttons can include icons for better visual communication.</BbCardDescription>
+        </BbCardHeader>
+        <BbCardContent>
+            <div class="flex flex-wrap gap-4">
+                <BbButton>
+                    <LucideIcon Name="mail" Size="16" class="mr-2"/>
+                    Login with Email
+                </BbButton>
+                <BbButton Variant="ButtonVariant.Secondary">
+                    <LucideIcon Name="loader-circle" Size="16" class="mr-2 animate-spin"/>
+                    Please wait
+                </BbButton>
+                <BbButton Variant="ButtonVariant.Outline">
+                    <LucideIcon Name="github" Size="16" class="mr-2"/>
+                    GitHub
+                </BbButton>
+                <BbButton>
+                    Next
+                    <LucideIcon Name="chevron-right" Size="16" class="ml-2"/>
+                </BbButton>
+            </div>
+        </BbCardContent>
+    </BbCard>
+
+    <!-- States -->
+    <BbCard>
+        <BbCardHeader>
+            <BbCardTitle>States</BbCardTitle>
+            <BbCardDescription>Buttons can be disabled or show loading states.</BbCardDescription>
+        </BbCardHeader>
+        <BbCardContent>
+            <div class="flex flex-wrap gap-4">
+                <BbButton Disabled="true">Disabled</BbButton>
+                <BbButton Variant="ButtonVariant.Outline" Disabled="true">Disabled Outline</BbButton>
+                <BbButton Loading="true" LoadingText="Loading...">Submit</BbButton>
+            </div>
+        </BbCardContent>
+    </BbCard>
+
+    <!-- As Link -->
+    <BbCard>
+        <BbCardHeader>
+            <BbCardTitle>As Link</BbCardTitle>
+            <BbCardDescription>Buttons can be rendered as anchor elements for navigation.</BbCardDescription>
+        </BbCardHeader>
+        <BbCardContent>
+            <div class="flex flex-wrap gap-4">
+                <BbButton Href="/">
+                    Go Home
+                </BbButton>
+                <BbButton Href="https://blazorblueprintui.com" Variant="ButtonVariant.Outline">
+                    Visit BlazorBlueprint
+                    <LucideIcon Name="external-link" Size="16" class="ml-2"/>
+                </BbButton>
+            </div>
+        </BbCardContent>
+    </BbCard>
+</div>
