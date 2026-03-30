@@ -58,4 +58,7 @@ public sealed class NullGraphicsDevice : IGraphicsDevice
 
     public void Draw(ICommandBuffer commandBuffer, uint vertexCount, uint instanceCount = 1, uint firstVertex = 0, uint firstInstance = 0)
         => throw new NotSupportedException("NullGraphicsDevice does not support drawing.");
+
+    public void UploadTexture2D(IImage image, ReadOnlySpan<byte> data, uint width, uint height, int bytesPerPixel)
+        => throw new NotSupportedException("NullGraphicsDevice does not support texture upload.");
 }

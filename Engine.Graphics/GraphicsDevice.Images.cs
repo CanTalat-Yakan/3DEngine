@@ -240,7 +240,7 @@ public sealed unsafe partial class GraphicsDevice
         vkImage.Layout = newLayout;
     }
 
-    internal void UploadTexture2D(IImage image, ReadOnlySpan<byte> data, uint width, uint height, int bytesPerPixel)
+    public void UploadTexture2D(IImage image, ReadOnlySpan<byte> data, uint width, uint height, int bytesPerPixel)
     {
         if (image is not VulkanImage vkImage)
             throw new ArgumentException("Image was not created by this device.", nameof(image));

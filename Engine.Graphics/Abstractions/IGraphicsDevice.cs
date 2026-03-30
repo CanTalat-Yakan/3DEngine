@@ -36,5 +36,8 @@ public interface IGraphicsDevice : IDisposable
     void BindGraphicsPipeline(ICommandBuffer commandBuffer, IPipeline pipeline);
     void BindDescriptorSet(ICommandBuffer commandBuffer, IPipeline pipeline, IDescriptorSet descriptorSet);
     void Draw(ICommandBuffer commandBuffer, uint vertexCount, uint instanceCount = 1, uint firstVertex = 0, uint firstInstance = 0);
+
+    // Texture upload
+    void UploadTexture2D(IImage image, ReadOnlySpan<byte> data, uint width, uint height, int bytesPerPixel);
 }
 

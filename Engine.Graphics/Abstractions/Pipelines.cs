@@ -7,5 +7,10 @@ public interface IRenderPass { }
 public interface IPipeline { }
 public interface ICommandBuffer { }
 
-public readonly record struct GraphicsPipelineDesc(IRenderPass RenderPass, IShader VertexShader, IShader FragmentShader);
+public readonly record struct GraphicsPipelineDesc(
+    IRenderPass RenderPass,
+    IShader VertexShader,
+    IShader FragmentShader,
+    bool BlendEnabled = false,
+    bool CullBackFace = true);
 

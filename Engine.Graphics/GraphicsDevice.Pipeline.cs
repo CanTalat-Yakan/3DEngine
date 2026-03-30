@@ -117,7 +117,7 @@ public sealed unsafe partial class GraphicsDevice
         VkPipelineRasterizationStateCreateInfo rasterizer = new()
         {
             polygonMode = VkPolygonMode.Fill,
-            cullMode = VkCullModeFlags.Back,
+            cullMode = desc.CullBackFace ? VkCullModeFlags.Back : VkCullModeFlags.None,
             frontFace = VkFrontFace.CounterClockwise,
             lineWidth = 1.0f
         };
@@ -130,7 +130,13 @@ public sealed unsafe partial class GraphicsDevice
         VkPipelineColorBlendAttachmentState colorBlendAttachment = new()
         {
             colorWriteMask = VkColorComponentFlags.R | VkColorComponentFlags.G | VkColorComponentFlags.B | VkColorComponentFlags.A,
-            blendEnable = false
+            blendEnable = desc.BlendEnabled,
+            srcColorBlendFactor = VkBlendFactor.SrcAlpha,
+            dstColorBlendFactor = VkBlendFactor.OneMinusSrcAlpha,
+            colorBlendOp = VkBlendOp.Add,
+            srcAlphaBlendFactor = VkBlendFactor.One,
+            dstAlphaBlendFactor = VkBlendFactor.OneMinusSrcAlpha,
+            alphaBlendOp = VkBlendOp.Add
         };
 
         VkPipelineColorBlendStateCreateInfo colorBlend = new()

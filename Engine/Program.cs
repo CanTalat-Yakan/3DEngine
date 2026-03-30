@@ -1,5 +1,10 @@
 ﻿using Engine;
 
-new App(Config.GetDefault())
+var config = Config.GetDefault(
+    title: "3D Engine Editor",
+    width: 1280,
+    height: 720);
+
+new App(config)
     .AddPlugin(new DefaultPlugins())
     .Run();

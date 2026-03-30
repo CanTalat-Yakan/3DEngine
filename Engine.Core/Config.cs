@@ -16,7 +16,7 @@ public sealed record Config
         int width = 600,
         int height = 400,
         WindowCommand windowCommand = WindowCommand.Show,
-        GraphicsBackend graphics = GraphicsBackend.SdlRenderer)
+        GraphicsBackend graphics = GraphicsBackend.Vulkan)
     {
         return new Config
         {

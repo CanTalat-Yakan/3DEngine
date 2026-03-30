@@ -15,6 +15,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Content Include="Shaders\**\*.glsl" CopyToOutputDirectory="PreserveNewest" Link="Source\Shaders\%(Filename)%(Extension)" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
         <PackageReference Include="UniversalSceneDescription" Version="6.0.0" />
     </ItemGroup>
