@@ -11,7 +11,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Engine.Core\Engine.Core.csproj" />
-        <ProjectReference Include="..\Engine.Ecs\Engine.Ecs.csproj" />
+        <ProjectReference Include="..\Engine.Entities\Engine.Entities.csproj" />
         <ProjectReference Include="..\Engine.Graphics\Engine.Graphics.csproj" />
         <ProjectReference Include="..\Engine.Renderer\Engine.Renderer.csproj" />
         <ProjectReference Include="..\Engine.Window\Engine.Window.csproj" />
