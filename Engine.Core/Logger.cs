@@ -39,28 +39,37 @@ public interface ILogger
 public sealed class Logger : ILogger
 {
     private readonly string _category;
-    private readonly List<ILoggerProvider> _providers = new();
+    private readonly List<ILoggerProvider> _extraProviders = new();
 
     public Logger(string category)
     {
         _category = category;
-        _providers.Add(ConsoleLoggerProvider.Instance);
-        if (FileLoggerProvider.Instance is { } file)
-            _providers.Add(file);
     }
 
     public Logger UseProvider(ILoggerProvider provider)
     {
-        if (!_providers.Contains(provider))
-            _providers.Add(provider);
+        if (!_extraProviders.Contains(provider)
+            && provider != ConsoleLoggerProvider.Instance
+            && provider is not FileLoggerProvider)
+            _extraProviders.Add(provider);
         return this;
     }
 
     public void Log(LogLevel level, string message, Exception? exception = null)
     {
-        if (level < LogConfig.MinimumLevel) return;
-        foreach (var provider in _providers)
-            provider.Log(level, _category, message, exception);
+        // Console: respects ConsoleMinimumLevel (defaults to Info — no startup traces on console).
+        if (level >= LogConfig.ConsoleMinimumLevel)
+            ConsoleLoggerProvider.Instance.Log(level, _category, message, exception);
+
+        // File: respects MinimumLevel (defaults to Trace — all startup diagnostics captured to disk).
+        // Late-bound lookup so loggers created before Initialize() still write to the file.
+        if (level >= LogConfig.MinimumLevel && FileLoggerProvider.Instance is { } file)
+            file.Log(level, _category, message, exception);
+
+        // Any extra user-added providers.
+        foreach (var provider in _extraProviders)
+            if (level >= LogConfig.MinimumLevel)
+                provider.Log(level, _category, message, exception);
     }
 
     public void Trace(string message) => Log(LogLevel.Trace, message);
@@ -90,12 +99,15 @@ public sealed class LoggerFactory
 /// <summary>Global log configuration.</summary>
 public static class LogConfig
 {
-    /// <summary>Minimum severity to emit. Messages below this level are discarded.</summary>
+    /// <summary>Minimum severity written to the log file and any extra providers. Defaults to Trace — captures all startup diagnostics to disk.</summary>
     public static LogLevel MinimumLevel { get; set; } = LogLevel.Trace;
+
+    /// <summary>Minimum severity written to the console. Defaults to Info — keeps the console readable while the log file gets the full detail.</summary>
+    public static LogLevel ConsoleMinimumLevel { get; set; } = LogLevel.Info;
 
     /// <summary>
     /// When true, per-frame repetitive diagnostics (stage timing, render steps) are emitted at Trace level.
-    /// When false (default), only one-time startup/lifecycle logs are shown — keeping the console clean at runtime.
+    /// When false (default), only one-time startup/lifecycle logs are shown — keeping output clean at runtime.
     /// Enable via <c>LogConfig.PerFrameLogging = true</c> or the <c>ENGINE_LOG_FRAMES=1</c> environment variable.
     /// </summary>
     public static bool PerFrameLogging { get; set; }
@@ -211,6 +223,8 @@ public static class Log
         logger.Info($"Base Dir:     {AppContext.BaseDirectory}");
         logger.Info($"Process ID:   {Environment.ProcessId}");
         logger.Info($"Timestamp:    {DateTime.UtcNow:O}");
+        logger.Info($"Console log:  {LogConfig.ConsoleMinimumLevel}+");
+        logger.Info($"File log:     {LogConfig.MinimumLevel}+ → {Path.Combine(AppContext.BaseDirectory, "Engine.log")}");
         logger.Info($"Frame logs:   {(LogConfig.PerFrameLogging ? "ENABLED" : "DISABLED (set ENGINE_LOG_FRAMES=1 to enable)")}");
         logger.Info("========================================================");
     }
