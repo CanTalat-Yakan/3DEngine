@@ -1,1 +1,5 @@
-﻿Console.WriteLine("Hello, World!");
+﻿using Engine;
+
+new App(Config.GetDefault())
+    .AddPlugin(new DefaultPlugins())
+    .Run();
