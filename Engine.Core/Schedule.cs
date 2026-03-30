@@ -51,7 +51,7 @@ public sealed class Schedule
         if (list.Count == 0) return;
 
         var isParallel = _parallelStages.Contains(stage) && list.Count > 1;
-        Logger.Trace($"Stage {stage}: executing {list.Count} system(s) [{(isParallel ? "parallel" : "sequential")}]");
+        Logger.FrameTrace($"Stage {stage}: executing {list.Count} system(s) [{(isParallel ? "parallel" : "sequential")}]");
 
         var sw = Stopwatch.StartNew();
         if (isParallel)
@@ -60,7 +60,7 @@ public sealed class Schedule
             list[i](world);
         sw.Stop();
 
-        Logger.Trace($"Stage {stage}: completed in {sw.Elapsed.TotalMilliseconds:F2}ms");
+        Logger.FrameTrace($"Stage {stage}: completed in {sw.Elapsed.TotalMilliseconds:F2}ms");
     }
 
     /// <summary>Runs all stages in fixed order.</summary>

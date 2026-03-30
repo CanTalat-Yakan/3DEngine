@@ -94,7 +94,7 @@ public sealed class App
         {
             _frameCount++;
             if (_frameCount <= 3 || (_frameCount % 1000 == 0))
-                Logger.Trace($"Frame #{_frameCount} begin");
+                Logger.FrameTrace($"Frame #{_frameCount} begin");
 
             Schedule.RunStage(Stage.First, World);
             Schedule.RunStage(Stage.PreUpdate, World);

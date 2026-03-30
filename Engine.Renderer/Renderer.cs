@@ -49,28 +49,28 @@ public sealed class Renderer : IDisposable
     {
         if (!_initialized) Initialize();
 
-        Logger.Trace("RenderFrame: Running extract systems...");
+        Logger.FrameTrace("RenderFrame: Running extract systems...");
         foreach (var sys in _extractSystems)
             sys.Run(appWorld, RenderWorld);
 
-        Logger.Trace("RenderFrame: Running prepare systems...");
+        Logger.FrameTrace("RenderFrame: Running prepare systems...");
         foreach (var sys in _prepareSystems)
             sys.Run(RenderWorld, Context);
 
-        Logger.Trace("RenderFrame: Beginning frame...");
+        Logger.FrameTrace("RenderFrame: Beginning frame...");
         var ctx = Context.BeginFrame(RenderWorld, out var imageIndex);
         SyncSurfaceInfo(ctx.FrameContext.Extent);
         UpdateDiagnostics(ctx.FrameContext.Extent);
 
-        Logger.Trace("RenderFrame: Running queue systems...");
+        Logger.FrameTrace("RenderFrame: Running queue systems...");
         foreach (var sys in _queueSystems)
             sys.Run(RenderWorld, Context, ctx);
 
-        Logger.Trace("RenderFrame: Executing render graph nodes...");
+        Logger.FrameTrace("RenderFrame: Executing render graph nodes...");
         foreach (var node in Graph.TopologicalOrder())
             node.Execute(Context, ctx, RenderWorld);
 
-        Logger.Trace("RenderFrame: Ending frame...");
+        Logger.FrameTrace("RenderFrame: Ending frame...");
         Context.EndFrame(ctx, imageIndex);
     }
 

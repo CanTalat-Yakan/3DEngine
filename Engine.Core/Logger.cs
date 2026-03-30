@@ -26,6 +26,8 @@ public interface ILogger
 {
     void Log(LogLevel level, string message, Exception? exception = null);
     void Trace(string message);
+    /// <summary>Trace-level log that only emits when <see cref="LogConfig.PerFrameLogging"/> is enabled. Use for per-frame repetitive diagnostics (stage timing, render steps, etc.).</summary>
+    void FrameTrace(string message);
     void Debug(string message);
     void Info(string message);
     void Warn(string message);
@@ -62,6 +64,7 @@ public sealed class Logger : ILogger
     }
 
     public void Trace(string message) => Log(LogLevel.Trace, message);
+    public void FrameTrace(string message) { if (LogConfig.PerFrameLogging) Log(LogLevel.Trace, message); }
     public void Debug(string message) => Log(LogLevel.Debug, message);
     public void Info(string message) => Log(LogLevel.Info, message);
     public void Warn(string message) => Log(LogLevel.Warning, message);
@@ -89,6 +92,14 @@ public static class LogConfig
 {
     /// <summary>Minimum severity to emit. Messages below this level are discarded.</summary>
     public static LogLevel MinimumLevel { get; set; } = LogLevel.Trace;
+
+    /// <summary>
+    /// When true, per-frame repetitive diagnostics (stage timing, render steps) are emitted at Trace level.
+    /// When false (default), only one-time startup/lifecycle logs are shown — keeping the console clean at runtime.
+    /// Enable via <c>LogConfig.PerFrameLogging = true</c> or the <c>ENGINE_LOG_FRAMES=1</c> environment variable.
+    /// </summary>
+    public static bool PerFrameLogging { get; set; }
+        = Environment.GetEnvironmentVariable("ENGINE_LOG_FRAMES") == "1";
 
     /// <summary>Engine-wide stopwatch started at process launch for elapsed timestamps.</summary>
     internal static readonly Stopwatch EngineTimer = Stopwatch.StartNew();
@@ -200,6 +211,7 @@ public static class Log
         logger.Info($"Base Dir:     {AppContext.BaseDirectory}");
         logger.Info($"Process ID:   {Environment.ProcessId}");
         logger.Info($"Timestamp:    {DateTime.UtcNow:O}");
+        logger.Info($"Frame logs:   {(LogConfig.PerFrameLogging ? "ENABLED" : "DISABLED (set ENGINE_LOG_FRAMES=1 to enable)")}");
         logger.Info("========================================================");
     }
 }
