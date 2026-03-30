@@ -18,7 +18,8 @@ public sealed class DefaultPlugins : IPlugin
             .AddPlugin(new BehaviorsPlugin())
             .AddPlugin(new SdlImGuiPlugin())
             .AddPlugin(new ClearColorPlugin())
-            .AddPlugin(new SdlRendererPlugin());
+            .AddPlugin(new SdlRendererPlugin())
+            .AddPlugin(new VulkanImGuiPlugin());
 
         app.AddSystem(Stage.First, (World world) => world.Resource<EcsWorld>().BeginFrame());
 

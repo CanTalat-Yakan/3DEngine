@@ -59,6 +59,24 @@ public sealed class NullGraphicsDevice : IGraphicsDevice
     public void Draw(ICommandBuffer commandBuffer, uint vertexCount, uint instanceCount = 1, uint firstVertex = 0, uint firstInstance = 0)
         => throw new NotSupportedException("NullGraphicsDevice does not support drawing.");
 
+    public void DrawIndexed(ICommandBuffer commandBuffer, uint indexCount, uint instanceCount = 1, uint firstIndex = 0, int vertexOffset = 0, uint firstInstance = 0)
+        => throw new NotSupportedException("NullGraphicsDevice does not support drawing.");
+
+    public void BindVertexBuffers(ICommandBuffer commandBuffer, uint firstBinding, IBuffer[] buffers, ulong[] offsets)
+        => throw new NotSupportedException("NullGraphicsDevice does not support buffer binding.");
+
+    public void BindIndexBuffer(ICommandBuffer commandBuffer, IBuffer buffer, ulong offset, IndexType indexType)
+        => throw new NotSupportedException("NullGraphicsDevice does not support buffer binding.");
+
+    public void SetViewport(ICommandBuffer commandBuffer, float x, float y, float width, float height, float minDepth, float maxDepth)
+        => throw new NotSupportedException("NullGraphicsDevice does not support viewports.");
+
+    public void SetScissor(ICommandBuffer commandBuffer, int x, int y, uint width, uint height)
+        => throw new NotSupportedException("NullGraphicsDevice does not support scissors.");
+
+    public void PushConstants(ICommandBuffer commandBuffer, IPipeline pipeline, ShaderStageFlags stageFlags, uint offset, ReadOnlySpan<byte> data)
+        => throw new NotSupportedException("NullGraphicsDevice does not support push constants.");
+
     public void UploadTexture2D(IImage image, ReadOnlySpan<byte> data, uint width, uint height, int bytesPerPixel)
         => throw new NotSupportedException("NullGraphicsDevice does not support texture upload.");
 }

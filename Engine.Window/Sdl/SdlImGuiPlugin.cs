@@ -35,10 +35,10 @@ public sealed class SdlImGuiPlugin : IPlugin
         else
         {
             // Vulkan mode: no SDL renderer, but ImGui still needs the font atlas built.
+            // Don't clear tex data — the Vulkan ImGui render node will upload it to GPU.
             logger.Info("ImGui using Vulkan mode — building font atlas only (no SDL renderer).");
             var io2 = ImGui.GetIO();
             io2.Fonts.GetTexDataAsRGBA32(out IntPtr _, out int _, out int _, out _);
-            io2.Fonts.ClearTexData();
         }
 
         app.World.InsertResource(new ImGuiState());

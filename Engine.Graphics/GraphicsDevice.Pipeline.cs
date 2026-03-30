@@ -97,7 +97,44 @@ public sealed unsafe partial class GraphicsDevice
             pName = entryName
         };
 
-        VkPipelineVertexInputStateCreateInfo vertexInput = new();
+        // Vertex input state — use custom bindings/attributes if provided
+        var vertexBindingCount = desc.VertexBindings?.Length ?? 0;
+        var vertexAttributeCount = desc.VertexAttributes?.Length ?? 0;
+
+        VkVertexInputBindingDescription* vkBindings = stackalloc VkVertexInputBindingDescription[Math.Max(vertexBindingCount, 1)];
+        VkVertexInputAttributeDescription* vkAttributes = stackalloc VkVertexInputAttributeDescription[Math.Max(vertexAttributeCount, 1)];
+
+        for (int i = 0; i < vertexBindingCount; i++)
+        {
+            var b = desc.VertexBindings![i];
+            vkBindings[i] = new VkVertexInputBindingDescription
+            {
+                binding = b.Binding,
+                stride = b.Stride,
+                inputRate = VkVertexInputRate.Vertex
+            };
+        }
+
+        for (int i = 0; i < vertexAttributeCount; i++)
+        {
+            var a = desc.VertexAttributes![i];
+            vkAttributes[i] = new VkVertexInputAttributeDescription
+            {
+                location = a.Location,
+                binding = a.Binding,
+                format = ToVkFormat(a.Format),
+                offset = a.Offset
+            };
+        }
+
+        VkPipelineVertexInputStateCreateInfo vertexInput = new()
+        {
+            vertexBindingDescriptionCount = (uint)vertexBindingCount,
+            pVertexBindingDescriptions = vertexBindingCount > 0 ? vkBindings : null,
+            vertexAttributeDescriptionCount = (uint)vertexAttributeCount,
+            pVertexAttributeDescriptions = vertexAttributeCount > 0 ? vkAttributes : null
+        };
+
         VkPipelineInputAssemblyStateCreateInfo inputAssembly = new()
         {
             topology = VkPrimitiveTopology.TriangleList
@@ -158,10 +195,26 @@ public sealed unsafe partial class GraphicsDevice
         VkDescriptorSetLayout* setLayouts = stackalloc VkDescriptorSetLayout[1];
         setLayouts[0] = _cameraSetLayout;
 
+        // Push constant ranges
+        var pcCount = desc.PushConstantRanges?.Length ?? 0;
+        VkPushConstantRange* vkPcRanges = stackalloc VkPushConstantRange[Math.Max(pcCount, 1)];
+        for (int i = 0; i < pcCount; i++)
+        {
+            var pc = desc.PushConstantRanges![i];
+            vkPcRanges[i] = new VkPushConstantRange
+            {
+                stageFlags = ToVkShaderStageFlags(pc.StageFlags),
+                offset = pc.Offset,
+                size = pc.Size
+            };
+        }
+
         VkPipelineLayoutCreateInfo layoutInfo = new()
         {
             setLayoutCount = 1,
-            pSetLayouts = setLayouts
+            pSetLayouts = setLayouts,
+            pushConstantRangeCount = (uint)pcCount,
+            pPushConstantRanges = pcCount > 0 ? vkPcRanges : null
         };
         _deviceApi.vkCreatePipelineLayout(_device, &layoutInfo, null, out VkPipelineLayout layout).CheckResult();
 
@@ -221,4 +274,92 @@ public sealed unsafe partial class GraphicsDevice
 
     IShader IGraphicsDevice.CreateShader(ShaderDesc desc) => CreateShader(desc);
     IPipeline IGraphicsDevice.CreateGraphicsPipeline(GraphicsPipelineDesc desc) => CreateGraphicsPipeline(desc);
+
+    // ---- Format / flag helpers ----
+
+    private static VkFormat ToVkFormat(VertexFormat format) => format switch
+    {
+        VertexFormat.Float2 => VkFormat.R32G32Sfloat,
+        VertexFormat.Float3 => VkFormat.R32G32B32Sfloat,
+        VertexFormat.Float4 => VkFormat.R32G32B32A32Sfloat,
+        VertexFormat.UNormR8G8B8A8 => VkFormat.R8G8B8A8Unorm,
+        _ => throw new ArgumentOutOfRangeException(nameof(format))
+    };
+
+    private static VkShaderStageFlags ToVkShaderStageFlags(ShaderStageFlags flags)
+    {
+        VkShaderStageFlags result = 0;
+        if (flags.HasFlag(ShaderStageFlags.Vertex)) result |= VkShaderStageFlags.Vertex;
+        if (flags.HasFlag(ShaderStageFlags.Fragment)) result |= VkShaderStageFlags.Fragment;
+        return result;
+    }
+
+    // ---- Extended draw commands ----
+
+    public void DrawIndexed(ICommandBuffer commandBuffer, uint indexCount, uint instanceCount = 1, uint firstIndex = 0, int vertexOffset = 0, uint firstInstance = 0)
+    {
+        if (commandBuffer is not VulkanCommandBuffer vkCmd)
+            throw new ArgumentException("Command buffer was not created by this device.", nameof(commandBuffer));
+        _deviceApi.vkCmdDrawIndexed(vkCmd.Handle, indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
+    }
+
+    public void BindVertexBuffers(ICommandBuffer commandBuffer, uint firstBinding, IBuffer[] buffers, ulong[] offsets)
+    {
+        if (commandBuffer is not VulkanCommandBuffer vkCmd)
+            throw new ArgumentException("Command buffer was not created by this device.", nameof(commandBuffer));
+
+        VkBuffer* vkBuffers = stackalloc VkBuffer[buffers.Length];
+        ulong* vkOffsets = stackalloc ulong[offsets.Length];
+        for (int i = 0; i < buffers.Length; i++)
+        {
+            if (buffers[i] is not VulkanBuffer vb)
+                throw new ArgumentException("Buffer was not created by this device.", nameof(buffers));
+            vkBuffers[i] = vb.Buffer;
+            vkOffsets[i] = offsets[i];
+        }
+
+        _deviceApi.vkCmdBindVertexBuffers(vkCmd.Handle, firstBinding, (uint)buffers.Length, vkBuffers, vkOffsets);
+    }
+
+    public void BindIndexBuffer(ICommandBuffer commandBuffer, IBuffer buffer, ulong offset, IndexType indexType)
+    {
+        if (commandBuffer is not VulkanCommandBuffer vkCmd)
+            throw new ArgumentException("Command buffer was not created by this device.", nameof(commandBuffer));
+        if (buffer is not VulkanBuffer vkBuffer)
+            throw new ArgumentException("Buffer was not created by this device.", nameof(buffer));
+
+        var vkIndexType = indexType == IndexType.UInt16 ? VkIndexType.Uint16 : VkIndexType.Uint32;
+        _deviceApi.vkCmdBindIndexBuffer(vkCmd.Handle, vkBuffer.Buffer, offset, vkIndexType);
+    }
+
+    public void SetViewport(ICommandBuffer commandBuffer, float x, float y, float width, float height, float minDepth, float maxDepth)
+    {
+        if (commandBuffer is not VulkanCommandBuffer vkCmd)
+            throw new ArgumentException("Command buffer was not created by this device.", nameof(commandBuffer));
+
+        VkViewport viewport = new(x, y, width, height, minDepth, maxDepth);
+        _deviceApi.vkCmdSetViewport(vkCmd.Handle, 0, 1, &viewport);
+    }
+
+    public void SetScissor(ICommandBuffer commandBuffer, int x, int y, uint width, uint height)
+    {
+        if (commandBuffer is not VulkanCommandBuffer vkCmd)
+            throw new ArgumentException("Command buffer was not created by this device.", nameof(commandBuffer));
+
+        VkRect2D scissor = new(new VkOffset2D(x, y), new VkExtent2D(width, height));
+        _deviceApi.vkCmdSetScissor(vkCmd.Handle, 0, 1, &scissor);
+    }
+
+    public void PushConstants(ICommandBuffer commandBuffer, IPipeline pipeline, ShaderStageFlags stageFlags, uint offset, ReadOnlySpan<byte> data)
+    {
+        if (commandBuffer is not VulkanCommandBuffer vkCmd)
+            throw new ArgumentException("Command buffer was not created by this device.", nameof(commandBuffer));
+        if (pipeline is not VulkanGraphicsPipeline vkPipeline)
+            throw new ArgumentException("Pipeline was not created by this device.", nameof(pipeline));
+
+        fixed (byte* pData = data)
+        {
+            _deviceApi.vkCmdPushConstants(vkCmd.Handle, vkPipeline.Layout, ToVkShaderStageFlags(stageFlags), offset, (uint)data.Length, pData);
+        }
+    }
 }
