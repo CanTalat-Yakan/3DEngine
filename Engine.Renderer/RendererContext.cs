@@ -1,6 +1,6 @@
 namespace Engine;
 
-/// <summary>High-level facade over the low-level graphics backend.</summary>
+/// <summary>High-level facade over the low-level vulkan graphics backend.</summary>
 public sealed class RendererContext : IDisposable
 {
     private static readonly ILogger Logger = Log.For<RendererContext>();
