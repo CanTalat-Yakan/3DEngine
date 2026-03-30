@@ -14,7 +14,7 @@ internal sealed class ImGuiRenderNode : IRenderNode
     private static readonly ILogger Logger = Log.Category("Engine.ImGui.Vulkan");
 
     public string Name => "imgui";
-    public IReadOnlyCollection<string> Dependencies { get; } = new[] { "sample" };
+    public IReadOnlyCollection<string> Dependencies { get; } = new[] { "sample", "overlay" };
 
     // Pipeline and font resources (created lazily on first Execute)
     private IPipeline? _pipeline;

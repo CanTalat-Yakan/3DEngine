@@ -18,7 +18,12 @@ public sealed class RenderGraph
     /// <summary>Returns nodes in topological order using Kahn's algorithm. Throws on cycles.</summary>
     public IEnumerable<IRenderNode> TopologicalOrder()
     {
-        var inEdges = _edges.ToDictionary(kv => kv.Key, kv => kv.Value.ToHashSet());
+        // Only keep edges to nodes that actually exist in the graph (ignore optional/unregistered deps)
+        var registered = _nodes.Keys.ToHashSet();
+        var inEdges = _edges.ToDictionary(
+            kv => kv.Key,
+            kv => kv.Value.Where(dep => registered.Contains(dep)).ToHashSet());
+
         var noDep = new Queue<string>(inEdges.Where(kv => kv.Value.Count == 0).Select(kv => kv.Key));
         var result = new List<IRenderNode>();
         while (noDep.Count > 0)

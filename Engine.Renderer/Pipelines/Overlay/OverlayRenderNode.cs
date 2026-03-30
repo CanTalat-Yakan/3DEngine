@@ -33,7 +33,14 @@ public sealed class OverlayRenderNode : IRenderNode
         }
 
         var cmd = cmds.FrameContext.CommandBuffer;
+        var extent = cmds.FrameContext.Extent;
+
         ctx.Graphics.BindGraphicsPipeline(cmd, _pipeline.Pipeline);
+
+        // Dynamic viewport + scissor are required — the pipeline uses dynamic state
+        ctx.Graphics.SetViewport(cmd, 0, 0, extent.Width, extent.Height, 0, 1);
+        ctx.Graphics.SetScissor(cmd, 0, 0, extent.Width, extent.Height);
+
         ctx.Graphics.BindDescriptorSet(cmd, _pipeline.Pipeline, overlay.DescriptorSet);
         ctx.Graphics.Draw(cmd, vertexCount: 3);
     }
