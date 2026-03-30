@@ -29,6 +29,13 @@ public sealed class SdlImGuiPlugin : IPlugin
             var renderer = new SdlImGuiRenderer(sdlWindow.Renderer);
             app.World.InsertResource(renderer);
         }
+        else
+        {
+            // Vulkan mode: no SDL renderer, but ImGui still needs the font atlas built.
+            var io2 = ImGui.GetIO();
+            io2.Fonts.GetTexDataAsRGBA32(out IntPtr _, out int _, out int _, out _);
+            io2.Fonts.ClearTexData();
+        }
 
         app.World.InsertResource(new ImGuiState());
 
@@ -61,7 +68,12 @@ public sealed class SdlImGuiPlugin : IPlugin
         app.AddSystem(Stage.Render, (world) =>
         {
             var sdl = world.Resource<AppWindow>().Sdl;
-            if (sdl.Renderer == IntPtr.Zero) return; // Vulkan mode: don't use SDL renderer path
+            if (sdl.Renderer == IntPtr.Zero)
+            {
+                // Vulkan mode: still need to end the ImGui frame.
+                ImGui.Render();
+                return;
+            }
             var imGuiRenderer = world.Resource<SdlImGuiRenderer>();
             var clear = world.Resource<RenderClearColor>();
 

@@ -14,7 +14,10 @@ public sealed unsafe partial class GraphicsDevice
 
     private partial void CreateInstance(string appName)
     {
-        _validationEnabled = ShouldEnableValidation();
+        // Load the Vulkan library — must be called before any other Vulkan API.
+        vkInitialize().CheckResult();
+
+        _validationEnabled = ShouldEnableValidation() && AreValidationLayersAvailable();
 
         VkUtf8ReadOnlyString appNameUtf8 = Encoding.UTF8.GetBytes(appName);
         VkUtf8ReadOnlyString engineNameUtf8 = "3DEngine"u8;
@@ -51,9 +54,13 @@ public sealed unsafe partial class GraphicsDevice
             createInfo.ppEnabledLayerNames = validation;
             PopulateDebugMessengerCreateInfo(ref debugCreateInfo);
             createInfo.pNext = &debugCreateInfo;
+            vkCreateInstance(&createInfo, null, out _instance).CheckResult();
+        }
+        else
+        {
+            vkCreateInstance(&createInfo, null, out _instance).CheckResult();
         }
 
-        vkCreateInstance(&createInfo, null, out _instance).CheckResult();
         _instanceApi = GetApi(_instance);
 
         if (_validationEnabled)
@@ -82,6 +89,46 @@ public sealed unsafe partial class GraphicsDevice
 #else
         return Environment.GetEnvironmentVariable("ENGINE_VULKAN_VALIDATION") == "1";
 #endif
+    }
+
+    /// <summary>
+    /// Enumerates available Vulkan instance layers and checks that all requested
+    /// validation layers are present. Returns false if any layer is missing,
+    /// preventing a segfault from requesting a non-existent layer.
+    /// </summary>
+    private static bool AreValidationLayersAvailable()
+    {
+        try
+        {
+            var result = vkEnumerateInstanceLayerProperties(out uint layerCount);
+            if (result != VkResult.Success || layerCount == 0) return false;
+
+            var availableLayers = new VkLayerProperties[(int)layerCount];
+            result = vkEnumerateInstanceLayerProperties(availableLayers);
+            if (result != VkResult.Success) return false;
+
+            var available = new HashSet<string>(StringComparer.Ordinal);
+            for (int i = 0; i < (int)layerCount; i++)
+            {
+                fixed (byte* namePtr = availableLayers[i].layerName)
+                {
+                    var name = Marshal.PtrToStringUTF8((nint)namePtr);
+                    if (name is not null) available.Add(name);
+                }
+            }
+
+            foreach (var required in ValidationLayers)
+            {
+                if (!available.Contains(required))
+                    return false;
+            }
+
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private static void PopulateDebugMessengerCreateInfo(ref VkDebugUtilsMessengerCreateInfoEXT createInfo)
