@@ -37,8 +37,10 @@ public sealed class UltralightContext : IDisposable
         ULPlatform.ErrorWrongThread = false;
         ULPlatform.EnableDefaultLogger = true;
         ULPlatform.SetDefaultFileSystem = true;
-        ULPlatform.SetDefaultFontLoader = true;
-        Logger.Debug("Ultralight platform flags set (default logger, file system, font loader).");
+
+        // Use AppCore's font loader — SetDefaultFontLoader alone is not sufficient
+        AppCoreMethods.SetPlatformFontLoader();
+        Logger.Debug("Ultralight platform flags set (default logger, file system, AppCore font loader).");
 
         // Create Ultralight renderer with default config
         var config = new ULConfig
