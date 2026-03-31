@@ -13,26 +13,25 @@ public struct PerformanceHud
     [OnRender]
     public static void Draw(BehaviorContext ctx)
     {
-        double dt = ctx.Time.DeltaSeconds;
-        double fps = dt > 0 ? 1.0 / dt : 0;
-        double elapsed = ctx.Time.ElapsedSeconds;
+        var time = ctx.Time;
+        double fps = time.Fps;
 
         // Reset peak every second
-        if (elapsed - _peakWindowStart >= 1.0)
+        if (time.ElapsedSeconds - _peakWindowStart >= 1.0)
         {
             _peakFps = 0;
-            _peakWindowStart = elapsed;
+            _peakWindowStart = time.ElapsedSeconds;
         }
 
         if (fps > _peakFps)
             _peakFps = fps;
 
         ImGui.Begin("Performance");
-        ImGui.Text($"FPS:       {fps:0}");
+        ImGui.Text($"FPS:       {time.SmoothedFps:0}");
         ImGui.Text($"Peak FPS:  {_peakFps:0}");
-        ImGui.Text($"Frame:     {dt * 1000.0:0.00} ms");
+        ImGui.Text($"Frame:     {time.DeltaSeconds * 1000.0:0.00} ms");
+        ImGui.Text($"Frames:    {time.FrameCount}");
         ImGui.End();
     }
 }
-
 
