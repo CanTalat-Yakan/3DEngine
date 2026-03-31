@@ -36,10 +36,10 @@ public sealed class App
         Log.PrintStartupBanner();
         Logger.Info("Creating App instance...");
 
-        var cfg = config ?? Config.GetDefault();
+        var cfg = config ?? Config.Default;
         World.InsertResource(cfg);
 
-        Logger.Info($"Config: window=\"{cfg.WindowData.Title}\" size={cfg.WindowData.Width}x{cfg.WindowData.Height} graphics={cfg.Graphics} command={cfg.WindowCommand}");
+        Logger.Info($"{cfg}");
         Logger.Info("App instance created successfully.");
     }
 
