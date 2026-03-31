@@ -2,8 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace Engine;
 
-
-/// <summary>Registers the Input resource and wires up the input backend.</summary>
+/// <summary>Registers the <see cref="Input"/> resource and wires up the platform input backend.</summary>
 public sealed class InputPlugin : IPlugin
 {
     private static readonly ILogger Logger = Log.Category("Engine.Input");
@@ -25,51 +24,144 @@ public sealed class InputPlugin : IPlugin
             Logger.Warn("InputPlugin: No IInputBackend resource found — input events will not be forwarded.");
         }
 
-        app.AddSystem(Stage.Last, (World world) => world.Resource<Input>().BeginFrame());
+        app.AddSystem(Stage.Last, static (world) => world.Resource<Input>().BeginFrame());
         Logger.Info("InputPlugin: Input system registered to Last stage.");
     }
 }
 
+/// <summary>
+/// Frame-based input state resource. Tracks keyboard, mouse, and text input.
+/// <para>
+/// Query methods (<c>KeyDown</c>, <c>MousePressed</c>, etc.) are public.
+/// Mutation methods (<c>SetKey</c>, <c>SetMouseButton</c>, etc.) are <c>internal</c>
+/// — only platform backends should call them.
+/// </para>
+/// </summary>
 public sealed class Input
 {
-    private readonly HashSet<Key> _down = new();
-    private readonly HashSet<Key> _pressed = new();
-    private readonly HashSet<Key> _released = new();
+    // ── Keyboard state ─────────────────────────────────────────────────
 
-    private readonly HashSet<int> _mouseDown = new();
-    private readonly HashSet<int> _mousePressed = new();
-    private readonly HashSet<int> _mouseReleased = new();
+    private readonly HashSet<Key> _keysDown = [];
+    private readonly HashSet<Key> _keysPressed = [];
+    private readonly HashSet<Key> _keysReleased = [];
 
+    // ── Mouse button state ─────────────────────────────────────────────
+
+    private readonly HashSet<MouseButton> _mouseDown = [];
+    private readonly HashSet<MouseButton> _mousePressed = [];
+    private readonly HashSet<MouseButton> _mouseReleased = [];
+
+    // ── Mouse position & delta ─────────────────────────────────────────
+
+    /// <summary>Current mouse X position in window pixels.</summary>
     public int MouseX { get; private set; }
+
+    /// <summary>Current mouse Y position in window pixels.</summary>
     public int MouseY { get; private set; }
+
+    /// <summary>Current mouse position as an (X, Y) tuple.</summary>
+    public (int X, int Y) MousePosition => (MouseX, MouseY);
+
+    /// <summary>Mouse X movement since last frame.</summary>
+    public int MouseDeltaX { get; private set; }
+
+    /// <summary>Mouse Y movement since last frame.</summary>
+    public int MouseDeltaY { get; private set; }
+
+    /// <summary>Mouse delta since last frame as an (X, Y) tuple.</summary>
+    public (int X, int Y) MouseDelta => (MouseDeltaX, MouseDeltaY);
+
+    // ── Mouse wheel ────────────────────────────────────────────────────
+
+    /// <summary>Horizontal scroll wheel delta this frame.</summary>
     public float WheelX { get; private set; }
+
+    /// <summary>Vertical scroll wheel delta this frame.</summary>
     public float WheelY { get; private set; }
 
-    private readonly List<char> _textInput = new();
+    // ── Text input ─────────────────────────────────────────────────────
 
-    public void BeginFrame()
+    private readonly List<char> _textInput = [];
+
+    /// <summary>Characters typed this frame (zero-allocation span).</summary>
+    public ReadOnlySpan<char> TextInput => CollectionsMarshal.AsSpan(_textInput);
+
+    // ── Keyboard queries ───────────────────────────────────────────────
+
+    /// <summary>True while the key is held down.</summary>
+    public bool KeyDown(Key key) => _keysDown.Contains(key);
+
+    /// <summary>True only on the frame the key was first pressed.</summary>
+    public bool KeyPressed(Key key) => _keysPressed.Contains(key);
+
+    /// <summary>True only on the frame the key was released.</summary>
+    public bool KeyReleased(Key key) => _keysReleased.Contains(key);
+
+    /// <summary>True if any key is currently held down.</summary>
+    public bool AnyKeyDown() => _keysDown.Count > 0;
+
+    /// <summary>True if any key was pressed this frame.</summary>
+    public bool AnyKeyPressed() => _keysPressed.Count > 0;
+
+    // ── Mouse button queries ───────────────────────────────────────────
+
+    /// <summary>True while the mouse button is held down.</summary>
+    public bool MouseDown(MouseButton button) => _mouseDown.Contains(button);
+
+    /// <summary>True only on the frame the mouse button was first pressed.</summary>
+    public bool MousePressed(MouseButton button) => _mousePressed.Contains(button);
+
+    /// <summary>True only on the frame the mouse button was released.</summary>
+    public bool MouseReleased(MouseButton button) => _mouseReleased.Contains(button);
+
+    /// <summary>True if any mouse button is currently held down.</summary>
+    public bool AnyMouseDown() => _mouseDown.Count > 0;
+
+    /// <summary>True if any mouse button was pressed this frame.</summary>
+    public bool AnyMousePressed() => _mousePressed.Count > 0;
+
+    // ── Backward-compatible int overloads ──────────────────────────────
+
+    /// <summary>True while the mouse button is held down (0-based index).</summary>
+    public bool MouseDown(int button) => _mouseDown.Contains((MouseButton)button);
+
+    /// <summary>True only on the frame the mouse button was first pressed (0-based index).</summary>
+    public bool MousePressed(int button) => _mousePressed.Contains((MouseButton)button);
+
+    /// <summary>True only on the frame the mouse button was released (0-based index).</summary>
+    public bool MouseReleased(int button) => _mouseReleased.Contains((MouseButton)button);
+
+    // ── Mutation (internal — platform backends only) ───────────────────
+
+    /// <summary>Clears per-frame transient state. Called once at the end of each frame.</summary>
+    internal void BeginFrame()
     {
-        _pressed.Clear();
-        _released.Clear();
+        _keysPressed.Clear();
+        _keysReleased.Clear();
         _mousePressed.Clear();
         _mouseReleased.Clear();
-        WheelX = 0; WheelY = 0;
+        MouseDeltaX = 0;
+        MouseDeltaY = 0;
+        WheelX = 0;
+        WheelY = 0;
         _textInput.Clear();
     }
 
-    public void SetKey(Key key, bool isDown)
+    /// <summary>Updates the state of a keyboard key.</summary>
+    internal void SetKey(Key key, bool isDown)
     {
         if (isDown)
         {
-            if (_down.Add(key)) _pressed.Add(key);
+            if (_keysDown.Add(key)) _keysPressed.Add(key);
         }
         else
         {
-            if (_down.Remove(key)) _released.Add(key);
+            if (_keysDown.Remove(key)) _keysReleased.Add(key);
         }
     }
 
-    public void SetMouseButton(int button, bool isDown)
+    /// <summary>Updates the state of a mouse button.</summary>
+    internal void SetMouseButton(MouseButton button, bool isDown)
     {
         if (isDown)
         {
@@ -81,32 +173,64 @@ public sealed class Input
         }
     }
 
-    public void SetMousePosition(int x, int y)
+    /// <summary>Updates the state of a mouse button by 0-based index.</summary>
+    internal void SetMouseButton(int button, bool isDown) => 
+        SetMouseButton((MouseButton)button, isDown);
+
+    /// <summary>Sets the absolute mouse position in window pixels.</summary>
+    internal void SetMousePosition(int x, int y)
     {
-        MouseX = x; MouseY = y;
+        MouseX = x;
+        MouseY = y;
     }
 
-    public void AddWheel(float dx, float dy)
+    /// <summary>Accumulates relative mouse motion for this frame.</summary>
+    internal void AddMouseDelta(int dx, int dy)
     {
-        WheelX += dx; WheelY += dy;
+        MouseDeltaX += dx;
+        MouseDeltaY += dy;
     }
 
-    public void AddText(string s)
+    /// <summary>Accumulates scroll wheel input for this frame.</summary>
+    internal void AddWheel(float dx, float dy)
     {
-        foreach (var c in s) _textInput.Add(c);
+        WheelX += dx;
+        WheelY += dy;
     }
 
-    public bool KeyDown(Key k) => _down.Contains(k);
-    public bool KeyPressed(Key k) => _pressed.Contains(k);
-    public bool KeyReleased(Key k) => _released.Contains(k);
+    /// <summary>Appends typed characters for this frame.</summary>
+    internal void AddText(string text)
+    {
+        foreach (var c in text)
+            _textInput.Add(c);
+    }
 
-    public bool MouseDown(int button) => _mouseDown.Contains(button);
-    public bool MousePressed(int button) => _mousePressed.Contains(button);
-    public bool MouseReleased(int button) => _mouseReleased.Contains(button);
+    // ── Diagnostics ────────────────────────────────────────────────────
 
-    public ReadOnlySpan<char> TextInput => CollectionsMarshal.AsSpan(_textInput);
+    /// <summary>Human-readable snapshot for debugging.</summary>
+    public override string ToString() => 
+        $"Input {{ Keys={_keysDown.Count} down, Mouse=({MouseX},{MouseY}), Buttons={_mouseDown.Count} down }}";
 }
 
+/// <summary>Mouse button identifiers (0-based, matching SDL button index minus 1).</summary>
+public enum MouseButton
+{
+    /// <summary>Left mouse button.</summary>
+    Left = 0,
+    /// <summary>Middle mouse button (wheel click).</summary>
+    Middle = 1,
+    /// <summary>Right mouse button.</summary>
+    Right = 2,
+    /// <summary>Extra button 1 (side button).</summary>
+    X1 = 3,
+    /// <summary>Extra button 2 (side button).</summary>
+    X2 = 4,
+}
+
+/// <summary>
+/// Keyboard scan codes (USB HID usage values).
+/// Values map directly to SDL scancodes for zero-cost conversion.
+/// </summary>
 public enum Key
 {
     Unknown = 0,
@@ -116,466 +240,391 @@ public enum Key
     D = 7,
     E = 8,
     F = 9,
-    G = 10, // 0x0000000A
-    H = 11, // 0x0000000B
-    I = 12, // 0x0000000C
-    J = 13, // 0x0000000D
-    K = 14, // 0x0000000E
-    L = 15, // 0x0000000F
-    M = 16, // 0x00000010
-    N = 17, // 0x00000011
-    O = 18, // 0x00000012
-    P = 19, // 0x00000013
-    Q = 20, // 0x00000014
-    R = 21, // 0x00000015
-    S = 22, // 0x00000016
-    T = 23, // 0x00000017
-    U = 24, // 0x00000018
-    V = 25, // 0x00000019
-    W = 26, // 0x0000001A
-    X = 27, // 0x0000001B
-    Y = 28, // 0x0000001C
-    Z = 29, // 0x0000001D
-    Alpha1 = 30, // 0x0000001E
-    Alpha2 = 31, // 0x0000001F
-    Alpha3 = 32, // 0x00000020
-    Alpha4 = 33, // 0x00000021
-    Alpha5 = 34, // 0x00000022
-    Alpha6 = 35, // 0x00000023
-    Alpha7 = 36, // 0x00000024
-    Alpha8 = 37, // 0x00000025
-    Alpha9 = 38, // 0x00000026
-    Alpha0 = 39, // 0x00000027
-    Return = 40, // 0x00000028
-    Escape = 41, // 0x00000029
-    Backspace = 42, // 0x0000002A
-    Tab = 43, // 0x0000002B
-    Space = 44, // 0x0000002C
-    Minus = 45, // 0x0000002D
-    Equals = 46, // 0x0000002E
-    Leftbracket = 47, // 0x0000002F
-    Rightbracket = 48, // 0x00000030
+    G = 10,
+    H = 11,
+    I = 12,
+    J = 13,
+    K = 14,
+    L = 15,
+    M = 16,
+    N = 17,
+    O = 18,
+    P = 19,
+    Q = 20,
+    R = 21,
+    S = 22,
+    T = 23,
+    U = 24,
+    V = 25,
+    W = 26,
+    X = 27,
+    Y = 28,
+    Z = 29,
+    Alpha1 = 30,
+    Alpha2 = 31,
+    Alpha3 = 32,
+    Alpha4 = 33,
+    Alpha5 = 34,
+    Alpha6 = 35,
+    Alpha7 = 36,
+    Alpha8 = 37,
+    Alpha9 = 38,
+    Alpha0 = 39,
+    Return = 40,
+    Escape = 41,
+    Backspace = 42,
+    Tab = 43,
+    Space = 44,
+    Minus = 45,
+    Equals = 46,
+    Leftbracket = 47,
+    Rightbracket = 48,
 
     /// <summary>
-    /// Located at the lower left of the return
-    /// key on ISO keyboards and at the right end
-    /// of the QWERTY row on ANSI keyboards.
-    /// Produces REVERSE SOLIDUS (backslash) and
-    /// VERTICAL LINE in a US layout, REVERSE
-    /// SOLIDUS and VERTICAL LINE in a UK Mac
-    /// layout, NUMBER SIGN and TILDE in a UK
-    /// Windows layout, DOLLAR SIGN and POUND SIGN
-    /// in a Swiss German layout, NUMBER SIGN and
-    /// APOSTROPHE in a German layout, GRAVE
-    /// ACCENT and POUND SIGN in a French Mac
-    /// layout, and ASTERISK and MICRO SIGN in a
-    /// French Windows layout.
+    /// Located at the lower left of the return key on ISO keyboards and at the right end
+    /// of the QWERTY row on ANSI keyboards. Produces backslash / vertical line in US layout.
     /// </summary>
-    Backslash = 49, // 0x00000031
+    Backslash = 49,
 
     /// <summary>
-    /// ISO USB keyboards actually use this code
-    /// instead of 49 for the same key, but all
-    /// OSes I've seen treat the two codes
-    /// identically. So, as an implementor, unless
-    /// your keyboard generates both of those
-    /// codes and your OS treats them differently,
-    /// you should generate BACKSLASH
-    /// instead of this code. As a user, you
-    /// should not rely on this code because SDL
-    /// will never generate it with most (all?)
-    /// keyboards.
+    /// ISO keyboards use this code instead of 49 for the same key. Most OSes treat both
+    /// identically — prefer <see cref="Backslash"/> unless your keyboard generates both.
     /// </summary>
-    NonUshash = 50, // 0x00000032
-    Semicolon = 51, // 0x00000033
-    Apostrophe = 52, // 0x00000034
+    NonUshash = 50,
+    Semicolon = 51,
+    Apostrophe = 52,
 
     /// <summary>
-    /// Located in the top left corner (on both ANSI
-    /// and ISO keyboards). Produces GRAVE ACCENT and
-    /// TILDE in a US Windows layout and in US and UK
-    /// Mac layouts on ANSI keyboards, GRAVE ACCENT
-    /// and NOT SIGN in a UK Windows layout, SECTION
-    /// SIGN and PLUS-MINUS SIGN in US and UK Mac
-    /// layouts on ISO keyboards, SECTION SIGN and
-    /// DEGREE SIGN in a Swiss German layout (Mac:
-    /// only on ISO keyboards), CIRCUMFLEX ACCENT and
-    /// DEGREE SIGN in a German layout (Mac: only on
-    /// ISO keyboards), SUPERSCRIPT TWO and TILDE in a
-    /// French Windows layout, COMMERCIAL AT and
-    /// NUMBER SIGN in a French Mac layout on ISO
-    /// keyboards, and LESS-THAN SIGN and GREATER-THAN
-    /// SIGN in a Swiss German, German, or French Mac
-    /// layout on ANSI keyboards.
+    /// Top left corner key. Produces grave accent / tilde in US layout,
+    /// section sign on ISO keyboards, etc.
     /// </summary>
-    Grave = 53, // 0x00000035
-    Comma = 54, // 0x00000036
-    Period = 55, // 0x00000037
-    Slash = 56, // 0x00000038
-    Capslock = 57, // 0x00000039
-    F1 = 58, // 0x0000003A
-    F2 = 59, // 0x0000003B
-    F3 = 60, // 0x0000003C
-    F4 = 61, // 0x0000003D
-    F5 = 62, // 0x0000003E
-    F6 = 63, // 0x0000003F
-    F7 = 64, // 0x00000040
-    F8 = 65, // 0x00000041
-    F9 = 66, // 0x00000042
-    F10 = 67, // 0x00000043
-    F11 = 68, // 0x00000044
-    F12 = 69, // 0x00000045
-    Printscreen = 70, // 0x00000046
-    Scrolllock = 71, // 0x00000047
-    Pause = 72, // 0x00000048
+    Grave = 53,
+    Comma = 54,
+    Period = 55,
+    Slash = 56,
+    Capslock = 57,
+    F1 = 58,
+    F2 = 59,
+    F3 = 60,
+    F4 = 61,
+    F5 = 62,
+    F6 = 63,
+    F7 = 64,
+    F8 = 65,
+    F9 = 66,
+    F10 = 67,
+    F11 = 68,
+    F12 = 69,
+    Printscreen = 70,
+    Scrolllock = 71,
+    Pause = 72,
+
+    /// <summary>Insert on PC, Help on some Mac keyboards.</summary>
+    Insert = 73,
+    Home = 74,
+    Pageup = 75,
+    Delete = 76,
+    End = 77,
+    Pagedown = 78,
+    Right = 79,
+    Left = 80,
+    Down = 81,
+    Up = 82,
+
+    /// <summary>Num Lock on PC, Clear on Mac keyboards.</summary>
+    NumLockClear = 83,
+    KpDivide = 84,
+    KpMultiply = 85,
+    KpMinus = 86,
+    KpPlus = 87,
+    KpEnter = 88,
+    Kp1 = 89,
+    Kp2 = 90,
+    Kp3 = 91,
+    Kp4 = 92,
+    Kp5 = 93,
+    Kp6 = 94,
+    Kp7 = 95,
+    Kp8 = 96,
+    Kp9 = 97,
+    Kp0 = 98,
+    KpPeriod = 99,
 
     /// <summary>
-    /// insert on PC, help on some Mac keyboards (but
-    /// does send code 73, not 117)
+    /// Additional key on ISO keyboards between left shift and Z.
+    /// Produces backslash in US/UK layout, less-than sign in German/French layout.
     /// </summary>
-    Insert = 73, // 0x00000049
-    Home = 74, // 0x0000004A
-    Pageup = 75, // 0x0000004B
-    Delete = 76, // 0x0000004C
-    End = 77, // 0x0000004D
-    Pagedown = 78, // 0x0000004E
-    Right = 79, // 0x0000004F
-    Left = 80, // 0x00000050
-    Down = 81, // 0x00000051
-    Up = 82, // 0x00000052
-
-    /// <summary>num lock on PC, clear on Mac keyboards</summary>
-    NumLockClear = 83, // 0x00000053
-    KpDivide = 84, // 0x00000054
-    KpMultiply = 85, // 0x00000055
-    KpMinus = 86, // 0x00000056
-    KpPlus = 87, // 0x00000057
-    KpEnter = 88, // 0x00000058
-    Kp1 = 89, // 0x00000059
-    Kp2 = 90, // 0x0000005A
-    Kp3 = 91, // 0x0000005B
-    Kp4 = 92, // 0x0000005C
-    Kp5 = 93, // 0x0000005D
-    Kp6 = 94, // 0x0000005E
-    Kp7 = 95, // 0x0000005F
-    Kp8 = 96, // 0x00000060
-    Kp9 = 97, // 0x00000061
-    Kp0 = 98, // 0x00000062
-    KpPeriod = 99, // 0x00000063
-
-    /// <summary>
-    /// This is the additional key that ISO
-    /// keyboards have over ANSI ones,
-    /// located between left shift and Z.
-    /// Produces GRAVE ACCENT and TILDE in a
-    /// US or UK Mac layout, REVERSE SOLIDUS
-    /// (backslash) and VERTICAL LINE in a
-    /// US or UK Windows layout, and
-    /// LESS-THAN SIGN and GREATER-THAN SIGN
-    /// in a Swiss German, German, or French
-    /// layout.
-    /// </summary>
-    NonUsBackSlash = 100, // 0x00000064
-
-    /// <summary>windows contextual menu, compose</summary>
-    Application = 101, // 0x00000065
-
-    /// <summary>
-    /// The USB document says this is a status flag,
-    /// not a physical key - but some Mac keyboards
-    /// do have a power key.
-    /// </summary>
-    Power = 102, // 0x00000066
-    KpEquals = 103, // 0x00000067
-    F13 = 104, // 0x00000068
-    F14 = 105, // 0x00000069
-    F15 = 106, // 0x0000006A
-    F16 = 107, // 0x0000006B
-    F17 = 108, // 0x0000006C
-    F18 = 109, // 0x0000006D
-    F19 = 110, // 0x0000006E
-    F20 = 111, // 0x0000006F
-    F21 = 112, // 0x00000070
-    F22 = 113, // 0x00000071
-    F23 = 114, // 0x00000072
-    F24 = 115, // 0x00000073
-    Execute = 116, // 0x00000074
-
-    /// <summary>AL Integrated Help Center</summary>
-    Help = 117, // 0x00000075
-
-    /// <summary>Menu (show menu)</summary>
-    Menu = 118, // 0x00000076
-    Select = 119, // 0x00000077
-
-    /// <summary>AC Stop</summary>
-    Stop = 120, // 0x00000078
-
-    /// <summary>AC Redo/Repeat</summary>
-    Again = 121, // 0x00000079
-
-    /// <summary>AC Undo</summary>
-    Undo = 122, // 0x0000007A
-
-    /// <summary>AC Cut</summary>
-    Cut = 123, // 0x0000007B
-
-    /// <summary>AC Copy</summary>
-    Copy = 124, // 0x0000007C
-
-    /// <summary>AC Paste</summary>
-    Paste = 125, // 0x0000007D
-
-    /// <summary>AC Find</summary>
-    Find = 126, // 0x0000007E
-    Mute = 127, // 0x0000007F
-    VolumeUp = 128, // 0x00000080
-    VolumeDown = 129, // 0x00000081
-    KpComma = 133, // 0x00000085
-    KpEqualsAs400 = 134, // 0x00000086
-
-    /// <summary>
-    /// used on Asian keyboards, see
-    /// footnotes in USB doc
-    /// </summary>
-    International1 = 135, // 0x00000087
-    International2 = 136, // 0x00000088
-
-    /// <summary>Yen</summary>
-    International3 = 137, // 0x00000089
-    International4 = 138, // 0x0000008A
-    International5 = 139, // 0x0000008B
-    International6 = 140, // 0x0000008C
-    International7 = 141, // 0x0000008D
-    International8 = 142, // 0x0000008E
-    International9 = 143, // 0x0000008F
-
-    /// <summary>Hangul/English toggle</summary>
-    Lang1 = 144, // 0x00000090
-
-    /// <summary>Hanja conversion</summary>
-    Lang2 = 145, // 0x00000091
-
-    /// <summary>Katakana</summary>
-    Lang3 = 146, // 0x00000092
-
-    /// <summary>Hiragana</summary>
-    Lang4 = 147, // 0x00000093
-
-    /// <summary>Zenkaku/Hankaku</summary>
-    Lang5 = 148, // 0x00000094
-
-    /// <summary>reserved</summary>
-    Lang6 = 149, // 0x00000095
-
-    /// <summary>reserved</summary>
-    Lang7 = 150, // 0x00000096
-
-    /// <summary>reserved</summary>
-    Lang8 = 151, // 0x00000097
-
-    /// <summary>reserved</summary>
-    Lang9 = 152, // 0x00000098
-
-    /// <summary>Erase-Eaze</summary>
-    AltErase = 153, // 0x00000099
-    SysReq = 154, // 0x0000009A
-
-    /// <summary>AC Cancel</summary>
-    Cancel = 155, // 0x0000009B
-    Clear = 156, // 0x0000009C
-    Prior = 157, // 0x0000009D
-    Return2 = 158, // 0x0000009E
-    Separator = 159, // 0x0000009F
-    Out = 160, // 0x000000A0
-    Oper = 161, // 0x000000A1
-    ClearAgain = 162, // 0x000000A2
-    CrSel = 163, // 0x000000A3
-    ExSel = 164, // 0x000000A4
-    Kp00 = 176, // 0x000000B0
-    Kp000 = 177, // 0x000000B1
-    ThousandsSeparator = 178, // 0x000000B2
-    DecimalSeparator = 179, // 0x000000B3
-    CurrencyUnit = 180, // 0x000000B4
-    CurrencySubunit = 181, // 0x000000B5
-    KpLeftParen = 182, // 0x000000B6
-    KpRightParen = 183, // 0x000000B7
-    KpLeftBrace = 184, // 0x000000B8
-    KpRightBrace = 185, // 0x000000B9
-    KpTab = 186, // 0x000000BA
-    KpBackspace = 187, // 0x000000BB
-    KpA = 188, // 0x000000BC
-    KpB = 189, // 0x000000BD
-    KpC = 190, // 0x000000BE
-    KpD = 191, // 0x000000BF
-    KpE = 192, // 0x000000C0
-    KpF = 193, // 0x000000C1
-    KpXor = 194, // 0x000000C2
-    KpPower = 195, // 0x000000C3
-    KpPercent = 196, // 0x000000C4
-    KpLess = 197, // 0x000000C5
-    KpGreater = 198, // 0x000000C6
-    KpAmpersand = 199, // 0x000000C7
-    KpDblAmpersand = 200, // 0x000000C8
-    KpVerticalBar = 201, // 0x000000C9
-    KpDblVerticalBar = 202, // 0x000000CA
-    KpColon = 203, // 0x000000CB
-    KpHash = 204, // 0x000000CC
-    KpSpace = 205, // 0x000000CD
-    KpAt = 206, // 0x000000CE
-    KpExClam = 207, // 0x000000CF
-    KpMemStore = 208, // 0x000000D0
-    KpMemRecall = 209, // 0x000000D1
-    KpMemClear = 210, // 0x000000D2
-    KpMemAdd = 211, // 0x000000D3
-    KpMemSubtract = 212, // 0x000000D4
-    KpMemMultiply = 213, // 0x000000D5
-    KpMemDivide = 214, // 0x000000D6
-    KpPlusMinus = 215, // 0x000000D7
-    KpClear = 216, // 0x000000D8
-    KpClearEntry = 217, // 0x000000D9
-    KpBinary = 218, // 0x000000DA
-    KpOctal = 219, // 0x000000DB
-    KpDecimal = 220, // 0x000000DC
-    KpHexadecimal = 221, // 0x000000DD
-    LCtrl = 224, // 0x000000E0
-    LShift = 225, // 0x000000E1
-
-    /// <summary>alt, option</summary>
-    LAlt = 226, // 0x000000E2
-
-    /// <summary>windows, command (apple), meta</summary>
-    LGUI = 227, // 0x000000E3
-    RCtrl = 228, // 0x000000E4
-    RShift = 229, // 0x000000E5
-
-    /// <summary>alt gr, option</summary>
-    RAlt = 230, // 0x000000E6
-
-    /// <summary>windows, command (apple), meta</summary>
-    RGUI = 231, // 0x000000E7
-
-    /// <summary>
-    /// I'm not sure if this is really not covered
-    /// by any of the above, but since there's a
-    /// special SDL_KMOD_MODE for it I'm adding it here
-    /// </summary>
-    Mode = 257, // 0x00000101
-
-    /// <summary>Sleep</summary>
-    Sleep = 258, // 0x00000102
-
-    /// <summary>Wake</summary>
-    Wake = 259, // 0x00000103
-
-    /// <summary>Channel Increment</summary>
-    ChannelIncrement = 260, // 0x00000104
-
-    /// <summary>Channel Decrement</summary>
-    ChannelDecrement = 261, // 0x00000105
-
-    /// <summary>Play</summary>
-    MediaPlay = 262, // 0x00000106
-
-    /// <summary>Pause</summary>
-    MediaPause = 263, // 0x00000107
-
-    /// <summary>Record</summary>
-    MediaRecord = 264, // 0x00000108
-
-    /// <summary>Fast Forward</summary>
-    MediaFastForward = 265, // 0x00000109
-
-    /// <summary>Rewind</summary>
-    MediaRewind = 266, // 0x0000010A
-
-    /// <summary>Next Track</summary>
-    MediaNextTrack = 267, // 0x0000010B
-
-    /// <summary>Previous Track</summary>
-    MediaPreviousTrack = 268, // 0x0000010C
-
-    /// <summary>Stop</summary>
-    MediaStop = 269, // 0x0000010D
-
-    /// <summary>Eject</summary>
-    MediaEject = 270, // 0x0000010E
-
-    /// <summary>Play / Pause</summary>
-    MediaPlayPause = 271, // 0x0000010F
-
-    /// <summary>Media Select</summary>
-    MediaSelect = 272, // 0x00000110
-
-    /// <summary>AC New</summary>
-    ACNew = 273, // 0x00000111
-
-    /// <summary>AC Open</summary>
-    ACOpen = 274, // 0x00000112
-
-    /// <summary>AC Close</summary>
-    ACClose = 275, // 0x00000113
-
-    /// <summary>AC Exit</summary>
-    ACExit = 276, // 0x00000114
-
-    /// <summary>AC Save</summary>
-    ACSave = 277, // 0x00000115
-
-    /// <summary>AC Print</summary>
-    ACPrint = 278, // 0x00000116
-
-    /// <summary>AC Properties</summary>
-    ACProperties = 279, // 0x00000117
-
-    /// <summary>AC Search</summary>
-    ACSearch = 280, // 0x00000118
-
-    /// <summary>AC Home</summary>
-    ACHome = 281, // 0x00000119
-
-    /// <summary>AC Back</summary>
-    ACBack = 282, // 0x0000011A
-
-    /// <summary>AC Forward</summary>
-    ACForward = 283, // 0x0000011B
-
-    /// <summary>AC Stop</summary>
-    ACStop = 284, // 0x0000011C
-
-    /// <summary>AC Refresh</summary>
-    ACRefresh = 285, // 0x0000011D
-
-    /// <summary>AC Bookmarks</summary>
-    ACBookmarks = 286, // 0x0000011E
-
-    /// <summary>
-    /// Usually situated below the display on phones and
-    /// used as a multi-function feature key for selecting
-    /// a software defined function shown on the bottom left
-    /// of the display.
-    /// </summary>
-    SoftLeft = 287, // 0x0000011F
-
-    /// <summary>
-    /// Usually situated below the display on phones and
-    /// used as a multi-function feature key for selecting
-    /// a software defined function shown on the bottom right
-    /// of the display.
-    /// </summary>
-    SoftRight = 288, // 0x00000120
-
-    /// <summary>Used for accepting phone calls.</summary>
-    Call = 289, // 0x00000121
-
-    /// <summary>Used for rejecting phone calls.</summary>
-    EndCall = 290, // 0x00000122
-
-    /// <summary>400-500 reserved for dynamic keycodes</summary>
-    Reserved = 400, // 0x00000190
-
-    /// <summary>
-    /// not a key, just marks the number of scancodes for array bounds
-    /// </summary>
-    Count = 512, // 0x00000200
+    NonUsBackSlash = 100,
+
+    /// <summary>Windows contextual menu / Compose key.</summary>
+    Application = 101,
+
+    /// <summary>Power key (status flag on USB spec, physical key on some Mac keyboards).</summary>
+    Power = 102,
+    KpEquals = 103,
+    F13 = 104,
+    F14 = 105,
+    F15 = 106,
+    F16 = 107,
+    F17 = 108,
+    F18 = 109,
+    F19 = 110,
+    F20 = 111,
+    F21 = 112,
+    F22 = 113,
+    F23 = 114,
+    F24 = 115,
+    Execute = 116,
+
+    /// <summary>AL Integrated Help Center.</summary>
+    Help = 117,
+
+    /// <summary>Show menu.</summary>
+    Menu = 118,
+    Select = 119,
+
+    /// <summary>AC Stop.</summary>
+    Stop = 120,
+
+    /// <summary>AC Redo / Repeat.</summary>
+    Again = 121,
+
+    /// <summary>AC Undo.</summary>
+    Undo = 122,
+
+    /// <summary>AC Cut.</summary>
+    Cut = 123,
+
+    /// <summary>AC Copy.</summary>
+    Copy = 124,
+
+    /// <summary>AC Paste.</summary>
+    Paste = 125,
+
+    /// <summary>AC Find.</summary>
+    Find = 126,
+    Mute = 127,
+    VolumeUp = 128,
+    VolumeDown = 129,
+    KpComma = 133,
+    KpEqualsAs400 = 134,
+
+    /// <summary>Used on Asian keyboards.</summary>
+    International1 = 135,
+    International2 = 136,
+
+    /// <summary>Yen key.</summary>
+    International3 = 137,
+    International4 = 138,
+    International5 = 139,
+    International6 = 140,
+    International7 = 141,
+    International8 = 142,
+    International9 = 143,
+
+    /// <summary>Hangul / English toggle.</summary>
+    Lang1 = 144,
+
+    /// <summary>Hanja conversion.</summary>
+    Lang2 = 145,
+
+    /// <summary>Katakana.</summary>
+    Lang3 = 146,
+
+    /// <summary>Hiragana.</summary>
+    Lang4 = 147,
+
+    /// <summary>Zenkaku / Hankaku.</summary>
+    Lang5 = 148,
+    Lang6 = 149,
+    Lang7 = 150,
+    Lang8 = 151,
+    Lang9 = 152,
+
+    /// <summary>Erase-Eaze.</summary>
+    AltErase = 153,
+    SysReq = 154,
+
+    /// <summary>AC Cancel.</summary>
+    Cancel = 155,
+    Clear = 156,
+    Prior = 157,
+    Return2 = 158,
+    Separator = 159,
+    Out = 160,
+    Oper = 161,
+    ClearAgain = 162,
+    CrSel = 163,
+    ExSel = 164,
+    Kp00 = 176,
+    Kp000 = 177,
+    ThousandsSeparator = 178,
+    DecimalSeparator = 179,
+    CurrencyUnit = 180,
+    CurrencySubunit = 181,
+    KpLeftParen = 182,
+    KpRightParen = 183,
+    KpLeftBrace = 184,
+    KpRightBrace = 185,
+    KpTab = 186,
+    KpBackspace = 187,
+    KpA = 188,
+    KpB = 189,
+    KpC = 190,
+    KpD = 191,
+    KpE = 192,
+    KpF = 193,
+    KpXor = 194,
+    KpPower = 195,
+    KpPercent = 196,
+    KpLess = 197,
+    KpGreater = 198,
+    KpAmpersand = 199,
+    KpDblAmpersand = 200,
+    KpVerticalBar = 201,
+    KpDblVerticalBar = 202,
+    KpColon = 203,
+    KpHash = 204,
+    KpSpace = 205,
+    KpAt = 206,
+    KpExClam = 207,
+    KpMemStore = 208,
+    KpMemRecall = 209,
+    KpMemClear = 210,
+    KpMemAdd = 211,
+    KpMemSubtract = 212,
+    KpMemMultiply = 213,
+    KpMemDivide = 214,
+    KpPlusMinus = 215,
+    KpClear = 216,
+    KpClearEntry = 217,
+    KpBinary = 218,
+    KpOctal = 219,
+    KpDecimal = 220,
+    KpHexadecimal = 221,
+    LCtrl = 224,
+    LShift = 225,
+
+    /// <summary>Left Alt / Option.</summary>
+    LAlt = 226,
+
+    /// <summary>Left GUI — Windows / Command (Apple) / Meta.</summary>
+    LGUI = 227,
+    RCtrl = 228,
+    RShift = 229,
+
+    /// <summary>Right Alt / AltGr / Option.</summary>
+    RAlt = 230,
+
+    /// <summary>Right GUI — Windows / Command (Apple) / Meta.</summary>
+    RGUI = 231,
+
+    /// <summary>Mode key (SDL_KMOD_MODE).</summary>
+    Mode = 257,
+
+    /// <summary>Sleep.</summary>
+    Sleep = 258,
+
+    /// <summary>Wake.</summary>
+    Wake = 259,
+
+    /// <summary>Channel Increment.</summary>
+    ChannelIncrement = 260,
+
+    /// <summary>Channel Decrement.</summary>
+    ChannelDecrement = 261,
+
+    /// <summary>Media Play.</summary>
+    MediaPlay = 262,
+
+    /// <summary>Media Pause.</summary>
+    MediaPause = 263,
+
+    /// <summary>Media Record.</summary>
+    MediaRecord = 264,
+
+    /// <summary>Media Fast Forward.</summary>
+    MediaFastForward = 265,
+
+    /// <summary>Media Rewind.</summary>
+    MediaRewind = 266,
+
+    /// <summary>Media Next Track.</summary>
+    MediaNextTrack = 267,
+
+    /// <summary>Media Previous Track.</summary>
+    MediaPreviousTrack = 268,
+
+    /// <summary>Media Stop.</summary>
+    MediaStop = 269,
+
+    /// <summary>Media Eject.</summary>
+    MediaEject = 270,
+
+    /// <summary>Media Play / Pause toggle.</summary>
+    MediaPlayPause = 271,
+
+    /// <summary>Media Select.</summary>
+    MediaSelect = 272,
+
+    /// <summary>AC New.</summary>
+    ACNew = 273,
+
+    /// <summary>AC Open.</summary>
+    ACOpen = 274,
+
+    /// <summary>AC Close.</summary>
+    ACClose = 275,
+
+    /// <summary>AC Exit.</summary>
+    ACExit = 276,
+
+    /// <summary>AC Save.</summary>
+    ACSave = 277,
+
+    /// <summary>AC Print.</summary>
+    ACPrint = 278,
+
+    /// <summary>AC Properties.</summary>
+    ACProperties = 279,
+
+    /// <summary>AC Search.</summary>
+    ACSearch = 280,
+
+    /// <summary>AC Home.</summary>
+    ACHome = 281,
+
+    /// <summary>AC Back.</summary>
+    ACBack = 282,
+
+    /// <summary>AC Forward.</summary>
+    ACForward = 283,
+
+    /// <summary>AC Stop.</summary>
+    ACStop = 284,
+
+    /// <summary>AC Refresh.</summary>
+    ACRefresh = 285,
+
+    /// <summary>AC Bookmarks.</summary>
+    ACBookmarks = 286,
+
+    /// <summary>Soft-key left (phones).</summary>
+    SoftLeft = 287,
+
+    /// <summary>Soft-key right (phones).</summary>
+    SoftRight = 288,
+
+    /// <summary>Accept phone call.</summary>
+    Call = 289,
+
+    /// <summary>Reject phone call.</summary>
+    EndCall = 290,
+
+    /// <summary>400–500 reserved for dynamic keycodes.</summary>
+    Reserved = 400,
+
+    /// <summary>Not a key — marks the scancode array upper bound.</summary>
+    Count = 512,
 }
+

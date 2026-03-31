@@ -30,12 +30,13 @@ public sealed class AppWindowPlugin : IPlugin
             {
                 case SDL.EventType.MouseMotion:
                     input.SetMousePosition((int)e.Motion.X, (int)e.Motion.Y);
+                    input.AddMouseDelta((int)e.Motion.XRel, (int)e.Motion.YRel);
                     break;
                 case SDL.EventType.MouseButtonDown:
                 case SDL.EventType.MouseButtonUp:
                     int btn = e.Button.Button - 1; // SDL 1..5 -> 0..4
-                    if (btn >= 0 && btn < 5)
-                        input.SetMouseButton(btn, (SDL.EventType)e.Type == SDL.EventType.MouseButtonDown);
+                    if (btn is >= 0 and < 5)
+                        input.SetMouseButton((MouseButton)btn, (SDL.EventType)e.Type == SDL.EventType.MouseButtonDown);
                     break;
                 case SDL.EventType.MouseWheel:
                     input.AddWheel(e.Wheel.X, e.Wheel.Y);

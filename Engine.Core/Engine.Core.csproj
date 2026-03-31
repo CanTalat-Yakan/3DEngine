@@ -7,5 +7,11 @@
         <Description>Core runtime: App, World, Schedule, Events, Config, Logger, Time, Input.</Description>
     </PropertyGroup>
 
+    <!-- Allow first-party backend projects to call internal mutation APIs (Input, Time, etc.) -->
+    <ItemGroup>
+        <InternalsVisibleTo Include="Engine.Window" />
+        <InternalsVisibleTo Include="Editor" />
+        <InternalsVisibleTo Include="Engine.Tests" />
+    </ItemGroup>
 
 </Project>
