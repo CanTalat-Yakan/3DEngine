@@ -1,5 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
+    <PropertyGroup>
+        <SelfContained>true</SelfContained>
+    </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="BlazorBlueprint.Components" Version="3.*"/>
         <PackageReference Include="BlazorBlueprint.Primitives" Version="3.*"/>
