@@ -70,6 +70,14 @@ public sealed class App
         return this;
     }
 
+    /// <summary>Registers a system with a Bevy-style <c>run_if</c> condition to a given stage.</summary>
+    public App AddSystem(Stage stage, SystemFn system, Func<World, bool> runCondition)
+    {
+        Schedule.AddSystem(stage, system, runCondition);
+        Logger.Trace($"System registered to stage {stage} (conditional): {system.Method.DeclaringType?.Name ?? "?"}.{system.Method.Name}");
+        return this;
+    }
+
     /// <summary>Inserts or replaces a world resource value.</summary>
     public App InsertResource<T>(T value) where T : notnull
     {
