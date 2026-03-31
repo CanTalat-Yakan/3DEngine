@@ -39,96 +39,45 @@ public sealed class InputPlugin : IPlugin
 /// </summary>
 public sealed class Input
 {
-    // ── Keyboard state ─────────────────────────────────────────────────
-
     private readonly HashSet<Key> _keysDown = [];
     private readonly HashSet<Key> _keysPressed = [];
     private readonly HashSet<Key> _keysReleased = [];
-
-    // ── Mouse button state ─────────────────────────────────────────────
 
     private readonly HashSet<MouseButton> _mouseDown = [];
     private readonly HashSet<MouseButton> _mousePressed = [];
     private readonly HashSet<MouseButton> _mouseReleased = [];
 
-    // ── Mouse position & delta ─────────────────────────────────────────
-
-    /// <summary>Current mouse X position in window pixels.</summary>
     public int MouseX { get; private set; }
-
-    /// <summary>Current mouse Y position in window pixels.</summary>
     public int MouseY { get; private set; }
 
-    /// <summary>Current mouse position as an (X, Y) tuple.</summary>
     public (int X, int Y) MousePosition => (MouseX, MouseY);
 
-    /// <summary>Mouse X movement since last frame.</summary>
     public int MouseDeltaX { get; private set; }
-
-    /// <summary>Mouse Y movement since last frame.</summary>
     public int MouseDeltaY { get; private set; }
 
-    /// <summary>Mouse delta since last frame as an (X, Y) tuple.</summary>
     public (int X, int Y) MouseDelta => (MouseDeltaX, MouseDeltaY);
 
-    // ── Mouse wheel ────────────────────────────────────────────────────
-
-    /// <summary>Horizontal scroll wheel delta this frame.</summary>
     public float WheelX { get; private set; }
-
-    /// <summary>Vertical scroll wheel delta this frame.</summary>
     public float WheelY { get; private set; }
 
-    // ── Text input ─────────────────────────────────────────────────────
-
     private readonly List<char> _textInput = [];
-
-    /// <summary>Characters typed this frame (zero-allocation span).</summary>
+    
     public ReadOnlySpan<char> TextInput => CollectionsMarshal.AsSpan(_textInput);
 
-    // ── Keyboard queries ───────────────────────────────────────────────
-
-    /// <summary>True while the key is held down.</summary>
     public bool KeyDown(Key key) => _keysDown.Contains(key);
-
-    /// <summary>True only on the frame the key was first pressed.</summary>
     public bool KeyPressed(Key key) => _keysPressed.Contains(key);
-
-    /// <summary>True only on the frame the key was released.</summary>
     public bool KeyReleased(Key key) => _keysReleased.Contains(key);
-
-    /// <summary>True if any key is currently held down.</summary>
     public bool AnyKeyDown() => _keysDown.Count > 0;
-
-    /// <summary>True if any key was pressed this frame.</summary>
     public bool AnyKeyPressed() => _keysPressed.Count > 0;
 
-    // ── Mouse button queries ───────────────────────────────────────────
-
-    /// <summary>True while the mouse button is held down.</summary>
     public bool MouseDown(MouseButton button) => _mouseDown.Contains(button);
-
-    /// <summary>True only on the frame the mouse button was first pressed.</summary>
     public bool MousePressed(MouseButton button) => _mousePressed.Contains(button);
-
-    /// <summary>True only on the frame the mouse button was released.</summary>
     public bool MouseReleased(MouseButton button) => _mouseReleased.Contains(button);
-
-    /// <summary>True if any mouse button is currently held down.</summary>
     public bool AnyMouseDown() => _mouseDown.Count > 0;
-
-    /// <summary>True if any mouse button was pressed this frame.</summary>
     public bool AnyMousePressed() => _mousePressed.Count > 0;
 
-    // ── Backward-compatible int overloads ──────────────────────────────
-
-    /// <summary>True while the mouse button is held down (0-based index).</summary>
     public bool MouseDown(int button) => _mouseDown.Contains((MouseButton)button);
-
-    /// <summary>True only on the frame the mouse button was first pressed (0-based index).</summary>
     public bool MousePressed(int button) => _mousePressed.Contains((MouseButton)button);
-
-    /// <summary>True only on the frame the mouse button was released (0-based index).</summary>
     public bool MouseReleased(int button) => _mouseReleased.Contains((MouseButton)button);
 
     // ── Mutation (internal — platform backends only) ───────────────────

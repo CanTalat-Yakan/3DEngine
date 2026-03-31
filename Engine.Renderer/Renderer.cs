@@ -107,7 +107,26 @@ public sealed class Renderer : IDisposable
     public void Dispose()
     {
         Logger.Info("Disposing Renderer and underlying graphics context...");
+
+        DisposeSystems(_queueSystems);
+        DisposeSystems(_prepareSystems);
+        DisposeSystems(_extractSystems);
+        Logger.Debug("Render systems disposed.");
+
+        Graph.Dispose();
+        Logger.Debug("Render graph nodes disposed.");
+
         Context.Dispose();
         Logger.Info("Renderer disposed.");
+    }
+
+    private static void DisposeSystems<T>(List<T> systems)
+    {
+        foreach (var sys in systems)
+        {
+            if (sys is IDisposable disposable)
+                disposable.Dispose();
+        }
+        systems.Clear();
     }
 }

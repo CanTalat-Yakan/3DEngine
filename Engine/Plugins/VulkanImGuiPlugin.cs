@@ -19,8 +19,6 @@ public sealed class VulkanImGuiPlugin : IPlugin
 
         Logger.Info("VulkanImGuiPlugin: Building — will add ImGui render node to Vulkan graph.");
 
-        ImGuiRenderNode? imguiNode = null;
-
         app.AddSystem(Stage.Startup, (World world) =>
         {
             var renderer = world.TryResource<Renderer>();
@@ -30,16 +28,8 @@ public sealed class VulkanImGuiPlugin : IPlugin
                 return;
             }
 
-            imguiNode = new ImGuiRenderNode();
-            renderer.AddNode(imguiNode);
-            Logger.Info("ImGuiRenderNode registered in render graph (depends on 'sample' node).");
-        });
-
-        app.AddSystem(Stage.Cleanup, (World world) =>
-        {
-            Logger.Info("VulkanImGuiPlugin: Cleanup — disposing ImGui render node resources...");
-            imguiNode?.Dispose();
-            Logger.Info("VulkanImGuiPlugin: Cleanup complete.");
+            renderer.AddNode(new ImGuiRenderNode());
+            Logger.Info("ImGuiRenderNode registered in render graph.");
         });
 
         Logger.Info("VulkanImGuiPlugin: Build complete.");

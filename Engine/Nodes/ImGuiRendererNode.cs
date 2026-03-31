@@ -9,7 +9,7 @@ namespace Engine;
 /// Reads draw data directly from ImGui (valid after ImGui.Render(), before next NewFrame()).
 /// Manages its own pipeline, font atlas texture, and per-frame vertex/index buffers.
 /// </summary>
-internal sealed class ImGuiRenderNode : IRenderNode
+internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
 {
     private static readonly ILogger Logger = Log.Category("Engine.ImGui.Vulkan");
 

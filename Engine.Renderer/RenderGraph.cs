@@ -1,7 +1,7 @@
 namespace Engine;
 
 /// <summary>Directed acyclic graph of render nodes with dependency-based topological execution order.</summary>
-public sealed class RenderGraph
+public sealed class RenderGraph : IDisposable
 {
     private readonly Dictionary<string, IRenderNode> _nodes = new();
     private readonly Dictionary<string, HashSet<string>> _edges = new();
@@ -40,5 +40,17 @@ public sealed class RenderGraph
         if (result.Count != _nodes.Count)
             throw new InvalidOperationException("Cycle detected in render graph.");
         return result;
+    }
+
+    /// <summary>Disposes all render nodes that implement <see cref="IDisposable"/>.</summary>
+    public void Dispose()
+    {
+        foreach (var node in _nodes.Values)
+        {
+            if (node is IDisposable disposable)
+                disposable.Dispose();
+        }
+        _nodes.Clear();
+        _edges.Clear();
     }
 }

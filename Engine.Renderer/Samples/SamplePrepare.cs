@@ -1,7 +1,7 @@
 namespace Engine;
 
 /// <summary>Prepares per-frame camera uniform buffer and descriptor set for rendering.</summary>
-public sealed class SamplePrepare : IPrepareSystem
+public sealed class SamplePrepare : IPrepareSystem, IDisposable
 {
     private IBuffer? _cameraBuffer;
     private IDescriptorSet? _cameraSet;
@@ -40,5 +40,11 @@ public sealed class SamplePrepare : IPrepareSystem
         ctx.Graphics.UpdateDescriptorSet(_cameraSet, uboBinding, samplerBinding: null);
 
         renderWorld.Set(_cameraSet);
+    }
+
+    public void Dispose()
+    {
+        _cameraSet?.Dispose();
+        _cameraBuffer?.Dispose();
     }
 }
