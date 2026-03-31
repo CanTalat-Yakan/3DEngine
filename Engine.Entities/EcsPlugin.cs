@@ -8,10 +8,8 @@ public sealed class EcsPlugin : IPlugin
     public void Build(App app)
     {
         Logger.Info("EcsPlugin: Registering EcsWorld and EcsCommands resources...");
-        if (!app.World.ContainsResource<EcsWorld>())
-            app.World.InsertResource(new EcsWorld());
-        if (!app.World.ContainsResource<EcsCommands>())
-            app.World.InsertResource(new EcsCommands());
+        app.World.InitResource<EcsWorld>();
+        app.World.InitResource<EcsCommands>();
 
         app.AddSystem(Stage.PostUpdate, (World world) => world.Resource<EcsCommands>().Apply(world.Resource<EcsWorld>()));
         Logger.Info("EcsPlugin: ECS command flush system registered to PostUpdate stage.");

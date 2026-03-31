@@ -10,8 +10,7 @@ public sealed class AppExitPlugin : IPlugin
     {
         Logger.Info("AppExitPlugin: Registering exit handler...");
         // Ensure exit state resource exists.
-        if (!app.World.ContainsResource<AppExit>())
-            app.World.InsertResource(new AppExit());
+        app.World.InitResource<AppExit>();
 
         // When the window signals quit, raise the Requested flag.
         var window = app.World.Resource<AppWindow>();

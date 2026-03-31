@@ -7,14 +7,7 @@ public static class Events
 {
     /// <summary>Gets the event queue resource for T, inserting a new one if missing.</summary>
     public static Events<T> Get<T>(World world)
-        => world.TryResource<Events<T>>() ?? Create<T>(world);
-
-    private static Events<T> Create<T>(World world)
-    {
-        var events = new Events<T>();
-        world.InsertResource(events);
-        return events;
-    }
+        => world.GetOrInsertResource(() => new Events<T>());
 }
 
 /// <summary>

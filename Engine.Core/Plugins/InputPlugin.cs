@@ -16,8 +16,7 @@ public sealed class InputPlugin : IPlugin
     public void Build(App app)
     {
         Logger.Info("InputPlugin: Registering Input resource...");
-        if (!app.World.ContainsResource<Input>())
-            app.World.InsertResource(new Input());
+        app.World.InitResource<Input>();
 
         var input = app.World.Resource<Input>();
 
