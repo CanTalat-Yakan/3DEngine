@@ -39,7 +39,7 @@ catch
 
 // ── 3. Run the native SDL3/Vulkan engine window (blocks on main thread) ──
 var config = Config.GetDefault(
-    title: "3D Engine Editor — Scene Viewport",
+    title: "3D Engine Editor",
     width: 1280,
     height: 720);
 
