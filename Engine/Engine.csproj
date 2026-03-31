@@ -2,6 +2,8 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
+        <SelfContained>true</SelfContained>
+        <PublishSingleFile>true</PublishSingleFile>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Title>3DEngine</Title>
         <PackageId>3DEngine</PackageId>
