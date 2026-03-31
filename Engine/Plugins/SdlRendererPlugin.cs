@@ -19,7 +19,7 @@ public sealed class SdlRendererPlugin : IPlugin
     public void Build(App app)
     {
         Logger.Info("SdlRendererPlugin: Creating Renderer and wiring extract/prepare/queue systems...");
-        var renderer = new Renderer();
+        var renderer = new Renderer(new RendererContext());
         renderer.AddExtractSystem(new ClearColorExtract());
         renderer.AddExtractSystem(new CameraExtract());
         renderer.AddExtractSystem(new MeshMaterialExtract());

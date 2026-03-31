@@ -12,17 +12,14 @@ public sealed class Renderer : IDisposable
 
     public RenderWorld RenderWorld { get; } = new();
     public RenderGraph Graph { get; } = new();
-    public RendererContext Context { get; } = new();
+    public RendererContext Context { get; }
     public RendererDiagnostics Diagnostics { get; } = new();
 
     private bool _initialized;
     private Extent2D _cachedSurfaceExtent;
 
-    public Renderer() { }
-    public Renderer(RendererContext context)
-    {
+    public Renderer(RendererContext context) =>
         Context = context;
-    }
 
     public void Initialize()
     {
@@ -123,10 +120,9 @@ public sealed class Renderer : IDisposable
     private static void DisposeSystems<T>(List<T> systems)
     {
         foreach (var sys in systems)
-        {
             if (sys is IDisposable disposable)
                 disposable.Dispose();
-        }
+
         systems.Clear();
     }
 }
