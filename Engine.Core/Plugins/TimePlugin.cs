@@ -13,7 +13,7 @@ public sealed class TimePlugin : IPlugin
     public void Build(App app)
     {
         Logger.Info("TimePlugin: Registering Time resource and frame-timing system.");
-        app.World.InsertResource(new Time());
+        app.World.InitResource<Time>();
 
         var watch = Stopwatch.StartNew();
         double lastElapsed = 0.0;
