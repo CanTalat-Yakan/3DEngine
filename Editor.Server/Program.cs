@@ -1,9 +1,5 @@
 using BlazorBlueprint.Components;
 using Editor.Server;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
 // When run standalone, start the server and block until shutdown.
 var server = await EditorServerHost.StartAsync(args: args);
