@@ -2,11 +2,6 @@ using System.Runtime.InteropServices;
 
 namespace Engine;
 
-/// <summary>Backend contract for platform-specific input event forwarding.</summary>
-public interface IInputBackend
-{
-    void Initialize(App app, Input input);
-}
 
 /// <summary>Registers the Input resource and wires up the input backend.</summary>
 public sealed class InputPlugin : IPlugin

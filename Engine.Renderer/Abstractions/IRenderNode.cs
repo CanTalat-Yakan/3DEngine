@@ -7,4 +7,3 @@ public interface IRenderNode
     IReadOnlyCollection<string> Dependencies { get; }
     void Execute(RendererContext ctx, CommandRecordingContext cmds, RenderWorld renderWorld);
 }
-
