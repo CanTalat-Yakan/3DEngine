@@ -15,112 +15,132 @@ public class ShowcaseNavigationShell : IEditorShellBuilder
                 {
                     container.Div(Css.MarginXAuto().MaxWidth("3xl").SpaceY(6), inner =>
                     {
+                        // ── Tabs ────────────────────────────────────────────
                         inner.Card(Css.Default, card =>
                         {
-                            card.Title("Navigation");
-                            card.Description("Tabs, collapsibles, accordion, breadcrumbs, and pagination.");
+                            card.Title("Tabs");
+                            card.Description("Switch between different views or sections.");
                             card.Content(c =>
                             {
-                                // Tabs
-                                c.Div(Css.SpaceY(2), section =>
+                                c.Tabs(Css.Default, tabs =>
                                 {
-                                    section.Label(Css.Default, "Tabs");
-                                    section.Tabs(Css.Default, tabs =>
+                                    tabs.Tab("Account", content =>
                                     {
-                                        tabs.Tab("Account", content =>
+                                        content.Card(Css.Default, tabCard =>
                                         {
-                                            content.Div(Css.SpaceY(2), inner2 =>
+                                            tabCard.Title("Account");
+                                            tabCard.Description("Make changes to your account here. Click save when you're done.");
+                                            tabCard.Content(tc =>
                                             {
-                                                inner2.Label(Css.Default, "Name");
-                                                inner2.Input(Css.Default, value: "John Doe");
-                                                inner2.Label(Css.Default, "Email");
-                                                inner2.Input(Css.Default, value: "john@example.com");
-                                                inner2.Button(Css.Default, "Save changes", () => { });
+                                                tc.Div(Css.SpaceY(2), fields =>
+                                                {
+                                                    fields.Label(Css.Default, "Name");
+                                                    fields.Input(Css.Default, value: "John Doe");
+                                                });
+                                                tc.Div(Css.SpaceY(2), fields =>
+                                                {
+                                                    fields.Label(Css.Default, "Email");
+                                                    fields.Input(Css.Default, value: "john@example.com");
+                                                });
                                             });
-                                        }, icon: Icon.From(Lucide.User));
-                                        tabs.Tab("Password", content =>
+                                            tabCard.Footer(f => f.Button(Css.Default, "Save changes", () => { }));
+                                        });
+                                    });
+                                    tabs.Tab("Password", content =>
+                                    {
+                                        content.Card(Css.Default, tabCard =>
                                         {
-                                            content.Div(Css.SpaceY(2), inner2 =>
+                                            tabCard.Title("Password");
+                                            tabCard.Description("Change your password here. After saving, you'll be logged out.");
+                                            tabCard.Content(tc =>
                                             {
-                                                inner2.Label(Css.Default, "Current password");
-                                                inner2.Input(Css.Default, placeholder: "Enter current password");
-                                                inner2.Label(Css.Default, "New password");
-                                                inner2.Input(Css.Default, placeholder: "Enter new password");
-                                                inner2.Button(Css.Default, "Change password", () => { });
+                                                tc.Div(Css.SpaceY(2), fields =>
+                                                {
+                                                    fields.Label(Css.Default, "Current password");
+                                                    fields.Input(Css.Default, placeholder: "Enter current password");
+                                                });
+                                                tc.Div(Css.SpaceY(2), fields =>
+                                                {
+                                                    fields.Label(Css.Default, "New password");
+                                                    fields.Input(Css.Default, placeholder: "Enter new password");
+                                                });
                                             });
-                                        }, icon: Icon.From(Lucide.Lock));
-                                        tabs.Tab("Settings", content =>
-                                        {
-                                            content.Switch(Css.Default, "Dark mode", initial: false);
-                                            content.Separator();
-                                            content.Switch(Css.Default, "Notifications", initial: true);
-                                        }, icon: Icon.From(Lucide.Settings));
+                                            tabCard.Footer(f => f.Button(Css.Default, "Change password", () => { }));
+                                        });
                                     });
-                                });
-
-                                c.Separator();
-
-                                // Accordion
-                                c.Div(Css.SpaceY(2), section =>
-                                {
-                                    section.Label(Css.Default, "Accordion");
-                                    section.Accordion(Css.Default, acc =>
+                                    tabs.Tab("Settings", content =>
                                     {
-                                        acc.Item("what", "What is BlazorBlueprint?", content =>
+                                        content.Card(Css.Default, tabCard =>
                                         {
-                                            content.Paragraph(Css.TextSm().TextColor("muted-foreground"),
-                                                "BlazorBlueprint is a Blazor component library that provides 80+ pre-styled components following the shadcn/ui design system.");
-                                        });
-                                        acc.Item("install", "How do I install it?", content =>
-                                        {
-                                            content.Paragraph(Css.TextSm().TextColor("muted-foreground"),
-                                                "You can install BlazorBlueprint via NuGet: dotnet add package BlazorBlueprint.Components");
-                                        });
-                                        acc.Item("customize", "Can I customize the styling?", content =>
-                                        {
-                                            content.Paragraph(Css.TextSm().TextColor("muted-foreground"),
-                                                "Yes! BlazorBlueprint uses CSS variables for theming. You can customize colors, spacing, and other design tokens.");
+                                            tabCard.Title("Settings");
+                                            tabCard.Description("Manage your application settings and preferences.");
+                                            tabCard.Content(tc =>
+                                            {
+                                                tc.Switch(Css.Default, "Dark mode", initial: false);
+                                                tc.Separator();
+                                                tc.Switch(Css.Default, "Notifications", initial: true);
+                                            });
                                         });
                                     });
                                 });
+                            });
+                        });
 
-                                c.Separator();
-
-                                // Collapsible
-                                c.Div(Css.SpaceY(2), section =>
+                        // ── Collapsible ─────────────────────────────────────
+                        inner.Card(Css.Default, card =>
+                        {
+                            card.Title("Collapsible");
+                            card.Description("A section that can be expanded or collapsed.");
+                            card.Content(c =>
+                            {
+                                c.Collapsible(Css.Default, "Recent Repositories", content =>
                                 {
-                                    section.Label(Css.Default, "Collapsible");
-                                    section.Collapsible(Css.Default, "Recent Repositories", content =>
-                                    {
-                                        content.Paragraph(Css.TextSm(), "blazorblueprint/components");
-                                        content.Paragraph(Css.TextSm(), "blazorblueprint/primitives");
-                                        content.Paragraph(Css.TextSm(), "blazorblueprint/icons");
-                                    }, expanded: false);
+                                    content.Paragraph(Css.TextSm(), "blazorblueprint/components");
+                                    content.Paragraph(Css.TextSm(), "blazorblueprint/primitives");
+                                    content.Paragraph(Css.TextSm(), "blazorblueprint/icons");
+                                }, expanded: false);
+                            });
+                        });
+
+                        // ── FAQ (Multiple Collapsibles) ─────────────────────
+                        inner.Card(Css.Default, card =>
+                        {
+                            card.Title("FAQ Section");
+                            card.Description("Multiple collapsible sections for FAQ-style content.");
+                            card.Content(c =>
+                            {
+                                c.Collapsible(Css.Default, "What is BlazorBlueprint?", content =>
+                                {
+                                    content.Paragraph(Css.TextSm().TextColor("muted-foreground"),
+                                        "BlazorBlueprint is a Blazor component library that provides 80+ pre-styled components following the shadcn/ui design system. It includes both styled components and headless primitives.");
                                 });
-
-                                c.Separator();
-
-                                // Breadcrumb
-                                c.Div(Css.SpaceY(2), section =>
+                                c.Collapsible(Css.Default, "How do I install it?", content =>
                                 {
-                                    section.Label(Css.Default, "Breadcrumb");
-                                    section.Breadcrumb(Css.Default, bc =>
-                                    {
-                                        bc.Item("Home", "/", Icon.From(Lucide.House));
-                                        bc.Separator();
-                                        bc.Item("Components", "/components");
-                                        bc.Separator();
-                                        bc.Item("Button");
-                                    });
+                                    content.Paragraph(Css.TextSm().TextColor("muted-foreground"),
+                                        "You can install BlazorBlueprint via NuGet: dotnet add package BlazorBlueprint.Components");
                                 });
-
-                                c.Separator();
-
-                                // Pagination
-                                c.Div(Css.SpaceY(2), section =>
+                                c.Collapsible(Css.Default, "Can I customize the styling?", content =>
                                 {
-                                    section.Label(Css.Default, "Pagination");
-                                    section.Pagination(Css.Default, currentPage: 3, totalPages: 10);
+                                    content.Paragraph(Css.TextSm().TextColor("muted-foreground"),
+                                        "Yes! BlazorBlueprint uses CSS variables for theming. You can customize colors, spacing, and other design tokens by modifying the CSS variables in your theme file.");
+                                });
+                            });
+                        });
+
+                        // ── Breadcrumb ──────────────────────────────────────
+                        inner.Card(Css.Default, card =>
+                        {
+                            card.Title("Breadcrumb");
+                            card.Description("Displays the path to the current page using a hierarchy of links.");
+                            card.Content(c =>
+                            {
+                                c.Breadcrumb(Css.Default, bc =>
+                                {
+                                    bc.Item("Home", "/", Icon.From(Lucide.House));
+                                    bc.Separator();
+                                    bc.Item("Components", "/components");
+                                    bc.Separator();
+                                    bc.Item("Button");
                                 });
                             });
                         });
