@@ -20,7 +20,7 @@ public class DefaultEditorShell : IEditorShellBuilder
                         {
                             hero.Div(Css.Flex().Column().Items(Align.Center).Gap(2), badges =>
                             {
-                                badges.Badge(Css.Default, "Editor Shell API", variant: "secondary");
+                                badges.Badge(Css.Default, "Editor Shell API", Variant.From(BadgeStyle.Secondary));
                                 badges.Paragraph(Css.TextXs().TextColor("muted-foreground"),
                                     "Built with IContentBuilder · Zero Blazor dependency");
                             });
@@ -42,10 +42,10 @@ public class DefaultEditorShell : IEditorShellBuilder
                                     section.Row(Css.Default, row =>
                                     {
                                         row.Button(Css.Default, "Primary", () => { });
-                                        row.Button(Css.Default, "Secondary", variant: "secondary");
-                                        row.Button(Css.Default, "Outline", variant: "outline");
-                                        row.Button(Css.Default, "Ghost", variant: "ghost");
-                                        row.Button(Css.Default, "Destructive", variant: "destructive");
+                                        row.Button(Css.Default, "Secondary", () => { }, Variant.From(ButtonStyle.Secondary));
+                                        row.Button(Css.Default, "Outline", () => { }, Variant.From(ButtonStyle.Outline));
+                                        row.Button(Css.Default, "Ghost", () => { }, Variant.From(ButtonStyle.Ghost));
+                                        row.Button(Css.Default, "Destructive", () => { }, Variant.From(ButtonStyle.Destructive));
                                     });
                                 });
 
@@ -77,9 +77,9 @@ public class DefaultEditorShell : IEditorShellBuilder
                                     section.Row(Css.Default, row =>
                                     {
                                         row.Badge(Css.Default, "Default");
-                                        row.Badge(Css.Default, "Secondary", variant: "secondary");
-                                        row.Badge(Css.Default, "Outline", variant: "outline");
-                                        row.Badge(Css.Default, "Destructive", variant: "destructive");
+                                        row.Badge(Css.Default, "Secondary", Variant.From(BadgeStyle.Secondary));
+                                        row.Badge(Css.Default, "Outline", Variant.From(BadgeStyle.Outline));
+                                        row.Badge(Css.Default, "Destructive", Variant.From(BadgeStyle.Destructive));
                                     });
                                 });
 
