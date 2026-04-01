@@ -12,7 +12,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Entities", "Engine.E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Application", "Engine.Application\Engine.Application.csproj", "{0038391B-6EDF-4149-85EA-C3989135E4B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Core", "Engine.Core\Engine.Core.csproj", "{E98FF9DF-9D9E-4CAB-80F2-C80EAA7E6D66}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Common", "Engine.Common\Engine.Common.csproj", "{E98FF9DF-9D9E-4CAB-80F2-C80EAA7E6D66}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Graphics", "Engine.Graphics\Engine.Graphics.csproj", "{515013A6-A597-42AD-B9B4-3BEB893CC914}"
 EndProject

@@ -29,7 +29,7 @@ var scriptsDir = Path.Combine(AppContext.BaseDirectory, "Scripts");
 
 var compiler = new ScriptCompiler(shellRegistry)
     .WatchDirectory(scriptsDir)
-    .AddReference(typeof(Engine.App).Assembly)          // Engine.Core
+    .AddReference(typeof(Engine.App).Assembly)          // Engine.Common
     .AddReference(typeof(Editor.Shell.ShellRegistry).Assembly); // Editor.Shell
 
 // Add Engine.Entities reference if available
