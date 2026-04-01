@@ -32,18 +32,32 @@ public sealed class ContentBuilder : IContentBuilder
     public IContentBuilder Code(string text, string? css = null)
     { _elements.Add(new Element("code") { Text = text, Css = css }); return this; }
 
+    public IContentBuilder Avatar(string? fallback = null, string? src = null, string? css = null)
+    { _elements.Add(new Element("avatar") { Text = fallback, Css = css, Props = { ["src"] = src } }); return this; }
+
+    public IContentBuilder Progress(int value, int max = 100, string? css = null)
+    { _elements.Add(new Element("progress") { Css = css, Props = { ["value"] = value, ["max"] = max } }); return this; }
+
     // ── Interactive ─────────────────────────────────────────────────────
 
-    public IContentBuilder Button(string label, Action? onClick = null, string? variant = null, string? icon = null, string? css = null)
+    public IContentBuilder Button(string label, Action? onClick = null, string? variant = null, string? icon = null,
+        bool disabled = false, bool loading = false, string? href = null, string? css = null)
     {
         _elements.Add(new Element("button") { Text = label, OnClick = onClick, Css = css,
-            Props = { ["variant"] = variant, ["icon"] = icon } });
+            Props = { ["variant"] = variant, ["icon"] = icon, ["disabled"] = disabled, ["loading"] = loading, ["href"] = href } });
         return this;
     }
 
     public IContentBuilder Input(string? placeholder = null, string? value = null, Action<string>? onChanged = null, string? id = null, string? css = null)
     {
         _elements.Add(new Element("input") { Id = id, Css = css, OnInput = onChanged,
+            Props = { ["placeholder"] = placeholder, ["value"] = value } });
+        return this;
+    }
+
+    public IContentBuilder Textarea(string? placeholder = null, string? value = null, Action<string>? onChanged = null, string? id = null, string? css = null)
+    {
+        _elements.Add(new Element("textarea") { Id = id, Css = css, OnInput = onChanged,
             Props = { ["placeholder"] = placeholder, ["value"] = value } });
         return this;
     }
@@ -59,6 +73,22 @@ public sealed class ContentBuilder : IContentBuilder
     {
         _elements.Add(new Element("switch") { Text = label, Id = id, Css = css, OnToggle = onChanged,
             Props = { ["checked"] = initial } });
+        return this;
+    }
+
+    public IContentBuilder Select((string Value, string Label)[] options, string? placeholder = null, string? selected = null,
+        Action<string>? onChanged = null, string? id = null, string? css = null)
+    {
+        _elements.Add(new Element("select") { Id = id, Css = css, OnInput = onChanged,
+            Props = { ["placeholder"] = placeholder, ["selected"] = selected, ["options"] = options } });
+        return this;
+    }
+
+    public IContentBuilder RadioGroup((string Value, string Label)[] options, string? selected = null,
+        Action<string>? onChanged = null, string? css = null)
+    {
+        _elements.Add(new Element("radio-group") { Css = css, OnInput = onChanged,
+            Props = { ["selected"] = selected, ["options"] = options } });
         return this;
     }
 
@@ -103,9 +133,10 @@ public sealed class ContentBuilder : IContentBuilder
 
     // ── Feedback ────────────────────────────────────────────────────────
 
-    public IContentBuilder Alert(string? title = null, string? description = null, string? variant = null, string? css = null)
+    public IContentBuilder Alert(string? title = null, string? description = null, string? variant = null,
+        string? icon = null, string? css = null)
     {
-        var el = new Element("alert") { Css = css, Props = { ["variant"] = variant } };
+        var el = new Element("alert") { Css = css, Props = { ["variant"] = variant, ["icon"] = icon } };
         if (title != null) el.Children.Add(new Element("alert-title") { Text = title });
         if (description != null) el.Children.Add(new Element("alert-description") { Text = description });
         _elements.Add(el);
@@ -118,6 +149,44 @@ public sealed class ContentBuilder : IContentBuilder
     {
         _elements.Add(new Element("link") { Text = text, Css = css,
             Props = { ["href"] = href, ["icon"] = icon, ["description"] = description } });
+        return this;
+    }
+
+    // ── Complex Components ──────────────────────────────────────────────
+
+    public IContentBuilder Tabs(Action<ITabsBuilder> configure, string? css = null)
+    {
+        var tabs = new Element("tabs") { Css = css };
+        var builder = new TabsBuilder(tabs);
+        configure(builder);
+        _elements.Add(tabs);
+        return this;
+    }
+
+    public IContentBuilder Collapsible(string title, Action<IContentBuilder> content, bool expanded = false, string? css = null)
+    {
+        var cb = new ContentBuilder();
+        content(cb);
+        _elements.Add(new Element("collapsible") { Text = title, Css = css,
+            Props = { ["expanded"] = expanded }, Children = cb.Build() });
+        return this;
+    }
+
+    public IContentBuilder Dialog(string triggerLabel, Action<IDialogBuilder> configure, string? triggerVariant = null)
+    {
+        var dialog = new Element("dialog") { Props = { ["triggerLabel"] = triggerLabel, ["triggerVariant"] = triggerVariant, ["open"] = false } };
+        var builder = new DialogBuilder(dialog);
+        configure(builder);
+        _elements.Add(dialog);
+        return this;
+    }
+
+    public IContentBuilder AlertDialog(string triggerLabel, Action<IAlertDialogBuilder> configure, string? triggerVariant = null)
+    {
+        var dialog = new Element("alert-dialog") { Props = { ["triggerLabel"] = triggerLabel, ["triggerVariant"] = triggerVariant, ["open"] = false } };
+        var builder = new AlertDialogBuilder(dialog);
+        configure(builder);
+        _elements.Add(dialog);
         return this;
     }
 
@@ -217,4 +286,65 @@ internal sealed class CardBuilder(Element card) : ICardBuilder
     }
 
     public ICardBuilder Css(string css) { card.Css = css; return this; }
+}
+
+// ── Tabs Builder ────────────────────────────────────────────────────────
+
+internal sealed class TabsBuilder(Element tabs) : ITabsBuilder
+{
+    public ITabsBuilder Tab(string label, Action<IContentBuilder> content, string? icon = null)
+    {
+        var cb = new ContentBuilder();
+        content(cb);
+        tabs.Children.Add(new Element("tab") { Text = label, Children = cb.Build(),
+            Props = { ["icon"] = icon } });
+        return this;
+    }
+}
+
+// ── Dialog Builder ──────────────────────────────────────────────────────
+
+internal sealed class DialogBuilder(Element dialog) : IDialogBuilder
+{
+    public IDialogBuilder Title(string text)
+    { dialog.Children.Add(new Element("dialog-title") { Text = text }); return this; }
+
+    public IDialogBuilder Description(string text)
+    { dialog.Children.Add(new Element("dialog-description") { Text = text }); return this; }
+
+    public IDialogBuilder Content(Action<IContentBuilder> content)
+    {
+        var cb = new ContentBuilder();
+        content(cb);
+        dialog.Children.Add(new Element("dialog-content") { Children = cb.Build() });
+        return this;
+    }
+
+    public IDialogBuilder Footer(Action<IContentBuilder> content)
+    {
+        var cb = new ContentBuilder();
+        content(cb);
+        dialog.Children.Add(new Element("dialog-footer") { Children = cb.Build() });
+        return this;
+    }
+}
+
+// ── Alert Dialog Builder ────────────────────────────────────────────────
+
+internal sealed class AlertDialogBuilder(Element dialog) : IAlertDialogBuilder
+{
+    public IAlertDialogBuilder Title(string text)
+    { dialog.Children.Add(new Element("alert-dialog-title") { Text = text }); return this; }
+
+    public IAlertDialogBuilder Description(string text)
+    { dialog.Children.Add(new Element("alert-dialog-description") { Text = text }); return this; }
+
+    public IAlertDialogBuilder CancelText(string text)
+    { dialog.Props["cancelText"] = text; return this; }
+
+    public IAlertDialogBuilder ConfirmText(string text)
+    { dialog.Props["confirmText"] = text; return this; }
+
+    public IAlertDialogBuilder OnConfirm(Action action)
+    { dialog.OnClick = action; return this; }
 }

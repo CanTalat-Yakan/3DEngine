@@ -45,12 +45,20 @@ public interface IContentBuilder
     IContentBuilder Icon(string name, int size = 16, string? css = null);
     IContentBuilder Badge(string text, string? variant = null, string? css = null);
     IContentBuilder Code(string text, string? css = null);
+    IContentBuilder Avatar(string? fallback = null, string? src = null, string? css = null);
+    IContentBuilder Progress(int value, int max = 100, string? css = null);
 
     // ── Interactive ─────────────────────────────────────────────────────
-    IContentBuilder Button(string label, Action? onClick = null, string? variant = null, string? icon = null, string? css = null);
+    IContentBuilder Button(string label, Action? onClick = null, string? variant = null, string? icon = null,
+        bool disabled = false, bool loading = false, string? href = null, string? css = null);
     IContentBuilder Input(string? placeholder = null, string? value = null, Action<string>? onChanged = null, string? id = null, string? css = null);
+    IContentBuilder Textarea(string? placeholder = null, string? value = null, Action<string>? onChanged = null, string? id = null, string? css = null);
     IContentBuilder Checkbox(string? label = null, bool initial = false, Action<bool>? onChanged = null, string? id = null, string? css = null);
     IContentBuilder Switch(string? label = null, bool initial = false, Action<bool>? onChanged = null, string? id = null, string? css = null);
+    IContentBuilder Select((string Value, string Label)[] options, string? placeholder = null, string? selected = null,
+        Action<string>? onChanged = null, string? id = null, string? css = null);
+    IContentBuilder RadioGroup((string Value, string Label)[] options, string? selected = null,
+        Action<string>? onChanged = null, string? css = null);
 
     // ── Layout ──────────────────────────────────────────────────────────
     IContentBuilder Separator(string? css = null);
@@ -65,10 +73,17 @@ public interface IContentBuilder
     IContentBuilder Card(Action<ICardBuilder> configure, string? css = null);
 
     // ── Feedback ────────────────────────────────────────────────────────
-    IContentBuilder Alert(string? title = null, string? description = null, string? variant = null, string? css = null);
+    IContentBuilder Alert(string? title = null, string? description = null, string? variant = null,
+        string? icon = null, string? css = null);
 
     // ── Links ───────────────────────────────────────────────────────────
     IContentBuilder Link(string text, string href, string? icon = null, string? description = null, string? css = null);
+
+    // ── Complex Components ──────────────────────────────────────────────
+    IContentBuilder Tabs(Action<ITabsBuilder> configure, string? css = null);
+    IContentBuilder Collapsible(string title, Action<IContentBuilder> content, bool expanded = false, string? css = null);
+    IContentBuilder Dialog(string triggerLabel, Action<IDialogBuilder> configure, string? triggerVariant = null);
+    IContentBuilder AlertDialog(string triggerLabel, Action<IAlertDialogBuilder> configure, string? triggerVariant = null);
 
     // ── Editor-specific ─────────────────────────────────────────────────
     IContentBuilder TreeItem(string label, string? icon = null, bool selected = false, bool expanded = true,
@@ -87,4 +102,29 @@ public interface ICardBuilder
     ICardBuilder Content(Action<IContentBuilder> content);
     ICardBuilder Footer(Action<IContentBuilder> content);
     ICardBuilder Css(string css);
+}
+
+/// <summary>Sub-builder for tab components.</summary>
+public interface ITabsBuilder
+{
+    ITabsBuilder Tab(string label, Action<IContentBuilder> content, string? icon = null);
+}
+
+/// <summary>Sub-builder for dialog components.</summary>
+public interface IDialogBuilder
+{
+    IDialogBuilder Title(string text);
+    IDialogBuilder Description(string text);
+    IDialogBuilder Content(Action<IContentBuilder> content);
+    IDialogBuilder Footer(Action<IContentBuilder> content);
+}
+
+/// <summary>Sub-builder for alert dialog (confirmation) components.</summary>
+public interface IAlertDialogBuilder
+{
+    IAlertDialogBuilder Title(string text);
+    IAlertDialogBuilder Description(string text);
+    IAlertDialogBuilder CancelText(string text);
+    IAlertDialogBuilder ConfirmText(string text);
+    IAlertDialogBuilder OnConfirm(Action action);
 }
