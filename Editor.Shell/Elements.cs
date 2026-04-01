@@ -42,14 +42,14 @@ public interface IContentBuilder
     IContentBuilder Heading(string? css, int level, string text);
     IContentBuilder Paragraph(string? css, string text);
     IContentBuilder Label(string? css, string text, string? forId = null);
-    IContentBuilder Icon(string? css, IconRef icon, int size = 16);
+    IContentBuilder Icon(string? css, string? icon, int size = 16);
     IContentBuilder Badge(string? css, string text, string? variant = null);
     IContentBuilder Code(string? css, string text);
     IContentBuilder Avatar(string? css, string? fallback = null, string? src = null);
     IContentBuilder Progress(string? css, int value, int max = 100);
 
     // ── Interactive ─────────────────────────────────────────────────────
-    IContentBuilder Button(string? css, string label, Action? onClick = null, string? variant = null, IconRef icon = default,
+    IContentBuilder Button(string? css, string label, Action? onClick = null, string? variant = null, string? icon = null,
         bool disabled = false, bool loading = false, string? href = null);
     IContentBuilder Input(string? css, string? placeholder = null, string? value = null, Action<string>? onChanged = null, string? id = null);
     IContentBuilder Textarea(string? css, string? placeholder = null, string? value = null, Action<string>? onChanged = null, string? id = null);
@@ -74,10 +74,10 @@ public interface IContentBuilder
 
     // ── Feedback ────────────────────────────────────────────────────────
     IContentBuilder Alert(string? css, string? title = null, string? description = null, string? variant = null,
-        IconRef icon = default);
+        string? icon = null);
 
     // ── Links ───────────────────────────────────────────────────────────
-    IContentBuilder Link(string? css, string text, string href, IconRef icon = default, string? description = null);
+    IContentBuilder Link(string? css, string text, string href, string? icon = null, string? description = null);
 
     // ── Complex Components ──────────────────────────────────────────────
     IContentBuilder Tabs(string? css, Action<ITabsBuilder> configure);
@@ -86,10 +86,10 @@ public interface IContentBuilder
     IContentBuilder AlertDialog(string triggerLabel, Action<IAlertDialogBuilder> configure, string? triggerVariant = null);
 
     // ── Editor-specific ─────────────────────────────────────────────────
-    IContentBuilder TreeItem(string label, IconRef icon = default, bool selected = false, bool expanded = true,
+    IContentBuilder TreeItem(string label, string? icon = null, bool selected = false, bool expanded = true,
         Action? onClick = null, Action<IContentBuilder>? children = null, string? iconColor = null);
     IContentBuilder FieldRow(string label, Action<IContentBuilder> control);
-    IContentBuilder EmptyState(IconRef icon = default, string? title = null, string? description = null);
+    IContentBuilder EmptyState(string? icon = null, string? title = null, string? description = null);
     IContentBuilder LogEntry(string time, string level, string category, string message);
 }
 
@@ -107,7 +107,7 @@ public interface ICardBuilder
 /// <summary>Sub-builder for tab components.</summary>
 public interface ITabsBuilder
 {
-    ITabsBuilder Tab(string label, Action<IContentBuilder> content, IconRef icon = default);
+    ITabsBuilder Tab(string label, Action<IContentBuilder> content, string? icon = null);
 }
 
 /// <summary>Sub-builder for dialog components.</summary>

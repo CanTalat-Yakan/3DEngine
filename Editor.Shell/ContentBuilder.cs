@@ -23,8 +23,8 @@ public sealed class ContentBuilder : IContentBuilder
     public IContentBuilder Label(string? css, string text, string? forId = null)
     { _elements.Add(new Element("label") { Text = text, Id = forId, Css = css }); return this; }
 
-    public IContentBuilder Icon(string? css, IconRef icon, int size = 16)
-    { _elements.Add(new Element("icon") { Text = icon.Name, Css = css, Props = { ["size"] = size, ["iconRef"] = icon } }); return this; }
+    public IContentBuilder Icon(string? css, string? icon, int size = 16)
+    { _elements.Add(new Element("icon") { Text = icon, Css = css, Props = { ["size"] = size, ["icon"] = icon } }); return this; }
 
     public IContentBuilder Badge(string? css, string text, string? variant = null)
     { _elements.Add(new Element("badge") { Text = text, Css = css, Props = { ["variant"] = variant } }); return this; }
@@ -40,7 +40,7 @@ public sealed class ContentBuilder : IContentBuilder
 
     // ── Interactive ─────────────────────────────────────────────────────
 
-    public IContentBuilder Button(string? css, string label, Action? onClick = null, string? variant = null, IconRef icon = default,
+    public IContentBuilder Button(string? css, string label, Action? onClick = null, string? variant = null, string? icon = null,
         bool disabled = false, bool loading = false, string? href = null)
     {
         _elements.Add(new Element("button") { Text = label, OnClick = onClick, Css = css,
@@ -134,7 +134,7 @@ public sealed class ContentBuilder : IContentBuilder
     // ── Feedback ────────────────────────────────────────────────────────
 
     public IContentBuilder Alert(string? css, string? title = null, string? description = null, string? variant = null,
-        IconRef icon = default)
+        string? icon = null)
     {
         var el = new Element("alert") { Css = css, Props = { ["variant"] = variant, ["icon"] = icon } };
         if (title != null) el.Children.Add(new Element("alert-title") { Text = title });
@@ -145,7 +145,7 @@ public sealed class ContentBuilder : IContentBuilder
 
     // ── Links ───────────────────────────────────────────────────────────
 
-    public IContentBuilder Link(string? css, string text, string href, IconRef icon = default, string? description = null)
+    public IContentBuilder Link(string? css, string text, string href, string? icon = null, string? description = null)
     {
         _elements.Add(new Element("link") { Text = text, Css = css,
             Props = { ["href"] = href, ["icon"] = icon, ["description"] = description } });
@@ -192,7 +192,7 @@ public sealed class ContentBuilder : IContentBuilder
 
     // ── Editor-specific ─────────────────────────────────────────────────
 
-    public IContentBuilder TreeItem(string label, IconRef icon = default, bool selected = false, bool expanded = true,
+    public IContentBuilder TreeItem(string label, string? icon = null, bool selected = false, bool expanded = true,
         Action? onClick = null, Action<IContentBuilder>? children = null, string? iconColor = null)
     {
         var el = new Element("tree-item") { Text = label, OnClick = onClick,
@@ -217,7 +217,7 @@ public sealed class ContentBuilder : IContentBuilder
         return this;
     }
 
-    public IContentBuilder EmptyState(IconRef icon = default, string? title = null, string? description = null)
+    public IContentBuilder EmptyState(string? icon = null, string? title = null, string? description = null)
     {
         _elements.Add(new Element("empty-state") { Props = { ["icon"] = icon, ["title"] = title, ["description"] = description } });
         return this;
@@ -292,7 +292,7 @@ internal sealed class CardBuilder(Element card) : ICardBuilder
 
 internal sealed class TabsBuilder(Element tabs) : ITabsBuilder
 {
-    public ITabsBuilder Tab(string label, Action<IContentBuilder> content, IconRef icon = default)
+    public ITabsBuilder Tab(string label, Action<IContentBuilder> content, string? icon = null)
     {
         var cb = new ContentBuilder();
         content(cb);

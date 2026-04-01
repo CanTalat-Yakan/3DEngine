@@ -101,13 +101,13 @@ public class DefaultEditorShell : IEditorShellBuilder
                                 c.Grid(Css.Default, 2, grid =>
                                 {
                                     grid.Link(Css.Default, "Documentation", "https://blazorblueprintui.com/docs",
-                                        icon: Lucide.BookOpen, description: "Learn how to use all 80+ components.");
+                                        Icon.From(Lucide.BookOpen), "Learn how to use all 80+ components.");
                                     grid.Link(Css.Default, "Components", "https://blazorblueprintui.com/components",
-                                        icon: Lucide.LayoutGrid, description: "Browse the complete component library.");
+                                        Icon.From(Lucide.LayoutGrid), "Browse the complete component library.");
                                     grid.Link(Css.Default, "Showcase", "/showcase/buttons",
-                                        icon: Lucide.Eye, description: "See components in action with examples.");
+                                        Icon.From(Lucide.Eye), "See components in action with examples.");
                                     grid.Link(Css.Default, "GitHub", "https://github.com/blazorblueprintui/ui",
-                                        icon: Lucide.Github, description: "Star the repo and contribute.");
+                                        Icon.From(Lucide.Github), "Star the repo and contribute.");
                                 });
                             });
                         });
@@ -115,7 +115,7 @@ public class DefaultEditorShell : IEditorShellBuilder
                     });
                 });
             });
-            panel.Icon(Lucide.LayoutGrid).Closeable(false);
+            panel.Icon(Icon.From(Lucide.LayoutGrid)).Closeable(false);
         });
     }
 }

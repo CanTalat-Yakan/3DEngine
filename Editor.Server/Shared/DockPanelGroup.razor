@@ -24,7 +24,7 @@
                     {
                         <BbTabsTrigger Value="@panel.Id"
                                        class="h-7 rounded-none border-b-2 border-transparent text-[11px] px-3 text-muted-foreground data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent">
-                        @if (!panel.Icon.IsNone)
+                        @if (!string.IsNullOrEmpty(panel.Icon))
                         {
                             @ElementRenderer.RenderIcon(panel.Icon, 12, "mr-1.5 opacity-60")
                         }

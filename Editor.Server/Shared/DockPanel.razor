@@ -5,7 +5,7 @@
     @if (Panel.DefaultZone != DockZone.Center || Panel.Closeable)
     {
         <div class="flex items-center h-7 border-b border-border/40 bg-background px-2 shrink-0 gap-1.5">
-        @if (!Panel.Icon.IsNone)
+        @if (!string.IsNullOrEmpty(Panel.Icon))
         {
             @ElementRenderer.RenderIcon(Panel.Icon, 12, "text-muted-foreground opacity-60")
         }

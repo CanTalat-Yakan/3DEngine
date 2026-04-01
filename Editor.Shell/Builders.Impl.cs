@@ -97,7 +97,7 @@ internal sealed class MenuBarBuilder(MenuBarDescriptor desc) : IMenuBarBuilder
         return this;
     }
 
-    public IMenuBarBuilder Menu(string label, IconRef icon, Action<IMenuBuilder> configure)
+    public IMenuBarBuilder Menu(string label, string? icon, Action<IMenuBuilder> configure)
     {
         var menu = new MenuDescriptor { Label = label, Icon = icon };
         configure(new MenuBuilder(menu));
@@ -108,7 +108,7 @@ internal sealed class MenuBarBuilder(MenuBarDescriptor desc) : IMenuBarBuilder
 
 internal sealed class MenuBuilder(MenuDescriptor menu) : IMenuBuilder
 {
-    public IMenuBuilder Item(string label, Action action, string? shortcut = null, IconRef icon = default)
+    public IMenuBuilder Item(string label, Action action, string? shortcut = null, string? icon = null)
     {
         menu.Items.Add(new MenuItemDescriptor
         {
@@ -120,7 +120,7 @@ internal sealed class MenuBuilder(MenuDescriptor menu) : IMenuBuilder
         return this;
     }
 
-    public IMenuBuilder Item(string label, string commandId, string? shortcut = null, IconRef icon = default)
+    public IMenuBuilder Item(string label, string commandId, string? shortcut = null, string? icon = null)
     {
         menu.Items.Add(new MenuItemDescriptor
         {
@@ -144,7 +144,7 @@ internal sealed class MenuBuilder(MenuDescriptor menu) : IMenuBuilder
         return this;
     }
 
-    public IMenuBuilder SubMenu(string label, Action<IMenuBuilder> configure, IconRef icon = default)
+    public IMenuBuilder SubMenu(string label, Action<IMenuBuilder> configure, string? icon = null)
     {
         var subMenu = new MenuDescriptor { Label = label, Icon = icon };
         configure(new MenuBuilder(subMenu));
@@ -168,7 +168,7 @@ internal sealed class MenuBuilder(MenuDescriptor menu) : IMenuBuilder
 
 internal sealed class ToolbarBuilder(ToolbarDescriptor desc) : IToolbarBuilder
 {
-    public IToolbarBuilder Button(string label, Action action, IconRef icon = default, string? tooltip = null)
+    public IToolbarBuilder Button(string label, Action action, string? icon = null, string? tooltip = null)
     {
         desc.Items.Add(new ToolbarItemDescriptor
         {
@@ -181,7 +181,7 @@ internal sealed class ToolbarBuilder(ToolbarDescriptor desc) : IToolbarBuilder
         return this;
     }
 
-    public IToolbarBuilder Button(string label, string commandId, IconRef icon = default, string? tooltip = null)
+    public IToolbarBuilder Button(string label, string commandId, string? icon = null, string? tooltip = null)
     {
         desc.Items.Add(new ToolbarItemDescriptor
         {
@@ -194,7 +194,7 @@ internal sealed class ToolbarBuilder(ToolbarDescriptor desc) : IToolbarBuilder
         return this;
     }
 
-    public IToolbarBuilder Toggle(string label, bool initial, Action<bool> onToggle, IconRef icon = default, string? tooltip = null)
+    public IToolbarBuilder Toggle(string label, bool initial, Action<bool> onToggle, string? icon = null, string? tooltip = null)
     {
         desc.Items.Add(new ToolbarItemDescriptor
         {
@@ -227,7 +227,7 @@ internal sealed class ToolbarBuilder(ToolbarDescriptor desc) : IToolbarBuilder
         return this;
     }
 
-    public IToolbarBuilder Dropdown(string label, Action<IMenuBuilder> configure, IconRef icon = default, string? tooltip = null)
+    public IToolbarBuilder Dropdown(string label, Action<IMenuBuilder> configure, string? icon = null, string? tooltip = null)
     {
         var menu = new MenuDescriptor { Label = label };
         configure(new MenuBuilder(menu));
@@ -276,7 +276,7 @@ internal sealed class StatusBarItemBuilder(StatusBarItemDescriptor item) : IStat
 {
     public IStatusBarItemBuilder Text(string text) { item.Text = text; return this; }
     public IStatusBarItemBuilder Binding(string expression) { item.BindingExpression = expression; return this; }
-    public IStatusBarItemBuilder Icon(IconRef icon) { item.Icon = icon; return this; }
+    public IStatusBarItemBuilder Icon(string? icon) { item.Icon = icon; return this; }
     public IStatusBarItemBuilder Widget(string widgetKey) { item.WidgetKey = widgetKey; return this; }
     public IStatusBarItemBuilder Tooltip(string tooltip) { item.Tooltip = tooltip; return this; }
     public IStatusBarItemBuilder OnClick(Action action) { item.ClickAction = action; return this; }
@@ -294,7 +294,7 @@ internal sealed class PanelBuilder(PanelDescriptor desc) : IPanelBuilder
         desc.Content = cb.Build();
         return this;
     }
-    public IPanelBuilder Icon(IconRef icon) { desc.Icon = icon; return this; }
+    public IPanelBuilder Icon(string? icon) { desc.Icon = icon; return this; }
     public IPanelBuilder TabGroup(string groupId, int order = 0)
     {
         desc.TabGroupId = groupId;
@@ -310,7 +310,7 @@ internal sealed class PanelBuilder(PanelDescriptor desc) : IPanelBuilder
 
 internal sealed class SettingsPageBuilder(SettingsPageDescriptor page) : ISettingsPageBuilder
 {
-    public ISettingsPageBuilder Icon(IconRef icon) { page.Icon = icon; return this; }
+    public ISettingsPageBuilder Icon(string? icon) { page.Icon = icon; return this; }
 
     public ISettingsPageBuilder Group(string title, Action<ISettingsGroupBuilder> configure)
     {
