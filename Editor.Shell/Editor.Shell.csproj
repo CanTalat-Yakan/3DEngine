@@ -8,10 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\Engine.Core\Engine.Core.csproj" />
     </ItemGroup>
 
