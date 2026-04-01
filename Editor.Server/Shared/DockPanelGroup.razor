@@ -34,17 +34,19 @@
                 </BbTabsList>
                 @foreach (var panel in orderedPanels)
                 {
-                    <BbTabsContent Value="@panel.Id" class="flex-1 overflow-auto m-0 p-0 min-h-0">
-                        @if (panel.Content is { Count: > 0 })
-                        {
-                            <ElementRenderer Elements="panel.Content" />
-                        }
-                        else
-                        {
-                            <div class="flex items-center justify-center h-full text-muted-foreground/30 text-[11px]">
-                                @panel.Id
-                            </div>
-                        }
+                    <BbTabsContent Value="@panel.Id" class="flex-1 m-0 p-0 min-h-0">
+                        <div class="overflow-y-auto" style="height: calc(100vh - 1.75rem);">
+                            @if (panel.Content is { Count: > 0 })
+                            {
+                                <ElementRenderer Elements="panel.Content" />
+                            }
+                            else
+                            {
+                                <div class="flex items-center justify-center h-full text-muted-foreground/30 text-[11px]">
+                                    @panel.Id
+                                </div>
+                            }
+                        </div>
                     </BbTabsContent>
                 }
             </BbTabs>
