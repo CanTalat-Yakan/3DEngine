@@ -22,6 +22,8 @@ public sealed class Element
     public Action? OnClick { get; set; }
     public Action<bool>? OnToggle { get; set; }
     public Action<string>? OnInput { get; set; }
+    public Action<double>? OnValueChanged { get; set; }
+    public Action<int>? OnIndexChanged { get; set; }
 
     public Element() { }
     public Element(string tag) => Tag = tag;
@@ -47,6 +49,9 @@ public interface IContentBuilder
     IContentBuilder Code(string? css, string text);
     IContentBuilder Avatar(string? css, string? fallback = null, string? src = null);
     IContentBuilder Progress(string? css, int value, int max = 100);
+    IContentBuilder Skeleton(string? css, string? width = null, string? height = null);
+    IContentBuilder Spinner(string? css, int size = 16);
+    IContentBuilder Kbd(string? css, string keys);
 
     // ── Interactive ─────────────────────────────────────────────────────
     IContentBuilder Button(string? css, string label, Action? onClick = null, string? variant = null, string? icon = null,
@@ -59,6 +64,16 @@ public interface IContentBuilder
         Action<string>? onChanged = null, string? id = null);
     IContentBuilder RadioGroup(string? css, (string Value, string Label)[] options, string? selected = null,
         Action<string>? onChanged = null);
+    IContentBuilder Slider(string? css, double value = 0, double min = 0, double max = 100, double step = 1,
+        Action<double>? onChanged = null);
+    IContentBuilder NumericInput(string? css, double value = 0, double? min = null, double? max = null, double step = 1,
+        Action<double>? onChanged = null, string? id = null);
+    IContentBuilder Combobox(string? css, (string Value, string Label)[] options, string? placeholder = null,
+        string? selected = null, Action<string>? onChanged = null, string? id = null);
+    IContentBuilder Toggle(string? css, string? label = null, bool pressed = false, Action<bool>? onChanged = null,
+        string? variant = null, string? icon = null);
+    IContentBuilder ToggleGroup(string? css, (string Value, string Label)[] options, string? selected = null,
+        Action<string>? onChanged = null, string? variant = null);
 
     // ── Layout ──────────────────────────────────────────────────────────
     IContentBuilder Separator(string? css = null);
@@ -68,6 +83,8 @@ public interface IContentBuilder
     IContentBuilder Column(string? css, Action<IContentBuilder> children);
     IContentBuilder Grid(string? css, int columns, Action<IContentBuilder> children);
     IContentBuilder ScrollArea(string? css, Action<IContentBuilder> children);
+    IContentBuilder Accordion(string? css, Action<IAccordionBuilder> configure, string? type = null);
+    IContentBuilder AspectRatio(string? css, double ratio, Action<IContentBuilder> content);
 
     // ── Cards ───────────────────────────────────────────────────────────
     IContentBuilder Card(string? css, Action<ICardBuilder> configure);
@@ -75,9 +92,27 @@ public interface IContentBuilder
     // ── Feedback ────────────────────────────────────────────────────────
     IContentBuilder Alert(string? css, string? title = null, string? description = null, string? variant = null,
         string? icon = null);
+    IContentBuilder Toast(string? css, string title, string? description = null, string? variant = null,
+        string? icon = null);
 
     // ── Links ───────────────────────────────────────────────────────────
     IContentBuilder Link(string? css, string text, string href, string? icon = null, string? description = null);
+
+    // ── Navigation ──────────────────────────────────────────────────────
+    IContentBuilder Breadcrumb(string? css, Action<IBreadcrumbBuilder> configure);
+    IContentBuilder Pagination(string? css, int currentPage, int totalPages, Action<int>? onPageChanged = null);
+
+    // ── Overlays & Popups ───────────────────────────────────────────────
+    IContentBuilder Tooltip(string? css, Action<IContentBuilder> trigger, string tip, string? side = null);
+    IContentBuilder DropdownMenu(string? css, string triggerLabel, Action<IDropdownMenuBuilder> configure,
+        string? triggerVariant = null, string? triggerIcon = null);
+    IContentBuilder ContextMenu(string? css, Action<IContentBuilder> trigger, Action<IDropdownMenuBuilder> configure);
+    IContentBuilder Popover(string? css, Action<IContentBuilder> trigger, Action<IContentBuilder> content);
+    IContentBuilder HoverCard(string? css, Action<IContentBuilder> trigger, Action<IContentBuilder> content);
+    IContentBuilder Drawer(string triggerLabel, Action<IDrawerBuilder> configure, string? direction = null,
+        string? triggerVariant = null);
+    IContentBuilder Sheet(string triggerLabel, Action<ISheetBuilder> configure, string? side = null,
+        string? triggerVariant = null);
 
     // ── Complex Components ──────────────────────────────────────────────
     IContentBuilder Tabs(string? css, Action<ITabsBuilder> configure);
@@ -92,6 +127,10 @@ public interface IContentBuilder
     IContentBuilder EmptyState(string? icon = null, string? title = null, string? description = null);
     IContentBuilder LogEntry(string time, string level, string category, string message);
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  Sub-builder interfaces — for components with complex nested structure.
+// ═══════════════════════════════════════════════════════════════════════════
 
 /// <summary>Sub-builder for card structure (header, title, description, content, footer).</summary>
 public interface ICardBuilder
@@ -127,4 +166,46 @@ public interface IAlertDialogBuilder
     IAlertDialogBuilder CancelText(string text);
     IAlertDialogBuilder ConfirmText(string text);
     IAlertDialogBuilder OnConfirm(Action action);
+}
+
+/// <summary>Sub-builder for accordion components.</summary>
+public interface IAccordionBuilder
+{
+    IAccordionBuilder Item(string value, string title, Action<IContentBuilder> content);
+}
+
+/// <summary>Sub-builder for dropdown menu and context menu components.</summary>
+public interface IDropdownMenuBuilder
+{
+    IDropdownMenuBuilder Item(string label, Action? onClick = null, string? icon = null, string? shortcut = null,
+        bool disabled = false);
+    IDropdownMenuBuilder CheckboxItem(string label, bool initial = false, Action<bool>? onChanged = null);
+    IDropdownMenuBuilder Separator();
+    IDropdownMenuBuilder Label(string text);
+    IDropdownMenuBuilder Sub(string label, Action<IDropdownMenuBuilder> submenu, string? icon = null);
+}
+
+/// <summary>Sub-builder for drawer components.</summary>
+public interface IDrawerBuilder
+{
+    IDrawerBuilder Title(string text);
+    IDrawerBuilder Description(string text);
+    IDrawerBuilder Content(Action<IContentBuilder> content);
+    IDrawerBuilder Footer(Action<IContentBuilder> content);
+}
+
+/// <summary>Sub-builder for sheet (side panel) components.</summary>
+public interface ISheetBuilder
+{
+    ISheetBuilder Title(string text);
+    ISheetBuilder Description(string text);
+    ISheetBuilder Content(Action<IContentBuilder> content);
+    ISheetBuilder Footer(Action<IContentBuilder> content);
+}
+
+/// <summary>Sub-builder for breadcrumb navigation.</summary>
+public interface IBreadcrumbBuilder
+{
+    IBreadcrumbBuilder Item(string label, string? href = null, string? icon = null);
+    IBreadcrumbBuilder Separator();
 }

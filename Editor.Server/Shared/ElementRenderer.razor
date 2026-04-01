@@ -77,6 +77,29 @@
             }
             break;
 
+        case "skeleton":
+            {
+                var skW = PropStr(el, "width");
+                var skH = PropStr(el, "height");
+                var skStyle = "";
+                if (skW != null) skStyle += $"width:{skW};";
+                if (skH != null) skStyle += $"height:{skH};";
+                <BbSkeleton class="@el.Css" style="@(skStyle.Length > 0 ? skStyle : null)" />
+            }
+            break;
+
+        case "spinner":
+            {
+                var spSize = PropInt(el, "size", 16);
+                var spSz = spSize <= 12 ? SpinnerSize.Small : spSize >= 24 ? SpinnerSize.Large : SpinnerSize.Default;
+                <BbSpinner Size="spSz" class="@el.Css" />
+            }
+            break;
+
+        case "kbd":
+            <BbKbd class="@el.Css">@el.Text</BbKbd>
+            break;
+
         // ── Interactive ─────────────────────────────────────────────
         case "button":
             {
@@ -185,6 +208,75 @@
             }
             break;
 
+        case "slider":
+            {
+                var slVal = PropDouble(el, "value");
+                var slMin = PropDouble(el, "min");
+                var slMax = PropDouble(el, "max", 100);
+                var slStep = PropDouble(el, "step", 1);
+                <BbSlider Value="slVal" Min="slMin" Max="slMax" Step="slStep"
+                          ValueChanged="@(v => OnSliderChanged(el, v))" class="@el.Css" />
+            }
+            break;
+
+        case "numeric-input":
+            {
+                var niEl = el;
+                var niVal = PropDouble(niEl, "value");
+                var niStep = PropDouble(niEl, "step", 1);
+                <BbNumericInput TValue="double" Value="niVal" Step="niStep" id="@niEl.Id" class="@niEl.Css"
+                                ValueChanged="@(v => OnNumericChanged(niEl, v))" />
+            }
+            break;
+
+        case "combobox":
+            {
+                var cmbEl = el;
+                var cmbPh = PropStr(cmbEl, "placeholder");
+                var cmbVal = PropStr(cmbEl, "selected");
+                var cmbOpts = cmbEl.Props.TryGetValue("options", out var co) && co is (string Value, string Label)[] cOpts ? cOpts : [];
+                <BbCombobox TValue="string" Value="@cmbVal" Placeholder="@cmbPh"
+                            ValueChanged="@((string v) => OnSelectChanged(cmbEl, v))" class="@cmbEl.Css">
+                    @foreach (var opt in cmbOpts)
+                    {
+                        <BbComboboxItem Value="@opt.Value" Text="@opt.Label" TValue="string" />
+                    }
+                </BbCombobox>
+            }
+            break;
+
+        case "toggle":
+            {
+                var tglEl = el;
+                var tglPressed = PropBool(tglEl, "pressed");
+                var tglVariant = PropStr(tglEl, "variant");
+                var tglIcon = PropIcon(tglEl, "icon");
+                var tv = tglVariant == "outline" ? ToggleVariant.Outline : ToggleVariant.Default;
+                <BbToggle Pressed="tglPressed" Variant="tv" class="@tglEl.Css"
+                          PressedChanged="@(v => OnTogglePressed(tglEl, v))">
+                    @if (tglIcon != null) { @RenderIcon(tglIcon, 16, tglEl.Text != null ? "mr-2" : null) }
+                    @tglEl.Text
+                </BbToggle>
+            }
+            break;
+
+        case "toggle-group":
+            {
+                var tgEl = el;
+                var tgVal = PropStr(tgEl, "selected");
+                var tgVariant = PropStr(tgEl, "variant");
+                var tgOpts = tgEl.Props.TryGetValue("options", out var tgo) && tgo is (string Value, string Label)[] tgOptsArr ? tgOptsArr : [];
+                var tgv = tgVariant == "outline" ? ToggleVariant.Outline : ToggleVariant.Default;
+                <BbToggleGroup TValue="string" Value="@tgVal" Variant="tgv" class="@tgEl.Css"
+                               ValueChanged="@((string v) => OnSelectChanged(tgEl, v))">
+                    @foreach (var opt in tgOpts)
+                    {
+                        <BbToggleGroupItem Value="@opt.Value" TValue="string">@opt.Label</BbToggleGroupItem>
+                    }
+                </BbToggleGroup>
+            }
+            break;
+
         // ── Layout ──────────────────────────────────────────────────
         case "separator":
             <BbSeparator class="@el.Css" />
@@ -225,6 +317,34 @@
             <div class="@Cx("overflow-auto flex-1", el.Css)">
                 <ElementRenderer Elements="el.Children" />
             </div>
+            break;
+
+        case "accordion":
+            {
+                var accType = PropStr(el, "type");
+                var accItems = el.Children.Where(c => c.Tag == "accordion-item").ToList();
+                <BbAccordion Type="@(accType == "multiple" ? BlazorBlueprint.Primitives.AccordionType.Multiple : BlazorBlueprint.Primitives.AccordionType.Single)" class="@Cx("w-full", el.Css)">
+                    @foreach (var item in accItems)
+                    {
+                        var accVal = PropStr(item, "value") ?? item.Text ?? "";
+                        <BbAccordionItem Value="@accVal">
+                            <BbAccordionTrigger>@item.Text</BbAccordionTrigger>
+                            <BbAccordionContent>
+                                <ElementRenderer Elements="item.Children" />
+                            </BbAccordionContent>
+                        </BbAccordionItem>
+                    }
+                </BbAccordion>
+            }
+            break;
+
+        case "aspect-ratio":
+            {
+                var arRatio = PropDouble(el, "ratio", 16.0 / 9.0);
+                <BbAspectRatio Ratio="arRatio" class="@el.Css">
+                    <ElementRenderer Elements="el.Children" />
+                </BbAspectRatio>
+            }
             break;
 
         // ── Cards ───────────────────────────────────────────────────
@@ -299,6 +419,23 @@
 
         case "alert-description":
             <BbAlertDescription>@el.Text</BbAlertDescription>
+            break;
+
+        case "toast":
+            {
+                var toastTitle = PropStr(el, "title") ?? "";
+                var toastDesc = PropStr(el, "description");
+                var toastVariant = PropStr(el, "variant");
+                var toastIcon = PropIcon(el, "icon");
+                var toastCss = toastVariant == "destructive" ? "border-destructive bg-destructive/10" : "";
+                <div class="@Cx("flex items-start gap-3 rounded-lg border p-4", Cx(toastCss, el.Css))">
+                    @if (toastIcon != null) { @RenderIcon(toastIcon, 16, "mt-0.5 shrink-0") }
+                    <div class="flex-1 space-y-1">
+                        <p class="text-sm font-semibold">@toastTitle</p>
+                        @if (toastDesc != null) { <p class="text-sm text-muted-foreground">@toastDesc</p> }
+                    </div>
+                </div>
+            }
             break;
 
         // ── Links ───────────────────────────────────────────────────
@@ -452,6 +589,252 @@
             }
             break;
 
+        // ── Tooltip ─────────────────────────────────────────────────
+        case "tooltip":
+            {
+                var tipText = el.Text ?? "";
+                var tipSide = PropStr(el, "side");
+                var tipTrigger = el.Props.TryGetValue("trigger", out var tt) && tt is List<Element> ttList ? ttList : [];
+                <BbTooltipProvider>
+                    <BbTooltip>
+                        <BbTooltipTrigger>
+                            <ElementRenderer Elements="tipTrigger" />
+                        </BbTooltipTrigger>
+                        <BbTooltipContent Side="@MapSide(tipSide)">
+                            <p>@tipText</p>
+                        </BbTooltipContent>
+                    </BbTooltip>
+                </BbTooltipProvider>
+            }
+            break;
+
+        // ── Dropdown Menu ──────────────────────────────────────────
+        case "dropdown-menu":
+            {
+                var dmEl = el;
+                var dmTrigger = dmEl.Text ?? "Menu";
+                var dmTv = MapButtonVariant(PropStr(dmEl, "triggerVariant"));
+                var dmIcon = PropIcon(dmEl, "triggerIcon");
+                <BbDropdownMenu>
+                    <BbDropdownMenuTrigger>
+                        <BbButton Variant="dmTv">
+                            @if (dmIcon != null) { @RenderIcon(dmIcon, 16, "mr-2") }
+                            @dmTrigger
+                        </BbButton>
+                    </BbDropdownMenuTrigger>
+                    <BbDropdownMenuContent>
+                        @RenderMenuChildren(dmEl.Children)
+                    </BbDropdownMenuContent>
+                </BbDropdownMenu>
+            }
+            break;
+
+        // ── Context Menu ───────────────────────────────────────────
+        case "context-menu":
+            {
+                var cmTrigger = el.Props.TryGetValue("trigger", out var cmt) && cmt is List<Element> cmtList ? cmtList : [];
+                <BbContextMenu>
+                    <BbContextMenuTrigger>
+                        <ElementRenderer Elements="cmTrigger" />
+                    </BbContextMenuTrigger>
+                    <BbContextMenuContent>
+                        @RenderMenuChildren(el.Children)
+                    </BbContextMenuContent>
+                </BbContextMenu>
+            }
+            break;
+
+        // ── Popover ────────────────────────────────────────────────
+        case "popover":
+            {
+                var popTrigger = el.Props.TryGetValue("trigger", out var pt) && pt is List<Element> ptList ? ptList : [];
+                var popContent = el.Props.TryGetValue("content", out var pc) && pc is List<Element> pcList ? pcList : [];
+                <BbPopover>
+                    <BbPopoverTrigger>
+                        <ElementRenderer Elements="popTrigger" />
+                    </BbPopoverTrigger>
+                    <BbPopoverContent class="@el.Css">
+                        <ElementRenderer Elements="popContent" />
+                    </BbPopoverContent>
+                </BbPopover>
+            }
+            break;
+
+        // ── Hover Card ─────────────────────────────────────────────
+        case "hover-card":
+            {
+                var hcTrigger = el.Props.TryGetValue("trigger", out var hct) && hct is List<Element> hctList ? hctList : [];
+                var hcContent = el.Props.TryGetValue("content", out var hcc) && hcc is List<Element> hccList ? hccList : [];
+                <BbHoverCard>
+                    <BbHoverCardTrigger>
+                        <ElementRenderer Elements="hcTrigger" />
+                    </BbHoverCardTrigger>
+                    <BbHoverCardContent class="@el.Css">
+                        <ElementRenderer Elements="hcContent" />
+                    </BbHoverCardContent>
+                </BbHoverCard>
+            }
+            break;
+
+        // ── Drawer ─────────────────────────────────────────────────
+        case "drawer":
+            {
+                var drEl = el;
+                var drOpen = PropBool(drEl, "open");
+                var drTrigger = PropStr(drEl, "triggerLabel") ?? "Open";
+                var drTv = MapButtonVariant(PropStr(drEl, "triggerVariant"));
+                var drDir = MapDrawerDirection(PropStr(drEl, "direction"));
+                <BbDrawer Open="drOpen" OpenChanged="@(v => OnOpenChanged(drEl, v))" Direction="drDir">
+                    <BbDrawerTrigger>
+                        <BbButton Variant="drTv">@drTrigger</BbButton>
+                    </BbDrawerTrigger>
+                    <BbDrawerContent>
+                        @{
+                            var drHasHeader = drEl.Children.Any(c => c.Tag is "drawer-title" or "drawer-description");
+                        }
+                        @if (drHasHeader)
+                        {
+                            <BbDrawerHeader>
+                                @foreach (var ch in drEl.Children.Where(c => c.Tag == "drawer-title"))
+                                {
+                                    <BbDrawerTitle>@ch.Text</BbDrawerTitle>
+                                }
+                                @foreach (var ch in drEl.Children.Where(c => c.Tag == "drawer-description"))
+                                {
+                                    <BbDrawerDescription>@ch.Text</BbDrawerDescription>
+                                }
+                            </BbDrawerHeader>
+                        }
+                        @foreach (var ch in drEl.Children.Where(c => c.Tag == "drawer-content"))
+                        {
+                            <div class="py-4 px-4">
+                                <ElementRenderer Elements="ch.Children" />
+                            </div>
+                        }
+                        @foreach (var ch in drEl.Children.Where(c => c.Tag == "drawer-footer"))
+                        {
+                            <BbDrawerFooter>
+                                <ElementRenderer Elements="ch.Children" />
+                            </BbDrawerFooter>
+                        }
+                    </BbDrawerContent>
+                </BbDrawer>
+            }
+            break;
+
+        // ── Sheet ──────────────────────────────────────────────────
+        case "sheet":
+            {
+                var shEl = el;
+                var shOpen = PropBool(shEl, "open");
+                var shTrigger = PropStr(shEl, "triggerLabel") ?? "Open";
+                var shTv = MapButtonVariant(PropStr(shEl, "triggerVariant"));
+                var shSide = MapSheetSide(PropStr(shEl, "side"));
+                <BbSheet Open="shOpen" OpenChanged="@(v => OnOpenChanged(shEl, v))" Side="shSide">
+                    <BbSheetTrigger>
+                        <BbButton Variant="shTv">@shTrigger</BbButton>
+                    </BbSheetTrigger>
+                    <BbSheetContent>
+                        @{
+                            var shHasHeader = shEl.Children.Any(c => c.Tag is "sheet-title" or "sheet-description");
+                        }
+                        @if (shHasHeader)
+                        {
+                            <BbSheetHeader>
+                                @foreach (var ch in shEl.Children.Where(c => c.Tag == "sheet-title"))
+                                {
+                                    <BbSheetTitle>@ch.Text</BbSheetTitle>
+                                }
+                                @foreach (var ch in shEl.Children.Where(c => c.Tag == "sheet-description"))
+                                {
+                                    <BbSheetDescription>@ch.Text</BbSheetDescription>
+                                }
+                            </BbSheetHeader>
+                        }
+                        @foreach (var ch in shEl.Children.Where(c => c.Tag == "sheet-content"))
+                        {
+                            <div class="py-4">
+                                <ElementRenderer Elements="ch.Children" />
+                            </div>
+                        }
+                        @foreach (var ch in shEl.Children.Where(c => c.Tag == "sheet-footer"))
+                        {
+                            <BbSheetFooter>
+                                <ElementRenderer Elements="ch.Children" />
+                            </BbSheetFooter>
+                        }
+                    </BbSheetContent>
+                </BbSheet>
+            }
+            break;
+
+        // ── Breadcrumb ─────────────────────────────────────────────
+        case "breadcrumb":
+            {
+                <BbBreadcrumb class="@el.Css">
+                    <BbBreadcrumbList>
+                        @foreach (var ch in el.Children)
+                        {
+                            if (ch.Tag == "breadcrumb-separator")
+                            {
+                                <BbBreadcrumbSeparator />
+                            }
+                            else if (ch.Tag == "breadcrumb-item")
+                            {
+                                var bcHref = PropStr(ch, "href");
+                                var bcIcon = PropIcon(ch, "icon");
+                                <BbBreadcrumbItem>
+                                    @if (bcHref != null)
+                                    {
+                                        <BbBreadcrumbLink Href="@bcHref">
+                                            @if (bcIcon != null) { @RenderIcon(bcIcon, 14, "mr-1") }
+                                            @ch.Text
+                                        </BbBreadcrumbLink>
+                                    }
+                                    else
+                                    {
+                                        <BbBreadcrumbPage>
+                                            @if (bcIcon != null) { @RenderIcon(bcIcon, 14, "mr-1") }
+                                            @ch.Text
+                                        </BbBreadcrumbPage>
+                                    }
+                                </BbBreadcrumbItem>
+                            }
+                        }
+                    </BbBreadcrumbList>
+                </BbBreadcrumb>
+            }
+            break;
+
+        // ── Pagination ─────────────────────────────────────────────
+        case "pagination":
+            {
+                var pgEl = el;
+                var pgCurrent = PropInt(pgEl, "currentPage", 1);
+                var pgTotal = PropInt(pgEl, "totalPages", 1);
+                <BbPagination class="@pgEl.Css">
+                    <BbPaginationContent>
+                        <BbPaginationItem>
+                            <BbPaginationPrevious Disabled="@(pgCurrent <= 1)"
+                                @onclick="() => OnPageNav(pgEl, pgCurrent - 1)" />
+                        </BbPaginationItem>
+                        @for (var i = 1; i <= pgTotal; i++)
+                        {
+                            var page = i;
+                            <BbPaginationItem>
+                                <BbPaginationLink IsActive="@(page == pgCurrent)"
+                                    @onclick="() => OnPageNav(pgEl, page)">@(page)</BbPaginationLink>
+                            </BbPaginationItem>
+                        }
+                        <BbPaginationItem>
+                            <BbPaginationNext Disabled="@(pgCurrent >= pgTotal)"
+                                @onclick="() => OnPageNav(pgEl, pgCurrent + 1)" />
+                        </BbPaginationItem>
+                    </BbPaginationContent>
+                </BbPagination>
+            }
+            break;
+
         // ── Editor: Tree Item ───────────────────────────────────────
         case "tree-item":
             {
@@ -555,6 +938,9 @@
     private static string? PropIcon(Element el, string key) =>
         el.Props.TryGetValue(key, out var v) && v is string s && !string.IsNullOrEmpty(s) ? s : null;
 
+    private static double PropDouble(Element el, string key, double fallback = 0) =>
+        el.Props.TryGetValue(key, out var v) ? v switch { double d => d, int i => i, float f => f, _ => fallback } : fallback;
+
     public static RenderFragment RenderIcon(string? icon, int size, string? css = null) => builder =>
     {
         if (string.IsNullOrEmpty(icon)) return;
@@ -573,6 +959,30 @@
         "destructive" => ButtonVariant.Destructive,
         "link" => ButtonVariant.Link,
         _ => ButtonVariant.Default
+    };
+
+    private static PopoverSide MapSide(string? s) => s switch
+    {
+        "bottom" => PopoverSide.Bottom,
+        "left" => PopoverSide.Left,
+        "right" => PopoverSide.Right,
+        _ => PopoverSide.Top
+    };
+
+    private static BlazorBlueprint.Primitives.SheetSide MapSheetSide(string? s) => s switch
+    {
+        "top" => BlazorBlueprint.Primitives.SheetSide.Top,
+        "bottom" => BlazorBlueprint.Primitives.SheetSide.Bottom,
+        "left" => BlazorBlueprint.Primitives.SheetSide.Left,
+        _ => BlazorBlueprint.Primitives.SheetSide.Right
+    };
+
+    private static DrawerDirection MapDrawerDirection(string? s) => s switch
+    {
+        "top" => DrawerDirection.Top,
+        "left" => DrawerDirection.Left,
+        "right" => DrawerDirection.Right,
+        _ => DrawerDirection.Bottom
     };
 
     private void OnCheckedChanged(Element el, bool value)
@@ -596,4 +1006,126 @@
     {
         el.Props["open"] = value;
     }
+
+    private void OnSliderChanged(Element el, double value)
+    {
+        el.Props["value"] = value;
+        el.OnValueChanged?.Invoke(value);
+    }
+
+    private void OnNumericChanged(Element el, double value)
+    {
+        el.Props["value"] = value;
+        el.OnValueChanged?.Invoke(value);
+    }
+
+    private void OnTogglePressed(Element el, bool value)
+    {
+        el.Props["pressed"] = value;
+        el.OnToggle?.Invoke(value);
+    }
+
+    private void OnPageNav(Element el, int page)
+    {
+        var total = PropInt(el, "totalPages", 1);
+        var clamped = Math.Clamp(page, 1, total);
+        el.Props["currentPage"] = clamped;
+        el.OnIndexChanged?.Invoke(clamped);
+    }
+
+    private RenderFragment RenderMenuChildren(List<Element> children) => builder =>
+    {
+        var seq = 0;
+        foreach (var ch in children)
+        {
+            switch (ch.Tag)
+            {
+                case "menu-label":
+                    builder.OpenComponent<BbDropdownMenuLabel>(seq++);
+                    builder.AddAttribute(seq++, "ChildContent", (RenderFragment)(b => b.AddContent(0, ch.Text)));
+                    builder.CloseComponent();
+                    break;
+
+                case "menu-separator":
+                    builder.OpenComponent<BbDropdownMenuSeparator>(seq++);
+                    builder.CloseComponent();
+                    break;
+
+                case "menu-item":
+                    var miIcon = PropIcon(ch, "icon");
+                    var miShortcut = PropStr(ch, "shortcut");
+                    var miDisabled = PropBool(ch, "disabled");
+                    var miCh = ch;
+                    builder.OpenComponent<BbDropdownMenuItem>(seq++);
+                    if (miDisabled) builder.AddAttribute(seq++, "Disabled", true);
+                    builder.AddAttribute(seq++, "OnClick",
+                        Microsoft.AspNetCore.Components.EventCallback.Factory.Create(this, () => miCh.OnClick?.Invoke()));
+                    builder.AddAttribute(seq++, "ChildContent", (RenderFragment)(b =>
+                    {
+                        if (miIcon != null) { b.AddContent(0, RenderIcon(miIcon, 16, "mr-2")); }
+                        b.AddContent(1, miCh.Text);
+                        if (miShortcut != null)
+                        {
+                            b.OpenElement(2, "span");
+                            b.AddAttribute(3, "class", "ml-auto text-xs text-muted-foreground");
+                            b.AddContent(4, miShortcut);
+                            b.CloseElement();
+                        }
+                    }));
+                    builder.CloseComponent();
+                    break;
+
+                case "menu-checkbox-item":
+                    var mciCh = ch;
+                    var mciChecked = PropBool(ch, "checked");
+                    builder.OpenComponent<BbDropdownMenuCheckboxItem>(seq++);
+                    builder.AddAttribute(seq++, "Checked", mciChecked);
+                    builder.AddAttribute(seq++, "CheckedChanged",
+                        Microsoft.AspNetCore.Components.EventCallback.Factory.Create<bool>(this, v =>
+                        {
+                            mciCh.Props["checked"] = v;
+                            mciCh.OnToggle?.Invoke(v);
+                        }));
+                    builder.AddAttribute(seq++, "ChildContent", (RenderFragment)(b => b.AddContent(0, mciCh.Text)));
+                    builder.CloseComponent();
+                    break;
+
+                case "menu-sub":
+                    // Sub-menus rendered as a labeled group with nested items
+                    var subCh = ch;
+                    var subIcon = PropIcon(ch, "icon");
+                    builder.OpenComponent<BbDropdownMenuLabel>(seq++);
+                    builder.AddAttribute(seq++, "ChildContent", (RenderFragment)(b =>
+                    {
+                        if (subIcon != null) { b.AddContent(0, RenderIcon(subIcon, 16, "mr-2")); }
+                        b.AddContent(1, subCh.Text);
+                    }));
+                    builder.CloseComponent();
+                    // Render sub-items inline
+                    foreach (var subItem in subCh.Children)
+                    {
+                        if (subItem.Tag == "menu-item")
+                        {
+                            var si = subItem;
+                            var siIcon = PropIcon(si, "icon");
+                            builder.OpenComponent<BbDropdownMenuItem>(seq++);
+                            builder.AddAttribute(seq++, "OnClick",
+                                Microsoft.AspNetCore.Components.EventCallback.Factory.Create(this, () => si.OnClick?.Invoke()));
+                            builder.AddAttribute(seq++, "ChildContent", (RenderFragment)(b =>
+                            {
+                                if (siIcon != null) { b.AddContent(0, RenderIcon(siIcon, 16, "mr-2")); }
+                                b.AddContent(1, $"  {si.Text}");
+                            }));
+                            builder.CloseComponent();
+                        }
+                        else if (subItem.Tag == "menu-separator")
+                        {
+                            builder.OpenComponent<BbDropdownMenuSeparator>(seq++);
+                            builder.CloseComponent();
+                        }
+                    }
+                    break;
+            }
+        }
+    };
 }

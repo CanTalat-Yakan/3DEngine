@@ -38,6 +38,15 @@ public sealed class ContentBuilder : IContentBuilder
     public IContentBuilder Progress(string? css, int value, int max = 100)
     { _elements.Add(new Element("progress") { Css = css, Props = { ["value"] = value, ["max"] = max } }); return this; }
 
+    public IContentBuilder Skeleton(string? css, string? width = null, string? height = null)
+    { _elements.Add(new Element("skeleton") { Css = css, Props = { ["width"] = width, ["height"] = height } }); return this; }
+
+    public IContentBuilder Spinner(string? css, int size = 16)
+    { _elements.Add(new Element("spinner") { Css = css, Props = { ["size"] = size } }); return this; }
+
+    public IContentBuilder Kbd(string? css, string keys)
+    { _elements.Add(new Element("kbd") { Text = keys, Css = css }); return this; }
+
     // ── Interactive ─────────────────────────────────────────────────────
 
     public IContentBuilder Button(string? css, string label, Action? onClick = null, string? variant = null, string? icon = null,
@@ -92,6 +101,46 @@ public sealed class ContentBuilder : IContentBuilder
         return this;
     }
 
+    public IContentBuilder Slider(string? css, double value = 0, double min = 0, double max = 100, double step = 1,
+        Action<double>? onChanged = null)
+    {
+        _elements.Add(new Element("slider") { Css = css, OnValueChanged = onChanged,
+            Props = { ["value"] = value, ["min"] = min, ["max"] = max, ["step"] = step } });
+        return this;
+    }
+
+    public IContentBuilder NumericInput(string? css, double value = 0, double? min = null, double? max = null, double step = 1,
+        Action<double>? onChanged = null, string? id = null)
+    {
+        _elements.Add(new Element("numeric-input") { Id = id, Css = css, OnValueChanged = onChanged,
+            Props = { ["value"] = value, ["min"] = min, ["max"] = max, ["step"] = step } });
+        return this;
+    }
+
+    public IContentBuilder Combobox(string? css, (string Value, string Label)[] options, string? placeholder = null,
+        string? selected = null, Action<string>? onChanged = null, string? id = null)
+    {
+        _elements.Add(new Element("combobox") { Id = id, Css = css, OnInput = onChanged,
+            Props = { ["placeholder"] = placeholder, ["selected"] = selected, ["options"] = options } });
+        return this;
+    }
+
+    public IContentBuilder Toggle(string? css, string? label = null, bool pressed = false, Action<bool>? onChanged = null,
+        string? variant = null, string? icon = null)
+    {
+        _elements.Add(new Element("toggle") { Text = label, Css = css, OnToggle = onChanged,
+            Props = { ["pressed"] = pressed, ["variant"] = variant, ["icon"] = icon } });
+        return this;
+    }
+
+    public IContentBuilder ToggleGroup(string? css, (string Value, string Label)[] options, string? selected = null,
+        Action<string>? onChanged = null, string? variant = null)
+    {
+        _elements.Add(new Element("toggle-group") { Css = css, OnInput = onChanged,
+            Props = { ["selected"] = selected, ["options"] = options, ["variant"] = variant } });
+        return this;
+    }
+
     // ── Layout ──────────────────────────────────────────────────────────
 
     public IContentBuilder Separator(string? css = null)
@@ -120,6 +169,23 @@ public sealed class ContentBuilder : IContentBuilder
     public IContentBuilder ScrollArea(string? css, Action<IContentBuilder> children)
     { _elements.Add(BuildContainer("scroll", css, children)); return this; }
 
+    public IContentBuilder Accordion(string? css, Action<IAccordionBuilder> configure, string? type = null)
+    {
+        var accordion = new Element("accordion") { Css = css, Props = { ["type"] = type } };
+        var builder = new AccordionBuilder(accordion);
+        configure(builder);
+        _elements.Add(accordion);
+        return this;
+    }
+
+    public IContentBuilder AspectRatio(string? css, double ratio, Action<IContentBuilder> content)
+    {
+        var el = BuildContainer("aspect-ratio", css, content);
+        el.Props["ratio"] = ratio;
+        _elements.Add(el);
+        return this;
+    }
+
     // ── Cards ───────────────────────────────────────────────────────────
 
     public IContentBuilder Card(string? css, Action<ICardBuilder> configure)
@@ -143,12 +209,111 @@ public sealed class ContentBuilder : IContentBuilder
         return this;
     }
 
+    public IContentBuilder Toast(string? css, string title, string? description = null, string? variant = null,
+        string? icon = null)
+    {
+        _elements.Add(new Element("toast") { Css = css,
+            Props = { ["title"] = title, ["description"] = description, ["variant"] = variant, ["icon"] = icon } });
+        return this;
+    }
+
     // ── Links ───────────────────────────────────────────────────────────
 
     public IContentBuilder Link(string? css, string text, string href, string? icon = null, string? description = null)
     {
         _elements.Add(new Element("link") { Text = text, Css = css,
             Props = { ["href"] = href, ["icon"] = icon, ["description"] = description } });
+        return this;
+    }
+
+    // ── Navigation ──────────────────────────────────────────────────────
+
+    public IContentBuilder Breadcrumb(string? css, Action<IBreadcrumbBuilder> configure)
+    {
+        var breadcrumb = new Element("breadcrumb") { Css = css };
+        var builder = new BreadcrumbBuilder(breadcrumb);
+        configure(builder);
+        _elements.Add(breadcrumb);
+        return this;
+    }
+
+    public IContentBuilder Pagination(string? css, int currentPage, int totalPages, Action<int>? onPageChanged = null)
+    {
+        _elements.Add(new Element("pagination") { Css = css, OnIndexChanged = onPageChanged,
+            Props = { ["currentPage"] = currentPage, ["totalPages"] = totalPages } });
+        return this;
+    }
+
+    // ── Overlays & Popups ───────────────────────────────────────────────
+
+    public IContentBuilder Tooltip(string? css, Action<IContentBuilder> trigger, string tip, string? side = null)
+    {
+        var triggerEl = BuildChildren(trigger);
+        _elements.Add(new Element("tooltip") { Text = tip, Css = css,
+            Props = { ["side"] = side, ["trigger"] = triggerEl } });
+        return this;
+    }
+
+    public IContentBuilder DropdownMenu(string? css, string triggerLabel, Action<IDropdownMenuBuilder> configure,
+        string? triggerVariant = null, string? triggerIcon = null)
+    {
+        var menu = new Element("dropdown-menu") { Text = triggerLabel, Css = css,
+            Props = { ["triggerVariant"] = triggerVariant, ["triggerIcon"] = triggerIcon } };
+        var builder = new DropdownMenuBuilder(menu);
+        configure(builder);
+        _elements.Add(menu);
+        return this;
+    }
+
+    public IContentBuilder ContextMenu(string? css, Action<IContentBuilder> trigger, Action<IDropdownMenuBuilder> configure)
+    {
+        var triggerEl = BuildChildren(trigger);
+        var menu = new Element("context-menu") { Css = css, Props = { ["trigger"] = triggerEl } };
+        var builder = new DropdownMenuBuilder(menu);
+        configure(builder);
+        _elements.Add(menu);
+        return this;
+    }
+
+    public IContentBuilder Popover(string? css, Action<IContentBuilder> trigger, Action<IContentBuilder> content)
+    {
+        var triggerEl = BuildChildren(trigger);
+        var contentEl = BuildChildren(content);
+        _elements.Add(new Element("popover") { Css = css,
+            Props = { ["trigger"] = triggerEl, ["content"] = contentEl } });
+        return this;
+    }
+
+    public IContentBuilder HoverCard(string? css, Action<IContentBuilder> trigger, Action<IContentBuilder> content)
+    {
+        var triggerEl = BuildChildren(trigger);
+        var contentEl = BuildChildren(content);
+        _elements.Add(new Element("hover-card") { Css = css,
+            Props = { ["trigger"] = triggerEl, ["content"] = contentEl } });
+        return this;
+    }
+
+    public IContentBuilder Drawer(string triggerLabel, Action<IDrawerBuilder> configure, string? direction = null,
+        string? triggerVariant = null)
+    {
+        var drawer = new Element("drawer") {
+            Props = { ["triggerLabel"] = triggerLabel, ["triggerVariant"] = triggerVariant,
+                       ["direction"] = direction, ["open"] = false } };
+        var builder = new DrawerBuilder(drawer);
+        configure(builder);
+        _elements.Add(drawer);
+        return this;
+    }
+
+    public IContentBuilder Sheet(string triggerLabel, Action<ISheetBuilder> configure, string? side = null,
+        string? triggerVariant = null)
+    {
+        var sheet = new Element("sheet") {
+            Props = { ["triggerLabel"] = triggerLabel, ["triggerVariant"] = triggerVariant,
+                       ["side"] = side, ["open"] = false } };
+        var builder = new SheetBuilder(sheet);
+        configure(builder);
+        _elements.Add(sheet);
         return this;
     }
 
@@ -237,7 +402,18 @@ public sealed class ContentBuilder : IContentBuilder
         children(cb);
         return new Element(tag) { Css = css, Children = cb.Build() };
     }
+
+    private static List<Element> BuildChildren(Action<IContentBuilder> configure)
+    {
+        var cb = new ContentBuilder();
+        configure(cb);
+        return cb.Build();
+    }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  Sub-builder implementations
+// ═══════════════════════════════════════════════════════════════════════════
 
 // ── Card Builder ────────────────────────────────────────────────────────
 
@@ -348,3 +524,131 @@ internal sealed class AlertDialogBuilder(Element dialog) : IAlertDialogBuilder
     public IAlertDialogBuilder OnConfirm(Action action)
     { dialog.OnClick = action; return this; }
 }
+
+// ── Accordion Builder ───────────────────────────────────────────────────
+
+internal sealed class AccordionBuilder(Element accordion) : IAccordionBuilder
+{
+    public IAccordionBuilder Item(string value, string title, Action<IContentBuilder> content)
+    {
+        var cb = new ContentBuilder();
+        content(cb);
+        accordion.Children.Add(new Element("accordion-item") { Text = title, Children = cb.Build(),
+            Props = { ["value"] = value } });
+        return this;
+    }
+}
+
+// ── Dropdown Menu Builder ───────────────────────────────────────────────
+
+internal sealed class DropdownMenuBuilder(Element menu) : IDropdownMenuBuilder
+{
+    public IDropdownMenuBuilder Item(string label, Action? onClick = null, string? icon = null,
+        string? shortcut = null, bool disabled = false)
+    {
+        menu.Children.Add(new Element("menu-item") { Text = label, OnClick = onClick,
+            Props = { ["icon"] = icon, ["shortcut"] = shortcut, ["disabled"] = disabled } });
+        return this;
+    }
+
+    public IDropdownMenuBuilder CheckboxItem(string label, bool initial = false, Action<bool>? onChanged = null)
+    {
+        menu.Children.Add(new Element("menu-checkbox-item") { Text = label, OnToggle = onChanged,
+            Props = { ["checked"] = initial } });
+        return this;
+    }
+
+    public IDropdownMenuBuilder Separator()
+    {
+        menu.Children.Add(new Element("menu-separator"));
+        return this;
+    }
+
+    public IDropdownMenuBuilder Label(string text)
+    {
+        menu.Children.Add(new Element("menu-label") { Text = text });
+        return this;
+    }
+
+    public IDropdownMenuBuilder Sub(string label, Action<IDropdownMenuBuilder> submenu, string? icon = null)
+    {
+        var sub = new Element("menu-sub") { Text = label, Props = { ["icon"] = icon } };
+        var builder = new DropdownMenuBuilder(sub);
+        submenu(builder);
+        menu.Children.Add(sub);
+        return this;
+    }
+}
+
+// ── Drawer Builder ──────────────────────────────────────────────────────
+
+internal sealed class DrawerBuilder(Element drawer) : IDrawerBuilder
+{
+    public IDrawerBuilder Title(string text)
+    { drawer.Children.Add(new Element("drawer-title") { Text = text }); return this; }
+
+    public IDrawerBuilder Description(string text)
+    { drawer.Children.Add(new Element("drawer-description") { Text = text }); return this; }
+
+    public IDrawerBuilder Content(Action<IContentBuilder> content)
+    {
+        var cb = new ContentBuilder();
+        content(cb);
+        drawer.Children.Add(new Element("drawer-content") { Children = cb.Build() });
+        return this;
+    }
+
+    public IDrawerBuilder Footer(Action<IContentBuilder> content)
+    {
+        var cb = new ContentBuilder();
+        content(cb);
+        drawer.Children.Add(new Element("drawer-footer") { Children = cb.Build() });
+        return this;
+    }
+}
+
+// ── Sheet Builder ───────────────────────────────────────────────────────
+
+internal sealed class SheetBuilder(Element sheet) : ISheetBuilder
+{
+    public ISheetBuilder Title(string text)
+    { sheet.Children.Add(new Element("sheet-title") { Text = text }); return this; }
+
+    public ISheetBuilder Description(string text)
+    { sheet.Children.Add(new Element("sheet-description") { Text = text }); return this; }
+
+    public ISheetBuilder Content(Action<IContentBuilder> content)
+    {
+        var cb = new ContentBuilder();
+        content(cb);
+        sheet.Children.Add(new Element("sheet-content") { Children = cb.Build() });
+        return this;
+    }
+
+    public ISheetBuilder Footer(Action<IContentBuilder> content)
+    {
+        var cb = new ContentBuilder();
+        content(cb);
+        sheet.Children.Add(new Element("sheet-footer") { Children = cb.Build() });
+        return this;
+    }
+}
+
+// ── Breadcrumb Builder ──────────────────────────────────────────────────
+
+internal sealed class BreadcrumbBuilder(Element breadcrumb) : IBreadcrumbBuilder
+{
+    public IBreadcrumbBuilder Item(string label, string? href = null, string? icon = null)
+    {
+        breadcrumb.Children.Add(new Element("breadcrumb-item") { Text = label,
+            Props = { ["href"] = href, ["icon"] = icon } });
+        return this;
+    }
+
+    public IBreadcrumbBuilder Separator()
+    {
+        breadcrumb.Children.Add(new Element("breadcrumb-separator"));
+        return this;
+    }
+}
+

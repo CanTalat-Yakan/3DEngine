@@ -35,6 +35,29 @@ public enum AlertStyle
     Warning
 }
 
+/// <summary>Visual style variants for toggles.</summary>
+public enum ToggleStyle
+{
+    Default,
+    Outline
+}
+
+/// <summary>Visual style variants for toasts.</summary>
+public enum ToastStyle
+{
+    Default,
+    Destructive
+}
+
+/// <summary>Tooltip / Popover / HoverCard placement side.</summary>
+public enum Side
+{
+    Top,
+    Bottom,
+    Left,
+    Right
+}
+
 /// <summary>
 /// Strongly-typed variant resolver. Converts variant enums to their lowercase string names
 /// used by the rendering layer.
@@ -53,6 +76,15 @@ public static class Variant
 
     /// <summary>Resolve a <see cref="AlertStyle"/> to its string name.</summary>
     public static string From(AlertStyle style) => style.ToVariantName();
+
+    /// <summary>Resolve a <see cref="ToggleStyle"/> to its string name.</summary>
+    public static string From(ToggleStyle style) => style.ToVariantName();
+
+    /// <summary>Resolve a <see cref="ToastStyle"/> to its string name.</summary>
+    public static string From(ToastStyle style) => style.ToVariantName();
+
+    /// <summary>Resolve a <see cref="Side"/> to its string name.</summary>
+    public static string From(Side side) => side.ToVariantName();
 
     /// <summary>Pass through a raw variant name string.</summary>
     public static string Custom(string name) => name;
@@ -87,5 +119,25 @@ public static class VariantExtensions
         AlertStyle.Warning => "warning",
         _ => "default"
     };
-}
 
+    public static string ToVariantName(this ToggleStyle style) => style switch
+    {
+        ToggleStyle.Outline => "outline",
+        _ => "default"
+    };
+
+    public static string ToVariantName(this ToastStyle style) => style switch
+    {
+        ToastStyle.Destructive => "destructive",
+        _ => "default"
+    };
+
+    public static string ToVariantName(this Side side) => side switch
+    {
+        Side.Top => "top",
+        Side.Bottom => "bottom",
+        Side.Left => "left",
+        Side.Right => "right",
+        _ => "top"
+    };
+}
