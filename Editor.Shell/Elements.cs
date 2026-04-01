@@ -120,12 +120,19 @@ public interface IContentBuilder
     IContentBuilder Dialog(string triggerLabel, Action<IDialogBuilder> configure, string? triggerVariant = null);
     IContentBuilder AlertDialog(string triggerLabel, Action<IAlertDialogBuilder> configure, string? triggerVariant = null);
 
+    // ── Menubar & Navigation Menu ────────────────────────────────────────
+    IContentBuilder Menubar(string? css, Action<IMenubarBuilder> configure);
+    IContentBuilder NavigationMenu(string? css, Action<INavigationMenuBuilder> configure);
+
     // ── Editor-specific ─────────────────────────────────────────────────
     IContentBuilder TreeItem(string label, string? icon = null, bool selected = false, bool expanded = true,
         Action? onClick = null, Action<IContentBuilder>? children = null, string? iconColor = null);
     IContentBuilder FieldRow(string label, Action<IContentBuilder> control);
     IContentBuilder EmptyState(string? icon = null, string? title = null, string? description = null);
     IContentBuilder LogEntry(string time, string level, string category, string message);
+
+    /// <summary>Renders a dark/light mode toggle button (ghost icon button).</summary>
+    IContentBuilder DarkModeToggle(string? css = null);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -209,3 +216,21 @@ public interface IBreadcrumbBuilder
     IBreadcrumbBuilder Item(string label, string? href = null, string? icon = null);
     IBreadcrumbBuilder Separator();
 }
+
+/// <summary>Sub-builder for a horizontal menubar component.</summary>
+public interface IMenubarBuilder
+{
+    /// <summary>Adds a top-level menu with dropdown items.</summary>
+    IMenubarBuilder Menu(string label, Action<IDropdownMenuBuilder> configure);
+}
+
+/// <summary>Sub-builder for a navigation menu component with grouped links.</summary>
+public interface INavigationMenuBuilder
+{
+    /// <summary>Adds a navigation link.</summary>
+    INavigationMenuBuilder Item(string label, string href, string? description = null, string? icon = null);
+
+    /// <summary>Adds a named group of navigation items.</summary>
+    INavigationMenuBuilder Group(string title, Action<INavigationMenuBuilder> configure);
+}
+

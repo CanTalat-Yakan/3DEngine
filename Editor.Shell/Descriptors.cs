@@ -11,6 +11,7 @@ namespace Editor.Shell;
 /// <summary>Hint for the default dock zone of a panel.</summary>
 public enum DockZone
 {
+    Top,
     Left,
     Right,
     Bottom,
@@ -60,3 +61,41 @@ public sealed class PanelDescriptor
     /// <summary>Whether the panel is visible on creation.</summary>
     public bool Visible { get; set; } = true;
 }
+
+// ── Content-level Descriptors (used by IContentBuilder elements) ────────
+
+/// <summary>Describes a horizontal menubar with top-level menus (rendered inside content).</summary>
+public sealed class MenubarDescriptor
+{
+    public List<MenubarMenuDescriptor> Menus { get; set; } = [];
+}
+
+/// <summary>A single top-level menu in the menubar.</summary>
+public sealed class MenubarMenuDescriptor
+{
+    public string Label { get; set; } = string.Empty;
+    public List<Element> Items { get; set; } = [];
+}
+
+/// <summary>Describes a navigation menu with grouped links (rendered inside content).</summary>
+public sealed class NavigationMenuDescriptor
+{
+    public List<NavMenuGroupDescriptor> Groups { get; set; } = [];
+}
+
+/// <summary>A group of navigation items, optionally with a title.</summary>
+public sealed class NavMenuGroupDescriptor
+{
+    public string? Title { get; set; }
+    public List<NavMenuItemDescriptor> Items { get; set; } = [];
+}
+
+/// <summary>A single navigation menu item with optional description and icon.</summary>
+public sealed class NavMenuItemDescriptor
+{
+    public string Label { get; set; } = string.Empty;
+    public string Href { get; set; } = "#";
+    public string? Description { get; set; }
+    public string? Icon { get; set; }
+}
+

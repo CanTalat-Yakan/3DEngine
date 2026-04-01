@@ -357,6 +357,24 @@ public sealed class ContentBuilder : IContentBuilder
 
     // ── Editor-specific ─────────────────────────────────────────────────
 
+    public IContentBuilder Menubar(string? css, Action<IMenubarBuilder> configure)
+    {
+        var builder = new MenubarBuilder();
+        configure(builder);
+        var el = new Element("menubar") { Css = css, Props = { ["descriptor"] = builder.Descriptor } };
+        _elements.Add(el);
+        return this;
+    }
+
+    public IContentBuilder NavigationMenu(string? css, Action<INavigationMenuBuilder> configure)
+    {
+        var builder = new NavigationMenuBuilder();
+        configure(builder);
+        var el = new Element("navigation-menu") { Css = css, Props = { ["descriptor"] = builder.Descriptor } };
+        _elements.Add(el);
+        return this;
+    }
+
     public IContentBuilder TreeItem(string label, string? icon = null, bool selected = false, bool expanded = true,
         Action? onClick = null, Action<IContentBuilder>? children = null, string? iconColor = null)
     {
@@ -391,6 +409,12 @@ public sealed class ContentBuilder : IContentBuilder
     public IContentBuilder LogEntry(string time, string level, string category, string message)
     {
         _elements.Add(new Element("log-entry") { Props = { ["time"] = time, ["level"] = level, ["category"] = category, ["message"] = message } });
+        return this;
+    }
+
+    public IContentBuilder DarkModeToggle(string? css = null)
+    {
+        _elements.Add(new Element("dark-mode-toggle") { Css = css });
         return this;
     }
 
@@ -648,6 +672,70 @@ internal sealed class BreadcrumbBuilder(Element breadcrumb) : IBreadcrumbBuilder
     public IBreadcrumbBuilder Separator()
     {
         breadcrumb.Children.Add(new Element("breadcrumb-separator"));
+        return this;
+    }
+}
+
+// ── Menubar Builder ─────────────────────────────────────────────────────
+
+internal sealed class MenubarBuilder : IMenubarBuilder
+{
+    internal readonly MenubarDescriptor Descriptor = new();
+
+    public IMenubarBuilder Menu(string label, Action<IDropdownMenuBuilder> configure)
+    {
+        var menu = new Element("menubar-menu") { Text = label };
+        var builder = new DropdownMenuBuilder(menu);
+        configure(builder);
+        Descriptor.Menus.Add(new MenubarMenuDescriptor { Label = label, Items = menu.Children });
+        return this;
+    }
+}
+
+// ── Navigation Menu Builder ─────────────────────────────────────────────
+
+internal sealed class NavigationMenuBuilder : INavigationMenuBuilder
+{
+    internal readonly NavigationMenuDescriptor Descriptor = new();
+    private readonly NavMenuGroupDescriptor? _currentGroup;
+
+    internal NavigationMenuBuilder() { }
+
+    private NavigationMenuBuilder(NavMenuGroupDescriptor group)
+    {
+        _currentGroup = group;
+    }
+
+    public INavigationMenuBuilder Item(string label, string href, string? description = null, string? icon = null)
+    {
+        var item = new NavMenuItemDescriptor
+        {
+            Label = label,
+            Href = href,
+            Description = description,
+            Icon = icon
+        };
+        if (_currentGroup != null)
+            _currentGroup.Items.Add(item);
+        else
+        {
+            var defaultGroup = Descriptor.Groups.FirstOrDefault(g => g.Title == null);
+            if (defaultGroup == null)
+            {
+                defaultGroup = new NavMenuGroupDescriptor();
+                Descriptor.Groups.Add(defaultGroup);
+            }
+            defaultGroup.Items.Add(item);
+        }
+        return this;
+    }
+
+    public INavigationMenuBuilder Group(string title, Action<INavigationMenuBuilder> configure)
+    {
+        var group = new NavMenuGroupDescriptor { Title = title };
+        var groupBuilder = new NavigationMenuBuilder(group);
+        configure(groupBuilder);
+        Descriptor.Groups.Add(group);
         return this;
     }
 }

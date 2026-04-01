@@ -15,6 +15,95 @@ public class ShowcaseNavigationShell : IEditorShellBuilder
                 {
                     container.Div(Css.MarginXAuto().MaxWidth("3xl").SpaceY(6), inner =>
                     {
+                        // ── Menubar ────────────────────────────────────────────
+                        inner.Card(Css.Default, card =>
+                        {
+                            card.Title("Menubar");
+                            card.Description("A horizontal menu bar with dropdown menus, typically at the top of a window or application.");
+                            card.Content(c =>
+                            {
+                                c.Menubar(Css.Default, menubar =>
+                                {
+                                    menubar.Menu("File", menu =>
+                                    {
+                                        menu.Item("New Tab", shortcut: "⌘T");
+                                        menu.Item("New Window", shortcut: "⌘N");
+                                        menu.Separator();
+                                        menu.Item("Share");
+                                        menu.Separator();
+                                        menu.Item("Print...", shortcut: "⌘P");
+                                    });
+                                    menubar.Menu("Edit", menu =>
+                                    {
+                                        menu.Item("Undo", shortcut: "⌘Z");
+                                        menu.Item("Redo", shortcut: "⇧⌘Z");
+                                        menu.Separator();
+                                        menu.Item("Cut");
+                                        menu.Item("Copy");
+                                        menu.Item("Paste");
+                                    });
+                                    menubar.Menu("View", menu =>
+                                    {
+                                        menu.CheckboxItem("Always Show Bookmarks Bar", initial: true);
+                                        menu.CheckboxItem("Always Show Full URLs", initial: false);
+                                        menu.Separator();
+                                        menu.Item("Reload", shortcut: "⌘R");
+                                        menu.Item("Force Reload", shortcut: "⇧⌘R");
+                                        menu.Separator();
+                                        menu.Item("Toggle Fullscreen");
+                                    });
+                                    menubar.Menu("Profiles", menu =>
+                                    {
+                                        menu.Label("Switch Profile");
+                                        menu.Separator();
+                                        menu.Item("Andy");
+                                        menu.Item("Benoit");
+                                        menu.Item("Luis");
+                                        menu.Separator();
+                                        menu.Item("Edit Profiles...");
+                                        menu.Item("Add Profile...");
+                                    });
+                                });
+                            });
+                        });
+
+                        // ── Navigation Menu ────────────────────────────────────
+                        inner.Card(Css.Default, card =>
+                        {
+                            card.Title("Navigation Menu");
+                            card.Description("A collection of links for navigating websites, with support for grouped dropdown content.");
+                            card.Content(c =>
+                            {
+                                c.NavigationMenu(Css.Default, nav =>
+                                {
+                                    nav.Group("Getting Started", group =>
+                                    {
+                                        group.Item("Introduction", "/docs",
+                                            description: "Re-usable components built using Blazor and Tailwind CSS.",
+                                            icon: Icon.From(Lucide.BookOpen));
+                                        group.Item("Installation", "/docs/installation",
+                                            description: "How to install dependencies and structure your app.",
+                                            icon: Icon.From(Lucide.Download));
+                                        group.Item("Typography", "/docs/typography",
+                                            description: "Styles for headings, paragraphs, lists...etc.",
+                                            icon: Icon.From(Lucide.Type));
+                                    });
+                                    nav.Group("Components", group =>
+                                    {
+                                        group.Item("Alert Dialog", "/docs/alert-dialog",
+                                            description: "A modal dialog that interrupts the user with important content.");
+                                        group.Item("Hover Card", "/docs/hover-card",
+                                            description: "For sighted users to preview content available behind a link.");
+                                        group.Item("Progress", "/docs/progress",
+                                            description: "Displays an indicator showing the completion progress of a task.");
+                                        group.Item("Tooltip", "/docs/tooltip",
+                                            description: "A popup that displays information related to an element when focused or hovered.");
+                                    });
+                                    nav.Item("Documentation", "https://blazorblueprintui.com/docs");
+                                });
+                            });
+                        });
+
                         // ── Tabs ────────────────────────────────────────────
                         inner.Card(Css.Default, card =>
                         {
@@ -151,4 +240,3 @@ public class ShowcaseNavigationShell : IEditorShellBuilder
         });
     }
 }
-

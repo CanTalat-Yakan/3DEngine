@@ -1,6 +1,7 @@
 @using Editor.Shell
 
 @{
+    var topPanels = Panels.Where(p => p.Visible && p.DefaultZone == DockZone.Top).OrderBy(p => p.TabOrder).ToList();
     var leftPanels = Panels.Where(p => p.Visible && p.DefaultZone == DockZone.Left).ToList();
     var rightPanels = Panels.Where(p => p.Visible && p.DefaultZone == DockZone.Right).ToList();
     var bottomPanels = Panels.Where(p => p.Visible && p.DefaultZone == DockZone.Bottom).ToList();
@@ -9,6 +10,17 @@
 }
 
 <div class="flex flex-col flex-1 overflow-hidden min-h-0">
+    @* ── Top panels (headers, nav bars, etc.) ─────────────────── *@
+    @foreach (var panel in topPanels)
+    {
+        @if (panel.Content is { Count: > 0 })
+        {
+            <div class="shrink-0">
+                <ElementRenderer Elements="panel.Content" />
+            </div>
+        }
+    }
+
     @* ── Top row: sidebars fill the available horizontal space ── *@
     @if (hasTop)
     {

@@ -27,6 +27,10 @@ public interface IShellBuilder
     IShellBuilder Meta(string key, object value);
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+//  Builder implementations
+// ═══════════════════════════════════════════════════════════════════════════
+
 /// <summary>Root builder that assembles a <see cref="PanelDescriptor"/>.</summary>
 internal sealed class PanelBuilder(PanelDescriptor desc) : IPanelBuilder
 {

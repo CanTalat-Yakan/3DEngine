@@ -7,6 +7,7 @@ public class DefaultEditorShell : IEditorShellBuilder
 
     public void Build(IShellBuilder shell)
     {
+        // ── Home panel ───────────────────────────────────────────────
         shell.Panel("showcase-home", "Home", DockZone.Center, panel =>
         {
             panel.Content(ui =>
@@ -26,6 +27,96 @@ public class DefaultEditorShell : IEditorShellBuilder
                             });
                             hero.Heading(Css.Default, 1, "Welcome to BlazorBlueprint");
                             hero.Paragraph(Css.Default, "Your Blazor app is ready with 80+ beautiful components.");
+                        });
+
+                        // ── Quick Demo (like App1) ───────────────────────────
+                        inner.Card(Css.Default, card =>
+                        {
+                            card.Title("Quick Demo");
+                            card.Description("Here are some BlazorBlueprint components in action.");
+                            card.Content(c =>
+                            {
+                                // Buttons
+                                c.Div(Css.SpaceY(2), section =>
+                                {
+                                    section.Label(Css.Default, "Buttons");
+                                    section.Row(Css.Default, row =>
+                                    {
+                                        row.Button(Css.Default, "Primary", () => { });
+                                        row.Button(Css.Default, "Secondary", () => { }, Variant.From(ButtonStyle.Secondary));
+                                        row.Button(Css.Default, "Outline", () => { }, Variant.From(ButtonStyle.Outline));
+                                        row.Button(Css.Default, "Ghost", () => { }, Variant.From(ButtonStyle.Ghost));
+                                        row.Button(Css.Default, "Destructive", () => { }, Variant.From(ButtonStyle.Destructive));
+                                    });
+                                });
+
+                                c.Separator();
+
+                                // Input
+                                c.Div(Css.SpaceY(2), section =>
+                                {
+                                    section.Label(Css.Default, "Input", forId: "demo-input");
+                                    section.Input(Css.Default, placeholder: "Type something...", id: "demo-input");
+                                });
+
+                                c.Separator();
+
+                                // Toggle Controls
+                                c.Div(Css.SpaceY(4), section =>
+                                {
+                                    section.Label(Css.Default, "Toggle Controls");
+                                    section.Checkbox(Css.Default, "I agree to the terms and conditions", initial: false);
+                                    section.Switch(Css.Default, "Enable notifications", initial: true);
+                                });
+
+                                c.Separator();
+
+                                // Badges
+                                c.Div(Css.SpaceY(2), section =>
+                                {
+                                    section.Label(Css.Default, "Badges");
+                                    section.Row(Css.Default, row =>
+                                    {
+                                        row.Badge(Css.Default, "Default");
+                                        row.Badge(Css.Default, "Secondary", Variant.From(BadgeStyle.Secondary));
+                                        row.Badge(Css.Default, "Outline", Variant.From(BadgeStyle.Outline));
+                                        row.Badge(Css.Default, "Destructive", Variant.From(BadgeStyle.Destructive));
+                                    });
+                                });
+
+                                c.Separator();
+
+                                // Dialog
+                                c.Div(Css.SpaceY(2), section =>
+                                {
+                                    section.Label(Css.Default, "Dialog");
+                                    section.Dialog("Open Dialog", dialog =>
+                                    {
+                                        dialog.Title("Edit Profile");
+                                        dialog.Description("Make changes to your profile here. Click save when you're done.");
+                                        dialog.Content(dc =>
+                                        {
+                                            dc.Div(Css.SpaceY(2), fields =>
+                                            {
+                                                fields.Label(Css.Default, "Name");
+                                                fields.Input(Css.Default, value: "John Doe");
+                                            });
+                                            dc.Div(Css.SpaceY(2), fields =>
+                                            {
+                                                fields.Label(Css.Default, "Email");
+                                                fields.Input(Css.Default, value: "john@example.com");
+                                            });
+                                        });
+                                        dialog.Footer(df => df.Button(Css.Default, "Save changes", () => { }));
+                                    }, triggerVariant: Variant.From(ButtonStyle.Outline));
+                                });
+
+                                c.Separator();
+
+                                // Alert
+                                c.Alert(Css.Default, "Everything is working!",
+                                    "BlazorBlueprint components are ready to use. Start building something amazing.");
+                            });
                         });
 
                         // ── Next Steps ──────────────────────────────────────
@@ -53,5 +144,6 @@ public class DefaultEditorShell : IEditorShellBuilder
             });
             panel.Icon(Icon.From(Lucide.House)).TabGroup("showcase", 0).Closeable(false);
         });
+
     }
 }

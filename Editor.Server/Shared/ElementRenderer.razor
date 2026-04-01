@@ -1,4 +1,5 @@
 @using Editor.Shell
+@using Microsoft.JSInterop
 
 @* ═════════════════════════════════════════════════════════════════════════
    ElementRenderer — recursively renders an Element tree as BlazorBlueprint
@@ -910,7 +911,96 @@
             }
             break;
 
+        // ── Dark Mode Toggle ──────────────────────────────────────────
+        case "dark-mode-toggle":
+            {
+                <BbButton Variant="ButtonVariant.Ghost" Size="ButtonSize.Icon" class="@el.Css"
+                          @onclick="async () => await ToggleDarkMode()">
+                    <LucideIcon Name="@(_isDarkMode ? "sun" : "moon")" Size="20" />
+                </BbButton>
+            }
+            break;
+
         // ── Fallback ────────────────────────────────────────────────
+        case "menubar":
+            {
+                var mbDesc = el.Props.TryGetValue("descriptor", out var mbD) && mbD is MenubarDescriptor mbd ? mbd : null;
+                if (mbDesc is { Menus.Count: > 0 })
+                {
+                    <BbMenubar class="@el.Css">
+                        @foreach (var menu in mbDesc.Menus)
+                        {
+                            <BbMenubarMenu>
+                                <BbMenubarTrigger>@menu.Label</BbMenubarTrigger>
+                                <BbMenubarContent>
+                                    @RenderMenuChildren(menu.Items)
+                                </BbMenubarContent>
+                            </BbMenubarMenu>
+                        }
+                    </BbMenubar>
+                }
+            }
+            break;
+
+        case "navigation-menu":
+            {
+                var nmDesc = el.Props.TryGetValue("descriptor", out var nmD) && nmD is NavigationMenuDescriptor nmd ? nmd : null;
+                if (nmDesc is { Groups.Count: > 0 })
+                {
+                    <BbNavigationMenu class="@el.Css">
+                        <BbNavigationMenuList>
+                            @foreach (var group in nmDesc.Groups)
+                            {
+                                @if (group.Title != null)
+                                {
+                                    <BbNavigationMenuItem>
+                                        <BbNavigationMenuTrigger>@group.Title</BbNavigationMenuTrigger>
+                                        <BbNavigationMenuContent>
+                                            <ul class="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                                                @foreach (var item in group.Items)
+                                                {
+                                                    <li>
+                                                        <BbNavigationMenuLink Href="@item.Href" class="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                                                            <div class="flex items-center gap-2">
+                                                                @if (!string.IsNullOrEmpty(item.Icon))
+                                                                {
+                                                                    @RenderIcon(item.Icon, 16, "text-primary")
+                                                                }
+                                                                <div class="text-sm font-medium leading-none">@item.Label</div>
+                                                            </div>
+                                                            @if (!string.IsNullOrEmpty(item.Description))
+                                                            {
+                                                                <p class="line-clamp-2 text-sm leading-snug text-muted-foreground">@item.Description</p>
+                                                            }
+                                                        </BbNavigationMenuLink>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </BbNavigationMenuContent>
+                                    </BbNavigationMenuItem>
+                                }
+                                else
+                                {
+                                    @foreach (var item in group.Items)
+                                    {
+                                        <BbNavigationMenuItem>
+                                            <BbNavigationMenuLink Href="@item.Href">
+                                                @if (!string.IsNullOrEmpty(item.Icon))
+                                                {
+                                                    @RenderIcon(item.Icon, 14, "mr-1.5")
+                                                }
+                                                @item.Label
+                                            </BbNavigationMenuLink>
+                                        </BbNavigationMenuItem>
+                                    }
+                                }
+                            }
+                        </BbNavigationMenuList>
+                    </BbNavigationMenu>
+                }
+            }
+            break;
+
         default:
             <div class="@el.Css">
                 @if (el.Text != null) { <span>@el.Text</span> }
@@ -922,6 +1012,24 @@
 
 @code {
     [Parameter, EditorRequired] public List<Element> Elements { get; set; } = [];
+    [Inject] private IJSRuntime JS { get; set; } = null!;
+
+    private static bool _isDarkMode = true; // default dark
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try { _isDarkMode = await JS.InvokeAsync<bool>("isDarkModeEnabled"); } catch { }
+            StateHasChanged();
+        }
+    }
+
+    private async Task ToggleDarkMode()
+    {
+        await JS.InvokeVoidAsync("toggleDarkMode");
+        _isDarkMode = !_isDarkMode;
+    }
 
     private static string Cx(string baseClass, string? extra) =>
         string.IsNullOrEmpty(extra) ? baseClass : $"{baseClass} {extra}";
