@@ -6,6 +6,7 @@
         <PackageId>3DEngine.Window</PackageId>
         <Version>1.0.2</Version>
         <Description>SDL3 platform layer: windowing, input, and ImGui integration.</Description>
+        <RootNamespace>Engine.Window</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

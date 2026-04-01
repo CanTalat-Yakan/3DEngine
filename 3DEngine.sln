@@ -10,7 +10,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Tests", "Engine.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Entities", "Engine.Entities\Engine.Entities.csproj", "{24790B1A-7C5A-4D71-8E7B-413184BF9121}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Window", "Engine.Window\Engine.Window.csproj", "{0038391B-6EDF-4149-85EA-C3989135E4B7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Application", "Engine.Application\Engine.Application.csproj", "{0038391B-6EDF-4149-85EA-C3989135E4B7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Core", "Engine.Core\Engine.Core.csproj", "{E98FF9DF-9D9E-4CAB-80F2-C80EAA7E6D66}"
 EndProject

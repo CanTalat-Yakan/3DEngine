@@ -17,7 +17,7 @@ public sealed class SdlWindow
     /// <summary>Creates a new SDL window. If useVulkan is true, no SDL renderer is created and the window uses the Vulkan flag.</summary>
     public SdlWindow(string title, int width, int height, bool useVulkan = false)
     {
-        var logger = Log.Category("Engine.Window");
+        var logger = Log.Category("Engine.Application");
         Title = title;
         Width = width;
         Height = height;
@@ -67,7 +67,7 @@ public sealed class SdlWindow
     /// <summary>Destroys the SDL renderer and window and quits SDL.</summary>
     public void Destroy()
     {
-        var logger = Log.Category("Engine.Window");
+        var logger = Log.Category("Engine.Application");
         logger.Info("Destroying SDL window and renderer...");
         if (Renderer != IntPtr.Zero)
         {

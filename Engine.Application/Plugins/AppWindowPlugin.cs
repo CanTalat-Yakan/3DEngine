@@ -62,7 +62,7 @@ public sealed class AppWindowPlugin : IPlugin
     /// <summary>Creates and shows the AppWindow using Config, inserts AppWindow, and provides the main loop driver.</summary>
     public void Build(App app)
     {
-        var logger = Log.Category("Engine.Window");
+        var logger = Log.Category("Engine.Application");
         var config = app.World.Resource<Config>();
 
         logger.Info($"AppWindowPlugin: Creating window \"{config.WindowData.Title}\" ({config.WindowData.Width}x{config.WindowData.Height}) with backend={config.Graphics}...");

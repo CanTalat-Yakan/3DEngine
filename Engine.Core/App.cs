@@ -7,7 +7,7 @@ namespace Engine;
 /// </summary>
 public sealed class App : IDisposable
 {
-    private static readonly ILogger Logger = Log.Category("Engine.App");
+    private static readonly ILogger Logger = Log.Category("Engine.Application");
 
     /// <summary>Shared global state and resources.</summary>
     public World World { get; } = new();

@@ -9,8 +9,8 @@
 
     <!-- Allow first-party backend projects to call internal mutation APIs (Input, Time, etc.) -->
     <ItemGroup>
-        <InternalsVisibleTo Include="Engine.Window" />
         <InternalsVisibleTo Include="Editor" />
+        <InternalsVisibleTo Include="Engine.Application" />
         <InternalsVisibleTo Include="Engine.Tests" />
     </ItemGroup>
 
