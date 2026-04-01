@@ -9,8 +9,8 @@ using Engine;
 //  │                              │  │  (Chrome/Firefox/etc.)       │
 //  │  Vulkan scene render         │  │  localhost:5000              │
 //  │  ImGuizmo gizmos             │  │  Blazor Server (in-process)  │
-//  │  ImGui debug overlays        │  │  SignalR WebSocket           │
-//  │                              │◄►│  Multiple tabs/pages         │
+//  │  ImGui debug overlays        │◄►│  SignalR WebSocket           │
+//  │                              │  │  Multiple tabs/pages         │
 //  │  No embedded browser         │  │  Full DevTools for free      │
 //  │  Zero overlay overhead       │  │  Hot-reloadable UI           │
 //  └──────────────────────────────┘  └──────────────────────────────┘
