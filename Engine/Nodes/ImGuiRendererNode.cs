@@ -99,8 +99,15 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
             -(R + L) / (R - L), -(T + B) / (B - T), 0, 1.0f
         );
 
-        // Set viewport
-        gfx.SetViewport(cmd, 0, 0, drawData.DisplaySize.X, drawData.DisplaySize.Y, 0, 1);
+        // Set viewport (in framebuffer pixels, accounting for DPI / framebuffer scale)
+        float fbScaleX = drawData.FramebufferScale.X;
+        float fbScaleY = drawData.FramebufferScale.Y;
+        float fbWidth = drawData.DisplaySize.X * fbScaleX;
+        float fbHeight = drawData.DisplaySize.Y * fbScaleY;
+        if (fbWidth <= 0 || fbHeight <= 0)
+            return;
+
+        gfx.SetViewport(cmd, 0, 0, fbWidth, fbHeight, 0, 1);
 
         // Bind pipeline and resources
         gfx.BindGraphicsPipeline(cmd, _pipeline!);
