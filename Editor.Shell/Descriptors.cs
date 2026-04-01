@@ -94,14 +94,14 @@ public sealed class MenuBarDescriptor
 public sealed class MenuDescriptor
 {
     public string Label { get; set; } = string.Empty;
-    public string? Icon { get; set; }
+    public IconRef Icon { get; set; }
     public List<MenuItemDescriptor> Items { get; set; } = [];
 }
 
 public sealed class MenuItemDescriptor
 {
     public string Label { get; set; } = string.Empty;
-    public string? Icon { get; set; }
+    public IconRef Icon { get; set; }
     public string? Shortcut { get; set; }
     public bool IsSeparator { get; set; }
     public bool IsDisabled { get; set; }
@@ -122,7 +122,7 @@ public sealed class ToolbarItemDescriptor
 {
     public ToolbarItemKind Kind { get; set; } = ToolbarItemKind.Button;
     public string Label { get; set; } = string.Empty;
-    public string? Icon { get; set; }
+    public IconRef Icon { get; set; }
     public string? Tooltip { get; set; }
     public bool IsToggled { get; set; }
     public string? GroupId { get; set; }
@@ -145,7 +145,7 @@ public sealed class StatusBarItemDescriptor
 {
     public StatusBarSlot Slot { get; set; } = StatusBarSlot.Left;
     public string? Text { get; set; }
-    public string? Icon { get; set; }
+    public IconRef Icon { get; set; }
     public string? Tooltip { get; set; }
     public string? BindingExpression { get; set; }
     public string? WidgetKey { get; set; }
@@ -158,7 +158,7 @@ public sealed class PanelDescriptor
 {
     public string Id { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
-    public string? Icon { get; set; }
+    public IconRef Icon { get; set; }
     public DockZone DefaultZone { get; set; } = DockZone.Left;
 
     /// <summary>If set, this panel is a tab inside the panel with matching <see cref="TabGroupId"/>.</summary>
@@ -186,7 +186,7 @@ public sealed class PanelDescriptor
 public sealed class SettingsPageDescriptor
 {
     public string Title { get; set; } = string.Empty;
-    public string? Icon { get; set; }
+    public IconRef Icon { get; set; }
     public List<SettingsGroupDescriptor> Groups { get; set; } = [];
 }
 

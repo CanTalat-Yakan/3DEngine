@@ -56,15 +56,15 @@ public interface IShellBuilder
 public interface IMenuBarBuilder
 {
     IMenuBarBuilder Menu(string label, Action<IMenuBuilder> configure);
-    IMenuBarBuilder Menu(string label, string icon, Action<IMenuBuilder> configure);
+    IMenuBarBuilder Menu(string label, IconRef icon, Action<IMenuBuilder> configure);
 }
 
 public interface IMenuBuilder
 {
-    IMenuBuilder Item(string label, Action action, string? shortcut = null, string? icon = null);
-    IMenuBuilder Item(string label, string commandId, string? shortcut = null, string? icon = null);
+    IMenuBuilder Item(string label, Action action, string? shortcut = null, IconRef icon = default);
+    IMenuBuilder Item(string label, string commandId, string? shortcut = null, IconRef icon = default);
     IMenuBuilder CheckItem(string label, bool isChecked, Action action, string? shortcut = null);
-    IMenuBuilder SubMenu(string label, Action<IMenuBuilder> configure, string? icon = null);
+    IMenuBuilder SubMenu(string label, Action<IMenuBuilder> configure, IconRef icon = default);
     IMenuBuilder Separator();
 }
 
@@ -72,12 +72,12 @@ public interface IMenuBuilder
 
 public interface IToolbarBuilder
 {
-    IToolbarBuilder Button(string label, Action action, string? icon = null, string? tooltip = null);
-    IToolbarBuilder Button(string label, string commandId, string? icon = null, string? tooltip = null);
-    IToolbarBuilder Toggle(string label, bool initial, Action<bool> onToggle, string? icon = null, string? tooltip = null);
+    IToolbarBuilder Button(string label, Action action, IconRef icon = default, string? tooltip = null);
+    IToolbarBuilder Button(string label, string commandId, IconRef icon = default, string? tooltip = null);
+    IToolbarBuilder Toggle(string label, bool initial, Action<bool> onToggle, IconRef icon = default, string? tooltip = null);
     IToolbarBuilder Separator();
     IToolbarBuilder Group(string groupId, Action<IToolbarBuilder> configure);
-    IToolbarBuilder Dropdown(string label, Action<IMenuBuilder> configure, string? icon = null, string? tooltip = null);
+    IToolbarBuilder Dropdown(string label, Action<IMenuBuilder> configure, IconRef icon = default, string? tooltip = null);
 }
 
 // ── Status Bar ──────────────────────────────────────────────────────────
@@ -93,7 +93,7 @@ public interface IStatusBarItemBuilder
 {
     IStatusBarItemBuilder Text(string text);
     IStatusBarItemBuilder Binding(string expression);
-    IStatusBarItemBuilder Icon(string icon);
+    IStatusBarItemBuilder Icon(IconRef icon);
     IStatusBarItemBuilder Widget(string widgetKey);
     IStatusBarItemBuilder Tooltip(string tooltip);
     IStatusBarItemBuilder OnClick(Action action);
@@ -110,7 +110,7 @@ public interface IPanelBuilder
     IPanelBuilder Content(Action<IContentBuilder> configure);
 
     /// <summary>Sets the icon shown in the panel tab.</summary>
-    IPanelBuilder Icon(string icon);
+    IPanelBuilder Icon(IconRef icon);
 
     /// <summary>Adds this panel as a tab in the specified tab group.</summary>
     IPanelBuilder TabGroup(string groupId, int order = 0);
@@ -129,7 +129,7 @@ public interface IPanelBuilder
 
 public interface ISettingsPageBuilder
 {
-    ISettingsPageBuilder Icon(string icon);
+    ISettingsPageBuilder Icon(IconRef icon);
     ISettingsPageBuilder Group(string title, Action<ISettingsGroupBuilder> configure);
 }
 

@@ -39,7 +39,11 @@
             break;
 
         case "icon":
-            <LucideIcon Name="@el.Text" Size="@PropInt(el, "size", 16)" class="@el.Css" />
+            {
+                var iconRef = PropIcon(el, "iconRef");
+                var iconSize = PropInt(el, "size", 16);
+                @RenderIcon(iconRef, iconSize, el.Css)
+            }
             break;
 
         case "badge":
@@ -78,14 +82,14 @@
             {
                 var v = PropStr(el, "variant");
                 var bv = MapButtonVariant(v);
-                var ic = PropStr(el, "icon");
+                var ic = PropIcon(el, "icon");
                 var btnDisabled = PropBool(el, "disabled");
                 var btnLoading = PropBool(el, "loading");
                 var btnHref = PropStr(el, "href");
                 @if (btnHref != null)
                 {
                     <BbButton Variant="bv" class="@el.Css" Href="@btnHref" Disabled="btnDisabled">
-                        @if (ic != null) { <LucideIcon Name="@ic" Size="16" class="mr-2" /> }
+                        @if (!ic.IsNone) { @RenderIcon(ic, 16, "mr-2") }
                         @el.Text
                     </BbButton>
                 }
@@ -93,7 +97,7 @@
                 {
                     <BbButton Variant="bv" class="@el.Css" @onclick="() => el.OnClick?.Invoke()"
                               Disabled="btnDisabled" Loading="btnLoading">
-                        @if (ic != null) { <LucideIcon Name="@ic" Size="16" class="mr-2" /> }
+                        @if (!ic.IsNone) { @RenderIcon(ic, 16, "mr-2") }
                         @el.Text
                     </BbButton>
                 }
@@ -260,7 +264,7 @@
         case "alert":
             {
                 var alertVariant = PropStr(el, "variant");
-                var alertIcon = PropStr(el, "icon");
+                var alertIcon = PropIcon(el, "icon");
                 var av = alertVariant switch
                 {
                     "danger" or "destructive" or "error" => AlertVariant.Danger,
@@ -269,11 +273,11 @@
                     "warning" => AlertVariant.Warning,
                     _ => AlertVariant.Default
                 };
-                @if (alertIcon != null)
+                @if (!alertIcon.IsNone)
                 {
                     <BbAlert Variant="av" class="@el.Css">
                         <Icon>
-                            <LucideIcon Name="@alertIcon" Size="16" />
+                            @RenderIcon(alertIcon, 16)
                         </Icon>
                         <ChildContent>
                             <ElementRenderer Elements="el.Children" />
@@ -301,11 +305,11 @@
         case "link":
             {
                 var href = PropStr(el, "href") ?? "#";
-                var ic = PropStr(el, "icon");
+                var ic = PropIcon(el, "icon");
                 var desc = PropStr(el, "description");
                 <a href="@href" target="_blank" class="@Cx("group block space-y-2 rounded-lg border p-4 hover:bg-accent transition-colors", el.Css)">
                     <div class="flex items-center gap-2">
-                        @if (ic != null) { <LucideIcon Name="@ic" Size="20" class="text-primary" /> }
+                        @if (!ic.IsNone) { @RenderIcon(ic, 20, "text-primary") }
                         <h3 class="font-semibold">@el.Text</h3>
                     </div>
                     @if (desc != null)
@@ -326,9 +330,9 @@
                         @foreach (var tab in tabChildren)
                         {
                             var tabVal = tab.Text?.ToLowerInvariant().Replace(" ", "-") ?? "";
-                            var tabIcon = PropStr(tab, "icon");
+                            var tabIcon = PropIcon(tab, "icon");
                             <BbTabsTrigger Value="@tabVal">
-                                @if (tabIcon != null) { <LucideIcon Name="@tabIcon" Size="14" class="mr-1.5" /> }
+                                @if (!tabIcon.IsNone) { @RenderIcon(tabIcon, 14, "mr-1.5") }
                                 @tab.Text
                             </BbTabsTrigger>
                         }
@@ -451,7 +455,7 @@
         // ── Editor: Tree Item ───────────────────────────────────────
         case "tree-item":
             {
-                var ic = PropStr(el, "icon");
+                var ic = PropIcon(el, "icon");
                 var sel = PropBool(el, "selected");
                 var exp = PropBool(el, "expanded", true);
                 var icColor = PropStr(el, "iconColor");
@@ -467,9 +471,9 @@
                         {
                             <span class="w-2.5"></span>
                         }
-                        @if (ic != null)
+                        @if (!ic.IsNone)
                         {
-                            <LucideIcon Name="@ic" Size="12" class="@(icColor ?? "text-muted-foreground")" />
+                            @RenderIcon(ic, 12, icColor ?? "text-muted-foreground")
                         }
                         <span class="@(sel ? "text-foreground" : "text-muted-foreground") text-[11px]">@el.Text</span>
                     </div>
@@ -496,11 +500,11 @@
         // ── Editor: Empty State ─────────────────────────────────────
         case "empty-state":
             {
-                var ic = PropStr(el, "icon");
+                var ic = PropIcon(el, "icon");
                 var title = PropStr(el, "title");
                 var desc = PropStr(el, "description");
                 <div class="flex-1 flex flex-col items-center justify-center gap-1.5 text-muted-foreground/30 p-6">
-                    @if (ic != null) { <LucideIcon Name="@ic" Size="24" class="opacity-40" /> }
+                    @if (!ic.IsNone) { @RenderIcon(ic, 24, "opacity-40") }
                     @if (title != null) { <span class="text-[11px] text-muted-foreground/40">@title</span> }
                     @if (desc != null) { <span class="text-[10px] text-muted-foreground/30">@desc</span> }
                 </div>
@@ -547,6 +551,38 @@
 
     private static bool PropBool(Element el, string key, bool fallback = false) =>
         el.Props.TryGetValue(key, out var v) && v is bool b ? b : fallback;
+
+    private static IconRef PropIcon(Element el, string key) =>
+        el.Props.TryGetValue(key, out var v) && v is IconRef r ? r : IconRef.None;
+
+    public static RenderFragment RenderIcon(IconRef icon, int size, string? css = null) => builder =>
+    {
+        if (icon.IsNone) return;
+        switch (icon.Set)
+        {
+            case IconSet.Lucide:
+                builder.OpenComponent<LucideIcon>(0);
+                builder.AddAttribute(1, "Name", icon.Name);
+                builder.AddAttribute(2, "Size", size);
+                if (css != null) builder.AddAttribute(3, "class", css);
+                builder.CloseComponent();
+                break;
+            case IconSet.Feather:
+                builder.OpenComponent<FeatherIcon>(0);
+                builder.AddAttribute(1, "Name", icon.Name);
+                builder.AddAttribute(2, "Size", size);
+                if (css != null) builder.AddAttribute(3, "Class", css);
+                builder.CloseComponent();
+                break;
+            case IconSet.Heroicon:
+                builder.OpenComponent<HeroIcon>(0);
+                builder.AddAttribute(1, "Name", icon.Name);
+                builder.AddAttribute(2, "Size", size);
+                if (css != null) builder.AddAttribute(3, "Class", css);
+                builder.CloseComponent();
+                break;
+        }
+    };
 
     private static ButtonVariant MapButtonVariant(string? v) => v switch
     {

@@ -1,3 +1,4 @@
+using BlazorBlueprint.Icons.Heroicons.Components;
 using Editor.Shell;
 
 [EditorShell]
@@ -101,13 +102,13 @@ public class DefaultEditorShell : IEditorShellBuilder
                                 c.Grid(Css.Default, 2, grid =>
                                 {
                                     grid.Link(Css.Default, "Documentation", "https://blazorblueprintui.com/docs",
-                                        icon: "book-open", description: "Learn how to use all 80+ components.");
+                                        icon: Lucide.BookOpen, description: "Learn how to use all 80+ components.");
                                     grid.Link(Css.Default, "Components", "https://blazorblueprintui.com/components",
-                                        icon: "layout-grid", description: "Browse the complete component library.");
+                                        icon: Lucide.LayoutGrid, description: "Browse the complete component library.");
                                     grid.Link(Css.Default, "Showcase", "/showcase/buttons",
-                                        icon: "eye", description: "See components in action with examples.");
+                                        icon: Lucide.Eye, description: "See components in action with examples.");
                                     grid.Link(Css.Default, "GitHub", "https://github.com/blazorblueprintui/ui",
-                                        icon: "github", description: "Star the repo and contribute.");
+                                        icon: Lucide.Github, description: "Star the repo and contribute.");
                                 });
                             });
                         });
@@ -115,7 +116,7 @@ public class DefaultEditorShell : IEditorShellBuilder
                     });
                 });
             });
-            panel.Icon("layout-grid").Closeable(false);
+            panel.Icon(Lucide.LayoutGrid).Closeable(false);
         });
     }
 }
