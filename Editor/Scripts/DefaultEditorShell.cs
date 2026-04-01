@@ -1,4 +1,3 @@
-using BlazorBlueprint.Icons.Heroicons.Components;
 using Editor.Shell;
 
 [EditorShell]
