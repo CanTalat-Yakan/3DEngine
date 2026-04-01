@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Files", "Engine.File
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editor.Compiler", "Editor.Compiler\Editor.Compiler.csproj", "{9ECA99E3-7007-4334-8B9B-E62F5C05E295}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App1", "App1\App1.csproj", "{EC1DD222-D807-4694-A8E5-062784F7BF73}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -84,5 +86,9 @@ Global
 		{9ECA99E3-7007-4334-8B9B-E62F5C05E295}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9ECA99E3-7007-4334-8B9B-E62F5C05E295}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9ECA99E3-7007-4334-8B9B-E62F5C05E295}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC1DD222-D807-4694-A8E5-062784F7BF73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC1DD222-D807-4694-A8E5-062784F7BF73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC1DD222-D807-4694-A8E5-062784F7BF73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC1DD222-D807-4694-A8E5-062784F7BF73}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
