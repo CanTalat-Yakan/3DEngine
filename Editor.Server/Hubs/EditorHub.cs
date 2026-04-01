@@ -3,11 +3,27 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Editor.Server.Hubs;
 
-/// <summary>
-/// SignalR hub bridging the Blazor editor UI and the engine runtime.
-/// Implements <see cref="IEditorHub"/> (client-to-server calls) and pushes
-/// engine state changes via <see cref="IEditorClient"/> callbacks.
-/// </summary>
+// ── SignalR Contracts ────────────────────────────────────────────────────
+
+/// <summary>Client-to-server calls available on the editor hub.</summary>
+public interface IEditorHub
+{
+    Task SelectEntity(int entityId);
+    Task DeselectEntity();
+    Task UpdateComponentField(int entityId, string componentType, string fieldName, string jsonValue);
+    Task ExecuteCommand(string commandId, string? jsonArgs = null);
+    Task<int> GetShellVersion();
+}
+
+/// <summary>Server-to-client callbacks pushed to connected editor clients.</summary>
+public interface IEditorClient
+{
+    Task OnEntitySelected(int entityId);
+    Task OnEntityDeselected();
+    Task OnShellChanged(int version);
+}
+
+// ── Hub ─────────────────────────────────────────────────────────────────
 public sealed class EditorHub : Hub<IEditorClient>, IEditorHub
 {
     private readonly ShellRegistry _registry;

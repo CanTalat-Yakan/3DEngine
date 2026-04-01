@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editor.Shell", "Editor.Shel
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Files", "Engine.Files\Engine.Files.csproj", "{863E8670-767F-4B69-BBD9-911201CA80B7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editor.Compiler", "Editor.Compiler\Editor.Compiler.csproj", "{9ECA99E3-7007-4334-8B9B-E62F5C05E295}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,5 +80,9 @@ Global
 		{863E8670-767F-4B69-BBD9-911201CA80B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{863E8670-767F-4B69-BBD9-911201CA80B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{863E8670-767F-4B69-BBD9-911201CA80B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9ECA99E3-7007-4334-8B9B-E62F5C05E295}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9ECA99E3-7007-4334-8B9B-E62F5C05E295}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9ECA99E3-7007-4334-8B9B-E62F5C05E295}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9ECA99E3-7007-4334-8B9B-E62F5C05E295}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

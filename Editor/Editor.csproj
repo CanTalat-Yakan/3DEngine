@@ -11,6 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Editor.Compiler\Editor.Compiler.csproj" />
       <ProjectReference Include="..\Engine\Engine.csproj" />
       <ProjectReference Include="..\Editor.Server\Editor.Server.csproj" />
       <ProjectReference Include="..\Editor.Shell\Editor.Shell.csproj" />
