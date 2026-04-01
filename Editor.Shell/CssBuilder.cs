@@ -26,6 +26,9 @@ public enum Justify { Start, Center, End, Between, Around, Evenly }
 /// </summary>
 public static class Css
 {
+    /// <summary>No CSS classes — use as the first argument when no styling is needed.</summary>
+    public static readonly string? Default = null;
+
     // Display
     public static CssBuilder Flex() => new CssBuilder().Flex();
     public static CssBuilder InlineFlex() => new CssBuilder().InlineFlex();
@@ -69,6 +72,17 @@ public static class Css
     public static CssBuilder Padding(int size) => new CssBuilder().Padding(size);
     public static CssBuilder PaddingX(int size) => new CssBuilder().PaddingX(size);
     public static CssBuilder PaddingY(int size) => new CssBuilder().PaddingY(size);
+
+    // Margin starters
+    public static CssBuilder MarginY(int size) => new CssBuilder().MarginY(size);
+    public static CssBuilder MarginX(int size) => new CssBuilder().MarginX(size);
+    public static CssBuilder MarginTop(int size) => new CssBuilder().MarginTop(size);
+
+    // Text color / font weight starters
+    public static CssBuilder TextColor(string color) => new CssBuilder().TextColor(color);
+    public static CssBuilder FontBold() => new CssBuilder().FontBold();
+    public static CssBuilder FontSemibold() => new CssBuilder().FontSemibold();
+    public static CssBuilder FontMedium() => new CssBuilder().FontMedium();
 }
 
 // ── Fluent builder ──────────────────────────────────────────────────────

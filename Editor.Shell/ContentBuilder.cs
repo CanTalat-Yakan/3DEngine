@@ -11,81 +11,81 @@ public sealed class ContentBuilder : IContentBuilder
 
     // ── Text & Display ──────────────────────────────────────────────────
 
-    public IContentBuilder Text(string text, string? css = null)
+    public IContentBuilder Text(string? css, string text)
     { _elements.Add(new Element("text") { Text = text, Css = css }); return this; }
 
-    public IContentBuilder Heading(int level, string text, string? css = null)
+    public IContentBuilder Heading(string? css, int level, string text)
     { _elements.Add(new Element($"h{Math.Clamp(level, 1, 6)}") { Text = text, Css = css }); return this; }
 
-    public IContentBuilder Paragraph(string text, string? css = null)
+    public IContentBuilder Paragraph(string? css, string text)
     { _elements.Add(new Element("p") { Text = text, Css = css }); return this; }
 
-    public IContentBuilder Label(string text, string? forId = null, string? css = null)
+    public IContentBuilder Label(string? css, string text, string? forId = null)
     { _elements.Add(new Element("label") { Text = text, Id = forId, Css = css }); return this; }
 
-    public IContentBuilder Icon(string name, int size = 16, string? css = null)
+    public IContentBuilder Icon(string? css, string name, int size = 16)
     { _elements.Add(new Element("icon") { Text = name, Css = css, Props = { ["size"] = size } }); return this; }
 
-    public IContentBuilder Badge(string text, string? variant = null, string? css = null)
+    public IContentBuilder Badge(string? css, string text, string? variant = null)
     { _elements.Add(new Element("badge") { Text = text, Css = css, Props = { ["variant"] = variant } }); return this; }
 
-    public IContentBuilder Code(string text, string? css = null)
+    public IContentBuilder Code(string? css, string text)
     { _elements.Add(new Element("code") { Text = text, Css = css }); return this; }
 
-    public IContentBuilder Avatar(string? fallback = null, string? src = null, string? css = null)
+    public IContentBuilder Avatar(string? css, string? fallback = null, string? src = null)
     { _elements.Add(new Element("avatar") { Text = fallback, Css = css, Props = { ["src"] = src } }); return this; }
 
-    public IContentBuilder Progress(int value, int max = 100, string? css = null)
+    public IContentBuilder Progress(string? css, int value, int max = 100)
     { _elements.Add(new Element("progress") { Css = css, Props = { ["value"] = value, ["max"] = max } }); return this; }
 
     // ── Interactive ─────────────────────────────────────────────────────
 
-    public IContentBuilder Button(string label, Action? onClick = null, string? variant = null, string? icon = null,
-        bool disabled = false, bool loading = false, string? href = null, string? css = null)
+    public IContentBuilder Button(string? css, string label, Action? onClick = null, string? variant = null, string? icon = null,
+        bool disabled = false, bool loading = false, string? href = null)
     {
         _elements.Add(new Element("button") { Text = label, OnClick = onClick, Css = css,
             Props = { ["variant"] = variant, ["icon"] = icon, ["disabled"] = disabled, ["loading"] = loading, ["href"] = href } });
         return this;
     }
 
-    public IContentBuilder Input(string? placeholder = null, string? value = null, Action<string>? onChanged = null, string? id = null, string? css = null)
+    public IContentBuilder Input(string? css, string? placeholder = null, string? value = null, Action<string>? onChanged = null, string? id = null)
     {
         _elements.Add(new Element("input") { Id = id, Css = css, OnInput = onChanged,
             Props = { ["placeholder"] = placeholder, ["value"] = value } });
         return this;
     }
 
-    public IContentBuilder Textarea(string? placeholder = null, string? value = null, Action<string>? onChanged = null, string? id = null, string? css = null)
+    public IContentBuilder Textarea(string? css, string? placeholder = null, string? value = null, Action<string>? onChanged = null, string? id = null)
     {
         _elements.Add(new Element("textarea") { Id = id, Css = css, OnInput = onChanged,
             Props = { ["placeholder"] = placeholder, ["value"] = value } });
         return this;
     }
 
-    public IContentBuilder Checkbox(string? label = null, bool initial = false, Action<bool>? onChanged = null, string? id = null, string? css = null)
+    public IContentBuilder Checkbox(string? css, string? label = null, bool initial = false, Action<bool>? onChanged = null, string? id = null)
     {
         _elements.Add(new Element("checkbox") { Text = label, Id = id, Css = css, OnToggle = onChanged,
             Props = { ["checked"] = initial } });
         return this;
     }
 
-    public IContentBuilder Switch(string? label = null, bool initial = false, Action<bool>? onChanged = null, string? id = null, string? css = null)
+    public IContentBuilder Switch(string? css, string? label = null, bool initial = false, Action<bool>? onChanged = null, string? id = null)
     {
         _elements.Add(new Element("switch") { Text = label, Id = id, Css = css, OnToggle = onChanged,
             Props = { ["checked"] = initial } });
         return this;
     }
 
-    public IContentBuilder Select((string Value, string Label)[] options, string? placeholder = null, string? selected = null,
-        Action<string>? onChanged = null, string? id = null, string? css = null)
+    public IContentBuilder Select(string? css, (string Value, string Label)[] options, string? placeholder = null, string? selected = null,
+        Action<string>? onChanged = null, string? id = null)
     {
         _elements.Add(new Element("select") { Id = id, Css = css, OnInput = onChanged,
             Props = { ["placeholder"] = placeholder, ["selected"] = selected, ["options"] = options } });
         return this;
     }
 
-    public IContentBuilder RadioGroup((string Value, string Label)[] options, string? selected = null,
-        Action<string>? onChanged = null, string? css = null)
+    public IContentBuilder RadioGroup(string? css, (string Value, string Label)[] options, string? selected = null,
+        Action<string>? onChanged = null)
     {
         _elements.Add(new Element("radio-group") { Css = css, OnInput = onChanged,
             Props = { ["selected"] = selected, ["options"] = options } });
@@ -100,16 +100,16 @@ public sealed class ContentBuilder : IContentBuilder
     public IContentBuilder Spacer()
     { _elements.Add(new Element("spacer")); return this; }
 
-    public IContentBuilder Div(Action<IContentBuilder> children, string? css = null)
+    public IContentBuilder Div(string? css, Action<IContentBuilder> children)
     { _elements.Add(BuildContainer("div", css, children)); return this; }
 
-    public IContentBuilder Row(Action<IContentBuilder> children, string? css = null)
+    public IContentBuilder Row(string? css, Action<IContentBuilder> children)
     { _elements.Add(BuildContainer("row", css, children)); return this; }
 
-    public IContentBuilder Column(Action<IContentBuilder> children, string? css = null)
+    public IContentBuilder Column(string? css, Action<IContentBuilder> children)
     { _elements.Add(BuildContainer("column", css, children)); return this; }
 
-    public IContentBuilder Grid(int columns, Action<IContentBuilder> children, string? css = null)
+    public IContentBuilder Grid(string? css, int columns, Action<IContentBuilder> children)
     {
         var el = BuildContainer("grid", css, children);
         el.Props["columns"] = columns;
@@ -117,12 +117,12 @@ public sealed class ContentBuilder : IContentBuilder
         return this;
     }
 
-    public IContentBuilder ScrollArea(Action<IContentBuilder> children, string? css = null)
+    public IContentBuilder ScrollArea(string? css, Action<IContentBuilder> children)
     { _elements.Add(BuildContainer("scroll", css, children)); return this; }
 
     // ── Cards ───────────────────────────────────────────────────────────
 
-    public IContentBuilder Card(Action<ICardBuilder> configure, string? css = null)
+    public IContentBuilder Card(string? css, Action<ICardBuilder> configure)
     {
         var card = new Element("card") { Css = css };
         var builder = new CardBuilder(card);
@@ -133,8 +133,8 @@ public sealed class ContentBuilder : IContentBuilder
 
     // ── Feedback ────────────────────────────────────────────────────────
 
-    public IContentBuilder Alert(string? title = null, string? description = null, string? variant = null,
-        string? icon = null, string? css = null)
+    public IContentBuilder Alert(string? css, string? title = null, string? description = null, string? variant = null,
+        string? icon = null)
     {
         var el = new Element("alert") { Css = css, Props = { ["variant"] = variant, ["icon"] = icon } };
         if (title != null) el.Children.Add(new Element("alert-title") { Text = title });
@@ -145,7 +145,7 @@ public sealed class ContentBuilder : IContentBuilder
 
     // ── Links ───────────────────────────────────────────────────────────
 
-    public IContentBuilder Link(string text, string href, string? icon = null, string? description = null, string? css = null)
+    public IContentBuilder Link(string? css, string text, string href, string? icon = null, string? description = null)
     {
         _elements.Add(new Element("link") { Text = text, Css = css,
             Props = { ["href"] = href, ["icon"] = icon, ["description"] = description } });
@@ -154,7 +154,7 @@ public sealed class ContentBuilder : IContentBuilder
 
     // ── Complex Components ──────────────────────────────────────────────
 
-    public IContentBuilder Tabs(Action<ITabsBuilder> configure, string? css = null)
+    public IContentBuilder Tabs(string? css, Action<ITabsBuilder> configure)
     {
         var tabs = new Element("tabs") { Css = css };
         var builder = new TabsBuilder(tabs);
@@ -163,7 +163,7 @@ public sealed class ContentBuilder : IContentBuilder
         return this;
     }
 
-    public IContentBuilder Collapsible(string title, Action<IContentBuilder> content, bool expanded = false, string? css = null)
+    public IContentBuilder Collapsible(string? css, string title, Action<IContentBuilder> content, bool expanded = false)
     {
         var cb = new ContentBuilder();
         content(cb);

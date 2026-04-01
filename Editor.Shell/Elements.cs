@@ -38,50 +38,50 @@ public sealed class Element
 public interface IContentBuilder
 {
     // ── Text & Display ──────────────────────────────────────────────────
-    IContentBuilder Text(string text, string? css = null);
-    IContentBuilder Heading(int level, string text, string? css = null);
-    IContentBuilder Paragraph(string text, string? css = null);
-    IContentBuilder Label(string text, string? forId = null, string? css = null);
-    IContentBuilder Icon(string name, int size = 16, string? css = null);
-    IContentBuilder Badge(string text, string? variant = null, string? css = null);
-    IContentBuilder Code(string text, string? css = null);
-    IContentBuilder Avatar(string? fallback = null, string? src = null, string? css = null);
-    IContentBuilder Progress(int value, int max = 100, string? css = null);
+    IContentBuilder Text(string? css, string text);
+    IContentBuilder Heading(string? css, int level, string text);
+    IContentBuilder Paragraph(string? css, string text);
+    IContentBuilder Label(string? css, string text, string? forId = null);
+    IContentBuilder Icon(string? css, string name, int size = 16);
+    IContentBuilder Badge(string? css, string text, string? variant = null);
+    IContentBuilder Code(string? css, string text);
+    IContentBuilder Avatar(string? css, string? fallback = null, string? src = null);
+    IContentBuilder Progress(string? css, int value, int max = 100);
 
     // ── Interactive ─────────────────────────────────────────────────────
-    IContentBuilder Button(string label, Action? onClick = null, string? variant = null, string? icon = null,
-        bool disabled = false, bool loading = false, string? href = null, string? css = null);
-    IContentBuilder Input(string? placeholder = null, string? value = null, Action<string>? onChanged = null, string? id = null, string? css = null);
-    IContentBuilder Textarea(string? placeholder = null, string? value = null, Action<string>? onChanged = null, string? id = null, string? css = null);
-    IContentBuilder Checkbox(string? label = null, bool initial = false, Action<bool>? onChanged = null, string? id = null, string? css = null);
-    IContentBuilder Switch(string? label = null, bool initial = false, Action<bool>? onChanged = null, string? id = null, string? css = null);
-    IContentBuilder Select((string Value, string Label)[] options, string? placeholder = null, string? selected = null,
-        Action<string>? onChanged = null, string? id = null, string? css = null);
-    IContentBuilder RadioGroup((string Value, string Label)[] options, string? selected = null,
-        Action<string>? onChanged = null, string? css = null);
+    IContentBuilder Button(string? css, string label, Action? onClick = null, string? variant = null, string? icon = null,
+        bool disabled = false, bool loading = false, string? href = null);
+    IContentBuilder Input(string? css, string? placeholder = null, string? value = null, Action<string>? onChanged = null, string? id = null);
+    IContentBuilder Textarea(string? css, string? placeholder = null, string? value = null, Action<string>? onChanged = null, string? id = null);
+    IContentBuilder Checkbox(string? css, string? label = null, bool initial = false, Action<bool>? onChanged = null, string? id = null);
+    IContentBuilder Switch(string? css, string? label = null, bool initial = false, Action<bool>? onChanged = null, string? id = null);
+    IContentBuilder Select(string? css, (string Value, string Label)[] options, string? placeholder = null, string? selected = null,
+        Action<string>? onChanged = null, string? id = null);
+    IContentBuilder RadioGroup(string? css, (string Value, string Label)[] options, string? selected = null,
+        Action<string>? onChanged = null);
 
     // ── Layout ──────────────────────────────────────────────────────────
     IContentBuilder Separator(string? css = null);
     IContentBuilder Spacer();
-    IContentBuilder Div(Action<IContentBuilder> children, string? css = null);
-    IContentBuilder Row(Action<IContentBuilder> children, string? css = null);
-    IContentBuilder Column(Action<IContentBuilder> children, string? css = null);
-    IContentBuilder Grid(int columns, Action<IContentBuilder> children, string? css = null);
-    IContentBuilder ScrollArea(Action<IContentBuilder> children, string? css = null);
+    IContentBuilder Div(string? css, Action<IContentBuilder> children);
+    IContentBuilder Row(string? css, Action<IContentBuilder> children);
+    IContentBuilder Column(string? css, Action<IContentBuilder> children);
+    IContentBuilder Grid(string? css, int columns, Action<IContentBuilder> children);
+    IContentBuilder ScrollArea(string? css, Action<IContentBuilder> children);
 
     // ── Cards ───────────────────────────────────────────────────────────
-    IContentBuilder Card(Action<ICardBuilder> configure, string? css = null);
+    IContentBuilder Card(string? css, Action<ICardBuilder> configure);
 
     // ── Feedback ────────────────────────────────────────────────────────
-    IContentBuilder Alert(string? title = null, string? description = null, string? variant = null,
-        string? icon = null, string? css = null);
+    IContentBuilder Alert(string? css, string? title = null, string? description = null, string? variant = null,
+        string? icon = null);
 
     // ── Links ───────────────────────────────────────────────────────────
-    IContentBuilder Link(string text, string href, string? icon = null, string? description = null, string? css = null);
+    IContentBuilder Link(string? css, string text, string href, string? icon = null, string? description = null);
 
     // ── Complex Components ──────────────────────────────────────────────
-    IContentBuilder Tabs(Action<ITabsBuilder> configure, string? css = null);
-    IContentBuilder Collapsible(string title, Action<IContentBuilder> content, bool expanded = false, string? css = null);
+    IContentBuilder Tabs(string? css, Action<ITabsBuilder> configure);
+    IContentBuilder Collapsible(string? css, string title, Action<IContentBuilder> content, bool expanded = false);
     IContentBuilder Dialog(string triggerLabel, Action<IDialogBuilder> configure, string? triggerVariant = null);
     IContentBuilder AlertDialog(string triggerLabel, Action<IAlertDialogBuilder> configure, string? triggerVariant = null);
 
