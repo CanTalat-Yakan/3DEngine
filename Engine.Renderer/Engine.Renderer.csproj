@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        
         <Title>3DEngine Renderer</Title>
         <PackageId>3DEngine.Renderer</PackageId>
         <Version>1.0.2</Version>

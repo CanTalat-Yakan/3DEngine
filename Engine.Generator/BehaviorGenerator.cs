@@ -144,7 +144,7 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
         sb.AppendLine();
         sb.AppendLine($"internal static class {b.SafeName}");
         sb.AppendLine("{");
-        sb.AppendLine("    public static void Register(Engine.Application app)");
+        sb.AppendLine("    public static void Register(Engine.App app)");
         sb.AppendLine("    {");
         foreach (var g in b.StageMethods.GroupBy(m => m.Stage))
             sb.AppendLine($"        app.AddSystem(Engine.Stage.{g.Key}, {b.SafeName}_{g.Key});");
@@ -214,7 +214,7 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
         sb.AppendLine("public static class BehaviorRegistration");
         sb.AppendLine("{");
         sb.AppendLine("    [global::Engine.GeneratedBehaviorRegistration]");
-        sb.AppendLine("    public static void Register(global::Engine.Application app)");
+        sb.AppendLine("    public static void Register(global::Engine.App app)");
         sb.AppendLine("    {");
         foreach (var b in behaviors)
             sb.AppendLine($"        global::{b.Namespace}.{b.SafeName}.Register(app);");
