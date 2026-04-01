@@ -10,4 +10,8 @@
         <PackageReference Include="BlazorBlueprint.Icons.Lucide" Version="2.*"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\Editor.Shell\Editor.Shell.csproj" />
+    </ItemGroup>
+
 </Project>

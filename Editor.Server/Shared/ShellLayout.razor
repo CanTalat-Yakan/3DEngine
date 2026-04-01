@@ -1,0 +1,12 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+
+<div class="shell-root h-screen w-screen flex flex-col overflow-hidden bg-background text-foreground">
+    <div class="flex-1 flex overflow-hidden min-h-0">
+        <ShellDockLayout Panels="Descriptor.Panels" />
+    </div>
+</div>
+
+<BbToastProvider Position="ToastPosition.BottomRight" />
+<BbDialogProvider />
+<BbPortalHost />

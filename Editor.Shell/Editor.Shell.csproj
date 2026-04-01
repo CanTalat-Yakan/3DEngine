@@ -1,3 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+    <PropertyGroup>
+        <Title>3DEngine Editor Shell</Title>
+        <PackageId>3DEngine.Editor.Shell</PackageId>
+        <Version>1.0.0</Version>
+        <Description>Declarative builder API and runtime script compiler for the 3D Engine editor UI.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Engine.Core\Engine.Core.csproj" />
+    </ItemGroup>
+
 </Project>

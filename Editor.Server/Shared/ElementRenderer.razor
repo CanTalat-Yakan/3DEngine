@@ -1,0 +1,330 @@
+@using Editor.Shell
+
+@* ═════════════════════════════════════════════════════════════════════════
+   ElementRenderer — recursively renders an Element tree as BlazorBlueprint
+   components. This is the bridge between the pure C# builder API and Blazor.
+   ═════════════════════════════════════════════════════════════════════════ *@
+
+@foreach (var el in Elements)
+{
+    switch (el.Tag)
+    {
+        // ── Text & Display ──────────────────────────────────────────
+        case "text":
+            <span class="@el.Css">@el.Text</span>
+            break;
+
+        case "h1":
+            <h1 class="@Cx("text-4xl font-bold tracking-tight sm:text-5xl", el.Css)">@el.Text</h1>
+            break;
+        case "h2":
+            <h2 class="@Cx("text-4xl font-bold tracking-tight sm:text-5xl", el.Css)">@el.Text</h2>
+            break;
+        case "h3":
+            <h3 class="@Cx("text-xl font-semibold", el.Css)">@el.Text</h3>
+            break;
+        case "h4":
+            <h4 class="@Cx("text-lg font-semibold", el.Css)">@el.Text</h4>
+            break;
+        case "h5" or "h6":
+            <h5 class="@Cx("text-sm font-medium", el.Css)">@el.Text</h5>
+            break;
+
+        case "p":
+            <p class="@Cx("text-xl text-muted-foreground", el.Css)">@el.Text</p>
+            break;
+
+        case "label":
+            <BbLabel For="@el.Id" class="@el.Css">@el.Text</BbLabel>
+            break;
+
+        case "icon":
+            <LucideIcon Name="@el.Text" Size="@PropInt(el, "size", 16)" class="@el.Css" />
+            break;
+
+        case "badge":
+            {
+                var v = PropStr(el, "variant");
+                var bv = v switch
+                {
+                    "secondary" => BadgeVariant.Secondary,
+                    "outline" => BadgeVariant.Outline,
+                    "destructive" => BadgeVariant.Destructive,
+                    _ => BadgeVariant.Default
+                };
+                <BbBadge Variant="bv" class="@el.Css">@el.Text</BbBadge>
+            }
+            break;
+
+        case "code":
+            <code class="@Cx("rounded bg-muted px-1.5 py-0.5 font-mono text-sm", el.Css)">@el.Text</code>
+            break;
+
+        // ── Interactive ─────────────────────────────────────────────
+        case "button":
+            {
+                var v = PropStr(el, "variant");
+                var bv = v switch
+                {
+                    "secondary" => ButtonVariant.Secondary,
+                    "outline" => ButtonVariant.Outline,
+                    "ghost" => ButtonVariant.Ghost,
+                    "destructive" => ButtonVariant.Destructive,
+                    _ => ButtonVariant.Default
+                };
+                var ic = PropStr(el, "icon");
+                <BbButton Variant="bv" class="@el.Css" @onclick="() => el.OnClick?.Invoke()">
+                    @if (ic != null) { <LucideIcon Name="@ic" Size="16" class="mr-2" /> }
+                    @el.Text
+                </BbButton>
+            }
+            break;
+
+        case "input":
+            {
+                var ph = PropStr(el, "placeholder");
+                var val = PropStr(el, "value") ?? "";
+                <BbInput Placeholder="@ph" Value="@val" id="@el.Id" class="@el.Css"
+                         ValueChanged="v => el.OnInput?.Invoke(v)" UpdateTiming="UpdateTiming.Immediate" />
+            }
+            break;
+
+        case "checkbox":
+            {
+                var cbEl = el;
+                var cbChk = PropBool(cbEl, "checked");
+                <div class="@Cx("flex items-center space-x-2", cbEl.Css)">
+                    <BbCheckbox id="@cbEl.Id" Checked="cbChk"
+                                CheckedChanged="@(v => OnCheckedChanged(cbEl, v))" />
+                    @if (cbEl.Text != null) { <BbLabel For="@cbEl.Id" class="font-normal">@cbEl.Text</BbLabel> }
+                </div>
+            }
+            break;
+
+        case "switch":
+            {
+                var swEl = el;
+                var swChk = PropBool(swEl, "checked");
+                <div class="@Cx("flex items-center space-x-2", swEl.Css)">
+                    <BbSwitch id="@swEl.Id" Checked="swChk"
+                              CheckedChanged="@(v => OnCheckedChanged(swEl, v))" />
+                    @if (swEl.Text != null) { <BbLabel For="@swEl.Id" class="font-normal">@swEl.Text</BbLabel> }
+                </div>
+            }
+            break;
+
+        // ── Layout ──────────────────────────────────────────────────
+        case "separator":
+            <BbSeparator class="@el.Css" />
+            break;
+
+        case "spacer":
+            <div class="flex-1" />
+            break;
+
+        case "div":
+            <div class="@el.Css">
+                <ElementRenderer Elements="el.Children" />
+            </div>
+            break;
+
+        case "row":
+            <div class="@Cx("flex flex-wrap gap-2 items-center", el.Css)">
+                <ElementRenderer Elements="el.Children" />
+            </div>
+            break;
+
+        case "column":
+            <div class="@Cx("flex flex-col gap-2", el.Css)">
+                <ElementRenderer Elements="el.Children" />
+            </div>
+            break;
+
+        case "grid":
+            {
+                var cols = PropInt(el, "columns", 2);
+                <div class="@Cx($"grid sm:grid-cols-{cols} gap-4", el.Css)">
+                    <ElementRenderer Elements="el.Children" />
+                </div>
+            }
+            break;
+
+        case "scroll":
+            <div class="@Cx("overflow-auto flex-1", el.Css)">
+                <ElementRenderer Elements="el.Children" />
+            </div>
+            break;
+
+        // ── Cards ───────────────────────────────────────────────────
+        case "card":
+            <BbCard class="@el.Css">
+                <ElementRenderer Elements="el.Children" />
+            </BbCard>
+            break;
+
+        case "card-header":
+            <BbCardHeader>
+                <ElementRenderer Elements="el.Children" />
+            </BbCardHeader>
+            break;
+
+        case "card-title":
+            <BbCardTitle>@el.Text</BbCardTitle>
+            break;
+
+        case "card-description":
+            <BbCardDescription>@el.Text</BbCardDescription>
+            break;
+
+        case "card-content":
+            <BbCardContent class="space-y-6">
+                <ElementRenderer Elements="el.Children" />
+            </BbCardContent>
+            break;
+
+        case "card-footer":
+            <BbCardFooter>
+                <ElementRenderer Elements="el.Children" />
+            </BbCardFooter>
+            break;
+
+        // ── Alerts ──────────────────────────────────────────────────
+        case "alert":
+            <BbAlert class="@el.Css">
+                <ElementRenderer Elements="el.Children" />
+            </BbAlert>
+            break;
+
+        case "alert-title":
+            <BbAlertTitle>@el.Text</BbAlertTitle>
+            break;
+
+        case "alert-description":
+            <BbAlertDescription>@el.Text</BbAlertDescription>
+            break;
+
+        // ── Links ───────────────────────────────────────────────────
+        case "link":
+            {
+                var href = PropStr(el, "href") ?? "#";
+                var ic = PropStr(el, "icon");
+                var desc = PropStr(el, "description");
+                <a href="@href" target="_blank" class="@Cx("group block space-y-2 rounded-lg border p-4 hover:bg-accent transition-colors", el.Css)">
+                    <div class="flex items-center gap-2">
+                        @if (ic != null) { <LucideIcon Name="@ic" Size="20" class="text-primary" /> }
+                        <h3 class="font-semibold">@el.Text</h3>
+                    </div>
+                    @if (desc != null)
+                    {
+                        <p class="text-sm text-muted-foreground">@desc</p>
+                    }
+                </a>
+            }
+            break;
+
+        // ── Editor: Tree Item ───────────────────────────────────────
+        case "tree-item":
+            {
+                var ic = PropStr(el, "icon");
+                var sel = PropBool(el, "selected");
+                var exp = PropBool(el, "expanded", true);
+                var icColor = PropStr(el, "iconColor");
+                var hasChildren = el.Children.Count > 0;
+                <div>
+                    <div class="@Cx("flex items-center gap-1.5 h-6 px-1.5 rounded-sm cursor-pointer", sel ? "bg-accent" : "hover:bg-accent/50")"
+                         @onclick="() => el.OnClick?.Invoke()">
+                        @if (hasChildren)
+                        {
+                            <LucideIcon Name="@(exp ? "chevron-down" : "chevron-right")" Size="10" class="text-muted-foreground/50" />
+                        }
+                        else
+                        {
+                            <span class="w-2.5" />
+                        }
+                        @if (ic != null)
+                        {
+                            <LucideIcon Name="@ic" Size="12" class="@(icColor ?? "text-muted-foreground")" />
+                        }
+                        <span class="@(sel ? "text-foreground" : "text-muted-foreground") text-[11px]">@el.Text</span>
+                    </div>
+                    @if (hasChildren && exp)
+                    {
+                        <div class="ml-3 border-l border-border/20 pl-1">
+                            <ElementRenderer Elements="el.Children" />
+                        </div>
+                    }
+                </div>
+            }
+            break;
+
+        // ── Editor: Field Row ───────────────────────────────────────
+        case "field-row":
+            <div class="flex items-center gap-2 h-6 text-[11px]">
+                <span class="w-28 shrink-0 text-muted-foreground truncate text-right pr-2">@el.Text</span>
+                <div class="flex-1 min-w-0">
+                    <ElementRenderer Elements="el.Children" />
+                </div>
+            </div>
+            break;
+
+        // ── Editor: Empty State ─────────────────────────────────────
+        case "empty-state":
+            {
+                var ic = PropStr(el, "icon");
+                var title = PropStr(el, "title");
+                var desc = PropStr(el, "description");
+                <div class="flex-1 flex flex-col items-center justify-center gap-1.5 text-muted-foreground/30 p-6">
+                    @if (ic != null) { <LucideIcon Name="@ic" Size="24" class="opacity-40" /> }
+                    @if (title != null) { <span class="text-[11px] text-muted-foreground/40">@title</span> }
+                    @if (desc != null) { <span class="text-[10px] text-muted-foreground/30">@desc</span> }
+                </div>
+            }
+            break;
+
+        // ── Editor: Log Entry ───────────────────────────────────────
+        case "log-entry":
+            {
+                var level = PropStr(el, "level") ?? "INFO";
+                var rowCss = level switch { "ERROR" or "FATAL" => "bg-destructive/5", "WARN" => "bg-yellow-500/5", _ => "" };
+                var iconName = level switch { "ERROR" or "FATAL" => "circle-x", "WARN" => "triangle-alert", "DEBUG" or "TRACE" => "bug", _ => "info" };
+                var iconCss = level switch { "ERROR" or "FATAL" => "text-destructive", "WARN" => "text-yellow-500", "DEBUG" or "TRACE" => "text-muted-foreground/30", _ => "text-blue-500/60" };
+                <div class="@Cx("flex items-start gap-0 px-2 hover:bg-accent/30 border-b border-border/10 font-mono text-[10px] leading-5", rowCss)">
+                    <span class="shrink-0 w-14 text-right pr-2 text-muted-foreground/40 py-px">@PropStr(el, "time")</span>
+                    <span class="shrink-0 w-4 py-px"><LucideIcon Name="@iconName" Size="10" class="@iconCss" /></span>
+                    <span class="shrink-0 text-muted-foreground/40 pr-1.5 py-px">@PropStr(el, "category")</span>
+                    <span class="break-all min-w-0 py-px">@PropStr(el, "message")</span>
+                </div>
+            }
+            break;
+
+        // ── Fallback ────────────────────────────────────────────────
+        default:
+            <div class="@el.Css">
+                @if (el.Text != null) { <span>@el.Text</span> }
+                @if (el.Children.Count > 0) { <ElementRenderer Elements="el.Children" /> }
+            </div>
+            break;
+    }
+}
+
+@code {
+    [Parameter, EditorRequired] public List<Element> Elements { get; set; } = [];
+
+    private static string Cx(string baseClass, string? extra) =>
+        string.IsNullOrEmpty(extra) ? baseClass : $"{baseClass} {extra}";
+
+    private static string? PropStr(Element el, string key) =>
+        el.Props.TryGetValue(key, out var v) ? v?.ToString() : null;
+
+    private static int PropInt(Element el, string key, int fallback = 0) =>
+        el.Props.TryGetValue(key, out var v) && v is int i ? i : fallback;
+
+    private static bool PropBool(Element el, string key, bool fallback = false) =>
+        el.Props.TryGetValue(key, out var v) && v is bool b ? b : fallback;
+
+    private void OnCheckedChanged(Element el, bool value)
+    {
+        el.Props["checked"] = value;
+        el.OnToggle?.Invoke(value);
+    }
+}

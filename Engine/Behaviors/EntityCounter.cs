@@ -23,7 +23,6 @@ public struct EntityCounter
         int count = ctx.Ecs.Count<EntityCounter>();
 
         ImGui.Begin("Performance");
-        ImGui.Separator();
         ImGui.Text($"Entities:  {count:N0}");
         ImGui.End();
     }

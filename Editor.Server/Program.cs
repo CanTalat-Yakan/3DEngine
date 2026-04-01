@@ -1,5 +1,7 @@
 using BlazorBlueprint.Components;
 using Editor.Server;
+using Editor.Server.Hubs;
+using Editor.Shell;
 
 // When run standalone, start the server and block until shutdown.
 var server = await EditorServerHost.StartAsync(args: args);
@@ -17,7 +19,16 @@ namespace Editor.Server
         /// Builds and starts the Blazor Server on the given URL without blocking.
         /// Returns the running <see cref="WebApplication"/> so the caller can stop it later.
         /// </summary>
-        public static async Task<WebApplication> StartAsync(string url = "http://localhost:5000", string[]? args = null)
+        /// <param name="url">Listen URL for the Blazor Server.</param>
+        /// <param name="args">Command-line args forwarded to the web host.</param>
+        /// <param name="registry">
+        /// Optional externally-owned <see cref="ShellRegistry"/>. When null a new instance is created.
+        /// Pass the same instance from the Editor host to share state.
+        /// </param>
+        public static async Task<WebApplication> StartAsync(
+            string url = "http://localhost:5000",
+            string[]? args = null,
+            ShellRegistry? registry = null)
         {
             // ApplicationName must point to this assembly so the static web assets
             // pipeline (wwwroot, _content/, CSS) resolves correctly even when
@@ -34,12 +45,20 @@ namespace Editor.Server
             // even when the environment isn't Development (e.g., hosted from Editor).
             builder.WebHost.UseStaticWebAssets();
 
+            // ── Editor Shell services ────────────────────────────────────
+            var shellRegistry = registry ?? new ShellRegistry();
+            builder.Services.AddSingleton(shellRegistry);
+            builder.Services.AddSingleton<EditorState>();
+
             // Add services to the container
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
             // Add BlazorBlueprint services
             builder.Services.AddBlazorBlueprintComponents();
+
+            // SignalR for engine ↔ shell communication
+            builder.Services.AddSignalR();
 
             var app = builder.Build();
 
@@ -55,6 +74,9 @@ namespace Editor.Server
             app.MapStaticAssets();
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
+
+            // Map the editor SignalR hub
+            app.MapHub<EditorHub>("/editor-hub");
 
             await app.StartAsync();
             return app;

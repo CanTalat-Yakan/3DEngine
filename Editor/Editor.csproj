@@ -13,6 +13,11 @@
     <ItemGroup>
       <ProjectReference Include="..\Engine\Engine.csproj" />
       <ProjectReference Include="..\Editor.Server\Editor.Server.csproj" />
+      <ProjectReference Include="..\Editor.Shell\Editor.Shell.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="Scripts\**\*.cs" CopyToOutputDirectory="PreserveNewest" LinkBase="Scripts" />
     </ItemGroup>
 
 </Project>
