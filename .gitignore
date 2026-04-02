@@ -463,3 +463,4 @@ appsettings.Development.local.json
 
 # CI/CD workflows to ignore
 .github/workflows/publish-nuget.yml
+Editor/imgui.ini
