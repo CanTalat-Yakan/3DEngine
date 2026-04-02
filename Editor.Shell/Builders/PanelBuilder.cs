@@ -52,4 +52,5 @@ internal sealed class PanelBuilder(PanelDescriptor desc) : IPanelBuilder
     public IPanelBuilder InitialSize(float fraction) { desc.InitialSize = Math.Clamp(fraction, 0.05f, 0.95f); return this; }
     public IPanelBuilder Closeable(bool closeable = true) { desc.Closeable = closeable; return this; }
     public IPanelBuilder Visible(bool visible = true) { desc.Visible = visible; return this; }
+    public IPanelBuilder Route(string route) { desc.Route = route; return this; }
 }

@@ -9,11 +9,12 @@ public class ShowcaseButtonsShell : IEditorShellBuilder
     {
         shell.Panel("showcase-buttons", "Buttons", DockZone.Center, panel =>
         {
+            panel.Icon(Icon.From(Lucide.RectangleHorizontal)).TabGroup("showcase", 1).Closeable(false).Route("/showcase/buttons");
             panel.Content(ui =>
             {
-                ui.Div(Css.Container().PaddingY(6), container =>
+                ShowcasePageHelper.WrapWithSidebar(ui, content =>
                 {
-                    container.Div(Css.MarginXAuto().MaxWidth("3xl").SpaceY(6), inner =>
+                    content.Div(Css.MarginXAuto().MaxWidth("3xl").SpaceY(6), inner =>
                     {
                         inner.Card(Css.Default, card =>
                         {
@@ -82,7 +83,6 @@ public class ShowcaseButtonsShell : IEditorShellBuilder
                     });
                 });
             });
-            panel.Icon(Icon.From(Lucide.RectangleHorizontal)).TabGroup("showcase", 1).Closeable(false);
         });
     }
 }

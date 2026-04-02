@@ -9,11 +9,12 @@ public class ShowcaseDialogsShell : IEditorShellBuilder
     {
         shell.Panel("showcase-dialogs", "Dialogs & Overlays", DockZone.Center, panel =>
         {
+            panel.Icon(Icon.From(Lucide.PanelTop)).TabGroup("showcase", 6).Closeable(false).Route("/showcase/dialogs");
             panel.Content(ui =>
             {
-                ui.Div(Css.Container().PaddingY(6), container =>
+                ShowcasePageHelper.WrapWithSidebar(ui, content =>
                 {
-                    container.Div(Css.MarginXAuto().MaxWidth("3xl").SpaceY(6), inner =>
+                    content.Div(Css.MarginXAuto().MaxWidth("3xl").SpaceY(6), inner =>
                     {
                         inner.Card(Css.Default, card =>
                         {
@@ -182,7 +183,6 @@ public class ShowcaseDialogsShell : IEditorShellBuilder
                     });
                 });
             });
-            panel.Icon(Icon.From(Lucide.PanelTop)).TabGroup("showcase", 6).Closeable(false);
         });
     }
 }

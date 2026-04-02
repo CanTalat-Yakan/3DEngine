@@ -9,11 +9,12 @@ public class ShowcaseFormsShell : IEditorShellBuilder
     {
         shell.Panel("showcase-forms", "Forms", DockZone.Center, panel =>
         {
+            panel.Icon(Icon.From(Lucide.TextCursorInput)).TabGroup("showcase", 2).Closeable(false).Route("/showcase/forms");
             panel.Content(ui =>
             {
-                ui.Div(Css.Container().PaddingY(6), container =>
+                ShowcasePageHelper.WrapWithSidebar(ui, content =>
                 {
-                    container.Div(Css.MarginXAuto().MaxWidth("3xl").SpaceY(6), inner =>
+                    content.Div(Css.MarginXAuto().MaxWidth("3xl").SpaceY(6), inner =>
                     {
                         inner.Card(Css.Default, card =>
                         {
@@ -143,7 +144,6 @@ public class ShowcaseFormsShell : IEditorShellBuilder
                     });
                 });
             });
-            panel.Icon(Icon.From(Lucide.TextCursorInput)).TabGroup("showcase", 2).Closeable(false);
         });
     }
 }

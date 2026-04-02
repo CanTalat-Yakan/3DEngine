@@ -9,11 +9,12 @@ public class ShowcaseNavigationShell : IEditorShellBuilder
     {
         shell.Panel("showcase-navigation", "Navigation", DockZone.Center, panel =>
         {
+            panel.Icon(Icon.From(Lucide.Navigation)).TabGroup("showcase", 5).Closeable(false).Route("/showcase/navigation");
             panel.Content(ui =>
             {
-                ui.Div(Css.Container().PaddingY(6), container =>
+                ShowcasePageHelper.WrapWithSidebar(ui, content =>
                 {
-                    container.Div(Css.MarginXAuto().MaxWidth("3xl").SpaceY(6), inner =>
+                    content.Div(Css.MarginXAuto().MaxWidth("3xl").SpaceY(6), inner =>
                     {
                         // ── Menubar ────────────────────────────────────────────
                         inner.Card(Css.Default, card =>
@@ -236,7 +237,6 @@ public class ShowcaseNavigationShell : IEditorShellBuilder
                     });
                 });
             });
-            panel.Icon(Icon.From(Lucide.Navigation)).TabGroup("showcase", 5).Closeable(false);
         });
     }
 }

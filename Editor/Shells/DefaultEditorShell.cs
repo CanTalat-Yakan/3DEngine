@@ -10,6 +10,7 @@ public class DefaultEditorShell : IEditorShellBuilder
         // ── Home panel ───────────────────────────────────────────────
         shell.Panel("showcase-home", "Home", DockZone.Center, panel =>
         {
+            panel.Icon(Icon.From(Lucide.House)).TabGroup("showcase", 0).Closeable(false).Route("/");
             panel.Content(ui =>
             {
                 ui.Div(Css.Container().PaddingY(10), container =>
@@ -142,7 +143,6 @@ public class DefaultEditorShell : IEditorShellBuilder
                     });
                 });
             });
-            panel.Icon(Icon.From(Lucide.House)).TabGroup("showcase", 0).Closeable(false);
         });
 
     }

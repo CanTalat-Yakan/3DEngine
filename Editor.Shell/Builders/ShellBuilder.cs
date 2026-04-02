@@ -23,6 +23,9 @@ public interface IPanelBuilder
 
     /// <summary>Whether the panel starts visible.</summary>
     IPanelBuilder Visible(bool visible = true);
+
+    /// <summary>Assigns a URL route to this panel (e.g. "/showcase/buttons"). The host resolves routes dynamically.</summary>
+    IPanelBuilder Route(string route);
 }
 
 /// <summary>Root builder that assembles a <see cref="ShellDescriptor"/>.</summary>

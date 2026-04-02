@@ -60,6 +60,12 @@ public sealed class PanelDescriptor
 
     /// <summary>Whether the panel is visible on creation.</summary>
     public bool Visible { get; set; } = true;
+
+    /// <summary>
+    /// When set, this panel's content is served at the given URL route (e.g. "/showcase/buttons").
+    /// A generic catch-all page in the host resolves the route to this panel at runtime.
+    /// </summary>
+    public string? Route { get; set; }
 }
 
 // ── Content-level Descriptors (used by IContentBuilder elements) ────────

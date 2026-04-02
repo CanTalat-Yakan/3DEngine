@@ -1,9 +1,24 @@
 @inherits LayoutComponentBase
 
-<div class="shell-root h-screen w-screen flex flex-col overflow-hidden bg-background text-foreground">
-    <div class="flex-1 flex overflow-hidden min-h-0">
-        <ShellDockLayout Panels="Descriptor.Panels" />
-    </div>
+<div class="shell-root relative min-h-screen flex flex-col bg-background text-foreground">
+    @{
+        var topPanels = Descriptor.Panels
+            .Where(p => p.Visible && p.DefaultZone == DockZone.Top)
+            .OrderBy(p => p.TabOrder)
+            .ToList();
+    }
+
+    @foreach (var panel in topPanels)
+    {
+        @if (panel.Content is { Count: > 0 })
+        {
+            <ElementRenderer Elements="panel.Content" />
+        }
+    }
+
+    <main class="flex-1">
+        @Body
+    </main>
 </div>
 
 <BbToastProvider Position="ToastPosition.BottomRight" />

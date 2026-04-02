@@ -9,6 +9,7 @@ public class HeaderShell : IEditorShellBuilder
     {
         shell.Panel("header", "Header", DockZone.Top, header =>
         {
+            header.Closeable(false);
             header.Content(ui =>
             {
                 ui.Div("sticky top-0 z-50 w-full border-b bg-background", outer =>
@@ -44,7 +45,6 @@ public class HeaderShell : IEditorShellBuilder
                     });
                 });
             });
-            header.Closeable(false);
         });
     }
 }

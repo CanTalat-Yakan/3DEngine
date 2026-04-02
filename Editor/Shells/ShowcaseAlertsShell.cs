@@ -9,11 +9,12 @@ public class ShowcaseAlertsShell : IEditorShellBuilder
     {
         shell.Panel("showcase-alerts", "Alerts & Feedback", DockZone.Center, panel =>
         {
+            panel.Icon(Icon.From(Lucide.Bell)).TabGroup("showcase", 4).Closeable(false).Route("/showcase/alerts");
             panel.Content(ui =>
             {
-                ui.Div(Css.Container().PaddingY(6), container =>
+                ShowcasePageHelper.WrapWithSidebar(ui, content =>
                 {
-                    container.Div(Css.MarginXAuto().MaxWidth("3xl").SpaceY(6), inner =>
+                    content.Div(Css.MarginXAuto().MaxWidth("3xl").SpaceY(6), inner =>
                     {
                         inner.Card(Css.Default, card =>
                         {
@@ -86,7 +87,6 @@ public class ShowcaseAlertsShell : IEditorShellBuilder
                     });
                 });
             });
-            panel.Icon(Icon.From(Lucide.Bell)).TabGroup("showcase", 4).Closeable(false);
         });
     }
 }
