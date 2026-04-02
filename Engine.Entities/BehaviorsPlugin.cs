@@ -39,8 +39,3 @@ public sealed class BehaviorsPlugin : IPlugin
         Logger.Info($"BehaviorsPlugin: {found} behavior registration(s) discovered and invoked.");
     }
 }
-
-[AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
-public sealed class GeneratedBehaviorRegistrationAttribute : Attribute
-{
-}

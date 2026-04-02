@@ -1,58 +1,44 @@
 namespace Engine;
 
+/// <summary>Marks a method for registration by the generator; must be used on methods in a struct with <see cref="BehaviorAttribute"/>.</summary>
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
+public sealed class GeneratedBehaviorRegistrationAttribute : Attribute;
+
 /// <summary>Marks a struct as an ECS Behavior; methods with stage attributes will be scheduled by the generator.</summary>
 [AttributeUsage(AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-public sealed class BehaviorAttribute : Attribute
-{
-}
+public sealed class BehaviorAttribute : Attribute;
 
 /// <summary>Runs once during app startup, before the window loop begins.</summary>
 [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-public sealed class OnStartupAttribute : Attribute
-{
-}
+public sealed class OnStartupAttribute : Attribute;
 
 /// <summary>Runs at the beginning of each frame.</summary>
 [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-public sealed class OnFirstAttribute : Attribute
-{
-}
+public sealed class OnFirstAttribute : Attribute;
 
 /// <summary>Runs before Update each frame.</summary>
 [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-public sealed class OnPreUpdateAttribute : Attribute
-{
-}
+public sealed class OnPreUpdateAttribute : Attribute;
 
 /// <summary>Runs during the main update stage each frame.</summary>
 [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-public sealed class OnUpdateAttribute : Attribute
-{
-}
+public sealed class OnUpdateAttribute : Attribute;
 
 /// <summary>Runs after Update each frame.</summary>
 [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-public sealed class OnPostUpdateAttribute : Attribute
-{
-}
+public sealed class OnPostUpdateAttribute : Attribute;
 
 /// <summary>Runs during the render stage each frame.</summary>
 [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-public sealed class OnRenderAttribute : Attribute
-{
-}
+public sealed class OnRenderAttribute : Attribute;
 
 /// <summary>Runs at the very end of each frame.</summary>
 [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-public sealed class OnLastAttribute : Attribute
-{
-}
+public sealed class OnLastAttribute : Attribute;
 
 /// <summary>Runs once during app cleanup, after the window loop ends.</summary>
 [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-public sealed class OnCleanupAttribute : Attribute
-{
-}
+public sealed class OnCleanupAttribute : Attribute;
 
 /// <summary>Filter: schedule only for entities that also have all listed component types.</summary>
 [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
