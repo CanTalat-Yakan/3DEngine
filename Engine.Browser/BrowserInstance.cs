@@ -29,6 +29,9 @@ public sealed class BrowserInstance : IDisposable
     /// <summary>The underlying Ultralight view (null before <see cref="Initialize"/>).</summary>
     public View? View => _view;
 
+    /// <summary>Row stride in bytes of the bitmap surface (may be &gt; Width*4 due to alignment).</summary>
+    public uint SurfaceRowBytes => _view?.Surface?.RowBytes ?? (Width * 4);
+
     /// <summary>
     /// Initializes the Ultralight platform, renderer, and view.
     /// Call once during Startup.
@@ -117,11 +120,17 @@ public sealed class BrowserInstance : IDisposable
     public void Update()
     {
         if (_renderer is null) return;
-        _renderer.Update();
-        _renderer.Render();
 
+        // Update processes timers, JS, layout, network — may flag the view as needing paint.
+        _renderer.Update();
+
+        // Capture the dirty state BEFORE Render(), because Render() paints the
+        // dirty regions to the bitmap surface and then clears the NeedsPaint flag.
         if (_view is not null)
             IsDirty = _view.NeedsPaint || IsDirty;
+
+        // Render paints all dirty views to their surfaces.
+        _renderer.Render();
     }
 
     /// <summary>

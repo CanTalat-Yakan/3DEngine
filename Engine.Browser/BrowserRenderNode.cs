@@ -50,18 +50,36 @@ public sealed class BrowserRenderNode : IRenderNode, IDisposable
         // Upload new pixels if dirty
         if (browser.IsDirty && _browserImage is not null)
         {
-            var rowBytes = browser.Width * 4; // BGRA8 = 4 bytes per pixel
-            var totalBytes = (int)(rowBytes * browser.Height);
+            var surfaceRowBytes = browser.SurfaceRowBytes;
+            var totalBytes = (int)(surfaceRowBytes * browser.Height);
 
-            // Ensure staging buffer is large enough
+            // Ensure staging buffer is large enough for the surface (includes row padding)
             if (_stagingBuffer is null || _stagingBuffer.Length < totalBytes)
                 _stagingBuffer = new byte[totalBytes];
 
-            if (browser.TryGetPixels(_stagingBuffer.AsSpan(0, totalBytes), out _))
+            if (browser.TryGetPixels(_stagingBuffer.AsSpan(0, totalBytes), out var actualRowBytes))
             {
-                // Ultralight renders BGRA. Our texture is B8G8R8A8_UNorm which maps directly.
-                gfx.UploadTexture2D(_browserImage, _stagingBuffer.AsSpan(0, totalBytes),
-                    browser.Width, browser.Height, bytesPerPixel: 4);
+                var packedRowBytes = browser.Width * 4;
+
+                if (actualRowBytes == packedRowBytes)
+                {
+                    // No padding — upload the surface data directly
+                    gfx.UploadTexture2D(_browserImage, _stagingBuffer.AsSpan(0, totalBytes),
+                        browser.Width, browser.Height, bytesPerPixel: 4);
+                }
+                else
+                {
+                    // Surface has row padding — strip it to get tightly-packed rows
+                    var packedSize = (int)(packedRowBytes * browser.Height);
+                    var packed = new byte[packedSize];
+                    for (uint y = 0; y < browser.Height; y++)
+                    {
+                        _stagingBuffer.AsSpan((int)(y * actualRowBytes), (int)packedRowBytes)
+                            .CopyTo(packed.AsSpan((int)(y * packedRowBytes)));
+                    }
+                    gfx.UploadTexture2D(_browserImage, packed.AsSpan(0, packedSize),
+                        browser.Width, browser.Height, bytesPerPixel: 4);
+                }
             }
         }
 
