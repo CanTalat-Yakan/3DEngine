@@ -18,7 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Include="Scripts\**\*.cs" CopyToOutputDirectory="PreserveNewest" LinkBase="Scripts" />
+      <None Include="Shells\**\*.cs" CopyToOutputDirectory="PreserveNewest" LinkBase="Scripts" />
     </ItemGroup>
 
 </Project>
