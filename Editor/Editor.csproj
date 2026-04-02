@@ -17,8 +17,11 @@
       <ProjectReference Include="..\Editor.Shell\Editor.Shell.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Content Include="Shells/**/*.cs" CopyToOutputDirectory="PreserveNewest" LinkBase="Scripts" />
-    </ItemGroup>
+    <Target Name="CopyShellScripts" AfterTargets="Build">
+      <ItemGroup>
+        <_ShellScripts Include="Shells/**/*.cs" />
+      </ItemGroup>
+      <Copy SourceFiles="@(_ShellScripts)" DestinationFolder="$(OutputPath)Scripts" SkipUnchangedFiles="true" />
+    </Target>
 
 </Project>
