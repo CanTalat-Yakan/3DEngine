@@ -132,7 +132,7 @@ public sealed class BrowserPlugin : IPlugin
         </head>
         <body>
             <div class="overlay">
-                <h1>🌐 3DEngine Browser</h1>
+                <h1>3DEngine Browser</h1>
                 <p>UltralightNet overlay active</p>
             </div>
         </body>

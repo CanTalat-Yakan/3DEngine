@@ -8,6 +8,6 @@ var config = Config.GetDefault(
 
 new App(config)
     .AddPlugin(new DefaultPlugins())
-    .AddPlugin(new BrowserPlugin { InitialUrl = "https://example.com" })
+    .AddPlugin(new BrowserPlugin())
     .AddPlugin(new VulkanBrowserPlugin())
     .Run();

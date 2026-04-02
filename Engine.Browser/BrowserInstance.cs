@@ -182,6 +182,11 @@ public sealed class BrowserInstance : IDisposable
             _renderer.Update();
             _renderer.Render();
         }
+
+        // The warm-up likely painted the surface already, so mark dirty
+        // so the first render frame uploads it to the GPU.
+        IsDirty = true;
+
         Logger.Info($"BrowserInstance: Warm-up complete (DOMReady={DiagDOMReady}, Finished={DiagPageFinished}).");
     }
 
@@ -276,6 +281,14 @@ public sealed class BrowserInstance : IDisposable
                     nonZero++;
             }
             DiagProbeNonZero = nonZero;
+
+            // Safety net: if the surface has content but IsDirty is false,
+            // force a dirty flag so the render node picks it up.
+            if (nonZero > 0 && !IsDirty && DiagUploadCount == 0)
+            {
+                IsDirty = true;
+                Logger.Info($"BrowserInstance: Probe found {nonZero} non-zero pixels — forcing IsDirty.");
+            }
         }
         finally
         {
