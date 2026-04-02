@@ -22,7 +22,7 @@ public struct EntityCounter
     {
         int count = ctx.Ecs.Count<EntityCounter>();
 
-        ImGui.Begin("Performance");
+        ImGui.Begin("Performance", ImGuiWindowFlags.NoSavedSettings);
         ImGui.Text($"Entities:  {count:N0}");
         ImGui.End();
     }

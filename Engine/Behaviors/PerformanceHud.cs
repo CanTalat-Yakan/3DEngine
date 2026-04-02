@@ -26,7 +26,7 @@ public struct PerformanceHud
         if (fps > _peakFps)
             _peakFps = fps;
 
-        ImGui.Begin("Performance");
+        ImGui.Begin("Performance", ImGuiWindowFlags.NoSavedSettings);
         ImGui.Text($"FPS:       {time.SmoothedFps:0}");
         ImGui.Text($"Peak FPS:  {_peakFps:0}");
         ImGui.Text($"Frame:     {time.DeltaSeconds * 1000.0:0.00} ms");
