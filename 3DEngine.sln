@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Files", "Engine.File
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editor.Compiler", "Editor.Compiler\Editor.Compiler.csproj", "{9ECA99E3-7007-4334-8B9B-E62F5C05E295}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Browser", "Engine.Browser\Engine.Browser.csproj", "{237FBBE0-3D41-46A2-8DD7-8C97A7CC89A6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -84,5 +86,9 @@ Global
 		{9ECA99E3-7007-4334-8B9B-E62F5C05E295}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9ECA99E3-7007-4334-8B9B-E62F5C05E295}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9ECA99E3-7007-4334-8B9B-E62F5C05E295}.Release|Any CPU.Build.0 = Release|Any CPU
+		{237FBBE0-3D41-46A2-8DD7-8C97A7CC89A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{237FBBE0-3D41-46A2-8DD7-8C97A7CC89A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{237FBBE0-3D41-46A2-8DD7-8C97A7CC89A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{237FBBE0-3D41-46A2-8DD7-8C97A7CC89A6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
