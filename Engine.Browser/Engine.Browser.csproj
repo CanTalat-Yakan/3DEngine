@@ -23,6 +23,7 @@
 
     <ItemGroup>
         <Content Include="Shaders\**\*.glsl" CopyToOutputDirectory="PreserveNewest" Link="Source\Shaders\%(Filename)%(Extension)" />
+        <EmbeddedResource Include="Source\default.html" LogicalName="Engine.Browser.default.html" />
     </ItemGroup>
 
 </Project>
