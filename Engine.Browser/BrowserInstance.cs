@@ -41,7 +41,7 @@ public sealed class BrowserInstance : IDisposable
     public long DiagNonZeroPixels { get; private set; }
     public long DiagTotalPixels => Width * Height;
 
-    /// <summary>Page title retrieved via JS — updated once per second.</summary>
+    /// <summary>Page title from the native View.Title property.</summary>
     public string? DiagPageTitle { get; private set; }
 
     /// <summary>Hex representation of the first 16 bytes of the last surface read.</summary>
@@ -52,6 +52,15 @@ public sealed class BrowserInstance : IDisposable
 
     /// <summary>Whether the CA certificate file exists on disk.</summary>
     public bool DiagCaCertExists => File.Exists(Path.Combine(AppContext.BaseDirectory, "resources", "cacert.pem"));
+
+    // ── Page load state (set by native callbacks) ────────────────────
+    public bool DiagDOMReady { get; private set; }
+    public bool DiagPageFinished { get; private set; }
+    public string? DiagLoadError { get; private set; }
+    public string? DiagLastConsoleMessage { get; private set; }
+
+    /// <summary>Non-zero pixel count from a forced surface probe (bypasses IsDirty).</summary>
+    public long DiagProbeNonZero { get; private set; }
 
     private int _titleQueryCountdown;
 
@@ -102,7 +111,40 @@ public sealed class BrowserInstance : IDisposable
 
         _view = _renderer.CreateView(width, height, viewConfig, _renderer.DefaultSession);
         _view.Focus();
+
+        // ── Register native callbacks for load tracking ──────────────
+        _view.OnDOMReady += OnDOMReadyHandler;
+        _view.OnFinishLoading += OnFinishLoadingHandler;
+        _view.OnFailLoading += OnFailLoadingHandler;
+        _view.OnAddConsoleMessage += OnConsoleMessageHandler;
+
         Logger.Info($"Ultralight view created ({width}x{height}, transparent={viewConfig.IsTransparent}).");
+    }
+
+    // ── Native callback handlers ─────────────────────────────────────
+    private void OnDOMReadyHandler(ulong frameId, bool isMainFrame, string url)
+    {
+        DiagDOMReady = true;
+        Logger.Info($"BrowserInstance: DOM ready (frame={frameId}, main={isMainFrame}, url={url})");
+    }
+
+    private void OnFinishLoadingHandler(ulong frameId, bool isMainFrame, string url)
+    {
+        DiagPageFinished = true;
+        Logger.Info($"BrowserInstance: Page finished loading (frame={frameId}, main={isMainFrame}, url={url})");
+    }
+
+    private void OnFailLoadingHandler(ulong frameId, bool isMainFrame, string url, string description, string errorDomain, int errorCode)
+    {
+        DiagLoadError = $"{errorDomain}:{errorCode} {description}";
+        Logger.Warn($"BrowserInstance: Page load FAILED — {DiagLoadError} (url={url})");
+    }
+
+    private void OnConsoleMessageHandler(ULMessageSource source, ULMessageLevel level, string message, uint lineNumber, uint columnNumber, string sourceId)
+    {
+        DiagLastConsoleMessage = $"[{level}] {message}";
+        if (level == ULMessageLevel.Error || level == ULMessageLevel.Warning)
+            Logger.Warn($"BrowserInstance: Console {level}: {message} ({sourceId}:{lineNumber}:{columnNumber})");
     }
 
     /// <summary>Loads raw HTML content into the view.</summary>
@@ -111,6 +153,10 @@ public sealed class BrowserInstance : IDisposable
         if (_view is null) return;
         Logger.Info("BrowserInstance: Loading HTML content...");
         _view.HTML = html;
+
+        // Warm-up: pump the renderer a few times so the page starts parsing
+        // before the main loop begins.
+        WarmUp();
     }
 
     /// <summary>Loads a URL into the view.</summary>
@@ -119,6 +165,24 @@ public sealed class BrowserInstance : IDisposable
         if (_view is null) return;
         Logger.Info($"BrowserInstance: Loading URL: {url}");
         _view.URL = url;
+
+        // Warm-up pump
+        WarmUp();
+    }
+
+    /// <summary>
+    /// Pumps the renderer several times to give the page a chance to parse,
+    /// layout, and produce initial paint during Startup (before the main loop).
+    /// </summary>
+    private void WarmUp()
+    {
+        if (_renderer is null) return;
+        for (int i = 0; i < 10; i++)
+        {
+            _renderer.Update();
+            _renderer.Render();
+        }
+        Logger.Info($"BrowserInstance: Warm-up complete (DOMReady={DiagDOMReady}, Finished={DiagPageFinished}).");
     }
 
     /// <summary>
@@ -147,15 +211,16 @@ public sealed class BrowserInstance : IDisposable
 
         DiagUpdateCount++;
 
-        // Query page title once per ~60 frames (roughly once per second)
+        // Update processes timers, JS, layout, network — may flag the view as needing paint.
+        _renderer.Update();
+
+        // Query page title once per ~60 frames AFTER Update() so the page has been processed.
         if (--_titleQueryCountdown <= 0)
         {
             _titleQueryCountdown = 60;
-            DiagPageTitle = EvaluateScript("document.title");
+            try { DiagPageTitle = _view?.Title; }
+            catch { DiagPageTitle = "(error)"; }
         }
-
-        // Update processes timers, JS, layout, network — may flag the view as needing paint.
-        _renderer.Update();
 
         // Capture the dirty state BEFORE Render(), because Render() paints the
         // dirty regions to the bitmap surface and then clears the NeedsPaint flag.
@@ -173,6 +238,48 @@ public sealed class BrowserInstance : IDisposable
         {
             IsDirty = true;
             DiagPaintCount++;
+        }
+
+        // ── Forced pixel probe (every ~120 frames) ──────────────────
+        // Bypasses IsDirty: directly locks the surface and scans for non-zero
+        // pixels to confirm whether Ultralight ever writes content.
+        if (DiagUpdateCount % 120 == 0)
+            ProbeSurfacePixels();
+    }
+
+    /// <summary>
+    /// Directly reads and scans the surface for non-zero pixels,
+    /// regardless of IsDirty state. Used for diagnostics only.
+    /// </summary>
+    private unsafe void ProbeSurfacePixels()
+    {
+        if (_view?.Surface is not { } surface) return;
+
+        var rowBytes = surface.RowBytes;
+        var byteCount = (int)(rowBytes * Height);
+        if (byteCount <= 0) return;
+
+        var ptr = surface.LockPixels();
+        try
+        {
+            var src = new ReadOnlySpan<byte>(ptr, byteCount);
+
+            // Capture first bytes
+            var previewLen = Math.Min(16, byteCount);
+            DiagFirstBytes = Convert.ToHexString(src.Slice(0, previewLen));
+
+            // Count non-zero pixels
+            long nonZero = 0;
+            for (int i = 0; i < byteCount; i += 4)
+            {
+                if (src[i] != 0 || src[i + 1] != 0 || src[i + 2] != 0 || src[i + 3] != 0)
+                    nonZero++;
+            }
+            DiagProbeNonZero = nonZero;
+        }
+        finally
+        {
+            surface.UnlockPixels();
         }
     }
 
