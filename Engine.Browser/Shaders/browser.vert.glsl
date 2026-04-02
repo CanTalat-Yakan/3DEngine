@@ -10,7 +10,6 @@ void main()
     // Produces: (0,0), (2,0), (0,2) which covers the [-1,1] NDC quad.
     vUV = vec2((gl_VertexIndex << 1) & 2, gl_VertexIndex & 2);
     gl_Position = vec4(vUV * 2.0 - 1.0, 0.0, 1.0);
-    // Flip Y so UV (0,0) is top-left (matching Ultralight bitmap layout).
-    vUV.y = 1.0 - vUV.y;
+    // Vulkan NDC Y points downward, matching Ultralight's top-left origin — no flip needed.
 }
 
