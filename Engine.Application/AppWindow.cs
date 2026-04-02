@@ -26,7 +26,7 @@ public sealed class AppWindow
         Sdl = new(windowData.Title, windowData.Width, windowData.Height, useVulkan);
     }
 
-    public AppWindow(WindowData windowData) : this(windowData, GraphicsBackend.SdlRenderer) {}
+    public AppWindow(WindowData windowData) : this(windowData, GraphicsBackend.Sdl) {}
 
     /// <summary>Returns true if this window has keyboard focus.</summary>
     public bool IsFocused()

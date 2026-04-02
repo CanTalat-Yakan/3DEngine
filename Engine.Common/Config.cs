@@ -100,7 +100,7 @@ public enum WindowCommand
 public enum GraphicsBackend
 {
     /// <summary>SDL software renderer — simple, portable, no GPU required.</summary>
-    SdlRenderer = 0,
+    Sdl = 0,
     /// <summary>Vulkan GPU-accelerated rendering.</summary>
     Vulkan = 1,
 }
