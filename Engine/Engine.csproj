@@ -31,14 +31,4 @@
         <PackageReference Include="Twizzle.ImGui-Bundle.NET" Version="1.91.5.2" />
     </ItemGroup>
 
-    <ItemGroup>
-        <None Remove="imgui.ini" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Content Include="..\README.md">
-        <Link>README.md</Link>
-      </Content>
-    </ItemGroup>
-
 </Project>
