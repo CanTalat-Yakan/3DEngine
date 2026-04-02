@@ -27,7 +27,7 @@ const string serverUrl = "http://localhost:5000";
 var shellRegistry = new ShellRegistry();
 var scriptsDir = Path.Combine(AppContext.BaseDirectory, "Shells");
 
-var compiler = new ScriptCompiler(shellRegistry)
+var compiler = new ShellCompiler(shellRegistry)
     .WatchDirectory(scriptsDir)
     .AddReference(typeof(Engine.App).Assembly)          // Engine.Common
     .AddReference(typeof(Editor.Shell.ShellRegistry).Assembly); // Editor.Shell
