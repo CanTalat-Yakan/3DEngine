@@ -9,6 +9,7 @@ public struct BrowserDebugHud
     private static readonly System.Numerics.Vector4 Red = new(1, 0.3f, 0.3f, 1);
     private static readonly System.Numerics.Vector4 Yellow = new(1, 1, 0, 1);
     private static readonly System.Numerics.Vector4 Green = new(0.3f, 1, 0.3f, 1);
+    private static string? _dumpPath;
 
     /// <summary>Draws browser debug info every render frame.</summary>
     [OnRender]
@@ -99,8 +100,8 @@ public struct BrowserDebugHud
 
         ImGui.Separator();
 
-        // ── Copy to clipboard ────────────────────────────────────────
-        if (ImGui.Button("Copy to Clipboard"))
+        // ── Dump to file ─────────────────────────────────────────────
+        if (ImGui.Button("Dump to File"))
         {
             var sb = new System.Text.StringBuilder();
             sb.AppendLine("=== Browser Debug ===");
@@ -124,8 +125,30 @@ public struct BrowserDebugHud
             sb.AppendLine($"First bytes: {b.DiagFirstBytes ?? "n/a"}");
             sb.AppendLine($"ICU data:   {(b.DiagIcuExists ? "OK" : "MISSING")}");
             sb.AppendLine($"CA certs:   {(b.DiagCaCertExists ? "OK" : "MISSING")}");
-            ImGui.SetClipboardText(sb.ToString());
+
+            // Warnings
+            if (!b.DiagDOMReady && b.DiagUpdateCount > 60)
+                sb.AppendLine("CRITICAL: DOM never became ready — page did not load!");
+            if (b.DiagLoadError is not null)
+                sb.AppendLine("CRITICAL: Page load failed!");
+            if (b.DiagUpdateCount > 60 && b.DiagPaintCount == 0)
+                sb.AppendLine("WARNING: NeedsPaint never true!");
+            if (b.DiagUpdateCount > 60 && b.DiagUploadCount == 0)
+                sb.AppendLine("WARNING: No uploads after 60+ frames!");
+            if (b.DiagUploadCount > 0 && b.DiagNonZeroPixels == 0 && b.DiagProbeNonZero == 0)
+                sb.AppendLine("WARNING: Pixels uploaded but all zero (upload + probe)!");
+            if (b.DiagUploadCount > 0 && b.DiagNonZeroPixels == 0 && b.DiagProbeNonZero > 0)
+                sb.AppendLine("HINT: Probe found pixels but upload didn't — timing issue!");
+            if (!b.DiagIcuExists)
+                sb.AppendLine("CRITICAL: icudt67l.dat missing — text layout will fail!");
+
+            var path = Path.Combine(AppContext.BaseDirectory, "browser_debug.txt");
+            File.WriteAllText(path, sb.ToString());
+            _dumpPath = path;
         }
+
+        if (_dumpPath is not null)
+            ImGui.Text($"Saved: {_dumpPath}");
 
         ImGui.End();
     }
