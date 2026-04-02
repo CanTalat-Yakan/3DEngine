@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <IsPackable>false</IsPackable>
+        <RootNamespace>Engine.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
