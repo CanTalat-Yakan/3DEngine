@@ -74,6 +74,7 @@ try
 {
     new Engine.App(config)
         .AddPlugin(new DefaultPlugins())
+        .AddPlugin(new BrowserPlugin { InitialUrl = serverUrl })
         .Run();
 }
 finally

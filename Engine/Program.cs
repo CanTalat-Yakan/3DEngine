@@ -9,5 +9,4 @@ var config = Config.GetDefault(
 new App(config)
     .AddPlugin(new DefaultPlugins())
     .AddPlugin(new BrowserPlugin())
-    .AddPlugin(new VulkanBrowserPlugin())
     .Run();
