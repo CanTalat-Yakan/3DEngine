@@ -59,6 +59,7 @@ public sealed class BrowserRenderNode : IRenderNode, IDisposable
 
             if (browser.TryGetPixels(_stagingBuffer.AsSpan(0, totalBytes), out var actualRowBytes))
             {
+                browser.DiagUploadCount++;
                 var packedRowBytes = browser.Width * 4;
 
                 if (actualRowBytes == packedRowBytes)

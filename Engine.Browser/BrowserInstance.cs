@@ -32,6 +32,29 @@ public sealed class BrowserInstance : IDisposable
     /// <summary>Row stride in bytes of the bitmap surface (may be &gt; Width*4 due to alignment).</summary>
     public uint SurfaceRowBytes => _view?.Surface?.RowBytes ?? (Width * 4);
 
+    // ── Diagnostics (read by ImGui debug window) ─────────────────────
+    public bool HasSurface => _view?.Surface is not null;
+    public bool NeedsPaintNow => _view?.NeedsPaint ?? false;
+    public int DiagUpdateCount { get; private set; }
+    public int DiagPaintCount { get; private set; }
+    public int DiagUploadCount { get; internal set; }
+    public long DiagNonZeroPixels { get; private set; }
+    public long DiagTotalPixels => Width * Height;
+
+    /// <summary>Page title retrieved via JS — updated once per second.</summary>
+    public string? DiagPageTitle { get; private set; }
+
+    /// <summary>Hex representation of the first 16 bytes of the last surface read.</summary>
+    public string? DiagFirstBytes { get; private set; }
+
+    /// <summary>Whether the ICU data file exists on disk.</summary>
+    public bool DiagIcuExists => File.Exists(Path.Combine(AppContext.BaseDirectory, "resources", "icudt67l.dat"));
+
+    /// <summary>Whether the CA certificate file exists on disk.</summary>
+    public bool DiagCaCertExists => File.Exists(Path.Combine(AppContext.BaseDirectory, "resources", "cacert.pem"));
+
+    private int _titleQueryCountdown;
+
     /// <summary>
     /// Initializes the Ultralight platform, renderer, and view.
     /// Call once during Startup.
@@ -46,10 +69,11 @@ public sealed class BrowserInstance : IDisposable
         ExtractEmbeddedResources();
 
         // ── Platform configuration via AppCore ────────────────────────
+        AppCoreMethods.SetDefaultLogger(Path.Combine(AppContext.BaseDirectory, "ultralight.log"));
         AppCoreMethods.SetPlatformFontLoader();
         AppCoreMethods.SetPlatformFileSystem(AppContext.BaseDirectory);
         ULPlatform.ErrorGPUDriverNotSet = false;
-        Logger.Info("AppCore platform font loader and file system enabled.");
+        Logger.Info("AppCore platform font loader, file system, and logger enabled.");
 
         // ── Renderer ──────────────────────────────────────────────────
         _renderer = ULPlatform.CreateRenderer();
@@ -121,16 +145,35 @@ public sealed class BrowserInstance : IDisposable
     {
         if (_renderer is null) return;
 
+        DiagUpdateCount++;
+
+        // Query page title once per ~60 frames (roughly once per second)
+        if (--_titleQueryCountdown <= 0)
+        {
+            _titleQueryCountdown = 60;
+            DiagPageTitle = EvaluateScript("document.title");
+        }
+
         // Update processes timers, JS, layout, network — may flag the view as needing paint.
         _renderer.Update();
 
         // Capture the dirty state BEFORE Render(), because Render() paints the
         // dirty regions to the bitmap surface and then clears the NeedsPaint flag.
-        if (_view is not null)
-            IsDirty = _view.NeedsPaint || IsDirty;
+        if (_view is not null && _view.NeedsPaint)
+        {
+            IsDirty = true;
+            DiagPaintCount++;
+        }
 
         // Render paints all dirty views to their surfaces.
         _renderer.Render();
+
+        // Also check AFTER Render in case this SDK version sets NeedsPaint post-render.
+        if (_view is not null && _view.NeedsPaint)
+        {
+            IsDirty = true;
+            DiagPaintCount++;
+        }
     }
 
     /// <summary>
@@ -154,7 +197,21 @@ public sealed class BrowserInstance : IDisposable
         var ptr = surface.LockPixels();
         try
         {
-            new ReadOnlySpan<byte>(ptr, byteCount).CopyTo(destination);
+            var src = new ReadOnlySpan<byte>(ptr, byteCount);
+            src.CopyTo(destination);
+
+            // Capture first 16 bytes for diagnostics
+            var previewLen = Math.Min(16, byteCount);
+            DiagFirstBytes = Convert.ToHexString(src.Slice(0, previewLen));
+
+            // Scan for non-zero pixels (diagnostics)
+            long nonZero = 0;
+            for (int i = 0; i < byteCount; i += 4)
+            {
+                if (src[i] != 0 || src[i + 1] != 0 || src[i + 2] != 0 || src[i + 3] != 0)
+                    nonZero++;
+            }
+            DiagNonZeroPixels = nonZero;
         }
         finally
         {
