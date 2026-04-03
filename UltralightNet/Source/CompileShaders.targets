@@ -1,0 +1,11 @@
+<Project>
+	<ItemGroup>
+		<Shaders Include="./shaders/*.*"/>
+	</ItemGroup>
+	<Target Name="CompileShaders" Inputs="@(Shaders)" Outputs="./shaders/compiled/**" BeforeTargets="ResolveReferences">
+        <MakeDir Directories="./shaders/compiled;./shaders/compiled/spirv;./shaders/compiled/spirv_vd;./shaders/compiled/glsl" />
+        <Exec Command="glslc -O -g -o ./shaders/compiled/spirv/%(Shaders.Filename)%(Shaders.Extension).spv %(Shaders.Identity)" EchoOff="false" />
+        <Exec Command="glslc -O -g -DVELDRID=1 -o ./shaders/compiled/spirv_vd/%(Shaders.Filename)%(Shaders.Extension).spv %(Shaders.Identity)" EchoOff="false" />
+        <Exec Command="spirv-cross --version 420 ./shaders/compiled/spirv/%(Shaders.Filename)%(Shaders.Extension).spv --output ./shaders/compiled/glsl/%(Shaders.Filename)%(Shaders.Extension)" EchoOff="false" />
+    </Target>
+</Project>

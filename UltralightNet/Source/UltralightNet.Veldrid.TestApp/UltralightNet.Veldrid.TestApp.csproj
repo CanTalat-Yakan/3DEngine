@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="TerraFX.Interop.Windows" Version="10.0.26100.2" />
+      <PackageReference Include="Veldrid" Version="4.9.0" />
+      <PackageReference Include="Veldrid.StartupUtilities" Version="4.9.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />
+      <ProjectReference Include="..\UltralightNet.Veldrid.SDL2\UltralightNet.Veldrid.SDL2.csproj" />
+      <ProjectReference Include="..\UltralightNet.Veldrid\UltralightNet.Veldrid.csproj" />
+      <ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />
+    </ItemGroup>
+
+</Project>

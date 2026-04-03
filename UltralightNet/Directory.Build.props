@@ -1,0 +1,38 @@
+<Project>
+	<PropertyGroup>
+		<UltralightVersion>1.4.0</UltralightVersion>
+
+		<TargetFramework>net8.0</TargetFramework>
+
+		<AssemblyVersion>$(UltralightVersion).0</AssemblyVersion>
+		<FileVersion>$(UltralightVersion).0</FileVersion>
+		<InformationalVersion>$(UltralightVersion)</InformationalVersion>
+		<Version>$(UltralightVersion)</Version>
+
+		<IsPackable>false</IsPackable>
+
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>disable</ImplicitUsings>
+
+		<NoWarn>1006</NoWarn>
+
+		<LangVersion>12</LangVersion>
+
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<!-- Directories -->
+	<PropertyGroup>
+		<SolutionDir>$(MSBuildThisFileDirectory)</SolutionDir>
+
+		<BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)Intermediate\$(MSBuildProjectName)</BaseIntermediateOutputPath>
+		<IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+		<MSBUildProjectExtensionsPath>$(BaseIntermediateOutputPath)</MSBUildProjectExtensionsPath>
+
+		<BuildPath>$(MSBuildThisFileDirectory)Build</BuildPath>
+		<BaseOutputPath>$(BuildPath)\$(Configuration)</BaseOutputPath>
+		<OutputPath>$(BaseOutputPath)\bin\$(MSBuildProjectName)\</OutputPath>
+	</PropertyGroup>
+</Project>
