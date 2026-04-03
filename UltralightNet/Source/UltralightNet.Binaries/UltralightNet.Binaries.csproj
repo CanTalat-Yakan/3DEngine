@@ -1,6 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<Platform>x64</Platform>
 		<Description>Ultralight native binaries</Description>
 	</PropertyGroup>
 	<ItemGroup>
