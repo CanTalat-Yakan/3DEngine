@@ -1,5 +1,4 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -18,21 +17,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet", "Source\UltralightNet\UltralightNet.csproj", "{1F8BE9AC-A40B-4F00-BA41-F1A28C197F1F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Test", "Source\UltralightNet.Test\UltralightNet.Test.csproj", "{73B85E50-C001-424A-A26F-F94ACAAD2978}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Binaries", "Source\UltralightNet.Binaries\UltralightNet.Binaries.csproj", "{0CC47EDC-9CA4-411A-B8B9-656491BE8B07}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.AppCore", "Source\UltralightNet.AppCore\UltralightNet.AppCore.csproj", "{C7D7C608-DC96-4CA8-8843-F512D9E74528}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Veldrid", "Source\UltralightNet.Veldrid\UltralightNet.Veldrid.csproj", "{644D1546-4849-45EB-8B45-DAE8333A5654}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Veldrid.SDL2", "Source\UltralightNet.Veldrid.SDL2\UltralightNet.Veldrid.SDL2.csproj", "{D2C07055-8EBB-4327-995E-612B566E4B8E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.GPUCommon", "Source\UltralightNet.GPUCommon\UltralightNet.GPUCommon.csproj", "{AAFC2484-A6BF-4E57-8AC5-9F85452B7D56}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.AppCore.Binaries", "Source\UltralightNet.AppCore.Binaries\UltralightNet.AppCore.Binaries.csproj", "{D9819CE6-5C9E-4A9B-8E16-3F6EA2046D13}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.Veldrid.TestApp", "Source\UltralightNet.Veldrid.TestApp\UltralightNet.Veldrid.TestApp.csproj", "{024BA876-72FB-4FDD-BBCF-5900550922B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,10 +33,6 @@ Global
 		{1F8BE9AC-A40B-4F00-BA41-F1A28C197F1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F8BE9AC-A40B-4F00-BA41-F1A28C197F1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F8BE9AC-A40B-4F00-BA41-F1A28C197F1F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{73B85E50-C001-424A-A26F-F94ACAAD2978}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{73B85E50-C001-424A-A26F-F94ACAAD2978}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{73B85E50-C001-424A-A26F-F94ACAAD2978}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{73B85E50-C001-424A-A26F-F94ACAAD2978}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0CC47EDC-9CA4-411A-B8B9-656491BE8B07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0CC47EDC-9CA4-411A-B8B9-656491BE8B07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CC47EDC-9CA4-411A-B8B9-656491BE8B07}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -56,26 +41,10 @@ Global
 		{C7D7C608-DC96-4CA8-8843-F512D9E74528}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7D7C608-DC96-4CA8-8843-F512D9E74528}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7D7C608-DC96-4CA8-8843-F512D9E74528}.Release|Any CPU.Build.0 = Release|Any CPU
-		{644D1546-4849-45EB-8B45-DAE8333A5654}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{644D1546-4849-45EB-8B45-DAE8333A5654}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{644D1546-4849-45EB-8B45-DAE8333A5654}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{644D1546-4849-45EB-8B45-DAE8333A5654}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D2C07055-8EBB-4327-995E-612B566E4B8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D2C07055-8EBB-4327-995E-612B566E4B8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D2C07055-8EBB-4327-995E-612B566E4B8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D2C07055-8EBB-4327-995E-612B566E4B8E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AAFC2484-A6BF-4E57-8AC5-9F85452B7D56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AAFC2484-A6BF-4E57-8AC5-9F85452B7D56}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AAFC2484-A6BF-4E57-8AC5-9F85452B7D56}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AAFC2484-A6BF-4E57-8AC5-9F85452B7D56}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D9819CE6-5C9E-4A9B-8E16-3F6EA2046D13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D9819CE6-5C9E-4A9B-8E16-3F6EA2046D13}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9819CE6-5C9E-4A9B-8E16-3F6EA2046D13}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9819CE6-5C9E-4A9B-8E16-3F6EA2046D13}.Release|Any CPU.Build.0 = Release|Any CPU
-		{024BA876-72FB-4FDD-BBCF-5900550922B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{024BA876-72FB-4FDD-BBCF-5900550922B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{024BA876-72FB-4FDD-BBCF-5900550922B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{024BA876-72FB-4FDD-BBCF-5900550922B1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
