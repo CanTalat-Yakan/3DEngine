@@ -461,9 +461,6 @@ appsettings.*.local.json
 appsettings.Local.json
 appsettings.Development.local.json
 
-# UltralightNet build output (custom output directories)
-UltralightNet/Build/
-UltralightNet/Intermediate/
 
 # CI/CD workflows to ignore
 .github/workflows/publish-nuget.yml
