@@ -1,7 +1,10 @@
 using UltralightNet;
+using UltralightNet.Enums;
+using UltralightNet.Structs;
 using UltralightNet.Platform;
 
 using ULRenderer = UltralightNet.Renderer;
+using ULPlatform = UltralightNet.Platform.Platform;
 
 namespace Engine;
 
@@ -81,7 +84,7 @@ public sealed class BrowserInstance : IDisposable
         AppCoreMethods.SetDefaultLogger(Path.Combine(AppContext.BaseDirectory, "ultralight.log"));
         AppCoreMethods.SetPlatformFontLoader();
         AppCoreMethods.SetPlatformFileSystem(AppContext.BaseDirectory);
-        ULPlatform.ErrorGPUDriverNotSet = false;
+        ULPlatform.ErrorGpuDriverNotSet = false;
         Logger.Info("AppCore platform font loader, file system, and logger enabled.");
 
         // ── Renderer ──────────────────────────────────────────────────
@@ -94,7 +97,7 @@ public sealed class BrowserInstance : IDisposable
         Logger.Info("Ultralight renderer created.");
 
         // ── View configuration (CPU/bitmap surface mode) ──────────────
-        var viewConfig = new ULViewConfig
+        var viewConfig = new ViewConfig
         {
             IsAccelerated = false,   // CPU rendering → bitmap surface
             IsTransparent = true,    // transparent background for compositing
@@ -106,14 +109,14 @@ public sealed class BrowserInstance : IDisposable
             FontFamilyFixed = "Courier New",
             FontFamilySerif = "Times New Roman",
             FontFamilySansSerif = "Arial",
-            UserAgent = "Mozilla/5.0 (3DEngine Browser) UltralightNet/1.3",
+            UserAgent = "Mozilla/5.0 (3DEngine Browser) UltralightNet/1.4",
         };
 
         _view = _renderer.CreateView(width, height, viewConfig, _renderer.DefaultSession);
         _view.Focus();
 
         // ── Register native callbacks for load tracking ──────────────
-        _view.OnDOMReady += OnDOMReadyHandler;
+        _view.OnDomReady += OnDOMReadyHandler;
         _view.OnFinishLoading += OnFinishLoadingHandler;
         _view.OnFailLoading += OnFailLoadingHandler;
         _view.OnAddConsoleMessage += OnConsoleMessageHandler;
@@ -140,10 +143,10 @@ public sealed class BrowserInstance : IDisposable
         Logger.Warn($"BrowserInstance: Page load FAILED — {DiagLoadError} (url={url})");
     }
 
-    private void OnConsoleMessageHandler(ULMessageSource source, ULMessageLevel level, string message, uint lineNumber, uint columnNumber, string sourceId)
+    private void OnConsoleMessageHandler(MessageSource source, MessageLevel level, string message, uint lineNumber, uint columnNumber, string sourceId)
     {
         DiagLastConsoleMessage = $"[{level}] {message}";
-        if (level == ULMessageLevel.Error || level == ULMessageLevel.Warning)
+        if (level == MessageLevel.Error || level == MessageLevel.Warning)
             Logger.Warn($"BrowserInstance: Console {level}: {message} ({sourceId}:{lineNumber}:{columnNumber})");
     }
 
@@ -152,7 +155,7 @@ public sealed class BrowserInstance : IDisposable
     {
         if (_view is null) return;
         Logger.Info("BrowserInstance: Loading HTML content...");
-        _view.HTML = html;
+        _view.LoadHtml(html);
 
         // Warm-up: pump the renderer a few times so the page starts parsing
         // before the main loop begins.
@@ -164,7 +167,7 @@ public sealed class BrowserInstance : IDisposable
     {
         if (_view is null) return;
         Logger.Info($"BrowserInstance: Loading URL: {url}");
-        _view.URL = url;
+        _view.Url = url;
 
         // Warm-up pump
         WarmUp();
@@ -198,7 +201,7 @@ public sealed class BrowserInstance : IDisposable
     {
         if (_view is null) return null;
         var result = _view.EvaluateScript(js, out var exception);
-        if (exception is not null)
+        if (!string.IsNullOrEmpty(exception))
         {
             Logger.Warn($"JS exception: {exception}");
             return null;
@@ -386,19 +389,19 @@ public sealed class BrowserInstance : IDisposable
     }
 
     /// <summary>Fires a mouse event into the Ultralight view.</summary>
-    public void FireMouseEvent(ULMouseEvent evt)
+    public void FireMouseEvent(MouseEvent evt)
     {
         _view?.FireMouseEvent(evt);
     }
 
     /// <summary>Fires a key event into the Ultralight view.</summary>
-    public void FireKeyEvent(ULKeyEvent evt)
+    public void FireKeyEvent(KeyEvent evt)
     {
         _view?.FireKeyEvent(evt);
     }
 
     /// <summary>Fires a scroll event into the Ultralight view.</summary>
-    public void FireScrollEvent(ULScrollEvent evt)
+    public void FireScrollEvent(ScrollEvent evt)
     {
         _view?.FireScrollEvent(evt);
     }
@@ -426,7 +429,7 @@ public sealed class BrowserInstance : IDisposable
         var resourceDir = Path.Combine(AppContext.BaseDirectory, "resources");
         Directory.CreateDirectory(resourceDir);
 
-        ExtractIfMissing(resourceDir, "icudt67l.dat", () => Resources.Icudt67ldat);
+        ExtractIfMissing(resourceDir, "icudt67l.dat", () => Resources.Icudt67Ldat);
         ExtractIfMissing(resourceDir, "cacert.pem", () => Resources.Cacertpem);
     }
 
