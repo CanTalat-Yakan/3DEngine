@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Generator", "Engine.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Renderer", "Engine.Renderer\Engine.Renderer.csproj", "{257FF756-DF85-4994-9BEF-5CB316F39BBD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Z.Engine.Tests", "Z.Engine.Tests\Z.Engine.Tests.csproj", "{03F7F5A7-B6A6-4A2B-905B-311580296CCB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Tests", "Engine.Tests\Engine.Tests.csproj", "{03F7F5A7-B6A6-4A2B-905B-311580296CCB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.Entities", "Engine.Entities\Engine.Entities.csproj", "{24790B1A-7C5A-4D71-8E7B-413184BF9121}"
 EndProject
