@@ -51,7 +51,7 @@ public sealed class BrowserPlugin : IPlugin
             Logger.Info("BrowserPlugin: Ultralight initialized and content loaded.");
 
             // Hook SDL events for input forwarding
-            if (world.TryResource<AppWindow>() is { } window)
+            if (world.TryGetResource<AppWindow>(out var window))
             {
                 window.SDLEvent += evt => BrowserInputBridge.ProcessEvent(evt, b);
 
@@ -66,7 +66,7 @@ public sealed class BrowserPlugin : IPlugin
             }
 
             // Sync the BrowserInstance into the RenderWorld for the render node
-            if (world.TryResource<Renderer>() is { } renderer)
+            if (world.TryGetResource<Renderer>(out var renderer))
             {
                 renderer.RenderWorld.Set(b);
                 Logger.Info("BrowserPlugin: BrowserInstance synced to RenderWorld.");
@@ -82,7 +82,7 @@ public sealed class BrowserPlugin : IPlugin
         // ── Cleanup: dispose Ultralight ──────────────────────────────
         app.AddSystem(Stage.Cleanup, static (World world) =>
         {
-            if (world.TryResource<BrowserInstance>() is { } b)
+            if (world.TryGetResource<BrowserInstance>(out var b))
             {
                 b.Dispose();
                 world.RemoveResource<BrowserInstance>();

@@ -6,5 +6,5 @@ namespace Engine;
 /// </summary>
 public interface IExtractSystem
 {
-    void Run(object appWorld, RenderWorld renderWorld);
+    void Run(World appWorld, RenderWorld renderWorld);
 }

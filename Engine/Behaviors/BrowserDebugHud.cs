@@ -15,8 +15,7 @@ public struct BrowserDebugHud
     [OnRender]
     public static void Draw(BehaviorContext ctx)
     {
-        var b = ctx.World.TryResource<BrowserInstance>();
-        if (b is null) return;
+        if (!ctx.World.TryGetResource<BrowserInstance>(out var b)) return;
 
         ImGui.Begin("Browser Debug", ImGuiWindowFlags.NoSavedSettings);
 

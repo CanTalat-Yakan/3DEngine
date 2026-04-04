@@ -21,8 +21,7 @@ public sealed class VulkanImGuiPlugin : IPlugin
 
         app.AddSystem(Stage.Startup, (World world) =>
         {
-            var renderer = world.TryResource<Renderer>();
-            if (renderer is null)
+            if (!world.TryGetResource<Renderer>(out var renderer))
             {
                 Logger.Warn("No Renderer resource found — ImGui render node not added.");
                 return;

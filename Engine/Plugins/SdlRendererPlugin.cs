@@ -7,9 +7,9 @@ public sealed class SdlRendererPlugin : IPlugin
 
     private sealed class ClearColorExtract : IExtractSystem
     {
-        public void Run(object appWorld, RenderWorld renderWorld)
+        public void Run(World appWorld, RenderWorld renderWorld)
         {
-            if (appWorld is World w && w.TryResource<ClearColor>() is { } cc)
+            if (appWorld.TryGetResource<ClearColor>(out var cc))
             {
                 renderWorld.Set(cc);
             }
@@ -69,7 +69,7 @@ public sealed class SdlRendererPlugin : IPlugin
         // Run Vulkan renderer after other Render stage systems
         app.AddSystem(Stage.Render, (world) =>
         {
-            if (world.TryResource<Renderer>() is { } r && r.Context.IsInitialized)
+            if (world.TryGetResource<Renderer>(out var r) && r.Context.IsInitialized)
             {
                 r.RenderFrame(world);
             }
@@ -78,7 +78,7 @@ public sealed class SdlRendererPlugin : IPlugin
         // Ensure disposal at app exit (Cleanup stage)
         app.AddSystem(Stage.Cleanup, (world) =>
         {
-            if (world.TryResource<Renderer>() is { } r)
+            if (world.TryGetResource<Renderer>(out var r))
             {
                 Logger.Info("SdlRendererPlugin: Cleanup stage — disposing Renderer...");
                 r.Dispose();

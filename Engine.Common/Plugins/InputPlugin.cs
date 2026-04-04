@@ -14,7 +14,7 @@ public sealed class InputPlugin : IPlugin
 
         var input = app.World.Resource<Input>();
 
-        if (app.World.TryResource<IInputBackend>() is { } backend)
+        if (app.World.TryGetResource<IInputBackend>(out var backend))
         {
             Logger.Info($"InputPlugin: Wiring input backend: {backend.GetType().Name}");
             backend.Initialize(app, input);

@@ -63,7 +63,7 @@ public sealed class SdlImGuiPlugin : IPlugin
             }
 
             ImGui.NewFrame();
-            if (world.TryResource<SdlImGuiRenderer>() is { } imguiRenderer)
+            if (world.TryGetResource<SdlImGuiRenderer>(out var imguiRenderer))
             {
                 imguiRenderer.NewFrame(appWindow.Sdl.Window);
             }
@@ -99,7 +99,7 @@ public sealed class SdlImGuiPlugin : IPlugin
         {
             world.Resource<AppWindow>().SDLEvent -= SdlImGuiInput.ProcessEvent;
 
-            if (world.TryResource<SdlImGuiRenderer>() is { } imguiRenderer)
+            if (world.TryGetResource<SdlImGuiRenderer>(out var imguiRenderer))
             {
                 imguiRenderer.Dispose();
                 world.RemoveResource<SdlImGuiRenderer>();

@@ -22,8 +22,7 @@ public sealed class VulkanBrowserPlugin : IPlugin
 
         app.AddSystem(Stage.Startup, (World world) =>
         {
-            var renderer = world.TryResource<Renderer>();
-            if (renderer is null)
+            if (!world.TryGetResource<Renderer>(out var renderer))
             {
                 Logger.Warn("No Renderer resource found — BrowserRenderNode not added.");
                 return;

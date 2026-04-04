@@ -42,7 +42,7 @@ public sealed class Renderer : IDisposable
     public void AddQueueSystem(IQueueSystem sys) => _queueSystems.Add(sys);
     public void AddNode(IRenderNode node) => Graph.AddNode(node);
 
-    public void RenderFrame(object appWorld)
+    public void RenderFrame(World appWorld)
     {
         if (!_initialized) Initialize();
 

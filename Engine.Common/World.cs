@@ -39,6 +39,18 @@ public sealed class World : IDisposable
     public T? TryResource<T>() where T : notnull =>
         _resources.TryGetValue(typeof(T), out var obj) ? (T?)obj : default;
 
+    /// <summary>Tries to get a resource of type T. Returns true and sets <paramref name="value"/> if found.</summary>
+    public bool TryGetResource<T>(out T value) where T : notnull
+    {
+        if (_resources.TryGetValue(typeof(T), out var obj) && obj is T typed)
+        {
+            value = typed;
+            return true;
+        }
+        value = default!;
+        return false;
+    }
+
     /// <summary>Returns a snapshot of all resource types currently stored.</summary>
     public IReadOnlyCollection<Type> ResourceTypes => _resources.Keys.ToArray();
 

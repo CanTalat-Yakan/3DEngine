@@ -11,7 +11,7 @@ public class RendererSmokeTests
         var context = new RendererContext(nullGfx);
         var renderer = new Renderer(context);
         renderer.Initialize();
-        renderer.RenderFrame(new object());
+        renderer.RenderFrame(new World());
         Assert.True(true);
     }
 }

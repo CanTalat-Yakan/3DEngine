@@ -3,11 +3,9 @@ namespace Engine;
 /// <summary>Extracts Mesh+Material entities into opaque draw lists for the renderer.</summary>
 public sealed class MeshMaterialExtract : IExtractSystem
 {
-    public void Run(object appWorld, Engine.RenderWorld renderWorld)
+    public void Run(World appWorld, RenderWorld renderWorld)
     {
-        if (appWorld is not World w) return;
-        var ecs = w.TryResource<EcsWorld>();
-        if (ecs is null) return;
+        if (!appWorld.TryGetResource<EcsWorld>(out var ecs)) return;
         var drawLists = renderWorld.TryGet<RenderDrawLists>() ?? new RenderDrawLists();
         drawLists.Clear();
 
