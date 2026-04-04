@@ -17,7 +17,7 @@ public sealed unsafe partial class GraphicsDevice
         if (_surface.Handle != 0)
         {
             Logger.Debug("Destroying VkSurfaceKHR...");
-            _instanceApi.vkDestroySurfaceKHR(_instance, _surface);
+            _instanceApi.vkDestroySurfaceKHR(_surface);
             _surface = default;
         }
     }

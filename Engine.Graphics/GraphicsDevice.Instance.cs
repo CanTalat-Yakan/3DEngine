@@ -77,7 +77,7 @@ public sealed unsafe partial class GraphicsDevice
         if (_validationEnabled)
         {
             Logger.Debug("Attaching Vulkan debug utils messenger for validation callbacks...");
-            _instanceApi.vkCreateDebugUtilsMessengerEXT(_instance, &debugCreateInfo, null, out _debugMessenger).CheckResult();
+            _instanceApi.vkCreateDebugUtilsMessengerEXT(&debugCreateInfo, null, out _debugMessenger).CheckResult();
             Logger.Debug("Debug messenger attached successfully.");
         }
     }
@@ -87,12 +87,12 @@ public sealed unsafe partial class GraphicsDevice
         if (_validationEnabled && _debugMessenger.Handle != 0)
         {
             Logger.Debug("Destroying Vulkan debug utils messenger...");
-            _instanceApi.vkDestroyDebugUtilsMessengerEXT(_instance, _debugMessenger, null);
+            _instanceApi.vkDestroyDebugUtilsMessengerEXT(_debugMessenger, null);
         }
         if (_instance.Handle != 0)
         {
             Logger.Debug("Destroying VkInstance...");
-            _instanceApi.vkDestroyInstance(_instance);
+            _instanceApi.vkDestroyInstance();
             _instance = default;
             Logger.Debug("VkInstance destroyed.");
         }

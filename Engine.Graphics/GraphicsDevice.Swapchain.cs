@@ -60,12 +60,12 @@ public sealed unsafe partial class GraphicsDevice
         }
 
         Logger.Debug($"Creating VkSwapchainKHR with {imageCount} images, sharing mode={createInfo.imageSharingMode}...");
-        _deviceApi.vkCreateSwapchainKHR(_device, &createInfo, null, out _swapchain).CheckResult();
+        _deviceApi.vkCreateSwapchainKHR(&createInfo, null, out _swapchain).CheckResult();
         Logger.Debug($"VkSwapchainKHR created (handle=0x{_swapchain.Handle:X}).");
 
-        _deviceApi.vkGetSwapchainImagesKHR(_device, _swapchain, out uint count).CheckResult();
+        _deviceApi.vkGetSwapchainImagesKHR(_swapchain, out uint count).CheckResult();
         Span<VkImage> images = stackalloc VkImage[(int)count];
-        _deviceApi.vkGetSwapchainImagesKHR(_device, _swapchain, images).CheckResult();
+        _deviceApi.vkGetSwapchainImagesKHR(_swapchain, images).CheckResult();
         _swapchainImages = images.ToArray();
         Logger.Debug($"Retrieved {_swapchainImages.Length} swapchain images.");
 
@@ -86,21 +86,21 @@ public sealed unsafe partial class GraphicsDevice
     {
         Logger.Debug($"Destroying swapchain resources — {_framebuffers.Length} framebuffers, {_swapchainImageViews.Length} image views...");
         foreach (var fb in _framebuffers)
-            if (fb.Handle != 0) _deviceApi.vkDestroyFramebuffer(_device, fb);
+            if (fb.Handle != 0) _deviceApi.vkDestroyFramebuffer(fb);
         foreach (var iv in _swapchainImageViews)
-            if (iv.Handle != 0) _deviceApi.vkDestroyImageView(_device, iv);
+            if (iv.Handle != 0) _deviceApi.vkDestroyImageView(iv);
         if (_depthImageView.Handle != 0)
-            _deviceApi.vkDestroyImageView(_device, _depthImageView);
+            _deviceApi.vkDestroyImageView(_depthImageView);
         if (_depthImage.Handle != 0)
-            _deviceApi.vkDestroyImage(_device, _depthImage);
+            _deviceApi.vkDestroyImage(_depthImage);
         if (_depthImageMemory.Handle != 0)
-            _deviceApi.vkFreeMemory(_device, _depthImageMemory);
+            _deviceApi.vkFreeMemory(_depthImageMemory);
         if (_renderPass.Handle != 0)
-            _deviceApi.vkDestroyRenderPass(_device, _renderPass);
+            _deviceApi.vkDestroyRenderPass(_renderPass);
         if (_swapchain.Handle != 0)
-            _deviceApi.vkDestroySwapchainKHR(_device, _swapchain);
+            _deviceApi.vkDestroySwapchainKHR(_swapchain);
         if (_commandPool.Handle != 0)
-            _deviceApi.vkDestroyCommandPool(_device, _commandPool);
+            _deviceApi.vkDestroyCommandPool(_commandPool);
 
         _framebuffers = Array.Empty<VkFramebuffer>();
         _swapchainImageViews = Array.Empty<VkImageView>();
@@ -180,8 +180,8 @@ public sealed unsafe partial class GraphicsDevice
             initialLayout = VkImageLayout.Undefined
         };
 
-        _deviceApi.vkCreateImage(_device, &imageInfo, null, out _depthImage).CheckResult();
-        _deviceApi.vkGetImageMemoryRequirements(_device, _depthImage, out VkMemoryRequirements req);
+        _deviceApi.vkCreateImage(&imageInfo, null, out _depthImage).CheckResult();
+        _deviceApi.vkGetImageMemoryRequirements(_depthImage, out VkMemoryRequirements req);
 
         VkMemoryAllocateInfo allocInfo = new()
         {
@@ -189,8 +189,8 @@ public sealed unsafe partial class GraphicsDevice
             memoryTypeIndex = FindMemoryType(req.memoryTypeBits, VkMemoryPropertyFlags.DeviceLocal)
         };
 
-        _deviceApi.vkAllocateMemory(_device, &allocInfo, null, out _depthImageMemory).CheckResult();
-        _deviceApi.vkBindImageMemory(_device, _depthImage, _depthImageMemory, 0).CheckResult();
+        _deviceApi.vkAllocateMemory(&allocInfo, null, out _depthImageMemory).CheckResult();
+        _deviceApi.vkBindImageMemory(_depthImage, _depthImageMemory, 0).CheckResult();
 
         VkImageViewCreateInfo viewInfo = new()
         {
@@ -200,7 +200,7 @@ public sealed unsafe partial class GraphicsDevice
             subresourceRange = new VkImageSubresourceRange(VkImageAspectFlags.Depth, 0, 1, 0, 1)
         };
 
-        _deviceApi.vkCreateImageView(_device, &viewInfo, null, out _depthImageView).CheckResult();
+        _deviceApi.vkCreateImageView(&viewInfo, null, out _depthImageView).CheckResult();
     }
 
     private void CreateImageViews()
@@ -216,7 +216,7 @@ public sealed unsafe partial class GraphicsDevice
                 components = VkComponentMapping.Rgba,
                 subresourceRange = new VkImageSubresourceRange(VkImageAspectFlags.Color, 0, 1, 0, 1)
             };
-            _deviceApi.vkCreateImageView(_device, &viewInfo, null, out _swapchainImageViews[i]).CheckResult();
+            _deviceApi.vkCreateImageView(&viewInfo, null, out _swapchainImageViews[i]).CheckResult();
         }
     }
 
@@ -281,7 +281,7 @@ public sealed unsafe partial class GraphicsDevice
             pDependencies = &dependency
         };
 
-        _deviceApi.vkCreateRenderPass(_device, &renderPassInfo, null, out _renderPass).CheckResult();
+        _deviceApi.vkCreateRenderPass(&renderPassInfo, null, out _renderPass).CheckResult();
     }
 
     private void CreateFramebuffers()
@@ -303,7 +303,7 @@ public sealed unsafe partial class GraphicsDevice
                 layers = 1
             };
 
-            _deviceApi.vkCreateFramebuffer(_device, &framebufferInfo, null, out _framebuffers[i]).CheckResult();
+            _deviceApi.vkCreateFramebuffer(&framebufferInfo, null, out _framebuffers[i]).CheckResult();
         }
     }
 
@@ -315,7 +315,7 @@ public sealed unsafe partial class GraphicsDevice
             queueFamilyIndex = _graphicsQueueFamily
         };
 
-        _deviceApi.vkCreateCommandPool(_device, &poolInfo, null, out _commandPool).CheckResult();
+        _deviceApi.vkCreateCommandPool(&poolInfo, null, out _commandPool).CheckResult();
 
         _commandBuffers = new VkCommandBuffer[MaxFramesInFlight];
         VkCommandBufferAllocateInfo allocInfo = new()
@@ -327,7 +327,7 @@ public sealed unsafe partial class GraphicsDevice
 
         fixed (VkCommandBuffer* buffers = _commandBuffers)
         {
-            _deviceApi.vkAllocateCommandBuffers(_device, &allocInfo, buffers).CheckResult();
+            _deviceApi.vkAllocateCommandBuffers(&allocInfo, buffers).CheckResult();
         }
     }
 }

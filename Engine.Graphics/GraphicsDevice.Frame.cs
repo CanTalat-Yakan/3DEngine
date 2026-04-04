@@ -9,9 +9,9 @@ public sealed unsafe partial class GraphicsDevice
         if (!IsInitialized)
             throw new InvalidOperationException("Graphics device not initialized");
 
-        _deviceApi.vkWaitForFences(_device, _inFlightFences[_currentFrame], true, ulong.MaxValue).CheckResult();
+        _deviceApi.vkWaitForFences(_inFlightFences[_currentFrame], true, ulong.MaxValue).CheckResult();
 
-        var result = _deviceApi.vkAcquireNextImageKHR(_device, _swapchain, ulong.MaxValue,
+        var result = _deviceApi.vkAcquireNextImageKHR(_swapchain, ulong.MaxValue,
             _imageAvailableSemaphores[_currentFrame], default, out uint imageIndex);
 
         if (result == VkResult.ErrorOutOfDateKHR)
@@ -70,7 +70,7 @@ public sealed unsafe partial class GraphicsDevice
             pSignalSemaphores = signalSemaphores
         };
 
-        _deviceApi.vkResetFences(_device, _inFlightFences[_currentFrame]).CheckResult();
+        _deviceApi.vkResetFences(_inFlightFences[_currentFrame]).CheckResult();
         _deviceApi.vkQueueSubmit(_graphicsQueue, 1, &submitInfo, _inFlightFences[_currentFrame]).CheckResult();
 
         VkSemaphore* presentWaitSemaphores = stackalloc VkSemaphore[1];

@@ -14,11 +14,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Vortice.Mathematics" Version="1.9.3" />
-        <PackageReference Include="Vortice.SPIRV" Version="1.0.4" />
-        <PackageReference Include="Vortice.SpirvCross" Version="1.5.3" />
-        <PackageReference Include="Vortice.Vulkan" Version="3.0.3" />
-        <PackageReference Include="Vortice.VulkanMemoryAllocator" Version="1.6.3" />
+        <PackageReference Include="Vortice.Mathematics" Version="2.1.0" />
+        <PackageReference Include="Vortice.SPIRV" Version="1.0.5" />
+        <PackageReference Include="Vortice.SpirvCross" Version="1.5.4" />
+        <PackageReference Include="Vortice.Vulkan" Version="3.2.1" />
+        <PackageReference Include="Vortice.VulkanMemoryAllocator" Version="1.7.0" />
     </ItemGroup>
 
 </Project>

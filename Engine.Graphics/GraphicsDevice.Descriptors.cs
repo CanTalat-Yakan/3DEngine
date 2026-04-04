@@ -51,7 +51,7 @@ public sealed unsafe partial class GraphicsDevice
             pBindings = bindings
         };
 
-        _deviceApi.vkCreateDescriptorSetLayout(_device, &layoutInfo, null, out _cameraSetLayout).CheckResult();
+        _deviceApi.vkCreateDescriptorSetLayout(&layoutInfo, null, out _cameraSetLayout).CheckResult();
         Logger.Debug("Descriptor set layout created.");
 
         Logger.Debug("Creating descriptor pool (64 UBOs + 64 samplers, maxSets=64)...");
@@ -66,7 +66,7 @@ public sealed unsafe partial class GraphicsDevice
             pPoolSizes = poolSizes
         };
 
-        _deviceApi.vkCreateDescriptorPool(_device, &poolInfo, null, out _descriptorPool).CheckResult();
+        _deviceApi.vkCreateDescriptorPool(&poolInfo, null, out _descriptorPool).CheckResult();
         Logger.Debug("Descriptor pool created successfully.");
     }
 
@@ -75,12 +75,12 @@ public sealed unsafe partial class GraphicsDevice
         Logger.Debug("Destroying descriptor resources (pool + layout)...");
         if (_descriptorPool.Handle != 0)
         {
-            _deviceApi.vkDestroyDescriptorPool(_device, _descriptorPool);
+            _deviceApi.vkDestroyDescriptorPool(_descriptorPool);
             _descriptorPool = default;
         }
         if (_cameraSetLayout.Handle != 0)
         {
-            _deviceApi.vkDestroyDescriptorSetLayout(_device, _cameraSetLayout);
+            _deviceApi.vkDestroyDescriptorSetLayout(_cameraSetLayout);
             _cameraSetLayout = default;
         }
     }
@@ -101,7 +101,7 @@ public sealed unsafe partial class GraphicsDevice
             pSetLayouts = layouts
         };
 
-        _deviceApi.vkAllocateDescriptorSets(_device, &allocInfo, &set).CheckResult();
+        _deviceApi.vkAllocateDescriptorSets(&allocInfo, &set).CheckResult();
         return new VulkanDescriptorSet(this, set);
     }
 
@@ -171,7 +171,7 @@ public sealed unsafe partial class GraphicsDevice
         if (writeCount == 0)
             return;
 
-        _deviceApi.vkUpdateDescriptorSets(_device, (uint)writeCount, writes, 0, null);
+        _deviceApi.vkUpdateDescriptorSets((uint)writeCount, writes, 0, null);
     }
 
     void IGraphicsDevice.UpdateDescriptorSet(IDescriptorSet descriptorSet, in UniformBufferBinding? uniformBinding, in CombinedImageSamplerBinding? samplerBinding)

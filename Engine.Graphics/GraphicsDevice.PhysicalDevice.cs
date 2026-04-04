@@ -14,12 +14,12 @@ public sealed unsafe partial class GraphicsDevice
     private partial void SelectPhysicalDevice()
     {
         Logger.Debug("Enumerating Vulkan physical devices...");
-        _instanceApi.vkEnumeratePhysicalDevices(_instance, out uint deviceCount).CheckResult();
+        _instanceApi.vkEnumeratePhysicalDevices(out uint deviceCount).CheckResult();
         if (deviceCount == 0) throw new InvalidOperationException("No Vulkan physical devices.");
         Logger.Debug($"Found {deviceCount} physical device(s).");
 
         Span<VkPhysicalDevice> devices = stackalloc VkPhysicalDevice[(int)deviceCount];
-        _instanceApi.vkEnumeratePhysicalDevices(_instance, devices).CheckResult();
+        _instanceApi.vkEnumeratePhysicalDevices(devices).CheckResult();
 
         VkPhysicalDevice? best = null;
         var bestScore = int.MinValue;

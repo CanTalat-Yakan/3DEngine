@@ -71,7 +71,7 @@ public sealed unsafe partial class GraphicsDevice : IGraphicsDevice
     {
         if (!IsInitialized) return;
         Logger.Info("Swapchain resize requested — waiting for device idle before recreating...");
-        _deviceApi.vkDeviceWaitIdle(_device).CheckResult();
+        _deviceApi.vkDeviceWaitIdle().CheckResult();
         Logger.Debug("Device idle — destroying old swapchain resources...");
         DestroySwapchainResources();
         Logger.Debug("Old swapchain resources destroyed — creating new swapchain resources...");
@@ -92,7 +92,7 @@ public sealed unsafe partial class GraphicsDevice : IGraphicsDevice
     {
         if (!IsInitialized) return;
         Logger.Info("Disposing graphics device — waiting for device idle...");
-        _deviceApi.vkDeviceWaitIdle(_device);
+        _deviceApi.vkDeviceWaitIdle();
         Logger.Debug("Destroying sync objects (semaphores, fences)...");
         DestroySyncObjects();
         Logger.Debug("Destroying swapchain resources (framebuffers, image views, render pass, command pool)...");

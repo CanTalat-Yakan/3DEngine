@@ -26,12 +26,12 @@ public sealed unsafe partial class GraphicsDevice
         {
             if (Image.Handle != 0)
             {
-                _device._deviceApi.vkDestroyImage(_device._device, Image);
+                _device._deviceApi.vkDestroyImage(Image);
                 Image = default;
             }
             if (Memory.Handle != 0)
             {
-                _device._deviceApi.vkFreeMemory(_device._device, Memory);
+                _device._deviceApi.vkFreeMemory(Memory);
                 Memory = default;
             }
         }
@@ -54,7 +54,7 @@ public sealed unsafe partial class GraphicsDevice
         {
             if (View.Handle != 0)
             {
-                _device._deviceApi.vkDestroyImageView(_device._device, View);
+                _device._deviceApi.vkDestroyImageView(View);
                 View = default;
             }
         }
@@ -77,7 +77,7 @@ public sealed unsafe partial class GraphicsDevice
         {
             if (Sampler.Handle != 0)
             {
-                _device._deviceApi.vkDestroySampler(_device._device, Sampler);
+                _device._deviceApi.vkDestroySampler(Sampler);
                 Sampler = default;
             }
         }
@@ -99,8 +99,8 @@ public sealed unsafe partial class GraphicsDevice
             initialLayout = VkImageLayout.Undefined
         };
 
-        _deviceApi.vkCreateImage(_device, &imageInfo, null, out VkImage image).CheckResult();
-        _deviceApi.vkGetImageMemoryRequirements(_device, image, out VkMemoryRequirements req);
+        _deviceApi.vkCreateImage(&imageInfo, null, out VkImage image).CheckResult();
+        _deviceApi.vkGetImageMemoryRequirements(image, out VkMemoryRequirements req);
 
         VkMemoryAllocateInfo allocInfo = new()
         {
@@ -108,8 +108,8 @@ public sealed unsafe partial class GraphicsDevice
             memoryTypeIndex = FindMemoryType(req.memoryTypeBits, VkMemoryPropertyFlags.DeviceLocal)
         };
 
-        _deviceApi.vkAllocateMemory(_device, &allocInfo, null, out VkDeviceMemory memory).CheckResult();
-        _deviceApi.vkBindImageMemory(_device, image, memory, 0).CheckResult();
+        _deviceApi.vkAllocateMemory(&allocInfo, null, out VkDeviceMemory memory).CheckResult();
+        _deviceApi.vkBindImageMemory(image, memory, 0).CheckResult();
 
         return new VulkanImage(this, image, memory, desc);
     }
@@ -135,7 +135,7 @@ public sealed unsafe partial class GraphicsDevice
             subresourceRange = new VkImageSubresourceRange(aspect, 0, 1, 0, 1)
         };
 
-        _deviceApi.vkCreateImageView(_device, &viewInfo, null, out VkImageView view).CheckResult();
+        _deviceApi.vkCreateImageView(&viewInfo, null, out VkImageView view).CheckResult();
         return new VulkanImageView(this, image, view);
     }
 
@@ -156,7 +156,7 @@ public sealed unsafe partial class GraphicsDevice
             mipmapMode = VkSamplerMipmapMode.Linear
         };
 
-        _deviceApi.vkCreateSampler(_device, &info, null, out VkSampler sampler).CheckResult();
+        _deviceApi.vkCreateSampler(&info, null, out VkSampler sampler).CheckResult();
         return new VulkanSampler(this, desc, sampler);
     }
 
@@ -316,13 +316,13 @@ public sealed unsafe partial class GraphicsDevice
 
             VkFence fence;
             VkFenceCreateInfo fenceInfo = new();
-            _deviceApi.vkCreateFence(_device, &fenceInfo, null, out fence).CheckResult();
+            _deviceApi.vkCreateFence(&fenceInfo, null, out fence).CheckResult();
 
             _deviceApi.vkQueueSubmit(_graphicsQueue, 1, &submitInfo, fence).CheckResult();
-            _deviceApi.vkWaitForFences(_device, 1, &fence, true, ulong.MaxValue).CheckResult();
+            _deviceApi.vkWaitForFences(1, &fence, true, ulong.MaxValue).CheckResult();
 
-            _deviceApi.vkDestroyFence(_device, fence);
-            _deviceApi.vkFreeCommandBuffers(_device, _commandPool, 1, &cmd);
+            _deviceApi.vkDestroyFence(fence);
+            _deviceApi.vkFreeCommandBuffers(_commandPool, 1, &cmd);
 
             vkImage.Layout = VkImageLayout.ShaderReadOnlyOptimal;
         }

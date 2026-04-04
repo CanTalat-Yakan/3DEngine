@@ -60,8 +60,8 @@ public sealed unsafe partial class GraphicsDevice
         _deviceApi = GetApi(_instance, _device);
 
         Logger.Debug("Retrieving graphics and present device queues...");
-        _deviceApi.vkGetDeviceQueue(_device, _graphicsQueueFamily, 0, out _graphicsQueue);
-        _deviceApi.vkGetDeviceQueue(_device, _presentQueueFamily, 0, out _presentQueue);
+        _deviceApi.vkGetDeviceQueue(_graphicsQueueFamily, 0, out _graphicsQueue);
+        _deviceApi.vkGetDeviceQueue(_presentQueueFamily, 0, out _presentQueue);
         Logger.Debug($"Queues retrieved — graphics=family {_graphicsQueueFamily}, present=family {_presentQueueFamily}");
     }
 
@@ -70,7 +70,7 @@ public sealed unsafe partial class GraphicsDevice
         if (_device.Handle != 0)
         {
             Logger.Debug("Destroying VkDevice...");
-            _deviceApi.vkDestroyDevice(_device);
+            _deviceApi.vkDestroyDevice();
             _device = default;
             Logger.Debug("VkDevice destroyed.");
         }

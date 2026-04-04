@@ -30,13 +30,13 @@ public sealed unsafe partial class GraphicsDevice
         {
             if (Buffer.Handle != 0)
             {
-                _device._deviceApi.vkDestroyBuffer(_device._device, Buffer);
+                _device._deviceApi.vkDestroyBuffer(Buffer);
                 Buffer = default;
             }
 
             if (Memory.Handle != 0)
             {
-                _device._deviceApi.vkFreeMemory(_device._device, Memory);
+                _device._deviceApi.vkFreeMemory(Memory);
                 Memory = default;
             }
         }
@@ -67,9 +67,9 @@ public sealed unsafe partial class GraphicsDevice
             sharingMode = VkSharingMode.Exclusive
         };
 
-        _deviceApi.vkCreateBuffer(_device, &bufferInfo, null, out VkBuffer buffer).CheckResult();
+        _deviceApi.vkCreateBuffer(&bufferInfo, null, out VkBuffer buffer).CheckResult();
 
-        _deviceApi.vkGetBufferMemoryRequirements(_device, buffer, out VkMemoryRequirements requirements);
+        _deviceApi.vkGetBufferMemoryRequirements(buffer, out VkMemoryRequirements requirements);
 
         var properties = desc.CpuAccess == CpuAccessMode.None
             ? VkMemoryPropertyFlags.DeviceLocal
@@ -83,8 +83,8 @@ public sealed unsafe partial class GraphicsDevice
             memoryTypeIndex = memoryTypeIndex
         };
 
-        _deviceApi.vkAllocateMemory(_device, &allocInfo, null, out VkDeviceMemory memory).CheckResult();
-        _deviceApi.vkBindBufferMemory(_device, buffer, memory, 0).CheckResult();
+        _deviceApi.vkAllocateMemory(&allocInfo, null, out VkDeviceMemory memory).CheckResult();
+        _deviceApi.vkBindBufferMemory(buffer, memory, 0).CheckResult();
 
         return new VulkanBuffer(this, buffer, memory, desc, desc.CpuAccess != CpuAccessMode.None);
     }
@@ -104,7 +104,7 @@ public sealed unsafe partial class GraphicsDevice
         }
 
         void* data;
-        _deviceApi.vkMapMemory(_device, vkBuffer.Memory, 0, vkBuffer.Description.Size, 0, &data).CheckResult();
+        _deviceApi.vkMapMemory(vkBuffer.Memory, 0, vkBuffer.Description.Size, 0, &data).CheckResult();
         vkBuffer.MappedPtr = (nint)data;
         return new Span<byte>(data, checked((int)vkBuffer.Description.Size));
     }
@@ -117,7 +117,7 @@ public sealed unsafe partial class GraphicsDevice
         if (!vkBuffer.IsHostVisible || vkBuffer.MappedPtr == nint.Zero)
             return;
 
-        _deviceApi.vkUnmapMemory(_device, vkBuffer.Memory);
+        _deviceApi.vkUnmapMemory(vkBuffer.Memory);
         vkBuffer.MappedPtr = nint.Zero;
     }
 
@@ -232,7 +232,7 @@ public sealed unsafe partial class GraphicsDevice
         };
 
         VkCommandBuffer cmd;
-        _deviceApi.vkAllocateCommandBuffers(_device, &allocInfo, &cmd).CheckResult();
+        _deviceApi.vkAllocateCommandBuffers(&allocInfo, &cmd).CheckResult();
 
         VkCommandBufferBeginInfo beginInfo = new()
         {
@@ -255,13 +255,13 @@ public sealed unsafe partial class GraphicsDevice
 
         VkFence fence;
         VkFenceCreateInfo fenceInfo = new();
-        _deviceApi.vkCreateFence(_device, &fenceInfo, null, out fence).CheckResult();
+        _deviceApi.vkCreateFence(&fenceInfo, null, out fence).CheckResult();
 
         _deviceApi.vkQueueSubmit(_graphicsQueue, 1, &submitInfo, fence).CheckResult();
-        _deviceApi.vkWaitForFences(_device, 1, &fence, true, ulong.MaxValue).CheckResult();
+        _deviceApi.vkWaitForFences(1, &fence, true, ulong.MaxValue).CheckResult();
 
-        _deviceApi.vkDestroyFence(_device, fence);
-        _deviceApi.vkFreeCommandBuffers(_device, _commandPool, 1, &cmd);
+        _deviceApi.vkDestroyFence(fence);
+        _deviceApi.vkFreeCommandBuffers(_commandPool, 1, &cmd);
     }
 
     private uint FindMemoryType(uint typeFilter, VkMemoryPropertyFlags properties)

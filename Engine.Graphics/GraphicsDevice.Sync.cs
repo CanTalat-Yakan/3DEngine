@@ -15,9 +15,9 @@ public sealed unsafe partial class GraphicsDevice
 
         for (int i = 0; i < MaxFramesInFlight; i++)
         {
-            _deviceApi.vkCreateSemaphore(_device, out _imageAvailableSemaphores[i]).CheckResult();
-            _deviceApi.vkCreateSemaphore(_device, out _renderFinishedSemaphores[i]).CheckResult();
-            _deviceApi.vkCreateFence(_device, &fenceInfo, null, out _inFlightFences[i]).CheckResult();
+            _deviceApi.vkCreateSemaphore(out _imageAvailableSemaphores[i]).CheckResult();
+            _deviceApi.vkCreateSemaphore(out _renderFinishedSemaphores[i]).CheckResult();
+            _deviceApi.vkCreateFence(&fenceInfo, null, out _inFlightFences[i]).CheckResult();
         }
         Logger.Debug($"Sync objects created: {MaxFramesInFlight} semaphore pairs + {MaxFramesInFlight} fences (pre-signaled).");
     }
@@ -26,11 +26,11 @@ public sealed unsafe partial class GraphicsDevice
     {
         Logger.Debug("Destroying sync objects (fences and semaphores)...");
         foreach (var fence in _inFlightFences)
-            if (fence.Handle != 0) _deviceApi.vkDestroyFence(_device, fence);
+            if (fence.Handle != 0) _deviceApi.vkDestroyFence(fence);
         foreach (var sem in _imageAvailableSemaphores)
-            if (sem.Handle != 0) _deviceApi.vkDestroySemaphore(_device, sem);
+            if (sem.Handle != 0) _deviceApi.vkDestroySemaphore(sem);
         foreach (var sem in _renderFinishedSemaphores)
-            if (sem.Handle != 0) _deviceApi.vkDestroySemaphore(_device, sem);
+            if (sem.Handle != 0) _deviceApi.vkDestroySemaphore(sem);
 
         _inFlightFences = Array.Empty<VkFence>();
         _imageAvailableSemaphores = Array.Empty<VkSemaphore>();

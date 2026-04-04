@@ -22,7 +22,7 @@ public sealed unsafe partial class GraphicsDevice
         {
             if (Module.Handle != 0)
             {
-                _device._deviceApi.vkDestroyShaderModule(_device._device, Module);
+                _device._deviceApi.vkDestroyShaderModule(Module);
                 Module = default;
             }
         }
@@ -45,12 +45,12 @@ public sealed unsafe partial class GraphicsDevice
         {
             if (Pipeline.Handle != 0)
             {
-                _device._deviceApi.vkDestroyPipeline(_device._device, Pipeline);
+                _device._deviceApi.vkDestroyPipeline(Pipeline);
                 Pipeline = default;
             }
             if (Layout.Handle != 0)
             {
-                _device._deviceApi.vkDestroyPipelineLayout(_device._device, Layout);
+                _device._deviceApi.vkDestroyPipelineLayout(Layout);
                 Layout = default;
             }
         }
@@ -66,7 +66,7 @@ public sealed unsafe partial class GraphicsDevice
                 pCode = (uint*)codePtr
             };
 
-            _deviceApi.vkCreateShaderModule(_device, &info, null, out VkShaderModule module).CheckResult();
+            _deviceApi.vkCreateShaderModule(&info, null, out VkShaderModule module).CheckResult();
             return new VulkanShader(this, desc, module);
         }
     }
@@ -216,7 +216,7 @@ public sealed unsafe partial class GraphicsDevice
             pushConstantRangeCount = (uint)pcCount,
             pPushConstantRanges = pcCount > 0 ? vkPcRanges : null
         };
-        _deviceApi.vkCreatePipelineLayout(_device, &layoutInfo, null, out VkPipelineLayout layout).CheckResult();
+        _deviceApi.vkCreatePipelineLayout(&layoutInfo, null, out VkPipelineLayout layout).CheckResult();
 
         VkGraphicsPipelineCreateInfo pipelineInfo = new()
         {
@@ -235,7 +235,7 @@ public sealed unsafe partial class GraphicsDevice
         };
 
         VkPipeline pipeline;
-        _deviceApi.vkCreateGraphicsPipelines(_device, default, 1, &pipelineInfo, null, &pipeline).CheckResult();
+        _deviceApi.vkCreateGraphicsPipelines(default, 1, &pipelineInfo, null, &pipeline).CheckResult();
         return new VulkanGraphicsPipeline(this, pipeline, layout);
     }
 
