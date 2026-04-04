@@ -11,5 +11,12 @@ public interface IMainLoopDriver
     /// until the loop ends (e.g., window close, editor stop).
     /// </summary>
     void Run(Action frameStep);
+
+    /// <summary>
+    /// Called after the Cleanup stage has finished to tear down platform resources
+    /// (e.g., destroy the SDL window). Override when the driver owns resources that
+    /// other Cleanup systems depend on.
+    /// </summary>
+    void Shutdown() { }
 }
 

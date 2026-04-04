@@ -157,6 +157,11 @@ public sealed class App : IDisposable
         Logger.Info("Running Cleanup stage — teardown and resource disposal...");
         Schedule.RunStage(Stage.Cleanup, World);
 
+        // Tear down platform resources (e.g., SDL window) *after* Cleanup systems
+        // have released GPU resources that depend on the window/surface.
+        Logger.Info("Shutting down main loop driver (platform teardown)...");
+        loop.Shutdown();
+
         // Dispose all IDisposable resources as a safety net.
         World.Dispose();
         Logger.Info("Cleanup stage complete. Application shutdown finished.");

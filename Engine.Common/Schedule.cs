@@ -64,7 +64,8 @@ public sealed class Schedule
         }
         SetSingleThreaded(Stage.Startup);
         SetSingleThreaded(Stage.Render);
-        Logger.Trace("Schedule created — all stages initialized, Startup and Render stages set to single-threaded.");
+        SetSingleThreaded(Stage.Cleanup);
+        Logger.Trace("Schedule created — all stages initialized, Startup, Render, and Cleanup stages set to single-threaded.");
     }
 
     // ── Registration ───────────────────────────────────────────────────

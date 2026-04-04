@@ -11,6 +11,14 @@ public sealed class AppWindowPlugin : IPlugin
         public void Run(Action frameStep)
         {
             window.Looping((Action)(() => frameStep()));
+            // NOTE: Do NOT destroy the SDL window here — Cleanup-stage systems
+            // (Vulkan, ImGui, Browser) still need the window/surface alive.
+        }
+
+        public void Shutdown()
+        {
+            // Called by App.Run() *after* the Cleanup stage, so all GPU
+            // resources have been released before the platform window goes away.
             window.Dispose(null);
         }
     }
