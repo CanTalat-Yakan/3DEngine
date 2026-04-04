@@ -18,6 +18,13 @@ public sealed class SdlRendererPlugin : IPlugin
 
     public void Build(App app)
     {
+        // Ensure a default clear color resource exists
+        var cfg = app.World.Resource<Config>();
+        var color = app.World.GetOrInsertResource(() => cfg.Graphics == GraphicsBackend.Vulkan
+            ? new ClearColor(0.675f, 0.086f, 0.173f, 1f)   // Tamarillo red for Vulkan
+            : new ClearColor(0.45f, 0.55f, 0.60f, 1.00f)); // blue-ish for SDL
+        Logger.Info($"Clear color set (R={color.R:F2}, G={color.G:F2}, B={color.B:F2}, A={color.A:F2}) for {cfg.Graphics} backend.");
+
         Logger.Info("SdlRendererPlugin: Creating Renderer and wiring extract/prepare/queue systems...");
         var renderer = new Renderer(new RendererContext());
         renderer.AddExtractSystem(new ClearColorExtract());
@@ -29,7 +36,6 @@ public sealed class SdlRendererPlugin : IPlugin
         Logger.Debug("Renderer resource registered with extract, prepare, and queue systems.");
 
         // Initialize Vulkan against SDL window if configured
-        var cfg = app.World.Resource<Config>();
         var window = app.World.Resource<AppWindow>();
 
         if (cfg.Graphics == GraphicsBackend.Vulkan)

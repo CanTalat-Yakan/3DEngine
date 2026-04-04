@@ -17,7 +17,6 @@ public sealed class DefaultPlugins : IPlugin
             .AddPlugin(new EcsPlugin())
             .AddPlugin(new BehaviorsPlugin())
             .AddPlugin(new SdlImGuiPlugin())
-            .AddPlugin(new ClearColorPlugin())
             .AddPlugin(new SdlRendererPlugin())
             .AddPlugin(new VulkanBrowserPlugin())
             .AddPlugin(new VulkanImGuiPlugin());
