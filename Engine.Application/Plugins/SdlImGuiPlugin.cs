@@ -20,11 +20,7 @@ public sealed class SdlImGuiPlugin : IPlugin
         io.DisplaySize = new Vector2(Math.Max(1, sdlWindow.Width), Math.Max(1, sdlWindow.Height));
         io.DeltaTime = 1f / 60f;
 
-        // Apply platform DPI scale so UI elements are readable on HiDPI displays
-        float dpiScale = 1; // sdlWindow.DisplayScale;
-        io.FontGlobalScale = dpiScale;
-        ImGui.GetStyle().ScaleAllSizes(dpiScale);
-        logger.Info($"ImGui initialized — display size: {sdlWindow.Width}x{sdlWindow.Height}, DPI scale: {dpiScale:F2}");
+        logger.Info($"ImGui initialized — display size: {sdlWindow.Width}x{sdlWindow.Height}");
 
         if (sdlWindow.Renderer != IntPtr.Zero)
         {
