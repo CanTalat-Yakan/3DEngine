@@ -39,7 +39,7 @@ public sealed class SdlWindow
         if (useVulkan)
         {
             logger.Info($"Creating SDL Vulkan window: \"{title}\" ({width}x{height})...");
-            var flags = SDL.WindowFlags.Resizable | SDL.WindowFlags.Vulkan;
+            var flags = SDL.WindowFlags.Resizable | SDL.WindowFlags.Vulkan | SDL.WindowFlags.Hidden;
             var window = SDL.CreateWindow(title, width, height, flags);
             if (window == IntPtr.Zero)
             {
@@ -55,7 +55,7 @@ public sealed class SdlWindow
         else
         {
             logger.Info($"Creating SDL window + software renderer: \"{title}\" ({width}x{height})...");
-            if (!SDL.CreateWindowAndRenderer(title, width, height, SDL.WindowFlags.Resizable, out var window, out var renderer))
+            if (!SDL.CreateWindowAndRenderer(title, width, height, SDL.WindowFlags.Resizable | SDL.WindowFlags.Hidden, out var window, out var renderer))
             {
                 var err = SDL.GetError();
                 logger.Error($"Window/renderer creation failed: {err}");
