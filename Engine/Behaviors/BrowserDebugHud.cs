@@ -3,7 +3,7 @@ using ImGuiNET;
 namespace Engine;
 
 /// <summary>ImGui diagnostic overlay for the Ultralight browser subsystem.</summary>
-[Behavior]
+// [Behavior]
 public struct BrowserDebugHud
 {
     private static readonly System.Numerics.Vector4 Red = new(1, 0.3f, 0.3f, 1);
