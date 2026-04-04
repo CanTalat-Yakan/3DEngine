@@ -12,6 +12,10 @@ public sealed class RendererContext : IDisposable
     private IBuffer[]? _cameraBuffers;
     private IDescriptorSet[]? _cameraDescriptorSets;
 
+    /// <summary>Frame-aware dynamic buffer allocator for transient GPU data.
+    /// Available after <see cref="Initialize"/> has been called.</summary>
+    public DynamicBufferAllocator? DynamicAllocator { get; private set; }
+
     public IGraphicsDevice Graphics => _graphics ?? throw new InvalidOperationException("Graphics device not created. Call Initialize first.");
 
     public RendererContext()
@@ -47,6 +51,9 @@ public sealed class RendererContext : IDisposable
 
         Logger.Debug("Creating per-swapchain-image camera uniform buffers and descriptor sets...");
         CreateCameraResources();
+
+        Logger.Debug("Creating dynamic buffer allocator...");
+        DynamicAllocator = new DynamicBufferAllocator(_graphics);
 
         Logger.Info($"RendererContext initialized in {sw.ElapsedMilliseconds}ms.");
     }
@@ -108,6 +115,10 @@ public sealed class RendererContext : IDisposable
         var frame = _graphics!.BeginFrame(clear);
         imageIndex = frame.FrameIndex;
 
+        // Advance the dynamic allocator — the fence wait inside BeginFrame guarantees
+        // this in-flight slot is idle, so resetting its cursors is safe.
+        DynamicAllocator?.BeginFrame(frame.InFlightIndex);
+
         if (_cameraBuffers is { Length: > 0 } cameraBuffers && _cameraDescriptorSets is { Length: > 0 })
         {
             var cameras = world.TryGet<RenderCameras>();
@@ -127,7 +138,7 @@ public sealed class RendererContext : IDisposable
             }
         }
 
-        return new CommandRecordingContext(frame);
+        return new CommandRecordingContext(frame, DynamicAllocator);
     }
 
     private void UploadCameraUniform(IBuffer buffer, in CameraUniform camera)
@@ -154,13 +165,16 @@ public sealed class RendererContext : IDisposable
 
         Logger.Info("RendererContext: Resize triggered — recreating swapchain and camera resources...");
         _graphics!.OnResize();
+        DynamicAllocator?.Reset();
         CreateCameraResources();
         Logger.Info("RendererContext: Resize complete.");
     }
 
     public void Dispose()
     {
-        Logger.Info("RendererContext: Disposing camera resources and graphics device...");
+        Logger.Info("RendererContext: Disposing camera resources, dynamic allocator, and graphics device...");
+        DynamicAllocator?.Dispose();
+        DynamicAllocator = null;
         if (_cameraBuffers != null)
         {
             foreach (var buf in _cameraBuffers)

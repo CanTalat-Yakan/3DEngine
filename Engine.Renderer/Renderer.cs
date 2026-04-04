@@ -50,14 +50,14 @@ public sealed class Renderer : IDisposable
         foreach (var sys in _extractSystems)
             sys.Run(appWorld, RenderWorld);
 
-        Logger.FrameTrace("RenderFrame: Running prepare systems...");
-        foreach (var sys in _prepareSystems)
-            sys.Run(RenderWorld, Context);
-
         Logger.FrameTrace("RenderFrame: Beginning frame...");
         var ctx = Context.BeginFrame(RenderWorld, out var imageIndex);
         SyncSurfaceInfo(ctx.FrameContext.Extent);
         UpdateDiagnostics(ctx.FrameContext.Extent);
+
+        Logger.FrameTrace("RenderFrame: Running prepare systems...");
+        foreach (var sys in _prepareSystems)
+            sys.Run(RenderWorld, Context, ctx);
 
         Logger.FrameTrace("RenderFrame: Running queue systems...");
         foreach (var sys in _queueSystems)

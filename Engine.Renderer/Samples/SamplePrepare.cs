@@ -1,15 +1,20 @@
 namespace Engine;
 
-/// <summary>Prepares per-frame camera uniform buffer and descriptor set for rendering.</summary>
+/// <summary>Uploads per-frame camera uniform buffer and descriptor set for rendering.
+/// Runs as a prepare system (after BeginFrame / fence wait) so the dynamic allocator
+/// is safe to use — no per-frame buffer aliasing.</summary>
 public sealed class SamplePrepare : IPrepareSystem, IDisposable
 {
-    private IBuffer? _cameraBuffer;
     private IDescriptorSet? _cameraSet;
 
-    public void Run(RenderWorld renderWorld, RendererContext ctx)
+    public void Run(RenderWorld renderWorld, RendererContext ctx, CommandRecordingContext cmds)
     {
         var cameras = renderWorld.TryGet<RenderCameras>();
         if (cameras is null || cameras.Items.Count == 0)
+            return;
+
+        var allocator = cmds.DynamicAllocator;
+        if (allocator is null)
             return;
 
         var cam = cameras.Items[0];
@@ -19,24 +24,19 @@ public sealed class SamplePrepare : IPrepareSystem, IDisposable
             Projection = cam.Projection
         };
 
-        if (_cameraBuffer is null)
-        {
-            var size = (ulong)System.Runtime.InteropServices.Marshal.SizeOf<CameraUniform>();
-            var desc = new BufferDesc(size, BufferUsage.Uniform | BufferUsage.TransferDst, CpuAccessMode.Write);
-            _cameraBuffer = ctx.Graphics.CreateBuffer(desc);
-        }
+        var sizeBytes = (ulong)System.Runtime.InteropServices.Marshal.SizeOf<CameraUniform>();
+        var alloc = allocator.Allocate(sizeBytes, BufferUsage.Uniform);
+
+        var span = allocator.Map(alloc);
+        System.Runtime.InteropServices.MemoryMarshal.Write(span, in uniform);
+        allocator.Unmap(alloc);
 
         if (_cameraSet is null)
         {
             _cameraSet = ctx.Graphics.CreateDescriptorSet();
         }
 
-        var span = ctx.Graphics.Map(_cameraBuffer);
-        System.Runtime.InteropServices.MemoryMarshal.Write(span, in uniform);
-        ctx.Graphics.Unmap(_cameraBuffer);
-
-        var sizeBytes = (ulong)System.Runtime.InteropServices.Marshal.SizeOf<CameraUniform>();
-        var uboBinding = new UniformBufferBinding(_cameraBuffer, 0, 0, sizeBytes);
+        var uboBinding = new UniformBufferBinding(alloc.Buffer, 0, alloc.Offset, sizeBytes);
         ctx.Graphics.UpdateDescriptorSet(_cameraSet, uboBinding, samplerBinding: null);
 
         renderWorld.Set(_cameraSet);
@@ -45,6 +45,5 @@ public sealed class SamplePrepare : IPrepareSystem, IDisposable
     public void Dispose()
     {
         _cameraSet?.Dispose();
-        _cameraBuffer?.Dispose();
     }
 }

@@ -6,5 +6,9 @@ namespace Engine;
 public struct Material
 {
     public Vector4 Albedo;
-    public Material(Vector4 albedo) { Albedo = albedo; }
+
+    public Material(Vector4 albedo)
+    {
+        Albedo = albedo;
+    }
 }

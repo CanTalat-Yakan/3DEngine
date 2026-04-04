@@ -7,7 +7,8 @@ namespace Engine;
 /// <summary>
 /// Render graph node that draws ImGui draw data using Vulkan.
 /// Reads draw data directly from ImGui (valid after ImGui.Render(), before next NewFrame()).
-/// Manages its own pipeline, font atlas texture, and per-frame vertex/index buffers.
+/// Manages its own pipeline and font atlas texture; vertex/index buffers are
+/// transiently allocated from the <see cref="DynamicBufferAllocator"/> each frame.
 /// </summary>
 internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
 {
@@ -25,14 +26,6 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
     private ISampler? _fontSampler;
     private IDescriptorSet? _fontDescriptorSet;
 
-    // Per-in-flight-frame vertex/index buffers (host-visible, resized as needed).
-    // Each in-flight frame slot gets its own buffer pair so that CPU writes never
-    // race with GPU reads from a previous frame that is still executing.
-    private IBuffer?[]? _vertexBuffers;
-    private IBuffer?[]? _indexBuffers;
-    private ulong[]? _vertexBufferSizes;
-    private ulong[]? _indexBufferSizes;
-
     public unsafe void Execute(RendererContext ctx, CommandRecordingContext cmds, RenderWorld renderWorld)
     {
         var drawData = ImGui.GetDrawData();
@@ -42,22 +35,12 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
         var gfx = ctx.Graphics;
         var cmd = cmds.FrameContext.CommandBuffer;
         var extent = cmds.FrameContext.Extent;
-        var flightIndex = cmds.FrameContext.InFlightIndex;
-        var framesInFlight = cmds.FrameContext.FramesInFlight;
+        var allocator = cmds.DynamicAllocator;
 
         // Lazy-init pipeline and font atlas
         if (_pipeline is null)
         {
             CreatePipelineAndFontAtlas(gfx, cmds.FrameContext.RenderPass);
-        }
-
-        // Lazy-init per-frame buffer arrays
-        if (_vertexBuffers is null || _vertexBuffers.Length != framesInFlight)
-        {
-            _vertexBuffers = new IBuffer?[framesInFlight];
-            _indexBuffers = new IBuffer?[framesInFlight];
-            _vertexBufferSizes = new ulong[framesInFlight];
-            _indexBufferSizes = new ulong[framesInFlight];
         }
 
         // Calculate total vertex/index sizes
@@ -69,19 +52,25 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
         ulong vertexSize = (ulong)(totalVertices * sizeof(ImDrawVert));
         ulong indexSize = (ulong)(totalIndices * sizeof(ushort));
 
-        // Resize buffers for this in-flight slot if needed
-        ref var vertexBuffer = ref _vertexBuffers[flightIndex];
-        ref var indexBuffer = ref _indexBuffers![flightIndex];
-        ref var vertexBufferSize = ref _vertexBufferSizes![flightIndex];
-        ref var indexBufferSize = ref _indexBufferSizes![flightIndex];
-
-        EnsureBuffer(gfx, ref vertexBuffer, ref vertexBufferSize, vertexSize, BufferUsage.Vertex);
-        EnsureBuffer(gfx, ref indexBuffer, ref indexBufferSize, indexSize, BufferUsage.Index);
+        // Allocate transient vertex/index buffers from the dynamic allocator.
+        // The allocator guarantees the backing buffer is idle (fence-waited) so
+        // CPU writes here are safe and the allocation lives until next BeginFrame
+        // recycles this in-flight slot.
+        DynamicAllocation vertexAlloc, indexAlloc;
+        if (allocator is not null)
+        {
+            vertexAlloc = allocator.Allocate(vertexSize, BufferUsage.Vertex);
+            indexAlloc = allocator.Allocate(indexSize, BufferUsage.Index);
+        }
+        else
+        {
+            return; // No allocator — cannot upload ImGui geometry
+        }
 
         // Upload vertex and index data
         {
-            var vtxSpan = gfx.Map(vertexBuffer!);
-            var idxSpan = gfx.Map(indexBuffer!);
+            var vtxSpan = allocator.Map(vertexAlloc);
+            var idxSpan = allocator.Map(indexAlloc);
 
             int vtxOffset = 0;
             int idxOffset = 0;
@@ -100,8 +89,8 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
                 idxOffset += idxBytes;
             }
 
-            gfx.Unmap(vertexBuffer!);
-            gfx.Unmap(indexBuffer!);
+            allocator.Unmap(vertexAlloc);
+            allocator.Unmap(indexAlloc);
         }
 
         // Build orthographic projection matrix
@@ -135,9 +124,9 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
         var projBytes = MemoryMarshal.AsBytes(new ReadOnlySpan<Matrix4x4>(in projection));
         gfx.PushConstants(cmd, _pipeline!, ShaderStageFlags.Vertex, 0, projBytes);
 
-        // Bind vertex and index buffers for this in-flight slot
-        gfx.BindVertexBuffers(cmd, 0, new[] { vertexBuffer! }, new ulong[] { 0 });
-        gfx.BindIndexBuffer(cmd, indexBuffer!, 0, IndexType.UInt16);
+        // Bind vertex and index buffers from dynamic allocator
+        gfx.BindVertexBuffers(cmd, 0, new[] { vertexAlloc.Buffer }, new ulong[] { vertexAlloc.Offset });
+        gfx.BindIndexBuffer(cmd, indexAlloc.Buffer, indexAlloc.Offset, IndexType.UInt16);
 
         // Render draw commands
         var clipOff = drawData.DisplayPos;
@@ -264,50 +253,8 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
         Logger.Info($"ImGui font atlas uploaded: {width}x{height} R8G8B8A8_UNorm.");
     }
 
-    private static void EnsureBuffer(IGraphicsDevice gfx, ref IBuffer? buffer, ref ulong currentSize, ulong requiredSize, BufferUsage usage)
-    {
-        if (buffer is not null && currentSize >= requiredSize)
-            return;
-
-        buffer?.Dispose();
-
-        // Round up to next power of 2 (minimum 4KB) to reduce reallocations
-        ulong newSize = Math.Max(4096, requiredSize);
-        newSize = NextPowerOfTwo(newSize);
-
-        var desc = new BufferDesc(newSize, usage, CpuAccessMode.Write);
-        buffer = gfx.CreateBuffer(desc);
-        currentSize = newSize;
-    }
-
-    private static ulong NextPowerOfTwo(ulong v)
-    {
-        v--;
-        v |= v >> 1;
-        v |= v >> 2;
-        v |= v >> 4;
-        v |= v >> 8;
-        v |= v >> 16;
-        v |= v >> 32;
-        return v + 1;
-    }
-
     public void Dispose()
     {
-        if (_indexBuffers is not null)
-        {
-            foreach (var buf in _indexBuffers)
-                buf?.Dispose();
-            _indexBuffers = null;
-        }
-        if (_vertexBuffers is not null)
-        {
-            foreach (var buf in _vertexBuffers)
-                buf?.Dispose();
-            _vertexBuffers = null;
-        }
-        _vertexBufferSizes = null;
-        _indexBufferSizes = null;
         _fontDescriptorSet?.Dispose();
         _fontSampler?.Dispose();
         _fontImageView?.Dispose();

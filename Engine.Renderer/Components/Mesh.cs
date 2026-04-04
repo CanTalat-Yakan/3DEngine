@@ -6,5 +6,9 @@ namespace Engine;
 public struct Mesh
 {
     public Vector3[] Positions;
-    public Mesh(Vector3[] positions) { Positions = positions; }
+
+    public Mesh(Vector3[] positions)
+    {
+        Positions = positions;
+    }
 }
