@@ -70,6 +70,31 @@ public sealed class AppWindow
 
             while (SDL.PollEvent(out var e))
             {
+                // ── HiDPI: scale mouse coordinates from window-space to content-space ──
+                // SDL gives coords in window logical coords (0..windowLogicalW).
+                // Content (browser/ImGui) uses Width×Height (the config resolution).
+                var evtType = (SDL.EventType)e.Type;
+                if (evtType == SDL.EventType.MouseMotion ||
+                    evtType is SDL.EventType.MouseButtonDown or SDL.EventType.MouseButtonUp)
+                {
+                    SDL.GetWindowSize(Sdl.Window, out int winW, out int winH);
+                    float scaleX = (winW > 0) ? (float)Sdl.Width / winW : 1f;
+                    float scaleY = (winH > 0) ? (float)Sdl.Height / winH : 1f;
+
+                    if (evtType == SDL.EventType.MouseMotion)
+                    {
+                        e.Motion.X *= scaleX;
+                        e.Motion.Y *= scaleY;
+                        e.Motion.XRel *= scaleX;
+                        e.Motion.YRel *= scaleY;
+                    }
+                    else
+                    {
+                        e.Button.X *= scaleX;
+                        e.Button.Y *= scaleY;
+                    }
+                }
+
                 SDLEvent?.Invoke(e);
 
                 if ((SDL.EventType)e.Type == SDL.EventType.Quit)
@@ -84,9 +109,13 @@ public sealed class AppWindow
                 }
                 if ((SDL.EventType)e.Type == SDL.EventType.WindowResized && e.Window.WindowID == SDL.GetWindowID(Sdl.Window))
                 {
-                    SDL.GetWindowSize(Sdl.Window, out int w, out int h);
-                    Sdl.Width = w; Sdl.Height = h;
-                    ResizeEvent?.Invoke(w, h);
+                    // Update display scale (may change if window moved between monitors).
+                    // Content resolution (Width/Height) stays at configured values — it's a
+                    // deliberate setting, not driven by the window manager.
+                    // The Vulkan swapchain auto-manages through VK_ERROR_OUT_OF_DATE_KHR.
+                    float resizeScale = SDL.GetWindowDisplayScale(Sdl.Window);
+                    if (resizeScale <= 0f) resizeScale = 1f;
+                    Sdl.DisplayScale = resizeScale;
                 }
             }
 

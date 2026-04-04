@@ -12,6 +12,10 @@ public sealed class SdlWindow
     public nint Window { get; private set; }
     public nint Renderer { get; private set; }
 
+    /// <summary>Display scale factor (e.g. 1.25 for 125% HiDPI). Always ≥ 1.</summary>
+    public float DisplayScale { get; internal set; } = 1f;
+
+
     public (int W, int H) Size => (Width, Height);
 
     /// <summary>Creates a new SDL window. If useVulkan is true, no SDL renderer is created and the window uses the Vulkan flag.</summary>
@@ -62,6 +66,28 @@ public sealed class SdlWindow
             Renderer = renderer;
             logger.Info($"SDL window created (handle=0x{window:X}), renderer (handle=0x{renderer:X}).");
         }
+
+        // ── HiDPI: manually scale the window so it fills the correct screen area ──
+        float scale = SDL.GetWindowDisplayScale(Window);
+        if (scale <= 0f) scale = 1f;
+        DisplayScale = scale;
+
+        if (scale > 1.001f)
+        {
+            int scaledW = (int)(width * scale);
+            int scaledH = (int)(height * scale);
+            SDL.SetWindowSize(Window, scaledW, scaledH);
+            logger.Info($"HiDPI detected (scale={scale:F2}): " +
+                $"pixel window enlarged to {scaledW}x{scaledH}, " +
+                $"content resolution stays {width}x{height}");
+        }
+
+        // Diagnostic logging
+        SDL.GetWindowSize(Window, out int actualW, out int actualH);
+        SDL.GetWindowSizeInPixels(Window, out int pixelW, out int pixelH);
+        logger.Info($"Window sizes — logical: {actualW}x{actualH}, " +
+            $"pixels: {pixelW}x{pixelH}, display scale: {scale:F2}, " +
+            $"content (Width×Height): {Width}x{Height}");
     }
 
     /// <summary>Destroys the SDL renderer and window and quits SDL.</summary>

@@ -7,13 +7,6 @@ namespace Engine;
 /// <summary>Sets up ImGui, schedules NewFrame/Render systems, and renders via ImGuiRenderer.</summary>
 public sealed class SdlImGuiPlugin : IPlugin
 {
-    private sealed class ImGuiState
-    {
-        public bool ShowDemo;
-        /// <summary>Last applied DPI scale so we can detect changes (e.g. window moved between monitors).</summary>
-        public float DpiScale = 1f;
-    }
-
     public void Build(App app)
     {
         var logger = Log.Category("Engine.ImGui");
@@ -27,9 +20,8 @@ public sealed class SdlImGuiPlugin : IPlugin
         io.DisplaySize = new Vector2(Math.Max(1, sdlWindow.Width), Math.Max(1, sdlWindow.Height));
         io.DeltaTime = 1f / 60f;
 
-        // Query the platform DPI scale and apply it to ImGui fonts & style
-        float dpiScale = SDL.GetWindowDisplayScale(sdlWindow.Window);
-        if (dpiScale <= 0f) dpiScale = 1f;
+        // Apply platform DPI scale so UI elements are readable on HiDPI displays
+        float dpiScale = 1; // sdlWindow.DisplayScale;
         io.FontGlobalScale = dpiScale;
         ImGui.GetStyle().ScaleAllSizes(dpiScale);
         logger.Info($"ImGui initialized — display size: {sdlWindow.Width}x{sdlWindow.Height}, DPI scale: {dpiScale:F2}");
@@ -49,8 +41,6 @@ public sealed class SdlImGuiPlugin : IPlugin
             io2.Fonts.GetTexDataAsRGBA32(out IntPtr _, out int _, out int _, out _);
         }
 
-        app.World.InsertResource(new ImGuiState { DpiScale = dpiScale });
-
         var appWindow = app.World.Resource<AppWindow>();
         appWindow.SDLEvent += SdlImGuiInput.ProcessEvent;
 
@@ -65,19 +55,6 @@ public sealed class SdlImGuiPlugin : IPlugin
                 ? (float)world.Resource<Time>().DeltaSeconds
                 : 1f / 60f;
 
-            // Detect DPI scale changes (e.g. window moved between monitors)
-            float currentDpiScale = SDL.GetWindowDisplayScale(appWindow.Sdl.Window);
-            if (currentDpiScale <= 0f) currentDpiScale = 1f;
-            var state = world.Resource<ImGuiState>();
-            if (MathF.Abs(currentDpiScale - state.DpiScale) > 0.01f)
-            {
-                // Undo previous scale, apply new
-                var style = ImGui.GetStyle();
-                ImGui.StyleColorsDark();
-                style.ScaleAllSizes(currentDpiScale);
-                io.FontGlobalScale = currentDpiScale;
-                state.DpiScale = currentDpiScale;
-            }
 
             // Set framebuffer scale for Vulkan mode (SDL renderer path sets this in NewFrame)
             if (appWindow.Sdl.Renderer == IntPtr.Zero)
@@ -94,12 +71,6 @@ public sealed class SdlImGuiPlugin : IPlugin
             {
                 imguiRenderer.NewFrame(appWindow.Sdl.Window);
             }
-        });
-
-        app.AddSystem(Stage.Update, (world) =>
-        {
-            var state = world.Resource<ImGuiState>();
-            if (state.ShowDemo) ImGui.ShowDemoWindow(ref state.ShowDemo);
         });
 
         app.AddSystem(Stage.Render, (world) =>
