@@ -21,6 +21,7 @@
 
     <ItemGroup>
         <PackageReference Include="AssimpNet" Version="5.0.0-beta1" />
+        <PackageReference Include="Twizzle.ImGui-Bundle.NET" Version="1.91.5.2" />
         <PackageReference Include="UniversalSceneDescription" Version="6.0.0" />
     </ItemGroup>
 
