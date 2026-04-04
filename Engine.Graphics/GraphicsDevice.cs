@@ -14,6 +14,7 @@ public sealed unsafe partial class GraphicsDevice : IGraphicsDevice
     public bool IsInitialized { get; private set; }
     public ISwapchain Swapchain => _swapchainWrapper;
     public GraphicsAdapterInfo AdapterInfo => _adapterInfo;
+    public int FramesInFlight => MaxFramesInFlight;
 
     public GraphicsDevice() => _swapchainWrapper = new VulkanSwapchain(this);
 

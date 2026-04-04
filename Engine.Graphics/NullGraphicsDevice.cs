@@ -14,11 +14,13 @@ public sealed class NullGraphicsDevice : IGraphicsDevice
     private sealed class NullFrameContext : IFrameContext
     {
         public uint FrameIndex { get; }
+        public int InFlightIndex { get; }
+        public int FramesInFlight => 1;
         public ICommandBuffer CommandBuffer { get; } = new NullCommandBuffer();
         public IRenderPass RenderPass { get; } = new NullRenderPass();
         public IFramebuffer Framebuffer { get; } = new NullFramebuffer();
         public Extent2D Extent { get; }
-        public NullFrameContext(uint idx) { FrameIndex = idx; Extent = new Extent2D(1,1); }
+        public NullFrameContext(uint idx) { FrameIndex = idx; InFlightIndex = (int)(idx % 1); Extent = new Extent2D(1,1); }
         public void Dispose() { }
     }
     private sealed class NullCommandBuffer : ICommandBuffer { }
@@ -27,6 +29,7 @@ public sealed class NullGraphicsDevice : IGraphicsDevice
 
     public bool IsInitialized { get; private set; }
     public ISwapchain Swapchain { get; } = new NullSwapchain();
+    public int FramesInFlight => 1;
     private uint _frame;
     public void Initialize(ISurfaceSource surfaceSource, string appName = "3DEngine") { IsInitialized = true; }
     public IFrameContext BeginFrame(ClearColor? clearOverride = null) { _frame++; return new NullFrameContext(_frame); }

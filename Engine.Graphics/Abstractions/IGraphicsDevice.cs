@@ -7,6 +7,9 @@ public interface IGraphicsDevice : IDisposable
     ISwapchain Swapchain { get; }
     GraphicsAdapterInfo AdapterInfo { get; }
 
+    /// <summary>Total number of frames that may be in flight simultaneously.</summary>
+    int FramesInFlight { get; }
+
     void Initialize(ISurfaceSource surfaceSource, string appName = "3DEngine");
     IFrameContext BeginFrame(ClearColor? clearOverride = null);
     void EndFrame(IFrameContext frameContext);

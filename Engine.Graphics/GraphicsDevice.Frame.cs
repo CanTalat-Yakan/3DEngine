@@ -43,7 +43,7 @@ public sealed unsafe partial class GraphicsDevice
 
         _deviceApi.vkCmdBeginRenderPass(cmd, &rpBegin, VkSubpassContents.Inline);
 
-        return new VulkanFrameContext(this, imageIndex, cmd, _swapchainExtent, _renderPass, _framebuffers[imageIndex], _resizeVersion);
+        return new VulkanFrameContext(this, imageIndex, _currentFrame, MaxFramesInFlight, cmd, _swapchainExtent, _renderPass, _framebuffers[imageIndex], _resizeVersion);
     }
 
     private partial void SubmitFrame(VulkanFrameContext ctx)
@@ -110,6 +110,8 @@ public sealed unsafe partial class GraphicsDevice
         private readonly ulong _bornResizeVersion;
 
         public uint FrameIndex { get; }
+        public int InFlightIndex { get; }
+        public int FramesInFlight { get; }
         public ICommandBuffer CommandBuffer { get; }
         public IRenderPass RenderPass { get; }
         public IFramebuffer Framebuffer { get; }
@@ -117,12 +119,15 @@ public sealed unsafe partial class GraphicsDevice
 
         internal VkCommandBuffer CommandBufferHandle { get; }
 
-        public VulkanFrameContext(GraphicsDevice owner, uint frameIndex, VkCommandBuffer cmd, VkExtent2D extent,
+        public VulkanFrameContext(GraphicsDevice owner, uint frameIndex, int inFlightIndex, int framesInFlight,
+            VkCommandBuffer cmd, VkExtent2D extent,
             VkRenderPass renderPass, VkFramebuffer framebuffer, ulong resizeVersion)
         {
             _owner = owner;
             _bornResizeVersion = resizeVersion;
             FrameIndex = frameIndex;
+            InFlightIndex = inFlightIndex;
+            FramesInFlight = framesInFlight;
             CommandBufferHandle = cmd;
             Extent = new Extent2D(extent.width, extent.height);
             RenderPass = new VulkanRenderPass(renderPass);

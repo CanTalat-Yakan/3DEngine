@@ -25,11 +25,13 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
     private ISampler? _fontSampler;
     private IDescriptorSet? _fontDescriptorSet;
 
-    // Per-frame vertex/index buffers (host-visible, resized as needed)
-    private IBuffer? _vertexBuffer;
-    private IBuffer? _indexBuffer;
-    private ulong _vertexBufferSize;
-    private ulong _indexBufferSize;
+    // Per-in-flight-frame vertex/index buffers (host-visible, resized as needed).
+    // Each in-flight frame slot gets its own buffer pair so that CPU writes never
+    // race with GPU reads from a previous frame that is still executing.
+    private IBuffer?[]? _vertexBuffers;
+    private IBuffer?[]? _indexBuffers;
+    private ulong[]? _vertexBufferSizes;
+    private ulong[]? _indexBufferSizes;
 
     public unsafe void Execute(RendererContext ctx, CommandRecordingContext cmds, RenderWorld renderWorld)
     {
@@ -40,11 +42,22 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
         var gfx = ctx.Graphics;
         var cmd = cmds.FrameContext.CommandBuffer;
         var extent = cmds.FrameContext.Extent;
+        var flightIndex = cmds.FrameContext.InFlightIndex;
+        var framesInFlight = cmds.FrameContext.FramesInFlight;
 
         // Lazy-init pipeline and font atlas
         if (_pipeline is null)
         {
             CreatePipelineAndFontAtlas(gfx, cmds.FrameContext.RenderPass);
+        }
+
+        // Lazy-init per-frame buffer arrays
+        if (_vertexBuffers is null || _vertexBuffers.Length != framesInFlight)
+        {
+            _vertexBuffers = new IBuffer?[framesInFlight];
+            _indexBuffers = new IBuffer?[framesInFlight];
+            _vertexBufferSizes = new ulong[framesInFlight];
+            _indexBufferSizes = new ulong[framesInFlight];
         }
 
         // Calculate total vertex/index sizes
@@ -56,14 +69,19 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
         ulong vertexSize = (ulong)(totalVertices * sizeof(ImDrawVert));
         ulong indexSize = (ulong)(totalIndices * sizeof(ushort));
 
-        // Resize buffers if needed
-        EnsureBuffer(gfx, ref _vertexBuffer, ref _vertexBufferSize, vertexSize, BufferUsage.Vertex);
-        EnsureBuffer(gfx, ref _indexBuffer, ref _indexBufferSize, indexSize, BufferUsage.Index);
+        // Resize buffers for this in-flight slot if needed
+        ref var vertexBuffer = ref _vertexBuffers[flightIndex];
+        ref var indexBuffer = ref _indexBuffers![flightIndex];
+        ref var vertexBufferSize = ref _vertexBufferSizes![flightIndex];
+        ref var indexBufferSize = ref _indexBufferSizes![flightIndex];
+
+        EnsureBuffer(gfx, ref vertexBuffer, ref vertexBufferSize, vertexSize, BufferUsage.Vertex);
+        EnsureBuffer(gfx, ref indexBuffer, ref indexBufferSize, indexSize, BufferUsage.Index);
 
         // Upload vertex and index data
         {
-            var vtxSpan = gfx.Map(_vertexBuffer!);
-            var idxSpan = gfx.Map(_indexBuffer!);
+            var vtxSpan = gfx.Map(vertexBuffer!);
+            var idxSpan = gfx.Map(indexBuffer!);
 
             int vtxOffset = 0;
             int idxOffset = 0;
@@ -82,8 +100,8 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
                 idxOffset += idxBytes;
             }
 
-            gfx.Unmap(_vertexBuffer!);
-            gfx.Unmap(_indexBuffer!);
+            gfx.Unmap(vertexBuffer!);
+            gfx.Unmap(indexBuffer!);
         }
 
         // Build orthographic projection matrix
@@ -117,9 +135,9 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
         var projBytes = MemoryMarshal.AsBytes(new ReadOnlySpan<Matrix4x4>(in projection));
         gfx.PushConstants(cmd, _pipeline!, ShaderStageFlags.Vertex, 0, projBytes);
 
-        // Bind vertex and index buffers
-        gfx.BindVertexBuffers(cmd, 0, new[] { _vertexBuffer! }, new ulong[] { 0 });
-        gfx.BindIndexBuffer(cmd, _indexBuffer!, 0, IndexType.UInt16);
+        // Bind vertex and index buffers for this in-flight slot
+        gfx.BindVertexBuffers(cmd, 0, new[] { vertexBuffer! }, new ulong[] { 0 });
+        gfx.BindIndexBuffer(cmd, indexBuffer!, 0, IndexType.UInt16);
 
         // Render draw commands
         var clipOff = drawData.DisplayPos;
@@ -276,8 +294,20 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
 
     public void Dispose()
     {
-        _indexBuffer?.Dispose();
-        _vertexBuffer?.Dispose();
+        if (_indexBuffers is not null)
+        {
+            foreach (var buf in _indexBuffers)
+                buf?.Dispose();
+            _indexBuffers = null;
+        }
+        if (_vertexBuffers is not null)
+        {
+            foreach (var buf in _vertexBuffers)
+                buf?.Dispose();
+            _vertexBuffers = null;
+        }
+        _vertexBufferSizes = null;
+        _indexBufferSizes = null;
         _fontDescriptorSet?.Dispose();
         _fontSampler?.Dispose();
         _fontImageView?.Dispose();
