@@ -42,13 +42,13 @@ public sealed class Renderer : IDisposable
     public void AddQueueSystem(IQueueSystem sys) => _queueSystems.Add(sys);
     public void AddNode(IRenderNode node) => Graph.AddNode(node);
 
-    public void RenderFrame(World appWorld)
+    public void RenderFrame(World world)
     {
         if (!_initialized) Initialize();
 
         Logger.FrameTrace("RenderFrame: Running extract systems...");
         foreach (var sys in _extractSystems)
-            sys.Run(appWorld, RenderWorld);
+            sys.Run(world, RenderWorld);
 
         Logger.FrameTrace("RenderFrame: Beginning frame...");
         var ctx = Context.BeginFrame(RenderWorld, out var imageIndex);

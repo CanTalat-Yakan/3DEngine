@@ -10,18 +10,18 @@ public sealed class DefaultPlugins : IPlugin
         Logger.Info("DefaultPlugins: Loading standard engine plugin set...");
 
         app.AddPlugin(new AppWindowPlugin())
-            .AddPlugin(new AppExitPlugin())
-            .AddPlugin(new ExceptionsPlugin())
-            .AddPlugin(new TimePlugin())
-            .AddPlugin(new InputPlugin())
-            .AddPlugin(new EcsPlugin())
-            .AddPlugin(new BehaviorsPlugin())
-            .AddPlugin(new SdlImGuiPlugin())
-            .AddPlugin(new SdlRendererPlugin())
-            .AddPlugin(new VulkanWebViewPlugin())
-            .AddPlugin(new VulkanImGuiPlugin());
+           .AddPlugin(new AppExitPlugin())
+           .AddPlugin(new ExceptionsPlugin())
+           .AddPlugin(new TimePlugin())
+           .AddPlugin(new InputPlugin())
+           .AddPlugin(new EcsPlugin())
+           .AddPlugin(new BehaviorsPlugin())
+           .AddPlugin(new SdlImGuiPlugin())
+           .AddPlugin(new SdlRendererPlugin())
+           .AddPlugin(new VulkanWebViewPlugin())
+           .AddPlugin(new VulkanImGuiPlugin());
 
-        app.AddSystem(Stage.First, (World world) => world.Resource<EcsWorld>().BeginFrame());
+        app.AddSystem(Stage.First, (world) => world.Resource<EcsWorld>().BeginFrame());
 
         Logger.Info("DefaultPlugins: All standard plugins loaded successfully.");
     }

@@ -5,9 +5,9 @@ namespace Engine;
 /// <summary>Extracts camera components into the render world as RenderCameras.</summary>
 public sealed class CameraExtract : IExtractSystem
 {
-    public void Run(World appWorld, RenderWorld renderWorld)
+    public void Run(World world, RenderWorld renderWorld)
     {
-        if (!appWorld.TryGetResource<EcsWorld>(out var ecs)) return;
+        if (!world.TryGetResource<EcsWorld>(out var ecs)) return;
 
         var surface = renderWorld.TryGet<RenderSurfaceInfo>();
         int surfaceW = surface?.Width > 0 ? surface!.Width : 1;

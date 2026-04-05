@@ -2,12 +2,12 @@ using System.Numerics;
 
 namespace Engine;
 
-/// <summary>Extracts camera data from the app world into the render world for the sample pipeline.</summary>
+/// <summary>Extracts camera data from the world into the render world for the sample pipeline.</summary>
 public sealed class SampleExtract : IExtractSystem
 {
-    public void Run(World appWorld, RenderWorld renderWorld)
+    public void Run(World world, RenderWorld renderWorld)
     {
-        if (!appWorld.TryGetResource<EcsWorld>(out var ecs)) return;
+        if (!world.TryGetResource<EcsWorld>(out var ecs)) return;
 
         var surface = renderWorld.TryGet<RenderSurfaceInfo>();
         int surfaceW = surface?.Width > 0 ? surface!.Width : 1;

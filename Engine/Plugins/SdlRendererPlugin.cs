@@ -7,12 +7,10 @@ public sealed class SdlRendererPlugin : IPlugin
 
     private sealed class ClearColorExtract : IExtractSystem
     {
-        public void Run(World appWorld, RenderWorld renderWorld)
+        public void Run(World world, RenderWorld renderWorld)
         {
-            if (appWorld.TryGetResource<ClearColor>(out var cc))
-            {
+            if (world.TryGetResource<ClearColor>(out var cc))
                 renderWorld.Set(cc);
-            }
         }
     }
 
@@ -70,9 +68,7 @@ public sealed class SdlRendererPlugin : IPlugin
         app.AddSystem(Stage.Render, (world) =>
         {
             if (world.TryGetResource<Renderer>(out var r) && r.Context.IsInitialized)
-            {
                 r.RenderFrame(world);
-            }
         });
 
         // Ensure disposal at app exit (Cleanup stage)
