@@ -449,7 +449,7 @@ public sealed unsafe class View : NativeContainer
 	/// </remarks>
 	/// <note>
 	/// The default Surface is BitmapSurface, but you can provide your own Surface
-	/// implementation via <see cref="Platform.SetSurfaceFactory"/> Platform::set_surface_factory().
+	/// implementation via <see cref="UltralightNet.Platform.Platform.SurfaceDefinition"/> Platform::set_surface_factory().
 	/// </note>
 	public Surface? Surface
 	{
@@ -790,7 +790,6 @@ public sealed unsafe class View : NativeContainer
 	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
 	private static void* NativeOnCreateInspectorView(nuint userData, void* caller, byte isLocal, UlString* inspectedUrl)
 	{
-		throw new Exception($"NativeOnCreateInspectorView: userData={userData}, caller={(nuint)caller}, isLocal={isLocal}, urlPtr={inspectedUrl->ToString()}");
 		var view = GetView(userData, caller).OnCreateInspectorView?.Invoke(isLocal != 0, inspectedUrl->ToString());
 		return view is null ? null : view.Handle;
 	}

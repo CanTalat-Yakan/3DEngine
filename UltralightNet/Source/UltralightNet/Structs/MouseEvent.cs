@@ -45,9 +45,9 @@ namespace UltralightNet.Structs
 			return Type == other.Type && X == other.X && Y == other.Y && Button == other.Button;
 		}
 
-		public override bool Equals(object obj)
+		public override bool Equals(object? obj)
 		{
-			return obj is MouseEvent && Equals((MouseEvent)obj);
+			return obj is MouseEvent other && Equals(other);
 		}
 
 		public override int GetHashCode()

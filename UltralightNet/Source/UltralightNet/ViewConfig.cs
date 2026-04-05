@@ -118,7 +118,7 @@ public struct ViewConfig : IEquatable<ViewConfig>
 	}
 
 	[CustomMarshaller(typeof(ViewConfig), MarshalMode.ManagedToUnmanagedIn, typeof(Marshaller))]
-	internal ref struct Marshaller
+	internal struct Marshaller
 	{
 		public uint DisplayId;
 
@@ -171,7 +171,7 @@ public struct ViewConfig : IEquatable<ViewConfig>
 		}
 	}
 
-	public bool Equals(ViewConfig other)
+	public readonly bool Equals(ViewConfig other)
 	{
 		return DisplayId == other.DisplayId && IsAccelerated == other.IsAccelerated && InitialDeviceScale.Equals(other.InitialDeviceScale) && IsTransparent == other.IsTransparent && InitialFocus == other.InitialFocus && EnableImages == other.EnableImages && EnableJavaScript == other.EnableJavaScript && EnableCompositor == other.EnableCompositor && FontFamilyStandard == other.FontFamilyStandard && FontFamilyFixed == other.FontFamilyFixed && FontFamilySerif == other.FontFamilySerif && FontFamilySansSerif == other.FontFamilySansSerif && UserAgent == other.UserAgent;
 	}

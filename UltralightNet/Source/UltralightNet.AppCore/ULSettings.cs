@@ -28,7 +28,7 @@ public struct ULSettings : IEquatable<ULSettings>
 
 	[StructLayout(LayoutKind.Sequential)]
 	[CustomMarshaller(typeof(ULSettings), MarshalMode.ManagedToUnmanagedIn, typeof(Marshaller))]
-	internal ref struct Marshaller
+	internal struct Marshaller
 	{
 		private UlString DeveloperName;
 		private UlString AppName;

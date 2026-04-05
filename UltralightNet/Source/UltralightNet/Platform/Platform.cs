@@ -237,7 +237,14 @@ namespace UltralightNet.Platform
 				if (s is not null)
 				{
 					var bytes = new byte[s.Length];
-					s.Read(bytes, 0, checked((int)s.Length));
+					int totalRead = 0;
+					while (totalRead < bytes.Length)
+					{
+						int read = s.Read(bytes, totalRead, bytes.Length - totalRead);
+						if (read == 0)
+							throw new System.IO.EndOfStreamException($"Unexpected end of stream while reading '{path}'.");
+						totalRead += read;
+					}
 					return UlBuffer.CreateFromDataCopy<byte>(bytes.AsSpan());
 				}
 

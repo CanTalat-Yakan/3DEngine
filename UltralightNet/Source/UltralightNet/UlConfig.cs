@@ -130,7 +130,7 @@ public struct UlConfig : IEquatable<UlConfig>
 	}
 
 	[CustomMarshaller(typeof(UlConfig), MarshalMode.ManagedToUnmanagedIn, typeof(Marshaller))]
-	internal ref struct Marshaller
+	internal struct Marshaller
 	{
 		public UlString CachePath;
 		public UlString ResourcePathPrefix;
@@ -197,7 +197,7 @@ public struct UlConfig : IEquatable<UlConfig>
 		}
 	}
 
-	public bool Equals(UlConfig other)
+	public readonly bool Equals(UlConfig other)
 	{
 		return CachePath == other.CachePath && ResourcePathPrefix == other.ResourcePathPrefix && FaceWinding == other.FaceWinding && FontHinting == other.FontHinting && FontGamma.Equals(other.FontGamma) && UserStylesheet == other.UserStylesheet && ForceRepaint == other.ForceRepaint && AnimationTimerDelay.Equals(other.AnimationTimerDelay) && ScrollTimerDelay.Equals(other.ScrollTimerDelay) && RecycleDelay.Equals(other.RecycleDelay) && MemoryCacheSize == other.MemoryCacheSize && PageCacheSize == other.PageCacheSize && OverrideRamSize == other.OverrideRamSize && MinLargeHeapSize == other.MinLargeHeapSize && MinSmallHeapSize == other.MinSmallHeapSize && NumRendererThreads == other.NumRendererThreads && MaxUpdateTime.Equals(other.MaxUpdateTime) && BitmapAlignment == other.BitmapAlignment && EffectQuality == other.EffectQuality;
 	}

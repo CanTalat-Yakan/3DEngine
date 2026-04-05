@@ -6,7 +6,7 @@ public enum GamepadEventType
 	/// <summary>This event type should be fired when a gamepad is connected.</summary>
 	/// <remarks>
 	///     You will need to previously declare the gamepad, its index, and details about
-	///     its axis and button layout via <see cref="Renderer.SetGamepadDetails(uint, ReadOnlySpan{char}, uint, uint)" />
+	///     its axis and button layout via <see cref="Renderer.SetGamepadDetails(uint, string, uint, uint)" />
 	///     prior to calling
 	///     <see cref="Renderer.FireGamepadEvent(GamepadEvent)" />.
 	/// </remarks>
