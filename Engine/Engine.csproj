@@ -14,12 +14,12 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Engine.Application\Engine.Application.csproj" />
-        <ProjectReference Include="..\Engine.WebView\Engine.WebView.csproj" />
         <ProjectReference Include="..\Engine.Common\Engine.Common.csproj" />
         <ProjectReference Include="..\Engine.Entities\Engine.Entities.csproj" />
+        <ProjectReference Include="..\Engine.Generator\Engine.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <ProjectReference Include="..\Engine.Graphics\Engine.Graphics.csproj" />
         <ProjectReference Include="..\Engine.Renderer\Engine.Renderer.csproj" />
-        <ProjectReference Include="..\Engine.Generator\Engine.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\Engine.WebView\Engine.WebView.csproj" />
     </ItemGroup>
 
     <ItemGroup>
