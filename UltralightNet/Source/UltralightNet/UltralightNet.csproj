@@ -2,10 +2,6 @@
 	<PropertyGroup>
 		<UseAppHost>true</UseAppHost>
 		<Description>Ultralight .NET bindings</Description>
-		<NoWarn>$(NoWarn);8974;1816;1591</NoWarn>
-		<!-- CS8974 creates noise with GCHandle.Alloc (dotnet/roslyn-analyzers#6816) -->
-		<!-- CA1816 creates noise in some Dispose() methods of Wrapper classes -->
-		<!-- CS1591 suppresses missing XML comment warnings for public APIs -->
 	</PropertyGroup>
 	
 	<ItemGroup>
