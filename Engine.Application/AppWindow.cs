@@ -116,6 +116,9 @@ public sealed class AppWindow
                     float resizeScale = SDL.GetWindowDisplayScale(Sdl.Window);
                     if (resizeScale <= 0f) resizeScale = 1f;
                     Sdl.DisplayScale = resizeScale;
+
+                    SDL.GetWindowSize(Sdl.Window, out int winW, out int winH);
+                    ResizeEvent?.Invoke(winW, winH);
                 }
             }
 
