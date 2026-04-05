@@ -15,85 +15,85 @@ public struct WebViewDebugHud
     [OnRender]
     public static void Draw(BehaviorContext ctx)
     {
-        if (!ctx.World.TryGetResource<WebViewInstance>(out var b)) return;
+        if (!ctx.World.TryGetResource<WebViewInstance>(out var w)) return;
 
         ImGui.Begin("WebView Debug", ImGuiWindowFlags.NoSavedSettings);
 
         // ── View info ────────────────────────────────────────────────
-        ImGui.Text($"View:       {b.Width}x{b.Height}");
-        ImGui.Text($"Surface:    {(b.HasSurface ? "YES" : "NO")}");
-        ImGui.Text($"RowBytes:   {b.SurfaceRowBytes}  (expected {b.Width * 4})");
-        ImGui.Text($"Page Title: {b.DiagPageTitle ?? "(null)"}");
+        ImGui.Text($"View:       {w.Width}x{w.Height}");
+        ImGui.Text($"Surface:    {(w.HasSurface ? "YES" : "NO")}");
+        ImGui.Text($"RowBytes:   {w.SurfaceRowBytes}  (expected {w.Width * 4})");
+        ImGui.Text($"Page Title: {w.DiagPageTitle ?? "(null)"}");
 
         ImGui.Separator();
 
         // ── Page load state (from native callbacks) ──────────────────
-        ImGui.TextColored(b.DiagDOMReady ? Green : Yellow,
-            $"DOM Ready:  {b.DiagDOMReady}");
-        ImGui.TextColored(b.DiagPageFinished ? Green : Yellow,
-            $"Page Done:  {b.DiagPageFinished}");
-        if (b.DiagLoadError is not null)
-            ImGui.TextColored(Red, $"Load Error: {b.DiagLoadError}");
-        if (b.DiagLastConsoleMessage is not null)
-            ImGui.Text($"Console:    {b.DiagLastConsoleMessage}");
+        ImGui.TextColored(w.DiagDOMReady ? Green : Yellow,
+            $"DOM Ready:  {w.DiagDOMReady}");
+        ImGui.TextColored(w.DiagPageFinished ? Green : Yellow,
+            $"Page Done:  {w.DiagPageFinished}");
+        if (w.DiagLoadError is not null)
+            ImGui.TextColored(Red, $"Load Error: {w.DiagLoadError}");
+        if (w.DiagLastConsoleMessage is not null)
+            ImGui.Text($"Console:    {w.DiagLastConsoleMessage}");
 
         ImGui.Separator();
 
         // ── Frame counters ───────────────────────────────────────────
-        ImGui.Text($"Updates:    {b.DiagUpdateCount}");
-        ImGui.Text($"Paints:     {b.DiagPaintCount}");
-        ImGui.Text($"Uploads:    {b.DiagUploadCount}");
-        ImGui.Text($"IsDirty:    {b.IsDirty}");
-        ImGui.Text($"NeedsPaint: {b.NeedsPaintNow}");
+        ImGui.Text($"Updates:    {w.DiagUpdateCount}");
+        ImGui.Text($"Paints:     {w.DiagPaintCount}");
+        ImGui.Text($"Uploads:    {w.DiagUploadCount}");
+        ImGui.Text($"IsDirty:    {w.IsDirty}");
+        ImGui.Text($"NeedsPaint: {w.NeedsPaintNow}");
 
         ImGui.Separator();
 
         // ── Pixel content ────────────────────────────────────────────
-        var pct = b.DiagTotalPixels > 0
-            ? (double)b.DiagNonZeroPixels / b.DiagTotalPixels * 100.0
+        var pct = w.DiagTotalPixels > 0
+            ? (double)w.DiagNonZeroPixels / w.DiagTotalPixels * 100.0
             : 0;
-        ImGui.Text($"Non-zero (upload): {b.DiagNonZeroPixels}/{b.DiagTotalPixels} ({pct:F1}%)");
+        ImGui.Text($"Non-zero (upload): {w.DiagNonZeroPixels}/{w.DiagTotalPixels} ({pct:F1}%)");
 
-        var probePct = b.DiagTotalPixels > 0
-            ? (double)b.DiagProbeNonZero / b.DiagTotalPixels * 100.0
+        var probePct = w.DiagTotalPixels > 0
+            ? (double)w.DiagProbeNonZero / w.DiagTotalPixels * 100.0
             : 0;
-        ImGui.Text($"Non-zero (probe):  {b.DiagProbeNonZero}/{b.DiagTotalPixels} ({probePct:F1}%)");
-        ImGui.Text($"First bytes: {b.DiagFirstBytes ?? "n/a"}");
+        ImGui.Text($"Non-zero (probe):  {w.DiagProbeNonZero}/{w.DiagTotalPixels} ({probePct:F1}%)");
+        ImGui.Text($"First bytes: {w.DiagFirstBytes ?? "n/a"}");
 
         ImGui.Separator();
 
         // ── Resource files on disk ───────────────────────────────────
-        ImGui.Text($"ICU data:   {(b.DiagIcuExists ? "OK" : "MISSING")}");
-        ImGui.Text($"CA certs:   {(b.DiagCaCertExists ? "OK" : "MISSING")}");
+        ImGui.Text($"ICU data:   {(w.DiagIcuExists ? "OK" : "MISSING")}");
+        ImGui.Text($"CA certs:   {(w.DiagCaCertExists ? "OK" : "MISSING")}");
 
         ImGui.Separator();
 
         // ── Warnings ─────────────────────────────────────────────────
-        if (!b.DiagDOMReady && b.DiagUpdateCount > 60)
+        if (!w.DiagDOMReady && w.DiagUpdateCount > 60)
             ImGui.TextColored(Red,
                 "CRITICAL: DOM never became ready — page did not load!");
 
-        if (b.DiagLoadError is not null)
+        if (w.DiagLoadError is not null)
             ImGui.TextColored(Red,
                 "CRITICAL: Page load failed! Check log for details.");
 
-        if (b.DiagUpdateCount > 60 && b.DiagPaintCount == 0)
+        if (w.DiagUpdateCount > 60 && w.DiagPaintCount == 0)
             ImGui.TextColored(Red,
                 "WARNING: NeedsPaint never true!");
 
-        if (b.DiagUpdateCount > 60 && b.DiagUploadCount == 0)
+        if (w.DiagUpdateCount > 60 && w.DiagUploadCount == 0)
             ImGui.TextColored(Red,
                 "WARNING: No uploads after 60+ frames!");
 
-        if (b.DiagUploadCount > 0 && b.DiagNonZeroPixels == 0 && b.DiagProbeNonZero == 0)
+        if (w.DiagUploadCount > 0 && w.DiagNonZeroPixels == 0 && w.DiagProbeNonZero == 0)
             ImGui.TextColored(Yellow,
                 "WARNING: Pixels uploaded but all zero (upload + probe)!");
 
-        if (b.DiagUploadCount > 0 && b.DiagNonZeroPixels == 0 && b.DiagProbeNonZero > 0)
+        if (w.DiagUploadCount > 0 && w.DiagNonZeroPixels == 0 && w.DiagProbeNonZero > 0)
             ImGui.TextColored(Yellow,
                 "HINT: Probe found pixels but upload didn't — timing issue!");
 
-        if (!b.DiagIcuExists)
+        if (!w.DiagIcuExists)
             ImGui.TextColored(Red,
                 "CRITICAL: icudt67l.dat missing — text layout will fail!");
 
@@ -104,41 +104,41 @@ public struct WebViewDebugHud
         {
             var sb = new System.Text.StringBuilder();
             sb.AppendLine("=== WebView Debug ===");
-            sb.AppendLine($"View:       {b.Width}x{b.Height}");
-            sb.AppendLine($"Surface:    {(b.HasSurface ? "YES" : "NO")}");
-            sb.AppendLine($"RowBytes:   {b.SurfaceRowBytes}  (expected {b.Width * 4})");
-            sb.AppendLine($"Page Title: {b.DiagPageTitle ?? "(null)"}");
-            sb.AppendLine($"DOM Ready:  {b.DiagDOMReady}");
-            sb.AppendLine($"Page Done:  {b.DiagPageFinished}");
-            if (b.DiagLoadError is not null)
-                sb.AppendLine($"Load Error: {b.DiagLoadError}");
-            if (b.DiagLastConsoleMessage is not null)
-                sb.AppendLine($"Console:    {b.DiagLastConsoleMessage}");
-            sb.AppendLine($"Updates:    {b.DiagUpdateCount}");
-            sb.AppendLine($"Paints:     {b.DiagPaintCount}");
-            sb.AppendLine($"Uploads:    {b.DiagUploadCount}");
-            sb.AppendLine($"IsDirty:    {b.IsDirty}");
-            sb.AppendLine($"NeedsPaint: {b.NeedsPaintNow}");
-            sb.AppendLine($"Non-zero (upload): {b.DiagNonZeroPixels}/{b.DiagTotalPixels}");
-            sb.AppendLine($"Non-zero (probe):  {b.DiagProbeNonZero}/{b.DiagTotalPixels}");
-            sb.AppendLine($"First bytes: {b.DiagFirstBytes ?? "n/a"}");
-            sb.AppendLine($"ICU data:   {(b.DiagIcuExists ? "OK" : "MISSING")}");
-            sb.AppendLine($"CA certs:   {(b.DiagCaCertExists ? "OK" : "MISSING")}");
+            sb.AppendLine($"View:       {w.Width}x{w.Height}");
+            sb.AppendLine($"Surface:    {(w.HasSurface ? "YES" : "NO")}");
+            sb.AppendLine($"RowBytes:   {w.SurfaceRowBytes}  (expected {w.Width * 4})");
+            sb.AppendLine($"Page Title: {w.DiagPageTitle ?? "(null)"}");
+            sb.AppendLine($"DOM Ready:  {w.DiagDOMReady}");
+            sb.AppendLine($"Page Done:  {w.DiagPageFinished}");
+            if (w.DiagLoadError is not null)
+                sb.AppendLine($"Load Error: {w.DiagLoadError}");
+            if (w.DiagLastConsoleMessage is not null)
+                sb.AppendLine($"Console:    {w.DiagLastConsoleMessage}");
+            sb.AppendLine($"Updates:    {w.DiagUpdateCount}");
+            sb.AppendLine($"Paints:     {w.DiagPaintCount}");
+            sb.AppendLine($"Uploads:    {w.DiagUploadCount}");
+            sb.AppendLine($"IsDirty:    {w.IsDirty}");
+            sb.AppendLine($"NeedsPaint: {w.NeedsPaintNow}");
+            sb.AppendLine($"Non-zero (upload): {w.DiagNonZeroPixels}/{w.DiagTotalPixels}");
+            sb.AppendLine($"Non-zero (probe):  {w.DiagProbeNonZero}/{w.DiagTotalPixels}");
+            sb.AppendLine($"First bytes: {w.DiagFirstBytes ?? "n/a"}");
+            sb.AppendLine($"ICU data:   {(w.DiagIcuExists ? "OK" : "MISSING")}");
+            sb.AppendLine($"CA certs:   {(w.DiagCaCertExists ? "OK" : "MISSING")}");
 
             // Warnings
-            if (!b.DiagDOMReady && b.DiagUpdateCount > 60)
+            if (!w.DiagDOMReady && w.DiagUpdateCount > 60)
                 sb.AppendLine("CRITICAL: DOM never became ready — page did not load!");
-            if (b.DiagLoadError is not null)
+            if (w.DiagLoadError is not null)
                 sb.AppendLine("CRITICAL: Page load failed!");
-            if (b.DiagUpdateCount > 60 && b.DiagPaintCount == 0)
+            if (w.DiagUpdateCount > 60 && w.DiagPaintCount == 0)
                 sb.AppendLine("WARNING: NeedsPaint never true!");
-            if (b.DiagUpdateCount > 60 && b.DiagUploadCount == 0)
+            if (w.DiagUpdateCount > 60 && w.DiagUploadCount == 0)
                 sb.AppendLine("WARNING: No uploads after 60+ frames!");
-            if (b.DiagUploadCount > 0 && b.DiagNonZeroPixels == 0 && b.DiagProbeNonZero == 0)
+            if (w.DiagUploadCount > 0 && w.DiagNonZeroPixels == 0 && w.DiagProbeNonZero == 0)
                 sb.AppendLine("WARNING: Pixels uploaded but all zero (upload + probe)!");
-            if (b.DiagUploadCount > 0 && b.DiagNonZeroPixels == 0 && b.DiagProbeNonZero > 0)
+            if (w.DiagUploadCount > 0 && w.DiagNonZeroPixels == 0 && w.DiagProbeNonZero > 0)
                 sb.AppendLine("HINT: Probe found pixels but upload didn't — timing issue!");
-            if (!b.DiagIcuExists)
+            if (!w.DiagIcuExists)
                 sb.AppendLine("CRITICAL: icudt67l.dat missing — text layout will fail!");
 
             var path = Path.Combine(AppContext.BaseDirectory, "webview_debug.txt");
