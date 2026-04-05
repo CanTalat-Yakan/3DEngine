@@ -3,11 +3,10 @@
     <PropertyGroup>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         
-        <Title>3DEngine Browser</Title>
-        <PackageId>3DEngine.Browser</PackageId>
+        <Title>3DEngine WebView</Title>
+        <PackageId>3DEngine.WebView</PackageId>
         <Version>1.0.0</Version>
-        <Description>UltralightNet HTML/CSS/JS browser overlay integrated with the Vulkan render pipeline.</Description>
-        <RootNamespace>Engine.Browser</RootNamespace>
+        <Description>UltralightNet HTML/CSS/JS webview overlay integrated with the Vulkan render pipeline.</Description>
     </PropertyGroup>
 
     <ItemGroup>
@@ -21,7 +20,7 @@
 
     <ItemGroup>
         <Content Include="Shaders\**\*.glsl" CopyToOutputDirectory="PreserveNewest" Link="Source\Shaders\%(Filename)%(Extension)" />
-        <EmbeddedResource Include="Source\default.html" LogicalName="Engine.Browser.default.html" />
+        <EmbeddedResource Include="Source\default.html" LogicalName="Engine.WebView.default.html" />
     </ItemGroup>
 
 </Project>

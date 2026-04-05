@@ -2,22 +2,22 @@ using ImGuiNET;
 
 namespace Engine;
 
-/// <summary>ImGui diagnostic overlay for the Ultralight browser subsystem.</summary>
+/// <summary>ImGui diagnostic overlay for the Ultralight webview subsystem.</summary>
 // [Behavior]
-public struct BrowserDebugHud
+public struct WebViewDebugHud
 {
     private static readonly System.Numerics.Vector4 Red = new(1, 0.3f, 0.3f, 1);
     private static readonly System.Numerics.Vector4 Yellow = new(1, 1, 0, 1);
     private static readonly System.Numerics.Vector4 Green = new(0.3f, 1, 0.3f, 1);
     private static string? _dumpPath;
 
-    /// <summary>Draws browser debug info every render frame.</summary>
+    /// <summary>Draws webview debug info every render frame.</summary>
     [OnRender]
     public static void Draw(BehaviorContext ctx)
     {
-        if (!ctx.World.TryGetResource<BrowserInstance>(out var b)) return;
+        if (!ctx.World.TryGetResource<WebViewInstance>(out var b)) return;
 
-        ImGui.Begin("Browser Debug", ImGuiWindowFlags.NoSavedSettings);
+        ImGui.Begin("WebView Debug", ImGuiWindowFlags.NoSavedSettings);
 
         // ── View info ────────────────────────────────────────────────
         ImGui.Text($"View:       {b.Width}x{b.Height}");
@@ -103,7 +103,7 @@ public struct BrowserDebugHud
         if (ImGui.Button("Dump to File"))
         {
             var sb = new System.Text.StringBuilder();
-            sb.AppendLine("=== Browser Debug ===");
+            sb.AppendLine("=== WebView Debug ===");
             sb.AppendLine($"View:       {b.Width}x{b.Height}");
             sb.AppendLine($"Surface:    {(b.HasSurface ? "YES" : "NO")}");
             sb.AppendLine($"RowBytes:   {b.SurfaceRowBytes}  (expected {b.Width * 4})");
@@ -141,7 +141,7 @@ public struct BrowserDebugHud
             if (!b.DiagIcuExists)
                 sb.AppendLine("CRITICAL: icudt67l.dat missing — text layout will fail!");
 
-            var path = Path.Combine(AppContext.BaseDirectory, "browser_debug.txt");
+            var path = Path.Combine(AppContext.BaseDirectory, "webview_debug.txt");
             File.WriteAllText(path, sb.ToString());
             _dumpPath = path;
         }

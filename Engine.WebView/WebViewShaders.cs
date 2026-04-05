@@ -1,7 +1,7 @@
 namespace Engine;
 
-/// <summary>Loads and optionally compiles browser overlay SPIR-V shaders from GLSL sources.</summary>
-public static class BrowserShaders
+/// <summary>Loads and optionally compiles webview overlay SPIR-V shaders from GLSL sources.</summary>
+public static class WebViewShaders
 {
     private static readonly ILogger Logger = Log.Category("Engine.WebView.Shaders");
 
@@ -10,15 +10,15 @@ public static class BrowserShaders
     public static ReadOnlyMemory<byte> Vertex { get; private set; } = ReadOnlyMemory<byte>.Empty;
     public static ReadOnlyMemory<byte> Fragment { get; private set; } = ReadOnlyMemory<byte>.Empty;
 
-    /// <summary>Ensures that the browser overlay shaders are loaded and compiled. Idempotent.</summary>
+    /// <summary>Ensures that the webview overlay shaders are loaded and compiled. Idempotent.</summary>
     public static void EnsureLoaded()
     {
         if (_loaded) return;
 
-        Logger.Info("Loading browser overlay shaders...");
+        Logger.Info("Loading webview overlay shaders...");
         var baseDir = AppContext.BaseDirectory;
-        var vertGlslPath = Path.Combine(baseDir, "Source", "Shaders", "browser.vert.glsl");
-        var fragGlslPath = Path.Combine(baseDir, "Source", "Shaders", "browser.frag.glsl");
+        var vertGlslPath = Path.Combine(baseDir, "Source", "Shaders", "webview.vert.glsl");
+        var fragGlslPath = Path.Combine(baseDir, "Source", "Shaders", "webview.frag.glsl");
         var vertSpvPath = Path.ChangeExtension(vertGlslPath, ".vert.spv");
         var fragSpvPath = Path.ChangeExtension(fragGlslPath, ".frag.spv");
 
@@ -28,7 +28,7 @@ public static class BrowserShaders
             Vertex = File.ReadAllBytes(vertSpvPath);
             Fragment = File.ReadAllBytes(fragSpvPath);
             _loaded = true;
-            Logger.Info($"Browser shaders loaded from SPIR-V (vertex={Vertex.Length} bytes, fragment={Fragment.Length} bytes).");
+            Logger.Info($"WebView shaders loaded from SPIR-V (vertex={Vertex.Length} bytes, fragment={Fragment.Length} bytes).");
             return;
         }
 
@@ -43,7 +43,7 @@ public static class BrowserShaders
                 Vertex = File.ReadAllBytes(vertSpvPath);
                 Fragment = File.ReadAllBytes(fragSpvPath);
                 _loaded = true;
-                Logger.Info($"Browser shaders compiled and loaded (vertex={Vertex.Length} bytes, fragment={Fragment.Length} bytes).");
+                Logger.Info($"WebView shaders compiled and loaded (vertex={Vertex.Length} bytes, fragment={Fragment.Length} bytes).");
                 return;
             }
 
@@ -54,7 +54,7 @@ public static class BrowserShaders
             Logger.Error($"Shader source files not found: {vertGlslPath}, {fragGlslPath}");
         }
 
-        throw new InvalidOperationException("Browser shaders could not be loaded. Ensure SPIR-V files exist or glslc is available.");
+        throw new InvalidOperationException("WebView shaders could not be loaded. Ensure SPIR-V files exist or glslc is available.");
     }
 
     private static void TryCompileWithGlslc(string glslPath, string spvPath, bool isVertex)

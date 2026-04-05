@@ -1,25 +1,28 @@
-﻿using System.Diagnostics;
-using Editor.Server;
+﻿using Editor.Server;
 using Editor.Shell;
 using Engine;
 
 // ── Editor Architecture ──────────────────────────────────────────────────
 //
-//  ┌──────────────────────────────┐  ┌──────────────────────────────┐
-//  │  SDL3 ENGINE WINDOW          │  │  BROWSER WINDOW              │
-//  │                              │  │  (Chrome/Firefox/etc.)       │
-//  │  Vulkan scene render         │  │  localhost:5000              │
-//  │  ImGuizmo gizmos             │  │  Blazor Server (in-process)  │
-//  │  ImGui debug overlays        │◄►│  SignalR WebSocket           │
-//  │                              │  │  Multiple tabs/pages         │
-//  │  No embedded browser         │  │  Full DevTools for free      │
-//  │  Zero overlay overhead       │  │  Hot-reloadable UI           │
-//  └──────────────────────────────┘  └──────────────────────────────┘
+//  ┌──────────────────────────────────────────────────────────────┐
+//  │  SDL3 ENGINE WINDOW                                          │
+//  │                                                              │
+//  │  Vulkan scene render                                         │
+//  │  ImGuizmo gizmos                                             │
+//  │  ImGui debug overlays                                        │
+//  │                                                              │
+//  │  ┌────────────────────────────────────────────────────────┐  │
+//  │  │  EMBEDDED WEBVIEW (Ultralight)                         │  │
+//  │  │  Blazor Server UI (in-process) ◄► SignalR WebSocket    │  │
+//  │  │  Hot-reloadable editor panels & inspectors             │  │
+//  │  └────────────────────────────────────────────────────────┘  │
+//  └──────────────────────────────────────────────────────────────┘
 //
 // Single process — the Blazor Server runs in-process on a background
 // thread while the SDL3/Vulkan engine drives the main thread.
-// The editor scene viewport is stable (no user scripts) — play mode
-// opens a separate SDL3 window for the full game runtime.
+// The editor UI is rendered via an Ultralight webview overlay composited
+// into the Vulkan render pipeline. Play mode opens a separate SDL3
+// window for the full game runtime.
 
 const string serverUrl = "http://localhost:5000";
 
@@ -53,18 +56,8 @@ compiler.CompilationCompleted += result =>
 var server = await EditorServerHost.StartAsync(serverUrl, registry: shellRegistry);
 Console.WriteLine($"[Editor] Blazor Server listening on {serverUrl}");
 
-// ── 3. Open the user's preferred browser ─────────────────────────────
-try
-{
-    Process.Start(new ProcessStartInfo(serverUrl) { UseShellExecute = true });
-    Console.WriteLine($"[Editor] Opened browser → {serverUrl}");
-}
-catch
-{
-    Console.WriteLine($"[Editor] Could not open browser automatically — navigate to {serverUrl}");
-}
-
-// ── 4. Run the native SDL3/Vulkan engine window (blocks on main thread) ──
+// ── 3. Run the native SDL3/Vulkan engine window (blocks on main thread) ──
+//       The embedded Ultralight webview connects to the Blazor Server above.
 var config = Config.GetDefault(
     title: "3D Engine Editor",
     width: 1920,
@@ -74,7 +67,7 @@ try
 {
     new Engine.App(config)
         .AddPlugin(new DefaultPlugins())
-        .AddPlugin(new BrowserPlugin { InitialUrl = serverUrl })
+        .AddPlugin(new WebViewPlugin { InitialUrl = serverUrl })
         .Run();
 }
 finally

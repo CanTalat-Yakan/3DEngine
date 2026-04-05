@@ -12,7 +12,7 @@ namespace Engine;
 /// Manages the Ultralight renderer and view lifecycle.
 /// Stored as a <see cref="World"/> resource.
 /// </summary>
-public sealed class BrowserInstance : IDisposable
+public sealed class WebViewInstance : IDisposable
 {
     private static readonly ILogger Logger = Log.Category("Engine.WebView");
 
@@ -20,10 +20,10 @@ public sealed class BrowserInstance : IDisposable
     private View? _view;
     private bool _disposed;
 
-    /// <summary>Current pixel width of the browser view.</summary>
+    /// <summary>Current pixel width of the webview view.</summary>
     public uint Width { get; private set; }
 
-    /// <summary>Current pixel height of the browser view.</summary>
+    /// <summary>Current pixel height of the webview view.</summary>
     public uint Height { get; private set; }
 
     /// <summary>Whether the Ultralight surface has been painted since last GPU upload.</summary>
@@ -73,7 +73,7 @@ public sealed class BrowserInstance : IDisposable
     /// </summary>
     public void Initialize(uint width, uint height)
     {
-        Logger.Info($"BrowserInstance: Initializing Ultralight ({width}x{height})...");
+        Logger.Info($"WebViewInstance: Initializing Ultralight ({width}x{height})...");
         Width = width;
         Height = height;
 
@@ -109,7 +109,7 @@ public sealed class BrowserInstance : IDisposable
             FontFamilyFixed = "Courier New",
             FontFamilySerif = "Times New Roman",
             FontFamilySansSerif = "Arial",
-            UserAgent = "Mozilla/5.0 (3DEngine Browser) UltralightNet/1.4",
+            UserAgent = "Mozilla/5.0 (3DEngine WebView) UltralightNet/1.4",
         };
 
         _view = _renderer.CreateView(width, height, viewConfig, _renderer.DefaultSession);
@@ -128,33 +128,33 @@ public sealed class BrowserInstance : IDisposable
     private void OnDOMReadyHandler(ulong frameId, bool isMainFrame, string url)
     {
         DiagDOMReady = true;
-        Logger.Info($"BrowserInstance: DOM ready (frame={frameId}, main={isMainFrame}, url={url})");
+        Logger.Info($"WebViewInstance: DOM ready (frame={frameId}, main={isMainFrame}, url={url})");
     }
 
     private void OnFinishLoadingHandler(ulong frameId, bool isMainFrame, string url)
     {
         DiagPageFinished = true;
-        Logger.Info($"BrowserInstance: Page finished loading (frame={frameId}, main={isMainFrame}, url={url})");
+        Logger.Info($"WebViewInstance: Page finished loading (frame={frameId}, main={isMainFrame}, url={url})");
     }
 
     private void OnFailLoadingHandler(ulong frameId, bool isMainFrame, string url, string description, string errorDomain, int errorCode)
     {
         DiagLoadError = $"{errorDomain}:{errorCode} {description}";
-        Logger.Warn($"BrowserInstance: Page load FAILED — {DiagLoadError} (url={url})");
+        Logger.Warn($"WebViewInstance: Page load FAILED — {DiagLoadError} (url={url})");
     }
 
     private void OnConsoleMessageHandler(MessageSource source, MessageLevel level, string message, uint lineNumber, uint columnNumber, string sourceId)
     {
         DiagLastConsoleMessage = $"[{level}] {message}";
         if (level == MessageLevel.Error || level == MessageLevel.Warning)
-            Logger.Warn($"BrowserInstance: Console {level}: {message} ({sourceId}:{lineNumber}:{columnNumber})");
+            Logger.Warn($"WebViewInstance: Console {level}: {message} ({sourceId}:{lineNumber}:{columnNumber})");
     }
 
     /// <summary>Loads raw HTML content into the view.</summary>
     public void LoadHtml(string html)
     {
         if (_view is null) return;
-        Logger.Info("BrowserInstance: Loading HTML content...");
+        Logger.Info("WebViewInstance: Loading HTML content...");
         _view.LoadHtml(html);
 
         // Warm-up: pump the renderer a few times so the page starts parsing
@@ -166,7 +166,7 @@ public sealed class BrowserInstance : IDisposable
     public void LoadUrl(string url)
     {
         if (_view is null) return;
-        Logger.Info($"BrowserInstance: Loading URL: {url}");
+        Logger.Info($"WebViewInstance: Loading URL: {url}");
         _view.Url = url;
 
         // Warm-up pump
@@ -190,7 +190,7 @@ public sealed class BrowserInstance : IDisposable
         // so the first render frame uploads it to the GPU.
         IsDirty = true;
 
-        Logger.Info($"BrowserInstance: Warm-up complete (DOMReady={DiagDOMReady}, Finished={DiagPageFinished}).");
+        Logger.Info($"WebViewInstance: Warm-up complete (DOMReady={DiagDOMReady}, Finished={DiagPageFinished}).");
     }
 
     /// <summary>
@@ -290,7 +290,7 @@ public sealed class BrowserInstance : IDisposable
             if (nonZero > 0 && !IsDirty && DiagUploadCount == 0)
             {
                 IsDirty = true;
-                Logger.Info($"BrowserInstance: Probe found {nonZero} non-zero pixels — forcing IsDirty.");
+                Logger.Info($"WebViewInstance: Probe found {nonZero} non-zero pixels — forcing IsDirty.");
             }
         }
         finally
@@ -375,13 +375,13 @@ public sealed class BrowserInstance : IDisposable
         IsDirty = false;
     }
 
-    /// <summary>Resizes the browser view. No-op if size hasn't changed.</summary>
+    /// <summary>Resizes the webview view. No-op if size hasn't changed.</summary>
     public void Resize(uint width, uint height)
     {
         if (_view is null || (Width == width && Height == height)) return;
         if (width == 0 || height == 0) return;
 
-        Logger.Info($"BrowserInstance: Resizing to {width}x{height}...");
+        Logger.Info($"WebViewInstance: Resizing to {width}x{height}...");
         _view.Resize(in width, in height);
         Width = width;
         Height = height;
@@ -411,12 +411,12 @@ public sealed class BrowserInstance : IDisposable
         if (_disposed) return;
         _disposed = true;
 
-        Logger.Info("BrowserInstance: Disposing Ultralight resources...");
+        Logger.Info("WebViewInstance: Disposing Ultralight resources...");
         _view?.Dispose();
         _view = null;
         _renderer?.Dispose();
         _renderer = null;
-        Logger.Info("BrowserInstance disposed.");
+        Logger.Info("WebViewInstance disposed.");
     }
 
     /// <summary>

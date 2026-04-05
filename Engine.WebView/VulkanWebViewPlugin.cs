@@ -1,11 +1,11 @@
 namespace Engine;
 
 /// <summary>
-/// Plugin that wires the Ultralight browser rendering into the Vulkan render graph.
+/// Plugin that wires the Ultralight webview rendering into the Vulkan render graph.
 /// Only activates when the graphics backend is Vulkan.
 /// Mirrors the <see cref="VulkanImGuiPlugin"/> pattern.
 /// </summary>
-public sealed class VulkanBrowserPlugin : IPlugin
+public sealed class VulkanWebViewPlugin : IPlugin
 {
     private static readonly ILogger Logger = Log.Category("Engine.WebView.Vulkan");
 
@@ -14,25 +14,25 @@ public sealed class VulkanBrowserPlugin : IPlugin
         var cfg = app.World.Resource<Config>();
         if (cfg.Graphics != GraphicsBackend.Vulkan)
         {
-            Logger.Info("VulkanBrowserPlugin: Non-Vulkan backend — skipping.");
+            Logger.Info("VulkanWebViewPlugin: Non-Vulkan backend — skipping.");
             return;
         }
 
-        Logger.Info("VulkanBrowserPlugin: Building — will add BrowserRenderNode to Vulkan graph.");
+        Logger.Info("VulkanWebViewPlugin: Building — will add WebViewRenderNode to Vulkan graph.");
 
         app.AddSystem(Stage.Startup, (World world) =>
         {
             if (!world.TryGetResource<Renderer>(out var renderer))
             {
-                Logger.Warn("No Renderer resource found — BrowserRenderNode not added.");
+                Logger.Warn("No Renderer resource found — WebViewRenderNode not added.");
                 return;
             }
 
-            renderer.AddNode(new BrowserRenderNode());
-            Logger.Info("BrowserRenderNode registered in render graph.");
+            renderer.AddNode(new WebViewRenderNode());
+            Logger.Info("WebViewRenderNode registered in render graph.");
         });
 
-        Logger.Info("VulkanBrowserPlugin: Build complete.");
+        Logger.Info("VulkanWebViewPlugin: Build complete.");
     }
 }
 

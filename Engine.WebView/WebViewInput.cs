@@ -10,19 +10,19 @@ namespace Engine;
 /// Translates SDL3 input events into Ultralight mouse, keyboard, and scroll events.
 /// Attaches to <see cref="AppWindow.SDLEvent"/> for automatic forwarding.
 /// </summary>
-internal static class BrowserInputBridge
+internal static class WebViewInput
 {
     private static readonly ILogger Logger = Log.Category("Engine.WebView.Input");
 
     /// <summary>
-    /// Processes a single SDL event and forwards it to the given <see cref="BrowserInstance"/>.
+    /// Processes a single SDL event and forwards it to the given <see cref="WebViewInstance"/>.
     /// </summary>
-    public static void ProcessEvent(SDL.Event e, BrowserInstance browser)
+    public static void ProcessEvent(SDL.Event e, WebViewInstance webView)
     {
         switch ((SDL.EventType)e.Type)
         {
             case SDL.EventType.MouseMotion:
-                browser.FireMouseEvent(new MouseEvent
+                webView.FireMouseEvent(new MouseEvent
                 {
                     Type = MouseEventType.MouseMoved,
                     X = (int)e.Motion.X,
@@ -32,7 +32,7 @@ internal static class BrowserInputBridge
                 break;
 
             case SDL.EventType.MouseButtonDown:
-                browser.FireMouseEvent(new MouseEvent
+                webView.FireMouseEvent(new MouseEvent
                 {
                     Type = MouseEventType.MouseDown,
                     X = (int)e.Button.X,
@@ -42,7 +42,7 @@ internal static class BrowserInputBridge
                 break;
 
             case SDL.EventType.MouseButtonUp:
-                browser.FireMouseEvent(new MouseEvent
+                webView.FireMouseEvent(new MouseEvent
                 {
                     Type = MouseEventType.MouseUp,
                     X = (int)e.Button.X,
@@ -59,16 +59,16 @@ internal static class BrowserInputBridge
                     DeltaX = (int)(e.Wheel.X * 32),
                     DeltaY = (int)(e.Wheel.Y * 32),
                 };
-                browser.FireScrollEvent(scroll);
+                webView.FireScrollEvent(scroll);
                 break;
             }
 
             case SDL.EventType.KeyDown:
-                FireKeyEvent(e, KeyEventType.RawKeyDown, browser);
+                FireKeyEvent(e, KeyEventType.RawKeyDown, webView);
                 break;
 
             case SDL.EventType.KeyUp:
-                FireKeyEvent(e, KeyEventType.KeyUp, browser);
+                FireKeyEvent(e, KeyEventType.KeyUp, webView);
                 break;
 
             case SDL.EventType.TextInput:
@@ -88,7 +88,7 @@ internal static class BrowserInputBridge
                             isKeypad: false,
                             isAutoRepeat: false,
                             isSystemKey: false);
-                        browser.FireKeyEvent(charEvt);
+                        webView.FireKeyEvent(charEvt);
                     }
                 }
                 break;
@@ -96,7 +96,7 @@ internal static class BrowserInputBridge
         }
     }
 
-    private static void FireKeyEvent(SDL.Event e, KeyEventType type, BrowserInstance browser)
+    private static void FireKeyEvent(SDL.Event e, KeyEventType type, WebViewInstance webView)
     {
         var scancode = (SDL.Scancode)e.Key.Scancode;
         int vk = MapSdlScancodeToVirtualKey(scancode);
@@ -116,7 +116,7 @@ internal static class BrowserInputBridge
             isAutoRepeat: e.Key.Repeat,
             isSystemKey: false);
 
-        browser.FireKeyEvent(keyEvt);
+        webView.FireKeyEvent(keyEvt);
     }
 
     private static KeyEventModifiers GetModifiers(SDL.Event e)

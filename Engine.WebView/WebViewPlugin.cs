@@ -2,15 +2,15 @@ namespace Engine;
 
 /// <summary>
 /// Plugin that integrates UltralightNet into the engine.
-/// Creates a <see cref="BrowserInstance"/> resource, hooks SDL3 events for input,
+/// Creates a <see cref="WebViewInstance"/> resource, hooks SDL3 events for input,
 /// and registers per-frame Update and Cleanup systems.
 /// <para>
 /// By default loads a simple "about:blank" page. Call
-/// <see cref="BrowserInstance.LoadHtml"/> or <see cref="BrowserInstance.LoadUrl"/>
+/// <see cref="WebViewInstance.LoadHtml"/> or <see cref="WebViewInstance.LoadUrl"/>
 /// after plugin setup to display content.
 /// </para>
 /// </summary>
-public sealed class BrowserPlugin : IPlugin
+public sealed class WebViewPlugin : IPlugin
 {
     private static readonly ILogger Logger = Log.Category("Engine.WebView");
 
@@ -22,16 +22,16 @@ public sealed class BrowserPlugin : IPlugin
 
     public void Build(App app)
     {
-        Logger.Info("BrowserPlugin: Building...");
+        Logger.Info("WebViewPlugin: Building...");
 
-        var browser = new BrowserInstance();
-        app.World.InsertResource(browser);
+        var webview = new WebViewInstance();
+        app.World.InsertResource(webview);
 
         // ── Startup: initialize Ultralight and load content ───────────
         app.AddSystem(Stage.Startup, (World world) =>
         {
             var cfg = world.Resource<Config>();
-            var b = world.Resource<BrowserInstance>();
+            var b = world.Resource<WebViewInstance>();
             b.Initialize((uint)cfg.WindowData.Width, (uint)cfg.WindowData.Height);
 
             if (InitialHtml is not null)
@@ -48,53 +48,53 @@ public sealed class BrowserPlugin : IPlugin
                 b.LoadHtml(LoadDefaultHtml());
             }
 
-            Logger.Info("BrowserPlugin: Ultralight initialized and content loaded.");
+            Logger.Info("WebViewPlugin: Ultralight initialized and content loaded.");
 
             // Hook SDL events for input forwarding
             if (world.TryGetResource<AppWindow>(out var window))
             {
-                window.SDLEvent += evt => BrowserInputBridge.ProcessEvent(evt, b);
+                window.SDLEvent += evt => WebViewInput.ProcessEvent(evt, b);
 
-                // Handle window resize → resize browser view
+                // Handle window resize → resize webview view
                 window.ResizeEvent += (w, h) =>
                 {
                     if (w > 0 && h > 0)
                         b.Resize((uint)w, (uint)h);
                 };
 
-                Logger.Info("BrowserPlugin: SDL event hooks registered.");
+                Logger.Info("WebViewPlugin: SDL event hooks registered.");
             }
 
-            // Sync the BrowserInstance into the RenderWorld for the render node
+            // Sync the WebViewInstance into the RenderWorld for the render node
             if (world.TryGetResource<Renderer>(out var renderer))
             {
                 renderer.RenderWorld.Set(b);
-                Logger.Info("BrowserPlugin: BrowserInstance synced to RenderWorld.");
+                Logger.Info("WebViewPlugin: WebViewInstance synced to RenderWorld.");
             }
         });
 
         // ── Per-frame: update Ultralight ──────────────────────────────
         app.AddSystem(Stage.Update, static (World world) =>
         {
-            world.TryResource<BrowserInstance>()?.Update();
+            world.TryResource<WebViewInstance>()?.Update();
         });
 
         // ── Cleanup: dispose Ultralight ──────────────────────────────
         app.AddSystem(Stage.Cleanup, static (World world) =>
         {
-            if (world.TryGetResource<BrowserInstance>(out var b))
+            if (world.TryGetResource<WebViewInstance>(out var b))
             {
                 b.Dispose();
-                world.RemoveResource<BrowserInstance>();
+                world.RemoveResource<WebViewInstance>();
             }
         });
 
-        Logger.Info("BrowserPlugin: Build complete.");
+        Logger.Info("WebViewPlugin: Build complete.");
     }
 
     private static string LoadDefaultHtml()
     {
-        using var stream = typeof(BrowserPlugin).Assembly
+        using var stream = typeof(WebViewPlugin).Assembly
             .GetManifestResourceStream("Engine.WebView.default.html");
         if (stream is null)
             throw new InvalidOperationException("Embedded resource 'Engine.WebView.default.html' not found.");

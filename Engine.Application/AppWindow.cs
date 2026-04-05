@@ -72,7 +72,7 @@ public sealed class AppWindow
             {
                 // ── HiDPI: scale mouse coordinates from window-space to content-space ──
                 // SDL gives coords in window logical coords (0..windowLogicalW).
-                // Content (browser/ImGui) uses Width×Height (the config resolution).
+                // Content (WebView/ImGui) uses Width×Height (the config resolution).
                 var evtType = (SDL.EventType)e.Type;
                 if (evtType == SDL.EventType.MouseMotion ||
                     evtType is SDL.EventType.MouseButtonDown or SDL.EventType.MouseButtonUp)
