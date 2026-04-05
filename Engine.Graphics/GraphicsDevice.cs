@@ -147,7 +147,8 @@ public sealed unsafe partial class GraphicsDevice : IGraphicsDevice
     private static string Utf8(ReadOnlySpan<byte> value)
     {
         if (value.IsEmpty) return string.Empty;
-        if (value[^1] == 0) value = value[..^1];
+        var nullIndex = value.IndexOf((byte)0);
+        if (nullIndex >= 0) value = value[..nullIndex];
         return Encoding.UTF8.GetString(value);
     }
 
