@@ -7,7 +7,7 @@ namespace Engine;
 /// </summary>
 public sealed class VulkanBrowserPlugin : IPlugin
 {
-    private static readonly ILogger Logger = Log.Category("Engine.Browser.Vulkan");
+    private static readonly ILogger Logger = Log.Category("Engine.WebView.Vulkan");
 
     public void Build(App app)
     {

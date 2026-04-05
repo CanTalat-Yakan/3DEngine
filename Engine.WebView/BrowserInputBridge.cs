@@ -12,7 +12,7 @@ namespace Engine;
 /// </summary>
 internal static class BrowserInputBridge
 {
-    private static readonly ILogger Logger = Log.Category("Engine.Browser.Input");
+    private static readonly ILogger Logger = Log.Category("Engine.WebView.Input");
 
     /// <summary>
     /// Processes a single SDL event and forwards it to the given <see cref="BrowserInstance"/>.

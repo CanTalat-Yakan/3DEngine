@@ -12,7 +12,7 @@ namespace Engine;
 /// </summary>
 internal static class AppCoreMethods
 {
-    private static readonly ILogger Logger = Log.Category("Engine.Browser");
+    private static readonly ILogger Logger = Log.Category("Engine.WebView");
     private static bool _nativeLibsLoaded;
 
     public static void SetPlatformFontLoader()

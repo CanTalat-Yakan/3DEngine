@@ -8,7 +8,7 @@ namespace Engine;
 /// </summary>
 public sealed class BrowserRenderNode : IRenderNode, IDisposable
 {
-    private static readonly ILogger Logger = Log.Category("Engine.Browser.Vulkan");
+    private static readonly ILogger Logger = Log.Category("Engine.WebView.Vulkan");
 
     public string Name => "browser";
     public IReadOnlyCollection<string> Dependencies { get; } = new[] { "sample" };

@@ -14,7 +14,7 @@ namespace Engine;
 /// </summary>
 public sealed class BrowserInstance : IDisposable
 {
-    private static readonly ILogger Logger = Log.Category("Engine.Browser");
+    private static readonly ILogger Logger = Log.Category("Engine.WebView");
 
     private ULRenderer? _renderer;
     private View? _view;

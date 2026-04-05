@@ -7,6 +7,7 @@
         <PackageId>3DEngine.Browser</PackageId>
         <Version>1.0.0</Version>
         <Description>UltralightNet HTML/CSS/JS browser overlay integrated with the Vulkan render pipeline.</Description>
+        <RootNamespace>Engine.Browser</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

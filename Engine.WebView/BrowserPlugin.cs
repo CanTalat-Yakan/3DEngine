@@ -12,7 +12,7 @@ namespace Engine;
 /// </summary>
 public sealed class BrowserPlugin : IPlugin
 {
-    private static readonly ILogger Logger = Log.Category("Engine.Browser");
+    private static readonly ILogger Logger = Log.Category("Engine.WebView");
 
     /// <summary>Optional initial HTML to load. Set before adding to App.</summary>
     public string? InitialHtml { get; init; }
@@ -95,9 +95,9 @@ public sealed class BrowserPlugin : IPlugin
     private static string LoadDefaultHtml()
     {
         using var stream = typeof(BrowserPlugin).Assembly
-            .GetManifestResourceStream("Engine.Browser.default.html");
+            .GetManifestResourceStream("Engine.WebView.default.html");
         if (stream is null)
-            throw new InvalidOperationException("Embedded resource 'Engine.Browser.default.html' not found.");
+            throw new InvalidOperationException("Embedded resource 'Engine.WebView.default.html' not found.");
         using var reader = new StreamReader(stream);
         return reader.ReadToEnd();
     }

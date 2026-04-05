@@ -3,7 +3,7 @@ namespace Engine;
 /// <summary>Loads and optionally compiles browser overlay SPIR-V shaders from GLSL sources.</summary>
 public static class BrowserShaders
 {
-    private static readonly ILogger Logger = Log.Category("Engine.Browser.Shaders");
+    private static readonly ILogger Logger = Log.Category("Engine.WebView.Shaders");
 
     private static bool _loaded;
 
