@@ -7,15 +7,19 @@
 		<!-- CA1816 creates noise in some Dispose() methods of Wrapper classes -->
 		<!-- CS1591 suppresses missing XML comment warnings for public APIs -->
 	</PropertyGroup>
+	
 	<ItemGroup>
 		<None Remove="resources\cacert.pem"/>
 		<None Remove="resources\icudt67l.dat"/>
 	</ItemGroup>
+	
 	<ItemGroup>
 		<EmbeddedResource Include="resources\cacert.pem"/>
 		<EmbeddedResource Include="resources\icudt67l.dat"/>
 	</ItemGroup>
+	
 	<ItemGroup>
 		<ProjectReference Include="..\UltralightNet.Binaries\UltralightNet.Binaries.csproj" />
 	</ItemGroup>
+	
 </Project>

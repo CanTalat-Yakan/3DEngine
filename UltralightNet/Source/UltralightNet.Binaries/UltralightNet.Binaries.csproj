@@ -1,7 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
+	
 	<PropertyGroup>
 		<Description>Ultralight native binaries</Description>
 	</PropertyGroup>
+	
 	<ItemGroup>
 		<_NativeAssetName Include="runtimes/win-x64/native/Ultralight.dll" />
 		<_NativeAssetName Include="runtimes/win-x64/native/UltralightCore.dll" />
@@ -17,4 +19,5 @@
 
 		<Content Include="@(_NativeAssetName)" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
+	
 </Project>

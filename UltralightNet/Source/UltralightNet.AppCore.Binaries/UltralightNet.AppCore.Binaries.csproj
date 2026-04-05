@@ -1,7 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
+	
 	<PropertyGroup>
 		<Description>AppCore native binaries</Description>
 	</PropertyGroup>
+	
 	<ItemGroup>
 		<ProjectReference Include="..\UltralightNet.Binaries\UltralightNet.Binaries.csproj" />
 
@@ -11,4 +13,5 @@
 
 		<Content Include="@(_NativeAssetName)" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
+	
 </Project>

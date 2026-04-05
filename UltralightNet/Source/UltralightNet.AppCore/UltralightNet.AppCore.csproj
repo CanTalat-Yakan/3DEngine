@@ -2,7 +2,10 @@
 
 	<PropertyGroup>
 		<Description>AppCore bindings</Description>
+		<NoWarn>$(NoWarn);1591</NoWarn>
+		<!-- CS1591 suppresses missing XML comment warnings for public APIs -->
 	</PropertyGroup>
+	
 	<ItemGroup>
 		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj"/>
 		<ProjectReference Include="..\UltralightNet.AppCore.Binaries\UltralightNet.AppCore.Binaries.csproj" />
