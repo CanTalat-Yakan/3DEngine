@@ -16,10 +16,15 @@
         <ProjectReference Include="..\Engine.Application\Engine.Application.csproj" />
         <ProjectReference Include="..\Engine.Common\Engine.Common.csproj" />
         <ProjectReference Include="..\Engine.Entities\Engine.Entities.csproj" />
+        <ProjectReference Include="..\Engine.Files\Engine.Files.csproj" />
         <ProjectReference Include="..\Engine.Generator\Engine.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <ProjectReference Include="..\Engine.Graphics\Engine.Graphics.csproj" />
         <ProjectReference Include="..\Engine.Renderer\Engine.Renderer.csproj" />
         <ProjectReference Include="..\Engine.WebView\Engine.WebView.csproj" />
+        <ProjectReference Include="..\UltralightNet\Source\UltralightNet.AppCore.Binaries\UltralightNet.AppCore.Binaries.csproj" />
+        <ProjectReference Include="..\UltralightNet\Source\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />
+        <ProjectReference Include="..\UltralightNet\Source\UltralightNet.Binaries\UltralightNet.Binaries.csproj" />
+        <ProjectReference Include="..\UltralightNet\Source\UltralightNet\UltralightNet.csproj" />
     </ItemGroup>
 
     <ItemGroup>
