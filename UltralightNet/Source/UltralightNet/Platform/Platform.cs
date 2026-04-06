@@ -106,9 +106,9 @@ namespace UltralightNet.Platform
 			if (EnableDefaultLogger && loggerWrapper is null) Logger = DefaultLogger;
 			if (SetDefaultFileSystem && filesystemWrapper is null)
 			{
-				FileSystem = config.ResourcePathPrefix is "resources/"
+				FileSystem = config.ResourcePathPrefix is "runtimes/"
 					? DefaultFileSystem
-					: throw new ArgumentException("Default file system supports only \"resources\" ResourcePathPrefix",
+					: throw new ArgumentException("Default file system supports only \"runtimes\" ResourcePathPrefix",
 						nameof(config));
 			}
 			else if (ErrorMissingResources && filesystemWrapper is not null)
@@ -207,8 +207,8 @@ namespace UltralightNet.Platform
 			{
 				return path switch
 				{
-					"resources/cacert.pem" => true,
-					"resources/icudt67l.dat" => true,
+					"runtimes/cacert.pem" => true,
+					"runtimes/icudt67l.dat" => true,
 					_ => false
 				};
 			}
@@ -227,8 +227,8 @@ namespace UltralightNet.Platform
 			{
 				var s = path switch
 				{
-					"resources/cacert.pem" => Resources.Cacertpem,
-					"resources/icudt67l.dat" => Resources.Icudt67Ldat,
+					"runtimes/cacert.pem" => Resources.Cacertpem,
+					"runtimes/icudt67l.dat" => Resources.Icudt67Ldat,
 					_ => null
 				};
 				if (s is UnmanagedMemoryStream unmanagedMemoryStream)

@@ -5,13 +5,8 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-		<None Remove="resources\cacert.pem"/>
-		<None Remove="resources\icudt67l.dat"/>
-	</ItemGroup>
-	
-	<ItemGroup>
-		<EmbeddedResource Include="resources\cacert.pem"/>
-		<EmbeddedResource Include="resources\icudt67l.dat"/>
+		<EmbeddedResource Include="runtimes\cacert.pem" />
+		<EmbeddedResource Include="runtimes\icudt67l.dat" />
 	</ItemGroup>
 	
 	<ItemGroup>

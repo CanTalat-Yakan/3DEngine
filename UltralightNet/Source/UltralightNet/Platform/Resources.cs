@@ -6,6 +6,6 @@ public static class Resources
 {
 	private static Assembly Assembly => typeof(Resources).Assembly;
 
-	public static Stream? Cacertpem => Assembly.GetManifestResourceStream("UltralightNet.resources.cacert.pem");
-	public static Stream? Icudt67Ldat => Assembly.GetManifestResourceStream("UltralightNet.resources.icudt67l.dat");
+	public static Stream? Cacertpem => Assembly.GetManifestResourceStream("UltralightNet.runtimes.cacert.pem");
+	public static Stream? Icudt67Ldat => Assembly.GetManifestResourceStream("UltralightNet.runtimes.icudt67l.dat");
 }

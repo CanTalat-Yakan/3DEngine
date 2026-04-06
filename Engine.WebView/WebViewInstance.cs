@@ -51,10 +51,10 @@ public sealed class WebViewInstance : IDisposable
     public string? DiagFirstBytes { get; private set; }
 
     /// <summary>Whether the ICU data file exists on disk.</summary>
-    public bool DiagIcuExists => File.Exists(Path.Combine(AppContext.BaseDirectory, "resources", "icudt67l.dat"));
+    public bool DiagIcuExists => File.Exists(Path.Combine(AppContext.BaseDirectory, "runtimes", "icudt67l.dat"));
 
     /// <summary>Whether the CA certificate file exists on disk.</summary>
-    public bool DiagCaCertExists => File.Exists(Path.Combine(AppContext.BaseDirectory, "resources", "cacert.pem"));
+    public bool DiagCaCertExists => File.Exists(Path.Combine(AppContext.BaseDirectory, "runtimes", "cacert.pem"));
 
     // ── Page load state (set by native callbacks) ────────────────────
     public bool DiagDOMReady { get; private set; }
@@ -460,7 +460,7 @@ public sealed class WebViewInstance : IDisposable
     /// </summary>
     private static void ExtractEmbeddedResources()
     {
-        var resourceDir = Path.Combine(AppContext.BaseDirectory, "resources");
+        var resourceDir = Path.Combine(AppContext.BaseDirectory, "runtimes");
         Directory.CreateDirectory(resourceDir);
 
         ExtractIfMissing(resourceDir, "icudt67l.dat", () => Resources.Icudt67Ldat);

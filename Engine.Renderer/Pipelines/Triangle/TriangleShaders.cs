@@ -17,8 +17,8 @@ public static class TriangleShaders
 
         Logger.Info("Loading triangle shaders...");
         var baseDir = AppContext.BaseDirectory;
-        var vertGlslPath = Path.Combine(baseDir, "Source", "Shaders", "triangle.vert.glsl");
-        var fragGlslPath = Path.Combine(baseDir, "Source", "Shaders", "triangle.frag.glsl");
+        var vertGlslPath = Path.Combine(baseDir, "source", "shaders", "triangle.vert.glsl");
+        var fragGlslPath = Path.Combine(baseDir, "source", "shaders", "triangle.frag.glsl");
         var vertSpvPath = Path.ChangeExtension(vertGlslPath, ".vert.spv");
         var fragSpvPath = Path.ChangeExtension(fragGlslPath, ".frag.spv");
 

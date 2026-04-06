@@ -15,7 +15,7 @@ public struct UlConfig : IEquatable<UlConfig>
 	public string CachePath = string.Empty;
 
 	/// <summary>Path to use for filesystem resources.</summary>
-	public string ResourcePathPrefix = "resources/";
+	public string ResourcePathPrefix = "runtimes/";
 
 	/// <summary>Face winding for ULGPUDriver.</summary>
 	public FaceWinding FaceWinding = FaceWinding.CounterClockwise;

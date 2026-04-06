@@ -17,8 +17,8 @@ public static class WebViewShaders
 
         Logger.Info("Loading webview overlay shaders...");
         var baseDir = AppContext.BaseDirectory;
-        var vertGlslPath = Path.Combine(baseDir, "Source", "Shaders", "webview.vert.glsl");
-        var fragGlslPath = Path.Combine(baseDir, "Source", "Shaders", "webview.frag.glsl");
+        var vertGlslPath = Path.Combine(baseDir, "source", "shaders", "webview.vert.glsl");
+        var fragGlslPath = Path.Combine(baseDir, "source", "shaders", "webview.frag.glsl");
         var vertSpvPath = Path.ChangeExtension(vertGlslPath, ".vert.spv");
         var fragSpvPath = Path.ChangeExtension(fragGlslPath, ".frag.spv");
 

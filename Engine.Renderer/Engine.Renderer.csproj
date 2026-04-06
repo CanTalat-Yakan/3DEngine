@@ -16,7 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="Shaders\**\*.glsl" CopyToOutputDirectory="PreserveNewest" Link="Source\Shaders\%(Filename)%(Extension)" />
+        <Content Include="Shaders\**\*.glsl" CopyToOutputDirectory="PreserveNewest" Link="source\shaders\%(Filename)%(Extension)" />
     </ItemGroup>
 
     <ItemGroup>
