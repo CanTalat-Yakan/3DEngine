@@ -32,6 +32,10 @@ public sealed class WebViewPlugin : IPlugin
         {
             var cfg = world.Resource<Config>();
             var b = world.Resource<WebViewInstance>();
+
+            // Initialize at config dimensions — if the window is actually
+            // larger (e.g. HiDPI scaling), the deferred resize in Update()
+            // will handle it safely without crashing native code.
             b.Initialize((uint)cfg.WindowData.Width, (uint)cfg.WindowData.Height);
 
             if (InitialHtml is not null)

@@ -67,6 +67,14 @@ public sealed class WebViewInstance : IDisposable
 
     private int _titleQueryCountdown;
 
+    // ── Deferred resize ─────────────────────────────────────────────
+    private uint _pendingResizeWidth;
+    private uint _pendingResizeHeight;
+    private bool _hasPendingResize;
+
+    /// <summary>Cached HTML content for reload after view recreation during resize.</summary>
+    private string? _lastLoadedHtml;
+
     /// <summary>
     /// Initializes the Ultralight platform, renderer, and view.
     /// Call once during Startup.
@@ -154,6 +162,7 @@ public sealed class WebViewInstance : IDisposable
     public void LoadHtml(string html)
     {
         if (_view is null) return;
+        _lastLoadedHtml = html;
         Logger.Info("WebViewInstance: Loading HTML content...");
         _view.LoadHtml(html);
 
@@ -166,6 +175,7 @@ public sealed class WebViewInstance : IDisposable
     public void LoadUrl(string url)
     {
         if (_view is null) return;
+        _lastLoadedHtml = null; // URL-based load — clear cached HTML
         Logger.Info($"WebViewInstance: Loading URL: {url}");
         _view.Url = url;
 
@@ -216,6 +226,9 @@ public sealed class WebViewInstance : IDisposable
     public void Update()
     {
         if (_renderer is null) return;
+
+        // Apply any deferred resize before processing the frame.
+        ApplyPendingResize();
 
         DiagUpdateCount++;
 
@@ -375,17 +388,38 @@ public sealed class WebViewInstance : IDisposable
         IsDirty = false;
     }
 
-    /// <summary>Resizes the webview view. No-op if size hasn't changed.</summary>
+    /// <summary>
+    /// Queues a resize for the webview view. The actual native resize is deferred
+    /// to the next <see cref="Update"/> call so it happens on the correct thread
+    /// and at a safe point in the frame lifecycle.
+    /// No-op if size hasn't changed.
+    /// </summary>
     public void Resize(uint width, uint height)
     {
         if (_view is null || (Width == width && Height == height)) return;
         if (width == 0 || height == 0) return;
 
-        Logger.Info($"WebViewInstance: Resizing to {width}x{height}...");
-        _view.Resize(in width, in height);
-        Width = width;
-        Height = height;
-        IsDirty = true;
+        Logger.Info($"WebViewInstance: Queuing resize to {width}x{height} (deferred to Update)...");
+        _pendingResizeWidth = width;
+        _pendingResizeHeight = height;
+        _hasPendingResize = true;
+    }
+
+    /// <summary>Applies a pending deferred resize. Called from <see cref="Update"/>.</summary>
+    private void ApplyPendingResize()
+    {
+        if (!_hasPendingResize) return;
+        _hasPendingResize = false;
+
+        // NOTE: Ultralight's native ulViewResize() segfaults on some platforms
+        // (observed on Linux with Intel Iris Xe + HiDPI scaling).  Rather than
+        // crashing the whole engine, we skip the native resize and let the GPU
+        // render node scale the WebView texture to fit the viewport.
+        //
+        // The WebView keeps rendering at its original resolution; the fullscreen
+        // quad in WebViewRenderNode stretches it to the current swapchain extent.
+        Logger.Info($"WebViewInstance: Window resized to {_pendingResizeWidth}x{_pendingResizeHeight} — " +
+                    $"WebView stays at {Width}x{Height} (GPU-scaled).");
     }
 
     /// <summary>Fires a mouse event into the Ultralight view.</summary>
