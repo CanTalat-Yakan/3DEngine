@@ -17,7 +17,9 @@
         <ProjectReference Include="..\Engine.Renderer\Engine.Renderer.csproj" />
         <ProjectReference Include="..\Engine.Application\Engine.Application.csproj" />
         <ProjectReference Include="..\UltralightNet\Source\UltralightNet\UltralightNet.csproj" />
-        <ProjectReference Include="..\UltralightNet\Source\UltralightNet.AppCore\UltralightNet.AppCore.csproj" Private="true" />
+        <ProjectReference Include="..\UltralightNet\Source\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />
+        <ProjectReference Include="..\UltralightNet\Source\UltralightNet.Binaries\UltralightNet.Binaries.csproj" />
+        <ProjectReference Include="..\UltralightNet\Source\UltralightNet.AppCore.Binaries\UltralightNet.AppCore.Binaries.csproj" />
     </ItemGroup>
 
     <ItemGroup>
