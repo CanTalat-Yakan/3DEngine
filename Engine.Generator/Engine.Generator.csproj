@@ -4,7 +4,6 @@
         <!-- Source generators must target netstandard2.0 (Roslyn requirement) -->
         <TargetFramework>netstandard2.0</TargetFramework>
         <LangVersion>latest</LangVersion>
-        <Nullable>enable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
         <OutputItemType>Analyzer</OutputItemType>
         <IncludeBuildOutput>false</IncludeBuildOutput>
