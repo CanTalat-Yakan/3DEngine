@@ -15,6 +15,7 @@
 
     <ItemGroup>
         <PackageReference Include="Vortice.Mathematics" Version="2.1.0" />
+        <PackageReference Include="Vortice.ShaderCompiler" Version="1.9.0" />
         <PackageReference Include="Vortice.SPIRV" Version="1.0.5" />
         <PackageReference Include="Vortice.SpirvCross" Version="1.5.4" />
         <PackageReference Include="Vortice.Vulkan" Version="3.2.1" />
