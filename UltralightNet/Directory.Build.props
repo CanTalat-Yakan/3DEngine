@@ -23,6 +23,6 @@
 		<LangVersion>latest</LangVersion>
 
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<GenerateDocumentationFile>false</GenerateDocumentationFile>
 	</PropertyGroup>
 </Project>
