@@ -5,6 +5,11 @@ public sealed class SdlRendererPlugin : IPlugin
 {
     private static readonly ILogger Logger = Log.Category("Engine.SdlRenderer");
 
+    /// <summary>Delay (ms) after the last resize event before committing the expensive
+    /// swapchain + allocator + camera rebuild.  During this window the Vulkan lazy path
+    /// (<c>VK_ERROR_OUT_OF_DATE_KHR</c>) handles swapchain-only rebuilds if needed.</summary>
+    private const long ResizeDebounceMs = 150;
+
     private sealed class ClearColorExtract : IExtractSystem
     {
         public void Run(World world, RenderWorld renderWorld)
@@ -36,6 +41,11 @@ public sealed class SdlRendererPlugin : IPlugin
         // Initialize Vulkan against SDL window if configured
         var window = app.World.Resource<AppWindow>();
 
+        // ── Debounce state for the expensive higher-level resize ──
+        // Captured by both the ResizeEvent lambda and the per-frame system lambda.
+        bool pendingRendererResize = false;
+        long lastResizeTick = 0;
+
         if (cfg.Graphics == GraphicsBackend.Vulkan)
         {
             Logger.Info("SdlRendererPlugin: Vulkan backend selected — initializing graphics context against SDL window...");
@@ -48,14 +58,16 @@ public sealed class SdlRendererPlugin : IPlugin
             renderer.RenderWorld.Set(surfaceInfo);
             Logger.Info($"Initial render surface: {surfaceInfo.Width}x{surfaceInfo.Height}");
 
-            // Handle resize -> update surface info and recreate swapchain
+            // Handle resize -> update surface info immediately (cheap metadata),
+            // but only *flag* the expensive swapchain rebuild for later.
             window.ResizeEvent += (w, h) =>
             {
                 if (w > 0 && h > 0)
                 {
-                    Logger.Info($"Window resized to {w}x{h} — updating render surface and swapchain...");
+                    Logger.Debug($"Window resized to {w}x{h} — updating render surface info (rebuild deferred).");
                     renderer.RenderWorld.Set(new RenderSurfaceInfo { Width = w, Height = h });
-                    renderer.Context.OnResize();
+                    pendingRendererResize = true;
+                    lastResizeTick = Environment.TickCount64;
                 }
             };
         }
@@ -64,11 +76,22 @@ public sealed class SdlRendererPlugin : IPlugin
             Logger.Info("SdlRendererPlugin: Non-Vulkan backend — Vulkan renderer initialization skipped.");
         }
 
-        // Run Vulkan renderer after other Render stage systems
+        // Run Vulkan renderer after other Render stage systems.
+        // Also resolves debounced resize when the quiet period has elapsed.
         app.AddSystem(Stage.Render, (world) =>
         {
-            if (world.TryGetResource<Renderer>(out var r) && r.Context.IsInitialized)
-                r.RenderFrame(world);
+            if (!world.TryGetResource<Renderer>(out var r) || !r.Context.IsInitialized)
+                return;
+
+            // ── Resolve debounced resize ──
+            if (pendingRendererResize && (Environment.TickCount64 - lastResizeTick) >= ResizeDebounceMs)
+            {
+                pendingRendererResize = false;
+                Logger.Info("Debounce elapsed — committing renderer resize (swapchain + allocator + camera)...");
+                r.Context.OnResize();
+            }
+
+            r.RenderFrame(world);
         });
 
         // Ensure disposal at app exit (Cleanup stage)

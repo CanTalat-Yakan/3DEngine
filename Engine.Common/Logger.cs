@@ -113,6 +113,9 @@ public static class LogConfig
     public static bool PerFrameLogging { get; set; }
         = Environment.GetEnvironmentVariable("ENGINE_LOG_FRAMES") == "1";
 
+    /// <summary>Maximum log file size in bytes. When exceeded the file logger writes a truncation notice and stops. Defaults to 50 MB.</summary>
+    public static long MaxLogFileBytes { get; set; } = 50L * 1024 * 1024;
+
     /// <summary>Engine-wide stopwatch started at process launch for elapsed timestamps.</summary>
     internal static readonly Stopwatch EngineTimer = Stopwatch.StartNew();
 }
@@ -151,6 +154,8 @@ public sealed class FileLoggerProvider : ILoggerProvider, IDisposable
 
     private readonly StreamWriter _writer;
     private readonly object _lock = new();
+    private long _bytesWritten;
+    private bool _truncated;
 
     private FileLoggerProvider(StreamWriter writer) => _writer = writer;
 
@@ -176,22 +181,38 @@ public sealed class FileLoggerProvider : ILoggerProvider, IDisposable
 
     public void Log(LogLevel level, string category, string message, Exception? exception = null)
     {
-        double elapsed = LogConfig.EngineTimer.Elapsed.TotalSeconds;
-        var levelTag = level switch
-        {
-            LogLevel.Trace    => "TRACE",
-            LogLevel.Debug    => "DEBUG",
-            LogLevel.Info     => "INFO ",
-            LogLevel.Warning  => "WARN ",
-            LogLevel.Error    => "ERROR",
-            LogLevel.Critical => "FATAL",
-            _ => level.ToString().ToUpperInvariant()
-        };
         lock (_lock)
         {
-            _writer.WriteLine($"[{elapsed,10:F4}s] [{levelTag}] [{category}] {message}");
+            if (_truncated) return;
+
+            double elapsed = LogConfig.EngineTimer.Elapsed.TotalSeconds;
+            var levelTag = level switch
+            {
+                LogLevel.Trace    => "TRACE",
+                LogLevel.Debug    => "DEBUG",
+                LogLevel.Info     => "INFO ",
+                LogLevel.Warning  => "WARN ",
+                LogLevel.Error    => "ERROR",
+                LogLevel.Critical => "FATAL",
+                _ => level.ToString().ToUpperInvariant()
+            };
+
+            var line = $"[{elapsed,10:F4}s] [{levelTag}] [{category}] {message}";
+            _writer.WriteLine(line);
+            _bytesWritten += Encoding.UTF8.GetByteCount(line) + Environment.NewLine.Length;
+
             if (exception != null)
-                _writer.WriteLine(exception);
+            {
+                var exStr = exception.ToString();
+                _writer.WriteLine(exStr);
+                _bytesWritten += Encoding.UTF8.GetByteCount(exStr) + Environment.NewLine.Length;
+            }
+
+            if (_bytesWritten >= LogConfig.MaxLogFileBytes)
+            {
+                _writer.WriteLine("--- LOG TRUNCATED (size limit reached) ---");
+                _truncated = true;
+            }
         }
     }
 
@@ -225,6 +246,7 @@ public static class Log
         logger.Info($"Timestamp:    {DateTime.UtcNow:O}");
         logger.Info($"Console log:  {LogConfig.ConsoleMinimumLevel}+");
         logger.Info($"File log:     {LogConfig.MinimumLevel}+ → {Path.Combine(AppContext.BaseDirectory, "Engine.log")}");
+        logger.Info($"File cap:     {LogConfig.MaxLogFileBytes / (1024 * 1024)} MB");
         logger.Info($"Frame logs:   {(LogConfig.PerFrameLogging ? "ENABLED" : "DISABLED (set ENGINE_LOG_FRAMES=1 to enable)")}");
         logger.Info("========================================================");
     }

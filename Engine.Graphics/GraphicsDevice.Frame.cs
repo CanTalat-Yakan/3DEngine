@@ -91,10 +91,18 @@ public sealed unsafe partial class GraphicsDevice
 
         var presentResult = _deviceApi.vkQueuePresentKHR(_presentQueue, &presentInfo);
 
-        if (presentResult == VkResult.ErrorOutOfDateKHR || presentResult == VkResult.SuboptimalKHR)
+        if (presentResult == VkResult.ErrorOutOfDateKHR)
         {
-            Logger.Warn($"Swapchain {presentResult} during present — triggering resize.");
+            // Swapchain is unusable — must rebuild now.
+            Logger.Warn("Swapchain out-of-date during present — triggering resize.");
             OnResize();
+        }
+        else if (presentResult == VkResult.SuboptimalKHR)
+        {
+            // Swapchain still works but isn't ideal (e.g. mid-drag on Linux).
+            // Let it ride — the next coalesced ResizeEvent or a future
+            // ErrorOutOfDateKHR will trigger a rebuild at the right time.
+            Logger.Debug("Swapchain suboptimal during present — deferring resize.");
         }
         else
         {

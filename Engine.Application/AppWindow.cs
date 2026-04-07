@@ -61,12 +61,21 @@ public sealed class AppWindow
     public void RequestClose() => _shouldClose = true;
 
     /// <summary>Pumps SDL events and calls the supplied per-frame delegates until quit is requested.</summary>
+    /// <remarks>
+    /// Resize events are coalesced: if multiple <c>WindowResized</c> events arrive in
+    /// a single poll batch, only the final dimensions are dispatched — once — after the
+    /// batch drains.  This collapses N resize callbacks per frame to at most 1.
+    /// </remarks>
     public void Looping(params Delegate[] onFrame)
     {
         bool running = true;
         while (running)
         {
             if (_shouldClose) running = false;
+
+            // ── Coalesced resize state for this poll batch ──
+            bool resizedThisBatch = false;
+            int coalescedW = 0, coalescedH = 0;
 
             while (SDL.PollEvent(out var e))
             {
@@ -110,16 +119,21 @@ public sealed class AppWindow
                 if ((SDL.EventType)e.Type == SDL.EventType.WindowResized && e.Window.WindowID == SDL.GetWindowID(Sdl.Window))
                 {
                     // Update display scale (may change if window moved between monitors).
-                    // Content resolution (Width/Height) stays at configured values — it's a
-                    // deliberate setting, not driven by the window manager.
-                    // The Vulkan swapchain auto-manages through VK_ERROR_OUT_OF_DATE_KHR.
                     float resizeScale = SDL.GetWindowDisplayScale(Sdl.Window);
                     if (resizeScale <= 0f) resizeScale = 1f;
                     Sdl.DisplayScale = resizeScale;
 
-                    SDL.GetWindowSize(Sdl.Window, out int winW, out int winH);
-                    ResizeEvent?.Invoke(winW, winH);
+                    // Flag for coalesced dispatch after the poll batch drains.
+                    // Only the last (most recent) dimensions matter.
+                    SDL.GetWindowSize(Sdl.Window, out coalescedW, out coalescedH);
+                    resizedThisBatch = true;
                 }
+            }
+
+            // ── Dispatch the single coalesced resize (if any) ──
+            if (resizedThisBatch && coalescedW > 0 && coalescedH > 0)
+            {
+                ResizeEvent?.Invoke(coalescedW, coalescedH);
             }
 
             foreach (var frame in onFrame)

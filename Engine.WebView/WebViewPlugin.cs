@@ -14,6 +14,10 @@ public sealed class WebViewPlugin : IPlugin
 {
     private static readonly ILogger Logger = Log.Category("Engine.WebView");
 
+    /// <summary>Delay (ms) after the last resize event before committing the native
+    /// <see cref="WebViewInstance.Resize"/> call (which triggers a surface reallocation).</summary>
+    private const long ResizeDebounceMs = 150;
+
     /// <summary>Optional initial HTML to load. Set before adding to App.</summary>
     public string? InitialHtml { get; init; }
 
@@ -26,6 +30,11 @@ public sealed class WebViewPlugin : IPlugin
 
         var webview = new WebViewInstance();
         app.World.InsertResource(webview);
+
+        // ── Debounce state for WebView native resize ──
+        bool pendingWebViewResize = false;
+        uint pendingW = 0, pendingH = 0;
+        long lastWebViewResizeTick = 0;
 
         // ── Startup: initialize Ultralight and load content ───────────
         app.AddSystem(Stage.Startup, (World world) =>
@@ -59,11 +68,16 @@ public sealed class WebViewPlugin : IPlugin
             {
                 window.SDLEvent += evt => WebViewInput.ProcessEvent(evt, b);
 
-                // Handle window resize → resize webview view
+                // Handle window resize → flag for debounced native resize
                 window.ResizeEvent += (w, h) =>
                 {
                     if (w > 0 && h > 0)
-                        b.Resize((uint)w, (uint)h);
+                    {
+                        pendingWebViewResize = true;
+                        pendingW = (uint)w;
+                        pendingH = (uint)h;
+                        lastWebViewResizeTick = Environment.TickCount64;
+                    }
                 };
 
                 Logger.Info("WebViewPlugin: SDL event hooks registered.");
@@ -77,10 +91,20 @@ public sealed class WebViewPlugin : IPlugin
             }
         });
 
-        // ── Per-frame: update Ultralight ──────────────────────────────
-        app.AddSystem(Stage.Update, static (World world) =>
+        // ── Per-frame: resolve debounced resize, then update Ultralight ──
+        app.AddSystem(Stage.Update, (World world) =>
         {
-            world.TryResource<WebViewInstance>()?.Update();
+            var b = world.TryResource<WebViewInstance>();
+            if (b is null) return;
+
+            if (pendingWebViewResize && (Environment.TickCount64 - lastWebViewResizeTick) >= ResizeDebounceMs)
+            {
+                pendingWebViewResize = false;
+                Logger.Debug($"WebView debounce elapsed — committing native resize to {pendingW}x{pendingH}.");
+                b.Resize(pendingW, pendingH);
+            }
+
+            b.Update();
         });
 
         // ── Cleanup: dispose Ultralight ──────────────────────────────
