@@ -2,7 +2,7 @@ namespace Engine;
 
 /// <summary>
 /// Render graph node that draws the Ultralight webview surface as a fullscreen textured overlay.
-/// Uses CPU bitmap surface mode — reads pixels from Ultralight, uploads to a Vulkan texture,
+/// Uses CPU bitmap surface mode -- reads pixels from Ultralight, uploads to a Vulkan texture,
 /// then draws a fullscreen triangle with alpha blending.
 /// Depends on "sample" so it renders after the 3D scene but before ImGui.
 /// </summary>
@@ -13,7 +13,7 @@ public sealed class WebViewRenderNode : IRenderNode, IDisposable
     public string Name => "webview";
     public IReadOnlyCollection<string> Dependencies { get; } = new[] { "sample" };
 
-    // GPU resources — created lazily on first Execute
+    // GPU resources -- created lazily on first Execute
     private IPipeline? _pipeline;
     private IShader? _vertexShader;
     private IShader? _fragmentShader;
@@ -52,11 +52,11 @@ public sealed class WebViewRenderNode : IRenderNode, IDisposable
         // On the frame where a native ulViewResize was committed, the
         // surface has been reallocated but Ultralight has NOT yet painted
         // into it (Update/Render were skipped).  We must not touch the
-        // surface at all — just draw the previous frame's texture.
+        // surface at all -- just draw the previous frame's texture.
         var currentGen = webview.ResizeGeneration;
         if (currentGen != _lastSeenResizeGeneration)
         {
-            // Generation changed — a resize happened.  Skip surface
+            // Generation changed -- a resize happened.  Skip surface
             // access this frame and defer texture recreation to the
             // next frame when the surface has been painted into.
             _lastSeenResizeGeneration = currentGen;
@@ -90,13 +90,13 @@ public sealed class WebViewRenderNode : IRenderNode, IDisposable
 
                 if (actualRowBytes == packedRowBytes)
                 {
-                    // No padding — upload the surface data directly
+                    // No padding -- upload the surface data directly
                     gfx.UploadTexture2D(_webviewImage, _stagingBuffer.AsSpan(0, totalBytes),
                         currentWidth, currentHeight, bytesPerPixel: 4);
                 }
                 else
                 {
-                    // Surface has row padding — strip it to get tightly-packed rows
+                    // Surface has row padding -- strip it to get tightly-packed rows
                     var packedSize = (int)(packedRowBytes * currentHeight);
                     var packed = new byte[packedSize];
                     for (uint y = 0; y < currentHeight; y++)

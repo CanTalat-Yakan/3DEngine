@@ -21,7 +21,7 @@ public sealed class InputPlugin : IPlugin
         }
         else
         {
-            Logger.Warn("InputPlugin: No IInputBackend resource found — input events will not be forwarded.");
+            Logger.Warn("InputPlugin: No IInputBackend resource found -- input events will not be forwarded.");
         }
 
         app.AddSystem(Stage.Last, new SystemDescriptor(static world =>
@@ -38,7 +38,7 @@ public sealed class InputPlugin : IPlugin
 /// <para>
 /// Query methods (<c>KeyDown</c>, <c>MousePressed</c>, etc.) are public.
 /// Mutation methods (<c>SetKey</c>, <c>SetMouseButton</c>, etc.) are <c>internal</c>
-/// — only platform backends should call them.
+/// -- only platform backends should call them.
 /// </para>
 /// </summary>
 public sealed class Input
@@ -84,7 +84,7 @@ public sealed class Input
     public bool MousePressed(int button) => _mousePressed.Contains((MouseButton)button);
     public bool MouseReleased(int button) => _mouseReleased.Contains((MouseButton)button);
 
-    // ── Mutation (internal — platform backends only) ───────────────────
+    // ── Mutation (internal -- platform backends only) ───────────────────
 
     /// <summary>Clears per-frame transient state. Called once at the end of each frame.</summary>
     internal void BeginFrame()
@@ -241,7 +241,7 @@ public enum Key
 
     /// <summary>
     /// ISO keyboards use this code instead of 49 for the same key. Most OSes treat both
-    /// identically — prefer <see cref="Backslash"/> unless your keyboard generates both.
+    /// identically -- prefer <see cref="Backslash"/> unless your keyboard generates both.
     /// </summary>
     NonUshash = 50,
     Semicolon = 51,
@@ -461,7 +461,7 @@ public enum Key
     /// <summary>Left Alt / Option.</summary>
     LAlt = 226,
 
-    /// <summary>Left GUI — Windows / Command (Apple) / Meta.</summary>
+    /// <summary>Left GUI -- Windows / Command (Apple) / Meta.</summary>
     LGUI = 227,
     RCtrl = 228,
     RShift = 229,
@@ -469,7 +469,7 @@ public enum Key
     /// <summary>Right Alt / AltGr / Option.</summary>
     RAlt = 230,
 
-    /// <summary>Right GUI — Windows / Command (Apple) / Meta.</summary>
+    /// <summary>Right GUI -- Windows / Command (Apple) / Meta.</summary>
     RGUI = 231,
 
     /// <summary>Mode key (SDL_KMOD_MODE).</summary>
@@ -577,7 +577,7 @@ public enum Key
     /// <summary>400–500 reserved for dynamic keycodes.</summary>
     Reserved = 400,
 
-    /// <summary>Not a key — marks the scancode array upper bound.</summary>
+    /// <summary>Not a key -- marks the scancode array upper bound.</summary>
     Count = 512,
 }
 

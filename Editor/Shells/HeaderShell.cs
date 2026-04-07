@@ -37,7 +37,7 @@ public class HeaderShell : IEditorShellBuilder
                                 "Showcase", href: "/showcase/buttons", variant: Variant.From(ButtonStyle.Link));
                         });
 
-                        // Right side — dark mode toggle
+                        // Right side -- dark mode toggle
                         bar.Div(Css.Flex().Flex1().Items(Align.Center).Justify(Justify.End).Raw("space-x-2"), actions =>
                         {
                             actions.DarkModeToggle();

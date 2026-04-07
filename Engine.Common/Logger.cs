@@ -57,11 +57,11 @@ public sealed class Logger : ILogger
 
     public void Log(LogLevel level, string message, Exception? exception = null)
     {
-        // Console: respects ConsoleMinimumLevel (defaults to Info — no startup traces on console).
+        // Console: respects ConsoleMinimumLevel (defaults to Info -- no startup traces on console).
         if (level >= LogConfig.ConsoleMinimumLevel)
             ConsoleLoggerProvider.Instance.Log(level, _category, message, exception);
 
-        // File: respects MinimumLevel (defaults to Trace — all startup diagnostics captured to disk).
+        // File: respects MinimumLevel (defaults to Trace -- all startup diagnostics captured to disk).
         // Late-bound lookup so loggers created before Initialize() still write to the file.
         if (level >= LogConfig.MinimumLevel && FileLoggerProvider.Instance is { } file)
             file.Log(level, _category, message, exception);
@@ -99,15 +99,15 @@ public sealed class LoggerFactory
 /// <summary>Global log configuration.</summary>
 public static class LogConfig
 {
-    /// <summary>Minimum severity written to the log file and any extra providers. Defaults to Trace — captures all startup diagnostics to disk.</summary>
+    /// <summary>Minimum severity written to the log file and any extra providers. Defaults to Trace -- captures all startup diagnostics to disk.</summary>
     public static LogLevel MinimumLevel { get; set; } = LogLevel.Trace;
 
-    /// <summary>Minimum severity written to the console. Defaults to Info — keeps the console readable while the log file gets the full detail.</summary>
+    /// <summary>Minimum severity written to the console. Defaults to Info -- keeps the console readable while the log file gets the full detail.</summary>
     public static LogLevel ConsoleMinimumLevel { get; set; } = LogLevel.Info;
 
     /// <summary>
     /// When true, per-frame repetitive diagnostics (stage timing, render steps) are emitted at Trace level.
-    /// When false (default), only one-time startup/lifecycle logs are shown — keeping output clean at runtime.
+    /// When false (default), only one-time startup/lifecycle logs are shown -- keeping output clean at runtime.
     /// Enable via <c>LogConfig.PerFrameLogging = true</c> or the <c>ENGINE_LOG_FRAMES=1</c> environment variable.
     /// </summary>
     public static bool PerFrameLogging { get; set; }
@@ -175,7 +175,7 @@ public sealed class FileLoggerProvider : ILoggerProvider, IDisposable
         }
         catch
         {
-            // Silently degrade — file logging is best-effort.
+            // Silently degrade -- file logging is best-effort.
         }
     }
 
@@ -234,7 +234,7 @@ public static class Log
     {
         var logger = Category("Engine");
         logger.Info("========================================================");
-        logger.Info("  3DEngine — Initializing");
+        logger.Info("  3DEngine -- Initializing");
         logger.Info("========================================================");
         logger.Info($"Runtime:      {RuntimeInformation.FrameworkDescription}");
         logger.Info($"OS:           {RuntimeInformation.OSDescription}");

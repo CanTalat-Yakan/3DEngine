@@ -4,7 +4,7 @@ using Editor.Shell;
 /// <summary>
 /// Helper used by showcase shell scripts to wrap page content with the
 /// shared sidebar navigation layout.  Lives at the implementation (script)
-/// level — Editor.Server knows nothing about showcases.
+/// level -- Editor.Server knows nothing about showcases.
 /// </summary>
 public static class ShowcasePageHelper
 {

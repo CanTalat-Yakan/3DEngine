@@ -18,7 +18,7 @@ using Engine;
 //  │  └────────────────────────────────────────────────────────┘  │
 //  └──────────────────────────────────────────────────────────────┘
 //
-// Single process — the Blazor Server runs in-process on a background
+// Single process -- the Blazor Server runs in-process on a background
 // thread while the SDL3/Vulkan engine drives the main thread.
 // The editor UI is rendered via an Ultralight webview overlay composited
 // into the Vulkan render pipeline. Play mode opens a separate SDL3
@@ -72,7 +72,7 @@ try
 }
 finally
 {
-    // Engine window closed — gracefully shut down everything.
+    // Engine window closed -- gracefully shut down everything.
     Console.WriteLine("[Editor] Shutting down...");
     compiler.Dispose();
     using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));

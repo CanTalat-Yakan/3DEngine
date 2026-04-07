@@ -25,7 +25,7 @@ public sealed class SystemDescriptor
     /// <summary>The system delegate to invoke.</summary>
     public SystemFn System { get; }
 
-    /// <summary>Optional predicate — when set, the system only runs if this returns <c>true</c>.</summary>
+    /// <summary>Optional predicate -- when set, the system only runs if this returns <c>true</c>.</summary>
     public Func<World, bool>? RunCondition { get => _runCondition; init => _runCondition = value; }
     private Func<World, bool>? _runCondition;
 
@@ -176,7 +176,7 @@ public sealed class Schedule
         SetSingleThreaded(Stage.Startup);
         SetSingleThreaded(Stage.Render);
         SetSingleThreaded(Stage.Cleanup);
-        Logger.Trace("Schedule created — all stages initialized, Startup, Render, and Cleanup stages set to single-threaded.");
+        Logger.Trace("Schedule created -- all stages initialized, Startup, Render, and Cleanup stages set to single-threaded.");
     }
 
     // ── Registration ───────────────────────────────────────────────────
@@ -310,7 +310,7 @@ public sealed class Schedule
 
             if (desc.RunCondition is { } cond && !cond(world))
             {
-                Logger.FrameTrace($"  ⏭ {desc.Name} — skipped (run condition false)");
+                Logger.FrameTrace($"  ⏭ {desc.Name} -- skipped (run condition false)");
                 continue;
             }
 
@@ -432,7 +432,7 @@ public sealed class Schedule
     {
         if (desc.RunCondition is { } cond && !cond(world))
         {
-            Logger.FrameTrace($"  ⏭ {desc.Name} — skipped (run condition false)");
+            Logger.FrameTrace($"  ⏭ {desc.Name} -- skipped (run condition false)");
             return;
         }
 

@@ -1,7 +1,7 @@
 namespace Editor.Shell;
 
 // ═══════════════════════════════════════════════════════════════════════════
-//  Descriptor Models — serializable POCO tree describing the entire editor UI.
+//  Descriptor Models -- serializable POCO tree describing the entire editor UI.
 //  Built by IShellBuilder implementations; consumed by the Blazor renderer.
 //  Zero Blazor/ASP.NET dependencies.
 // ═══════════════════════════════════════════════════════════════════════════

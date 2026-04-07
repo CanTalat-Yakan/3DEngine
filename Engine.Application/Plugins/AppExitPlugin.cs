@@ -16,7 +16,7 @@ public sealed class AppExitPlugin : IPlugin
         var window = app.World.Resource<AppWindow>();
         window.QuitEvent += () =>
         {
-            Logger.Info("Quit event received — flagging application exit.");
+            Logger.Info("Quit event received -- flagging application exit.");
             app.World.Resource<AppExit>().Requested = true;
         };
 
@@ -25,7 +25,7 @@ public sealed class AppExitPlugin : IPlugin
             {
                 if (world.Resource<AppExit>().Requested)
                 {
-                    Logger.Info("Exit requested — closing window to break main loop.");
+                    Logger.Info("Exit requested -- closing window to break main loop.");
                     world.Resource<AppWindow>().RequestClose();
                 }
             }, "AppExitPlugin.Update")

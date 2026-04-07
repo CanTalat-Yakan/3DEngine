@@ -42,7 +42,7 @@ public sealed class WebViewPlugin : IPlugin
                 var cfg = world.Resource<Config>();
                 var b = world.Resource<WebViewInstance>();
             
-                // Initialize at config dimensions — if the window is actually
+                // Initialize at config dimensions -- if the window is actually
                 // larger (e.g. HiDPI scaling), the deferred resize in Update()
                 // will handle it safely without crashing native code.
                 b.Initialize((uint)cfg.WindowData.Width, (uint)cfg.WindowData.Height);
@@ -105,7 +105,7 @@ public sealed class WebViewPlugin : IPlugin
                 if (pendingWebViewResize && (Environment.TickCount64 - lastWebViewResizeTick) >= ResizeDebounceMs)
                 {
                     pendingWebViewResize = false;
-                    Logger.Debug($"WebView debounce elapsed — committing native resize to {pendingW}x{pendingH}.");
+                    Logger.Debug($"WebView debounce elapsed -- committing native resize to {pendingW}x{pendingH}.");
                     b.Resize(pendingW, pendingH);
                 }
             

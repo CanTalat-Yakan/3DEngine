@@ -123,7 +123,7 @@ public sealed class App : IDisposable
 
     /// <summary>
     /// Returns the existing resource of type T, or inserts <paramref name="value"/> and returns it.
-    /// Atomic — safe for concurrent callers.
+    /// Atomic -- safe for concurrent callers.
     /// </summary>
     public T GetOrInsertResource<T>(T value) where T : notnull
         => World.GetOrInsertResource(value);
@@ -143,15 +143,15 @@ public sealed class App : IDisposable
     /// </summary>
     public void Run()
     {
-        Logger.Info("App.Run() — Resolving main loop driver...");
+        Logger.Info("App.Run() -- Resolving main loop driver...");
         var loop = World.Resource<IMainLoopDriver>();
         Logger.Info($"Main loop driver: {loop.GetType().Name}");
 
-        Logger.Info("Running Startup stage — one-time initialization systems...");
+        Logger.Info("Running Startup stage -- one-time initialization systems...");
         Schedule.RunStage(Stage.Startup, World);
         Logger.Info("Startup stage complete.");
 
-        Logger.Info("Entering main loop — per-frame execution begins.");
+        Logger.Info("Entering main loop -- per-frame execution begins.");
         loop.Run(() =>
         {
             _frameCount++;
@@ -163,7 +163,7 @@ public sealed class App : IDisposable
         });
 
         Logger.Info($"Main loop exited after {_frameCount} frames.");
-        Logger.Info("Running Cleanup stage — teardown and resource disposal...");
+        Logger.Info("Running Cleanup stage -- teardown and resource disposal...");
         Schedule.RunStage(Stage.Cleanup, World);
 
         // Tear down platform resources (e.g., SDL window) *after* Cleanup systems

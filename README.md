@@ -320,7 +320,7 @@ ecs.TransformEach<Mass>((e, m) => m);
 
 ### ECS Internals and File Layout
 
-- Storage: Sparse-set layout (sparse index + dense arrays for entities and components) — cache-friendly, O(1) lookups.
+- Storage: Sparse-set layout (sparse index + dense arrays for entities and components) -- cache-friendly, O(1) lookups.
 - Changed flags: Compact bitset aligned to dense storage; cleared per frame.
 - Type lookup: One store per component type with direct casting (no interfaces in hot loops).
 - File split (partial class):
@@ -472,7 +472,7 @@ alongside them.
   methods).
 - A `BehaviorsPlugin` that registers those systems into the app.
 
-`DefaultPlugins` includes `BehaviorsPlugin`, so behaviors are picked up automatically at build time—no manual
+`DefaultPlugins` includes `BehaviorsPlugin`, so behaviors are picked up automatically at build time--no manual
 registration required.
 
 ### FAQ

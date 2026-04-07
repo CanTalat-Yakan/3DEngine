@@ -1,7 +1,7 @@
 namespace Editor.Shell;
 
 // ═══════════════════════════════════════════════════════════════════════════
-//  CSS Builder — fluent Tailwind-style API for composing CSS classes.
+//  CSS Builder -- fluent Tailwind-style API for composing CSS classes.
 //  Works with the existing string? css parameters via implicit conversion.
 //
 //  Usage:
@@ -26,7 +26,7 @@ public enum Justify { Start, Center, End, Between, Around, Evenly }
 /// </summary>
 public static class Css
 {
-    /// <summary>No CSS classes — use as the first argument when no styling is needed.</summary>
+    /// <summary>No CSS classes -- use as the first argument when no styling is needed.</summary>
     public static readonly string? Default = null;
 
     // Display

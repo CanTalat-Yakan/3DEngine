@@ -24,7 +24,7 @@ public sealed class Renderer : IDisposable
     public void Initialize()
     {
         if (_initialized) return;
-        Logger.Info("Initializing Renderer — setting up diagnostics and render graph...");
+        Logger.Info("Initializing Renderer -- setting up diagnostics and render graph...");
         var sw = Stopwatch.StartNew();
 
         Diagnostics.Initialize(Context.AdapterInfo);

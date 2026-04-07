@@ -17,7 +17,7 @@ public readonly record struct DynamicAllocation(IBuffer Buffer, ulong Offset, ul
 /// <see cref="Dispose"/>.
 /// </para>
 /// <para>
-/// Only accessed from the render thread — no locking required.
+/// Only accessed from the render thread -- no locking required.
 /// </para>
 /// </summary>
 public sealed class DynamicBufferAllocator : IDisposable
@@ -41,7 +41,7 @@ public sealed class DynamicBufferAllocator : IDisposable
         for (int i = 0; i < _framesInFlight; i++)
             _arenas[i] = new FrameArena();
 
-        Logger.Info($"DynamicBufferAllocator created — {_framesInFlight} frame slots.");
+        Logger.Info($"DynamicBufferAllocator created -- {_framesInFlight} frame slots.");
     }
 
     /// <summary>
@@ -94,7 +94,7 @@ public sealed class DynamicBufferAllocator : IDisposable
     {
         foreach (var arena in _arenas)
             arena.DisposeAll();
-        Logger.Debug("DynamicBufferAllocator reset — all backing buffers disposed.");
+        Logger.Debug("DynamicBufferAllocator reset -- all backing buffers disposed.");
     }
 
     public void Dispose()
@@ -141,7 +141,7 @@ public sealed class DynamicBufferAllocator : IDisposable
                 ab.Capacity = newCap;
 
                 // Must re-upload any data already written this frame into the old buffer.
-                // Since we grew mid-frame, just reset cursor — caller hasn't bound anything yet
+                // Since we grew mid-frame, just reset cursor -- caller hasn't bound anything yet
                 // because we're bump-allocating forward and the old buffer was disposed.
                 ab.Cursor = 0;
             }

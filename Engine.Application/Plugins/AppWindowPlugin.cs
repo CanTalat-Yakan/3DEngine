@@ -11,7 +11,7 @@ public sealed class AppWindowPlugin : IPlugin
         public void Run(Action frameStep)
         {
             window.Looping((Action)(() => frameStep()));
-            // NOTE: Do NOT destroy the SDL window here — Cleanup-stage systems
+            // NOTE: Do NOT destroy the SDL window here -- Cleanup-stage systems
             // (Vulkan, ImGui, WebView) still need the window/surface alive.
         }
 

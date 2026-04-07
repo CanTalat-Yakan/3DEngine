@@ -1,7 +1,7 @@
 namespace Editor.Shell;
 
 // ═══════════════════════════════════════════════════════════════════════════
-//  Element Descriptors — a virtual UI tree built from C# scripts.
+//  Element Descriptors -- a virtual UI tree built from C# scripts.
 //  Each node maps to a BlazorBlueprint component rendered by ElementRenderer.
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -31,7 +31,7 @@ public sealed class Element
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-//  Content Builder — fluent API for building UI element trees from C# scripts.
+//  Content Builder -- fluent API for building UI element trees from C# scripts.
 //  Covers all BlazorBlueprint component types: layout, text, inputs, cards,
 //  alerts, badges, dialogs, trees, field rows, etc.
 // ═══════════════════════════════════════════════════════════════════════════
@@ -136,7 +136,7 @@ public interface IContentBuilder
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-//  Sub-builder interfaces — for components with complex nested structure.
+//  Sub-builder interfaces -- for components with complex nested structure.
 // ═══════════════════════════════════════════════════════════════════════════
 
 /// <summary>Sub-builder for card structure (header, title, description, content, footer).</summary>

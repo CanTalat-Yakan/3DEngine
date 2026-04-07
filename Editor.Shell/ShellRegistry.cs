@@ -2,7 +2,7 @@ namespace Editor.Shell;
 
 /// <summary>
 /// Central registry holding the current <see cref="ShellDescriptor"/>.
-/// Observable — fires <see cref="Changed"/> whenever the descriptor tree is
+/// Observable -- fires <see cref="Changed"/> whenever the descriptor tree is
 /// rebuilt (e.g., after a script hot-reload). Thread-safe for concurrent reads
 /// and atomic swaps.
 /// </summary>

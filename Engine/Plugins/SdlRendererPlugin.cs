@@ -48,7 +48,7 @@ public sealed class SdlRendererPlugin : IPlugin
 
         if (cfg.Graphics == GraphicsBackend.Vulkan)
         {
-            Logger.Info("SdlRendererPlugin: Vulkan backend selected — initializing graphics context against SDL window...");
+            Logger.Info("SdlRendererPlugin: Vulkan backend selected -- initializing graphics context against SDL window...");
             // Grab the ISurfaceSource that AppWindowPlugin inserted
             var surface = app.World.Resource<ISurfaceSource>();
             renderer.Context.Initialize(surface, cfg.WindowData.Title);
@@ -64,7 +64,7 @@ public sealed class SdlRendererPlugin : IPlugin
             {
                 if (w > 0 && h > 0)
                 {
-                    Logger.Debug($"Window resized to {w}x{h} — updating render surface info (rebuild deferred).");
+                    Logger.Debug($"Window resized to {w}x{h} -- updating render surface info (rebuild deferred).");
                     renderer.RenderWorld.Set(new RenderSurfaceInfo { Width = w, Height = h });
                     pendingRendererResize = true;
                     lastResizeTick = Environment.TickCount64;
@@ -73,7 +73,7 @@ public sealed class SdlRendererPlugin : IPlugin
         }
         else
         {
-            Logger.Info("SdlRendererPlugin: Non-Vulkan backend — Vulkan renderer initialization skipped.");
+            Logger.Info("SdlRendererPlugin: Non-Vulkan backend -- Vulkan renderer initialization skipped.");
         }
 
         // Run Vulkan renderer after other Render stage systems.
@@ -87,7 +87,7 @@ public sealed class SdlRendererPlugin : IPlugin
                 if (pendingRendererResize && (Environment.TickCount64 - lastResizeTick) >= ResizeDebounceMs)
                 {
                     pendingRendererResize = false;
-                    Logger.Info("Debounce elapsed — committing renderer resize (swapchain + allocator + camera)...");
+                    Logger.Info("Debounce elapsed -- committing renderer resize (swapchain + allocator + camera)...");
                     r.Context.OnResize();
                 }
             
@@ -103,7 +103,7 @@ public sealed class SdlRendererPlugin : IPlugin
             {
                 if (world.TryGetResource<Renderer>(out var r))
                 {
-                    Logger.Info("SdlRendererPlugin: Cleanup stage — disposing Renderer...");
+                    Logger.Info("SdlRendererPlugin: Cleanup stage -- disposing Renderer...");
                     r.Dispose();
                     world.RemoveResource<Renderer>();
                 }

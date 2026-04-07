@@ -1,4 +1,4 @@
-// Auto-generated icon enums — do not edit by hand.
+// Auto-generated icon enums -- do not edit by hand.
 // Re-generate by running the icon extraction tool.
 namespace Editor.Shell;
 

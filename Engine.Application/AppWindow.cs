@@ -63,7 +63,7 @@ public sealed class AppWindow
     /// <summary>Pumps SDL events and calls the supplied per-frame delegates until quit is requested.</summary>
     /// <remarks>
     /// Resize events are coalesced: if multiple <c>WindowResized</c> events arrive in
-    /// a single poll batch, only the final dimensions are dispatched — once — after the
+    /// a single poll batch, only the final dimensions are dispatched -- once -- after the
     /// batch drains.  This collapses N resize callbacks per frame to at most 1.
     /// </remarks>
     public void Looping(params Delegate[] onFrame)
@@ -103,7 +103,7 @@ public sealed class AppWindow
                     Sdl.DisplayScale = resizeScale;
 
                     // GetWindowSize returns logical coordinates on native Wayland,
-                    // macOS, and iOS — but physical pixels on Windows, X11 (XWayland),
+                    // macOS, and iOS -- but physical pixels on Windows, X11 (XWayland),
                     // and Android.
                     SDL.GetWindowSize(Sdl.Window, out int rawW, out int rawH);
                     if (Sdl.NeedsManualHiDpiScaling && resizeScale > 1.001f)

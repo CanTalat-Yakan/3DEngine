@@ -6,15 +6,15 @@ namespace UltralightNet.Enums;
 public enum EffectQuality : byte // CAPI_Defines.h - no type, platform/Config.h - uint8_t
 {
 	/// <summary>
-	/// Fastest effect quality — uses the lowest quality effects (half-resolution, fewer passes, etc.)
+	/// Fastest effect quality -- uses the lowest quality effects (half-resolution, fewer passes, etc.)
 	/// </summary>
 	Low,
 	/// <summary>
-	/// Default effect quality — strikes a good balance between quality and performance.
+	/// Default effect quality -- strikes a good balance between quality and performance.
 	/// </summary>
 	Medium,
 	/// <summary>
-	/// Highest effect quality — favors quality over performance.
+	/// Highest effect quality -- favors quality over performance.
 	/// </summary>
 	High,
 }

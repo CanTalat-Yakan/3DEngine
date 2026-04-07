@@ -34,7 +34,7 @@ public sealed class ExceptionsPlugin : IPlugin
             }, "ExceptionsPlugin.Cleanup")
             .MainThreadOnly());
 
-        Logger.Info("Exception handlers installed — unhandled exceptions will be logged to Engine.log and Crash.log.");
+        Logger.Info("Exception handlers installed -- unhandled exceptions will be logged to Engine.log and Crash.log.");
     }
 
     private static void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -53,7 +53,7 @@ public sealed class ExceptionsPlugin : IPlugin
     private static void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
         // Log but observe so it doesn't tear down the process in modern .NET.
-        Logger.Error("Unobserved task exception — this usually indicates a fire-and-forget Task that threw.", e.Exception);
+        Logger.Error("Unobserved task exception -- this usually indicates a fire-and-forget Task that threw.", e.Exception);
         e.SetObserved();
     }
 
@@ -70,7 +70,7 @@ public sealed class ExceptionsPlugin : IPlugin
             var sb = new StringBuilder();
 
             sb.AppendLine("========================================================");
-            sb.AppendLine(fatal ? "  3DEngine — FATAL CRASH" : "  3DEngine — UNHANDLED EXCEPTION");
+            sb.AppendLine(fatal ? "  3DEngine -- FATAL CRASH" : "  3DEngine -- UNHANDLED EXCEPTION");
             sb.AppendLine("========================================================");
             sb.AppendLine($"Timestamp:  {DateTime.UtcNow:O}");
             sb.AppendLine($"Uptime:     {LogConfig.EngineTimer.Elapsed}");
@@ -86,7 +86,7 @@ public sealed class ExceptionsPlugin : IPlugin
         }
         catch
         {
-            // Best-effort — if we can't write the crash log, don't mask the original exception.
+            // Best-effort -- if we can't write the crash log, don't mask the original exception.
         }
     }
 

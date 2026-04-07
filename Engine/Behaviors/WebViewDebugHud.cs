@@ -73,7 +73,7 @@ public struct WebViewDebugHud
         // ── Warnings ─────────────────────────────────────────────────
         if (!w.DiagDOMReady && w.DiagUpdateCount > 60)
             ImGui.TextColored(Red,
-                "CRITICAL: DOM never became ready — page did not load!");
+                "CRITICAL: DOM never became ready -- page did not load!");
 
         if (w.DiagLoadError is not null)
             ImGui.TextColored(Red,
@@ -93,11 +93,11 @@ public struct WebViewDebugHud
 
         if (w.DiagUploadCount > 0 && w.DiagNonZeroPixels == 0 && w.DiagProbeNonZero > 0)
             ImGui.TextColored(Yellow,
-                "HINT: Probe found pixels but upload didn't — timing issue!");
+                "HINT: Probe found pixels but upload didn't -- timing issue!");
 
         if (!w.DiagIcuExists)
             ImGui.TextColored(Red,
-                "CRITICAL: icudt67l.dat missing — text layout will fail!");
+                "CRITICAL: icudt67l.dat missing -- text layout will fail!");
 
         ImGui.Separator();
 
@@ -134,7 +134,7 @@ public struct WebViewDebugHud
 
             // Warnings
             if (!w.DiagDOMReady && w.DiagUpdateCount > 60)
-                sb.AppendLine("CRITICAL: DOM never became ready — page did not load!");
+                sb.AppendLine("CRITICAL: DOM never became ready -- page did not load!");
             if (w.DiagLoadError is not null)
                 sb.AppendLine("CRITICAL: Page load failed!");
             if (w.DiagUpdateCount > 60 && w.DiagPaintCount == 0)

@@ -83,7 +83,7 @@ public sealed class WebViewInstance : IDisposable
     /// <summary>Set to <c>true</c> for the single frame where the native
     /// <c>ulViewResize</c> was committed.  While set, no Ultralight
     /// Update/Render is executed and the render node must not touch the
-    /// surface — this is the "quiescent resize" pattern used by CEF and
+    /// surface -- this is the "quiescent resize" pattern used by CEF and
     /// similar browser-embedding solutions.</summary>
     private bool _resizedThisFrame;
 
@@ -160,7 +160,7 @@ public sealed class WebViewInstance : IDisposable
     private void OnFailLoadingHandler(ulong frameId, bool isMainFrame, string url, string description, string errorDomain, int errorCode)
     {
         DiagLoadError = $"{errorDomain}:{errorCode} {description}";
-        Logger.Warn($"WebViewInstance: Page load FAILED — {DiagLoadError} (url={url})");
+        Logger.Warn($"WebViewInstance: Page load FAILED -- {DiagLoadError} (url={url})");
     }
 
     private void OnConsoleMessageHandler(MessageSource source, MessageLevel level, string message, uint lineNumber, uint columnNumber, string sourceId)
@@ -242,7 +242,7 @@ public sealed class WebViewInstance : IDisposable
 
         // ── Quiescent resize ─────────────────────────────────────────
         // If a resize is pending, commit it NOW and return immediately.
-        // No Ultralight Update/Render is called this frame — the native
+        // No Ultralight Update/Render is called this frame -- the native
         // surface has just been reallocated and must not be touched until
         // the next frame.  This is the industry-standard "frame gap"
         // pattern used by CEF and similar browser-embedding solutions.

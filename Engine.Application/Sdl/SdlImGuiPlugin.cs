@@ -20,7 +20,7 @@ public sealed class SdlImGuiPlugin : IPlugin
         io.DisplaySize = new Vector2(Math.Max(1, sdlWindow.Width), Math.Max(1, sdlWindow.Height));
         io.DeltaTime = 1f / 60f;
 
-        logger.Info($"ImGui initialized — display size: {sdlWindow.Width}x{sdlWindow.Height}");
+        logger.Info($"ImGui initialized -- display size: {sdlWindow.Width}x{sdlWindow.Height}");
 
         if (sdlWindow.Renderer != IntPtr.Zero)
         {
@@ -31,8 +31,8 @@ public sealed class SdlImGuiPlugin : IPlugin
         else
         {
             // Vulkan mode: no SDL renderer, but ImGui still needs the font atlas built.
-            // Don't clear tex data — the Vulkan ImGui render node will upload it to GPU.
-            logger.Info("ImGui using Vulkan mode — building font atlas only (no SDL renderer).");
+            // Don't clear tex data -- the Vulkan ImGui render node will upload it to GPU.
+            logger.Info("ImGui using Vulkan mode -- building font atlas only (no SDL renderer).");
             var io2 = ImGui.GetIO();
             io2.Fonts.GetTexDataAsRGBA32(out IntPtr _, out int _, out int _, out _);
         }

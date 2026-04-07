@@ -37,7 +37,7 @@ public sealed unsafe partial class GraphicsDevice
 
             if (!features.geometryShader)
             {
-                Logger.Debug($"    Rejected — no geometry shader support.");
+                Logger.Debug($"    Rejected -- no geometry shader support.");
                 continue;
             }
 
@@ -67,7 +67,7 @@ public sealed unsafe partial class GraphicsDevice
 
         if (best is null)
         {
-            Logger.Error("Failed to find a suitable Vulkan GPU — no device passed all requirements.");
+            Logger.Error("Failed to find a suitable Vulkan GPU -- no device passed all requirements.");
             throw new InvalidOperationException("Failed to find a suitable GPU for Vulkan.");
         }
 

@@ -5,19 +5,19 @@ public enum Stage
 {
     /// <summary>Runs once at application start before the main loop.</summary>
     Startup,
-    /// <summary>First per-frame stage — time updates, input polling.</summary>
+    /// <summary>First per-frame stage -- time updates, input polling.</summary>
     First,
-    /// <summary>Pre-update logic — physics preparation, AI sensing.</summary>
+    /// <summary>Pre-update logic -- physics preparation, AI sensing.</summary>
     PreUpdate,
     /// <summary>Main gameplay logic.</summary>
     Update,
-    /// <summary>Post-update logic — constraint solving, transform propagation.</summary>
+    /// <summary>Post-update logic -- constraint solving, transform propagation.</summary>
     PostUpdate,
-    /// <summary>Rendering commands — draw calls, GPU submission.</summary>
+    /// <summary>Rendering commands -- draw calls, GPU submission.</summary>
     Render,
-    /// <summary>Last per-frame stage — diagnostic flush, event cleanup.</summary>
+    /// <summary>Last per-frame stage -- diagnostic flush, event cleanup.</summary>
     Last,
-    /// <summary>Runs once after the main loop exits — teardown and resource disposal.</summary>
+    /// <summary>Runs once after the main loop exits -- teardown and resource disposal.</summary>
     Cleanup,
 }
 

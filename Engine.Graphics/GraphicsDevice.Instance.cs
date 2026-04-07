@@ -15,7 +15,7 @@ public sealed unsafe partial class GraphicsDevice
     private partial void CreateInstance(string appName)
     {
         Logger.Debug("Loading Vulkan library via vkInitialize()...");
-        // Load the Vulkan library — must be called before any other Vulkan API.
+        // Load the Vulkan library -- must be called before any other Vulkan API.
         vkInitialize().CheckResult();
         Logger.Debug("Vulkan library loaded successfully.");
 
