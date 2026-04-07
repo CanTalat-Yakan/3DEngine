@@ -37,6 +37,9 @@ public sealed class SystemDescriptor
     /// <summary>Resource types this system writes.</summary>
     public IReadOnlyCollection<Type> Writes => _writes;
 
+    /// <summary>True when this system declares at least one explicit resource read/write dependency.</summary>
+    public bool HasExplicitAccess => _reads.Count > 0 || _writes.Count > 0;
+
     private readonly HashSet<Type> _reads = [];
     private readonly HashSet<Type> _writes = [];
 
@@ -97,6 +100,41 @@ public sealed class SystemDescriptor
 
         return false;
     }
+
+    internal bool TryGetConflictReason(SystemDescriptor other, out string reason)
+    {
+        if (!HasExplicitAccess || !other.HasExplicitAccess)
+        {
+            reason = "missing explicit access metadata";
+            return true;
+        }
+
+        foreach (var t in _writes)
+        {
+            if (other._writes.Contains(t))
+            {
+                reason = $"write/write {t.Name}";
+                return true;
+            }
+            if (other._reads.Contains(t))
+            {
+                reason = $"write/read {t.Name}";
+                return true;
+            }
+        }
+
+        foreach (var t in _reads)
+        {
+            if (other._writes.Contains(t))
+            {
+                reason = $"read/write {t.Name}";
+                return true;
+            }
+        }
+
+        reason = string.Empty;
+        return false;
+    }
 }
 
 /// <summary>
@@ -115,6 +153,7 @@ public sealed class Schedule
     private readonly Lock _lock = new();
     private readonly Dictionary<Stage, List<SystemDescriptor>> _systemsByStage = new();
     private readonly HashSet<Stage> _parallelStages = [];
+    private readonly HashSet<string> _missingAccessWarnings = [];
 
     /// <summary>Per-stage and per-system timing recorded during execution.</summary>
     public ScheduleDiagnostics Diagnostics { get; } = new();
@@ -272,10 +311,13 @@ public sealed class Schedule
 
     private void RunParallel(Stage stage, List<SystemDescriptor> systems, World world)
     {
+        WarnForMissingAccessMetadata(stage, systems);
+
         // Build execution batches where systems can safely run together.
         // Main-thread systems form their own single-item batch and flush pending parallel work.
-        var batches = BuildExecutionBatches(systems);
+        var batches = BuildExecutionBatches(systems, out var notes);
         Diagnostics.RecordBatches(stage, batches);
+        Diagnostics.RecordBatchNotes(stage, notes);
 
         for (int i = 0; i < batches.Count; i++)
         {
@@ -296,15 +338,17 @@ public sealed class Schedule
         }
     }
 
-    private static List<List<SystemDescriptor>> BuildExecutionBatches(List<SystemDescriptor> systems)
+    private static List<List<SystemDescriptor>> BuildExecutionBatches(List<SystemDescriptor> systems, out List<IReadOnlyList<string>> notes)
     {
         var batches = new List<List<SystemDescriptor>>();
+        var batchNotes = new List<List<string>>();
 
         foreach (var desc in systems)
         {
             if (desc.Affinity == ThreadAffinity.MainThread)
             {
                 batches.Add([desc]);
+                batchNotes.Add(["main-thread-only"]);
                 continue;
             }
 
@@ -318,9 +362,11 @@ public sealed class Schedule
                 var conflict = false;
                 for (int j = 0; j < batch.Count; j++)
                 {
-                    if (desc.ConflictsWith(batch[j]))
+                    if (desc.TryGetConflictReason(batch[j], out var reason))
                     {
                         conflict = true;
+                        if (!batchNotes[i].Contains(reason))
+                            batchNotes[i].Add(reason);
                         break;
                     }
                 }
@@ -334,10 +380,33 @@ public sealed class Schedule
             }
 
             if (!placed)
+            {
                 batches.Add([desc]);
+                batchNotes.Add([]);
+            }
         }
 
+        notes = batchNotes.Select(n => (IReadOnlyList<string>)n.ToArray()).ToList();
         return batches;
+    }
+
+    private void WarnForMissingAccessMetadata(Stage stage, List<SystemDescriptor> systems)
+    {
+        for (int i = 0; i < systems.Count; i++)
+        {
+            var desc = systems[i];
+            if (desc.HasExplicitAccess || desc.Affinity == ThreadAffinity.MainThread)
+                continue;
+
+            var key = $"{stage}:{desc.Name}";
+            lock (_lock)
+            {
+                if (!_missingAccessWarnings.Add(key))
+                    continue;
+            }
+
+            Logger.Warn($"System '{desc.Name}' in stage {stage} has no Read/Write metadata; scheduler is using conservative conflict mode.");
+        }
     }
 
     private void ExecuteSystem(Stage stage, SystemDescriptor desc, World world)
@@ -369,6 +438,7 @@ public sealed class ScheduleDiagnostics
     private readonly Dictionary<Stage, TimeSpan> _stageTimes = new();
     private readonly Dictionary<(Stage Stage, string System), TimeSpan> _systemTimes = new();
     private readonly Dictionary<Stage, List<IReadOnlyList<string>>> _stageBatches = new();
+    private readonly Dictionary<Stage, List<IReadOnlyList<string>>> _stageBatchNotes = new();
 
     /// <summary>Records the total duration of a stage execution.</summary>
     internal void RecordStage(Stage stage, TimeSpan elapsed)
@@ -391,6 +461,13 @@ public sealed class ScheduleDiagnostics
                 .Select(batch => (IReadOnlyList<string>)batch.Select(desc => desc.Name).ToArray())
                 .ToList();
         }
+    }
+
+    /// <summary>Records conflict/placement notes for each computed batch.</summary>
+    internal void RecordBatchNotes(Stage stage, List<IReadOnlyList<string>> notes)
+    {
+        lock (_lock)
+            _stageBatchNotes[stage] = notes.ToList();
     }
 
     /// <summary>Last recorded duration for a stage, or <see cref="TimeSpan.Zero"/>.</summary>
@@ -431,6 +508,20 @@ public sealed class ScheduleDiagnostics
         }
     }
 
+    /// <summary>Snapshot of scheduler batch notes (conflicts/main-thread markers) from the most recent frame.</summary>
+    public IReadOnlyDictionary<Stage, IReadOnlyList<IReadOnlyList<string>>> StageBatchNotes
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _stageBatchNotes.ToDictionary(
+                    kv => kv.Key,
+                    kv => (IReadOnlyList<IReadOnlyList<string>>)kv.Value.Select(noteList => (IReadOnlyList<string>)noteList.ToArray()).ToArray());
+            }
+        }
+    }
+
     /// <summary>Clears all recorded timings.</summary>
     public void Reset()
     {
@@ -439,6 +530,7 @@ public sealed class ScheduleDiagnostics
             _stageTimes.Clear();
             _systemTimes.Clear();
             _stageBatches.Clear();
+            _stageBatchNotes.Clear();
         }
     }
 }
