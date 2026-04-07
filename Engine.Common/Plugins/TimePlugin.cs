@@ -18,15 +18,16 @@ public sealed class TimePlugin : IPlugin
         var watch = Stopwatch.StartNew();
         double lastElapsed = 0.0;
 
-        app.AddSystem(Stage.First, (world) =>
-        {
-            double now = watch.Elapsed.TotalSeconds;
-            double rawDelta = now - lastElapsed;
-            lastElapsed = now;
-
-            var time = world.Resource<Time>();
-            time.Update(now, rawDelta);
-        });
+        app.AddSystem(Stage.First, new SystemDescriptor(world =>
+            {
+                double now = watch.Elapsed.TotalSeconds;
+                double rawDelta = now - lastElapsed;
+                lastElapsed = now;
+            
+                var time = world.Resource<Time>();
+                time.Update(now, rawDelta);
+            }, "TimePlugin.Update")
+            .Write<Time>());
     }
 }
 

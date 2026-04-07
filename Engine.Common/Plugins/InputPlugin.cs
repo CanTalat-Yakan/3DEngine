@@ -24,7 +24,11 @@ public sealed class InputPlugin : IPlugin
             Logger.Warn("InputPlugin: No IInputBackend resource found — input events will not be forwarded.");
         }
 
-        app.AddSystem(Stage.Last, static (world) => world.Resource<Input>().BeginFrame());
+        app.AddSystem(Stage.Last, new SystemDescriptor(static world =>
+            {
+                world.Resource<Input>().BeginFrame();
+            }, "InputPlugin.BeginFrame")
+            .Write<Input>());
         Logger.Info("InputPlugin: Input system registered to Last stage.");
     }
 }

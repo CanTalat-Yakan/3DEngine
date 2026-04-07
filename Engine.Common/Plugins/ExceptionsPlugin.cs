@@ -26,12 +26,13 @@ public sealed class ExceptionsPlugin : IPlugin
         app.World.InsertResource(new ExceptionHandlerInstalled());
 
         // Unsubscribe during Cleanup so handlers don't outlive the app.
-        app.AddSystem(Stage.Cleanup, static (World world) =>
-        {
-            AppDomain.CurrentDomain.UnhandledException -= OnUnhandledException;
-            TaskScheduler.UnobservedTaskException -= OnUnobservedTaskException;
-            Logger.Debug("Global exception handlers unsubscribed.");
-        });
+        app.AddSystem(Stage.Cleanup, new SystemDescriptor(static world =>
+            {
+                AppDomain.CurrentDomain.UnhandledException -= OnUnhandledException;
+                TaskScheduler.UnobservedTaskException -= OnUnobservedTaskException;
+                Logger.Debug("Global exception handlers unsubscribed.");
+            }, "ExceptionsPlugin.Cleanup")
+            .MainThreadOnly());
 
         Logger.Info("Exception handlers installed — unhandled exceptions will be logged to Engine.log and Crash.log.");
     }

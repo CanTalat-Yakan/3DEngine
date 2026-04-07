@@ -19,17 +19,19 @@ public sealed class VulkanImGuiPlugin : IPlugin
 
         Logger.Info("VulkanImGuiPlugin: Building — will add ImGui render node to Vulkan graph.");
 
-        app.AddSystem(Stage.Startup, (World world) =>
-        {
-            if (!world.TryGetResource<Renderer>(out var renderer))
+        app.AddSystem(Stage.Startup, new SystemDescriptor(world =>
             {
-                Logger.Warn("No Renderer resource found — ImGui render node not added.");
-                return;
-            }
-
-            renderer.AddNode(new ImGuiRenderNode());
-            Logger.Info("ImGuiRenderNode registered in render graph.");
-        });
+                if (!world.TryGetResource<Renderer>(out var renderer))
+                {
+                    Logger.Warn("No Renderer resource found — ImGui render node not added.");
+                    return;
+                }
+            
+                renderer.AddNode(new ImGuiRenderNode());
+                Logger.Info("ImGuiRenderNode registered in render graph.");
+            }, "VulkanImGuiPlugin.Startup")
+            .MainThreadOnly()
+            .Write<Renderer>());
 
         Logger.Info("VulkanImGuiPlugin: Build complete.");
     }

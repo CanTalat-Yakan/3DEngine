@@ -20,17 +20,19 @@ public sealed class VulkanWebViewPlugin : IPlugin
 
         Logger.Info("VulkanWebViewPlugin: Building — will add WebViewRenderNode to Vulkan graph.");
 
-        app.AddSystem(Stage.Startup, (World world) =>
-        {
-            if (!world.TryGetResource<Renderer>(out var renderer))
+        app.AddSystem(Stage.Startup, new SystemDescriptor(world =>
             {
-                Logger.Warn("No Renderer resource found — WebViewRenderNode not added.");
-                return;
-            }
-
-            renderer.AddNode(new WebViewRenderNode());
-            Logger.Info("WebViewRenderNode registered in render graph.");
-        });
+                if (!world.TryGetResource<Renderer>(out var renderer))
+                {
+                    Logger.Warn("No Renderer resource found — WebViewRenderNode not added.");
+                    return;
+                }
+            
+                renderer.AddNode(new WebViewRenderNode());
+                Logger.Info("WebViewRenderNode registered in render graph.");
+            }, "VulkanWebViewPlugin.Startup")
+            .MainThreadOnly()
+            .Write<Renderer>());
 
         Logger.Info("VulkanWebViewPlugin: Build complete.");
     }

@@ -11,7 +11,12 @@ public sealed class EcsPlugin : IPlugin
         app.World.InitResource<EcsWorld>();
         app.World.InitResource<EcsCommands>();
 
-        app.AddSystem(Stage.PostUpdate, (World world) => world.Resource<EcsCommands>().Apply(world.Resource<EcsWorld>()));
+        app.AddSystem(Stage.PostUpdate, new SystemDescriptor(world =>
+            {
+                world.Resource<EcsCommands>().Apply(world.Resource<EcsWorld>());
+            }, "EcsPlugin.FlushCommands")
+            .Write<EcsCommands>()
+            .Write<EcsWorld>());
         Logger.Info("EcsPlugin: ECS command flush system registered to PostUpdate stage.");
     }
 }

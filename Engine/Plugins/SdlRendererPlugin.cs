@@ -78,32 +78,38 @@ public sealed class SdlRendererPlugin : IPlugin
 
         // Run Vulkan renderer after other Render stage systems.
         // Also resolves debounced resize when the quiet period has elapsed.
-        app.AddSystem(Stage.Render, (world) =>
-        {
-            if (!world.TryGetResource<Renderer>(out var r) || !r.Context.IsInitialized)
-                return;
-
-            // ── Resolve debounced resize ──
-            if (pendingRendererResize && (Environment.TickCount64 - lastResizeTick) >= ResizeDebounceMs)
+        app.AddSystem(Stage.Render, new SystemDescriptor(world =>
             {
-                pendingRendererResize = false;
-                Logger.Info("Debounce elapsed — committing renderer resize (swapchain + allocator + camera)...");
-                r.Context.OnResize();
-            }
-
-            r.RenderFrame(world);
-        });
+                if (!world.TryGetResource<Renderer>(out var r) || !r.Context.IsInitialized)
+                    return;
+            
+                // ── Resolve debounced resize ──
+                if (pendingRendererResize && (Environment.TickCount64 - lastResizeTick) >= ResizeDebounceMs)
+                {
+                    pendingRendererResize = false;
+                    Logger.Info("Debounce elapsed — committing renderer resize (swapchain + allocator + camera)...");
+                    r.Context.OnResize();
+                }
+            
+                r.RenderFrame(world);
+            }, "SdlRendererPlugin.Render")
+            .MainThreadOnly()
+            .Read<ClearColor>()
+            .Read<EcsWorld>()
+            .Write<Renderer>());
 
         // Ensure disposal at app exit (Cleanup stage)
-        app.AddSystem(Stage.Cleanup, (world) =>
-        {
-            if (world.TryGetResource<Renderer>(out var r))
+        app.AddSystem(Stage.Cleanup, new SystemDescriptor(world =>
             {
-                Logger.Info("SdlRendererPlugin: Cleanup stage — disposing Renderer...");
-                r.Dispose();
-                world.RemoveResource<Renderer>();
-            }
-        });
+                if (world.TryGetResource<Renderer>(out var r))
+                {
+                    Logger.Info("SdlRendererPlugin: Cleanup stage — disposing Renderer...");
+                    r.Dispose();
+                    world.RemoveResource<Renderer>();
+                }
+            }, "SdlRendererPlugin.Cleanup")
+            .MainThreadOnly()
+            .Write<Renderer>());
 
         Logger.Info("SdlRendererPlugin: Build complete.");
     }

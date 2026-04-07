@@ -21,14 +21,16 @@ public sealed class AppExitPlugin : IPlugin
         };
 
         // Early frame: if an exit was requested previously, ask window to close (will break main loop).
-        app.AddSystem(Stage.First, (World world) =>
-        {
-            if (world.Resource<AppExit>().Requested)
+        app.AddSystem(Stage.First, new SystemDescriptor(world =>
             {
-                Logger.Info("Exit requested — closing window to break main loop.");
-                world.Resource<AppWindow>().RequestClose();
-            }
-        });
+                if (world.Resource<AppExit>().Requested)
+                {
+                    Logger.Info("Exit requested — closing window to break main loop.");
+                    world.Resource<AppWindow>().RequestClose();
+                }
+            }, "AppExitPlugin.Update")
+            .Read<AppExit>()
+            .Write<AppWindow>());
 
         Logger.Info("AppExitPlugin: Exit handler registered.");
     }

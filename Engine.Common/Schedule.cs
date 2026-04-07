@@ -76,6 +76,11 @@ public sealed class SystemDescriptor
 
     internal bool ConflictsWith(SystemDescriptor other)
     {
+        // Conservative mode: systems without explicit access metadata are treated as
+        // broad writers so they don't race with annotated systems.
+        if ((_reads.Count == 0 && _writes.Count == 0) || (other._reads.Count == 0 && other._writes.Count == 0))
+            return true;
+
         if (_writes.Count > 0)
         {
             foreach (var t in _writes)
@@ -270,6 +275,14 @@ public sealed class Schedule
         // Build execution batches where systems can safely run together.
         // Main-thread systems form their own single-item batch and flush pending parallel work.
         var batches = BuildExecutionBatches(systems);
+        Diagnostics.RecordBatches(stage, batches);
+
+        for (int i = 0; i < batches.Count; i++)
+        {
+            var batch = batches[i];
+            var mode = batch.Count == 1 || batch[0].Affinity == ThreadAffinity.MainThread ? "sequential" : "parallel";
+            Logger.FrameTrace($"  batch {i + 1}/{batches.Count} [{mode}] => {string.Join(", ", batch.Select(d => d.Name))}");
+        }
 
         foreach (var batch in batches)
         {
@@ -355,6 +368,7 @@ public sealed class ScheduleDiagnostics
     private readonly Lock _lock = new();
     private readonly Dictionary<Stage, TimeSpan> _stageTimes = new();
     private readonly Dictionary<(Stage Stage, string System), TimeSpan> _systemTimes = new();
+    private readonly Dictionary<Stage, List<IReadOnlyList<string>>> _stageBatches = new();
 
     /// <summary>Records the total duration of a stage execution.</summary>
     internal void RecordStage(Stage stage, TimeSpan elapsed)
@@ -366,6 +380,17 @@ public sealed class ScheduleDiagnostics
     internal void RecordSystem(Stage stage, string systemName, TimeSpan elapsed)
     {
         lock (_lock) _systemTimes[(stage, systemName)] = elapsed;
+    }
+
+    /// <summary>Records the scheduler batch plan used for a parallel stage execution.</summary>
+    internal void RecordBatches(Stage stage, List<List<SystemDescriptor>> batches)
+    {
+        lock (_lock)
+        {
+            _stageBatches[stage] = batches
+                .Select(batch => (IReadOnlyList<string>)batch.Select(desc => desc.Name).ToArray())
+                .ToList();
+        }
     }
 
     /// <summary>Last recorded duration for a stage, or <see cref="TimeSpan.Zero"/>.</summary>
@@ -392,6 +417,20 @@ public sealed class ScheduleDiagnostics
         get { lock (_lock) return new Dictionary<(Stage, string), TimeSpan>(_systemTimes); }
     }
 
+    /// <summary>Snapshot of stage batch composition from the most recent frame.</summary>
+    public IReadOnlyDictionary<Stage, IReadOnlyList<IReadOnlyList<string>>> StageBatches
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _stageBatches.ToDictionary(
+                    kv => kv.Key,
+                    kv => (IReadOnlyList<IReadOnlyList<string>>)kv.Value.Select(batch => (IReadOnlyList<string>)batch.ToArray()).ToArray());
+            }
+        }
+    }
+
     /// <summary>Clears all recorded timings.</summary>
     public void Reset()
     {
@@ -399,6 +438,7 @@ public sealed class ScheduleDiagnostics
         {
             _stageTimes.Clear();
             _systemTimes.Clear();
+            _stageBatches.Clear();
         }
     }
 }

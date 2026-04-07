@@ -21,7 +21,11 @@ public sealed class DefaultPlugins : IPlugin
            .AddPlugin(new VulkanWebViewPlugin())
            .AddPlugin(new VulkanImGuiPlugin());
 
-        app.AddSystem(Stage.First, (world) => world.Resource<EcsWorld>().BeginFrame());
+        app.AddSystem(Stage.First, new SystemDescriptor(world =>
+            {
+                world.Resource<EcsWorld>().BeginFrame();
+            }, "DefaultPlugins.EcsBeginFrame")
+            .Write<EcsWorld>());
 
         Logger.Info("DefaultPlugins: All standard plugins loaded successfully.");
     }
