@@ -103,8 +103,8 @@ public sealed class AppWindow
                     Sdl.DisplayScale = resizeScale;
 
                     // GetWindowSize returns logical coordinates on native Wayland,
-                    // Windows, and macOS — but physical pixels on X11 (XWayland).
-                    // Only divide by scale on the X11 backend.
+                    // macOS, and iOS — but physical pixels on Windows, X11 (XWayland),
+                    // and Android.
                     SDL.GetWindowSize(Sdl.Window, out int rawW, out int rawH);
                     if (Sdl.NeedsManualHiDpiScaling && resizeScale > 1.001f)
                     {

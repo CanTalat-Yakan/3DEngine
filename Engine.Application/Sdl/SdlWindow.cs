@@ -18,9 +18,9 @@ public sealed class SdlWindow
     /// <summary>
     /// True when the SDL video backend uses physical-pixel coordinates for
     /// <c>CreateWindow</c>/<c>GetWindowSize</c>/<c>SetWindowSize</c> instead of logical
-    /// coordinates.  Currently only the <c>"x11"</c> backend (XWayland) has this
-    /// behaviour; native Wayland, Windows (<c>"windows"</c>), and macOS (<c>"cocoa"</c>)
-    /// all use logical coordinates natively.
+    /// coordinates.  Windows, X11 (including XWayland), and Android use physical
+    /// pixels; native Wayland, macOS, and iOS use logical coordinates.
+    /// Detected at runtime by comparing window size to backing pixel size.
     /// </summary>
     public bool NeedsManualHiDpiScaling { get; private set; }
 
@@ -77,30 +77,37 @@ public sealed class SdlWindow
 
         // ── HiDPI handling ──
         // SDL3 spec: CreateWindow / GetWindowSize / SetWindowSize use *logical*
-        // coordinates on native Wayland, Windows, and macOS.  The X11 backend
-        // (including XWayland) is the exception — it works in physical pixels.
+        // coordinates on native Wayland, macOS, and iOS.  Windows, X11 (including
+        // XWayland), and Android are the exceptions — they work in physical pixels.
         //
-        // Detect the active video backend at runtime so we only apply the
-        // manual scaling workaround where it is actually needed.
+        // Rather than matching on video-driver name strings (brittle), we detect
+        // the coordinate mode at runtime by comparing the window size against the
+        // backing pixel size.  When the two differ the platform uses logical
+        // coordinates and no manual workaround is needed; when they are equal the
+        // platform uses physical pixels and we must scale the window ourselves.
         string videoDriver = SDL.GetCurrentVideoDriver() ?? "";
-        NeedsManualHiDpiScaling = videoDriver.Equals("x11", StringComparison.OrdinalIgnoreCase);
 
         float scale = SDL.GetWindowDisplayScale(Window);
         if (scale <= 0f) scale = 1f;
         DisplayScale = scale;
 
+        SDL.GetWindowSize(Window, out int winW, out int winH);
+        SDL.GetWindowSizeInPixels(Window, out int pxW, out int pxH);
+        NeedsManualHiDpiScaling = (winW == pxW && winH == pxH) && scale > 1.001f;
+
         logger.Info($"SDL video driver: \"{videoDriver}\", display scale: {scale:F2}, " +
+                    $"window size: {winW}x{winH}, pixel size: {pxW}x{pxH}, " +
                     $"manual HiDPI scaling: {NeedsManualHiDpiScaling}");
 
         if (NeedsManualHiDpiScaling && scale > 1.001f)
         {
-            // X11/XWayland: CreateWindow used physical pixels, so a 1280×720
-            // window appears small on a 2× display.  Scale it up so the window
+            // CreateWindow used physical pixels, so a 1280×720 window
+            // appears small on a 2× display.  Scale it up so the window
             // fills the intended logical area on screen.
             int scaledW = (int)(width * scale);
             int scaledH = (int)(height * scale);
             SDL.SetWindowSize(Window, scaledW, scaledH);
-            logger.Info($"XWayland HiDPI: window scaled to {scaledW}x{scaledH}, " +
+            logger.Info($"Manual HiDPI Scaling: window scaled to {scaledW}x{scaledH}, " +
                         $"content resolution: {width}x{height}");
         }
         else
