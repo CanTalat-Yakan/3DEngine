@@ -102,6 +102,14 @@ public sealed class App : IDisposable
         return this;
     }
 
+    /// <summary>Registers a fully configured system descriptor to a stage.</summary>
+    public App AddSystem(Stage stage, SystemDescriptor descriptor)
+    {
+        Schedule.AddSystem(stage, descriptor);
+        Logger.Trace($"System descriptor registered to stage {stage}: {descriptor.Name}");
+        return this;
+    }
+
     // ── Resource helpers ───────────────────────────────────────────────
 
     /// <summary>Inserts or replaces a world resource value.</summary>

@@ -92,20 +92,25 @@ public sealed class WebViewPlugin : IPlugin
         });
 
         // ── Per-frame: resolve debounced resize, then update Ultralight ──
-        app.AddSystem(Stage.Update, (World world) =>
-        {
-            var b = world.TryResource<WebViewInstance>();
-            if (b is null) return;
-
-            if (pendingWebViewResize && (Environment.TickCount64 - lastWebViewResizeTick) >= ResizeDebounceMs)
+        app.AddSystem(
+            Stage.Update,
+            new SystemDescriptor((world) =>
             {
-                pendingWebViewResize = false;
-                Logger.Debug($"WebView debounce elapsed — committing native resize to {pendingW}x{pendingH}.");
-                b.Resize(pendingW, pendingH);
-            }
+                var b = world.TryResource<WebViewInstance>();
+                if (b is null) return;
 
-            b.Update();
-        });
+                if (pendingWebViewResize && (Environment.TickCount64 - lastWebViewResizeTick) >= ResizeDebounceMs)
+                {
+                    pendingWebViewResize = false;
+                    Logger.Debug($"WebView debounce elapsed — committing native resize to {pendingW}x{pendingH}.");
+                    b.Resize(pendingW, pendingH);
+                }
+
+                b.Update();
+            }, name: "WebViewPlugin.Update")
+            .MainThreadOnly()
+            .Write<WebViewInstance>()
+            .Read<AppWindow>());
 
         // ── Cleanup: dispose Ultralight ──────────────────────────────
         app.AddSystem(Stage.Cleanup, static (World world) =>

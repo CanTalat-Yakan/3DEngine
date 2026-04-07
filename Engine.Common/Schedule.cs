@@ -6,6 +6,13 @@ namespace Engine;
 /// <summary>System delegate: receives the <see cref="World"/> to read/write resources and entities.</summary>
 public delegate void SystemFn(World world);
 
+/// <summary>Declares whether a system may run on worker threads or must run on the main thread.</summary>
+public enum ThreadAffinity
+{
+    Any,
+    MainThread,
+}
+
 /// <summary>
 /// Wraps a <see cref="SystemFn"/> with a human-readable name and an optional run condition.
 /// Used internally by <see cref="Schedule"/> and exposed via diagnostics.
@@ -21,6 +28,18 @@ public sealed class SystemDescriptor
     /// <summary>Optional predicate — when set, the system only runs if this returns <c>true</c>.</summary>
     public Func<World, bool>? RunCondition { get; init; }
 
+    /// <summary>Thread affinity for this system. Defaults to <see cref="ThreadAffinity.Any"/>.</summary>
+    public ThreadAffinity Affinity { get; private set; } = ThreadAffinity.Any;
+
+    /// <summary>Resource types this system reads.</summary>
+    public IReadOnlyCollection<Type> Reads => _reads;
+
+    /// <summary>Resource types this system writes.</summary>
+    public IReadOnlyCollection<Type> Writes => _writes;
+
+    private readonly HashSet<Type> _reads = [];
+    private readonly HashSet<Type> _writes = [];
+
     public SystemDescriptor(SystemFn system, string? name = null)
     {
         System = system;
@@ -32,6 +51,46 @@ public sealed class SystemDescriptor
         var method = system.Method;
         var type = method.DeclaringType?.Name ?? "?";
         return $"{type}.{method.Name}";
+    }
+
+    /// <summary>Marks this system as main-thread-only.</summary>
+    public SystemDescriptor MainThreadOnly()
+    {
+        Affinity = ThreadAffinity.MainThread;
+        return this;
+    }
+
+    /// <summary>Declares a read dependency on a resource type.</summary>
+    public SystemDescriptor Read<T>() where T : notnull
+    {
+        _reads.Add(typeof(T));
+        return this;
+    }
+
+    /// <summary>Declares a write dependency on a resource type.</summary>
+    public SystemDescriptor Write<T>() where T : notnull
+    {
+        _writes.Add(typeof(T));
+        return this;
+    }
+
+    internal bool ConflictsWith(SystemDescriptor other)
+    {
+        if (_writes.Count > 0)
+        {
+            foreach (var t in _writes)
+                if (other._writes.Contains(t) || other._reads.Contains(t))
+                    return true;
+        }
+
+        if (_reads.Count > 0)
+        {
+            foreach (var t in _reads)
+                if (other._writes.Contains(t))
+                    return true;
+        }
+
+        return false;
     }
 }
 
@@ -208,26 +267,85 @@ public sealed class Schedule
 
     private void RunParallel(Stage stage, List<SystemDescriptor> systems, World world)
     {
-        Parallel.ForEach(systems, desc =>
+        // Build execution batches where systems can safely run together.
+        // Main-thread systems form their own single-item batch and flush pending parallel work.
+        var batches = BuildExecutionBatches(systems);
+
+        foreach (var batch in batches)
         {
-            if (desc.RunCondition is { } cond && !cond(world))
+            if (batch.Count == 1)
             {
-                Logger.FrameTrace($"  ⏭ {desc.Name} — skipped (run condition false)");
-                return;
+                ExecuteSystem(stage, batch[0], world);
+                continue;
             }
 
-            var sw = Stopwatch.StartNew();
-            try
+            Parallel.ForEach(batch, desc => ExecuteSystem(stage, desc, world));
+        }
+    }
+
+    private static List<List<SystemDescriptor>> BuildExecutionBatches(List<SystemDescriptor> systems)
+    {
+        var batches = new List<List<SystemDescriptor>>();
+
+        foreach (var desc in systems)
+        {
+            if (desc.Affinity == ThreadAffinity.MainThread)
             {
-                desc.System(world);
+                batches.Add([desc]);
+                continue;
             }
-            catch (Exception ex)
+
+            var placed = false;
+            for (int i = 0; i < batches.Count; i++)
             {
-                Logger.Error($"System '{desc.Name}' threw in stage {stage}", ex);
+                var batch = batches[i];
+                if (batch.Count == 1 && batch[0].Affinity == ThreadAffinity.MainThread)
+                    continue;
+
+                var conflict = false;
+                for (int j = 0; j < batch.Count; j++)
+                {
+                    if (desc.ConflictsWith(batch[j]))
+                    {
+                        conflict = true;
+                        break;
+                    }
+                }
+
+                if (conflict)
+                    continue;
+
+                batch.Add(desc);
+                placed = true;
+                break;
             }
-            sw.Stop();
-            Diagnostics.RecordSystem(stage, desc.Name, sw.Elapsed);
-        });
+
+            if (!placed)
+                batches.Add([desc]);
+        }
+
+        return batches;
+    }
+
+    private void ExecuteSystem(Stage stage, SystemDescriptor desc, World world)
+    {
+        if (desc.RunCondition is { } cond && !cond(world))
+        {
+            Logger.FrameTrace($"  ⏭ {desc.Name} — skipped (run condition false)");
+            return;
+        }
+
+        var sw = Stopwatch.StartNew();
+        try
+        {
+            desc.System(world);
+        }
+        catch (Exception ex)
+        {
+            Logger.Error($"System '{desc.Name}' threw in stage {stage}", ex);
+        }
+        sw.Stop();
+        Diagnostics.RecordSystem(stage, desc.Name, sw.Elapsed);
     }
 }
 

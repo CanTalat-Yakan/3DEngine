@@ -147,7 +147,7 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
         sb.AppendLine("    public static void Register(Engine.App app)");
         sb.AppendLine("    {");
         foreach (var g in b.StageMethods.GroupBy(m => m.Stage))
-            sb.AppendLine($"        app.AddSystem(Engine.Stage.{g.Key}, {b.SafeName}_{g.Key});");
+            sb.AppendLine($"        app.AddSystem(Engine.Stage.{g.Key}, new global::Engine.SystemDescriptor({b.SafeName}_{g.Key}, \"{b.SafeName}_{g.Key}\").Write<global::Engine.EcsWorld>());");
         sb.AppendLine("    }");
         foreach (var m in b.StageMethods)
         {
