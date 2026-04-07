@@ -6,6 +6,7 @@ namespace Engine;
 // [Behavior]
 public struct WebViewDebugHud
 {
+    private static readonly ILogger Logger = Log.Category("Engine.WebView.DebugHud");
     private static readonly System.Numerics.Vector4 Red = new(1, 0.3f, 0.3f, 1);
     private static readonly System.Numerics.Vector4 Yellow = new(1, 1, 0, 1);
     private static readonly System.Numerics.Vector4 Green = new(0.3f, 1, 0.3f, 1);
@@ -99,7 +100,12 @@ public struct WebViewDebugHud
 
         ImGui.Separator();
 
-        // ── Dump to file ─────────────────────────────────────────────
+        // ── Log / Dump ───────────────────────────────────────────────
+        if (ImGui.Button("Log Snapshot"))
+            LogSnapshot(w);
+
+        ImGui.SameLine();
+
         if (ImGui.Button("Dump to File"))
         {
             var sb = new System.Text.StringBuilder();
@@ -150,6 +156,21 @@ public struct WebViewDebugHud
             ImGui.Text($"Saved: {_dumpPath}");
 
         ImGui.End();
+    }
+
+    private static void LogSnapshot(WebViewInstance w)
+    {
+        var pct = w.DiagTotalPixels > 0
+            ? (double)w.DiagNonZeroPixels / w.DiagTotalPixels * 100.0
+            : 0;
+
+        Logger.Info(
+            $"WebViewDebug view={w.Width}x{w.Height} dirty={w.IsDirty} needsPaint={w.NeedsPaintNow} " +
+            $"updates={w.DiagUpdateCount} paints={w.DiagPaintCount} uploads={w.DiagUploadCount} " +
+            $"nonZero={w.DiagNonZeroPixels}/{w.DiagTotalPixels} ({pct:F1}%)");
+
+        if (w.DiagLoadError is not null)
+            Logger.Warn($"WebViewDebug load error: {w.DiagLoadError}");
     }
 }
 
