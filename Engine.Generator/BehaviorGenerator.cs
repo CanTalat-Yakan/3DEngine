@@ -69,7 +69,9 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
                 IsStatic = m.IsStatic,
                 MethodContainer = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                 MethodName = m.Name,
-                Filters = GetFilters(m)
+                Filters = GetFilters(m),
+                RunIfMethod = GetRunIf(m),
+                ToggleKey = GetToggleKey(m),
             });
         }
 
@@ -135,6 +137,34 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
         return new Filters(with, without, changed);
     }
 
+    /// <summary>Extracts the [RunIf] condition method name from a method's attributes, or null if absent.</summary>
+    private static string? GetRunIf(IMethodSymbol m)
+    {
+        foreach (var a in m.GetAttributes())
+            if (a.AttributeClass?.ToDisplayString() == "Engine.RunIfAttribute" &&
+                a.ConstructorArguments.Length > 0 &&
+                a.ConstructorArguments[0].Value is string name)
+                return name;
+        return null;
+    }
+
+    /// <summary>Extracts the [ToggleKey] key+modifier pair as raw integers, or null if absent.</summary>
+    private static (int Key, int Modifier, bool DefaultEnabled)? GetToggleKey(IMethodSymbol m)
+    {
+        foreach (var a in m.GetAttributes())
+        {
+            if (a.AttributeClass?.ToDisplayString() != "Engine.ToggleKeyAttribute") continue;
+            var key = a.ConstructorArguments.Length > 0 && a.ConstructorArguments[0].Value is int k ? k : 0;
+            var mod = a.ConstructorArguments.Length > 1 && a.ConstructorArguments[1].Value is int mo ? mo : 0;
+            var def = true;
+            foreach (var na in a.NamedArguments)
+                if (na.Key == "DefaultEnabled" && na.Value.Value is bool b)
+                    def = b;
+            return (key, mod, def);
+        }
+        return null;
+    }
+
     /// <summary>Generates per-stage system functions and a static Register helper for one behavior.</summary>
     private static string GenBehaviorSystems(BehaviorModel b)
     {
@@ -147,7 +177,28 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
         sb.AppendLine("    public static void Register(Engine.App app)");
         sb.AppendLine("    {");
         foreach (var g in b.StageMethods.GroupBy(m => m.Stage))
-            sb.AppendLine($"        app.AddSystem(Engine.Stage.{g.Key}, new global::Engine.SystemDescriptor({b.SafeName}_{g.Key}, \"{b.SafeName}_{g.Key}\").Write<global::Engine.EcsWorld>());");
+        {
+            var first = g.First();
+            var systemId = $"{b.SafeName}_{g.Key}";
+            string desc;
+            if (first.ToggleKey is var (k, mod, defEnabled))
+            {
+                desc = $"new global::Engine.SystemDescriptor({systemId}, \"{systemId}\")" +
+                       $".RunIf(global::Engine.BehaviorConditions.KeyToggle(\"{systemId}\", (global::Engine.Key){k}, (global::Engine.KeyModifier){mod}, {(defEnabled ? "true" : "false")}))" +
+                       $".Write<global::Engine.EcsWorld>()";
+            }
+            else if (first.RunIfMethod is { } runIf)
+            {
+                desc = $"new global::Engine.SystemDescriptor({systemId}, \"{systemId}\")" +
+                       $".RunIf({b.BehaviorFqn}.{runIf})" +
+                       $".Write<global::Engine.EcsWorld>()";
+            }
+            else
+            {
+                desc = $"new global::Engine.SystemDescriptor({systemId}, \"{systemId}\").Write<global::Engine.EcsWorld>()";
+            }
+            sb.AppendLine($"        app.AddSystem(Engine.Stage.{g.Key}, {desc});");
+        }
         sb.AppendLine("    }");
         foreach (var m in b.StageMethods)
         {
@@ -232,6 +283,8 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
         public string MethodContainer { get; init; } = string.Empty;
         public string MethodName { get; init; } = string.Empty;
         public Filters Filters { get; init; } = new Filters(Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>());
+        public string? RunIfMethod { get; init; }
+        public (int Key, int Modifier, bool DefaultEnabled)? ToggleKey { get; init; }
     }
     private sealed record BehaviorModel
     {

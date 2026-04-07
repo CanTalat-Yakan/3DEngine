@@ -26,7 +26,8 @@ public sealed class SystemDescriptor
     public SystemFn System { get; }
 
     /// <summary>Optional predicate — when set, the system only runs if this returns <c>true</c>.</summary>
-    public Func<World, bool>? RunCondition { get; init; }
+    public Func<World, bool>? RunCondition { get => _runCondition; init => _runCondition = value; }
+    private Func<World, bool>? _runCondition;
 
     /// <summary>Thread affinity for this system. Defaults to <see cref="ThreadAffinity.Any"/>.</summary>
     public ThreadAffinity Affinity { get; private set; } = ThreadAffinity.Any;
@@ -60,6 +61,13 @@ public sealed class SystemDescriptor
     public SystemDescriptor MainThreadOnly()
     {
         Affinity = ThreadAffinity.MainThread;
+        return this;
+    }
+
+    /// <summary>Attaches a Bevy-style <c>run_if</c> condition. The system is skipped when <paramref name="condition"/> returns <c>false</c>.</summary>
+    public SystemDescriptor RunIf(Func<World, bool> condition)
+    {
+        _runCondition = condition;
         return this;
     }
 

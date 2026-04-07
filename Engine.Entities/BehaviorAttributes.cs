@@ -63,3 +63,59 @@ public sealed class ChangedAttribute : Attribute
     public Type[] Types { get; }
     public ChangedAttribute(params Type[] types) => Types = types;
 }
+
+/// <summary>
+/// Attaches a run condition to a behavior system method.
+/// <paramref name="methodName"/> must be a <c>static bool(Engine.World)</c> method declared on the
+/// same behavior struct. Use <c>nameof(...)</c> to keep the reference refactor-safe.
+/// The system is skipped for the frame when the condition returns <c>false</c>.
+/// </summary>
+/// <example>
+/// <code>
+/// [OnUpdate]
+/// [RunIf(nameof(IsGamePlaying))]
+/// public static void Tick(BehaviorContext ctx) { ... }
+///
+/// public static bool IsGamePlaying(World world)
+///     => world.TryGetResource&lt;GameState&gt;(out var s) &amp;&amp; s.IsPlaying;
+/// </code>
+/// </example>
+[AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
+public sealed class RunIfAttribute : Attribute
+{
+    /// <summary>Name of the <c>static bool(World)</c> condition method on the same behavior struct.</summary>
+    public string MethodName { get; }
+    public RunIfAttribute(string methodName) => MethodName = methodName;
+}
+
+/// <summary>
+/// Binds a keyboard shortcut directly to a system, toggling it on/off without any boilerplate method.
+/// Each press of <paramref name="key"/> (with optional <paramref name="modifier"/> held) flips the
+/// enabled state. The system starts enabled unless <c>DefaultEnabled = false</c> is set.
+/// </summary>
+/// <remarks>
+/// Toggle state is managed via <see cref="SystemToggleRegistry"/> in <see cref="BehaviorConditions"/>.
+/// </remarks>
+/// <example>
+/// <code>
+/// [OnRender]
+/// [ToggleKey(Key.F3)]                          // F3 alone
+/// [ToggleKey(Key.F3, DefaultEnabled = false)]  // F3, default off
+/// [ToggleKey(Key.F3, KeyModifier.Ctrl)]        // Ctrl + F3
+/// public static void Draw(BehaviorContext ctx) { ... }
+/// </code>
+/// </example>
+[AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
+public sealed class ToggleKeyAttribute : Attribute
+{
+    public Key Key { get; }
+    public KeyModifier Modifier { get; }
+    public bool DefaultEnabled { get; init; } = true;
+    public ToggleKeyAttribute(Key key, KeyModifier modifier = KeyModifier.None)
+    {
+        Key = key;
+        Modifier = modifier;
+    }
+}
+
+

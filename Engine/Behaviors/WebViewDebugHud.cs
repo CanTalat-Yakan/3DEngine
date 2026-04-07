@@ -3,7 +3,7 @@ using ImGuiNET;
 namespace Engine;
 
 /// <summary>ImGui diagnostic overlay for the Ultralight webview subsystem.</summary>
-// [Behavior]
+[Behavior]
 public struct WebViewDebugHud
 {
     private static readonly ILogger Logger = Log.Category("Engine.WebView.DebugHud");
@@ -14,6 +14,7 @@ public struct WebViewDebugHud
 
     /// <summary>Draws webview debug info every render frame.</summary>
     [OnRender]
+    [ToggleKey(Key.F3, KeyModifier.Alt, DefaultEnabled = false)]
     public static void Draw(BehaviorContext ctx)
     {
         if (!ctx.World.TryGetResource<WebViewInstance>(out var w)) return;

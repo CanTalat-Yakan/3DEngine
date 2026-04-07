@@ -4,13 +4,14 @@ using ImGuiNET;
 namespace Engine;
 
 /// <summary>ImGui overlay showing scheduler batch composition and conflict notes per stage.</summary>
-// [Behavior]
+[Behavior]
 public struct ScheduleDebugHud
 {
     private static readonly ILogger Logger = Log.Category("Engine.Schedule.DebugHud");
     private static string? _lastDumpPath;
 
     [OnRender]
+    [ToggleKey(Key.F3, KeyModifier.Alt, DefaultEnabled = false)]
     public static void Draw(BehaviorContext ctx)
     {
         if (!ctx.World.TryGetResource<ScheduleDiagnostics>(out var diagnostics))
