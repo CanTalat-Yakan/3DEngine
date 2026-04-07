@@ -70,7 +70,7 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
                 MethodContainer = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                 MethodName = m.Name,
                 Filters = GetFilters(m),
-                RunIfMethod = GetRunIf(m),
+                RunIf = GetRunIf(m, type),
                 ToggleKey = GetToggleKey(m),
             });
         }
@@ -137,16 +137,41 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
         return new Filters(with, without, changed);
     }
 
-    /// <summary>Extracts the [RunIf] condition method name from a method's attributes, or null if absent.</summary>
-    private static string? GetRunIf(IMethodSymbol m)
+    /// <summary>Extracts the [RunIf] condition member (method/property/field) info from a method's attributes.</summary>
+    private static (string Name, MemberKind Kind)? GetRunIf(IMethodSymbol method, INamedTypeSymbol behaviorType)
     {
-        foreach (var a in m.GetAttributes())
+        // Get the attribute name
+        string? attrName = null;
+        foreach (var a in method.GetAttributes())
+        {
             if (a.AttributeClass?.ToDisplayString() == "Engine.RunIfAttribute" &&
                 a.ConstructorArguments.Length > 0 &&
                 a.ConstructorArguments[0].Value is string name)
-                return name;
-        return null;
+            {
+                attrName = name;
+                break;
+            }
+        }
+
+        if (attrName is null) return null;
+
+        // Find the member in the behavior type
+        foreach (var member in behaviorType.GetMembers())
+        {
+            if (member.Name != attrName) continue;
+
+            if (member is IMethodSymbol)
+                return (attrName, MemberKind.Method);
+            else if (member is IPropertySymbol)
+                return (attrName, MemberKind.Property);
+            else if (member is IFieldSymbol)
+                return (attrName, MemberKind.Field);
+        }
+
+        return null; // Member not found
     }
+
+    private enum MemberKind { Method, Property, Field }
 
     /// <summary>Extracts the [ToggleKey] key+modifier pair as raw integers, or null if absent.</summary>
     private static (int Key, int Modifier, bool DefaultEnabled)? GetToggleKey(IMethodSymbol m)
@@ -187,10 +212,17 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
                        $".RunIf(global::Engine.BehaviorConditions.KeyToggle(\"{systemId}\", (global::Engine.Key){k}, (global::Engine.KeyModifier){mod}, {(defEnabled ? "true" : "false")}))" +
                        $".Write<global::Engine.EcsWorld>()";
             }
-            else if (first.RunIfMethod is { } runIf)
+            else if (first.RunIf is var (name, kind))
             {
+                string runIfExpr = kind switch
+                {
+                    MemberKind.Method => $"{b.BehaviorFqn}.{name}",
+                    MemberKind.Property => $"_ => {b.BehaviorFqn}.{name}",
+                    MemberKind.Field => $"_ => {b.BehaviorFqn}.{name}",
+                    _ => throw new InvalidOperationException($"Unknown member kind: {kind}")
+                };
                 desc = $"new global::Engine.SystemDescriptor({systemId}, \"{systemId}\")" +
-                       $".RunIf({b.BehaviorFqn}.{runIf})" +
+                       $".RunIf({runIfExpr})" +
                        $".Write<global::Engine.EcsWorld>()";
             }
             else
@@ -283,7 +315,7 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
         public string MethodContainer { get; init; } = string.Empty;
         public string MethodName { get; init; } = string.Empty;
         public Filters Filters { get; init; } = new Filters(Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>());
-        public string? RunIfMethod { get; init; }
+        public (string Name, MemberKind Kind)? RunIf { get; init; }
         public (int Key, int Modifier, bool DefaultEnabled)? ToggleKey { get; init; }
     }
     private sealed record BehaviorModel
