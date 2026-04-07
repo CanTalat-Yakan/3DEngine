@@ -79,53 +79,37 @@ public sealed class AppWindow
 
             while (SDL.PollEvent(out var e))
             {
-                // ── HiDPI: scale mouse coordinates from window-space to content-space ──
-                // SDL gives coords in window logical coords (0..windowLogicalW).
-                // Content (WebView/ImGui) uses Width×Height (the config resolution).
-                var evtType = (SDL.EventType)e.Type;
-                if (evtType == SDL.EventType.MouseMotion ||
-                    evtType is SDL.EventType.MouseButtonDown or SDL.EventType.MouseButtonUp)
-                {
-                    SDL.GetWindowSize(Sdl.Window, out int winW, out int winH);
-                    float scaleX = (winW > 0) ? (float)Sdl.Width / winW : 1f;
-                    float scaleY = (winH > 0) ? (float)Sdl.Height / winH : 1f;
-
-                    if (evtType == SDL.EventType.MouseMotion)
-                    {
-                        e.Motion.X *= scaleX;
-                        e.Motion.Y *= scaleY;
-                        e.Motion.XRel *= scaleX;
-                        e.Motion.YRel *= scaleY;
-                    }
-                    else
-                    {
-                        e.Button.X *= scaleX;
-                        e.Button.Y *= scaleY;
-                    }
-                }
-
                 SDLEvent?.Invoke(e);
 
-                if ((SDL.EventType)e.Type == SDL.EventType.Quit)
+                var evtType = (SDL.EventType)e.Type;
+
+                if (evtType == SDL.EventType.Quit)
                 {
                     QuitEvent?.Invoke();
                     running = false;
                 }
-                if ((SDL.EventType)e.Type == SDL.EventType.WindowCloseRequested && e.Window.WindowID == SDL.GetWindowID(Sdl.Window))
+                if (evtType == SDL.EventType.WindowCloseRequested
+                    && e.Window.WindowID == SDL.GetWindowID(Sdl.Window))
                 {
                     QuitEvent?.Invoke();
                     running = false;
                 }
-                if ((SDL.EventType)e.Type == SDL.EventType.WindowResized && e.Window.WindowID == SDL.GetWindowID(Sdl.Window))
+                if (evtType == SDL.EventType.WindowResized
+                    && e.Window.WindowID == SDL.GetWindowID(Sdl.Window))
                 {
                     // Update display scale (may change if window moved between monitors).
                     float resizeScale = SDL.GetWindowDisplayScale(Sdl.Window);
                     if (resizeScale <= 0f) resizeScale = 1f;
                     Sdl.DisplayScale = resizeScale;
 
-                    // Flag for coalesced dispatch after the poll batch drains.
-                    // Only the last (most recent) dimensions matter.
-                    SDL.GetWindowSize(Sdl.Window, out coalescedW, out coalescedH);
+                    // GetWindowSize returns values in the same coordinate space as
+                    // SetWindowSize (unscaled on Wayland).  Divide by the display
+                    // scale to obtain the logical content resolution.
+                    // The Vulkan swapchain queries pixel dimensions independently
+                    // via SdlSurfaceSource.GetDrawableSize().
+                    SDL.GetWindowSize(Sdl.Window, out int rawW, out int rawH);
+                    coalescedW = (int)(rawW / resizeScale);
+                    coalescedH = (int)(rawH / resizeScale);
                     resizedThisBatch = true;
                 }
             }
@@ -133,6 +117,8 @@ public sealed class AppWindow
             // ── Dispatch the single coalesced resize (if any) ──
             if (resizedThisBatch && coalescedW > 0 && coalescedH > 0)
             {
+                Sdl.Width = coalescedW;
+                Sdl.Height = coalescedH;
                 ResizeEvent?.Invoke(coalescedW, coalescedH);
             }
 

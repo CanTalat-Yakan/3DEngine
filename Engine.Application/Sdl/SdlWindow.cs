@@ -67,7 +67,13 @@ public sealed class SdlWindow
             logger.Info($"SDL window created (handle=0x{window:X}), renderer (handle=0x{renderer:X}).");
         }
 
-        // ── HiDPI: manually scale the window so it fills the correct screen area ──
+        // ── HiDPI: scale the window so it fills the intended screen area ──
+        // On some compositors (e.g. Wayland + Flatpak) SDL3 CreateWindow dimensions
+        // are in physical pixels, so a 1280x720 window appears small on a 2x display.
+        // Scale the window up so it matches the logical content resolution on screen.
+        // Width/Height stay as the config values — the content resolution used by
+        // WebView, ImGui, and the camera.  The Vulkan swapchain queries pixel
+        // dimensions independently via SdlSurfaceSource.GetDrawableSize().
         float scale = SDL.GetWindowDisplayScale(Window);
         if (scale <= 0f) scale = 1f;
         DisplayScale = scale;
@@ -77,17 +83,13 @@ public sealed class SdlWindow
             int scaledW = (int)(width * scale);
             int scaledH = (int)(height * scale);
             SDL.SetWindowSize(Window, scaledW, scaledH);
-            logger.Info($"HiDPI detected (scale={scale:F2}): " +
-                $"pixel window enlarged to {scaledW}x{scaledH}, " +
-                $"content resolution stays {width}x{height}");
+            logger.Info($"HiDPI (scale={scale:F2}): window scaled to {scaledW}x{scaledH}, " +
+                        $"content resolution: {width}x{height}");
         }
-
-        // Diagnostic logging
-        SDL.GetWindowSize(Window, out int actualW, out int actualH);
-        SDL.GetWindowSizeInPixels(Window, out int pixelW, out int pixelH);
-        logger.Info($"Window sizes — logical: {actualW}x{actualH}, " +
-            $"pixels: {pixelW}x{pixelH}, display scale: {scale:F2}, " +
-            $"content (Width×Height): {Width}x{Height}");
+        else
+        {
+            logger.Info($"Window created: {width}x{height}, display scale: {scale:F2}");
+        }
     }
 
     /// <summary>Destroys the SDL renderer and window and quits SDL.</summary>

@@ -75,6 +75,9 @@ public sealed class WebViewInstance : IDisposable
     /// <summary>Cached HTML content for reload after view recreation during resize.</summary>
     private string? _lastLoadedHtml;
 
+    /// <summary>Cached URL for reload after view recreation during resize.</summary>
+    private string? _lastLoadedUrl;
+
     /// <summary>
     /// Initializes the Ultralight platform, renderer, and view.
     /// Call once during Startup.
@@ -163,6 +166,7 @@ public sealed class WebViewInstance : IDisposable
     {
         if (_view is null) return;
         _lastLoadedHtml = html;
+        _lastLoadedUrl = null;
         Logger.Info("WebViewInstance: Loading HTML content...");
         _view.LoadHtml(html);
 
@@ -176,6 +180,7 @@ public sealed class WebViewInstance : IDisposable
     {
         if (_view is null) return;
         _lastLoadedHtml = null; // URL-based load — clear cached HTML
+        _lastLoadedUrl = url;
         Logger.Info($"WebViewInstance: Loading URL: {url}");
         _view.Url = url;
 
@@ -411,15 +416,73 @@ public sealed class WebViewInstance : IDisposable
         if (!_hasPendingResize) return;
         _hasPendingResize = false;
 
-        // NOTE: Ultralight's native ulViewResize() segfaults on some platforms
-        // (observed on Linux with Intel Iris Xe + HiDPI scaling).  Rather than
-        // crashing the whole engine, we skip the native resize and let the GPU
-        // render node scale the WebView texture to fit the viewport.
-        //
-        // The WebView keeps rendering at its original resolution; the fullscreen
-        // quad in WebViewRenderNode stretches it to the current swapchain extent.
-        Logger.Info($"WebViewInstance: Window resized to {_pendingResizeWidth}x{_pendingResizeHeight} — " +
-                    $"WebView stays at {Width}x{Height} (GPU-scaled).");
+        var newW = _pendingResizeWidth;
+        var newH = _pendingResizeHeight;
+
+        if (_renderer is null || (Width == newW && Height == newH))
+            return;
+
+        Logger.Info($"WebViewInstance: Recreating view at {newW}x{newH} (was {Width}x{Height})...");
+
+        // ── Tear down the old view ──────────────────────────────────────
+        if (_view is not null)
+        {
+            _view.OnDomReady -= OnDOMReadyHandler;
+            _view.OnFinishLoading -= OnFinishLoadingHandler;
+            _view.OnFailLoading -= OnFailLoadingHandler;
+            _view.OnAddConsoleMessage -= OnConsoleMessageHandler;
+            _view.Dispose();
+            _view = null;
+        }
+
+        // ── Create a new view at the requested dimensions ───────────────
+        var viewConfig = new ViewConfig
+        {
+            IsAccelerated = false,
+            IsTransparent = true,
+            InitialDeviceScale = 1.0,
+            InitialFocus = true,
+            EnableImages = true,
+            EnableJavaScript = true,
+            FontFamilyStandard = "Arial",
+            FontFamilyFixed = "Courier New",
+            FontFamilySerif = "Times New Roman",
+            FontFamilySansSerif = "Arial",
+            UserAgent = "Mozilla/5.0 (3DEngine WebView) UltralightNet/1.4",
+        };
+
+        _view = _renderer.CreateView(newW, newH, viewConfig, _renderer.DefaultSession);
+        _view.Focus();
+
+        _view.OnDomReady += OnDOMReadyHandler;
+        _view.OnFinishLoading += OnFinishLoadingHandler;
+        _view.OnFailLoading += OnFailLoadingHandler;
+        _view.OnAddConsoleMessage += OnConsoleMessageHandler;
+
+        Width = newW;
+        Height = newH;
+
+        // ── Reload content ──────────────────────────────────────────────
+        if (_lastLoadedHtml is not null)
+        {
+            _view.LoadHtml(_lastLoadedHtml);
+        }
+        else if (_lastLoadedUrl is not null)
+        {
+            _view.Url = _lastLoadedUrl;
+        }
+
+        // Pump a few frames so the page starts rendering at the new size.
+        for (int i = 0; i < 5; i++)
+        {
+            _renderer.Update();
+            _renderer.Render();
+        }
+
+        // Mark dirty so the render node picks up the new surface immediately.
+        IsDirty = true;
+
+        Logger.Info($"WebViewInstance: View recreated at {newW}x{newH}.");
     }
 
     /// <summary>Fires a mouse event into the Ultralight view.</summary>
