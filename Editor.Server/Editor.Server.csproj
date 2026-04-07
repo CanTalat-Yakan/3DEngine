@@ -13,6 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Editor.Compiler\Editor.Compiler.csproj" />
         <ProjectReference Include="..\Editor.Shell\Editor.Shell.csproj" />
     </ItemGroup>
 

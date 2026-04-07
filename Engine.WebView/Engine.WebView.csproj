@@ -23,8 +23,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="Shaders\**\*.glsl" CopyToOutputDirectory="PreserveNewest" Link="source\shaders\%(Filename)%(Extension)" />
-        <EmbeddedResource Include="Source\default.html" LogicalName="Engine.WebView.default.html" />
+        <Content Include="Shaders\**\*.glsl" CopyToOutputDirectory="PreserveNewest" Link="source\shaders\%(RecursiveDir)%(Filename)%(Extension)" />
+        <EmbeddedResource Include="Source\default.html" Link="source\defaults\%(RecursiveDir)%(Filename)%(Extension)" LogicalName="Engine.WebView.default.html" />
     </ItemGroup>
 
 </Project>

@@ -36,6 +36,7 @@ public sealed partial class ShellCompiler : IDisposable
     private readonly ShellRegistry _registry;
     private readonly List<string> _scriptDirectories = [];
     private readonly List<MetadataReference> _references = [];
+    private readonly List<string> _userAssemblyPaths = [];
     private readonly List<FileSystemWatcher> _watchers = [];
     private readonly Lock _compileLock = new();
 

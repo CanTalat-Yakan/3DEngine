@@ -3,9 +3,38 @@ using Editor.Server;
 using Editor.Server.Hubs;
 using Editor.Shell;
 
+// ── Standalone mode: compile scripts if a shells directory exists ──
+var shellRegistry = new ShellRegistry();
+ShellCompiler? compiler = null;
+
+// Look for a source/shells/ directory next to the executable
+var scriptsDir = Path.Combine(AppContext.BaseDirectory, "source", "shells");
+if (!Directory.Exists(scriptsDir))
+{
+    // Also try relative to project directory (for `dotnet run`)
+    scriptsDir = Path.Combine(Directory.GetCurrentDirectory(), "..", "Editor", "Shells");
+}
+
+if (Directory.Exists(scriptsDir))
+{
+    compiler = new ShellCompiler(shellRegistry).WatchDirectory(scriptsDir);
+    var compileResult = compiler.Start();
+    Console.WriteLine($"[Editor.Server] Script compilation: {compileResult.Message}");
+    foreach (var err in compileResult.Errors)
+        Console.WriteLine($"[Editor.Server]   ERROR {err.FileName}({err.Line},{err.Column}): {err.Message}");
+
+    compiler.CompilationCompleted += result =>
+    {
+        Console.WriteLine($"[Editor.Server] Hot-reload: {result.Message}");
+        foreach (var err in result.Errors)
+            Console.WriteLine($"[Editor.Server]   ERROR {err.FileName}({err.Line},{err.Column}): {err.Message}");
+    };
+}
+
 // When run standalone, start the server and block until shutdown.
-var server = await EditorServerHost.StartAsync(args: args);
+var server = await EditorServerHost.StartAsync(args: args, registry: shellRegistry);
 await server.WaitForShutdownAsync();
+compiler?.Dispose();
 
 namespace Editor.Server
 {

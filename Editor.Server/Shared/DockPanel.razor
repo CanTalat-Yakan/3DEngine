@@ -23,7 +23,11 @@
 
     @* Panel content *@
     <div class="flex-1 overflow-auto min-h-0">
-        @if (Panel.Content is { Count: > 0 })
+        @if (Panel.ComponentType is not null)
+        {
+            <DynamicComponent Type="Panel.ComponentType" />
+        }
+        else if (Panel.Content is { Count: > 0 })
         {
             <ElementRenderer Elements="Panel.Content" />
         }

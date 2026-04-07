@@ -29,7 +29,11 @@
                 {
                     <BbTabsContent Value="@panel.Id" class="flex-1 m-0 p-0 min-h-0">
                         <div class="overflow-y-auto" style="height: calc(100vh - 3.5rem);">
-                            @if (panel.Content is { Count: > 0 })
+                            @if (panel.ComponentType is not null)
+                            {
+                                <DynamicComponent Type="panel.ComponentType" />
+                            }
+                            else if (panel.Content is { Count: > 0 })
                             {
                                 <ElementRenderer Elements="panel.Content" />
                             }

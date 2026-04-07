@@ -9,9 +9,24 @@
             .ToList();
     }
 
+    @* ── Inject custom CSS from user scripts ─────────────────── *@
+    @if (Descriptor.CustomCss.Count > 0)
+    {
+        <style>
+            @foreach (var css in Descriptor.CustomCss)
+            {
+                @((MarkupString)css)
+            }
+        </style>
+    }
+
     @foreach (var panel in topPanels)
     {
-        @if (panel.Content is { Count: > 0 })
+        @if (panel.ComponentType is not null)
+        {
+            <DynamicComponent Type="panel.ComponentType" />
+        }
+        else if (panel.Content is { Count: > 0 })
         {
             <ElementRenderer Elements="panel.Content" />
         }

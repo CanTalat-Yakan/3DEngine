@@ -28,7 +28,7 @@ const string serverUrl = "http://localhost:5000";
 
 // ── 1. Set up the shell registry and script compiler ─────────────────
 var shellRegistry = new ShellRegistry();
-var scriptsDir = Path.Combine(AppContext.BaseDirectory, "Shells");
+var scriptsDir = Path.Combine(AppContext.BaseDirectory, "source", "shells");
 
 var compiler = new ShellCompiler(shellRegistry)
     .WatchDirectory(scriptsDir)

@@ -13,7 +13,13 @@
     @* ── Top panels (headers, nav bars, etc.) ─────────────────── *@
     @foreach (var panel in topPanels)
     {
-        @if (panel.Content is { Count: > 0 })
+        @if (panel.ComponentType is not null)
+        {
+            <div class="shrink-0">
+                <DynamicComponent Type="panel.ComponentType" />
+            </div>
+        }
+        else if (panel.Content is { Count: > 0 })
         {
             <div class="shrink-0">
                 <ElementRenderer Elements="panel.Content" />

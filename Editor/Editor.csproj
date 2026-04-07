@@ -3,6 +3,7 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <SelfContained>true</SelfContained>
+        <PublishSingleFile>true</PublishSingleFile>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
@@ -21,7 +22,13 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="Shells\**\*.cs" CopyToOutputDirectory="PreserveNewest" LinkBase="Scripts" />
+        <Content Include="Shells\**\*.cs" CopyToOutputDirectory="PreserveNewest" Link="source\shells\%(RecursiveDir)%(Filename)%(Extension)" />
+        <Content Include="Shells\**\*.razor" CopyToOutputDirectory="PreserveNewest" Link="source\shells\%(RecursiveDir)%(Filename)%(Extension)" />
+        <Content Include="Shells\**\*.css" CopyToOutputDirectory="PreserveNewest" Link="source\shells\%(RecursiveDir)%(Filename)%(Extension)" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Shells\**" />
     </ItemGroup>
 
 </Project>

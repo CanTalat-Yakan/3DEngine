@@ -53,6 +53,12 @@ public sealed class ShellDescriptor
 
     /// <summary>User-defined metadata (arbitrary key-value pairs attached by shell builders).</summary>
     public Dictionary<string, object> Metadata { get; set; } = [];
+
+    /// <summary>
+    /// CSS snippets collected from <c>.css</c> files in the scripts directory.
+    /// Injected into the page at render time via a <c>&lt;style&gt;</c> block.
+    /// </summary>
+    public List<string> CustomCss { get; set; } = [];
 }
 
 // ── Panels (Dockable) ──────────────────────────────────────────────────
@@ -99,6 +105,13 @@ public sealed class PanelDescriptor
 
     /// <summary>Element tree built from the content builder API. Takes priority over <see cref="WidgetKey"/>.</summary>
     public List<Element>? Content { get; set; }
+
+    /// <summary>
+    /// When set, the panel renders a native Blazor component via <c>DynamicComponent</c>.
+    /// Takes priority over both <see cref="Content"/> and <see cref="WidgetKey"/>.
+    /// Populated automatically for <c>.razor</c> files annotated with <see cref="EditorPanelAttribute"/>.
+    /// </summary>
+    public Type? ComponentType { get; set; }
 
     /// <summary>Initial size as a fraction (0..1) of the parent dock area. Defaults to 0.25.</summary>
     public float InitialSize { get; set; } = 0.25f;

@@ -3,7 +3,8 @@ namespace Editor.Shell;
 public sealed partial class ShellCompiler
 {
     /// <summary>
-    /// Performs an initial compilation and starts file watchers.
+    /// Performs an initial compilation and starts file watchers for <c>.cs</c>,
+    /// <c>.razor</c>, and <c>.css</c> files in all configured directories.
     /// Call once after configuration.
     /// </summary>
     /// <returns>The result of the initial compilation.</returns>
@@ -13,17 +14,20 @@ public sealed partial class ShellCompiler
 
         foreach (var dir in _scriptDirectories)
         {
-            var watcher = new FileSystemWatcher(dir, "*.cs")
+            foreach (var ext in WatchedExtensions)
             {
-                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.CreationTime,
-                IncludeSubdirectories = true,
-                EnableRaisingEvents = true
-            };
-            watcher.Changed += OnFileChanged;
-            watcher.Created += OnFileChanged;
-            watcher.Deleted += OnFileChanged;
-            watcher.Renamed += OnFileRenamed;
-            _watchers.Add(watcher);
+                var watcher = new FileSystemWatcher(dir, ext)
+                {
+                    NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.CreationTime,
+                    IncludeSubdirectories = true,
+                    EnableRaisingEvents = true
+                };
+                watcher.Changed += OnFileChanged;
+                watcher.Created += OnFileChanged;
+                watcher.Deleted += OnFileChanged;
+                watcher.Renamed += OnFileRenamed;
+                _watchers.Add(watcher);
+            }
         }
 
         return result;
@@ -44,5 +48,12 @@ public sealed partial class ShellCompiler
         }
         _watchers.Clear();
         UnloadCurrent();
+
+        // Clean up temp Razor build directory
+        if (_razorProjectDir != null && Directory.Exists(_razorProjectDir))
+        {
+            try { Directory.Delete(_razorProjectDir, recursive: true); }
+            catch { /* best effort cleanup */ }
+        }
     }
 }

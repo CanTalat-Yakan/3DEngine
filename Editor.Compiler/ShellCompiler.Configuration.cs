@@ -24,7 +24,10 @@ public sealed partial class ShellCompiler
     {
         var location = assembly.Location;
         if (!string.IsNullOrEmpty(location) && File.Exists(location))
+        {
             _references.Add(MetadataReference.CreateFromFile(location));
+            _userAssemblyPaths.Add(location);
+        }
         return this;
     }
 

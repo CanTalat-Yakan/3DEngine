@@ -18,9 +18,9 @@
         <ProjectReference Include="..\Engine.Entities\Engine.Entities.csproj" />
         <ProjectReference Include="..\Engine.Graphics\Engine.Graphics.csproj" />
     </ItemGroup>
-
+    
     <ItemGroup>
-        <Content Include="Shaders\**\*.glsl" CopyToOutputDirectory="PreserveNewest" Link="source\shaders\%(Filename)%(Extension)" />
+        <Content Include="Shaders\**\*.glsl" CopyToOutputDirectory="PreserveNewest" Link="source\shaders\%(RecursiveDir)%(Filename)%(Extension)" />
     </ItemGroup>
 
     <ItemGroup>
