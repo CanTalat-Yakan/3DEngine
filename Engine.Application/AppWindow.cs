@@ -102,14 +102,20 @@ public sealed class AppWindow
                     if (resizeScale <= 0f) resizeScale = 1f;
                     Sdl.DisplayScale = resizeScale;
 
-                    // GetWindowSize returns values in the same coordinate space as
-                    // SetWindowSize (unscaled on Wayland).  Divide by the display
-                    // scale to obtain the logical content resolution.
-                    // The Vulkan swapchain queries pixel dimensions independently
-                    // via SdlSurfaceSource.GetDrawableSize().
+                    // GetWindowSize returns logical coordinates on native Wayland,
+                    // Windows, and macOS — but physical pixels on X11 (XWayland).
+                    // Only divide by scale on the X11 backend.
                     SDL.GetWindowSize(Sdl.Window, out int rawW, out int rawH);
-                    coalescedW = (int)(rawW / resizeScale);
-                    coalescedH = (int)(rawH / resizeScale);
+                    if (Sdl.NeedsManualHiDpiScaling && resizeScale > 1.001f)
+                    {
+                        coalescedW = (int)(rawW / resizeScale);
+                        coalescedH = (int)(rawH / resizeScale);
+                    }
+                    else
+                    {
+                        coalescedW = rawW;
+                        coalescedH = rawH;
+                    }
                     resizedThisBatch = true;
                 }
             }
