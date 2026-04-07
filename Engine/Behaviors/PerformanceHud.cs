@@ -35,6 +35,32 @@ public struct PerformanceHud
     }
 }
 
+/// <summary>Tracks a per-entity tick counter and displays entity statistics in the HUD.</summary>
+[Behavior]
+public struct EntityCounter
+{
+    public int Ticks;
+
+    /// <summary>Increments this entity's tick counter each update.</summary>
+    [OnUpdate]
+    public void Tick(BehaviorContext ctx)
+    {
+        Ticks++;
+        ctx.Ecs.Update(ctx.EntityId, this);
+    }
+
+    /// <summary>Displays aggregate entity statistics.</summary>
+    [OnRender]
+    public static void Draw(BehaviorContext ctx)
+    {
+        int count = ctx.Ecs.Count<EntityCounter>();
+
+        ImGui.Begin("Performance", ImGuiWindowFlags.NoSavedSettings);
+        ImGui.Text($"Entities:  {count:N0}");
+        ImGui.End();
+    }
+}
+
 /// <summary>Spawns a batch of entities with <see cref="EntityCounter"/> when Space is pressed.</summary>
 [Behavior]
 public struct StressTestSpawner
