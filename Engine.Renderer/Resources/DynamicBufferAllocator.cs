@@ -28,6 +28,7 @@ public sealed class DynamicBufferAllocator : IDisposable
     private readonly int _framesInFlight;
     private readonly FrameArena[] _arenas;
     private int _currentSlot;
+    private bool _disposed;
 
     /// <summary>Minimum backing buffer size (64 KB).</summary>
     private const ulong MinBufferSize = 64 * 1024;
@@ -49,6 +50,7 @@ public sealed class DynamicBufferAllocator : IDisposable
     /// </summary>
     public void BeginFrame(int inFlightIndex)
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
         _currentSlot = inFlightIndex;
         _arenas[_currentSlot].Reset();
     }
@@ -60,6 +62,7 @@ public sealed class DynamicBufferAllocator : IDisposable
     /// </summary>
     public DynamicAllocation Allocate(ulong size, BufferUsage usage)
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
         if (size == 0)
             throw new ArgumentOutOfRangeException(nameof(size), "Allocation size must be > 0.");
 
@@ -71,6 +74,7 @@ public sealed class DynamicBufferAllocator : IDisposable
     /// covering exactly the allocation's region.</summary>
     public Span<byte> Map(DynamicAllocation alloc)
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
         var full = _gfx.Map(alloc.Buffer);
         return full.Slice((int)alloc.Offset, (int)alloc.Size);
     }
@@ -78,6 +82,7 @@ public sealed class DynamicBufferAllocator : IDisposable
     /// <summary>Unmaps the backing buffer that contains <paramref name="alloc"/>.</summary>
     public void Unmap(DynamicAllocation alloc)
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
         _gfx.Unmap(alloc.Buffer);
     }
 
@@ -94,6 +99,8 @@ public sealed class DynamicBufferAllocator : IDisposable
 
     public void Dispose()
     {
+        if (_disposed) return;
+        _disposed = true;
         Reset();
         Logger.Info("DynamicBufferAllocator disposed.");
     }

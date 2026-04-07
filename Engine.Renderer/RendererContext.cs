@@ -60,47 +60,59 @@ public sealed class RendererContext : IDisposable
 
     private void CreateCameraResources()
     {
+        DisposeCameraResources();
+
+        if (!IsInitialized)
+            return;
+
+        var imageCount = (int)_graphics!.Swapchain.ImageCount;
+        if (imageCount <= 0)
+            return;
+
+        var newBuffers = new IBuffer[imageCount];
+        var newSets = new IDescriptorSet[imageCount];
+
+        ulong cameraSize = (ulong)System.Runtime.InteropServices.Marshal.SizeOf<CameraUniform>();
+        try
+        {
+            for (int i = 0; i < imageCount; i++)
+            {
+                var desc = new BufferDesc(cameraSize, BufferUsage.Uniform | BufferUsage.TransferDst, CpuAccessMode.Write);
+                newBuffers[i] = _graphics!.CreateBuffer(desc);
+                newSets[i] = _graphics.CreateDescriptorSet();
+
+                var ubBinding = new UniformBufferBinding(newBuffers[i], 0, 0, cameraSize);
+                _graphics.UpdateDescriptorSet(newSets[i], ubBinding, samplerBinding: null);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.Error("Failed to create camera resources — cleaning up partial state.", ex);
+            for (int i = 0; i < imageCount; i++)
+            {
+                newSets[i]?.Dispose();
+                newBuffers[i]?.Dispose();
+            }
+            return;
+        }
+
+        _cameraBuffers = newBuffers;
+        _cameraDescriptorSets = newSets;
+    }
+
+    private void DisposeCameraResources()
+    {
         if (_cameraBuffers != null)
         {
             foreach (var buf in _cameraBuffers)
-                buf.Dispose();
+                buf?.Dispose();
+            _cameraBuffers = null;
         }
         if (_cameraDescriptorSets != null)
         {
             foreach (var set in _cameraDescriptorSets)
-                set.Dispose();
-        }
-
-        if (!IsInitialized)
-        {
-            _cameraBuffers = null;
+                set?.Dispose();
             _cameraDescriptorSets = null;
-            return;
-        }
-
-        var imageCount = (int)_graphics!.Swapchain.ImageCount;
-        if (imageCount <= 0)
-        {
-            _cameraBuffers = null;
-            _cameraDescriptorSets = null;
-            return;
-        }
-
-        _cameraBuffers = new IBuffer[imageCount];
-        _cameraDescriptorSets = new IDescriptorSet[imageCount];
-
-        ulong cameraSize = (ulong)System.Runtime.InteropServices.Marshal.SizeOf<CameraUniform>();
-        for (int i = 0; i < imageCount; i++)
-        {
-            var desc = new BufferDesc(cameraSize, BufferUsage.Uniform | BufferUsage.TransferDst);
-            var buffer = _graphics!.CreateBuffer(desc);
-            _cameraBuffers[i] = buffer;
-
-            var set = _graphics.CreateDescriptorSet();
-            _cameraDescriptorSets[i] = set;
-
-            var ubBinding = new UniformBufferBinding(buffer, 0, 0, cameraSize);
-            _graphics.UpdateDescriptorSet(set, ubBinding, samplerBinding: null);
         }
     }
 
@@ -164,7 +176,18 @@ public sealed class RendererContext : IDisposable
             return;
 
         Logger.Info("RendererContext: Resize triggered — recreating swapchain and camera resources...");
-        _graphics!.OnResize();
+        try
+        {
+            _graphics!.OnResize();
+        }
+        catch (Exception ex)
+        {
+            Logger.Error("RendererContext: Swapchain resize failed — cleaning up resources.", ex);
+            DisposeCameraResources();
+            DynamicAllocator?.Reset();
+            return;
+        }
+
         DynamicAllocator?.Reset();
         CreateCameraResources();
         Logger.Info("RendererContext: Resize complete.");
@@ -175,18 +198,7 @@ public sealed class RendererContext : IDisposable
         Logger.Info("RendererContext: Disposing camera resources, dynamic allocator, and graphics device...");
         DynamicAllocator?.Dispose();
         DynamicAllocator = null;
-        if (_cameraBuffers != null)
-        {
-            foreach (var buf in _cameraBuffers)
-                buf.Dispose();
-            _cameraBuffers = null;
-        }
-        if (_cameraDescriptorSets != null)
-        {
-            foreach (var set in _cameraDescriptorSets)
-                set.Dispose();
-            _cameraDescriptorSets = null;
-        }
+        DisposeCameraResources();
 
         _graphics?.Dispose();
         Logger.Info("RendererContext disposed.");

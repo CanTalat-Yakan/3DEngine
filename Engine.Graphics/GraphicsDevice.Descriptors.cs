@@ -20,7 +20,11 @@ public sealed unsafe partial class GraphicsDevice
 
         public void Dispose()
         {
-            // Individual descriptor sets are implicitly freed when the pool is destroyed.
+            if (Handle.Handle != 0 && _device._descriptorPool.Handle != 0)
+            {
+                var set = Handle;
+                _device._deviceApi.vkFreeDescriptorSets(_device._descriptorPool, 1, &set);
+            }
             Handle = default;
         }
     }
@@ -61,6 +65,7 @@ public sealed unsafe partial class GraphicsDevice
 
         VkDescriptorPoolCreateInfo poolInfo = new()
         {
+            flags = VkDescriptorPoolCreateFlags.FreeDescriptorSet,
             maxSets = 64,
             poolSizeCount = 2,
             pPoolSizes = poolSizes
