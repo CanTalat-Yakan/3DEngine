@@ -77,6 +77,7 @@ public sealed unsafe partial class GraphicsDevice : IGraphicsDevice
         Logger.Debug("Old swapchain resources destroyed — creating new swapchain resources...");
         CreateSwapchainResources();
         _resizeVersion++;
+        _suboptimalLogged = false;
         Logger.Info($"Swapchain resized to {_swapchainExtent.width}x{_swapchainExtent.height} (revision={_resizeVersion}, images={_swapchainImages.Length})");
     }
 
@@ -137,6 +138,7 @@ public sealed unsafe partial class GraphicsDevice : IGraphicsDevice
     private uint _lastAcquiredImageIndex;
     private readonly VulkanSwapchain _swapchainWrapper;
     private ulong _resizeVersion;
+    private bool _suboptimalLogged;
     private VkDebugUtilsMessengerEXT _debugMessenger;
     private bool _validationEnabled;
     private GraphicsAdapterInfo _adapterInfo = GraphicsAdapterInfo.Unknown;

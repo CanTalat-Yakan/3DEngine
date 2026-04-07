@@ -72,12 +72,6 @@ public sealed class WebViewInstance : IDisposable
     private uint _pendingResizeHeight;
     private bool _hasPendingResize;
 
-    /// <summary>Cached HTML content for reload after view recreation during resize.</summary>
-    private string? _lastLoadedHtml;
-
-    /// <summary>Cached URL for reload after view recreation during resize.</summary>
-    private string? _lastLoadedUrl;
-
     /// <summary>
     /// Initializes the Ultralight platform, renderer, and view.
     /// Call once during Startup.
@@ -165,8 +159,6 @@ public sealed class WebViewInstance : IDisposable
     public void LoadHtml(string html)
     {
         if (_view is null) return;
-        _lastLoadedHtml = html;
-        _lastLoadedUrl = null;
         Logger.Info("WebViewInstance: Loading HTML content...");
         _view.LoadHtml(html);
 
@@ -179,8 +171,6 @@ public sealed class WebViewInstance : IDisposable
     public void LoadUrl(string url)
     {
         if (_view is null) return;
-        _lastLoadedHtml = null; // URL-based load — clear cached HTML
-        _lastLoadedUrl = url;
         Logger.Info($"WebViewInstance: Loading URL: {url}");
         _view.Url = url;
 
@@ -422,67 +412,20 @@ public sealed class WebViewInstance : IDisposable
         if (_renderer is null || (Width == newW && Height == newH))
             return;
 
-        Logger.Info($"WebViewInstance: Recreating view at {newW}x{newH} (was {Width}x{Height})...");
+        Logger.Info($"WebViewInstance: Resizing view to {newW}x{newH} (was {Width}x{Height})...");
 
-        // ── Tear down the old view ──────────────────────────────────────
-        if (_view is not null)
-        {
-            _view.OnDomReady -= OnDOMReadyHandler;
-            _view.OnFinishLoading -= OnFinishLoadingHandler;
-            _view.OnFailLoading -= OnFailLoadingHandler;
-            _view.OnAddConsoleMessage -= OnConsoleMessageHandler;
-            _view.Dispose();
-            _view = null;
-        }
-
-        // ── Create a new view at the requested dimensions ───────────────
-        var viewConfig = new ViewConfig
-        {
-            IsAccelerated = false,
-            IsTransparent = true,
-            InitialDeviceScale = 1.0,
-            InitialFocus = true,
-            EnableImages = true,
-            EnableJavaScript = true,
-            FontFamilyStandard = "Arial",
-            FontFamilyFixed = "Courier New",
-            FontFamilySerif = "Times New Roman",
-            FontFamilySansSerif = "Arial",
-            UserAgent = "Mozilla/5.0 (3DEngine WebView) UltralightNet/1.4",
-        };
-
-        _view = _renderer.CreateView(newW, newH, viewConfig, _renderer.DefaultSession);
-        _view.Focus();
-
-        _view.OnDomReady += OnDOMReadyHandler;
-        _view.OnFinishLoading += OnFinishLoadingHandler;
-        _view.OnFailLoading += OnFailLoadingHandler;
-        _view.OnAddConsoleMessage += OnConsoleMessageHandler;
+        // Use the native ulViewResize API — this resizes the view and its
+        // backing surface in-place without destroying/recreating the view,
+        // preserving all callbacks, JS state, and page content.
+        _view!.Resize(newW, newH);
 
         Width = newW;
         Height = newH;
 
-        // ── Reload content ──────────────────────────────────────────────
-        if (_lastLoadedHtml is not null)
-        {
-            _view.LoadHtml(_lastLoadedHtml);
-        }
-        else if (_lastLoadedUrl is not null)
-        {
-            _view.Url = _lastLoadedUrl;
-        }
-
-        // Pump a few frames so the page starts rendering at the new size.
-        for (int i = 0; i < 5; i++)
-        {
-            _renderer.Update();
-            _renderer.Render();
-        }
-
-        // Mark dirty so the render node picks up the new surface immediately.
+        // Mark dirty so the render node picks up the resized surface.
         IsDirty = true;
 
-        Logger.Info($"WebViewInstance: View recreated at {newW}x{newH}.");
+        Logger.Info($"WebViewInstance: View resized to {newW}x{newH}.");
     }
 
     /// <summary>Fires a mouse event into the Ultralight view.</summary>

@@ -102,7 +102,11 @@ public sealed unsafe partial class GraphicsDevice
             // Swapchain still works but isn't ideal (e.g. mid-drag on Linux).
             // Let it ride — the next coalesced ResizeEvent or a future
             // ErrorOutOfDateKHR will trigger a rebuild at the right time.
-            Logger.Debug("Swapchain suboptimal during present — deferring resize.");
+            if (!_suboptimalLogged)
+            {
+                Logger.Debug("Swapchain suboptimal during present — deferring resize.");
+                _suboptimalLogged = true;
+            }
         }
         else
         {
