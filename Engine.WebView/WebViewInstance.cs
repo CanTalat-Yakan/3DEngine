@@ -73,6 +73,21 @@ public sealed class WebViewInstance : IDisposable
     private bool _hasPendingResize;
 
     /// <summary>
+    /// Monotonically-increasing generation counter, bumped on every committed
+    /// native resize.  The render node tracks this to skip pixel reads on the
+    /// frame where a resize occurred (the surface has been reallocated and no
+    /// Ultralight Render() has painted into it yet).
+    /// </summary>
+    public uint ResizeGeneration { get; private set; }
+
+    /// <summary>Set to <c>true</c> for the single frame where the native
+    /// <c>ulViewResize</c> was committed.  While set, no Ultralight
+    /// Update/Render is executed and the render node must not touch the
+    /// surface — this is the "quiescent resize" pattern used by CEF and
+    /// similar browser-embedding solutions.</summary>
+    private bool _resizedThisFrame;
+
+    /// <summary>
     /// Initializes the Ultralight platform, renderer, and view.
     /// Call once during Startup.
     /// </summary>
@@ -222,8 +237,23 @@ public sealed class WebViewInstance : IDisposable
     {
         if (_renderer is null) return;
 
-        // Apply any deferred resize before processing the frame.
-        ApplyPendingResize();
+        // Reset per-frame flag.
+        _resizedThisFrame = false;
+
+        // ── Quiescent resize ─────────────────────────────────────────
+        // If a resize is pending, commit it NOW and return immediately.
+        // No Ultralight Update/Render is called this frame — the native
+        // surface has just been reallocated and must not be touched until
+        // the next frame.  This is the industry-standard "frame gap"
+        // pattern used by CEF and similar browser-embedding solutions.
+        if (_hasPendingResize && ApplyPendingResize())
+        {
+            // The resize was committed.  Skip all Ultralight work this
+            // frame so the surface is fully quiescent.  The next frame's
+            // normal Update/Render cycle will paint into the new surface.
+            DiagUpdateCount++;
+            return;
+        }
 
         DiagUpdateCount++;
 
@@ -259,7 +289,8 @@ public sealed class WebViewInstance : IDisposable
         // ── Forced pixel probe (every ~120 frames) ──────────────────
         // Bypasses IsDirty: directly locks the surface and scans for non-zero
         // pixels to confirm whether Ultralight ever writes content.
-        if (DiagUpdateCount % 120 == 0)
+        // Skipped on resize frames — the surface was just reallocated.
+        if (DiagUpdateCount % 120 == 0 && !_resizedThisFrame)
             ProbeSurfacePixels();
     }
 
@@ -320,9 +351,13 @@ public sealed class WebViewInstance : IDisposable
         if (!IsDirty)
             return false;
 
+        // Guard against reading stale dimensions during a resize transition.
+        // The native surface may have been reallocated by ulViewResize() while
+        // the managed Width/Height are still being updated.
+        var currentHeight = Height;
         rowBytes = surface.RowBytes;
-        var byteCount = (int)(rowBytes * Height);
-        if (destination.Length < byteCount)
+        var byteCount = (int)(rowBytes * currentHeight);
+        if (byteCount <= 0 || destination.Length < byteCount)
             return false;
 
         var ptr = surface.LockPixels();
@@ -400,32 +435,52 @@ public sealed class WebViewInstance : IDisposable
         _hasPendingResize = true;
     }
 
-    /// <summary>Applies a pending deferred resize. Called from <see cref="Update"/>.</summary>
-    private void ApplyPendingResize()
+    /// <summary>
+    /// Applies a pending deferred resize.  Returns <c>true</c> if the native
+    /// <c>ulViewResize</c> was actually committed (caller should skip all
+    /// further Ultralight work this frame).
+    /// </summary>
+    private bool ApplyPendingResize()
     {
-        if (!_hasPendingResize) return;
-        _hasPendingResize = false;
+        if (!_hasPendingResize) return false;
 
         var newW = _pendingResizeWidth;
         var newH = _pendingResizeHeight;
 
-        if (_renderer is null || (Width == newW && Height == newH))
-            return;
+        if (_renderer is null || _view is null || (Width == newW && Height == newH))
+        {
+            _hasPendingResize = false;
+            return false;
+        }
+
+        _hasPendingResize = false;
 
         Logger.Info($"WebViewInstance: Resizing view to {newW}x{newH} (was {Width}x{Height})...");
+
+        // Clear any stale dirty-region rectangles that reference the old
+        // surface dimensions.  Without this the native resize code may
+        // dereference out-of-bounds offsets in the old bitmap buffer.
+        _view.Surface?.ClearDirtyBounds();
 
         // Use the native ulViewResize API — this resizes the view and its
         // backing surface in-place without destroying/recreating the view,
         // preserving all callbacks, JS state, and page content.
-        _view!.Resize(newW, newH);
+        _view.Resize(newW, newH);
 
         Width = newW;
         Height = newH;
 
-        // Mark dirty so the render node picks up the resized surface.
+        // Bump the generation so the render node knows the surface was
+        // reallocated and will skip pixel reads this frame.
+        ResizeGeneration++;
+        _resizedThisFrame = true;
+
+        // Mark dirty so the render node picks up the resized surface on
+        // the NEXT frame (after the quiescent gap).
         IsDirty = true;
 
-        Logger.Info($"WebViewInstance: View resized to {newW}x{newH}.");
+        Logger.Info($"WebViewInstance: View resized to {newW}x{newH} (generation={ResizeGeneration}).");
+        return true;
     }
 
     /// <summary>Fires a mouse event into the Ultralight view.</summary>

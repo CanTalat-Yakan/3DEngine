@@ -26,6 +26,11 @@ public sealed class WebViewRenderNode : IRenderNode, IDisposable
     private uint _textureWidth;
     private uint _textureHeight;
 
+    // Tracks the webview resize generation to skip pixel access on the
+    // frame where a resize was committed (surface just reallocated, not
+    // yet painted into by Ultralight).
+    private uint _lastSeenResizeGeneration;
+
     // Staging buffer for pixel upload
     private byte[]? _stagingBuffer;
 
@@ -43,6 +48,21 @@ public sealed class WebViewRenderNode : IRenderNode, IDisposable
         if (_pipeline is null)
             CreatePipeline(gfx, cmds.FrameContext.RenderPass);
 
+        // ── Quiescent resize guard ──────────────────────────────────
+        // On the frame where a native ulViewResize was committed, the
+        // surface has been reallocated but Ultralight has NOT yet painted
+        // into it (Update/Render were skipped).  We must not touch the
+        // surface at all — just draw the previous frame's texture.
+        var currentGen = webview.ResizeGeneration;
+        if (currentGen != _lastSeenResizeGeneration)
+        {
+            // Generation changed — a resize happened.  Skip surface
+            // access this frame and defer texture recreation to the
+            // next frame when the surface has been painted into.
+            _lastSeenResizeGeneration = currentGen;
+            goto draw;
+        }
+
         // Recreate texture if webview size changed
         if (_webviewImage is null || _textureWidth != webview.Width || _textureHeight != webview.Height)
             RecreatewebviewTexture(gfx, webview.Width, webview.Height);
@@ -51,7 +71,13 @@ public sealed class WebViewRenderNode : IRenderNode, IDisposable
         if (webview.IsDirty && _webviewImage is not null)
         {
             var surfaceRowBytes = webview.SurfaceRowBytes;
-            var totalBytes = (int)(surfaceRowBytes * webview.Height);
+            var currentWidth = webview.Width;
+            var currentHeight = webview.Height;
+            var totalBytes = (int)(surfaceRowBytes * currentHeight);
+
+            // Guard: skip upload if dimensions are zero or texture size doesn't match
+            if (totalBytes <= 0 || _textureWidth != currentWidth || _textureHeight != currentHeight)
+                goto draw;
 
             // Ensure staging buffer is large enough for the surface (includes row padding)
             if (_stagingBuffer is null || _stagingBuffer.Length < totalBytes)
@@ -60,29 +86,31 @@ public sealed class WebViewRenderNode : IRenderNode, IDisposable
             if (webview.TryGetPixels(_stagingBuffer.AsSpan(0, totalBytes), out var actualRowBytes))
             {
                 webview.DiagUploadCount++;
-                var packedRowBytes = webview.Width * 4;
+                var packedRowBytes = currentWidth * 4;
 
                 if (actualRowBytes == packedRowBytes)
                 {
                     // No padding — upload the surface data directly
                     gfx.UploadTexture2D(_webviewImage, _stagingBuffer.AsSpan(0, totalBytes),
-                        webview.Width, webview.Height, bytesPerPixel: 4);
+                        currentWidth, currentHeight, bytesPerPixel: 4);
                 }
                 else
                 {
                     // Surface has row padding — strip it to get tightly-packed rows
-                    var packedSize = (int)(packedRowBytes * webview.Height);
+                    var packedSize = (int)(packedRowBytes * currentHeight);
                     var packed = new byte[packedSize];
-                    for (uint y = 0; y < webview.Height; y++)
+                    for (uint y = 0; y < currentHeight; y++)
                     {
                         _stagingBuffer.AsSpan((int)(y * actualRowBytes), (int)packedRowBytes)
                             .CopyTo(packed.AsSpan((int)(y * packedRowBytes)));
                     }
                     gfx.UploadTexture2D(_webviewImage, packed.AsSpan(0, packedSize),
-                        webview.Width, webview.Height, bytesPerPixel: 4);
+                        currentWidth, currentHeight, bytesPerPixel: 4);
                 }
             }
         }
+
+        draw:
 
         if (_webviewImage is null || _pipeline is null || _descriptorSet is null)
             return;
