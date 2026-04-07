@@ -1,10 +1,22 @@
 using Editor.Shell;
 
+/// <summary>
+/// Showcase shell demonstrating button variants, icon buttons, disabled/loading states,
+/// and link-style buttons via the <see cref="IContentBuilder"/> API.
+/// </summary>
+/// <remarks>
+/// Registered at route <c>/showcase/buttons</c> as a center-docked tabbed panel
+/// (tab group <c>"showcase"</c>, index 1).
+/// </remarks>
+/// <seealso cref="ShowcasePageHelper"/>
+/// <seealso cref="IEditorShellBuilder"/>
 [EditorShell]
 public class ShowcaseButtonsShell : IEditorShellBuilder
 {
+    /// <inheritdoc />
     public int Order => 1;
 
+    /// <inheritdoc />
     public void Build(IShellBuilder shell)
     {
         shell.Panel("showcase-buttons", "Buttons", DockZone.Center, panel =>
@@ -86,4 +98,3 @@ public class ShowcaseButtonsShell : IEditorShellBuilder
         });
     }
 }
-

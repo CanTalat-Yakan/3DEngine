@@ -3,18 +3,32 @@ using SDL3;
 
 namespace Engine;
 
-/// <summary>Creates the application window from Config and inserts it as a resource.</summary>
+/// <summary>
+/// Creates the application window from <see cref="Config"/>, inserts it as a resource,
+/// and provides the <see cref="IMainLoopDriver"/> and <see cref="IInputBackend"/>.
+/// </summary>
+/// <remarks>
+/// When the graphics backend is <see cref="GraphicsBackend.Vulkan"/>, an
+/// <see cref="ISurfaceSource"/> is also registered so the renderer can create a Vulkan surface.
+/// </remarks>
+/// <seealso cref="AppWindow"/>
+/// <seealso cref="Config"/>
+/// <seealso cref="IMainLoopDriver"/>
+/// <seealso cref="IInputBackend"/>
 public sealed class AppWindowPlugin : IPlugin
 {
+    /// <summary>SDL-backed main loop driver that pumps events via <see cref="AppWindow.Looping"/>.</summary>
     private sealed class SdlMainLoopDriver(AppWindow window) : IMainLoopDriver
     {
+        /// <inheritdoc />
         public void Run(Action frameStep)
         {
             window.Looping((Action)(() => frameStep()));
-            // NOTE: Do NOT destroy the SDL window here -- Cleanup-stage systems
+            // NOTE: Do NOT destroy the SDL window here - Cleanup-stage systems
             // (Vulkan, ImGui, WebView) still need the window/surface alive.
         }
 
+        /// <inheritdoc />
         public void Shutdown()
         {
             // Called by App.Run() *after* the Cleanup stage, so all GPU
@@ -23,8 +37,10 @@ public sealed class AppWindowPlugin : IPlugin
         }
     }
 
+    /// <summary>SDL input backend forwarding keyboard, mouse, and text events into the engine <see cref="Input"/> resource.</summary>
     private sealed class SdlInputBackend : IInputBackend
     {
+        /// <inheritdoc />
         public void Initialize(App app, Input input)
         {
             // Hook SDL events to update input; AppWindow already pumps events but we add handlers.
@@ -67,7 +83,7 @@ public sealed class AppWindowPlugin : IPlugin
         }
     }
 
-    /// <summary>Creates and shows the AppWindow using Config, inserts AppWindow, and provides the main loop driver.</summary>
+    /// <inheritdoc />
     public void Build(App app)
     {
         var logger = Log.Category("Engine.Application");

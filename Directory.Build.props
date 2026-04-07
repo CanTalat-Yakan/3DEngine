@@ -9,6 +9,12 @@
         <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     </PropertyGroup>
 
+    <!-- XML documentation & enforcement -->
+    <PropertyGroup>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
+    </PropertyGroup>
+
     <!-- NuGet package metadata -->
     <PropertyGroup>
         <Authors>CanTalat-Yakan</Authors>

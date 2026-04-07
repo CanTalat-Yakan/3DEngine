@@ -1,10 +1,19 @@
 namespace Engine;
 
 /// <summary>Discovers and invokes source-generated behavior registration methods to wire systems into the app.</summary>
+/// <remarks>
+/// Scans all loaded assemblies for static methods annotated with
+/// <see cref="GeneratedBehaviorRegistrationAttribute"/>. Each discovered method is invoked with the
+/// <see cref="App"/> instance, allowing generated code to register systems, conditions, and resources.
+/// </remarks>
+/// <seealso cref="BehaviorAttribute"/>
+/// <seealso cref="GeneratedBehaviorRegistrationAttribute"/>
+/// <seealso cref="EcsPlugin"/>
 public sealed class BehaviorsPlugin : IPlugin
 {
     private static readonly ILogger Logger = Log.Category("Engine.Behaviors");
 
+    /// <inheritdoc />
     public void Build(App app)
     {
         Logger.Info("BehaviorsPlugin: Scanning assemblies for generated behavior registrations...");

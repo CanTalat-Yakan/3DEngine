@@ -4,20 +4,31 @@ namespace Engine;
 
 public sealed unsafe partial class GraphicsDevice
 {
+    /// <summary>Global descriptor pool from which all descriptor sets are allocated.</summary>
     private VkDescriptorPool _descriptorPool;
+
+    /// <summary>Default descriptor set layout (binding 0 = UBO vertex, binding 1 = combined image sampler fragment).</summary>
     private VkDescriptorSetLayout _cameraSetLayout;
 
+    /// <summary>Wraps a Vulkan descriptor set allocated from the device's global pool.</summary>
+    /// <seealso cref="IDescriptorSet"/>
     private sealed class VulkanDescriptorSet : IDescriptorSet
     {
         private readonly GraphicsDevice _device;
+
+        /// <summary>The underlying Vulkan descriptor set handle.</summary>
         internal VkDescriptorSet Handle;
 
+        /// <summary>Creates a new Vulkan descriptor set wrapper.</summary>
+        /// <param name="device">The owning graphics device.</param>
+        /// <param name="handle">The allocated Vulkan descriptor set handle.</param>
         public VulkanDescriptorSet(GraphicsDevice device, VkDescriptorSet handle)
         {
             _device = device;
             Handle = handle;
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             if (Handle.Handle != 0 && _device._descriptorPool.Handle != 0)
@@ -29,6 +40,7 @@ public sealed unsafe partial class GraphicsDevice
         }
     }
 
+    /// <summary>Creates the default descriptor set layout and descriptor pool used for camera UBOs and texture samplers.</summary>
     private void CreateDescriptorResources()
     {
         Logger.Debug("Creating descriptor set layout (binding 0=UBO vertex, binding 1=CombinedImageSampler fragment)...");
@@ -75,6 +87,7 @@ public sealed unsafe partial class GraphicsDevice
         Logger.Debug("Descriptor pool created successfully.");
     }
 
+    /// <summary>Destroys the descriptor pool and descriptor set layout.</summary>
     private void DestroyDescriptorResources()
     {
         Logger.Debug("Destroying descriptor resources (pool + layout)...");
@@ -90,6 +103,7 @@ public sealed unsafe partial class GraphicsDevice
         }
     }
 
+    /// <inheritdoc />
     public IDescriptorSet CreateDescriptorSet()
     {
         if (_descriptorPool.Handle == 0)
@@ -112,6 +126,10 @@ public sealed unsafe partial class GraphicsDevice
 
     IDescriptorSet IGraphicsDevice.CreateDescriptorSet() => CreateDescriptorSet();
 
+    /// <summary>Updates a descriptor set with optional uniform buffer and combined image sampler bindings by writing to Vulkan descriptors.</summary>
+    /// <param name="descriptorSet">The descriptor set to update.</param>
+    /// <param name="uniformBinding">Optional uniform buffer binding descriptor.</param>
+    /// <param name="samplerBinding">Optional combined image sampler binding descriptor.</param>
     internal void UpdateDescriptorSet(
         IDescriptorSet descriptorSet,
         in UniformBufferBinding? uniformBinding,

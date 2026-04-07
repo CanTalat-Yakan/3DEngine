@@ -6,10 +6,18 @@ namespace Engine;
 /// Tracks wall-clock time since start, per-frame delta, frame count, and smoothed FPS.
 /// Updates during the <see cref="Stage.First"/> stage each frame.
 /// </summary>
+/// <remarks>
+/// Registers a <see cref="Time"/> resource in the world and a system that measures
+/// elapsed wall-clock time using <see cref="System.Diagnostics.Stopwatch"/>.
+/// The system clamps large deltas (e.g., debugger pauses) via <see cref="Time.MaxDeltaSeconds"/>.
+/// </remarks>
+/// <seealso cref="Time"/>
+/// <seealso cref="Stage.First"/>
 public sealed class TimePlugin : IPlugin
 {
     private static readonly ILogger Logger = Log.Category("Engine.Time");
 
+    /// <inheritdoc />
     public void Build(App app)
     {
         Logger.Info("TimePlugin: Registering Time resource and frame-timing system.");
@@ -72,6 +80,8 @@ public sealed class Time
     public double Fps => DeltaSeconds > 0.0 ? 1.0 / DeltaSeconds : 0.0;
 
     /// <summary>Called by <see cref="TimePlugin"/> once per frame to advance timing state.</summary>
+    /// <param name="elapsedSeconds">Total wall-clock seconds since the app started.</param>
+    /// <param name="rawDelta">Un-clamped seconds since the previous frame.</param>
     internal void Update(double elapsedSeconds, double rawDelta)
     {
         ElapsedSeconds = elapsedSeconds;

@@ -1,10 +1,19 @@
 namespace Engine;
 
-/// <summary>Aggregates the standard set of engine plugins.</summary>
+/// <summary>
+/// Aggregates the standard set of engine plugins: window, input, ECS, behaviors, ImGui, renderer, and WebView.
+/// </summary>
+/// <remarks>
+/// Also registers a <see cref="Stage.First"/> system that calls <see cref="EcsWorld.BeginFrame"/>
+/// to advance the frame tick and clear per-frame change tracking.
+/// </remarks>
+/// <seealso cref="App"/>
+/// <seealso cref="IPlugin"/>
 public sealed class DefaultPlugins : IPlugin
 {
     private static readonly ILogger Logger = Log.Category("Engine.Plugins");
 
+    /// <inheritdoc />
     public void Build(App app)
     {
         Logger.Info("DefaultPlugins: Loading standard engine plugin set...");

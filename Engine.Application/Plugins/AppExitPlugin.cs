@@ -1,11 +1,17 @@
 namespace Engine;
 
-/// <summary>Handles application exit: listens for window quit events and requests closure.</summary>
+/// <summary>
+/// Handles application exit: listens for window quit events and requests closure.
+/// Inserts an <see cref="AppExit"/> resource and adds a <see cref="Stage.First"/> system
+/// that closes the window when <see cref="AppExit.Requested"/> is set.
+/// </summary>
+/// <seealso cref="AppExit"/>
+/// <seealso cref="AppWindow"/>
 public sealed class AppExitPlugin : IPlugin
 {
     private static readonly ILogger Logger = Log.Category("Engine.AppExit");
 
-    /// <summary>Inserts the <see cref="AppExit"/> resource (if missing), wires window quit to set its flag, and adds a First-stage system to close the window when requested.</summary>
+    /// <inheritdoc />
     public void Build(App app)
     {
         Logger.Info("AppExitPlugin: Registering exit handler...");
@@ -16,7 +22,7 @@ public sealed class AppExitPlugin : IPlugin
         var window = app.World.Resource<AppWindow>();
         window.QuitEvent += () =>
         {
-            Logger.Info("Quit event received -- flagging application exit.");
+            Logger.Info("Quit event received - flagging application exit.");
             app.World.Resource<AppExit>().Requested = true;
         };
 
@@ -25,7 +31,7 @@ public sealed class AppExitPlugin : IPlugin
             {
                 if (world.Resource<AppExit>().Requested)
                 {
-                    Logger.Info("Exit requested -- closing window to break main loop.");
+                    Logger.Info("Exit requested - closing window to break main loop.");
                     world.Resource<AppWindow>().RequestClose();
                 }
             }, "AppExitPlugin.Update")

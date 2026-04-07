@@ -6,6 +6,18 @@ namespace Editor.Shell;
 
 public sealed partial class ShellCompiler
 {
+    /// <summary>
+    /// Performs a full compilation cycle: collect files → parse → compile → load → discover builders → update registry.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The entire operation runs under <c>_compileLock</c> to prevent concurrent compilations.
+    /// On success, the previous <c>AssemblyLoadContext</c> is unloaded and the new
+    /// descriptor is pushed to the <see cref="ShellRegistry"/>.
+    /// </para>
+    /// <para>If no script files are found, an empty <see cref="ShellDescriptor"/> is pushed.</para>
+    /// </remarks>
+    /// <returns>A <see cref="ShellCompilationResult"/> describing success, errors, and warnings.</returns>
     private ShellCompilationResult CompileAndLoad()
     {
         lock (_compileLock)
@@ -113,6 +125,14 @@ public sealed partial class ShellCompiler
         }
     }
 
+    /// <summary>
+    /// Discovers types annotated with <see cref="EditorShellAttribute"/> that implement
+    /// <see cref="IEditorShellBuilder"/>, instantiates them, and executes their
+    /// <see cref="IEditorShellBuilder.Build"/> method in priority order.
+    /// </summary>
+    /// <param name="assembly">The compiled script assembly to scan.</param>
+    /// <param name="result">Compilation result to append warnings to on instantiation/build failures.</param>
+    /// <returns>The assembled <see cref="ShellDescriptor"/>.</returns>
     private static ShellDescriptor DiscoverAndBuildShell(Assembly assembly, ShellCompilationResult result)
     {
         var builders = new List<IEditorShellBuilder>();

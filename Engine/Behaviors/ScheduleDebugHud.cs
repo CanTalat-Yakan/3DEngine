@@ -4,12 +4,21 @@ using ImGuiNET;
 namespace Engine;
 
 /// <summary>ImGui overlay showing scheduler batch composition and conflict notes per stage.</summary>
+/// <remarks>
+/// Toggled with <c>Alt+F3</c> (default off).  Reads <see cref="ScheduleDiagnostics"/>
+/// from the world and displays each <see cref="Stage"/>'s parallel/sequential batches
+/// with planner notes explaining why systems could or couldn't be batched together.
+/// </remarks>
+/// <seealso cref="ScheduleDiagnostics"/>
+/// <seealso cref="Schedule"/>
 [Behavior]
 public struct ScheduleDebugHud
 {
     private static readonly ILogger Logger = Log.Category("Engine.Schedule.DebugHud");
     private static string? _lastDumpPath;
 
+    /// <summary>Draws the schedule debug overlay, including batch lists and diagnostic buttons.</summary>
+    /// <param name="ctx">Behavior context providing world resource access.</param>
     [OnRender]
     [ToggleKey(Key.F3, KeyModifier.Alt, DefaultEnabled = false)]
     public static void Draw(BehaviorContext ctx)

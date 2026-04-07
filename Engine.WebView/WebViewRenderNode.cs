@@ -2,18 +2,32 @@ namespace Engine;
 
 /// <summary>
 /// Render graph node that draws the Ultralight webview surface as a fullscreen textured overlay.
-/// Uses CPU bitmap surface mode -- reads pixels from Ultralight, uploads to a Vulkan texture,
+/// Uses CPU bitmap surface mode - reads pixels from Ultralight, uploads to a Vulkan texture,
 /// then draws a fullscreen triangle with alpha blending.
 /// Depends on "sample" so it renders after the 3D scene but before ImGui.
 /// </summary>
+/// <remarks>
+/// <para>
+/// GPU resources (pipeline, shaders, texture, sampler, descriptor set) are created lazily on
+/// first <see cref="Execute"/>.  The texture is recreated whenever the webview dimensions change.
+/// A <em>quiescent resize guard</em> skips surface access on the frame where a native resize
+/// was committed, drawing the previous frame's texture instead.
+/// </para>
+/// </remarks>
+/// <seealso cref="WebViewInstance"/>
+/// <seealso cref="WebViewShaders"/>
+/// <seealso cref="WebViewPlugin"/>
+/// <seealso cref="VulkanWebViewPlugin"/>
 public sealed class WebViewRenderNode : IRenderNode, IDisposable
 {
     private static readonly ILogger Logger = Log.Category("Engine.WebView.Vulkan");
 
+    /// <inheritdoc />
     public string Name => "webview";
+    /// <inheritdoc />
     public IReadOnlyCollection<string> Dependencies { get; } = new[] { "sample" };
 
-    // GPU resources -- created lazily on first Execute
+    // GPU resources - created lazily on first Execute
     private IPipeline? _pipeline;
     private IShader? _vertexShader;
     private IShader? _fragmentShader;
@@ -34,6 +48,10 @@ public sealed class WebViewRenderNode : IRenderNode, IDisposable
     // Staging buffer for pixel upload
     private byte[]? _stagingBuffer;
 
+    /// <inheritdoc />
+    /// <param name="ctx">The current renderer context providing GPU device access.</param>
+    /// <param name="cmds">The command recording context for the current frame.</param>
+    /// <param name="renderWorld">The render world containing the <see cref="WebViewInstance"/> resource.</param>
     public unsafe void Execute(RendererContext ctx, CommandRecordingContext cmds, RenderWorld renderWorld)
     {
         var webview = renderWorld.TryGet<WebViewInstance>();
@@ -52,11 +70,11 @@ public sealed class WebViewRenderNode : IRenderNode, IDisposable
         // On the frame where a native ulViewResize was committed, the
         // surface has been reallocated but Ultralight has NOT yet painted
         // into it (Update/Render were skipped).  We must not touch the
-        // surface at all -- just draw the previous frame's texture.
+        // surface at all - just draw the previous frame's texture.
         var currentGen = webview.ResizeGeneration;
         if (currentGen != _lastSeenResizeGeneration)
         {
-            // Generation changed -- a resize happened.  Skip surface
+            // Generation changed - a resize happened.  Skip surface
             // access this frame and defer texture recreation to the
             // next frame when the surface has been painted into.
             _lastSeenResizeGeneration = currentGen;
@@ -90,13 +108,13 @@ public sealed class WebViewRenderNode : IRenderNode, IDisposable
 
                 if (actualRowBytes == packedRowBytes)
                 {
-                    // No padding -- upload the surface data directly
+                    // No padding - upload the surface data directly
                     gfx.UploadTexture2D(_webviewImage, _stagingBuffer.AsSpan(0, totalBytes),
                         currentWidth, currentHeight, bytesPerPixel: 4);
                 }
                 else
                 {
-                    // Surface has row padding -- strip it to get tightly-packed rows
+                    // Surface has row padding - strip it to get tightly-packed rows
                     var packedSize = (int)(packedRowBytes * currentHeight);
                     var packed = new byte[packedSize];
                     for (uint y = 0; y < currentHeight; y++)
@@ -127,6 +145,9 @@ public sealed class WebViewRenderNode : IRenderNode, IDisposable
         gfx.Draw(cmd, vertexCount: 3, instanceCount: 1);
     }
 
+    /// <summary>Creates the fullscreen overlay Vulkan pipeline with alpha blending and no vertex input.</summary>
+    /// <param name="gfx">The graphics device to create GPU resources on.</param>
+    /// <param name="renderPass">The render pass the pipeline must be compatible with.</param>
     private void CreatePipeline(IGraphicsDevice gfx, IRenderPass renderPass)
     {
         Logger.Info("Creating webview overlay Vulkan pipeline...");
@@ -152,6 +173,10 @@ public sealed class WebViewRenderNode : IRenderNode, IDisposable
         Logger.Info("WebView overlay pipeline created.");
     }
 
+    /// <summary>Recreates the GPU texture, image view, sampler, and descriptor set for the given dimensions.</summary>
+    /// <param name="gfx">The graphics device to create GPU resources on.</param>
+    /// <param name="width">New texture width in pixels.</param>
+    /// <param name="height">New texture height in pixels.</param>
     private void RecreatewebviewTexture(IGraphicsDevice gfx, uint width, uint height)
     {
         if (width == 0 || height == 0) return;
@@ -190,6 +215,7 @@ public sealed class WebViewRenderNode : IRenderNode, IDisposable
         Logger.Info($"WebView texture created: {width}x{height}.");
     }
 
+    /// <summary>Disposes all GPU resources (pipeline, shaders, texture, sampler, descriptor set).</summary>
     public void Dispose()
     {
         Logger.Info("Disposing WebViewRenderNode GPU resources...");

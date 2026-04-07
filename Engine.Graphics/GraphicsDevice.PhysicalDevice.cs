@@ -4,13 +4,20 @@ namespace Engine;
 
 public sealed unsafe partial class GraphicsDevice
 {
+    /// <summary>Indices of the graphics and present queue families for the selected physical device.</summary>
     private struct QueueFamilyIndices
     {
+        /// <summary>Index of the graphics queue family, or <see cref="uint.MaxValue"/> if not found.</summary>
         public uint Graphics;
+
+        /// <summary>Index of the present queue family, or <see cref="uint.MaxValue"/> if not found.</summary>
         public uint Present;
+
+        /// <summary>Returns <see langword="true"/> when both graphics and present queue families have been found.</summary>
         public bool IsComplete => Graphics != uint.MaxValue && Present != uint.MaxValue;
     }
 
+    /// <summary>Enumerates physical devices, scores their capabilities, and selects the best GPU.</summary>
     private partial void SelectPhysicalDevice()
     {
         Logger.Debug("Enumerating Vulkan physical devices...");
@@ -37,7 +44,7 @@ public sealed unsafe partial class GraphicsDevice
 
             if (!features.geometryShader)
             {
-                Logger.Debug($"    Rejected -- no geometry shader support.");
+                Logger.Debug($"    Rejected - no geometry shader support.");
                 continue;
             }
 
@@ -67,7 +74,7 @@ public sealed unsafe partial class GraphicsDevice
 
         if (best is null)
         {
-            Logger.Error("Failed to find a suitable Vulkan GPU -- no device passed all requirements.");
+            Logger.Error("Failed to find a suitable Vulkan GPU - no device passed all requirements.");
             throw new InvalidOperationException("Failed to find a suitable GPU for Vulkan.");
         }
 
@@ -75,6 +82,9 @@ public sealed unsafe partial class GraphicsDevice
         Logger.Info($"Selected GPU: {_adapterInfo.Name} (score={bestScore})");
     }
 
+    /// <summary>Finds the graphics and present queue family indices for the given physical device.</summary>
+    /// <param name="device">The physical device to query.</param>
+    /// <returns>A <see cref="QueueFamilyIndices"/> indicating the discovered families.</returns>
     private QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device)
     {
         var result = new QueueFamilyIndices { Graphics = uint.MaxValue, Present = uint.MaxValue };
@@ -98,6 +108,7 @@ public sealed unsafe partial class GraphicsDevice
         return result;
     }
 
+    /// <summary>Maps a <see cref="VkPhysicalDeviceType"/> to the engine's <see cref="GraphicsDeviceType"/>.</summary>
     private static GraphicsDeviceType ToDeviceType(VkPhysicalDeviceType type) => type switch
     {
         VkPhysicalDeviceType.DiscreteGpu => GraphicsDeviceType.DiscreteGpu,

@@ -3,6 +3,13 @@ using ImGuiNET;
 namespace Engine;
 
 /// <summary>ImGui diagnostic overlay for the Ultralight webview subsystem.</summary>
+/// <remarks>
+/// Toggled with <c>Alt+F3</c> (default off).  Displays view dimensions, surface state,
+/// page load callbacks, frame counters, pixel content diagnostics, resource file status,
+/// and actionable warnings when common failure conditions are detected.
+/// </remarks>
+/// <seealso cref="WebViewInstance"/>
+/// <seealso cref="WebViewRenderNode"/>
 [Behavior]
 public struct WebViewDebugHud
 {
@@ -13,6 +20,7 @@ public struct WebViewDebugHud
     private static string? _dumpPath;
 
     /// <summary>Draws webview debug info every render frame.</summary>
+    /// <param name="ctx">Behavior context providing world resource access.</param>
     [OnRender]
     [ToggleKey(Key.F3, KeyModifier.Alt, DefaultEnabled = false)]
     public static void Draw(BehaviorContext ctx)
@@ -73,7 +81,7 @@ public struct WebViewDebugHud
         // ── Warnings ─────────────────────────────────────────────────
         if (!w.DiagDOMReady && w.DiagUpdateCount > 60)
             ImGui.TextColored(Red,
-                "CRITICAL: DOM never became ready -- page did not load!");
+                "CRITICAL: DOM never became ready - page did not load!");
 
         if (w.DiagLoadError is not null)
             ImGui.TextColored(Red,
@@ -93,11 +101,11 @@ public struct WebViewDebugHud
 
         if (w.DiagUploadCount > 0 && w.DiagNonZeroPixels == 0 && w.DiagProbeNonZero > 0)
             ImGui.TextColored(Yellow,
-                "HINT: Probe found pixels but upload didn't -- timing issue!");
+                "HINT: Probe found pixels but upload didn't - timing issue!");
 
         if (!w.DiagIcuExists)
             ImGui.TextColored(Red,
-                "CRITICAL: icudt67l.dat missing -- text layout will fail!");
+                "CRITICAL: icudt67l.dat missing - text layout will fail!");
 
         ImGui.Separator();
 
@@ -134,7 +142,7 @@ public struct WebViewDebugHud
 
             // Warnings
             if (!w.DiagDOMReady && w.DiagUpdateCount > 60)
-                sb.AppendLine("CRITICAL: DOM never became ready -- page did not load!");
+                sb.AppendLine("CRITICAL: DOM never became ready - page did not load!");
             if (w.DiagLoadError is not null)
                 sb.AppendLine("CRITICAL: Page load failed!");
             if (w.DiagUpdateCount > 60 && w.DiagPaintCount == 0)
@@ -159,6 +167,8 @@ public struct WebViewDebugHud
         ImGui.End();
     }
 
+    /// <summary>Logs a concise diagnostic snapshot of the webview state to the engine logger.</summary>
+    /// <param name="w">The webview instance to snapshot.</param>
     private static void LogSnapshot(WebViewInstance w)
     {
         var pct = w.DiagTotalPixels > 0

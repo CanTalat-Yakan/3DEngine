@@ -1,10 +1,22 @@
 using Editor.Shell;
 
+/// <summary>
+/// Showcase shell demonstrating feedback components: alert banners (all severity levels),
+/// badges, progress bars, inline code, and keyboard shortcut indicators.
+/// </summary>
+/// <remarks>
+/// Registered at route <c>/showcase/alerts</c> as a center-docked tabbed panel
+/// (tab group <c>"showcase"</c>, index 4).
+/// </remarks>
+/// <seealso cref="ShowcasePageHelper"/>
+/// <seealso cref="IEditorShellBuilder"/>
 [EditorShell]
 public class ShowcaseAlertsShell : IEditorShellBuilder
 {
+    /// <inheritdoc />
     public int Order => 4;
 
+    /// <inheritdoc />
     public void Build(IShellBuilder shell)
     {
         shell.Panel("showcase-alerts", "Alerts & Feedback", DockZone.Center, panel =>
@@ -90,4 +102,3 @@ public class ShowcaseAlertsShell : IEditorShellBuilder
         });
     }
 }
-

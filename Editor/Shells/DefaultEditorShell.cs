@@ -1,10 +1,24 @@
 using Editor.Shell;
 
+/// <summary>
+/// Default editor shell that defines the "Home" landing page panel.
+/// Demonstrates various <see cref="IContentBuilder"/> components including
+/// buttons, inputs, toggle controls, badges, dialogs, and alert banners.
+/// </summary>
+/// <remarks>
+/// This shell is loaded with <see cref="IEditorShellBuilder.Order"/> = 0 (default priority)
+/// and registers a center-docked panel at the root route (<c>/</c>).
+/// Serves as both a functional landing page and a living reference for the shell API.
+/// </remarks>
+/// <seealso cref="IEditorShellBuilder"/>
+/// <seealso cref="ShowcasePageHelper"/>
 [EditorShell]
 public class DefaultEditorShell : IEditorShellBuilder
 {
+    /// <inheritdoc />
     public int Order => 0;
 
+    /// <inheritdoc />
     public void Build(IShellBuilder shell)
     {
         // ── Home panel ───────────────────────────────────────────────

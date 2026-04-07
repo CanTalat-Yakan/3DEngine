@@ -4,7 +4,7 @@ using Editor.Shell;
 /// <summary>
 /// Helper used by showcase shell scripts to wrap page content with the
 /// shared sidebar navigation layout.  Lives at the implementation (script)
-/// level -- Editor.Server knows nothing about showcases.
+/// level - Editor.Server knows nothing about showcases.
 /// </summary>
 public static class ShowcasePageHelper
 {
@@ -22,6 +22,8 @@ public static class ShowcasePageHelper
     /// Wraps <paramref name="pageContent"/> inside a two-column layout:
     /// fixed sidebar (nav links) + scrollable main content area.
     /// </summary>
+    /// <param name="ui">The parent content builder to write into.</param>
+    /// <param name="pageContent">Callback that fills the scrollable main content area.</param>
     public static void WrapWithSidebar(IContentBuilder ui, Action<IContentBuilder> pageContent)
     {
         ui.Div("container py-6", container =>

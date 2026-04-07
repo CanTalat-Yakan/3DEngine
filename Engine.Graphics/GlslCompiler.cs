@@ -6,6 +6,18 @@ namespace Engine;
 /// Provides in-process GLSL → SPIR-V compilation using the shaderc library.
 /// No external tools (glslc) required. Safe for runtime use, editor hot-reload, and published builds.
 /// </summary>
+/// <remarks>
+/// <para>
+/// A new <see cref="Compiler"/> instance is created per <see cref="Compile"/> call because
+/// the shaderc compiler is not thread-safe.  For typical shader loading this is negligible;
+/// callers needing high-throughput compilation can pool externally.
+/// </para>
+/// <para>
+/// <see cref="CompileFileWithCache"/> provides a disk-backed cache: if a <c>.spv</c> file
+/// exists and is newer than the GLSL source, the cached bytecode is returned without invoking shaderc.
+/// </para>
+/// </remarks>
+/// <seealso cref="ShaderStage"/>
 public static class GlslCompiler
 {
     private static readonly ILogger Logger = Log.Category("Engine.GlslCompiler");

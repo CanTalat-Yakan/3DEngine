@@ -1,8 +1,14 @@
 namespace Engine;
 
-/// <summary>Extracts Mesh+Material entities into opaque draw lists for the renderer.</summary>
+/// <summary>
+/// Extracts entities with <see cref="Mesh"/> + <see cref="Material"/> components into
+/// <see cref="RenderDrawLists"/> sorted by vertex count for front-to-back rendering.
+/// </summary>
+/// <seealso cref="RenderDrawLists"/>
+/// <seealso cref="DrawCommand"/>
 public sealed class MeshMaterialExtract : IExtractSystem
 {
+    /// <inheritdoc />
     public void Run(World world, RenderWorld renderWorld)
     {
         if (!world.TryGetResource<EcsWorld>(out var ecs)) return;

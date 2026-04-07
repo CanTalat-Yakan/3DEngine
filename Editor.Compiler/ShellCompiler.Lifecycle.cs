@@ -6,6 +6,7 @@ public sealed partial class ShellCompiler
     /// Performs an initial compilation and starts file watchers.
     /// Call once after configuration.
     /// </summary>
+    /// <returns>The result of the initial compilation.</returns>
     public ShellCompilationResult Start()
     {
         var result = CompileAndLoad();
@@ -29,8 +30,10 @@ public sealed partial class ShellCompiler
     }
 
     /// <summary>Manually triggers a recompilation.</summary>
+    /// <returns>The result of the recompilation.</returns>
     public ShellCompilationResult Recompile() => CompileAndLoad();
 
+    /// <summary>Disposes the debounce timer, file watchers, and the current script load context.</summary>
     public void Dispose()
     {
         _debounceTimer?.Dispose();
@@ -43,4 +46,3 @@ public sealed partial class ShellCompiler
         UnloadCurrent();
     }
 }
-

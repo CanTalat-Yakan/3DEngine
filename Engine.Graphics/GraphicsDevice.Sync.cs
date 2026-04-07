@@ -4,6 +4,7 @@ namespace Engine;
 
 public sealed unsafe partial class GraphicsDevice
 {
+    /// <summary>Creates semaphores and pre-signaled fences for each frame-in-flight.</summary>
     private partial void CreateSyncObjects()
     {
         Logger.Debug($"Creating synchronization objects for {MaxFramesInFlight} frames-in-flight...");
@@ -22,6 +23,7 @@ public sealed unsafe partial class GraphicsDevice
         Logger.Debug($"Sync objects created: {MaxFramesInFlight} semaphore pairs + {MaxFramesInFlight} fences (pre-signaled).");
     }
 
+    /// <summary>Destroys all synchronization fences and semaphores.</summary>
     private partial void DestroySyncObjects()
     {
         Logger.Debug("Destroying sync objects (fences and semaphores)...");

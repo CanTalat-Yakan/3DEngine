@@ -9,6 +9,7 @@ public sealed class VulkanWebViewPlugin : IPlugin
 {
     private static readonly ILogger Logger = Log.Category("Engine.WebView.Vulkan");
 
+    /// <inheritdoc />
     public void Build(App app)
     {
         var cfg = app.World.Resource<Config>();

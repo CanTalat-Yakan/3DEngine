@@ -5,6 +5,7 @@ namespace Engine;
 
 public sealed unsafe partial class GraphicsDevice
 {
+    /// <summary>Creates the swapchain, image views, depth buffer, render pass, framebuffers, and command pool.</summary>
     private partial void CreateSwapchainResources()
     {
         Logger.Debug("Querying drawable size from surface source...");
@@ -82,9 +83,10 @@ public sealed unsafe partial class GraphicsDevice
         Logger.Debug("Swapchain resource creation complete.");
     }
 
+    /// <summary>Destroys all swapchain-related resources including framebuffers, image views, depth buffer, render pass, and command pool.</summary>
     private partial void DestroySwapchainResources()
     {
-        Logger.Debug($"Destroying swapchain resources -- {_framebuffers.Length} framebuffers, {_swapchainImageViews.Length} image views...");
+        Logger.Debug($"Destroying swapchain resources - {_framebuffers.Length} framebuffers, {_swapchainImageViews.Length} image views...");
         foreach (var fb in _framebuffers)
             if (fb.Handle != 0) _deviceApi.vkDestroyFramebuffer(fb);
         foreach (var iv in _swapchainImageViews)
@@ -114,6 +116,8 @@ public sealed unsafe partial class GraphicsDevice
         _depthImageView = default;
     }
 
+    /// <summary>Queries surface capabilities, supported formats, and present modes for swapchain creation.</summary>
+    /// <param name="device">The physical device to query.</param>
     private (VkSurfaceCapabilitiesKHR Capabilities, VkSurfaceFormatKHR[] Formats, VkPresentModeKHR[] PresentModes) QuerySwapchainSupport(VkPhysicalDevice device)
     {
         _instanceApi.vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, _surface, out VkSurfaceCapabilitiesKHR capabilities).CheckResult();
@@ -126,6 +130,7 @@ public sealed unsafe partial class GraphicsDevice
         return (capabilities, formats.ToArray(), modes.ToArray());
     }
 
+    /// <summary>Selects the preferred swapchain surface format, favoring <c>B8G8R8A8_UNORM</c>.</summary>
     private static VkSurfaceFormatKHR ChooseSwapchainFormat(VkSurfaceFormatKHR[] formats)
     {
         if (formats.Length == 1 && formats[0].format == VkFormat.Undefined)
@@ -140,6 +145,7 @@ public sealed unsafe partial class GraphicsDevice
         return formats[0];
     }
 
+    /// <summary>Selects the preferred present mode: Mailbox &gt; Immediate &gt; FIFO.</summary>
     private static VkPresentModeKHR ChoosePresentMode(VkPresentModeKHR[] modes)
     {
         if (modes.Contains(VkPresentModeKHR.Mailbox))
@@ -149,6 +155,7 @@ public sealed unsafe partial class GraphicsDevice
         return VkPresentModeKHR.Fifo;
     }
 
+    /// <summary>Determines the swapchain extent, clamping to surface capabilities.</summary>
     private static VkExtent2D ChooseSwapExtent(VkSurfaceCapabilitiesKHR caps, uint width, uint height)
     {
         if (caps.currentExtent.width != uint.MaxValue)
@@ -161,6 +168,7 @@ public sealed unsafe partial class GraphicsDevice
         };
     }
 
+    /// <summary>Creates the depth buffer image, memory, and image view (<c>D32_SFLOAT</c>).</summary>
     private void CreateDepthResources()
     {
         // For now always use a 32-bit float depth buffer.
@@ -203,6 +211,7 @@ public sealed unsafe partial class GraphicsDevice
         _deviceApi.vkCreateImageView(&viewInfo, null, out _depthImageView).CheckResult();
     }
 
+    /// <summary>Creates a <c>VkImageView</c> for each swapchain image.</summary>
     private void CreateImageViews()
     {
         _swapchainImageViews = new VkImageView[_swapchainImages.Length];
@@ -220,6 +229,7 @@ public sealed unsafe partial class GraphicsDevice
         }
     }
 
+    /// <summary>Creates the render pass with color and depth attachments.</summary>
     private void CreateRenderPass()
     {
         var colorAttachment = new VkAttachmentDescription
@@ -284,6 +294,7 @@ public sealed unsafe partial class GraphicsDevice
         _deviceApi.vkCreateRenderPass(&renderPassInfo, null, out _renderPass).CheckResult();
     }
 
+    /// <summary>Creates one framebuffer per swapchain image, attaching color and depth views.</summary>
     private void CreateFramebuffers()
     {
         _framebuffers = new VkFramebuffer[_swapchainImageViews.Length];
@@ -307,6 +318,7 @@ public sealed unsafe partial class GraphicsDevice
         }
     }
 
+    /// <summary>Creates the command pool and allocates one primary command buffer per frame-in-flight.</summary>
     private void CreateCommandPoolAndBuffers()
     {
         VkCommandPoolCreateInfo poolInfo = new()

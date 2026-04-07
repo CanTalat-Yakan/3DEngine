@@ -1,7 +1,9 @@
-// Auto-generated icon enums -- do not edit by hand.
+// Auto-generated icon enums - do not edit by hand.
 // Re-generate by running the icon extraction tool.
 namespace Editor.Shell;
 
+/// <summary>Lucide icon set. Use with <see cref="Icon.From(Lucide)"/> to resolve icon names.</summary>
+/// <seealso cref="Icon"/>
 public enum Lucide
 {
     None = 0,
@@ -1672,6 +1674,8 @@ public enum Lucide
     ZoomOut,
 }
 
+/// <summary>Feather icon set. Use with <see cref="Icon.From(Feather)"/> to resolve icon names.</summary>
+/// <seealso cref="Icon"/>
 public enum Feather
 {
     None = 0,
@@ -1963,6 +1967,8 @@ public enum Feather
     ZoomOut,
 }
 
+/// <summary>Heroicons icon set. Use with <see cref="Icon.From(Heroicon)"/> to resolve icon names.</summary>
+/// <seealso cref="Icon"/>
 public enum Heroicon
 {
     None = 0,

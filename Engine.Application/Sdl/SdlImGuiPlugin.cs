@@ -5,8 +5,26 @@ using SDL3;
 namespace Engine;
 
 /// <summary>Sets up ImGui, schedules NewFrame/Render systems, and renders via ImGuiRenderer.</summary>
+/// <remarks>
+/// <para>
+/// Creates the ImGui context, configures dark style and keyboard/gamepad navigation, then
+/// registers three per-frame systems:
+/// <list type="number">
+///   <item><description><see cref="Stage.PreUpdate"/>: sets display size, delta time, framebuffer scale, and calls <c>ImGui.NewFrame()</c>.</description></item>
+///   <item><description><see cref="Stage.Render"/>: calls <c>ImGui.Render()</c> and (in SDL renderer mode) clears and presents via SDL.</description></item>
+///   <item><description><see cref="Stage.Cleanup"/>: tears down the ImGui context and disposes the SDL renderer backend.</description></item>
+/// </list>
+/// </para>
+/// <para>
+/// In Vulkan mode, no <see cref="SdlImGuiRenderer"/> is created - the font atlas is built
+/// but not uploaded to an SDL texture; the Vulkan ImGui render node handles GPU upload.
+/// </para>
+/// </remarks>
+/// <seealso cref="SdlImGuiRenderer"/>
+/// <seealso cref="SdlImGuiInput"/>
 public sealed class SdlImGuiPlugin : IPlugin
 {
+    /// <inheritdoc />
     public void Build(App app)
     {
         var logger = Log.Category("Engine.ImGui");
@@ -20,7 +38,7 @@ public sealed class SdlImGuiPlugin : IPlugin
         io.DisplaySize = new Vector2(Math.Max(1, sdlWindow.Width), Math.Max(1, sdlWindow.Height));
         io.DeltaTime = 1f / 60f;
 
-        logger.Info($"ImGui initialized -- display size: {sdlWindow.Width}x{sdlWindow.Height}");
+        logger.Info($"ImGui initialized - display size: {sdlWindow.Width}x{sdlWindow.Height}");
 
         if (sdlWindow.Renderer != IntPtr.Zero)
         {
@@ -31,8 +49,8 @@ public sealed class SdlImGuiPlugin : IPlugin
         else
         {
             // Vulkan mode: no SDL renderer, but ImGui still needs the font atlas built.
-            // Don't clear tex data -- the Vulkan ImGui render node will upload it to GPU.
-            logger.Info("ImGui using Vulkan mode -- building font atlas only (no SDL renderer).");
+            // Don't clear tex data - the Vulkan ImGui render node will upload it to GPU.
+            logger.Info("ImGui using Vulkan mode - building font atlas only (no SDL renderer).");
             var io2 = ImGui.GetIO();
             io2.Fonts.GetTexDataAsRGBA32(out IntPtr _, out int _, out int _, out _);
         }

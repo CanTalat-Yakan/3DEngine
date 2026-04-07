@@ -1,6 +1,12 @@
 namespace Engine;
 
 /// <summary>Creates and owns a simple triangle graphics pipeline from SPIR-V shaders.</summary>
+/// <remarks>
+/// The pipeline uses no vertex input (the fullscreen triangle is generated in the vertex shader),
+/// no blending, and no back-face culling.  It is created once and reused for every frame.
+/// </remarks>
+/// <seealso cref="TriangleShaders"/>
+/// <seealso cref="SampleQueue"/>
 public sealed class TrianglePipeline : IDisposable
 {
     private static readonly ILogger Logger = Log.Category("Engine.Renderer.Triangle");
@@ -10,8 +16,14 @@ public sealed class TrianglePipeline : IDisposable
     private readonly IShader _fragmentShader;
     private readonly IPipeline _pipeline;
 
+    /// <summary>The compiled Vulkan graphics pipeline handle.</summary>
     public IPipeline Pipeline => _pipeline;
 
+    /// <summary>Creates a new triangle pipeline from pre-compiled SPIR-V bytecode.</summary>
+    /// <param name="graphics">The graphics device to create GPU resources on.</param>
+    /// <param name="renderPass">The render pass the pipeline must be compatible with.</param>
+    /// <param name="vertexSpirv">SPIR-V bytecode for the vertex shader.</param>
+    /// <param name="fragmentSpirv">SPIR-V bytecode for the fragment shader.</param>
     public TrianglePipeline(IGraphicsDevice graphics, IRenderPass renderPass, ReadOnlyMemory<byte> vertexSpirv, ReadOnlyMemory<byte> fragmentSpirv)
     {
         _graphics = graphics;
@@ -29,6 +41,7 @@ public sealed class TrianglePipeline : IDisposable
         Logger.Debug("Triangle pipeline created successfully.");
     }
 
+    /// <summary>Disposes the vertex and fragment shader modules.</summary>
     public void Dispose()
     {
         Logger.Debug("Disposing triangle pipeline shaders...");

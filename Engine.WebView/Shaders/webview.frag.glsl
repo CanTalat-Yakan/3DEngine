@@ -11,7 +11,7 @@ void main()
     // so at this point the texture is standard RGBA.
     vec4 texel = texture(browserTexture, vUV);
 
-    // Pre-multiplied alpha compositing -- Ultralight outputs pre-multiplied alpha.
+    // Pre-multiplied alpha compositing - Ultralight outputs pre-multiplied alpha.
     outColor = texel;
 }
 

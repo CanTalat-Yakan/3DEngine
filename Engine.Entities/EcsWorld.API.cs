@@ -7,12 +7,16 @@ public sealed partial class EcsWorld
     private int _currentTick;
 
     /// <summary>Spawns a new entity and returns its integer ID.</summary>
+    /// <returns>The newly allocated entity ID.</returns>
     public int Spawn() => _entities.Spawn();
 
-    /// <summary>Returns current generation for an entity id (0 if never used).</summary>
+    /// <summary>Returns the current generation for an entity ID (0 if never allocated).</summary>
+    /// <param name="entityId">The entity ID to query.</param>
+    /// <returns>The generation counter, or <c>0</c> if the ID was never used.</returns>
     public int GetGeneration(int entityId) => _entities.GetGeneration(entityId);
 
-    /// <summary>Removes an entity and all of its components, disposing IDisposable components.</summary>
+    /// <summary>Removes an entity and all of its components, disposing <see cref="IDisposable"/> components.</summary>
+    /// <param name="entity">The entity ID to remove.</param>
     public void Despawn(int entity)
     {
         foreach (var store in _stores.Values)
@@ -22,44 +26,66 @@ public sealed partial class EcsWorld
         _entities.Despawn(entity);
     }
 
-    /// <summary>Advances frame tick; used for per-frame change tracking (clears changed bitsets).</summary>
+    /// <summary>
+    /// Advances the frame tick counter and clears all per-frame change-tracking bits.
+    /// Called once at the start of each frame.
+    /// </summary>
     public void BeginFrame()
     {
         _currentTick++;
         foreach (var s in _stores.Values) s.ClearChangedTicks();
     }
 
-    /// <summary>Count of components of type T.</summary>
+    /// <summary>Returns the number of entities that currently have component <typeparamref name="T"/>.</summary>
+    /// <typeparam name="T">The component type to count.</typeparam>
+    /// <returns>The count of entities with this component type.</returns>
     public int Count<T>() => GetStore<T>(create: false)?.Count ?? 0;
 
-    /// <summary>Removes component T from entity if present.</summary>
+    /// <summary>Removes component <typeparamref name="T"/> from an entity if present.</summary>
+    /// <typeparam name="T">The component type to remove.</typeparam>
+    /// <param name="entity">The entity ID.</param>
+    /// <returns><c>true</c> if the component was removed; <c>false</c> if it was not present.</returns>
     public bool Remove<T>(int entity)
     {
         var store = GetStore<T>(create: false);
         return store != null && store.Remove(entity);
     }
 
-    /// <summary>Returns span of entity IDs that currently have component T.</summary>
+    /// <summary>Returns a span of entity IDs that currently have component <typeparamref name="T"/>.</summary>
+    /// <typeparam name="T">The component type to query.</typeparam>
+    /// <returns>A read-only span of entity IDs. Empty if no entities have this component.</returns>
     public ReadOnlySpan<int> EntitiesWith<T>()
     {
         var store = GetStore<T>(create: false);
         return store == null ? ReadOnlySpan<int>.Empty : store.EntitiesSpan();
     }
 
-    /// <summary>Pre-reserves capacity for a component type to reduce resizing.</summary>
+    /// <summary>Pre-reserves capacity for component <typeparamref name="T"/> to reduce resizing during bulk spawns.</summary>
+    /// <typeparam name="T">The component type to reserve storage for.</typeparam>
+    /// <param name="componentCapacity">The number of component slots to pre-allocate in the dense array.</param>
+    /// <param name="maxEntityIdHint">Optional hint for the maximum expected entity ID to size the sparse array.</param>
     public void Reserve<T>(int componentCapacity, int maxEntityIdHint = 0)
     {
         var store = GetStore<T>();
         store.Reserve(componentCapacity, maxEntityIdHint);
     }
 
-    /// <summary>Adds a component to an entity (overwrites if existing) without marking changed.</summary>
+    /// <summary>Adds a component to an entity (overwrites if already present) without marking it as changed.</summary>
+    /// <typeparam name="T">The component type.</typeparam>
+    /// <param name="entity">The entity ID.</param>
+    /// <param name="component">The component value.</param>
     public void Add<T>(int entity, T component) => GetStore<T>().Add(entity, component);
 
-    /// <summary>Updates an existing component (or adds if missing) and marks it changed for this frame.</summary>
+    /// <summary>Updates an existing component (or adds if missing) and marks it as changed for this frame.</summary>
+    /// <typeparam name="T">The component type.</typeparam>
+    /// <param name="entity">The entity ID.</param>
+    /// <param name="component">The new component value.</param>
     public void Update<T>(int entity, T component) => GetStore<T>().Update(entity, component, _currentTick);
 
-    /// <summary>Updates an existing component via transformer and marks it changed; no-op if missing.</summary>
+    /// <summary>Updates an existing component via a transformer function and marks it as changed; no-op if the component is missing.</summary>
+    /// <typeparam name="T">The component type.</typeparam>
+    /// <param name="entity">The entity ID.</param>
+    /// <param name="mutate">A function that receives the current value and returns the updated value.</param>
     public void Mutate<T>(int entity, Func<T, T> mutate)
     {
         var store = GetStore<T>(create: false);
@@ -71,21 +97,31 @@ public sealed partial class EcsWorld
         }
     }
 
-    /// <summary>Returns true if entity has component T.</summary>
+    /// <summary>Checks whether an entity has component <typeparamref name="T"/>.</summary>
+    /// <typeparam name="T">The component type.</typeparam>
+    /// <param name="entity">The entity ID.</param>
+    /// <returns><c>true</c> if the entity has the component; otherwise <c>false</c>.</returns>
     public bool Has<T>(int entity)
     {
         var store = GetStore<T>(create: false);
         return store != null && store.Has(entity);
     }
 
-    /// <summary>Returns true if component T on entity was modified this frame.</summary>
+    /// <summary>Checks whether component <typeparamref name="T"/> on <paramref name="entity"/> was modified this frame.</summary>
+    /// <typeparam name="T">The component type.</typeparam>
+    /// <param name="entity">The entity ID.</param>
+    /// <returns><c>true</c> if the component was modified this frame; otherwise <c>false</c>.</returns>
     public bool Changed<T>(int entity)
     {
         var store = GetStore<T>(create: false);
         return store != null && store.ChangedThisFrame(entity, _currentTick);
     }
 
-    /// <summary>Attempts to read component T from entity; returns false if not found.</summary>
+    /// <summary>Attempts to read component <typeparamref name="T"/> from an entity.</summary>
+    /// <typeparam name="T">The component type.</typeparam>
+    /// <param name="entity">The entity ID.</param>
+    /// <param name="component">When returning <c>true</c>, contains the component value; otherwise <c>default</c>.</param>
+    /// <returns><c>true</c> if the component was found; otherwise <c>false</c>.</returns>
     public bool TryGet<T>(int entity, out T? component)
     {
         var store = GetStore<T>(create: false);
@@ -99,7 +135,11 @@ public sealed partial class EcsWorld
         return false;
     }
 
-    /// <summary>Returns a ref to component T on entity, or throws if missing.</summary>
+    /// <summary>Returns a ref to component <typeparamref name="T"/> on <paramref name="entity"/>, or throws if missing.</summary>
+    /// <typeparam name="T">The component type.</typeparam>
+    /// <param name="entity">The entity ID.</param>
+    /// <returns>A reference to the component value in the dense array.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown if the entity does not have the component.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ref T GetRef<T>(int entity)
     {
@@ -108,7 +148,9 @@ public sealed partial class EcsWorld
         return ref store.GetRef(entity);
     }
 
-    /// <summary>Applies a transform function to every component of type T.</summary>
+    /// <summary>Applies a transform function to every component of type <typeparamref name="T"/>, marking each as changed.</summary>
+    /// <typeparam name="T">The component type.</typeparam>
+    /// <param name="transform">A function receiving the entity ID and current value, returning the new value.</param>
     public void TransformEach<T>(Func<int, T, T> transform)
     {
         var store = GetStore<T>(create: false);
@@ -122,7 +164,9 @@ public sealed partial class EcsWorld
         }
     }
 
-    /// <summary>Parallel version of <see cref="TransformEach{T}"/>.</summary>
+    /// <summary>Parallel version of <see cref="TransformEach{T}"/>. Suitable for large component counts with no cross-entity dependencies.</summary>
+    /// <typeparam name="T">The component type.</typeparam>
+    /// <param name="transform">A function receiving the entity ID and current value, returning the new value.</param>
     public void ParallelTransformEach<T>(Func<int, T, T> transform)
     {
         var store = GetStore<T>(create: false);
@@ -138,7 +182,9 @@ public sealed partial class EcsWorld
         });
     }
 
-    /// <summary>Returns a zero-allocation ref-enumerable over components of type T.</summary>
+    /// <summary>Returns a zero-allocation ref-enumerable over components of type <typeparamref name="T"/>.</summary>
+    /// <typeparam name="T">The component type.</typeparam>
+    /// <returns>A <see cref="RefEnumerable{T}"/> for <c>foreach</c>-based ref iteration.</returns>
     public RefEnumerable<T> IterateRef<T>()
     {
         var store = GetStore<T>(create: false);
@@ -146,7 +192,10 @@ public sealed partial class EcsWorld
         return RefEnumerable<T>.FromStore(store, markOnIterate: true);
     }
 
-    /// <summary>Returns a zero-allocation ref-enumerable over entities matching both T1 and T2.</summary>
+    /// <summary>Returns a zero-allocation ref-enumerable over entities matching both <typeparamref name="T1"/> and <typeparamref name="T2"/>.</summary>
+    /// <typeparam name="T1">The first component type.</typeparam>
+    /// <typeparam name="T2">The second component type.</typeparam>
+    /// <returns>A <see cref="RefEnumerable{T1,T2}"/> for <c>foreach</c>-based ref iteration.</returns>
     public RefEnumerable<T1, T2> IterateRef<T1, T2>()
     {
         var s1 = GetStore<T1>(create: false);
@@ -155,7 +204,9 @@ public sealed partial class EcsWorld
         return RefEnumerable<T1, T2>.From(s1, s2, markOnIterate: true);
     }
 
-    /// <summary>Returns a span view of all components of type T.</summary>
+    /// <summary>Returns a span view of all components of type <typeparamref name="T"/> for raw iteration.</summary>
+    /// <typeparam name="T">The component type.</typeparam>
+    /// <returns>A <see cref="ComponentSpan{T}"/> containing parallel entity ID and component spans.</returns>
     public ComponentSpan<T> GetSpan<T>()
     {
         var store = GetStore<T>(create: false);
@@ -163,7 +214,9 @@ public sealed partial class EcsWorld
         return store.AsSpan();
     }
 
-    /// <summary>Enumerates all (entity, component) pairs of type T.</summary>
+    /// <summary>Enumerates all (entity, component) pairs of type <typeparamref name="T"/>.</summary>
+    /// <typeparam name="T">The component type.</typeparam>
+    /// <returns>An enumerable of (entity ID, component value) tuples.</returns>
     public IEnumerable<(int Entity, T Component)> Query<T>()
     {
         var store = GetStore<T>(create: false);
@@ -172,7 +225,10 @@ public sealed partial class EcsWorld
             yield return item;
     }
 
-    /// <summary>Enumerates entities that have both T1 and T2, iterating the smaller store first.</summary>
+    /// <summary>Enumerates entities that have both <typeparamref name="T1"/> and <typeparamref name="T2"/>, iterating the smaller store first.</summary>
+    /// <typeparam name="T1">The first component type.</typeparam>
+    /// <typeparam name="T2">The second component type.</typeparam>
+    /// <returns>An enumerable of (entity ID, C1, C2) tuples.</returns>
     public IEnumerable<(int Entity, T1 C1, T2 C2)> Query<T1, T2>()
     {
         var s1 = GetStore<T1>(create: false);
@@ -192,7 +248,11 @@ public sealed partial class EcsWorld
         }
     }
 
-    /// <summary>Enumerates entities that have T1, T2, and T3.</summary>
+    /// <summary>Enumerates entities that have <typeparamref name="T1"/>, <typeparamref name="T2"/>, and <typeparamref name="T3"/>.</summary>
+    /// <typeparam name="T1">The first component type.</typeparam>
+    /// <typeparam name="T2">The second component type.</typeparam>
+    /// <typeparam name="T3">The third component type.</typeparam>
+    /// <returns>An enumerable of (entity ID, C1, C2, C3) tuples.</returns>
     public IEnumerable<(int Entity, T1 C1, T2 C2, T3 C3)> Query<T1, T2, T3>()
     {
         var s1 = GetStore<T1>(create: false);
@@ -229,7 +289,10 @@ public sealed partial class EcsWorld
         }
     }
 
-    /// <summary>Enumerates components of type T that match a predicate.</summary>
+    /// <summary>Enumerates components of type <typeparamref name="T"/> that match a predicate.</summary>
+    /// <typeparam name="T">The component type.</typeparam>
+    /// <param name="predicate">A filter function that must return <c>true</c> for the entity to be included.</param>
+    /// <returns>An enumerable of (entity ID, component value) tuples matching the predicate.</returns>
     public IEnumerable<(int Entity, T Component)> QueryWhere<T>(Func<T, bool> predicate)
     {
         foreach (var (entity, comp) in Query<T>())

@@ -3,8 +3,20 @@ using System.Numerics;
 namespace Engine;
 
 /// <summary>Extracts camera data from the world into the render world for the sample pipeline.</summary>
+/// <remarks>
+/// Queries all entities with a <see cref="Camera"/> component, computes view and perspective
+/// projection matrices using the entity's <see cref="Transform"/>, and writes a
+/// <see cref="RenderCameras"/> collection into the render world for consumption by
+/// <see cref="SamplePrepare"/> and <see cref="SampleQueue"/>.
+/// </remarks>
+/// <seealso cref="SamplePrepare"/>
+/// <seealso cref="SampleQueue"/>
+/// <seealso cref="RenderCameras"/>
 public sealed class SampleExtract : IExtractSystem
 {
+    /// <inheritdoc />
+    /// <param name="world">The main application world containing ECS data.</param>
+    /// <param name="renderWorld">The render world to write extracted camera data into.</param>
     public void Run(World world, RenderWorld renderWorld)
     {
         if (!world.TryGetResource<EcsWorld>(out var ecs)) return;

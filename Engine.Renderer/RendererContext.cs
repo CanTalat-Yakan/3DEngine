@@ -2,7 +2,14 @@ using System.Diagnostics;
 
 namespace Engine;
 
-/// <summary>High-level facade over the low-level vulkan graphics backend.</summary>
+/// <summary>
+/// High-level facade over the low-level Vulkan graphics backend.
+/// Manages the graphics device lifecycle, camera uniform buffers, descriptor sets,
+/// and the <see cref="DynamicBufferAllocator"/> for transient GPU allocations.
+/// </summary>
+/// <seealso cref="Renderer"/>
+/// <seealso cref="IGraphicsDevice"/>
+/// <seealso cref="DynamicBufferAllocator"/>
 public sealed class RendererContext : IDisposable
 {
     private static readonly ILogger Logger = Log.For<RendererContext>();
@@ -16,27 +23,40 @@ public sealed class RendererContext : IDisposable
     /// Available after <see cref="Initialize"/> has been called.</summary>
     public DynamicBufferAllocator? DynamicAllocator { get; private set; }
 
+    /// <summary>The low-level graphics device for GPU resource creation and rendering commands.</summary>
+    /// <exception cref="InvalidOperationException">Accessed before <see cref="Initialize"/> has been called.</exception>
     public IGraphicsDevice Graphics => _graphics ?? throw new InvalidOperationException("Graphics device not created. Call Initialize first.");
 
+    /// <summary>Creates a new <see cref="RendererContext"/> using the default <see cref="GraphicsDevice"/> factory.</summary>
     public RendererContext()
     {
         _graphicsFactory = static () => new GraphicsDevice();
     }
 
+    /// <summary>Creates a new <see cref="RendererContext"/> with a pre-existing graphics device.</summary>
+    /// <param name="graphics">The graphics device to use.</param>
     public RendererContext(IGraphicsDevice graphics)
     {
         _graphics = graphics;
     }
 
+    /// <summary>Creates a new <see cref="RendererContext"/> with a custom graphics device factory.</summary>
+    /// <param name="graphicsFactory">Factory delegate invoked once during <see cref="Initialize"/>.</param>
     public RendererContext(Func<IGraphicsDevice> graphicsFactory)
     {
         _graphicsFactory = graphicsFactory;
     }
 
+    /// <summary>Whether the underlying graphics device has been initialized.</summary>
     public bool IsInitialized => _graphics?.IsInitialized ?? false;
 
+    /// <summary>Information about the currently selected graphics adapter (GPU).</summary>
+    /// <exception cref="InvalidOperationException">Accessed before <see cref="Initialize"/> has been called.</exception>
     public GraphicsAdapterInfo AdapterInfo => _graphics?.AdapterInfo ?? throw new InvalidOperationException("RendererContext not initialized.");
 
+    /// <summary>Initializes the graphics device, creates per-frame camera resources, and sets up the dynamic buffer allocator.</summary>
+    /// <param name="surfaceSource">Platform surface source for creating the swapchain.</param>
+    /// <param name="appName">Application name embedded in the Vulkan instance.</param>
     public void Initialize(ISurfaceSource surfaceSource, string appName = "3DEngine")
     {
         if (IsInitialized) return;
@@ -58,6 +78,7 @@ public sealed class RendererContext : IDisposable
         Logger.Info($"RendererContext initialized in {sw.ElapsedMilliseconds}ms.");
     }
 
+    /// <summary>Creates per-swapchain-image camera uniform buffers and descriptor sets.</summary>
     private void CreateCameraResources()
     {
         DisposeCameraResources();
@@ -100,6 +121,7 @@ public sealed class RendererContext : IDisposable
         _cameraDescriptorSets = newSets;
     }
 
+    /// <summary>Disposes camera uniform buffers and descriptor sets.</summary>
     private void DisposeCameraResources()
     {
         if (_cameraBuffers != null)
@@ -116,6 +138,10 @@ public sealed class RendererContext : IDisposable
         }
     }
 
+    /// <summary>Begins a new render frame: acquires a swapchain image, uploads camera data, and returns a command recording context.</summary>
+    /// <param name="world">The render world containing camera and clear color data.</param>
+    /// <param name="imageIndex">The acquired swapchain image index.</param>
+    /// <returns>A <see cref="CommandRecordingContext"/> for recording GPU commands this frame.</returns>
     public CommandRecordingContext BeginFrame(RenderWorld world, out uint imageIndex)
     {
         if (!IsInitialized) throw new InvalidOperationException("RendererContext not initialized.");
@@ -153,6 +179,9 @@ public sealed class RendererContext : IDisposable
         return new CommandRecordingContext(frame, DynamicAllocator);
     }
 
+    /// <summary>Uploads a camera uniform struct to the specified buffer via map/write/unmap.</summary>
+    /// <param name="buffer">The target uniform buffer.</param>
+    /// <param name="camera">The camera uniform data to upload.</param>
     private void UploadCameraUniform(IBuffer buffer, in CameraUniform camera)
     {
         var span = _graphics!.Map(buffer);
@@ -160,16 +189,25 @@ public sealed class RendererContext : IDisposable
         _graphics.Unmap(buffer);
     }
 
+    /// <summary>Begins a new render frame without returning the image index.</summary>
+    /// <param name="world">The render world containing camera and clear color data.</param>
+    /// <returns>A <see cref="CommandRecordingContext"/> for recording GPU commands this frame.</returns>
     public CommandRecordingContext BeginFrame(RenderWorld world) => BeginFrame(world, out _);
 
+    /// <summary>Ends the current frame and submits it for presentation.</summary>
+    /// <param name="ctx">The command recording context for this frame.</param>
+    /// <param name="imageIndex">The swapchain image index to present.</param>
     public void EndFrame(CommandRecordingContext ctx, uint imageIndex)
     {
         _graphics!.EndFrame(ctx.FrameContext);
         ctx.Dispose();
     }
 
+    /// <summary>Ends the current frame using the image index from the frame context.</summary>
+    /// <param name="ctx">The command recording context for this frame.</param>
     public void EndFrame(CommandRecordingContext ctx) => EndFrame(ctx, ctx.FrameContext.FrameIndex);
 
+    /// <summary>Handles a resize event by recreating the swapchain, dynamic allocator, and camera resources.</summary>
     public void OnResize()
     {
         if (!IsInitialized)
@@ -193,6 +231,7 @@ public sealed class RendererContext : IDisposable
         Logger.Info("RendererContext: Resize complete.");
     }
 
+    /// <inheritdoc />
     public void Dispose()
     {
         Logger.Info("RendererContext: Disposing camera resources, dynamic allocator, and graphics device...");

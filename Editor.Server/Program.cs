@@ -25,6 +25,9 @@ namespace Editor.Server
         /// Optional externally-owned <see cref="ShellRegistry"/>. When null a new instance is created.
         /// Pass the same instance from the Editor host to share state.
         /// </param>
+        /// <returns>The running <see cref="WebApplication"/> that the caller can await or stop.</returns>
+        /// <seealso cref="ShellRegistry"/>
+        /// <seealso cref="EditorHub"/>
         public static async Task<WebApplication> StartAsync(
             string url = "http://localhost:5000",
             string[]? args = null,

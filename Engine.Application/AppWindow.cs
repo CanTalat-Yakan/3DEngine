@@ -2,12 +2,24 @@ using SDL3;
 
 namespace Engine;
 
-/// <summary>Thin wrapper over SDL window and event loop with hooks for resize, quit, and raw event forwarding.</summary>
+/// <summary>
+/// Thin wrapper over SDL window and event loop with hooks for resize, quit, and raw event forwarding.
+/// </summary>
+/// <remarks>
+/// Resize events are coalesced: if multiple <c>WindowResized</c> events arrive in
+/// a single poll batch, only the final dimensions are dispatched - once - after the
+/// batch drains, collapsing N resize callbacks per frame to at most 1.
+/// </remarks>
+/// <seealso cref="SdlWindow"/>
+/// <seealso cref="WindowData"/>
 public sealed class AppWindow
 {
     /// <summary>The underlying SDL window/renderer pair wrapper.</summary>
     public SdlWindow Sdl { get; private set; }
 
+    /// <summary>Delegate for window resize events.</summary>
+    /// <param name="width">New window width in pixels.</param>
+    /// <param name="height">New window height in pixels.</param>
     public delegate void ResizeEventHandler(int width, int height);
     /// <summary>Raised when this window is resized.</summary>
     public event ResizeEventHandler? ResizeEvent;
@@ -20,12 +32,17 @@ public sealed class AppWindow
 
     private volatile bool _shouldClose;
 
+    /// <summary>Creates a new window with the specified properties and graphics backend.</summary>
+    /// <param name="windowData">Window title and size.</param>
+    /// <param name="backend">Graphics backend to use.</param>
     public AppWindow(WindowData windowData, GraphicsBackend backend)
     {
         var useVulkan = backend == GraphicsBackend.Vulkan;
         Sdl = new(windowData.Title, windowData.Width, windowData.Height, useVulkan);
     }
 
+    /// <summary>Creates a new window with the specified properties using the SDL software renderer.</summary>
+    /// <param name="windowData">Window title and size.</param>
     public AppWindow(WindowData windowData) : this(windowData, GraphicsBackend.Sdl) {}
 
     /// <summary>Returns true if this window has keyboard focus.</summary>
@@ -34,7 +51,8 @@ public sealed class AppWindow
         return SDL.GetKeyboardFocus() == Sdl.Window;
     }
 
-    /// <summary>Shows the window and applies an initial command.</summary>
+    /// <summary>Shows the window and applies an initial window command (maximize, minimize, etc.).</summary>
+    /// <param name="command">The window command to apply after showing.</param>
     public void Show(WindowCommand command = WindowCommand.Normal)
     {
         SDL.ShowWindow(Sdl.Window);
@@ -61,9 +79,10 @@ public sealed class AppWindow
     public void RequestClose() => _shouldClose = true;
 
     /// <summary>Pumps SDL events and calls the supplied per-frame delegates until quit is requested.</summary>
+    /// <param name="onFrame">Delegates invoked once each frame iteration.</param>
     /// <remarks>
     /// Resize events are coalesced: if multiple <c>WindowResized</c> events arrive in
-    /// a single poll batch, only the final dimensions are dispatched -- once -- after the
+    /// a single poll batch, only the final dimensions are dispatched - once - after the
     /// batch drains.  This collapses N resize callbacks per frame to at most 1.
     /// </remarks>
     public void Looping(params Delegate[] onFrame)
@@ -103,7 +122,7 @@ public sealed class AppWindow
                     Sdl.DisplayScale = resizeScale;
 
                     // GetWindowSize returns logical coordinates on native Wayland,
-                    // macOS, and iOS -- but physical pixels on Windows, X11 (XWayland),
+                    // macOS, and iOS - but physical pixels on Windows, X11 (XWayland),
                     // and Android.
                     SDL.GetWindowSize(Sdl.Window, out int rawW, out int rawH);
                     if (Sdl.NeedsManualHiDpiScaling && resizeScale > 1.001f)
@@ -134,6 +153,7 @@ public sealed class AppWindow
     }
 
     /// <summary>Disposes the underlying SDL resources, optionally invoking a callback before return.</summary>
+    /// <param name="onDispose">Optional callback invoked after SDL resources are destroyed.</param>
     public void Dispose(Action? onDispose)
     {
         Sdl.Destroy();

@@ -1,6 +1,13 @@
 namespace Engine;
 
-/// <summary>Composition-root plugin that wires the Vulkan renderer to the platform window.</summary>
+/// <summary>
+/// Composition-root plugin that wires the Vulkan renderer to the platform window.
+/// Creates the <see cref="Renderer"/>, registers extract/prepare/queue systems,
+/// initializes the Vulkan graphics context, and handles debounced resize.
+/// </summary>
+/// <seealso cref="Renderer"/>
+/// <seealso cref="RendererContext"/>
+/// <seealso cref="AppWindowPlugin"/>
 public sealed class SdlRendererPlugin : IPlugin
 {
     private static readonly ILogger Logger = Log.Category("Engine.SdlRenderer");
@@ -10,8 +17,10 @@ public sealed class SdlRendererPlugin : IPlugin
     /// (<c>VK_ERROR_OUT_OF_DATE_KHR</c>) handles swapchain-only rebuilds if needed.</summary>
     private const long ResizeDebounceMs = 150;
 
+    /// <summary>Extract system that copies <see cref="ClearColor"/> from the game world to the render world.</summary>
     private sealed class ClearColorExtract : IExtractSystem
     {
+        /// <inheritdoc />
         public void Run(World world, RenderWorld renderWorld)
         {
             if (world.TryGetResource<ClearColor>(out var cc))
@@ -19,6 +28,7 @@ public sealed class SdlRendererPlugin : IPlugin
         }
     }
 
+    /// <inheritdoc />
     public void Build(App app)
     {
         // Ensure a default clear color resource exists
@@ -48,7 +58,7 @@ public sealed class SdlRendererPlugin : IPlugin
 
         if (cfg.Graphics == GraphicsBackend.Vulkan)
         {
-            Logger.Info("SdlRendererPlugin: Vulkan backend selected -- initializing graphics context against SDL window...");
+            Logger.Info("SdlRendererPlugin: Vulkan backend selected - initializing graphics context against SDL window...");
             // Grab the ISurfaceSource that AppWindowPlugin inserted
             var surface = app.World.Resource<ISurfaceSource>();
             renderer.Context.Initialize(surface, cfg.WindowData.Title);
@@ -64,7 +74,7 @@ public sealed class SdlRendererPlugin : IPlugin
             {
                 if (w > 0 && h > 0)
                 {
-                    Logger.Debug($"Window resized to {w}x{h} -- updating render surface info (rebuild deferred).");
+                    Logger.Debug($"Window resized to {w}x{h} - updating render surface info (rebuild deferred).");
                     renderer.RenderWorld.Set(new RenderSurfaceInfo { Width = w, Height = h });
                     pendingRendererResize = true;
                     lastResizeTick = Environment.TickCount64;
@@ -73,7 +83,7 @@ public sealed class SdlRendererPlugin : IPlugin
         }
         else
         {
-            Logger.Info("SdlRendererPlugin: Non-Vulkan backend -- Vulkan renderer initialization skipped.");
+            Logger.Info("SdlRendererPlugin: Non-Vulkan backend - Vulkan renderer initialization skipped.");
         }
 
         // Run Vulkan renderer after other Render stage systems.
@@ -87,7 +97,7 @@ public sealed class SdlRendererPlugin : IPlugin
                 if (pendingRendererResize && (Environment.TickCount64 - lastResizeTick) >= ResizeDebounceMs)
                 {
                     pendingRendererResize = false;
-                    Logger.Info("Debounce elapsed -- committing renderer resize (swapchain + allocator + camera)...");
+                    Logger.Info("Debounce elapsed - committing renderer resize (swapchain + allocator + camera)...");
                     r.Context.OnResize();
                 }
             
@@ -103,7 +113,7 @@ public sealed class SdlRendererPlugin : IPlugin
             {
                 if (world.TryGetResource<Renderer>(out var r))
                 {
-                    Logger.Info("SdlRendererPlugin: Cleanup stage -- disposing Renderer...");
+                    Logger.Info("SdlRendererPlugin: Cleanup stage - disposing Renderer...");
                     r.Dispose();
                     world.RemoveResource<Renderer>();
                 }

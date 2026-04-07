@@ -44,7 +44,11 @@ public sealed class OnCleanupAttribute : Attribute;
 [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
 public sealed class WithAttribute : Attribute
 {
+    /// <summary>The component types to require.</summary>
     public Type[] Types { get; }
+
+    /// <summary>Creates a new <see cref="WithAttribute"/> requiring all specified component types.</summary>
+    /// <param name="types">The component types that must be present on the entity.</param>
     public WithAttribute(params Type[] types) => Types = types;
 }
 
@@ -52,7 +56,11 @@ public sealed class WithAttribute : Attribute
 [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
 public sealed class WithoutAttribute : Attribute
 {
+    /// <summary>The component types to exclude.</summary>
     public Type[] Types { get; }
+
+    /// <summary>Creates a new <see cref="WithoutAttribute"/> excluding entities with any of the specified types.</summary>
+    /// <param name="types">The component types that must <em>not</em> be present on the entity.</param>
     public WithoutAttribute(params Type[] types) => Types = types;
 }
 
@@ -60,13 +68,17 @@ public sealed class WithoutAttribute : Attribute
 [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
 public sealed class ChangedAttribute : Attribute
 {
+    /// <summary>The component types to watch for changes.</summary>
     public Type[] Types { get; }
+
+    /// <summary>Creates a new <see cref="ChangedAttribute"/> watching the specified component types for changes.</summary>
+    /// <param name="types">The component types; the system runs only if any of these changed this frame.</param>
     public ChangedAttribute(params Type[] types) => Types = types;
 }
 
 /// <summary>
 /// Attaches a run condition to a behavior system method.
-/// <paramref name="memberName"/> must be a static bool member (method, property, or field) declared on the
+/// The <c>memberName</c> parameter must be a static bool member (method, property, or field) declared on the
 /// same behavior struct. Use <c>nameof(...)</c> to keep the reference refactor-safe.
 /// The system is skipped for the frame when the condition returns <c>false</c>.
 /// </summary>
@@ -99,12 +111,18 @@ public sealed class RunIfAttribute : Attribute
 {
     /// <summary>Name of the static bool member (method, property, or field) on the same behavior struct.</summary>
     public string MethodName { get; }
+
+    /// <summary>Creates a new <see cref="RunIfAttribute"/> referencing a static bool member by name.</summary>
+    /// <param name="memberName">
+    /// The name of a static bool member (method, property, or field) on the same behavior struct.
+    /// Use <c>nameof(...)</c> to keep the reference refactor-safe.
+    /// </param>
     public RunIfAttribute(string memberName) => MethodName = memberName;
 }
 
 /// <summary>
 /// Binds a keyboard shortcut directly to a system, toggling it on/off without any boilerplate method.
-/// Each press of <paramref name="key"/> (with optional <paramref name="modifier"/> held) flips the
+/// Each press of the specified <c>key</c> (with optional <c>modifier</c> held) flips the
 /// enabled state. The system starts enabled unless <c>DefaultEnabled = false</c> is set.
 /// </summary>
 /// <remarks>
@@ -122,9 +140,18 @@ public sealed class RunIfAttribute : Attribute
 [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
 public sealed class ToggleKeyAttribute : Attribute
 {
+    /// <summary>The keyboard key that toggles this system.</summary>
     public Key Key { get; }
+
+    /// <summary>Optional modifier keys that must be held when pressing <see cref="Key"/>.</summary>
     public KeyModifier Modifier { get; }
+
+    /// <summary>Initial enabled state before the first toggle. Defaults to <c>true</c>.</summary>
     public bool DefaultEnabled { get; init; } = true;
+
+    /// <summary>Creates a new <see cref="ToggleKeyAttribute"/> binding the specified key (with optional modifier) to toggle this system.</summary>
+    /// <param name="key">The keyboard key that toggles the system.</param>
+    /// <param name="modifier">Optional modifier keys that must be held when pressing <paramref name="key"/>.</param>
     public ToggleKeyAttribute(Key key, KeyModifier modifier = KeyModifier.None)
     {
         Key = key;

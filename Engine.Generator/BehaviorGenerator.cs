@@ -9,6 +9,21 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Engine;
 
 /// <summary>Roslyn incremental generator scanning [Engine.Behavior] structs and emitting stage systems plus a registration function discoverable at runtime.</summary>
+/// <remarks>
+/// <para>
+/// This generator runs at compile-time and produces two kinds of source outputs:
+/// <list type="number">
+///   <item><description>Per-behavior <c>{Name}_Generated.g.cs</c> files containing system lambdas for each stage method.</description></item>
+///   <item><description>A single <c>BehaviorsRegistration.g.cs</c> file marked with <c>[GeneratedBehaviorRegistration]</c>,
+///     discoverable by <c>BehaviorsPlugin</c> at runtime via reflection.</description></item>
+/// </list>
+/// </para>
+/// <para>
+/// The private record types <c>BehaviorModel</c>, <c>StageMethod</c>, and <c>Filters</c> form the
+/// intermediate representation between Roslyn syntax analysis and source generation.
+/// </para>
+/// </remarks>
+/// <seealso cref="Stage"/>
 [Generator(LanguageNames.CSharp)]
 public sealed class BehaviorGenerator : IIncrementalGenerator
 {
@@ -171,6 +186,7 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
         return null; // Member not found
     }
 
+    /// <summary>Classifies the kind of member referenced by a [RunIf] attribute.</summary>
     private enum MemberKind { Method, Property, Field }
 
     /// <summary>Extracts the [ToggleKey] key+modifier pair as raw integers, or null if absent.</summary>
@@ -306,24 +322,46 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
         return sb.ToString();
     }
 
+    /// <summary>Scheduling stage for generated system registration.</summary>
     private enum Stage { Startup, First, PreUpdate, Update, PostUpdate, Render, Last, Cleanup }
+
+    /// <summary>Component filter configuration extracted from [With], [Without], [Changed] attributes.</summary>
+    /// <param name="With">Component types that must be present on the entity.</param>
+    /// <param name="Without">Component types that must be absent from the entity.</param>
+    /// <param name="Changed">Component types that must have been modified since the last frame.</param>
     private sealed record Filters(IReadOnlyList<string> With, IReadOnlyList<string> Without, IReadOnlyList<string> Changed);
+
+    /// <summary>Represents a single stage-annotated method within a behavior struct.</summary>
     private sealed record StageMethod
     {
+        /// <summary>The scheduling stage this method runs in.</summary>
         public Stage Stage { get; init; }
+        /// <summary>Whether the method is static (global) or instance (per-entity).</summary>
         public bool IsStatic { get; init; }
+        /// <summary>Fully-qualified name of the type containing the method.</summary>
         public string MethodContainer { get; init; } = string.Empty;
+        /// <summary>Simple name of the method.</summary>
         public string MethodName { get; init; } = string.Empty;
+        /// <summary>Component filters applied to this method.</summary>
         public Filters Filters { get; init; } = new Filters(Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>());
+        /// <summary>Optional [RunIf] condition reference (member name and kind).</summary>
         public (string Name, MemberKind Kind)? RunIf { get; init; }
+        /// <summary>Optional [ToggleKey] key binding (key code, modifier, default enabled state).</summary>
         public (int Key, int Modifier, bool DefaultEnabled)? ToggleKey { get; init; }
     }
+
+    /// <summary>Aggregated model for a single [Behavior]-annotated struct and its stage methods.</summary>
     private sealed record BehaviorModel
     {
+        /// <summary>Namespace of the behavior type.</summary>
         public string Namespace { get; init; } = "Engine";
+        /// <summary>Simple type name of the behavior struct.</summary>
         public string Name { get; init; } = string.Empty;
+        /// <summary>Generated helper class name (unique per behavior).</summary>
         public string SafeName { get; init; } = string.Empty;
+        /// <summary>Fully-qualified name of the behavior struct.</summary>
         public string BehaviorFqn { get; init; } = string.Empty;
+        /// <summary>All stage-annotated methods discovered on this behavior.</summary>
         public List<StageMethod> StageMethods { get; init; } = new();
     }
 }

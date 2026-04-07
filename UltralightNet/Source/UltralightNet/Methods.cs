@@ -37,7 +37,7 @@ public static unsafe partial class Methods
 	public static partial uint ulVersionPatch();
 
 	/// <summary>
-	///     Preload Ultralight binaries on OSX/MacOS and Linux
+	/// Preload Ultralight binaries on OSX/MacOS and Linux
 	/// </summary>
 	/// <remarks>UltralightCore, WebCore, Ultralight, AppCore</remarks>
 	public static void Preload()
@@ -50,7 +50,7 @@ public static unsafe partial class Methods
 		// Per-assembly resolver for this assembly
 		NativeLibrary.SetDllImportResolver(typeof(Methods).Assembly, ResolveUltralightLibrary);
 
-		// Global last-resort resolver -- catches P/Invoke failures from ANY assembly
+		// Global last-resort resolver - catches P/Invoke failures from ANY assembly
 		// (e.g. old-style [DllImport] in UltralightNet.AppCore)
 		System.Runtime.Loader.AssemblyLoadContext.Default.ResolvingUnmanagedDll +=
 			(asm, name) => ResolveUltralightLibrary(name, asm, null);
@@ -62,7 +62,7 @@ public static unsafe partial class Methods
 	private static readonly System.Collections.Generic.HashSet<System.Reflection.Assembly> _registeredAssemblies = new();
 
 	/// <summary>
-	///     Register a DLL import resolver for an external assembly (used by UltralightNet.AppCore).
+	/// Register a DLL import resolver for an external assembly (used by UltralightNet.AppCore).
 	/// </summary>
 	internal static void RegisterResolver(System.Reflection.Assembly assembly)
 	{

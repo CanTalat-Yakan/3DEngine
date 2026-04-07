@@ -4,10 +4,17 @@ namespace Engine;
 /// Plugin that wires ImGui rendering into the Vulkan render graph.
 /// Only activates when the graphics backend is Vulkan.
 /// </summary>
+/// <remarks>
+/// Registers a <see cref="Stage.Startup"/> system that adds an <see cref="ImGuiRenderNode"/>
+/// to the <see cref="Renderer"/>'s render graph.  If the graphics backend is not Vulkan,
+/// the plugin is a no-op.
+/// </remarks>
+/// <seealso cref="ImGuiRenderNode"/>
 public sealed class VulkanImGuiPlugin : IPlugin
 {
     private static readonly ILogger Logger = Log.Category("Engine.ImGui.Vulkan");
 
+    /// <inheritdoc />
     public void Build(App app)
     {
         var cfg = app.World.Resource<Config>();

@@ -29,12 +29,21 @@ public interface IPanelBuilder
 }
 
 /// <summary>Root builder that assembles a <see cref="ShellDescriptor"/>.</summary>
+/// <remarks>
+/// Concrete implementation of <see cref="IShellBuilder"/>. Accumulates panel descriptors
+/// and metadata. Call <see cref="Build"/> to produce the final <see cref="ShellDescriptor"/>.
+/// </remarks>
+/// <seealso cref="IShellBuilder"/>
+/// <seealso cref="ShellDescriptor"/>
 public sealed class ShellBuilder : IShellBuilder
 {
     private readonly ShellDescriptor _desc = new();
 
+    /// <summary>Returns the assembled <see cref="ShellDescriptor"/>.</summary>
+    /// <returns>The complete shell descriptor with all registered panels and metadata.</returns>
     public ShellDescriptor Build() => _desc;
 
+    /// <inheritdoc />
     public IShellBuilder Panel(string id, string title, DockZone zone, Action<IPanelBuilder> configure)
     {
         var panel = new PanelDescriptor { Id = id, Title = title, DefaultZone = zone };
@@ -44,6 +53,7 @@ public sealed class ShellBuilder : IShellBuilder
         return this;
     }
 
+    /// <inheritdoc />
     public IShellBuilder Panel(string id, string title, DockZone zone, string widgetKey)
     {
         _desc.Panels.Add(new PanelDescriptor
@@ -56,6 +66,7 @@ public sealed class ShellBuilder : IShellBuilder
         return this;
     }
 
+    /// <inheritdoc />
     public IShellBuilder Meta(string key, object value)
     {
         _desc.Metadata[key] = value;

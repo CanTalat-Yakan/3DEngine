@@ -1,10 +1,21 @@
 using Editor.Shell;
 
+/// <summary>
+/// Shell that produces the sticky top header bar with brand logo, navigation links,
+/// and a dark mode toggle. Docked to <see cref="DockZone.Top"/>.
+/// </summary>
+/// <remarks>
+/// Loads with <see cref="IEditorShellBuilder.Order"/> = −1 so it registers before
+/// content panels. The header is non-closeable and spans the full viewport width.
+/// </remarks>
+/// <seealso cref="IEditorShellBuilder"/>
 [EditorShell]
 public class HeaderShell : IEditorShellBuilder
 {
+    /// <inheritdoc />
     public int Order => -1;
 
+    /// <inheritdoc />
     public void Build(IShellBuilder shell)
     {
         shell.Panel("header", "Header", DockZone.Top, header =>
@@ -37,7 +48,7 @@ public class HeaderShell : IEditorShellBuilder
                                 "Showcase", href: "/showcase/buttons", variant: Variant.From(ButtonStyle.Link));
                         });
 
-                        // Right side -- dark mode toggle
+                        // Right side - dark mode toggle
                         bar.Div(Css.Flex().Flex1().Items(Align.Center).Justify(Justify.End).Raw("space-x-2"), actions =>
                         {
                             actions.DarkModeToggle();
@@ -48,4 +59,3 @@ public class HeaderShell : IEditorShellBuilder
         });
     }
 }
-

@@ -7,23 +7,36 @@ namespace Engine;
 /// Registers native platform implementations (font loader, file system, logger)
 /// via the AppCore native library.
 /// </summary>
+/// <remarks>
+/// All public methods lazily initialize the native library loader on first call via
+/// <see cref="EnsureNativeLibsLoaded"/>, which pre-loads Ultralight native libraries
+/// in the correct dependency order and registers DllImport resolvers.
+/// On Linux, a <c>libbz2.so.1.0</c> compatibility symlink is created automatically.
+/// </remarks>
+/// <seealso cref="NativeLibraryLoader"/>
+/// <seealso cref="WebViewInstance"/>
 internal static class AppCoreMethods
 {
     private static readonly ILogger Logger = Log.Category("Engine.WebView");
     private static NativeLibraryLoader? _loader;
 
+    /// <summary>Registers the AppCore platform font loader (calls the native <c>ulEnablePlatformFontLoader</c>).</summary>
     public static void SetPlatformFontLoader()
     {
         EnsureNativeLibsLoaded();
         ForkAppCore.SetPlatformFontLoader();
     }
 
+    /// <summary>Registers the AppCore platform file system rooted at <paramref name="baseDirectory"/>.</summary>
+    /// <param name="baseDirectory">The base directory for file:// URL resolution.</param>
     public static void SetPlatformFileSystem(string baseDirectory)
     {
         EnsureNativeLibsLoaded();
         ForkAppCore.ulEnablePlatformFileSystem(baseDirectory);
     }
 
+    /// <summary>Registers the AppCore default logger writing to <paramref name="logPath"/>.</summary>
+    /// <param name="logPath">Absolute path for the Ultralight log file.</param>
     public static void SetDefaultLogger(string logPath)
     {
         EnsureNativeLibsLoaded();

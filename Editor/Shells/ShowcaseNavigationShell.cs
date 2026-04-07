@@ -1,10 +1,22 @@
 using Editor.Shell;
 
+/// <summary>
+/// Showcase shell demonstrating navigation components: menubar, navigation menu with grouped
+/// dropdowns, tabs with card content, collapsible sections, FAQ accordion, and breadcrumbs.
+/// </summary>
+/// <remarks>
+/// Registered at route <c>/showcase/navigation</c> as a center-docked tabbed panel
+/// (tab group <c>"showcase"</c>, index 5).
+/// </remarks>
+/// <seealso cref="ShowcasePageHelper"/>
+/// <seealso cref="IEditorShellBuilder"/>
 [EditorShell]
 public class ShowcaseNavigationShell : IEditorShellBuilder
 {
+    /// <inheritdoc />
     public int Order => 5;
 
+    /// <inheritdoc />
     public void Build(IShellBuilder shell)
     {
         shell.Panel("showcase-navigation", "Navigation", DockZone.Center, panel =>

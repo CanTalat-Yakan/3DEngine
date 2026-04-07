@@ -5,12 +5,22 @@ namespace Engine;
 
 public sealed unsafe partial class GraphicsDevice
 {
+    /// <summary>Wraps a Vulkan shader module with its creation descriptor.</summary>
+    /// <seealso cref="IShader"/>
     private sealed class VulkanShader : IShader
     {
         private readonly GraphicsDevice _device;
+
+        /// <inheritdoc />
         public ShaderDesc Description { get; }
+
+        /// <summary>The underlying Vulkan shader module handle.</summary>
         internal VkShaderModule Module;
 
+        /// <summary>Creates a new Vulkan shader wrapper.</summary>
+        /// <param name="device">The owning graphics device.</param>
+        /// <param name="desc">The shader creation descriptor.</param>
+        /// <param name="module">The compiled Vulkan shader module.</param>
         public VulkanShader(GraphicsDevice device, ShaderDesc desc, VkShaderModule module)
         {
             _device = device;
@@ -18,6 +28,7 @@ public sealed unsafe partial class GraphicsDevice
             Module = module;
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             if (Module.Handle != 0)
@@ -28,12 +39,22 @@ public sealed unsafe partial class GraphicsDevice
         }
     }
 
+    /// <summary>Wraps a Vulkan graphics pipeline and its pipeline layout.</summary>
+    /// <seealso cref="IPipeline"/>
     private sealed class VulkanGraphicsPipeline : IPipeline
     {
         private readonly GraphicsDevice _device;
+
+        /// <summary>The underlying Vulkan pipeline handle.</summary>
         internal VkPipeline Pipeline;
+
+        /// <summary>The pipeline layout describing descriptor set and push constant bindings.</summary>
         internal VkPipelineLayout Layout;
 
+        /// <summary>Creates a new Vulkan graphics pipeline wrapper.</summary>
+        /// <param name="device">The owning graphics device.</param>
+        /// <param name="pipeline">The Vulkan pipeline handle.</param>
+        /// <param name="layout">The Vulkan pipeline layout handle.</param>
         public VulkanGraphicsPipeline(GraphicsDevice device, VkPipeline pipeline, VkPipelineLayout layout)
         {
             _device = device;
@@ -41,6 +62,7 @@ public sealed unsafe partial class GraphicsDevice
             Layout = layout;
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             if (Pipeline.Handle != 0)
@@ -56,6 +78,7 @@ public sealed unsafe partial class GraphicsDevice
         }
     }
 
+    /// <inheritdoc />
     public IShader CreateShader(ShaderDesc desc)
     {
         fixed (byte* codePtr = desc.Bytecode.Span)
@@ -71,6 +94,7 @@ public sealed unsafe partial class GraphicsDevice
         }
     }
 
+    /// <inheritdoc />
     public IPipeline CreateGraphicsPipeline(GraphicsPipelineDesc desc)
     {
         if (desc.RenderPass is not VulkanRenderPass rpWrapper)
@@ -97,7 +121,7 @@ public sealed unsafe partial class GraphicsDevice
             pName = entryName
         };
 
-        // Vertex input state -- use custom bindings/attributes if provided
+        // Vertex input state - use custom bindings/attributes if provided
         var vertexBindingCount = desc.VertexBindings?.Length ?? 0;
         var vertexAttributeCount = desc.VertexAttributes?.Length ?? 0;
 
@@ -239,6 +263,7 @@ public sealed unsafe partial class GraphicsDevice
         return new VulkanGraphicsPipeline(this, pipeline, layout);
     }
 
+    /// <inheritdoc />
     public void BindGraphicsPipeline(ICommandBuffer commandBuffer, IPipeline pipeline)
     {
         if (commandBuffer is not VulkanCommandBuffer vkCmd)
@@ -249,6 +274,7 @@ public sealed unsafe partial class GraphicsDevice
         _deviceApi.vkCmdBindPipeline(vkCmd.Handle, VkPipelineBindPoint.Graphics, vkPipeline.Pipeline);
     }
 
+    /// <inheritdoc />
     public void BindDescriptorSet(ICommandBuffer commandBuffer, IPipeline pipeline, IDescriptorSet descriptorSet)
     {
         if (commandBuffer is not VulkanCommandBuffer vkCmd)
@@ -264,6 +290,7 @@ public sealed unsafe partial class GraphicsDevice
         _deviceApi.vkCmdBindDescriptorSets(vkCmd.Handle, VkPipelineBindPoint.Graphics, vkPipeline.Layout, 0, 1, sets, 0, null);
     }
 
+    /// <inheritdoc />
     public void Draw(ICommandBuffer commandBuffer, uint vertexCount, uint instanceCount = 1, uint firstVertex = 0, uint firstInstance = 0)
     {
         if (commandBuffer is not VulkanCommandBuffer vkCmd)
@@ -277,6 +304,7 @@ public sealed unsafe partial class GraphicsDevice
 
     // ---- Format / flag helpers ----
 
+    /// <summary>Maps an engine <see cref="VertexFormat"/> to the Vulkan <c>VkFormat</c> equivalent.</summary>
     private static VkFormat ToVkFormat(VertexFormat format) => format switch
     {
         VertexFormat.Float2 => VkFormat.R32G32Sfloat,
@@ -286,6 +314,7 @@ public sealed unsafe partial class GraphicsDevice
         _ => throw new ArgumentOutOfRangeException(nameof(format))
     };
 
+    /// <summary>Converts engine <see cref="ShaderStageFlags"/> to Vulkan <c>VkShaderStageFlags</c>.</summary>
     private static VkShaderStageFlags ToVkShaderStageFlags(ShaderStageFlags flags)
     {
         VkShaderStageFlags result = 0;
@@ -296,6 +325,7 @@ public sealed unsafe partial class GraphicsDevice
 
     // ---- Extended draw commands ----
 
+    /// <inheritdoc />
     public void DrawIndexed(ICommandBuffer commandBuffer, uint indexCount, uint instanceCount = 1, uint firstIndex = 0, int vertexOffset = 0, uint firstInstance = 0)
     {
         if (commandBuffer is not VulkanCommandBuffer vkCmd)
@@ -303,6 +333,7 @@ public sealed unsafe partial class GraphicsDevice
         _deviceApi.vkCmdDrawIndexed(vkCmd.Handle, indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
     }
 
+    /// <inheritdoc />
     public void BindVertexBuffers(ICommandBuffer commandBuffer, uint firstBinding, IBuffer[] buffers, ulong[] offsets)
     {
         if (commandBuffer is not VulkanCommandBuffer vkCmd)
@@ -321,6 +352,7 @@ public sealed unsafe partial class GraphicsDevice
         _deviceApi.vkCmdBindVertexBuffers(vkCmd.Handle, firstBinding, (uint)buffers.Length, vkBuffers, vkOffsets);
     }
 
+    /// <inheritdoc />
     public void BindIndexBuffer(ICommandBuffer commandBuffer, IBuffer buffer, ulong offset, IndexType indexType)
     {
         if (commandBuffer is not VulkanCommandBuffer vkCmd)
@@ -332,6 +364,7 @@ public sealed unsafe partial class GraphicsDevice
         _deviceApi.vkCmdBindIndexBuffer(vkCmd.Handle, vkBuffer.Buffer, offset, vkIndexType);
     }
 
+    /// <inheritdoc />
     public void SetViewport(ICommandBuffer commandBuffer, float x, float y, float width, float height, float minDepth, float maxDepth)
     {
         if (commandBuffer is not VulkanCommandBuffer vkCmd)
@@ -341,6 +374,7 @@ public sealed unsafe partial class GraphicsDevice
         _deviceApi.vkCmdSetViewport(vkCmd.Handle, 0, 1, &viewport);
     }
 
+    /// <inheritdoc />
     public void SetScissor(ICommandBuffer commandBuffer, int x, int y, uint width, uint height)
     {
         if (commandBuffer is not VulkanCommandBuffer vkCmd)
@@ -350,6 +384,7 @@ public sealed unsafe partial class GraphicsDevice
         _deviceApi.vkCmdSetScissor(vkCmd.Handle, 0, 1, &scissor);
     }
 
+    /// <inheritdoc />
     public void PushConstants(ICommandBuffer commandBuffer, IPipeline pipeline, ShaderStageFlags stageFlags, uint offset, ReadOnlySpan<byte> data)
     {
         if (commandBuffer is not VulkanCommandBuffer vkCmd)

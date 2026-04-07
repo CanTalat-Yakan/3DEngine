@@ -5,14 +5,29 @@ namespace Engine;
 
 public sealed unsafe partial class GraphicsDevice
 {
+    /// <summary>Wraps a Vulkan image with its backing device memory and current layout.</summary>
+    /// <seealso cref="IImage"/>
     private sealed class VulkanImage : IImage
     {
         private readonly GraphicsDevice _device;
+
+        /// <summary>The underlying Vulkan image handle.</summary>
         internal VkImage Image;
+
+        /// <summary>The device memory backing this image.</summary>
         internal VkDeviceMemory Memory;
+
+        /// <summary>The current image layout, updated after each layout transition.</summary>
         internal VkImageLayout Layout;
+
+        /// <inheritdoc />
         public ImageDesc Description { get; }
 
+        /// <summary>Creates a new Vulkan image wrapper.</summary>
+        /// <param name="device">The owning graphics device.</param>
+        /// <param name="image">The Vulkan image handle.</param>
+        /// <param name="memory">The backing device memory.</param>
+        /// <param name="desc">The image creation descriptor.</param>
         public VulkanImage(GraphicsDevice device, VkImage image, VkDeviceMemory memory, ImageDesc desc)
         {
             _device = device;
@@ -22,6 +37,7 @@ public sealed unsafe partial class GraphicsDevice
             Layout = VkImageLayout.Undefined;
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             if (Image.Handle != 0)
@@ -37,12 +53,22 @@ public sealed unsafe partial class GraphicsDevice
         }
     }
 
+    /// <summary>Wraps a Vulkan image view for a specific <see cref="IImage"/>.</summary>
+    /// <seealso cref="IImageView"/>
     private sealed class VulkanImageView : IImageView
     {
         private readonly GraphicsDevice _device;
+
+        /// <inheritdoc />
         public IImage Image { get; }
+
+        /// <summary>The underlying Vulkan image view handle.</summary>
         internal VkImageView View;
 
+        /// <summary>Creates a new Vulkan image view wrapper.</summary>
+        /// <param name="device">The owning graphics device.</param>
+        /// <param name="image">The image this view references.</param>
+        /// <param name="view">The Vulkan image view handle.</param>
         public VulkanImageView(GraphicsDevice device, IImage image, VkImageView view)
         {
             _device = device;
@@ -50,6 +76,7 @@ public sealed unsafe partial class GraphicsDevice
             View = view;
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             if (View.Handle != 0)
@@ -60,12 +87,22 @@ public sealed unsafe partial class GraphicsDevice
         }
     }
 
+    /// <summary>Wraps a Vulkan sampler with its creation descriptor.</summary>
+    /// <seealso cref="ISampler"/>
     private sealed class VulkanSampler : ISampler
     {
         private readonly GraphicsDevice _device;
+
+        /// <inheritdoc />
         public SamplerDesc Description { get; }
+
+        /// <summary>The underlying Vulkan sampler handle.</summary>
         internal VkSampler Sampler;
 
+        /// <summary>Creates a new Vulkan sampler wrapper.</summary>
+        /// <param name="device">The owning graphics device.</param>
+        /// <param name="desc">The sampler creation descriptor.</param>
+        /// <param name="sampler">The Vulkan sampler handle.</param>
         public VulkanSampler(GraphicsDevice device, SamplerDesc desc, VkSampler sampler)
         {
             _device = device;
@@ -73,6 +110,7 @@ public sealed unsafe partial class GraphicsDevice
             Sampler = sampler;
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             if (Sampler.Handle != 0)
@@ -83,6 +121,9 @@ public sealed unsafe partial class GraphicsDevice
         }
     }
 
+    /// <summary>Creates a device-local GPU image (texture or render target) backed by Vulkan memory.</summary>
+    /// <param name="desc">Image creation descriptor (extent, format, usage).</param>
+    /// <returns>A new <see cref="IImage"/> handle.</returns>
     public IImage CreateImage(ImageDesc desc)
     {
         VkImageCreateInfo imageInfo = new()
@@ -114,6 +155,9 @@ public sealed unsafe partial class GraphicsDevice
         return new VulkanImage(this, image, memory, desc);
     }
 
+    /// <summary>Creates a typed <c>VkImageView</c> for the given image, selecting aspect flags based on the image format.</summary>
+    /// <param name="image">The image to create a view for (must originate from this device).</param>
+    /// <returns>A new <see cref="IImageView"/> handle.</returns>
     public IImageView CreateImageView(IImage image)
     {
         if (image is not VulkanImage vkImage)
@@ -139,6 +183,9 @@ public sealed unsafe partial class GraphicsDevice
         return new VulkanImageView(this, image, view);
     }
 
+    /// <summary>Creates a Vulkan texture sampler with the specified filtering and addressing modes.</summary>
+    /// <param name="desc">Sampler creation descriptor.</param>
+    /// <returns>A new <see cref="ISampler"/> handle.</returns>
     public ISampler CreateSampler(SamplerDesc desc)
     {
         VkSamplerCreateInfo info = new()
@@ -160,6 +207,7 @@ public sealed unsafe partial class GraphicsDevice
         return new VulkanSampler(this, desc, sampler);
     }
 
+    /// <summary>Maps an engine <see cref="SamplerAddressMode"/> to the Vulkan equivalent.</summary>
     private static VkSamplerAddressMode ToVkAddressMode(SamplerAddressMode mode) => mode switch
     {
         SamplerAddressMode.ClampToEdge => VkSamplerAddressMode.ClampToEdge,
@@ -168,6 +216,7 @@ public sealed unsafe partial class GraphicsDevice
         _ => VkSamplerAddressMode.ClampToEdge
     };
 
+    /// <summary>Maps an engine <see cref="ImageFormat"/> to the Vulkan <c>VkFormat</c> equivalent.</summary>
     private static VkFormat ToVkFormat(ImageFormat format) => format switch
     {
         ImageFormat.R8G8B8A8_UNorm => VkFormat.R8G8B8A8Unorm,
@@ -177,6 +226,7 @@ public sealed unsafe partial class GraphicsDevice
         _ => VkFormat.Undefined
     };
 
+    /// <summary>Converts engine <see cref="ImageUsage"/> flags to Vulkan <c>VkImageUsageFlags</c>.</summary>
     private static VkImageUsageFlags ToVkImageUsage(ImageUsage usage)
     {
         VkImageUsageFlags flags = 0;
@@ -188,6 +238,11 @@ public sealed unsafe partial class GraphicsDevice
         return flags;
     }
 
+    /// <summary>Transitions an image layout via a pipeline barrier using default stage flags.</summary>
+    /// <param name="image">The image to transition.</param>
+    /// <param name="oldLayout">The current layout.</param>
+    /// <param name="newLayout">The target layout.</param>
+    /// <param name="aspect">Image aspect flags (color, depth, etc.).</param>
     internal void TransitionImageLayout(IImage image, VkImageLayout oldLayout, VkImageLayout newLayout, VkImageAspectFlags aspect)
     {
         if (image is not VulkanImage vkImage)
@@ -213,6 +268,13 @@ public sealed unsafe partial class GraphicsDevice
         vkImage.Layout = newLayout;
     }
 
+    /// <summary>Transitions an image layout via a pipeline barrier with explicit stage flags.</summary>
+    /// <param name="image">The image to transition.</param>
+    /// <param name="oldLayout">The current layout.</param>
+    /// <param name="newLayout">The target layout.</param>
+    /// <param name="aspect">Image aspect flags (color, depth, etc.).</param>
+    /// <param name="srcStage">Source pipeline stage for the barrier.</param>
+    /// <param name="dstStage">Destination pipeline stage for the barrier.</param>
     internal void TransitionImageLayout(IImage image,
         VkImageLayout oldLayout,
         VkImageLayout newLayout,
@@ -240,6 +302,12 @@ public sealed unsafe partial class GraphicsDevice
         vkImage.Layout = newLayout;
     }
 
+    /// <summary>Uploads raw pixel data to a 2D image via a staging buffer, transitioning layouts automatically.</summary>
+    /// <param name="image">The destination image (must originate from this device).</param>
+    /// <param name="data">Raw pixel data to upload.</param>
+    /// <param name="width">Texture width in pixels.</param>
+    /// <param name="height">Texture height in pixels.</param>
+    /// <param name="bytesPerPixel">Bytes per pixel (e.g., 4 for RGBA8).</param>
     public void UploadTexture2D(IImage image, ReadOnlySpan<byte> data, uint width, uint height, int bytesPerPixel)
     {
         if (image is not VulkanImage vkImage)
@@ -332,7 +400,12 @@ public sealed unsafe partial class GraphicsDevice
         }
     }
 
-
+    /// <summary>Uploads a span of typed pixel data to a 2D image using sizeof(<typeparamref name="TPixel"/>) as bytes-per-pixel.</summary>
+    /// <typeparam name="TPixel">Unmanaged pixel type (e.g. <c>uint</c> for RGBA8).</typeparam>
+    /// <param name="image">The destination image.</param>
+    /// <param name="pixels">Pixel data to upload.</param>
+    /// <param name="width">Texture width in pixels.</param>
+    /// <param name="height">Texture height in pixels.</param>
     internal void UploadTexture2D<TPixel>(IImage image, ReadOnlySpan<TPixel> pixels, uint width, uint height)
         where TPixel : unmanaged
     {

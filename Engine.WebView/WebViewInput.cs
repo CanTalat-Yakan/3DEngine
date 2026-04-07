@@ -10,6 +10,13 @@ namespace Engine;
 /// Translates SDL3 input events into Ultralight mouse, keyboard, and scroll events.
 /// Attaches to <see cref="AppWindow.SDLEvent"/> for automatic forwarding.
 /// </summary>
+/// <remarks>
+/// Handles mouse motion, button press/release, scroll wheel, key down/up, and text input.
+/// Key events are mapped from <see cref="SDL.Scancode"/> to Windows Virtual Key codes
+/// via <see cref="MapSdlScancodeToVirtualKey"/> for Ultralight's internal key handling.
+/// </remarks>
+/// <seealso cref="WebViewInstance"/>
+/// <seealso cref="WebViewPlugin"/>
 internal static class WebViewInput
 {
     private static readonly ILogger Logger = Log.Category("Engine.WebView.Input");
@@ -17,6 +24,8 @@ internal static class WebViewInput
     /// <summary>
     /// Processes a single SDL event and forwards it to the given <see cref="WebViewInstance"/>.
     /// </summary>
+    /// <param name="e">The raw SDL event to translate.</param>
+    /// <param name="webView">The Ultralight view instance to forward input to.</param>
     public static void ProcessEvent(SDL.Event e, WebViewInstance webView)
     {
         switch ((SDL.EventType)e.Type)
@@ -96,6 +105,10 @@ internal static class WebViewInput
         }
     }
 
+    /// <summary>Builds and fires a key event (RawKeyDown or KeyUp) into the webview.</summary>
+    /// <param name="e">The SDL key event.</param>
+    /// <param name="type">The Ultralight key event type to emit.</param>
+    /// <param name="webView">The target webview instance.</param>
     private static void FireKeyEvent(SDL.Event e, KeyEventType type, WebViewInstance webView)
     {
         var scancode = (SDL.Scancode)e.Key.Scancode;
@@ -119,6 +132,9 @@ internal static class WebViewInput
         webView.FireKeyEvent(keyEvt);
     }
 
+    /// <summary>Extracts keyboard modifier flags from an SDL key event.</summary>
+    /// <param name="e">The SDL event containing key modifier state.</param>
+    /// <returns>The corresponding Ultralight <see cref="KeyEventModifiers"/> flags.</returns>
     private static KeyEventModifiers GetModifiers(SDL.Event e)
     {
         var mod = (SDL.Keymod)e.Key.Mod;
@@ -132,6 +148,9 @@ internal static class WebViewInput
         return result;
     }
 
+    /// <summary>Maps an SDL mouse button index to an Ultralight <see cref="MouseEventButton"/>.</summary>
+    /// <param name="sdlButton">The SDL button index (1=left, 2=middle, 3=right).</param>
+    /// <returns>The corresponding <see cref="MouseEventButton"/>, or <see cref="MouseEventButton.None"/> for unknown buttons.</returns>
     private static MouseEventButton MapMouseButton(byte sdlButton) => sdlButton switch
     {
         1 => MouseEventButton.Left,
@@ -140,6 +159,9 @@ internal static class WebViewInput
         _ => MouseEventButton.None
     };
 
+    /// <summary>Checks whether an SDL scancode falls in the numeric keypad range.</summary>
+    /// <param name="code">The SDL scancode to test.</param>
+    /// <returns><c>true</c> if the scancode is a keypad key.</returns>
     private static bool IsKeypad(SDL.Scancode code) => code is
         >= SDL.Scancode.KpDivide and <= SDL.Scancode.KpEquals;
 

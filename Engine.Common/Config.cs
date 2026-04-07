@@ -22,6 +22,12 @@ public sealed record Config
     public GraphicsBackend Graphics { get; init; } = GraphicsBackend.Vulkan;
 
     /// <summary>Builds a configuration with the specified parameters. All have sensible defaults.</summary>
+    /// <param name="title">Window title bar text.</param>
+    /// <param name="width">Window width in pixels.</param>
+    /// <param name="height">Window height in pixels.</param>
+    /// <param name="windowCommand">Window action applied on startup.</param>
+    /// <param name="graphics">Graphics backend to use.</param>
+    /// <returns>A new <see cref="Config"/> instance with the specified settings.</returns>
     public static Config GetDefault(
         string title = "3D Engine",
         int width = 600,
@@ -36,18 +42,28 @@ public sealed record Config
         };
 
     /// <summary>Returns a copy with the provided window properties.</summary>
+    /// <param name="title">Window title bar text.</param>
+    /// <param name="width">Window width in pixels.</param>
+    /// <param name="height">Window height in pixels.</param>
+    /// <returns>A new <see cref="Config"/> with updated window data.</returns>
     public Config WithWindow(string title, int width, int height)
         => this with { WindowData = new(title, width, height) };
 
     /// <summary>Returns a copy with the provided window data.</summary>
+    /// <param name="windowData">The window properties to apply.</param>
+    /// <returns>A new <see cref="Config"/> with the updated window data.</returns>
     public Config WithWindow(WindowData windowData)
         => this with { WindowData = windowData };
 
     /// <summary>Returns a copy with a different startup window command.</summary>
+    /// <param name="command">The <see cref="WindowCommand"/> to apply on startup.</param>
+    /// <returns>A new <see cref="Config"/> with the updated command.</returns>
     public Config WithCommand(WindowCommand command)
         => this with { WindowCommand = command };
 
     /// <summary>Returns a copy with a different graphics backend.</summary>
+    /// <param name="backend">The <see cref="GraphicsBackend"/> to use.</param>
+    /// <returns>A new <see cref="Config"/> with the updated backend.</returns>
     public Config WithGraphics(GraphicsBackend backend)
         => this with { Graphics = backend };
 
@@ -71,6 +87,10 @@ public readonly record struct WindowData
     /// <summary>Window height in pixels (≥ 1).</summary>
     public int Height { get; }
 
+    /// <summary>Creates a new <see cref="WindowData"/> with the specified properties.</summary>
+    /// <param name="title">Window title bar text. If blank, defaults to <c>"3D Engine"</c>.</param>
+    /// <param name="width">Window width in pixels. Clamped to a minimum of 1.</param>
+    /// <param name="height">Window height in pixels. Clamped to a minimum of 1.</param>
     public WindowData(string title, int width, int height)
     {
         Title = string.IsNullOrWhiteSpace(title) ? "3D Engine" : title;
@@ -99,7 +119,7 @@ public enum WindowCommand
 /// <summary>Graphics backend selector for the application window.</summary>
 public enum GraphicsBackend
 {
-    /// <summary>SDL software renderer -- simple, portable, no GPU required.</summary>
+    /// <summary>SDL software renderer - simple, portable, no GPU required.</summary>
     Sdl = 0,
     /// <summary>Vulkan GPU-accelerated rendering.</summary>
     Vulkan = 1,

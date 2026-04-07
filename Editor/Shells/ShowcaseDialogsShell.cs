@@ -1,10 +1,22 @@
 using Editor.Shell;
 
+/// <summary>
+/// Showcase shell demonstrating overlay components: dialogs, alert dialogs, drawers, sheets,
+/// tooltips, dropdown menus with submenus, popovers, and hover cards.
+/// </summary>
+/// <remarks>
+/// Registered at route <c>/showcase/dialogs</c> as a center-docked tabbed panel
+/// (tab group <c>"showcase"</c>, index 6).
+/// </remarks>
+/// <seealso cref="ShowcasePageHelper"/>
+/// <seealso cref="IEditorShellBuilder"/>
 [EditorShell]
 public class ShowcaseDialogsShell : IEditorShellBuilder
 {
+    /// <inheritdoc />
     public int Order => 6;
 
+    /// <inheritdoc />
     public void Build(IShellBuilder shell)
     {
         shell.Panel("showcase-dialogs", "Dialogs & Overlays", DockZone.Center, panel =>
@@ -186,4 +198,3 @@ public class ShowcaseDialogsShell : IEditorShellBuilder
         });
     }
 }
-

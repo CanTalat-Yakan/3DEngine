@@ -1,15 +1,45 @@
 namespace Engine;
 
-/// <summary>Partial core of the Entity-Component-System world with archetype-based storage.</summary>
+/// <summary>
+/// Partial core of the Entity-Component-System world with sparse-set-based component storage.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Entities are integer IDs allocated by a generational pool (<see cref="EntityPool"/>).
+/// Components are stored in per-type <see cref="ComponentStore{T}"/> instances backed by
+/// <see cref="SparseSet{T}"/> for O(1) add/remove/lookup and cache-friendly iteration.
+/// </para>
+/// <para>
+/// This class is split across multiple partial files:
+/// <list>
+///   <item><description><c>EcsWorld.cs</c> type declarations and internal storage.</description></item>
+///   <item><description><c>EcsWorld.API.cs</c> public entity/component/query API.</description></item>
+///   <item><description><c>EcsWorld.Components.cs</c> <c>ComponentStore&lt;T&gt;</c> implementation.</description></item>
+///   <item><description><c>EcsWorld.Pool.cs</c> <see cref="EntityPool"/> allocator.</description></item>
+///   <item><description><c>EcsWorld.SparseSet.cs</c> <see cref="SparseSet{T}"/> data structure.</description></item>
+///   <item><description><c>EcsWorld.RefIterators.cs</c> zero-allocation ref-based iterators.</description></item>
+/// </list>
+/// </para>
+/// </remarks>
+/// <seealso cref="EcsCommands"/>
+/// <seealso cref="EcsPlugin"/>
+/// <seealso cref="BehaviorContext"/>
 public sealed partial class EcsWorld
 {
     private readonly EntityPool _entities = new();
     private readonly Dictionary<Type, IComponentStore> _stores = new();
 
+    /// <summary>Internal marker interface for type-erased component storage.</summary>
     private interface IComponentStore
     {
+        /// <summary>Number of components in this store.</summary>
         int Count { get; }
+        /// <summary>Removes the component for <paramref name="entity"/>, returning any <see cref="IDisposable"/>.</summary>
+        /// <param name="entity">The entity ID.</param>
+        /// <param name="disposable">Set to the component's <see cref="IDisposable"/> implementation, or <c>null</c>.</param>
+        /// <returns><c>true</c> if the component was removed.</returns>
         bool TryRemove(int entity, out IDisposable? disposable);
+        /// <summary>Clears all per-frame change-tracking bits.</summary>
         void ClearChangedTicks();
     }
 }

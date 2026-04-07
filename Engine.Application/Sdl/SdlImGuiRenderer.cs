@@ -6,6 +6,13 @@ using SDL3;
 namespace Engine;
 
 /// <summary>Renders ImGui draw data using the SDL3 renderer API.</summary>
+/// <remarks>
+/// This is the software/SDL2D rendering backend for ImGui.  In Vulkan mode
+/// (via the Vulkan ImGui render node), this class is <em>not</em> instantiated.
+/// Uses SDL <c>RenderGeometry</c> to submit per-batch indexed triangles.
+/// </remarks>
+/// <seealso cref="SdlImGuiPlugin"/>
+/// <seealso cref="SdlImGuiInput"/>
 public sealed class SdlImGuiRenderer : IDisposable
 {
     private readonly nint _renderer;
@@ -13,6 +20,7 @@ public sealed class SdlImGuiRenderer : IDisposable
     private bool _disposed;
 
     /// <summary>Creates a new ImGui renderer bound to an existing SDL renderer.</summary>
+    /// <param name="renderer">The native SDL_Renderer handle.</param>
     public SdlImGuiRenderer(nint renderer)
     {
         _renderer = renderer;
@@ -20,6 +28,7 @@ public sealed class SdlImGuiRenderer : IDisposable
     }
 
     /// <summary>Updates ImGui IO display size and framebuffer scale for a new frame.</summary>
+    /// <param name="window">The native SDL_Window handle to query dimensions from.</param>
     public void NewFrame(nint window)
     {
         var io = ImGui.GetIO();
@@ -33,6 +42,7 @@ public sealed class SdlImGuiRenderer : IDisposable
     }
 
     /// <summary>Renders ImGui draw data using the SDL renderer with clip rects and blending.</summary>
+    /// <param name="drawData">The ImGui draw data produced by <c>ImGui.GetDrawData()</c>.</param>
     public unsafe void RenderDrawData(ImDrawDataPtr drawData)
     {
         if (drawData.CmdListsCount == 0)

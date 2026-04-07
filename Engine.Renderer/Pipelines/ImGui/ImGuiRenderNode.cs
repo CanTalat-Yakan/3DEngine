@@ -10,11 +10,25 @@ namespace Engine;
 /// Manages its own pipeline and font atlas texture; vertex/index buffers are
 /// transiently allocated from the <see cref="DynamicBufferAllocator"/> each frame.
 /// </summary>
+/// <remarks>
+/// <para>
+/// Pipeline and font atlas are created lazily on first <see cref="Execute"/>.
+/// Per-frame geometry is uploaded into transient dynamic buffer allocations that are
+/// automatically recycled after the GPU has consumed them.
+/// </para>
+/// <para>
+/// The node depends on <c>"sample"</c> so it renders <em>after</em> the 3D scene.
+/// </para>
+/// </remarks>
+/// <seealso cref="ImGuiShaders"/>
+/// <seealso cref="VulkanImGuiPlugin"/>
 internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
 {
     private static readonly ILogger Logger = Log.Category("Engine.ImGui.Vulkan");
 
+    /// <inheritdoc />
     public string Name => "imgui";
+    /// <inheritdoc />
     public IReadOnlyCollection<string> Dependencies { get; } = new[] { "sample" };
 
     // Pipeline and font resources (created lazily on first Execute)
@@ -26,6 +40,10 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
     private ISampler? _fontSampler;
     private IDescriptorSet? _fontDescriptorSet;
 
+    /// <inheritdoc />
+    /// <param name="ctx">Renderer context providing GPU device access.</param>
+    /// <param name="cmds">Command recording context with dynamic allocator for transient buffers.</param>
+    /// <param name="renderWorld">The render world (unused by this node; ImGui data is read directly).</param>
     public unsafe void Execute(RendererContext ctx, CommandRecordingContext cmds, RenderWorld renderWorld)
     {
         var drawData = ImGui.GetDrawData();
@@ -183,6 +201,9 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
         gfx.SetScissor(cmd, 0, 0, extent.Width, extent.Height);
     }
 
+    /// <summary>Creates the ImGui graphics pipeline (with alpha blending and push-constant projection) and uploads the font atlas texture.</summary>
+    /// <param name="gfx">The graphics device to create GPU resources on.</param>
+    /// <param name="renderPass">The render pass the pipeline must be compatible with.</param>
     private unsafe void CreatePipelineAndFontAtlas(IGraphicsDevice gfx, IRenderPass renderPass)
     {
         Logger.Info("Creating ImGui Vulkan pipeline and font atlas...");
@@ -253,6 +274,7 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
         Logger.Info($"ImGui font atlas uploaded: {width}x{height} R8G8B8A8_UNorm.");
     }
 
+    /// <summary>Disposes the font descriptor set, sampler, image view, image, and shader modules.</summary>
     public void Dispose()
     {
         _fontDescriptorSet?.Dispose();

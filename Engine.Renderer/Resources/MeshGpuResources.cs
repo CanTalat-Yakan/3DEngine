@@ -3,13 +3,24 @@ using System.Numerics;
 
 namespace Engine;
 
-/// <summary>GPU resource registry mapping logical mesh IDs to vertex buffers.</summary>
+/// <summary>GPU resource registry mapping logical mesh entity IDs to uploaded vertex buffers.</summary>
+/// <seealso cref="Mesh"/>
+/// <seealso cref="IBuffer"/>
 public sealed class MeshGpuRegistry
 {
     private readonly ConcurrentDictionary<int, IBuffer> _vertexBuffers = new();
 
+    /// <summary>Attempts to retrieve an existing vertex buffer for the given entity.</summary>
+    /// <param name="entityId">The entity ID owning the mesh.</param>
+    /// <param name="buffer">When returning <c>true</c>, the vertex buffer; otherwise <c>null</c>.</param>
+    /// <returns><c>true</c> if found; otherwise <c>false</c>.</returns>
     public bool TryGet(int entityId, out IBuffer buffer) => _vertexBuffers.TryGetValue(entityId, out buffer!);
 
+    /// <summary>Gets the existing vertex buffer for <paramref name="entityId"/>, or creates and uploads a new one.</summary>
+    /// <param name="entityId">The entity ID owning the mesh.</param>
+    /// <param name="mesh">The mesh data to upload if no buffer exists yet.</param>
+    /// <param name="device">The graphics device for buffer creation and upload.</param>
+    /// <returns>The vertex buffer (existing or newly created).</returns>
     public IBuffer GetOrCreate(int entityId, Mesh mesh, IGraphicsDevice device)
     {
         return _vertexBuffers.GetOrAdd(entityId, _ => CreateVertexBuffer(mesh, device));

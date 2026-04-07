@@ -1,10 +1,22 @@
 using Editor.Shell;
 
+/// <summary>
+/// Showcase shell demonstrating form components: inputs, textarea, select, combobox,
+/// checkbox, radio group, switch, slider, toggle, and toggle group.
+/// </summary>
+/// <remarks>
+/// Registered at route <c>/showcase/forms</c> as a center-docked tabbed panel
+/// (tab group <c>"showcase"</c>, index 2).
+/// </remarks>
+/// <seealso cref="ShowcasePageHelper"/>
+/// <seealso cref="IEditorShellBuilder"/>
 [EditorShell]
 public class ShowcaseFormsShell : IEditorShellBuilder
 {
+    /// <inheritdoc />
     public int Order => 2;
 
+    /// <inheritdoc />
     public void Build(IShellBuilder shell)
     {
         shell.Panel("showcase-forms", "Forms", DockZone.Center, panel =>
@@ -147,4 +159,3 @@ public class ShowcaseFormsShell : IEditorShellBuilder
         });
     }
 }
-

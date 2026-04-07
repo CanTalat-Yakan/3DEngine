@@ -1,13 +1,24 @@
 namespace Engine;
 
 /// <summary>Loads and optionally compiles webview overlay SPIR-V shaders from GLSL sources.</summary>
+/// <remarks>
+/// Uses <see cref="GlslCompiler.CompileFileWithCache"/> for lazy on-disk caching:
+/// if a pre-compiled <c>.spv</c> file exists and is newer than the GLSL source, the
+/// cached bytecode is used directly; otherwise the GLSL is compiled at runtime.
+/// Thread safety: <see cref="EnsureLoaded"/> is idempotent but not thread-safe;
+/// call from a single thread during Startup.
+/// </remarks>
+/// <seealso cref="WebViewRenderNode"/>
+/// <seealso cref="GlslCompiler"/>
 public static class WebViewShaders
 {
     private static readonly ILogger Logger = Log.Category("Engine.WebView.Shaders");
 
     private static bool _loaded;
 
+    /// <summary>SPIR-V bytecode for the webview overlay vertex shader.</summary>
     public static ReadOnlyMemory<byte> Vertex { get; private set; } = ReadOnlyMemory<byte>.Empty;
+    /// <summary>SPIR-V bytecode for the webview overlay fragment shader.</summary>
     public static ReadOnlyMemory<byte> Fragment { get; private set; } = ReadOnlyMemory<byte>.Empty;
 
     /// <summary>Ensures that the webview overlay shaders are loaded and compiled. Idempotent.</summary>

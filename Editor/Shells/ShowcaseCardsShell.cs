@@ -1,10 +1,22 @@
 using Editor.Shell;
 
+/// <summary>
+/// Showcase shell demonstrating card layouts: feature cards in a grid,
+/// interactive cards with toggle controls, and card footers.
+/// </summary>
+/// <remarks>
+/// Registered at route <c>/showcase/cards</c> as a center-docked tabbed panel
+/// (tab group <c>"showcase"</c>, index 3).
+/// </remarks>
+/// <seealso cref="ShowcasePageHelper"/>
+/// <seealso cref="IEditorShellBuilder"/>
 [EditorShell]
 public class ShowcaseCardsShell : IEditorShellBuilder
 {
+    /// <inheritdoc />
     public int Order => 3;
 
+    /// <inheritdoc />
     public void Build(IShellBuilder shell)
     {
         shell.Panel("showcase-cards", "Cards", DockZone.Center, panel =>
@@ -86,4 +98,3 @@ public class ShowcaseCardsShell : IEditorShellBuilder
         });
     }
 }
-

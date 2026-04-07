@@ -7,15 +7,18 @@ namespace Engine;
 
 public sealed unsafe partial class GraphicsDevice
 {
+    /// <summary>Khronos validation layer names requested when validation is enabled.</summary>
     private static readonly string[] ValidationLayers =
     {
         Utf8(VK_LAYER_KHRONOS_VALIDATION_EXTENSION_NAME)
     };
 
+    /// <summary>Creates the Vulkan instance, configures validation layers and the debug messenger.</summary>
+    /// <param name="appName">Application name embedded in the <c>VkApplicationInfo</c>.</param>
     private partial void CreateInstance(string appName)
     {
         Logger.Debug("Loading Vulkan library via vkInitialize()...");
-        // Load the Vulkan library -- must be called before any other Vulkan API.
+        // Load the Vulkan library - must be called before any other Vulkan API.
         vkInitialize().CheckResult();
         Logger.Debug("Vulkan library loaded successfully.");
 
@@ -82,6 +85,7 @@ public sealed unsafe partial class GraphicsDevice
         }
     }
 
+    /// <summary>Destroys the debug messenger and Vulkan instance.</summary>
     private partial void DestroyInstance()
     {
         if (_validationEnabled && _debugMessenger.Handle != 0)
@@ -98,6 +102,7 @@ public sealed unsafe partial class GraphicsDevice
         }
     }
 
+    /// <summary>Returns <see langword="true"/> when Vulkan validation should be enabled (always in DEBUG; via env var in RELEASE).</summary>
     private static bool ShouldEnableValidation()
     {
 #if DEBUG
@@ -147,6 +152,8 @@ public sealed unsafe partial class GraphicsDevice
         }
     }
 
+    /// <summary>Populates the debug messenger create info with severity/type filters and the native callback.</summary>
+    /// <param name="createInfo">The create info struct to populate (overwritten in-place).</param>
     private static void PopulateDebugMessengerCreateInfo(ref VkDebugUtilsMessengerCreateInfoEXT createInfo)
     {
         createInfo = new VkDebugUtilsMessengerCreateInfoEXT
@@ -161,6 +168,7 @@ public sealed unsafe partial class GraphicsDevice
         };
     }
 
+    /// <summary>Native callback invoked by the Vulkan validation layer; routes messages to <see cref="Log"/>.</summary>
     [UnmanagedCallersOnly]
     private static uint DebugCallback(
         VkDebugUtilsMessageSeverityFlagsEXT severity,

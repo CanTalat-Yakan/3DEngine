@@ -17,9 +17,11 @@ public readonly record struct DynamicAllocation(IBuffer Buffer, ulong Offset, ul
 /// <see cref="Dispose"/>.
 /// </para>
 /// <para>
-/// Only accessed from the render thread -- no locking required.
+/// Only accessed from the render thread - no locking required.
 /// </para>
 /// </summary>
+/// <seealso cref="DynamicAllocation"/>
+/// <seealso cref="RendererContext"/>
 public sealed class DynamicBufferAllocator : IDisposable
 {
     private static readonly ILogger Logger = Log.Category("Engine.DynamicAllocator");
@@ -33,6 +35,8 @@ public sealed class DynamicBufferAllocator : IDisposable
     /// <summary>Minimum backing buffer size (64 KB).</summary>
     private const ulong MinBufferSize = 64 * 1024;
 
+    /// <summary>Creates a new allocator with one arena per in-flight frame.</summary>
+    /// <param name="gfx">The graphics device used to create backing GPU buffers.</param>
     public DynamicBufferAllocator(IGraphicsDevice gfx)
     {
         _gfx = gfx;
@@ -41,13 +45,14 @@ public sealed class DynamicBufferAllocator : IDisposable
         for (int i = 0; i < _framesInFlight; i++)
             _arenas[i] = new FrameArena();
 
-        Logger.Info($"DynamicBufferAllocator created -- {_framesInFlight} frame slots.");
+        Logger.Info($"DynamicBufferAllocator created - {_framesInFlight} frame slots.");
     }
 
     /// <summary>
     /// Advances to the given in-flight frame slot and resets its write cursors.
     /// Must be called after the fence wait (i.e. inside <c>RendererContext.BeginFrame</c>).
     /// </summary>
+    /// <param name="inFlightIndex">Zero-based frame slot index (0 .. <c>FramesInFlight-1</c>).</param>
     public void BeginFrame(int inFlightIndex)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -94,9 +99,10 @@ public sealed class DynamicBufferAllocator : IDisposable
     {
         foreach (var arena in _arenas)
             arena.DisposeAll();
-        Logger.Debug("DynamicBufferAllocator reset -- all backing buffers disposed.");
+        Logger.Debug("DynamicBufferAllocator reset - all backing buffers disposed.");
     }
 
+    /// <summary>Disposes all backing buffers across all frame slots. Safe to call multiple times.</summary>
     public void Dispose()
     {
         if (_disposed) return;
@@ -107,17 +113,24 @@ public sealed class DynamicBufferAllocator : IDisposable
 
     // ── Per-frame-slot arena ───────────────────────────────────────────
 
+    /// <summary>Per-frame bump arena maintaining one backing buffer per <see cref="BufferUsage"/>.</summary>
     private sealed class FrameArena
     {
         // One backing buffer per usage type encountered
         private readonly Dictionary<BufferUsage, ArenaBuffer> _buffers = new();
 
+        /// <summary>Resets all write cursors to zero without disposing buffers.</summary>
         public void Reset()
         {
             foreach (var ab in _buffers.Values)
                 ab.Cursor = 0;
         }
 
+        /// <summary>Allocates a sub-region of the given size and usage, growing the backing buffer if needed.</summary>
+        /// <param name="gfx">Graphics device used to create/resize buffers.</param>
+        /// <param name="size">Size in bytes of the allocation.</param>
+        /// <param name="usage">Buffer usage flags determining which backing arena to allocate from.</param>
+        /// <returns>A <see cref="DynamicAllocation"/> describing the buffer, offset, and size of the allocation.</returns>
         public DynamicAllocation Allocate(IGraphicsDevice gfx, ulong size, BufferUsage usage)
         {
             if (!_buffers.TryGetValue(usage, out var ab))
@@ -141,7 +154,7 @@ public sealed class DynamicBufferAllocator : IDisposable
                 ab.Capacity = newCap;
 
                 // Must re-upload any data already written this frame into the old buffer.
-                // Since we grew mid-frame, just reset cursor -- caller hasn't bound anything yet
+                // Since we grew mid-frame, just reset cursor - caller hasn't bound anything yet
                 // because we're bump-allocating forward and the old buffer was disposed.
                 ab.Cursor = 0;
             }
@@ -151,6 +164,7 @@ public sealed class DynamicBufferAllocator : IDisposable
             return new DynamicAllocation(ab.Buffer!, offset, size);
         }
 
+        /// <summary>Disposes all backing GPU buffers and resets all arena state.</summary>
         public void DisposeAll()
         {
             foreach (var ab in _buffers.Values)
@@ -164,13 +178,18 @@ public sealed class DynamicBufferAllocator : IDisposable
         }
     }
 
+    /// <summary>Holds a single GPU buffer, its capacity, and the current write cursor.</summary>
     private sealed class ArenaBuffer
     {
+        /// <summary>The GPU buffer, or <c>null</c> if not yet allocated.</summary>
         public IBuffer? Buffer;
+        /// <summary>Total byte capacity of <see cref="Buffer"/>.</summary>
         public ulong Capacity;
+        /// <summary>Current byte offset of the next allocation.</summary>
         public ulong Cursor;
     }
 
+    /// <summary>Rounds <paramref name="v"/> up to the next power of two (minimum <see cref="MinBufferSize"/>).</summary>
     private static ulong NextPowerOfTwo(ulong v)
     {
         if (v == 0) return MinBufferSize;

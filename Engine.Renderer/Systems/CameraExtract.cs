@@ -2,9 +2,15 @@ using System.Numerics;
 
 namespace Engine;
 
-/// <summary>Extracts camera components into the render world as RenderCameras.</summary>
+/// <summary>
+/// Extracts <see cref="Camera"/> + <see cref="Transform"/> components from the ECS world
+/// into <see cref="RenderCameras"/> in the render world, computing view and projection matrices.
+/// </summary>
+/// <seealso cref="RenderCamera"/>
+/// <seealso cref="RenderCameras"/>
 public sealed class CameraExtract : IExtractSystem
 {
+    /// <inheritdoc />
     public void Run(World world, RenderWorld renderWorld)
     {
         if (!world.TryGetResource<EcsWorld>(out var ecs)) return;

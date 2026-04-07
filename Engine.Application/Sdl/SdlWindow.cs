@@ -2,14 +2,31 @@ using SDL3;
 
 namespace Engine;
 
-/// <summary>Owns an SDL window and renderer and provides creation/destruction lifecycle.</summary>
+/// <summary>
+/// Owns an SDL window and optional software renderer, providing lifecycle management and HiDPI support.
+/// </summary>
+/// <remarks>
+/// When <c>useVulkan</c> is <c>true</c> on construction, no SDL renderer is created -
+/// only the window handle is available for Vulkan surface creation.
+/// HiDPI coordinate-mode detection is performed at startup to determine whether manual scaling is needed.
+/// </remarks>
+/// <seealso cref="AppWindow"/>
+/// <seealso cref="SdlSurfaceSource"/>
 public sealed class SdlWindow
 {
+    /// <summary>Window title.</summary>
     public string Title { get; private set; }
+
+    /// <summary>Window width in logical pixels.</summary>
     public int Width { get; internal set; }
+
+    /// <summary>Window height in logical pixels.</summary>
     public int Height { get; internal set; }
 
+    /// <summary>Native SDL window handle.</summary>
     public nint Window { get; private set; }
+
+    /// <summary>Native SDL renderer handle (<c>IntPtr.Zero</c> in Vulkan mode).</summary>
     public nint Renderer { get; private set; }
 
     /// <summary>Display scale factor (e.g. 1.25 for 125% HiDPI). Always ≥ 1.</summary>
@@ -24,6 +41,7 @@ public sealed class SdlWindow
     /// </summary>
     public bool NeedsManualHiDpiScaling { get; private set; }
 
+    /// <summary>Window size as a (Width, Height) tuple.</summary>
     public (int W, int H) Size => (Width, Height);
 
     /// <summary>Creates a new SDL window. If useVulkan is true, no SDL renderer is created and the window uses the Vulkan flag.</summary>
@@ -78,7 +96,7 @@ public sealed class SdlWindow
         // ── HiDPI handling ──
         // SDL3 spec: CreateWindow / GetWindowSize / SetWindowSize use *logical*
         // coordinates on native Wayland, macOS, and iOS.  Windows, X11 (including
-        // XWayland), and Android are the exceptions -- they work in physical pixels.
+        // XWayland), and Android are the exceptions - they work in physical pixels.
         //
         // Rather than matching on video-driver name strings (brittle), we detect
         // the coordinate mode at runtime by comparing the window size against the

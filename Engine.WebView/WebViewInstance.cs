@@ -12,6 +12,21 @@ namespace Engine;
 /// Manages the Ultralight renderer and view lifecycle.
 /// Stored as a <see cref="World"/> resource.
 /// </summary>
+/// <remarks>
+/// <para>
+/// Wraps the Ultralight <see cref="UltralightNet.Renderer"/> and <see cref="View"/>
+/// objects, providing CPU-mode bitmap surface rendering suitable for texture upload to
+/// a GPU pipeline.  The class implements a <em>quiescent resize</em> pattern: when the
+/// view is resized via <see cref="Resize"/>, the actual native resize is deferred to
+/// the next <see cref="Update"/> call, and on that frame all Ultralight work is skipped
+/// so the freshly-reallocated surface is not accessed before being painted into.
+/// </para>
+/// <para>Thread safety: this class is <b>not</b> thread-safe. All calls must occur on the
+/// same thread (typically the main thread via <c>MainThreadOnly()</c> system descriptors).</para>
+/// </remarks>
+/// <seealso cref="WebViewPlugin"/>
+/// <seealso cref="WebViewRenderNode"/>
+/// <seealso cref="WebViewInput"/>
 public sealed class WebViewInstance : IDisposable
 {
     private static readonly ILogger Logger = Log.Category("Engine.WebView");
@@ -36,12 +51,19 @@ public sealed class WebViewInstance : IDisposable
     public uint SurfaceRowBytes => _view?.Surface?.RowBytes ?? (Width * 4);
 
     // ── Diagnostics (read by ImGui debug window) ─────────────────────
+    /// <summary>Whether the Ultralight view has an active bitmap surface.</summary>
     public bool HasSurface => _view?.Surface is not null;
+    /// <summary>Whether the native view currently needs a paint pass (checked before <see cref="Update"/>).</summary>
     public bool NeedsPaintNow => _view?.NeedsPaint ?? false;
+    /// <summary>Total number of <see cref="Update"/> invocations since initialization.</summary>
     public int DiagUpdateCount { get; private set; }
+    /// <summary>Total number of paint events detected (NeedsPaint was true).</summary>
     public int DiagPaintCount { get; private set; }
+    /// <summary>Total number of pixel uploads to the GPU texture (incremented by the render node).</summary>
     public int DiagUploadCount { get; internal set; }
+    /// <summary>Count of non-zero BGRA pixels found during the last <see cref="TryGetPixels"/> call.</summary>
     public long DiagNonZeroPixels { get; private set; }
+    /// <summary>Total pixel count (<c>Width × Height</c>) for the current view dimensions.</summary>
     public long DiagTotalPixels => Width * Height;
 
     /// <summary>Page title from the native View.Title property.</summary>
@@ -57,9 +79,13 @@ public sealed class WebViewInstance : IDisposable
     public bool DiagCaCertExists => File.Exists(Path.Combine(AppContext.BaseDirectory, "runtimes", "cacert.pem"));
 
     // ── Page load state (set by native callbacks) ────────────────────
+    /// <summary>Whether the DOM-ready callback has fired for the current page.</summary>
     public bool DiagDOMReady { get; private set; }
+    /// <summary>Whether the page-finished-loading callback has fired for the current page.</summary>
     public bool DiagPageFinished { get; private set; }
+    /// <summary>Formatted error string from the last page-load failure, or <c>null</c> if no error.</summary>
     public string? DiagLoadError { get; private set; }
+    /// <summary>Last JavaScript console message captured by the native callback.</summary>
     public string? DiagLastConsoleMessage { get; private set; }
 
     /// <summary>Non-zero pixel count from a forced surface probe (bypasses IsDirty).</summary>
@@ -83,7 +109,7 @@ public sealed class WebViewInstance : IDisposable
     /// <summary>Set to <c>true</c> for the single frame where the native
     /// <c>ulViewResize</c> was committed.  While set, no Ultralight
     /// Update/Render is executed and the render node must not touch the
-    /// surface -- this is the "quiescent resize" pattern used by CEF and
+    /// surface - this is the "quiescent resize" pattern used by CEF and
     /// similar browser-embedding solutions.</summary>
     private bool _resizedThisFrame;
 
@@ -91,6 +117,8 @@ public sealed class WebViewInstance : IDisposable
     /// Initializes the Ultralight platform, renderer, and view.
     /// Call once during Startup.
     /// </summary>
+    /// <param name="width">Initial pixel width of the Ultralight view.</param>
+    /// <param name="height">Initial pixel height of the Ultralight view.</param>
     public void Initialize(uint width, uint height)
     {
         Logger.Info($"WebViewInstance: Initializing Ultralight ({width}x{height})...");
@@ -160,7 +188,7 @@ public sealed class WebViewInstance : IDisposable
     private void OnFailLoadingHandler(ulong frameId, bool isMainFrame, string url, string description, string errorDomain, int errorCode)
     {
         DiagLoadError = $"{errorDomain}:{errorCode} {description}";
-        Logger.Warn($"WebViewInstance: Page load FAILED -- {DiagLoadError} (url={url})");
+        Logger.Warn($"WebViewInstance: Page load FAILED - {DiagLoadError} (url={url})");
     }
 
     private void OnConsoleMessageHandler(MessageSource source, MessageLevel level, string message, uint lineNumber, uint columnNumber, string sourceId)
@@ -171,6 +199,7 @@ public sealed class WebViewInstance : IDisposable
     }
 
     /// <summary>Loads raw HTML content into the view.</summary>
+    /// <param name="html">The HTML markup to load. Must not be <c>null</c>.</param>
     public void LoadHtml(string html)
     {
         if (_view is null) return;
@@ -183,6 +212,7 @@ public sealed class WebViewInstance : IDisposable
     }
 
     /// <summary>Loads a URL into the view.</summary>
+    /// <param name="url">The URL to navigate to (e.g. <c>"https://example.com"</c> or <c>"file:///..."</c>).</param>
     public void LoadUrl(string url)
     {
         if (_view is null) return;
@@ -217,6 +247,8 @@ public sealed class WebViewInstance : IDisposable
     /// Evaluates JavaScript in the view context.
     /// Returns the result string or null on error.
     /// </summary>
+    /// <param name="js">The JavaScript source code to evaluate.</param>
+    /// <returns>The string result of evaluation, or <c>null</c> if the view is uninitialized or a JS exception occurred.</returns>
     public string? EvaluateScript(string js)
     {
         if (_view is null) return null;
@@ -242,7 +274,7 @@ public sealed class WebViewInstance : IDisposable
 
         // ── Quiescent resize ─────────────────────────────────────────
         // If a resize is pending, commit it NOW and return immediately.
-        // No Ultralight Update/Render is called this frame -- the native
+        // No Ultralight Update/Render is called this frame - the native
         // surface has just been reallocated and must not be touched until
         // the next frame.  This is the industry-standard "frame gap"
         // pattern used by CEF and similar browser-embedding solutions.
@@ -329,7 +361,7 @@ public sealed class WebViewInstance : IDisposable
             if (nonZero > 0 && !IsDirty && DiagUploadCount == 0)
             {
                 IsDirty = true;
-                Logger.Info($"WebViewInstance: Probe found {nonZero} non-zero pixels — forcing IsDirty.");
+                Logger.Info($"WebViewInstance: Probe found {nonZero} non-zero pixels - forcing IsDirty.");
             }
         }
         finally
@@ -342,6 +374,9 @@ public sealed class WebViewInstance : IDisposable
     /// Locks the bitmap surface pixels and copies them into <paramref name="destination"/>.
     /// Returns true if new pixel data was copied (i.e. the surface was dirty).
     /// </summary>
+    /// <param name="destination">Target buffer that must be at least <c>SurfaceRowBytes × Height</c> bytes.</param>
+    /// <param name="rowBytes">Receives the row stride in bytes of the copied data.</param>
+    /// <returns><c>true</c> if pixels were copied; <c>false</c> if the surface is not dirty or unavailable.</returns>
     public unsafe bool TryGetPixels(Span<byte> destination, out uint rowBytes)
     {
         rowBytes = 0;
@@ -394,6 +429,8 @@ public sealed class WebViewInstance : IDisposable
     /// Caller must call <see cref="UnlockPixels"/> when done.
     /// Returns an empty span if there's no surface or it's not dirty.
     /// </summary>
+    /// <param name="rowBytes">Receives the row stride in bytes, or 0 if no surface is available.</param>
+    /// <returns>A read-only span over the locked pixel data, or an empty span.</returns>
     public unsafe ReadOnlySpan<byte> LockPixels(out uint rowBytes)
     {
         rowBytes = 0;
@@ -424,6 +461,8 @@ public sealed class WebViewInstance : IDisposable
     /// and at a safe point in the frame lifecycle.
     /// No-op if size hasn't changed.
     /// </summary>
+    /// <param name="width">New pixel width (must be &gt; 0).</param>
+    /// <param name="height">New pixel height (must be &gt; 0).</param>
     public void Resize(uint width, uint height)
     {
         if (_view is null || (Width == width && Height == height)) return;
@@ -462,7 +501,7 @@ public sealed class WebViewInstance : IDisposable
         // dereference out-of-bounds offsets in the old bitmap buffer.
         _view.Surface?.ClearDirtyBounds();
 
-        // Use the native ulViewResize API — this resizes the view and its
+        // Use the native ulViewResize API - this resizes the view and its
         // backing surface in-place without destroying/recreating the view,
         // preserving all callbacks, JS state, and page content.
         _view.Resize(newW, newH);
@@ -484,23 +523,27 @@ public sealed class WebViewInstance : IDisposable
     }
 
     /// <summary>Fires a mouse event into the Ultralight view.</summary>
+    /// <param name="evt">The Ultralight mouse event describing motion, button presses, or releases.</param>
     public void FireMouseEvent(MouseEvent evt)
     {
         _view?.FireMouseEvent(evt);
     }
 
     /// <summary>Fires a key event into the Ultralight view.</summary>
+    /// <param name="evt">The Ultralight key event describing key down, key up, or character input.</param>
     public void FireKeyEvent(KeyEvent evt)
     {
         _view?.FireKeyEvent(evt);
     }
 
     /// <summary>Fires a scroll event into the Ultralight view.</summary>
+    /// <param name="evt">The Ultralight scroll event describing wheel delta.</param>
     public void FireScrollEvent(ScrollEvent evt)
     {
         _view?.FireScrollEvent(evt);
     }
 
+    /// <summary>Releases the Ultralight view and renderer. Safe to call multiple times.</summary>
     public void Dispose()
     {
         if (_disposed) return;

@@ -23,8 +23,13 @@ public static class Icon
     public static string Custom(string name) => name;
 }
 
+/// <summary>Extension methods that convert icon-set enums to their kebab-case string names.</summary>
+/// <seealso cref="Icon"/>
 public static class IconEnumExtensions
 {
+    /// <summary>Converts a <see cref="Lucide"/> enum value to its kebab-case icon name.</summary>
+    /// <param name="icon">The Lucide icon enum value.</param>
+    /// <returns>The kebab-case icon name string (e.g. <c>"alarm-clock"</c>).</returns>
     public static string ToIconName(this Lucide icon) => icon switch
     {
         Lucide.AArrowDown => "a-arrow-down",
@@ -1695,6 +1700,9 @@ public static class IconEnumExtensions
         _ => ""
     };
 
+    /// <summary>Converts a <see cref="Feather"/> enum value to its kebab-case icon name.</summary>
+    /// <param name="icon">The Feather icon enum value.</param>
+    /// <returns>The kebab-case icon name string.</returns>
     public static string ToIconName(this Feather icon) => icon switch
     {
         Feather.Activity => "activity",
@@ -1986,6 +1994,9 @@ public static class IconEnumExtensions
         _ => ""
     };
 
+    /// <summary>Converts a <see cref="Heroicon"/> enum value to its kebab-case icon name.</summary>
+    /// <param name="icon">The Heroicon enum value.</param>
+    /// <returns>The kebab-case icon name string.</returns>
     public static string ToIconName(this Heroicon icon) => icon switch
     {
         Heroicon.AcademicCap => "academic-cap",
