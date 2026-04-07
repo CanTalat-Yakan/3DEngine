@@ -251,12 +251,14 @@ public sealed class Schedule
     {
         List<SystemDescriptor> list;
         bool isParallel;
+        bool stageMarkedParallel;
 
         lock (_lock)
         {
             list = _systemsByStage[stage];
             if (list.Count == 0) return;
-            isParallel = _parallelStages.Contains(stage) && list.Count > 1;
+            stageMarkedParallel = _parallelStages.Contains(stage);
+            isParallel = stageMarkedParallel && list.Count > 1;
         }
 
         Logger.FrameTrace($"Stage {stage}: executing {list.Count} system(s) [{(isParallel ? "parallel" : "sequential")}]");
@@ -266,7 +268,7 @@ public sealed class Schedule
         if (isParallel)
             RunParallel(stage, list, world);
         else
-            RunSequential(stage, list, world);
+            RunSequential(stage, list, world, stageMarkedParallel);
 
         stageSw.Stop();
         Diagnostics.RecordStage(stage, stageSw.Elapsed);
@@ -282,8 +284,17 @@ public sealed class Schedule
 
     // ── Private helpers ────────────────────────────────────────────────
 
-    private void RunSequential(Stage stage, List<SystemDescriptor> systems, World world)
+    private void RunSequential(Stage stage, List<SystemDescriptor> systems, World world, bool stageMarkedParallel)
     {
+        var sequentialReason = stageMarkedParallel
+            ? (systems.Count <= 1 ? "single-system-stage" : "serialized-by-conflicts")
+            : "stage-configured-single-threaded";
+
+        var batches = systems.Select(s => new List<SystemDescriptor> { s }).ToList();
+        var notes = batches.Select(_ => (IReadOnlyList<string>)new[] { sequentialReason }).ToList();
+        Diagnostics.RecordBatches(stage, batches);
+        Diagnostics.RecordBatchNotes(stage, notes);
+
         var span = CollectionsMarshal.AsSpan(systems);
         for (int i = 0; i < span.Length; i++)
         {

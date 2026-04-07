@@ -35,6 +35,7 @@ public sealed class App : IDisposable
 
         var cfg = config ?? Config.Default;
         World.InsertResource(cfg);
+        World.InsertResource(Schedule.Diagnostics);
 
         Logger.Info($"{cfg}");
         Logger.Info("App instance created successfully.");
