@@ -3,6 +3,7 @@
     <PropertyGroup>
         <IsPackable>false</IsPackable>
         <RootNamespace>Engine.Tests</RootNamespace>
+        <AssemblyName>Engine.Tests</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
@@ -10,6 +11,7 @@
         <ProjectReference Include="..\Engine.Entities\Engine.Entities.csproj" />
         <ProjectReference Include="..\Engine.Renderer\Engine.Renderer.csproj" />
         <ProjectReference Include="..\Engine.Graphics\Engine.Graphics.csproj" />
+        <ProjectReference Include="..\Editor.Shell\Editor.Shell.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -19,6 +21,11 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="coverlet.collector" Version="6.0.4">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="FluentAssertions" Version="8.2.0" />
     </ItemGroup>
 
 </Project>

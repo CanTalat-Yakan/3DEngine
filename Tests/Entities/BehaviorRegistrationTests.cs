@@ -1,6 +1,7 @@
+using FluentAssertions;
 using Xunit;
 
-namespace Engine.Tests;
+namespace Engine.Tests.Entities;
 
 public static class DummyRegistration
 {
@@ -13,13 +14,18 @@ public static class DummyRegistration
     }
 }
 
+[Trait("Category", "Unit")]
 public class BehaviorRegistrationTests
 {
     [Fact]
     public void BehaviorsPlugin_Invokes_Annotated_Registration_Methods()
     {
-        var app = new App();
+        using var app = new App();
+        var callsBefore = DummyRegistration.Calls;
+
         new BehaviorsPlugin().Build(app);
-        Assert.True(DummyRegistration.Calls >= 1);
+
+        DummyRegistration.Calls.Should().BeGreaterThan(callsBefore);
     }
 }
+

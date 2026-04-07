@@ -1,7 +1,9 @@
+using FluentAssertions;
 using Xunit;
 
-namespace Engine.Tests;
+namespace Engine.Tests.Renderer;
 
+[Trait("Category", "Smoke")]
 public class RendererSmokeTests
 {
     private sealed class StubSurfaceSource : ISurfaceSource
@@ -17,9 +19,12 @@ public class RendererSmokeTests
         var nullGfx = new NullGraphicsDevice();
         var context = new RendererContext(nullGfx);
         context.Initialize(new StubSurfaceSource());
-        var renderer = new Renderer(context);
+        var renderer = new Engine.Renderer(context);
+
         renderer.Initialize();
-        renderer.RenderFrame(new World());
-        Assert.True(true);
+        var act = () => renderer.RenderFrame(new World());
+
+        act.Should().NotThrow();
     }
 }
+
