@@ -14,17 +14,17 @@ public sealed class VulkanWebViewPlugin : IPlugin
         var cfg = app.World.Resource<Config>();
         if (cfg.Graphics != GraphicsBackend.Vulkan)
         {
-            Logger.Info("VulkanWebViewPlugin: Non-Vulkan backend — skipping.");
+            Logger.Info("VulkanWebViewPlugin: Non-Vulkan backend - skipping.");
             return;
         }
 
-        Logger.Info("VulkanWebViewPlugin: Building — will add WebViewRenderNode to Vulkan graph.");
+        Logger.Info("VulkanWebViewPlugin: Building - will add WebViewRenderNode to Vulkan graph.");
 
         app.AddSystem(Stage.Startup, new SystemDescriptor(world =>
             {
                 if (!world.TryGetResource<Renderer>(out var renderer))
                 {
-                    Logger.Warn("No Renderer resource found — WebViewRenderNode not added.");
+                    Logger.Warn("No Renderer resource found - WebViewRenderNode not added.");
                     return;
                 }
             

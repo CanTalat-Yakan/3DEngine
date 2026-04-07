@@ -64,7 +64,7 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
         }
         else
         {
-            return; // No allocator — cannot upload ImGui geometry
+            return; // No allocator - cannot upload ImGui geometry
         }
 
         // Upload vertex and index data

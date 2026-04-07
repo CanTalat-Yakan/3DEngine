@@ -2,7 +2,7 @@ namespace Engine;
 
 /// <summary>Uploads per-frame camera uniform buffer and descriptor set for rendering.
 /// Runs as a prepare system (after BeginFrame / fence wait) so the dynamic allocator
-/// is safe to use — no per-frame buffer aliasing.</summary>
+/// is safe to use - no per-frame buffer aliasing.</summary>
 public sealed class SamplePrepare : IPrepareSystem, IDisposable
 {
     private IDescriptorSet? _cameraSet;

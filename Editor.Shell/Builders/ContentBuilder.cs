@@ -1,7 +1,7 @@
 namespace Editor.Shell;
 
 // ═══════════════════════════════════════════════════════════════════════════
-//  Concrete Content Builder — builds Element trees from fluent API calls.
+//  Concrete Content Builder - builds Element trees from fluent API calls.
 // ═══════════════════════════════════════════════════════════════════════════
 
 public sealed class ContentBuilder : IContentBuilder

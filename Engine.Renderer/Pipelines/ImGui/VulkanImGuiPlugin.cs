@@ -13,17 +13,17 @@ public sealed class VulkanImGuiPlugin : IPlugin
         var cfg = app.World.Resource<Config>();
         if (cfg.Graphics != GraphicsBackend.Vulkan)
         {
-            Logger.Info("VulkanImGuiPlugin: Non-Vulkan backend — skipping.");
+            Logger.Info("VulkanImGuiPlugin: Non-Vulkan backend - skipping.");
             return;
         }
 
-        Logger.Info("VulkanImGuiPlugin: Building — will add ImGui render node to Vulkan graph.");
+        Logger.Info("VulkanImGuiPlugin: Building - will add ImGui render node to Vulkan graph.");
 
         app.AddSystem(Stage.Startup, new SystemDescriptor(world =>
             {
                 if (!world.TryGetResource<Renderer>(out var renderer))
                 {
-                    Logger.Warn("No Renderer resource found — ImGui render node not added.");
+                    Logger.Warn("No Renderer resource found - ImGui render node not added.");
                     return;
                 }
             

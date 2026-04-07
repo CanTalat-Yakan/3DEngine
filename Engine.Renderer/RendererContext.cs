@@ -87,7 +87,7 @@ public sealed class RendererContext : IDisposable
         }
         catch (Exception ex)
         {
-            Logger.Error("Failed to create camera resources — cleaning up partial state.", ex);
+            Logger.Error("Failed to create camera resources - cleaning up partial state.", ex);
             for (int i = 0; i < imageCount; i++)
             {
                 newSets[i]?.Dispose();
@@ -127,7 +127,7 @@ public sealed class RendererContext : IDisposable
         var frame = _graphics!.BeginFrame(clear);
         imageIndex = frame.FrameIndex;
 
-        // Advance the dynamic allocator — the fence wait inside BeginFrame guarantees
+        // Advance the dynamic allocator - the fence wait inside BeginFrame guarantees
         // this in-flight slot is idle, so resetting its cursors is safe.
         DynamicAllocator?.BeginFrame(frame.InFlightIndex);
 
@@ -175,14 +175,14 @@ public sealed class RendererContext : IDisposable
         if (!IsInitialized)
             return;
 
-        Logger.Info("RendererContext: Resize triggered — recreating swapchain and camera resources...");
+        Logger.Info("RendererContext: Resize triggered - recreating swapchain and camera resources...");
         try
         {
             _graphics!.OnResize();
         }
         catch (Exception ex)
         {
-            Logger.Error("RendererContext: Swapchain resize failed — cleaning up resources.", ex);
+            Logger.Error("RendererContext: Swapchain resize failed - cleaning up resources.", ex);
             DisposeCameraResources();
             DynamicAllocator?.Reset();
             return;

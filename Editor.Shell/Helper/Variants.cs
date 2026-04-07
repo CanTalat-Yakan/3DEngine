@@ -1,7 +1,7 @@
 namespace Editor.Shell;
 
 // ═══════════════════════════════════════════════════════════════════════════
-//  Strongly-typed component variant enums — no Blazor dependency.
+//  Strongly-typed component variant enums - no Blazor dependency.
 //  Mapped to BlazorBlueprint variant types by the rendering layer.
 // ═══════════════════════════════════════════════════════════════════════════
 

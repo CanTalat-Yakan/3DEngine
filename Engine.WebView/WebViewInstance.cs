@@ -257,7 +257,7 @@ public sealed class WebViewInstance : IDisposable
 
         DiagUpdateCount++;
 
-        // Update processes timers, JS, layout, network — may flag the view as needing paint.
+        // Update processes timers, JS, layout, network - may flag the view as needing paint.
         _renderer.Update();
 
         // Query page title once per ~60 frames AFTER Update() so the page has been processed.
@@ -289,7 +289,7 @@ public sealed class WebViewInstance : IDisposable
         // ── Forced pixel probe (every ~120 frames) ──────────────────
         // Bypasses IsDirty: directly locks the surface and scans for non-zero
         // pixels to confirm whether Ultralight ever writes content.
-        // Skipped on resize frames — the surface was just reallocated.
+        // Skipped on resize frames - the surface was just reallocated.
         if (DiagUpdateCount % 120 == 0 && !_resizedThisFrame)
             ProbeSurfacePixels();
     }

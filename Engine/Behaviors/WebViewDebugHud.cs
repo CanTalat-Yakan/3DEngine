@@ -144,9 +144,9 @@ public struct WebViewDebugHud
             if (w.DiagUploadCount > 0 && w.DiagNonZeroPixels == 0 && w.DiagProbeNonZero == 0)
                 sb.AppendLine("WARNING: Pixels uploaded but all zero (upload + probe)!");
             if (w.DiagUploadCount > 0 && w.DiagNonZeroPixels == 0 && w.DiagProbeNonZero > 0)
-                sb.AppendLine("HINT: Probe found pixels but upload didn't — timing issue!");
+                sb.AppendLine("HINT: Probe found pixels but upload didn't - timing issue!");
             if (!w.DiagIcuExists)
-                sb.AppendLine("CRITICAL: icudt67l.dat missing — text layout will fail!");
+                sb.AppendLine("CRITICAL: icudt67l.dat missing - text layout will fail!");
 
             var path = Path.Combine(AppContext.BaseDirectory, "webview_debug.txt");
             File.WriteAllText(path, sb.ToString());

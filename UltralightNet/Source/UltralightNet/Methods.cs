@@ -50,7 +50,7 @@ public static unsafe partial class Methods
 		// Per-assembly resolver for this assembly
 		NativeLibrary.SetDllImportResolver(typeof(Methods).Assembly, ResolveUltralightLibrary);
 
-		// Global last-resort resolver — catches P/Invoke failures from ANY assembly
+		// Global last-resort resolver -- catches P/Invoke failures from ANY assembly
 		// (e.g. old-style [DllImport] in UltralightNet.AppCore)
 		System.Runtime.Loader.AssemblyLoadContext.Default.ResolvingUnmanagedDll +=
 			(asm, name) => ResolveUltralightLibrary(name, asm, null);

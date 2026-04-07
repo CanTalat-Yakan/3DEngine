@@ -62,14 +62,14 @@ public sealed class World : IDisposable
 
     /// <summary>
     /// Returns the existing resource of type T, or inserts <paramref name="value"/> and returns it.
-    /// Atomic — safe for concurrent callers.
+    /// Atomic - safe for concurrent callers.
     /// </summary>
     public T GetOrInsertResource<T>(T value) where T : notnull => 
         (T)_resources.GetOrAdd(typeof(T), value);
 
     /// <summary>
     /// Returns the existing resource of type T, or creates one via <paramref name="factory"/>,
-    /// inserts it, and returns it. Atomic — safe for concurrent callers.
+    /// inserts it, and returns it. Atomic - safe for concurrent callers.
     /// The factory is only invoked when the resource is missing.
     /// </summary>
     public T GetOrInsertResource<T>(Func<T> factory) where T : notnull => 
@@ -109,7 +109,7 @@ public sealed class World : IDisposable
             }
 
         _resources.Clear();
-        Logger.Trace("World cleared — all resources removed.");
+        Logger.Trace("World cleared - all resources removed.");
     }
 
     /// <summary>Disposes all <see cref="IDisposable"/> resources and clears the world.</summary>
