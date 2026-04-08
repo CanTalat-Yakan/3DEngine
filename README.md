@@ -16,6 +16,7 @@
 <p align="center" style="text-align:center">
   <img alt="Status" src="https://img.shields.io/badge/Status-Early%20Preview-yellow">
   <img alt="Platforms" src="https://img.shields.io/badge/Platforms-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey">
+  <a href="https://deepwiki.com/CanTalat-Yakan/3DEngine"><img alt="Ask DeepWiki" src="https://deepwiki.com/badge.svg"></a>
 </p>
 
 <p align="center" style="text-align:center"><sub>Last updated: April 8, 2026</sub></p>
