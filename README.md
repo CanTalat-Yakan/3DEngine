@@ -387,9 +387,23 @@ and conflict notes for debugging.
 Plugins implement `IPlugin` and configure the app during a one-time `Build` phase:
 
 ```csharp
-public interface IPlugin
+public sealed class PhysicsPlugin : IPlugin
 {
-    void Build(App app);
+    public void Build(App app)
+    {
+        // Insert resources
+        app.World.InitResource<PhysicsWorld>();
+
+        // Register systems with resource-access metadata
+        app.AddSystem(Stage.PreUpdate, new SystemDescriptor(world =>
+        {
+            var physics = world.Resource<PhysicsWorld>();
+            var time = world.Resource<Time>();
+            physics.Step(time.DeltaSeconds);
+        }, "Physics.Step")
+        .Read<Time>()
+        .Write<PhysicsWorld>());
+    }
 }
 ```
 
@@ -431,15 +445,60 @@ var res = world.InitResource<MyService>();
 Common resources: `Config`, `EcsWorld`, `EcsCommands`, `AppWindow`, `Time`, `Input`, `Renderer`,
 `ScheduleDiagnostics`, `WebViewInstance`.
 
-**`Events<T>`** provides typed, thread-safe event queues:
+**`Time`** — frame timing updated each frame by `TimePlugin`:
 
 ```csharp
-// Send
-Events.Get<DamageEvent>(world).Send(new DamageEvent(target, 25));
+var time = world.Resource<Time>();
+double dt   = time.DeltaSeconds;      // clamped delta (use for gameplay)
+double raw  = time.RawDeltaSeconds;   // un-clamped wall-clock delta
+double fps  = time.SmoothedFps;       // exponentially smoothed FPS
+ulong frame = time.FrameCount;        // total frames since start
+```
 
-// Read (snapshot copy)
+**`Input`** — keyboard, mouse, and text input state updated by `InputPlugin`:
+
+```csharp
+var input = world.Resource<Input>();
+
+// Keyboard
+if (input.KeyPressed(Key.Space))  { /* first frame Space is down */ }
+if (input.KeyDown(Key.W))         { /* held down continuously  */ }
+if (input.KeyReleased(Key.Escape)){ /* released this frame     */ }
+
+// Mouse
+if (input.MousePressed(MouseButton.Left)) { /* click */ }
+var (mx, my) = input.MousePosition;
+var (dx, dy) = input.MouseDelta;
+float scroll = input.WheelY;
+
+// Text input (typed characters this frame)
+foreach (char c in input.TextInput)
+    Console.Write(c);
+```
+
+**`Events<T>`** provides typed, thread-safe event queues for decoupled inter-system communication:
+
+```csharp
+// Direct queue access
+Events.Get<DamageEvent>(world).Send(new DamageEvent(target, 25));
 foreach (var evt in Events.Get<DamageEvent>(world).Read())
     ApplyDamage(evt);
+
+// Typed writer/reader handles (zero-allocation ref structs)
+var writer = EventWriter<DamageEvent>.Get(world);
+writer.Send(new DamageEvent(target, 25));
+writer.SendBatch(stackalloc[] { evt1, evt2 });
+
+var reader = EventReader<DamageEvent>.Get(world);
+foreach (var evt in reader.Read())
+    ApplyDamage(evt);
+var drained = reader.Drain(); // read + clear atomically
+
+// World extension shortcuts
+world.SendEvent(new DamageEvent(target, 25));
+foreach (var evt in world.ReadEvents<DamageEvent>())
+    ApplyDamage(evt);
+world.ClearEvents<DamageEvent>();
 ```
 
 Events accumulate during a frame and should be cleared once per frame (typically in `Stage.Last`).
@@ -461,7 +520,39 @@ Events accumulate during a frame and should be cleared once per frame (typically
 | `Remove<T>(id)` | Detach a component. |
 | `Changed<T>(id)` | Was this component modified this frame? |
 | `Count<T>()` | Number of entities with this component. |
+| `EntitiesWith<T>()` | Span of entity IDs that have this component. |
 | `Reserve<T>(n, hint)` | Pre-allocate storage to reduce resizing. |
+
+```csharp
+var ecs = world.Resource<EcsWorld>();
+
+// Spawn and attach components
+var e = ecs.Spawn();
+ecs.Add(e, new Position { X = 0, Y = 0 });
+ecs.Add(e, new Velocity { X = 1, Y = 0 });
+
+// Read
+if (ecs.TryGet<Position>(e, out var pos))
+    Console.WriteLine($"Position: {pos.X}, {pos.Y}");
+
+// Update (marks changed)
+ecs.Update(e, new Position { X = 5, Y = 10 });
+
+// Mutate in-place via function (marks changed)
+ecs.Mutate<Position>(e, p => p with { X = p.X + 1 });
+
+// Direct ref access for hot paths
+ref var vel = ref ecs.GetRef<Velocity>(e);
+vel.X += 0.1f;
+
+// Bulk operations
+ecs.Reserve<Position>(10_000);                   // pre-allocate storage
+ReadOnlySpan<int> ids = ecs.EntitiesWith<Position>(); // all entities with Position
+bool dirty = ecs.Changed<Position>(e);           // was it modified this frame?
+
+// Despawn (disposes IDisposable components)
+ecs.Despawn(e);
+```
 
 **Queries:**
 
@@ -472,10 +563,21 @@ ecs.Query<T1, T2, T3>()     // three components
 ecs.QueryWhere<T>(predicate) // filtered by predicate
 ```
 
-**Deferred commands** via `EcsCommands`:
+**Deferred commands** via `EcsCommands` — mutations queued during iteration, flushed at `PostUpdate`:
 
 ```csharp
-ctx.Cmd.Spawn((id, ecs) => ecs.Add(id, new MyComp()));
+// Spawn with components (fluent chaining)
+ctx.Cmd
+    .Spawn((id, ecs) =>
+    {
+        ecs.Add(id, new Position { X = 0, Y = 0 });
+        ecs.Add(id, new Velocity { X = 1, Y = 0 });
+    })
+    .Spawn((id, ecs) => ecs.Add(id, new Position()));
+
+// Deferred add / remove / despawn
+ctx.Cmd.Add(entityId, new Health { Value = 100 });
+ctx.Cmd.Remove<Poison>(entityId);
 ctx.Cmd.Despawn(entityId);
 ```
 
@@ -496,6 +598,14 @@ are disposed.
 // Value-copy query
 foreach (var (e, pos) in ecs.Query<Position>()) { /* read pos */ }
 
+// Multi-component query (joins on smallest set)
+foreach (var (e, pos, vel) in ecs.Query<Position, Velocity>())
+    ecs.Update(e, new Position { X = pos.X + vel.X, Y = pos.Y + vel.Y });
+
+// Filtered query with predicate
+foreach (var (e, hp) in ecs.QueryWhere<Health>(h => h.Value <= 0))
+    ecs.Despawn(e);
+
 // Zero-allocation ref iteration (marks changed)
 foreach (var rc in ecs.IterateRef<Velocity>())
     rc.Component.dx += 1;
@@ -503,6 +613,9 @@ foreach (var rc in ecs.IterateRef<Velocity>())
 // Two-component ref iteration
 foreach (var rc in ecs.IterateRef<Position, Velocity>())
     rc.C1.x += rc.C2.dx;
+
+// Mutate in-place via function (marks changed, no-op if missing)
+ecs.Mutate<Health>(e, h => h with { Value = h.Value - 10 });
 
 // Transform helper (marks changed)
 ecs.TransformEach<Position>((e, p) => { p.x += 1; return p; });
@@ -718,6 +831,24 @@ The `Renderer` orchestrates a four-phase pipeline each frame:
 | **Queue** | `IQueueSystem` | Build draw commands and render lists |
 | **Graph** | `IRenderNode` | Execute render passes in topological order |
 
+```csharp
+// Register custom render systems on the Renderer
+var renderer = world.Resource<Renderer>();
+renderer.AddExtractSystem(new MyExtractSystem());
+renderer.AddPrepareSystem(new MyPrepareSystem());
+renderer.AddQueueSystem(new MyQueueSystem());
+renderer.AddNode(new MyRenderNode());
+
+// Implement a custom render node
+public class MyRenderNode : IRenderNode
+{
+    public void Execute(RendererContext ctx, /* frame context */ ..., RenderWorld rw)
+    {
+        // Issue draw calls using ctx.Device, read data from rw
+    }
+}
+```
+
 `RenderGraph` manages the directed acyclic graph of `IRenderNode` instances. `RendererContext` wraps the
 `GraphicsDevice` and provides frame-scoped resources (camera, dynamic allocator). `RendererDiagnostics` tracks adapter
 info, surface extent, and frame statistics.
@@ -751,21 +882,29 @@ inspectors available instantly without restarting.
 The engine uses a structured multi-provider logging system:
 
 ```csharp
+// Create a category-scoped logger (static, one per class)
 private static readonly ILogger Logger = Log.Category("MySystem");
 
+// Or derive from a type name automatically
+private static readonly ILogger Logger = Log.For<MyPlugin>();
+
+// Log at different severity levels
+Logger.Trace("Variable x = 42");
+Logger.Debug("Processing batch of 100 entities.");
 Logger.Info("System initialized.");
 Logger.Warn("Resource missing — using defaults.");
 Logger.Error("Operation failed.", exception);
+
+// Frame-level trace (auto-suppressed after first few frames, then sampled)
+Logger.FrameTrace($"Frame #{frameCount} begin");
 ```
 
 Severity levels: `Trace` → `Debug` → `Info` → `Warning` → `Error` → `Critical`.
 
 Providers:
 - **Console** — ANSI-colored output with category and severity prefix.
-- **File** — Persistent log written to `Engine.log` in the application directory.
-
-Frame-level trace messages (`Logger.FrameTrace(...)`) are automatically suppressed after the first few frames and then
-sampled periodically to avoid log flooding.
+- **File** — Persistent log written to `Engine.log` in the application directory. Initialized automatically on
+  `App` construction via `FileLoggerProvider.Initialize(path)`.
 
 ### FAQ
 
