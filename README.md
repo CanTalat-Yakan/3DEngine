@@ -970,11 +970,11 @@ Early days! If you want to help:
 - Propose small, well-scoped PRs (build scripts, docs, samples, or isolated subsystems).
 - Keep changes platform-agnostic when possible.
 
-By participating, you agree to abide by our [Code of Conduct](./CODE_OF_CONDUCT.md).
+By participating, you agree to abide by our [Code of Conduct](./.github/CODE_OF_CONDUCT.md).
 
 ## License
 
-Code: MIT license. See [LICENSE](./LICENSE) for the full text.
+Code: MPL-2.0 license. See [LICENSE](./LICENSE) for the full text.
 
 Contributions: By submitting a contribution, you agree to license your contribution under the same license as this
 repository.
