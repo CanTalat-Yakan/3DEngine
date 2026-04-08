@@ -36,9 +36,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{B20594
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{30CACF02-90B9-49FD-851A-D16A8C59B9F2}"
 	ProjectSection(SolutionItems) = preProject
-		LICENSE.txt = LICENSE.txt
-		README.md = README.md
 		.gitignore = .gitignore
+		LICENSE = LICENSE
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet", "UltralightNet\Source\UltralightNet\UltralightNet.csproj", "{6856B621-DD6B-46F2-B41D-AAA594769D66}"
