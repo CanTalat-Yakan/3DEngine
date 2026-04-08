@@ -16,7 +16,7 @@
 <p align="center" style="text-align:center">
   <img alt="Status" src="https://img.shields.io/badge/Status-Early%20Preview-yellow">
   <img alt="Platforms" src="https://img.shields.io/badge/Platforms-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey">
-  <a href="https://discord.gg/c3UtTVNbRb"><img alt="Discord" src="https://img.shields.io/discord/308323056592486420?logo=discord&logoColor=white&color=5865F2"></a>
+  <a href="https://discord.gg/c3UtTVNbRb"><img alt="Discord" src="https://img.shields.io/discord/1288979341006475345?logo=discord&logoColor=white&color=5865F2"></a>
   <a href="https://deepwiki.com/CanTalat-Yakan/3DEngine"><img alt="Ask DeepWiki" src="https://deepwiki.com/badge.svg"></a>
 </p>
 
