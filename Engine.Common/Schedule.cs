@@ -239,6 +239,18 @@ public sealed class SystemDescriptor
 /// <see cref="Stage.Cleanup"/> are single-threaded by default. All other stages are parallel.
 /// </para>
 /// </remarks>
+/// <example>
+/// <code>
+/// var schedule = new Schedule();
+/// schedule.AddSystem(Stage.Update, static world =>
+/// {
+///     var time = world.Resource&lt;Time&gt;();
+///     Console.WriteLine($"Frame delta: {time.DeltaSeconds:F4}s");
+/// });
+/// schedule.AddSystem(Stage.Update, PhysicsStep, world => world.ContainsResource&lt;PhysicsWorld&gt;());
+/// schedule.RunStage(Stage.Update, world);
+/// </code>
+/// </example>
 /// <seealso cref="Stage"/>
 /// <seealso cref="StageOrder"/>
 /// <seealso cref="SystemDescriptor"/>

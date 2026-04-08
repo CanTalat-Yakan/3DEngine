@@ -73,18 +73,18 @@ gameplay logic in two ways:
 
 ## Design Goals
 
-- **Ergonomic ECS** — Lightweight world + staged schedule inspired by Bevy; attribute-driven behaviors with run
+- **Ergonomic ECS** - Lightweight world + staged schedule inspired by Bevy; attribute-driven behaviors with run
   conditions and keyboard toggles to minimize boilerplate.
-- **Explicit Rendering** — Vulkan-first with a structured extract → prepare → queue → graph pipeline; no hidden
+- **Explicit Rendering** - Vulkan-first with a structured extract → prepare → queue → graph pipeline; no hidden
   abstractions.
-- **Parallel by Default** — Resource-access metadata on `SystemDescriptor` enables automatic parallel batching within
+- **Parallel by Default** - Resource-access metadata on `SystemDescriptor` enables automatic parallel batching within
   stages; conservative fallback for unannotated systems.
-- **Extensibility** — Plugins compose engine services; source generation handles repetitive registration; typed event
+- **Extensibility** - Plugins compose engine services; source generation handles repetitive registration; typed event
   queues for decoupled communication.
-- **Cross-Platform** — Linux, Windows, and macOS (MoltenVK) targeted with minimal platform-specific code in user land.
-- **Separation of Concerns** — Runtime (game loop, ECS, renderer) cleanly separated from editor tooling (Blazor Server,
+- **Cross-Platform** - Linux, Windows, and macOS (MoltenVK) targeted with minimal platform-specific code in user land.
+- **Separation of Concerns** - Runtime (game loop, ECS, renderer) cleanly separated from editor tooling (Blazor Server,
   WebView, hot-reloadable shell scripts).
-- **Fast Iteration** — Hot-reload for editor UI via Roslyn-based `ShellCompiler`; inspectable runtime overlays via
+- **Fast Iteration** - Hot-reload for editor UI via Roslyn-based `ShellCompiler`; inspectable runtime overlays via
   ImGui; structured logging to file and console.
 
 ## Current Status
@@ -157,45 +157,45 @@ See `Engine/Program.cs` for the runtime entry point and `Editor/Program.cs` for 
 
 ### Runtime
 
-- **Staged update loop** — `Startup` (once) → `First` → `PreUpdate` → `Update` → `PostUpdate` → `Render` → `Last`
+- **Staged update loop** - `Startup` (once) → `First` → `PreUpdate` → `Update` → `PostUpdate` → `Render` → `Last`
   (per frame) → `Cleanup` (once on exit).
-- **Parallel scheduler** — Systems within a stage run in parallel batches based on declared `Read<T>`/`Write<T>`
+- **Parallel scheduler** - Systems within a stage run in parallel batches based on declared `Read<T>`/`Write<T>`
   resource-access metadata. `ScheduleDiagnostics` provides per-stage and per-system timing.
-- **Cache-friendly ECS** — Sparse-set storage, generational entity pool, per-frame bitset change tracking,
+- **Cache-friendly ECS** - Sparse-set storage, generational entity pool, per-frame bitset change tracking,
   zero-allocation ref iterators, multi-type queries (up to 3), `TransformEach`, `ParallelTransformEach`, and raw span
   access.
-- **Behavior source generator** — `[Behavior]` structs with stage attributes (`[OnStartup]` through `[OnCleanup]`),
+- **Behavior source generator** - `[Behavior]` structs with stage attributes (`[OnStartup]` through `[OnCleanup]`),
   component filters (`[With]`, `[Without]`, `[Changed]`), run conditions (`[RunIf]`), and keyboard toggles
   (`[ToggleKey]`).
-- **Deferred commands** — `EcsCommands` queue spawn/despawn/add/remove operations, flushed automatically at
+- **Deferred commands** - `EcsCommands` queue spawn/despawn/add/remove operations, flushed automatically at
   `PostUpdate`.
-- **Typed event system** — `Events<T>` queues with `EventWriter<T>` and `EventReader<T>` for decoupled, type-safe
+- **Typed event system** - `Events<T>` queues with `EventWriter<T>` and `EventReader<T>` for decoupled, type-safe
   inter-system communication.
-- **Plugin model** — `DefaultPlugins` aggregates: `AppWindowPlugin`, `AppExitPlugin`, `ExceptionsPlugin`,
+- **Plugin model** - `DefaultPlugins` aggregates: `AppWindowPlugin`, `AppExitPlugin`, `ExceptionsPlugin`,
   `TimePlugin`, `InputPlugin`, `EcsPlugin`, `BehaviorsPlugin`, `SdlImGuiPlugin`, `SdlRendererPlugin`,
   `VulkanWebViewPlugin`, `VulkanImGuiPlugin`.
-- **Vulkan graphics device** — Instance creation, physical device selection, logical device, swapchain management,
+- **Vulkan graphics device** - Instance creation, physical device selection, logical device, swapchain management,
   pipeline creation, buffer/image allocation (VMA), descriptor sets, and synchronization primitives.
-- **Render pipeline** — Extract → Prepare → Queue → Graph execution model with `RenderWorld`, `RenderGraph`,
+- **Render pipeline** - Extract → Prepare → Queue → Graph execution model with `RenderWorld`, `RenderGraph`,
   `IRenderNode`, `RendererContext`, and `RendererDiagnostics`.
-- **Shader pipeline** — GLSL → SPIR-V compilation via `Vortice.ShaderCompiler`; SPIR-V cross-reflection via
+- **Shader pipeline** - GLSL → SPIR-V compilation via `Vortice.ShaderCompiler`; SPIR-V cross-reflection via
   `Vortice.SpirvCross`.
-- **ImGui overlays** — Performance HUD (FPS, frame time, entity count), schedule debug HUD (batch composition,
+- **ImGui overlays** - Performance HUD (FPS, frame time, entity count), schedule debug HUD (batch composition,
   conflict notes), and WebView debug HUD. Togglable via `[ToggleKey]`.
-- **WebView overlay** — Ultralight-based HTML/CSS/JS rendering composited into the Vulkan pipeline with full SDL3
+- **WebView overlay** - Ultralight-based HTML/CSS/JS rendering composited into the Vulkan pipeline with full SDL3
   input forwarding.
-- **Structured logging** — Multi-provider logging (console with ANSI colors, file output) with category scoping,
+- **Structured logging** - Multi-provider logging (console with ANSI colors, file output) with category scoping,
   severity levels (`Trace` through `Critical`), and frame-level trace suppression.
 
 ### Editor
 
-- **Blazor Server** — In-process ASP.NET Core host serving a Razor component tree over SignalR WebSocket.
-- **Embedded WebView** — Ultralight renders the Blazor UI directly inside the SDL3/Vulkan engine window.
-- **Hot-reloadable shells** — `ShellCompiler` watches `.cs`/`.razor`/`.css` files, recompiles via Roslyn on change,
+- **Blazor Server** - In-process ASP.NET Core host serving a Razor component tree over SignalR WebSocket.
+- **Embedded WebView** - Ultralight renders the Blazor UI directly inside the SDL3/Vulkan engine window.
+- **Hot-reloadable shells** - `ShellCompiler` watches `.cs`/`.razor`/`.css` files, recompiles via Roslyn on change,
   and hot-swaps editor panels without restarting.
-- **Shell registry** — `ShellRegistry` + `ShellDescriptor` system for dynamically discovered editor panels and
+- **Shell registry** - `ShellRegistry` + `ShellDescriptor` system for dynamically discovered editor panels and
   inspectors.
-- **Single process** — Engine and editor run in one process; Blazor Server on a background thread, SDL3/Vulkan on the
+- **Single process** - Engine and editor run in one process; Blazor Server on a background thread, SDL3/Vulkan on the
   main thread.
 
 ## Tech Stack
@@ -290,8 +290,8 @@ public struct Spinner
 ```
 
 1. Add the struct to any project that references `Engine.Entities`.
-2. Build — the source generator emits systems automatically.
-3. Run — the behavior executes per entity each frame. No manual registration needed.
+2. Build - the source generator emits systems automatically.
+3. Run - the behavior executes per entity each frame. No manual registration needed.
 
 ### Plugin-based (manual)
 
@@ -341,9 +341,9 @@ public sealed class GamePlugin : IPlugin
 
 The engine drives a Bevy-like staged loop (see `Engine.Common/Stage.cs`):
 
-- **`Startup`** — runs once before the main loop.
-- **Per-frame stages** — `First` → `PreUpdate` → `Update` → `PostUpdate` → `Render` → `Last`.
-- **`Cleanup`** — runs once after the main loop exits (resource teardown).
+- **`Startup`** - runs once before the main loop.
+- **Per-frame stages** - `First` → `PreUpdate` → `Update` → `PostUpdate` → `Render` → `Last`.
+- **`Cleanup`** - runs once after the main loop exits (resource teardown).
 
 Systems are `SystemFn(World world)` delegates registered to stages via `App.AddSystem(stage, system)` and executed by
 the `Schedule`.
@@ -371,10 +371,10 @@ app.AddSystem(Stage.Update, new SystemDescriptor(MySystem, "Physics.Integrate")
     .RunIf(world => world.Resource<GameState>().IsPlaying));
 ```
 
-- **`Read<T>()`** — declares a read-only dependency. Multiple readers can run in parallel.
-- **`Write<T>()`** — declares a read-write dependency. Writers conflict with all other accessors of the same type.
-- **`RunIf(predicate)`** — conditional execution; the system is skipped when the predicate returns `false`.
-- **`MainThreadOnly()`** — forces the system onto the main thread (required for SDL/GPU calls).
+- **`Read<T>()`** - declares a read-only dependency. Multiple readers can run in parallel.
+- **`Write<T>()`** - declares a read-write dependency. Writers conflict with all other accessors of the same type.
+- **`RunIf(predicate)`** - conditional execution; the system is skipped when the predicate returns `false`.
+- **`MainThreadOnly()`** - forces the system onto the main thread (required for SDL/GPU calls).
 
 Systems without explicit metadata are conservatively serialized. `Startup`, `Render`, and `Cleanup` stages are
 single-threaded by default; all other stages are parallel.
@@ -445,7 +445,7 @@ var res = world.InitResource<MyService>();
 Common resources: `Config`, `EcsWorld`, `EcsCommands`, `AppWindow`, `Time`, `Input`, `Renderer`,
 `ScheduleDiagnostics`, `WebViewInstance`.
 
-**`Time`** — frame timing updated each frame by `TimePlugin`:
+**`Time`** - frame timing updated each frame by `TimePlugin`:
 
 ```csharp
 var time = world.Resource<Time>();
@@ -455,7 +455,7 @@ double fps  = time.SmoothedFps;       // exponentially smoothed FPS
 ulong frame = time.FrameCount;        // total frames since start
 ```
 
-**`Input`** — keyboard, mouse, and text input state updated by `InputPlugin`:
+**`Input`** - keyboard, mouse, and text input state updated by `InputPlugin`:
 
 ```csharp
 var input = world.Resource<Input>();
@@ -563,7 +563,7 @@ ecs.Query<T1, T2, T3>()     // three components
 ecs.QueryWhere<T>(predicate) // filtered by predicate
 ```
 
-**Deferred commands** via `EcsCommands` — mutations queued during iteration, flushed at `PostUpdate`:
+**Deferred commands** via `EcsCommands` - mutations queued during iteration, flushed at `PostUpdate`:
 
 ```csharp
 // Spawn with components (fluent chaining)
@@ -644,7 +644,7 @@ ecs.TransformEach<Mass>((e, m) => m); // mark all changed
 
 ### ECS Internals and File Layout
 
-**Storage model:** Sparse-set layout — sparse index array + dense arrays for entities and components. O(1) add, remove,
+**Storage model:** Sparse-set layout - sparse index array + dense arrays for entities and components. O(1) add, remove,
 and lookup; cache-friendly sequential iteration.
 
 **Partial class split:**
@@ -654,7 +654,7 @@ and lookup; cache-friendly sequential iteration.
 | `EcsWorld.cs` | Type declarations, internal storage, `IComponentStore` interface |
 | `EcsWorld.API.cs` | Public entity/component/query API (`Spawn`, `Add`, `Query`, etc.) |
 | `EcsWorld.Components.cs` | `ComponentStore<T>` implementation, CRUD, spans |
-| `EcsWorld.Pool.cs` | `EntityPool` — generational ID allocator with free list |
+| `EcsWorld.Pool.cs` | `EntityPool` - generational ID allocator with free list |
 | `EcsWorld.SparseSet.cs` | `SparseSet<T>` data structure |
 | `EcsWorld.RefIterators.cs` | `RefEnumerable<T>`, `RefEnumerable<T1,T2>`, transforms |
 
@@ -666,9 +666,9 @@ Author gameplay in a script-like way:
 2. Add methods with **stage attributes**: `[OnStartup]`, `[OnFirst]`, `[OnPreUpdate]`, `[OnUpdate]`,
    `[OnPostUpdate]`, `[OnRender]`, `[OnLast]`, `[OnCleanup]`.
 3. Optionally add **filters** on instance methods:
-   - `[With(typeof(Position), typeof(Velocity))]` — require components.
-   - `[Without(typeof(Disabled))]` — exclude components.
-   - `[Changed(typeof(Transform))]` — run only if changed this frame.
+   - `[With(typeof(Position), typeof(Velocity))]` - require components.
+   - `[Without(typeof(Disabled))]` - exclude components.
+   - `[Changed(typeof(Transform))]` - run only if changed this frame.
 
 **Static vs instance methods:**
 
@@ -753,7 +753,7 @@ public struct HeavyBehavior : IDisposable
 
 ### Run Conditions and Toggle Keys
 
-**`[RunIf]`** — attach a static condition to skip a system when it returns `false`:
+**`[RunIf]`** - attach a static condition to skip a system when it returns `false`:
 
 ```csharp
 [Behavior]
@@ -769,7 +769,7 @@ public struct GameplaySystem
 }
 ```
 
-**`[ToggleKey]`** — bind a keyboard shortcut to toggle a system on/off at runtime:
+**`[ToggleKey]`** - bind a keyboard shortcut to toggle a system on/off at runtime:
 
 ```csharp
 [OnRender]
@@ -808,12 +808,12 @@ registrations under the hood.
 `Engine.Generator` (`BehaviorGenerator`) is a Roslyn incremental source generator that scans for `[Behavior]` structs
 and emits:
 
-- **Per-behavior** `{Name}_Generated.g.cs` — static class with system lambdas for each stage method, including
+- **Per-behavior** `{Name}_Generated.g.cs` - static class with system lambdas for each stage method, including
   query loops, filter checks, and component write-back for instance methods.
-- **`BehaviorsRegistration.g.cs`** — a single registration method marked with `[GeneratedBehaviorRegistration]`,
+- **`BehaviorsRegistration.g.cs`** - a single registration method marked with `[GeneratedBehaviorRegistration]`,
   discovered at runtime by `BehaviorsPlugin` via reflection.
 
-`DefaultPlugins` includes `BehaviorsPlugin`, so behaviors are picked up automatically at build time — no manual
+`DefaultPlugins` includes `BehaviorsPlugin`, so behaviors are picked up automatically at build time - no manual
 registration required.
 
 ### Render Pipeline
@@ -892,7 +892,7 @@ private static readonly ILogger Logger = Log.For<MyPlugin>();
 Logger.Trace("Variable x = 42");
 Logger.Debug("Processing batch of 100 entities.");
 Logger.Info("System initialized.");
-Logger.Warn("Resource missing — using defaults.");
+Logger.Warn("Resource missing - using defaults.");
 Logger.Error("Operation failed.", exception);
 
 // Frame-level trace (auto-suppressed after first few frames, then sampled)
@@ -902,14 +902,14 @@ Logger.FrameTrace($"Frame #{frameCount} begin");
 Severity levels: `Trace` → `Debug` → `Info` → `Warning` → `Error` → `Critical`.
 
 Providers:
-- **Console** — ANSI-colored output with category and severity prefix.
-- **File** — Persistent log written to `Engine.log` in the application directory. Initialized automatically on
+- **Console** - ANSI-colored output with category and severity prefix.
+- **File** - Persistent log written to `Engine.log` in the application directory. Initialized automatically on
   `App` construction via `FileLoggerProvider.Initialize(path)`.
 
 ### FAQ
 
 **Static vs instance behavior methods?**
-Static methods run once per stage invocation — ideal for global logic, UI overlays, or one-shot spawns. Instance methods
+Static methods run once per stage invocation - ideal for global logic, UI overlays, or one-shot spawns. Instance methods
 run per entity that has the behavior component and can read/write fields on `this`.
 
 **Struct lifetimes and disposal?**

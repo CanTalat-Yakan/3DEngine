@@ -74,7 +74,7 @@ public sealed partial class ShellCompiler
                     // so C#-only shells still work even when .razor compilation has issues.
                     var razorErrors = result.Errors.ToList();
                     result.Errors.Clear();
-                    result.Warnings.Add($"Razor build failed ({razorErrors.Count} error(s)) — falling back to C#-only compilation.");
+                    result.Warnings.Add($"Razor build failed ({razorErrors.Count} error(s)) - falling back to C#-only compilation.");
                     foreach (var err in razorErrors)
                         result.Warnings.Add($"  Razor: {err.FileName}({err.Line},{err.Column}): {err.Message}");
 

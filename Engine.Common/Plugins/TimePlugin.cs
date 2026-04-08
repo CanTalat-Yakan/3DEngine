@@ -11,6 +11,21 @@ namespace Engine;
 /// elapsed wall-clock time using <see cref="System.Diagnostics.Stopwatch"/>.
 /// The system clamps large deltas (e.g., debugger pauses) via <see cref="Time.MaxDeltaSeconds"/>.
 /// </remarks>
+/// <example>
+/// <code>
+/// // Access frame timing inside a behavior
+/// [Behavior]
+/// public partial struct TimingDemo
+/// {
+///     [OnUpdate]
+///     public static void Tick(BehaviorContext ctx)
+///     {
+///         float dt = (float)ctx.Time.DeltaSeconds;
+///         Console.WriteLine($"FPS: {ctx.Time.SmoothedFps:F0}, delta: {dt * 1000:F1}ms");
+///     }
+/// }
+/// </code>
+/// </example>
 /// <seealso cref="Time"/>
 /// <seealso cref="Stage.First"/>
 public sealed class TimePlugin : IPlugin
@@ -46,6 +61,29 @@ public sealed class TimePlugin : IPlugin
 /// frame count, and an exponentially smoothed FPS estimate.
 /// </para>
 /// </summary>
+/// <example>
+/// <code>
+/// // Read timing data inside a behavior
+/// [Behavior]
+/// public partial struct FpsOverlay
+/// {
+///     [OnRender]
+///     public static void Draw(BehaviorContext ctx)
+///     {
+///         Console.WriteLine($"Frame {ctx.Time.FrameCount}: {ctx.Time.SmoothedFps:F0} FPS");
+///     }
+/// }
+/// </code>
+/// <code>
+/// // Read timing data inside a raw system
+/// app.AddSystem(Stage.Update, static world =>
+/// {
+///     var time = world.Resource&lt;Time&gt;();
+///     float dt = (float)time.DeltaSeconds;
+///     Console.WriteLine($"Frame {time.FrameCount}: {time.SmoothedFps:F0} FPS, delta {dt * 1000:F1}ms");
+/// });
+/// </code>
+/// </example>
 public sealed class Time
 {
     /// <summary>

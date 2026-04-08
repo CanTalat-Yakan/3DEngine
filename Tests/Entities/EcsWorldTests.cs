@@ -286,7 +286,7 @@ public class EcsWorldTests
         for (int i = 0; i < span.Entities.Length; i++)
             span.Components[i].A *= 2;
 
-        // Direct span mutation does not auto mark changed — explicit mark needed
+        // Direct span mutation does not auto mark changed - explicit mark needed
         ecs.TransformEach<TestComp>((_, c) => c);
 
         ecs.Changed<TestComp>(e1).Should().BeTrue();

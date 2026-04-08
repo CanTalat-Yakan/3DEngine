@@ -10,6 +10,27 @@ namespace Engine;
 /// Systems that iterate over entities set <see cref="EntityId"/> for each entity before
 /// calling the behavior method.
 /// </remarks>
+/// <example>
+/// <code>
+/// [Behavior]
+/// public partial struct PlayerMovement
+/// {
+///     [OnUpdate]
+///     public static void Move(BehaviorContext ctx)
+///     {
+///         float dt = (float)ctx.Time.DeltaSeconds;
+///         var ecs = ctx.Ecs;
+///
+///         foreach (var (e, pos, vel) in ecs.Query&lt;Position, Velocity&gt;())
+///             ecs.Update(e, new Position(pos.X + vel.X * dt, pos.Y + vel.Y * dt));
+///
+///         // Deferred spawn via commands (applied in PostUpdate)
+///         if (ctx.Input.KeyPressed(Key.Space))
+///             ctx.Cmd.Spawn((id, w) => w.Add(id, new Projectile()));
+///     }
+/// }
+/// </code>
+/// </example>
 /// <seealso cref="BehaviorAttribute"/>
 /// <seealso cref="EcsWorld"/>
 /// <seealso cref="EcsCommands"/>

@@ -6,7 +6,7 @@ namespace Engine.Tests.Common;
 [Trait("Category", "Unit")]
 public class TimeTests
 {
-    // Time.Update is internal — Engine.Common has [InternalsVisibleTo("Engine.Tests")]
+    // Time.Update is internal - Engine.Common has [InternalsVisibleTo("Engine.Tests")]
 
     [Fact]
     public void Update_Increments_FrameCount()

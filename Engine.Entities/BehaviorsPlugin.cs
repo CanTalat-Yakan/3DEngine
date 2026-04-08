@@ -6,6 +6,17 @@ namespace Engine;
 /// <see cref="GeneratedBehaviorRegistrationAttribute"/>. Each discovered method is invoked with the
 /// <see cref="App"/> instance, allowing generated code to register systems, conditions, and resources.
 /// </remarks>
+/// <example>
+/// <code>
+/// // Any [Behavior] struct in loaded assemblies is auto-discovered and registered:
+/// [Behavior]
+/// public partial struct EnemyAI
+/// {
+///     [OnUpdate]
+///     public static void Think(BehaviorContext ctx) { /* ... */ }
+/// }
+/// </code>
+/// </example>
 /// <seealso cref="BehaviorAttribute"/>
 /// <seealso cref="GeneratedBehaviorRegistrationAttribute"/>
 /// <seealso cref="EcsPlugin"/>

@@ -108,6 +108,12 @@ public sealed class Events<T>
 
 /// <summary>Write-only handle for sending events of type <typeparamref name="T"/>.</summary>
 /// <typeparam name="T">The event payload type.</typeparam>
+/// <example>
+/// <code>
+/// var writer = EventWriter&lt;DamageEvent&gt;.Get(world);
+/// writer.Send(new DamageEvent(target, 25));
+/// </code>
+/// </example>
 /// <seealso cref="EventReader{T}"/>
 /// <seealso cref="Events{T}"/>
 public readonly ref struct EventWriter<T>
@@ -134,6 +140,13 @@ public readonly ref struct EventWriter<T>
 
 /// <summary>Read-only handle for consuming events of type <typeparamref name="T"/>.</summary>
 /// <typeparam name="T">The event payload type.</typeparam>
+/// <example>
+/// <code>
+/// var reader = EventReader&lt;DamageEvent&gt;.Get(world);
+/// foreach (var evt in reader.Read())
+///     ApplyDamage(evt.Target, evt.Amount);
+/// </code>
+/// </example>
 /// <seealso cref="EventWriter{T}"/>
 /// <seealso cref="Events{T}"/>
 public readonly ref struct EventReader<T>
@@ -165,6 +178,19 @@ public readonly ref struct EventReader<T>
 }
 
 /// <summary>Convenience extensions for firing and reading events directly on <see cref="World"/>.</summary>
+/// <example>
+/// <code>
+/// // Send directly on World
+/// world.SendEvent(new DamageEvent(target, 50));
+///
+/// // Read directly on World
+/// foreach (var evt in world.ReadEvents&lt;DamageEvent&gt;())
+///     ApplyDamage(evt);
+///
+/// // Drain (read + clear) at end of frame
+/// var events = world.DrainEvents&lt;DamageEvent&gt;();
+/// </code>
+/// </example>
 /// <seealso cref="Events{T}"/>
 public static class WorldEventExtensions
 {

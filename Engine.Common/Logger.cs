@@ -304,6 +304,24 @@ public sealed class FileLoggerProvider : ILoggerProvider, IDisposable
 /// <summary>
 /// Static entry point for creating category-scoped loggers.
 /// </summary>
+/// <example>
+/// <code>
+/// // Create a category logger (cached on subsequent calls)
+/// private static readonly ILogger Logger = Log.Category("Game.Physics");
+///
+/// // Or derive the category from a type name
+/// private static readonly ILogger Logger = Log.For&lt;PhysicsSystem&gt;();
+///
+/// // Use severity helpers
+/// Logger.Info("Simulation started");
+/// Logger.Warn("Gravity is zero - objects will float");
+/// Logger.Error("Collision solver diverged", ex);
+///
+/// // Tune output levels
+/// LogConfig.ConsoleMinimumLevel = LogLevel.Warning;  // quieter console
+/// LogConfig.PerFrameLogging = true;                  // enable per-frame trace
+/// </code>
+/// </example>
 /// <seealso cref="Logger"/>
 /// <seealso cref="LoggerFactory"/>
 public static class Log

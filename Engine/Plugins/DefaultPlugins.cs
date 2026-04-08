@@ -7,6 +7,14 @@ namespace Engine;
 /// Also registers a <see cref="Stage.First"/> system that calls <see cref="EcsWorld.BeginFrame"/>
 /// to advance the frame tick and clear per-frame change tracking.
 /// </remarks>
+/// <example>
+/// <code>
+/// var app = new App(Config.GetDefault(title: "My Game", width: 1280, height: 720));
+/// app.AddPlugin(new DefaultPlugins());        // window, input, ECS, renderer, ...
+/// app.AddSystem(Stage.Update, MyGameSystem);  // add your own systems
+/// app.Run();
+/// </code>
+/// </example>
 /// <seealso cref="App"/>
 /// <seealso cref="IPlugin"/>
 public sealed class DefaultPlugins : IPlugin

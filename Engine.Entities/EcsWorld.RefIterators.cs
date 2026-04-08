@@ -4,6 +4,15 @@ public sealed partial class EcsWorld
 {
     /// <summary>Zero-allocation ref wrapper for a single component, providing direct mutable access.</summary>
     /// <typeparam name="T">The component type.</typeparam>
+    /// <example>
+    /// <code>
+    /// foreach (var rc in ecs.IterateRef&lt;Position&gt;())
+    /// {
+    ///     int entity = rc.Entity;
+    ///     rc.Component.X += 1.0f; // direct mutation by ref
+    /// }
+    /// </code>
+    /// </example>
     public readonly ref struct RefComponent<T>
     {
         /// <summary>The entity ID owning this component.</summary>
@@ -30,6 +39,13 @@ public sealed partial class EcsWorld
     /// Returned by <see cref="EcsWorld.IterateRef{T}"/>.
     /// </summary>
     /// <typeparam name="T">The component type.</typeparam>
+    /// <example>
+    /// <code>
+    /// // Heal all entities with a Health component
+    /// foreach (var rc in ecs.IterateRef&lt;Health&gt;())
+    ///     rc.Component.Current = Math.Min(rc.Component.Current + 1, rc.Component.Max);
+    /// </code>
+    /// </example>
     public readonly ref struct RefEnumerable<T>
     {
         private readonly ReadOnlySpan<int> _entities;
@@ -106,6 +122,16 @@ public sealed partial class EcsWorld
     /// <summary>Zero-allocation ref wrapper for a pair of components on the same entity.</summary>
     /// <typeparam name="T1">The first component type.</typeparam>
     /// <typeparam name="T2">The second component type.</typeparam>
+    /// <example>
+    /// <code>
+    /// foreach (var pair in ecs.IterateRef&lt;Position, Velocity&gt;())
+    /// {
+    ///     ref var pos = ref pair.C1;
+    ///     ref var vel = ref pair.C2;
+    ///     pos.X += vel.X * dt;
+    /// }
+    /// </code>
+    /// </example>
     public readonly ref struct RefComponents<T1, T2>
     {
         /// <summary>The entity ID owning these components.</summary>
@@ -140,6 +166,18 @@ public sealed partial class EcsWorld
     /// </summary>
     /// <typeparam name="T1">The first component type.</typeparam>
     /// <typeparam name="T2">The second component type.</typeparam>
+    /// <example>
+    /// <code>
+    /// // Apply drag to all entities with Position and Velocity
+    /// foreach (var pair in ecs.IterateRef&lt;Position, Velocity&gt;())
+    /// {
+    ///     pair.C2.X *= 0.99f;
+    ///     pair.C2.Y *= 0.99f;
+    ///     pair.C1.X += pair.C2.X * dt;
+    ///     pair.C1.Y += pair.C2.Y * dt;
+    /// }
+    /// </code>
+    /// </example>
     public readonly ref struct RefEnumerable<T1, T2>
     {
         private readonly ComponentStore<T1>? _a;

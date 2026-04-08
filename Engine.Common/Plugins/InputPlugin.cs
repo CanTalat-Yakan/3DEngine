@@ -52,6 +52,45 @@ public sealed class InputPlugin : IPlugin
 /// - only platform backends should call them.
 /// </para>
 /// </summary>
+/// <example>
+/// <code>
+/// // Read input inside a behavior
+/// [Behavior]
+/// public partial struct PlayerController
+/// {
+///     [OnUpdate]
+///     public static void HandleInput(BehaviorContext ctx)
+///     {
+///         if (ctx.Input.KeyPressed(Key.Space))
+///             Console.WriteLine("Jump!");
+///         if (ctx.Input.KeyDown(Key.W))
+///             MoveForward();
+///         if (ctx.Input.MousePressed(MouseButton.Left))
+///             Shoot(ctx.Input.MouseX, ctx.Input.MouseY);
+///
+///         var (dx, dy) = ctx.Input.MouseDelta;
+///         RotateCamera(dx, dy);
+///     }
+/// }
+/// </code>
+/// <code>
+/// // Read input inside a raw system
+/// app.AddSystem(Stage.Update, static world =>
+/// {
+///     var input = world.Resource&lt;Input&gt;();
+///
+///     if (input.KeyPressed(Key.Space))
+///         Console.WriteLine("Jump!");
+///     if (input.KeyDown(Key.W))
+///         MoveForward();
+///     if (input.MousePressed(MouseButton.Left))
+///         Shoot(input.MouseX, input.MouseY);
+///
+///     var (dx, dy) = input.MouseDelta;
+///     RotateCamera(dx, dy);
+/// });
+/// </code>
+/// </example>
 public sealed class Input
 {
     private readonly HashSet<Key> _keysDown = [];

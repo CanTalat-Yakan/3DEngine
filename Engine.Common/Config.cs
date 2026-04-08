@@ -4,6 +4,23 @@ namespace Engine;
 /// Immutable application configuration: window properties, startup command, and graphics backend.
 /// Use <c>with</c> expressions or the fluent <c>With*</c> methods to derive variants.
 /// </summary>
+/// <example>
+/// <code>
+/// // Use the canonical defaults
+/// var app = new App(Config.Default);
+/// </code>
+/// <code>
+/// // Customise with named parameters
+/// var cfg = Config.GetDefault(title: "My Game", width: 1920, height: 1080);
+/// </code>
+/// <code>
+/// // Derive a variant with fluent methods
+/// var headless = Config.Default
+///     .WithWindow("Headless", 1, 1)
+///     .WithCommand(WindowCommand.Hide)
+///     .WithGraphics(GraphicsBackend.Sdl);
+/// </code>
+/// </example>
 public sealed record Config
 {
     /// <summary>

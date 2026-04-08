@@ -8,6 +8,12 @@ public sealed partial class EcsWorld
 
     /// <summary>Spawns a new entity and returns its integer ID.</summary>
     /// <returns>The newly allocated entity ID.</returns>
+    /// <example>
+    /// <code>
+    /// int entity = ecs.Spawn();
+    /// ecs.Add(entity, new Position { X = 10, Y = 20 });
+    /// </code>
+    /// </example>
     public int Spawn() => _entities.Spawn();
 
     /// <summary>Returns the current generation for an entity ID (0 if never allocated).</summary>
@@ -122,6 +128,12 @@ public sealed partial class EcsWorld
     /// <param name="entity">The entity ID.</param>
     /// <param name="component">When returning <c>true</c>, contains the component value; otherwise <c>default</c>.</param>
     /// <returns><c>true</c> if the component was found; otherwise <c>false</c>.</returns>
+    /// <example>
+    /// <code>
+    /// if (ecs.TryGet&lt;Health&gt;(entity, out var hp))
+    ///     Console.WriteLine($"HP: {hp.Current}/{hp.Max}");
+    /// </code>
+    /// </example>
     public bool TryGet<T>(int entity, out T? component)
     {
         var store = GetStore<T>(create: false);
@@ -151,6 +163,13 @@ public sealed partial class EcsWorld
     /// <summary>Applies a transform function to every component of type <typeparamref name="T"/>, marking each as changed.</summary>
     /// <typeparam name="T">The component type.</typeparam>
     /// <param name="transform">A function receiving the entity ID and current value, returning the new value.</param>
+    /// <example>
+    /// <code>
+    /// // Apply gravity to all velocities
+    /// ecs.TransformEach&lt;Velocity&gt;((entity, vel) =>
+    ///     vel with { Y = vel.Y - 9.81f * dt });
+    /// </code>
+    /// </example>
     public void TransformEach<T>(Func<int, T, T> transform)
     {
         var store = GetStore<T>(create: false);
@@ -185,6 +204,13 @@ public sealed partial class EcsWorld
     /// <summary>Returns a zero-allocation ref-enumerable over components of type <typeparamref name="T"/>.</summary>
     /// <typeparam name="T">The component type.</typeparam>
     /// <returns>A <see cref="RefEnumerable{T}"/> for <c>foreach</c>-based ref iteration.</returns>
+    /// <example>
+    /// <code>
+    /// // Mutate positions in-place with zero allocation
+    /// foreach (var rc in ecs.IterateRef&lt;Position&gt;())
+    ///     rc.Component.X += velocity * dt;
+    /// </code>
+    /// </example>
     public RefEnumerable<T> IterateRef<T>()
     {
         var store = GetStore<T>(create: false);
@@ -196,6 +222,18 @@ public sealed partial class EcsWorld
     /// <typeparam name="T1">The first component type.</typeparam>
     /// <typeparam name="T2">The second component type.</typeparam>
     /// <returns>A <see cref="RefEnumerable{T1,T2}"/> for <c>foreach</c>-based ref iteration.</returns>
+    /// <example>
+    /// <code>
+    /// // Integrate velocity into position, both mutated by ref
+    /// foreach (var pair in ecs.IterateRef&lt;Position, Velocity&gt;())
+    /// {
+    ///     ref var pos = ref pair.C1;
+    ///     ref var vel = ref pair.C2;
+    ///     pos.X += vel.X * dt;
+    ///     pos.Y += vel.Y * dt;
+    /// }
+    /// </code>
+    /// </example>
     public RefEnumerable<T1, T2> IterateRef<T1, T2>()
     {
         var s1 = GetStore<T1>(create: false);
@@ -217,6 +255,12 @@ public sealed partial class EcsWorld
     /// <summary>Enumerates all (entity, component) pairs of type <typeparamref name="T"/>.</summary>
     /// <typeparam name="T">The component type.</typeparam>
     /// <returns>An enumerable of (entity ID, component value) tuples.</returns>
+    /// <example>
+    /// <code>
+    /// foreach (var (entity, pos) in ecs.Query&lt;Position&gt;())
+    ///     Console.WriteLine($"Entity {entity} at ({pos.X}, {pos.Y})");
+    /// </code>
+    /// </example>
     public IEnumerable<(int Entity, T Component)> Query<T>()
     {
         var store = GetStore<T>(create: false);
@@ -229,6 +273,12 @@ public sealed partial class EcsWorld
     /// <typeparam name="T1">The first component type.</typeparam>
     /// <typeparam name="T2">The second component type.</typeparam>
     /// <returns>An enumerable of (entity ID, C1, C2) tuples.</returns>
+    /// <example>
+    /// <code>
+    /// foreach (var (entity, pos, vel) in ecs.Query&lt;Position, Velocity&gt;())
+    ///     ecs.Update(entity, new Position(pos.X + vel.X * dt, pos.Y + vel.Y * dt));
+    /// </code>
+    /// </example>
     public IEnumerable<(int Entity, T1 C1, T2 C2)> Query<T1, T2>()
     {
         var s1 = GetStore<T1>(create: false);

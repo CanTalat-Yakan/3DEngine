@@ -6,6 +6,38 @@ namespace Engine;
 /// registers a <see cref="Stage.PostUpdate"/> system that calls <see cref="EcsCommands.Apply"/>
 /// to flush deferred spawn/despawn/add/remove operations in FIFO order.
 /// </remarks>
+/// <example>
+/// <code>
+/// // Spawn entities and add components via deferred commands
+/// [Behavior]
+/// public partial struct Spawner
+/// {
+///     [OnStartup]
+///     public static void Init(BehaviorContext ctx)
+///     {
+///         ctx.Cmd.Spawn((id, ecs) =>
+///         {
+///             ecs.Add(id, new Position { X = 0, Y = 0 });
+///             ecs.Add(id, new Health { Current = 100, Max = 100 });
+///         });
+///     }
+/// }
+/// </code>
+/// <code>
+/// // Query and iterate entities in a system
+/// [Behavior]
+/// public partial struct MovementSystem
+/// {
+///     [OnUpdate]
+///     public static void Move(BehaviorContext ctx)
+///     {
+///         float dt = (float)ctx.Time.DeltaSeconds;
+///         foreach (var rc in ctx.Ecs.IterateRef&lt;Position&gt;())
+///             rc.Component.X += 10f * dt;
+///     }
+/// }
+/// </code>
+/// </example>
 /// <seealso cref="EcsWorld"/>
 /// <seealso cref="EcsCommands"/>
 /// <seealso cref="BehaviorsPlugin"/>

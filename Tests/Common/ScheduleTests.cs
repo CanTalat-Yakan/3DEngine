@@ -240,7 +240,7 @@ public class ScheduleTests
         schedule.AddSystem(Stage.Update, _ => throw new InvalidOperationException("boom"));
         schedule.AddSystem(Stage.Update, _ => afterFault++);
 
-        // Should not throw — exceptions are isolated
+        // Should not throw - exceptions are isolated
         var act = () => schedule.RunStage(Stage.Update, world);
         act.Should().NotThrow();
 

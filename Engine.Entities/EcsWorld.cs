@@ -21,6 +21,24 @@ namespace Engine;
 /// </list>
 /// </para>
 /// </remarks>
+/// <example>
+/// <code>
+/// var ecs = new EcsWorld();
+///
+/// // Spawn entities and attach components
+/// int player = ecs.Spawn();
+/// ecs.Add(player, new Position { X = 0, Y = 0 });
+/// ecs.Add(player, new Health { Current = 100, Max = 100 });
+///
+/// // Query entities by component type
+/// foreach (var (entity, pos, hp) in ecs.Query&lt;Position, Health&gt;())
+///     Console.WriteLine($"Entity {entity} at ({pos.X},{pos.Y}) HP={hp.Current}");
+///
+/// // Zero-allocation ref iteration
+/// foreach (var rc in ecs.IterateRef&lt;Position&gt;())
+///     rc.Component.X += 1.0f;
+/// </code>
+/// </example>
 /// <seealso cref="EcsCommands"/>
 /// <seealso cref="EcsPlugin"/>
 /// <seealso cref="BehaviorContext"/>

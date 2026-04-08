@@ -209,7 +209,7 @@ public class WorldTests : IDisposable
         _world.InsertResource(new ThrowingDisposable());
         _world.InsertResource("safe");
 
-        // Should not throw — exceptions are swallowed
+        // Should not throw - exceptions are swallowed
         var act = () => _world.Clear();
         act.Should().NotThrow();
 
