@@ -967,7 +967,7 @@ Items are aspirational and subject to change as the project evolves.
 ## Community
 
 <p align="center" style="text-align:center">
-  <a href="https://discord.gg/c3UtTVNbRb"><img src="https://discord.com/api/guilds/1288979341006475345/widget.png?style=banner2" alt="Discord Banner"/></a>
+  <a href="https://discord.gg/c3UtTVNbRb"><img src="https://discord.com/api/guilds/1288979341006475345/widget.png?style=banner4" alt="Discord Banner"/></a>
 </p>
 
 ## Contributing
