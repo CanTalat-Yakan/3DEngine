@@ -33,8 +33,10 @@ public sealed class CameraExtract : IExtractSystem
 
             Transform t = default;
             ecs.TryGet(entity, out t);
-            var view = Matrix4x4.CreateFromQuaternion(Quaternion.Inverse(t.Rotation)) * Matrix4x4.CreateTranslation(-t.Position);
+            var view = Matrix4x4.CreateTranslation(-t.Position) * Matrix4x4.CreateFromQuaternion(Quaternion.Inverse(t.Rotation));
             var proj = Matrix4x4.CreatePerspectiveFieldOfView(cam.FovY, aspect, cam.Near, cam.Far);
+            // Flip Y for Vulkan NDC (Y points downward), preserving CCW front-face winding.
+            proj.M22 = -proj.M22;
 
             // Spawn render entity with ExtractedView component
             int renderEntity = renderWorld.Spawn();
