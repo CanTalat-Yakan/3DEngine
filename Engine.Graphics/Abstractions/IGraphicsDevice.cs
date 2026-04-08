@@ -201,6 +201,26 @@ public interface IGraphicsDevice : IDisposable
     /// <param name="bytesPerPixel">Bytes per pixel (e.g., 4 for RGBA8).</param>
     void UploadTexture2D(IImage image, ReadOnlySpan<byte> data, uint width, uint height, int bytesPerPixel);
 
+    /// <summary>
+    /// Records texture upload commands into an existing command buffer without a GPU stall.
+    /// The staging buffer is kept alive until <see cref="FlushDeferredStagingBuffers"/> is called
+    /// (typically after the frame's fence signals completion).
+    /// </summary>
+    /// <param name="commandBuffer">The command buffer to record upload commands into (must be outside a render pass).</param>
+    /// <param name="image">The destination image.</param>
+    /// <param name="data">Raw pixel data.</param>
+    /// <param name="width">Texture width in pixels.</param>
+    /// <param name="height">Texture height in pixels.</param>
+    /// <param name="bytesPerPixel">Bytes per pixel (e.g., 4 for RGBA8).</param>
+    void UploadTexture2DDeferred(ICommandBuffer commandBuffer, IImage image, ReadOnlySpan<byte> data, uint width, uint height, int bytesPerPixel);
+
+    /// <summary>
+    /// Disposes all staging buffers from deferred texture uploads for the given in-flight frame slot.
+    /// Called after the slot's fence has been waited on, guaranteeing the GPU has finished reading.
+    /// </summary>
+    /// <param name="inFlightIndex">The in-flight frame slot index (0 .. <see cref="FramesInFlight"/>-1).</param>
+    void FlushDeferredStagingBuffers(int inFlightIndex);
+
     // ── Offscreen Rendering ──────────────────────────────────────────────
 
     /// <summary>Creates an offscreen render pass with a single color attachment.</summary>

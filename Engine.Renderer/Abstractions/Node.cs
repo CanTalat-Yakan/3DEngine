@@ -26,12 +26,12 @@ public interface INode
 }
 
 /// <summary>
-/// Convenience base that auto-iterates <see cref="RenderCameras"/>, calling
-/// <see cref="Run(RenderGraphContext, RenderContext, RenderCamera, RenderWorld)"/> per camera.
-/// Matches Bevy's ViewNode pattern using <see cref="RenderCameras"/> as the view query type.
+/// Convenience base that auto-iterates <see cref="ExtractedView"/> render entities, calling
+/// <see cref="Run(RenderGraphContext, RenderContext, ExtractedView, RenderWorld)"/> per camera.
+/// Matches Bevy's ViewNode pattern using <see cref="ExtractedView"/> as the view query type.
 /// </summary>
 /// <seealso cref="INode"/>
-/// <seealso cref="RenderCameras"/>
+/// <seealso cref="ExtractedView"/>
 public abstract class ViewNode : INode
 {
     /// <inheritdoc />
@@ -43,21 +43,18 @@ public abstract class ViewNode : INode
     /// <inheritdoc />
     public virtual void Update(RenderWorld renderWorld) { }
 
-    /// <summary>Iterates all cameras and calls the per-camera Run overload.</summary>
+    /// <summary>Iterates all extracted view entities and calls the per-camera Run overload.</summary>
     public void Run(RenderGraphContext graphContext, RenderContext renderContext, RenderWorld renderWorld)
     {
-        var cameras = renderWorld.TryGet<RenderCameras>();
-        if (cameras is null) return;
-
-        foreach (var camera in cameras.Items)
-            Run(graphContext, renderContext, camera, renderWorld);
+        foreach (var (_, view) in renderWorld.Entities.Query<ExtractedView>())
+            Run(graphContext, renderContext, view, renderWorld);
     }
 
     /// <summary>Executes rendering logic for a single camera view.</summary>
     /// <param name="graphContext">Context for accessing slot values and running sub-graphs.</param>
     /// <param name="renderContext">Context wrapping the graphics device and command buffer.</param>
-    /// <param name="camera">The camera to render from.</param>
+    /// <param name="view">The extracted camera view to render from.</param>
     /// <param name="renderWorld">The render world containing render resources.</param>
-    protected abstract void Run(RenderGraphContext graphContext, RenderContext renderContext, RenderCamera camera, RenderWorld renderWorld);
+    protected abstract void Run(RenderGraphContext graphContext, RenderContext renderContext, ExtractedView view, RenderWorld renderWorld);
 }
 

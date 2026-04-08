@@ -1,22 +1,24 @@
 namespace Engine;
 
 /// <summary>
-/// Prepare system that ensures GPU vertex buffers exist for all mesh entities
-/// in the current frame's <see cref="ExtractedMeshData"/>.
-/// Uses <see cref="MeshGpuRegistry"/> to cache buffers across frames.
+/// Prepare system that ensures GPU vertex buffers exist for all render entities
+/// with <see cref="RenderMeshInstance"/> components.
+/// Uses <see cref="MeshGpuRegistry"/> to cache buffers across frames, keyed by the
+/// source game-world entity ID.
 /// </summary>
-/// <seealso cref="ExtractedMeshData"/>
+/// <remarks>
+/// Bevy equivalent: <c>prepare_meshes</c> system querying <c>RenderMeshInstance</c> entities.
+/// </remarks>
+/// <seealso cref="RenderMeshInstance"/>
 /// <seealso cref="MeshGpuRegistry"/>
 /// <seealso cref="MainPassNode"/>
 public sealed class MeshPrepare : IPrepareSystem
 {
     /// <inheritdoc />
-    /// <param name="renderWorld">The render world containing <see cref="ExtractedMeshData"/>.</param>
-    /// <param name="renderContext">Render context providing GPU device access.</param>
     public void Run(RenderWorld renderWorld, RenderContext renderContext)
     {
-        var extracted = renderWorld.TryGet<ExtractedMeshData>();
-        if (extracted is null || extracted.Entries.Count == 0)
+        var ecs = renderWorld.Entities;
+        if (ecs.Count<RenderMeshInstance>() == 0)
             return;
 
         var registry = renderWorld.TryGet<MeshGpuRegistry>();
@@ -28,10 +30,10 @@ public sealed class MeshPrepare : IPrepareSystem
 
         var gfx = renderContext.Device;
 
-        foreach (var entry in extracted.Entries)
+        foreach (var (entity, mesh) in ecs.Query<RenderMeshInstance>())
         {
             // GetOrCreate checks if a buffer already exists; creates and uploads only if missing.
-            registry.GetOrCreate(entry.EntityId, entry.MeshData, gfx);
+            registry.GetOrCreate(mesh.MainEntityId, mesh.MeshData, gfx);
         }
     }
 }

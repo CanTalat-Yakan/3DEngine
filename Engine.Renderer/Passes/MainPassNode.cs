@@ -4,7 +4,8 @@ namespace Engine;
 
 /// <summary>
 /// Main render graph node that begins the swapchain render pass with <see cref="LoadOp.Clear"/>,
-/// sets up the camera UBO, and draws all extracted mesh entities.
+/// sets up the camera UBO, and drains <see cref="Opaque3dPhase"/> and <see cref="Transparent3dPhase"/>
+/// via their draw functions.
 /// The render pass is left OPEN and published as <see cref="ActiveSwapchainPass"/> in the
 /// <see cref="RenderWorld"/> so downstream overlay nodes (webview, imgui) can draw into the
 /// same pass without the overhead of separate begin/end cycles.
@@ -13,10 +14,14 @@ namespace Engine;
 /// <seealso cref="ActiveSwapchainPass"/>
 /// <seealso cref="MeshPipeline"/>
 /// <seealso cref="CameraExtract"/>
+/// <seealso cref="Opaque3dPhase"/>
+/// <seealso cref="Transparent3dPhase"/>
 public sealed class MainPassNode : INode, IDisposable
 {
     private IDescriptorSet? _cameraSet;
     private MeshPipeline? _meshPipeline;
+    private DrawMeshOpaque? _drawOpaque;
+    private DrawMeshTransparent? _drawTransparent;
 
     /// <inheritdoc />
     public void Run(RenderGraphContext graphContext, RenderContext renderContext, RenderWorld renderWorld)
@@ -48,11 +53,18 @@ public sealed class MainPassNode : INode, IDisposable
         renderWorld.Set(new ActiveSwapchainPass(pass, extent));
 
         // ── Camera-dependent drawing ────────────────────────────────────
-        var cameras = renderWorld.TryGet<RenderCameras>();
-        if (cameras is null || cameras.Items.Count == 0)
+        // Query the first ExtractedView render entity (Bevy: query extracted cameras)
+        ExtractedView? firstView = null;
+        foreach (var (_, view) in renderWorld.Entities.Query<ExtractedView>())
+        {
+            firstView = view;
+            break;
+        }
+
+        if (firstView is null)
             return; // Clear was already issued; overlay nodes will still draw
 
-        var camera = cameras.Items[0];
+        var camera = firstView.Value;
 
         // ── Prepare: camera UBO ─────────────────────────────────────────
         var allocator = renderContext.DynamicAllocator;
@@ -79,41 +91,44 @@ public sealed class MainPassNode : INode, IDisposable
 
         if (_cameraSet is null) return;
 
-        // ── Mesh draw ───────────────────────────────────────────────────
-        var extracted = renderWorld.TryGet<ExtractedMeshData>();
-        if (extracted is null || extracted.Entries.Count == 0)
-            return;
-
-        var registry = renderWorld.TryGet<MeshGpuRegistry>();
-        if (registry is null)
-            return;
-
+        // ── Ensure pipeline and draw functions ───────────────────────────
         if (_meshPipeline is null)
         {
             MeshShaders.EnsureLoaded();
+            var cache = renderWorld.TryGet<PipelineCache>();
             _meshPipeline = new MeshPipeline(gfx, swapchainTarget.RenderPass,
-                MeshShaders.Vertex, MeshShaders.Fragment);
+                MeshShaders.Vertex, MeshShaders.Fragment, cache);
+            _drawOpaque = new DrawMeshOpaque(_meshPipeline.Pipeline);
+            _drawTransparent = new DrawMeshTransparent(_meshPipeline.Pipeline);
         }
 
         pass.SetPipeline(_meshPipeline.Pipeline);
         pass.SetBindGroup(_meshPipeline.Pipeline, _cameraSet);
 
-        foreach (var entry in extracted.Entries)
+        // ── Drain opaque phase (front-to-back) ──────────────────────────
+        var opaquePhase = renderWorld.TryGet<Opaque3dPhase>();
+        if (opaquePhase is not null)
         {
-            if (!registry.TryGet(entry.EntityId, out var vertexBuffer))
-                continue;
-
-            var pushConstants = new MeshPushConstants
+            var items = opaquePhase.Phase.Items;
+            for (int i = 0; i < items.Count; i++)
             {
-                Model = entry.ModelMatrix,
-                Albedo = entry.Albedo
-            };
+                var item = items[i];
+                var drawFn = item.DrawFunction ?? _drawOpaque!;
+                drawFn.Draw(ref item, pass, renderWorld);
+            }
+        }
 
-            pass.PushConstants(_meshPipeline.Pipeline, ShaderStageFlags.All,
-                0, MemoryMarshal.AsBytes(new ReadOnlySpan<MeshPushConstants>(in pushConstants)));
-
-            pass.SetVertexBuffer(0, new[] { vertexBuffer }, new ulong[] { 0 });
-            pass.Draw((uint)entry.VertexCount);
+        // ── Drain transparent phase (back-to-front) ─────────────────────
+        var transparentPhase = renderWorld.TryGet<Transparent3dPhase>();
+        if (transparentPhase is not null)
+        {
+            var items = transparentPhase.Phase.Items;
+            for (int i = 0; i < items.Count; i++)
+            {
+                var item = items[i];
+                var drawFn = item.DrawFunction ?? _drawTransparent!;
+                drawFn.Draw(ref item, pass, renderWorld);
+            }
         }
     }
 

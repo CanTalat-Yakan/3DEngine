@@ -418,6 +418,77 @@ public sealed unsafe partial class GraphicsDevice
         UploadTexture2D(image, bytes, width, height, bpp);
     }
 
+    /// <inheritdoc />
+    public void UploadTexture2DDeferred(ICommandBuffer commandBuffer, IImage image, ReadOnlySpan<byte> data, uint width, uint height, int bytesPerPixel)
+    {
+        if (image is not VulkanImage vkImage)
+            throw new ArgumentException("Image was not created by this device.", nameof(image));
+        if (commandBuffer is not VulkanCommandBuffer vkCmd)
+            throw new ArgumentException("Command buffer was not created by this device.", nameof(commandBuffer));
+        if (data.Length == 0) return;
+
+        ulong expectedSize = (ulong)width * height * (ulong)bytesPerPixel;
+        if ((ulong)data.Length < expectedSize)
+            throw new ArgumentException("Provided data is smaller than the expected image size.", nameof(data));
+
+        // Create staging buffer (will be kept alive until frame fence signals)
+        var stagingDesc = new BufferDesc(expectedSize, BufferUsage.TransferSrc, CpuAccessMode.Write);
+        var staging = (VulkanBuffer)CreateBuffer(stagingDesc);
+
+        var stagingSpan = Map(staging);
+        data.Slice(0, (int)expectedSize).CopyTo(stagingSpan);
+        Unmap(staging);
+
+        var cmd = vkCmd.Handle;
+
+        // Transition image to transfer dst
+        VkImageMemoryBarrier barrierToDst = new()
+        {
+            oldLayout = vkImage.Layout,
+            newLayout = VkImageLayout.TransferDstOptimal,
+            srcQueueFamilyIndex = Vulkan.VK_QUEUE_FAMILY_IGNORED,
+            dstQueueFamilyIndex = Vulkan.VK_QUEUE_FAMILY_IGNORED,
+            image = vkImage.Image,
+            subresourceRange = new VkImageSubresourceRange(VkImageAspectFlags.Color, 0, 1, 0, 1)
+        };
+
+        _deviceApi.vkCmdPipelineBarrier(cmd, VkPipelineStageFlags.TopOfPipe, VkPipelineStageFlags.Transfer,
+            0, 0, null, 0, null, 1, &barrierToDst);
+
+        // Copy buffer to image
+        VkBufferImageCopy region = new()
+        {
+            bufferOffset = 0,
+            bufferRowLength = 0,
+            bufferImageHeight = 0,
+            imageSubresource = new VkImageSubresourceLayers(VkImageAspectFlags.Color, 0, 0, 1),
+            imageOffset = new VkOffset3D(0, 0, 0),
+            imageExtent = new VkExtent3D(width, height, 1)
+        };
+
+        _deviceApi.vkCmdCopyBufferToImage(cmd, staging.Buffer, vkImage.Image, VkImageLayout.TransferDstOptimal, 1, &region);
+
+        // Transition image to shader read-only
+        VkImageMemoryBarrier barrierToShaderRead = new()
+        {
+            oldLayout = VkImageLayout.TransferDstOptimal,
+            newLayout = VkImageLayout.ShaderReadOnlyOptimal,
+            srcQueueFamilyIndex = Vulkan.VK_QUEUE_FAMILY_IGNORED,
+            dstQueueFamilyIndex = Vulkan.VK_QUEUE_FAMILY_IGNORED,
+            image = vkImage.Image,
+            subresourceRange = new VkImageSubresourceRange(VkImageAspectFlags.Color, 0, 1, 0, 1)
+        };
+
+        _deviceApi.vkCmdPipelineBarrier(cmd, VkPipelineStageFlags.Transfer, VkPipelineStageFlags.FragmentShader,
+            0, 0, null, 0, null, 1, &barrierToShaderRead);
+
+        vkImage.Layout = VkImageLayout.ShaderReadOnlyOptimal;
+
+        // Track staging buffer for deferred disposal after frame fence signals
+        _deferredStagingBuffers[_currentFrame] ??= new List<IBuffer>();
+        _deferredStagingBuffers[_currentFrame]!.Add(staging);
+    }
+
     IImage IGraphicsDevice.CreateImage(ImageDesc desc) => CreateImage(desc);
     IImageView IGraphicsDevice.CreateImageView(IImage image) => CreateImageView(image);
     ISampler IGraphicsDevice.CreateSampler(SamplerDesc desc) => CreateSampler(desc);

@@ -185,17 +185,25 @@ public sealed unsafe partial class GraphicsDevice
         else
             throw new ArgumentException("Framebuffer must originate from this GraphicsDevice.", nameof(framebuffer));
 
-        var clearValue = clear.HasValue
+        var colorClear = clear.HasValue
             ? new VkClearValue(new VkClearColorValue(clear.Value.R, clear.Value.G, clear.Value.B, clear.Value.A))
             : new VkClearValue(new VkClearColorValue(0, 0, 0, 0));
+
+        // Swapchain render passes include a depth attachment (2 attachments total).
+        // Offscreen render passes have only 1 color attachment.
+        bool hasDepth = renderPass is VulkanRenderPass;
+
+        VkClearValue* clearValues = stackalloc VkClearValue[2];
+        clearValues[0] = colorClear;
+        clearValues[1] = new VkClearValue(new VkClearDepthStencilValue(1.0f, 0));
 
         VkRenderPassBeginInfo rpBegin = new()
         {
             renderPass = rpHandle,
             framebuffer = fbHandle,
             renderArea = new VkRect2D(new VkOffset2D(0, 0), new VkExtent2D(extent.Width, extent.Height)),
-            clearValueCount = 1,
-            pClearValues = &clearValue
+            clearValueCount = hasDepth ? 2u : 1u,
+            pClearValues = clearValues
         };
 
         _deviceApi.vkCmdBeginRenderPass(vkCmd.Handle, &rpBegin, VkSubpassContents.Inline);

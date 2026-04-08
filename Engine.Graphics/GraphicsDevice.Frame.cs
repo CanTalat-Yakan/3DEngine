@@ -14,6 +14,10 @@ public sealed unsafe partial class GraphicsDevice
 
         _deviceApi.vkWaitForFences(_inFlightFences[_currentFrame], true, ulong.MaxValue).CheckResult();
 
+        // After the fence signals, the GPU has finished reading staging buffers from this slot's
+        // previous frame - safe to dispose them now.
+        FlushDeferredStagingBuffers(_currentFrame);
+
         var result = _deviceApi.vkAcquireNextImageKHR(_swapchain, ulong.MaxValue,
             _imageAvailableSemaphores[_currentFrame], default, out uint imageIndex);
 

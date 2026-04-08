@@ -182,66 +182,66 @@ public class NullGraphicsDeviceTests
     }
 
     [Fact]
-    public void BindGraphicsPipeline_Throws_NotSupportedException()
+    public void BindGraphicsPipeline_Is_NoOp()
     {
         var act = () => _device.BindGraphicsPipeline(null!, null!);
-        act.Should().Throw<NotSupportedException>();
+        act.Should().NotThrow();
     }
 
     [Fact]
-    public void BindDescriptorSet_Throws_NotSupportedException()
+    public void BindDescriptorSet_Is_NoOp()
     {
         var act = () => _device.BindDescriptorSet(null!, null!, null!);
-        act.Should().Throw<NotSupportedException>();
+        act.Should().NotThrow();
     }
 
     [Fact]
-    public void Draw_Throws_NotSupportedException()
+    public void Draw_Is_NoOp()
     {
         var act = () => _device.Draw(null!, 3);
-        act.Should().Throw<NotSupportedException>();
+        act.Should().NotThrow();
     }
 
     [Fact]
-    public void DrawIndexed_Throws_NotSupportedException()
+    public void DrawIndexed_Is_NoOp()
     {
         var act = () => _device.DrawIndexed(null!, 3);
-        act.Should().Throw<NotSupportedException>();
+        act.Should().NotThrow();
     }
 
     [Fact]
-    public void BindVertexBuffers_Throws_NotSupportedException()
+    public void BindVertexBuffers_Is_NoOp()
     {
         var act = () => _device.BindVertexBuffers(null!, 0, [], []);
-        act.Should().Throw<NotSupportedException>();
+        act.Should().NotThrow();
     }
 
     [Fact]
-    public void BindIndexBuffer_Throws_NotSupportedException()
+    public void BindIndexBuffer_Is_NoOp()
     {
         var act = () => _device.BindIndexBuffer(null!, null!, 0, IndexType.UInt16);
-        act.Should().Throw<NotSupportedException>();
+        act.Should().NotThrow();
     }
 
     [Fact]
-    public void SetViewport_Throws_NotSupportedException()
+    public void SetViewport_Is_NoOp()
     {
         var act = () => _device.SetViewport(null!, 0, 0, 100, 100, 0, 1);
-        act.Should().Throw<NotSupportedException>();
+        act.Should().NotThrow();
     }
 
     [Fact]
-    public void SetScissor_Throws_NotSupportedException()
+    public void SetScissor_Is_NoOp()
     {
         var act = () => _device.SetScissor(null!, 0, 0, 100, 100);
-        act.Should().Throw<NotSupportedException>();
+        act.Should().NotThrow();
     }
 
     [Fact]
-    public void PushConstants_Throws_NotSupportedException()
+    public void PushConstants_Is_NoOp()
     {
-        Assert.Throws<NotSupportedException>(() =>
-            _device.PushConstants(null!, null!, ShaderStageFlags.All, 0, ReadOnlySpan<byte>.Empty));
+        var act = () => _device.PushConstants(null!, null!, ShaderStageFlags.All, 0, ReadOnlySpan<byte>.Empty);
+        act.Should().NotThrow();
     }
 
     [Fact]

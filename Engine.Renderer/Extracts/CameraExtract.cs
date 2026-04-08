@@ -4,10 +4,13 @@ namespace Engine;
 
 /// <summary>
 /// Extracts <see cref="Camera"/> + <see cref="Transform"/> components from the ECS world
-/// into <see cref="RenderCameras"/> in the render world, computing view and projection matrices.
+/// into render entities with <see cref="ExtractedView"/> components.
 /// </summary>
-/// <seealso cref="RenderCamera"/>
-/// <seealso cref="RenderCameras"/>
+/// <remarks>
+/// Bevy equivalent: <c>extract_cameras</c> spawning render entities with <c>ExtractedView</c>.
+/// </remarks>
+/// <seealso cref="ExtractedView"/>
+/// <seealso cref="CameraUniform"/>
 public sealed class CameraExtract : IExtractSystem
 {
     /// <inheritdoc />
@@ -19,9 +22,6 @@ public sealed class CameraExtract : IExtractSystem
         int surfaceW = surface?.Width > 0 ? surface!.Width : 1;
         int surfaceH = surface?.Height > 0 ? surface!.Height : 1;
         var textures = renderWorld.TryGet<RenderTextures>();
-
-        var cameras = renderWorld.TryGet<RenderCameras>() ?? new RenderCameras();
-        cameras.Items.Clear();
 
         foreach (var (entity, cam) in ecs.Query<global::Engine.Camera>())
         {
@@ -38,8 +38,16 @@ public sealed class CameraExtract : IExtractSystem
             ecs.TryGet(entity, out t);
             var view = Matrix4x4.CreateFromQuaternion(Quaternion.Inverse(t.Rotation)) * Matrix4x4.CreateTranslation(-t.Position);
             var proj = Matrix4x4.CreatePerspectiveFieldOfView(cam.FovY, aspect, cam.Near, cam.Far);
-            cameras.Items.Add(new RenderCamera(view, proj, wPixels, hPixels));
+
+            // Spawn render entity with ExtractedView component
+            int renderEntity = renderWorld.Spawn();
+            renderWorld.Entities.Add(renderEntity, new ExtractedView
+            {
+                View = view,
+                Projection = proj,
+                Width = wPixels,
+                Height = hPixels
+            });
         }
-        renderWorld.Set(cameras);
     }
 }

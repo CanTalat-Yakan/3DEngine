@@ -106,6 +106,11 @@ public sealed partial class GraphicsDevice : IGraphicsDevice
         CreateSyncObjects();
         Logger.Info($"Step 6/6: Sync objects created in {sw.ElapsedMilliseconds}ms ({MaxFramesInFlight} frames-in-flight)");
 
+        // Initialize per-frame deferred staging buffer lists
+        _deferredStagingBuffers = new List<IBuffer>?[MaxFramesInFlight];
+        for (int i = 0; i < MaxFramesInFlight; i++)
+            _deferredStagingBuffers[i] = new List<IBuffer>();
+
         Logger.Info("Creating descriptor resources - descriptor set layouts and descriptor pool for uniform buffers and samplers...");
         sw.Restart();
         CreateDescriptorResources();
@@ -143,11 +148,28 @@ public sealed partial class GraphicsDevice : IGraphicsDevice
     }
 
     /// <inheritdoc />
+    public void FlushDeferredStagingBuffers(int inFlightIndex)
+    {
+        if (inFlightIndex < 0 || inFlightIndex >= _deferredStagingBuffers.Length) return;
+        var list = _deferredStagingBuffers[inFlightIndex];
+        if (list is null || list.Count == 0) return;
+
+        foreach (var buffer in list)
+            buffer.Dispose();
+        list.Clear();
+    }
+
+    /// <inheritdoc />
     public void Dispose()
     {
         if (!IsInitialized) return;
         Logger.Info("Disposing graphics device - waiting for device idle...");
         _deviceApi.vkDeviceWaitIdle();
+
+        // Flush all deferred staging buffers
+        for (int i = 0; i < _deferredStagingBuffers.Length; i++)
+            FlushDeferredStagingBuffers(i);
+
         Logger.Debug("Destroying sync objects (semaphores, fences)...");
         DestroySyncObjects();
         Logger.Debug("Destroying swapchain resources (framebuffers, image views, render pass, command pool)...");
@@ -200,6 +222,7 @@ public sealed partial class GraphicsDevice : IGraphicsDevice
     private VkImage _depthImage;
     private VkDeviceMemory _depthImageMemory;
     private VkImageView _depthImageView;
+    private List<IBuffer>?[] _deferredStagingBuffers = Array.Empty<List<IBuffer>?>();
 
     /// <summary>Decodes a null-terminated UTF-8 byte span into a managed string.</summary>
     private static string Utf8(ReadOnlySpan<byte> value)

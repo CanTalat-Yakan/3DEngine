@@ -58,6 +58,16 @@ public sealed class Renderer : IDisposable
         Graph.AddNode("main_pass", new MainPassNode());
         Logger.Debug("Default MainPassNode added to render graph.");
 
+        // Pipeline cache for deduplicating compiled pipelines across nodes
+        var pipelineCache = new PipelineCache(Context.Graphics);
+        RenderWorld.Set(pipelineCache);
+        Logger.Debug("PipelineCache created and registered in RenderWorld.");
+
+        // Register the phase queue system that populates render phases from extracted data.
+        // It runs as a prepare system after MeshPrepare (vertex buffers uploaded first).
+        AddPrepareSystem(new QueueMeshPhaseItems());
+        Logger.Debug("QueueMeshPhaseItems prepare system registered.");
+
         _initialized = true;
         Logger.Info($"Renderer initialized in {sw.ElapsedMilliseconds}ms.");
     }
@@ -77,6 +87,7 @@ public sealed class Renderer : IDisposable
         if (!_initialized) Initialize();
 
         Logger.FrameTrace("RenderFrame: Running extract systems...");
+        RenderWorld.ClearEntities();
         foreach (var sys in _extractSystems)
             sys.Run(world, RenderWorld);
 
@@ -204,6 +215,10 @@ public sealed class Renderer : IDisposable
 
         Graph.Dispose();
         Logger.Debug("Render graph nodes disposed.");
+
+        // Dispose pipeline cache before the graphics device
+        RenderWorld.TryGet<PipelineCache>()?.Dispose();
+        Logger.Debug("Pipeline cache disposed.");
 
         Context.Dispose();
         Logger.Info("Renderer disposed.");

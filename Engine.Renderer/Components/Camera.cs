@@ -1,7 +1,7 @@
 namespace Engine;
 
 /// <summary>Simple perspective camera component with projection parameters.</summary>
-/// <seealso cref="RenderCamera"/>
+/// <seealso cref="ExtractedView"/>
 /// <seealso cref="Transform"/>
 public struct Camera
 {

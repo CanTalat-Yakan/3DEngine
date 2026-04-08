@@ -158,10 +158,16 @@ public sealed class RendererContext : IDisposable
 
         if (_cameraBuffers is { Length: > 0 } cameraBuffers && _cameraDescriptorSets is { Length: > 0 })
         {
-            var cameras = world.TryGet<RenderCameras>();
-            if (cameras is { Items.Count: > 0 })
+            // Query the first ExtractedView render entity
+            ExtractedView? firstView = null;
+            foreach (var (_, view) in world.Entities.Query<ExtractedView>())
             {
-                var cam = cameras.Items[0];
+                firstView = view;
+                break;
+            }
+
+            if (firstView is { } cam)
+            {
                 var cameraUniform = new CameraUniform
                 {
                     View = cam.View,

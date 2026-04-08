@@ -103,44 +103,32 @@ public sealed class NullGraphicsDevice : IGraphicsDevice
         => throw new NotSupportedException("NullGraphicsDevice does not support descriptors.");
 
     /// <inheritdoc />
-    public void BindGraphicsPipeline(ICommandBuffer commandBuffer, IPipeline pipeline)
-        => throw new NotSupportedException("NullGraphicsDevice does not support graphics pipelines.");
-
+    public void BindGraphicsPipeline(ICommandBuffer commandBuffer, IPipeline pipeline) { }
     /// <inheritdoc />
-    public void BindDescriptorSet(ICommandBuffer commandBuffer, IPipeline pipeline, IDescriptorSet descriptorSet)
-        => throw new NotSupportedException("NullGraphicsDevice does not support descriptors.");
-
+    public void BindDescriptorSet(ICommandBuffer commandBuffer, IPipeline pipeline, IDescriptorSet descriptorSet) { }
     /// <inheritdoc />
-    public void Draw(ICommandBuffer commandBuffer, uint vertexCount, uint instanceCount = 1, uint firstVertex = 0, uint firstInstance = 0)
-        => throw new NotSupportedException("NullGraphicsDevice does not support drawing.");
-
+    public void Draw(ICommandBuffer commandBuffer, uint vertexCount, uint instanceCount = 1, uint firstVertex = 0, uint firstInstance = 0) { }
     /// <inheritdoc />
-    public void DrawIndexed(ICommandBuffer commandBuffer, uint indexCount, uint instanceCount = 1, uint firstIndex = 0, int vertexOffset = 0, uint firstInstance = 0)
-        => throw new NotSupportedException("NullGraphicsDevice does not support drawing.");
-
+    public void DrawIndexed(ICommandBuffer commandBuffer, uint indexCount, uint instanceCount = 1, uint firstIndex = 0, int vertexOffset = 0, uint firstInstance = 0) { }
     /// <inheritdoc />
-    public void BindVertexBuffers(ICommandBuffer commandBuffer, uint firstBinding, IBuffer[] buffers, ulong[] offsets)
-        => throw new NotSupportedException("NullGraphicsDevice does not support buffer binding.");
-
+    public void BindVertexBuffers(ICommandBuffer commandBuffer, uint firstBinding, IBuffer[] buffers, ulong[] offsets) { }
     /// <inheritdoc />
-    public void BindIndexBuffer(ICommandBuffer commandBuffer, IBuffer buffer, ulong offset, IndexType indexType)
-        => throw new NotSupportedException("NullGraphicsDevice does not support buffer binding.");
-
+    public void BindIndexBuffer(ICommandBuffer commandBuffer, IBuffer buffer, ulong offset, IndexType indexType) { }
     /// <inheritdoc />
-    public void SetViewport(ICommandBuffer commandBuffer, float x, float y, float width, float height, float minDepth, float maxDepth)
-        => throw new NotSupportedException("NullGraphicsDevice does not support viewports.");
-
+    public void SetViewport(ICommandBuffer commandBuffer, float x, float y, float width, float height, float minDepth, float maxDepth) { }
     /// <inheritdoc />
-    public void SetScissor(ICommandBuffer commandBuffer, int x, int y, uint width, uint height)
-        => throw new NotSupportedException("NullGraphicsDevice does not support scissors.");
-
+    public void SetScissor(ICommandBuffer commandBuffer, int x, int y, uint width, uint height) { }
     /// <inheritdoc />
-    public void PushConstants(ICommandBuffer commandBuffer, IPipeline pipeline, ShaderStageFlags stageFlags, uint offset, ReadOnlySpan<byte> data)
-        => throw new NotSupportedException("NullGraphicsDevice does not support push constants.");
+    public void PushConstants(ICommandBuffer commandBuffer, IPipeline pipeline, ShaderStageFlags stageFlags, uint offset, ReadOnlySpan<byte> data) { }
 
     /// <inheritdoc />
     public void UploadTexture2D(IImage image, ReadOnlySpan<byte> data, uint width, uint height, int bytesPerPixel)
         => throw new NotSupportedException("NullGraphicsDevice does not support texture upload.");
+    /// <inheritdoc />
+    public void UploadTexture2DDeferred(ICommandBuffer commandBuffer, IImage image, ReadOnlySpan<byte> data, uint width, uint height, int bytesPerPixel)
+        => throw new NotSupportedException("NullGraphicsDevice does not support texture upload.");
+    /// <inheritdoc />
+    public void FlushDeferredStagingBuffers(int inFlightIndex) { }
 
     /// <inheritdoc />
     public IRenderPass CreateRenderPass(RenderPassDesc desc)
@@ -155,12 +143,9 @@ public sealed class NullGraphicsDevice : IGraphicsDevice
     public void SubmitAndWait(ICommandBuffer commandBuffer)
         => throw new NotSupportedException("NullGraphicsDevice does not support command buffers.");
     /// <inheritdoc />
-    public void CmdBeginRenderPass(ICommandBuffer commandBuffer, IRenderPass renderPass, IFramebuffer framebuffer, Extent2D extent, ClearColor? clear = null)
-        => throw new NotSupportedException("NullGraphicsDevice does not support offscreen rendering.");
+    public void CmdBeginRenderPass(ICommandBuffer commandBuffer, IRenderPass renderPass, IFramebuffer framebuffer, Extent2D extent, ClearColor? clear = null) { }
     /// <inheritdoc />
-    public void CmdEndRenderPass(ICommandBuffer commandBuffer)
-        => throw new NotSupportedException("NullGraphicsDevice does not support offscreen rendering.");
+    public void CmdEndRenderPass(ICommandBuffer commandBuffer) { }
     /// <inheritdoc />
-    public void CmdPipelineBarrier(ICommandBuffer commandBuffer, IImage image, ImageLayout oldLayout, ImageLayout newLayout)
-        => throw new NotSupportedException("NullGraphicsDevice does not support pipeline barriers.");
+    public void CmdPipelineBarrier(ICommandBuffer commandBuffer, IImage image, ImageLayout oldLayout, ImageLayout newLayout) { }
 }

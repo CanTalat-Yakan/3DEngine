@@ -40,8 +40,10 @@ public sealed class MeshPipeline : IDisposable
     /// <param name="renderPass">The render pass the pipeline must be compatible with.</param>
     /// <param name="vertexSpirv">SPIR-V bytecode for the mesh vertex shader.</param>
     /// <param name="fragmentSpirv">SPIR-V bytecode for the mesh fragment shader.</param>
+    /// <param name="pipelineCache">Optional pipeline cache for deduplication.</param>
     public MeshPipeline(IGraphicsDevice graphics, IRenderPass renderPass,
-        ReadOnlyMemory<byte> vertexSpirv, ReadOnlyMemory<byte> fragmentSpirv)
+        ReadOnlyMemory<byte> vertexSpirv, ReadOnlyMemory<byte> fragmentSpirv,
+        PipelineCache? pipelineCache = null)
     {
         Logger.Debug($"Compiling mesh shaders (vertex={vertexSpirv.Length} bytes, fragment={fragmentSpirv.Length} bytes)...");
         var vsDesc = new ShaderDesc(ShaderStage.Vertex, vertexSpirv, "main");
@@ -66,7 +68,6 @@ public sealed class MeshPipeline : IDisposable
             new PushConstantRange(ShaderStageFlags.All, 0, (uint)Marshal.SizeOf<MeshPushConstants>())
         };
 
-        Logger.Debug("Creating mesh graphics pipeline...");
         var pipelineDesc = new GraphicsPipelineDesc(
             renderPass,
             _vertexShader,
@@ -75,10 +76,21 @@ public sealed class MeshPipeline : IDisposable
             CullBackFace: true,
             VertexBindings: vertexBindings,
             VertexAttributes: vertexAttributes,
-            PushConstantRanges: pushConstantRanges);
+            PushConstantRanges: pushConstantRanges,
+            DepthTestEnabled: true,
+            DepthWriteEnabled: true);
 
-        _pipeline = graphics.CreateGraphicsPipeline(pipelineDesc);
-        Logger.Debug("Mesh pipeline created successfully.");
+        if (pipelineCache is not null)
+        {
+            Logger.Debug("Looking up mesh pipeline in cache...");
+            _pipeline = pipelineCache.GetOrCreate(pipelineDesc);
+        }
+        else
+        {
+            Logger.Debug("Creating mesh graphics pipeline (no cache)...");
+            _pipeline = graphics.CreateGraphicsPipeline(pipelineDesc);
+        }
+        Logger.Debug("Mesh pipeline ready.");
     }
 
     /// <summary>Disposes the vertex and fragment shader modules.</summary>

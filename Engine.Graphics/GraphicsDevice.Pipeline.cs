@@ -210,6 +210,16 @@ public sealed unsafe partial class GraphicsDevice
             pAttachments = &colorBlendAttachment
         };
 
+        // Depth-stencil state
+        VkPipelineDepthStencilStateCreateInfo depthStencil = new()
+        {
+            depthTestEnable = desc.DepthTestEnabled,
+            depthWriteEnable = desc.DepthWriteEnabled,
+            depthCompareOp = desc.DepthTestEnabled ? ToVkCompareOp(desc.DepthCompareOp) : VkCompareOp.Always,
+            depthBoundsTestEnable = false,
+            stencilTestEnable = false
+        };
+
         VkDynamicState* dynamics = stackalloc VkDynamicState[2];
         dynamics[0] = VkDynamicState.Viewport;
         dynamics[1] = VkDynamicState.Scissor;
@@ -272,6 +282,7 @@ public sealed unsafe partial class GraphicsDevice
             pViewportState = &viewportState,
             pRasterizationState = &rasterizer,
             pMultisampleState = &multisample,
+            pDepthStencilState = &depthStencil,
             pColorBlendState = &colorBlend,
             pDynamicState = &dynamicState,
             layout = layout,
@@ -343,6 +354,20 @@ public sealed unsafe partial class GraphicsDevice
         if (flags.HasFlag(ShaderStageFlags.Fragment)) result |= VkShaderStageFlags.Fragment;
         return result;
     }
+
+    /// <summary>Maps an engine <see cref="CompareOp"/> to the Vulkan <c>VkCompareOp</c> equivalent.</summary>
+    private static VkCompareOp ToVkCompareOp(CompareOp op) => op switch
+    {
+        CompareOp.Never => VkCompareOp.Never,
+        CompareOp.Less => VkCompareOp.Less,
+        CompareOp.Equal => VkCompareOp.Equal,
+        CompareOp.LessOrEqual => VkCompareOp.LessOrEqual,
+        CompareOp.Greater => VkCompareOp.Greater,
+        CompareOp.NotEqual => VkCompareOp.NotEqual,
+        CompareOp.GreaterOrEqual => VkCompareOp.GreaterOrEqual,
+        CompareOp.Always => VkCompareOp.Always,
+        _ => VkCompareOp.Less
+    };
 
     // ---- Extended draw commands ----
 

@@ -5,59 +5,45 @@ using Xunit;
 namespace Engine.Tests.Renderer;
 
 [Trait("Category", "Unit")]
-public class RenderCameraTests
+public class ExtractedViewTests
 {
-    // ── RenderCamera struct ─────────────────────────────────────────────
-
     [Fact]
-    public void Constructor_Stores_All_Fields()
+    public void Stores_View_And_Projection_Matrices()
     {
         var view = Matrix4x4.CreateLookAt(Vector3.UnitZ, Vector3.Zero, Vector3.UnitY);
         var proj = Matrix4x4.CreatePerspectiveFieldOfView(1.0f, 16f / 9f, 0.1f, 1000f);
 
-        var cam = new RenderCamera(view, proj, 1920, 1080);
+        var ev = new ExtractedView
+        {
+            View = view,
+            Projection = proj,
+            Width = 1920,
+            Height = 1080
+        };
 
-        cam.View.Should().Be(view);
-        cam.Projection.Should().Be(proj);
-        cam.Width.Should().Be(1920);
-        cam.Height.Should().Be(1080);
+        ev.View.Should().Be(view);
+        ev.Projection.Should().Be(proj);
+        ev.Width.Should().Be(1920);
+        ev.Height.Should().Be(1080);
     }
 
     [Fact]
-    public void Default_Has_Identity_Matrices_And_Zero_Size()
+    public void Default_Has_Zero_Fields()
     {
-        var cam = default(RenderCamera);
+        var ev = default(ExtractedView);
 
-        cam.View.Should().Be(default(Matrix4x4));
-        cam.Projection.Should().Be(default(Matrix4x4));
-        cam.Width.Should().Be(0);
-        cam.Height.Should().Be(0);
+        ev.View.Should().Be(default(Matrix4x4));
+        ev.Projection.Should().Be(default(Matrix4x4));
+        ev.Width.Should().Be(0);
+        ev.Height.Should().Be(0);
     }
+}
 
-    // ── RenderCameras collection ────────────────────────────────────────
+// ── CameraUniform struct ────────────────────────────────────────────
 
-    [Fact]
-    public void Items_Starts_Empty()
-    {
-        var cameras = new RenderCameras();
-
-        cameras.Items.Should().BeEmpty();
-    }
-
-    [Fact]
-    public void Items_Can_Hold_Multiple_Cameras()
-    {
-        var cameras = new RenderCameras();
-        cameras.Items.Add(new RenderCamera(Matrix4x4.Identity, Matrix4x4.Identity, 800, 600));
-        cameras.Items.Add(new RenderCamera(Matrix4x4.Identity, Matrix4x4.Identity, 1920, 1080));
-
-        cameras.Items.Should().HaveCount(2);
-        cameras.Items[0].Width.Should().Be(800);
-        cameras.Items[1].Width.Should().Be(1920);
-    }
-
-    // ── CameraUniform struct ────────────────────────────────────────────
-
+[Trait("Category", "Unit")]
+public class CameraUniformTests
+{
     [Fact]
     public void CameraUniform_Stores_Matrices()
     {
@@ -133,27 +119,4 @@ public class CameraTests
         cam.TargetName.Should().Be("offscreen");
     }
 }
-
-[Trait("Category", "Unit")]
-public class DrawCommandTests
-{
-    [Fact]
-    public void Constructor_Stores_EntityId_And_SortKey()
-    {
-        var cmd = new DrawCommand(42, 100);
-
-        cmd.EntityId.Should().Be(42);
-        cmd.SortKey.Should().Be(100);
-    }
-
-    [Fact]
-    public void Default_Has_Zero_Values()
-    {
-        var cmd = default(DrawCommand);
-
-        cmd.EntityId.Should().Be(0);
-        cmd.SortKey.Should().Be(0);
-    }
-}
-
 

@@ -88,9 +88,14 @@ public sealed class WebViewRenderNode : INode, IDisposable
                 // be re-opened below.
                 activePass.Pass.EndRenderPass();
 
+                // Use deferred upload: records copy commands into the frame command buffer
+                // and tracks the staging buffer for cleanup after the frame fence signals.
+                // No GPU stall (no vkWaitForFences per upload).
+                var cmd = renderContext.CommandBuffer;
+
                 if (actualRowBytes == packedRowBytes)
                 {
-                    gfx.UploadTexture2D(_webviewImage, _stagingBuffer.AsSpan(0, totalBytes),
+                    gfx.UploadTexture2DDeferred(cmd, _webviewImage, _stagingBuffer.AsSpan(0, totalBytes),
                         currentWidth, currentHeight, bytesPerPixel: 4);
                 }
                 else
@@ -102,7 +107,7 @@ public sealed class WebViewRenderNode : INode, IDisposable
                         _stagingBuffer.AsSpan((int)(y * actualRowBytes), (int)packedRowBytes)
                             .CopyTo(packed.AsSpan((int)(y * packedRowBytes)));
                     }
-                    gfx.UploadTexture2D(_webviewImage, packed.AsSpan(0, packedSize),
+                    gfx.UploadTexture2DDeferred(cmd, _webviewImage, packed.AsSpan(0, packedSize),
                         currentWidth, currentHeight, bytesPerPixel: 4);
                 }
 
