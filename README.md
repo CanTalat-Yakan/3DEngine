@@ -54,6 +54,7 @@
     - [Logging](#logging)
     - [FAQ](#faq)
 - [Roadmap](#roadmap)
+- [Community](#community)
 - [Contributing](#contributing)
 - [License](#license)
 
