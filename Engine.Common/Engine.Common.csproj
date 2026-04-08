@@ -5,7 +5,6 @@
         <PackageId>3DEngine.Core</PackageId>
         <Version>2.0.0</Version>
         <Description>Core runtime: App, World, Schedule, Events, Config, Logger, Time, Input.</Description>
-        <RootNamespace>Engine.Core</RootNamespace>
     </PropertyGroup>
 
     <!-- Allow first-party backend projects to call internal mutation APIs (Input, Time, etc.) -->

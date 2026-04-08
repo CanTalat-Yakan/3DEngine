@@ -5,6 +5,11 @@
         <RootNamespace>Engine.Tests</RootNamespace>
         <AssemblyName>Engine.Tests</AssemblyName>
     </PropertyGroup>
+    
+    <PropertyGroup>
+        <Title>3DEngine Tests</Title>
+        <Description>xUnit test suite covering core runtime, ECS, renderer, and editor subsystems.</Description>
+    </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Engine.Common\Engine.Common.csproj" />

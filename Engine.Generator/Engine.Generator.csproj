@@ -9,7 +9,9 @@
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <IsRoslynComponent>true</IsRoslynComponent>
+    </PropertyGroup>
 
+    <PropertyGroup>
         <Title>3DEngine Generator</Title>
         <PackageId>3DEngine.Generator</PackageId>
         <Version>1.0.0</Version>

@@ -5,7 +5,9 @@
         <SelfContained>true</SelfContained>
         <PublishSingleFile>true</PublishSingleFile>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        
+    </PropertyGroup>
+
+    <PropertyGroup>
         <Title>3DEngine</Title>
         <PackageId>3DEngine</PackageId>
         <Version>4.0.1</Version>

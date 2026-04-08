@@ -4,7 +4,7 @@
         <Title>3DEngine Files</Title>
         <PackageId>3DEngine.Files</PackageId>
         <Version>1.0.0</Version>
-        <Description>Roslyn source generator for file managament</Description>
+        <Description>Cross-platform native library loader with DllImport resolution, search paths, and symlink helpers.</Description>
     </PropertyGroup>
 
     <ItemGroup>

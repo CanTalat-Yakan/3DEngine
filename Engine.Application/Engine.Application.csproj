@@ -2,7 +2,9 @@
 
     <PropertyGroup>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        
+    </PropertyGroup>
+
+    <PropertyGroup>
         <Title>3DEngine Window</Title>
         <PackageId>3DEngine.Window</PackageId>
         <Version>1.0.2</Version>

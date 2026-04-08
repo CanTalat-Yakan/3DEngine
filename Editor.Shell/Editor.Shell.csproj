@@ -4,7 +4,7 @@
         <Title>3DEngine Editor Shell</Title>
         <PackageId>3DEngine.Editor.Shell</PackageId>
         <Version>1.0.0</Version>
-        <Description>Declarative builder API and runtime script compiler for the 3D Engine editor UI.</Description>
+        <Description>Shell registry, descriptors, and builder API for dynamically discovered editor panels and inspectors.</Description>
     </PropertyGroup>
 
     <ItemGroup>
