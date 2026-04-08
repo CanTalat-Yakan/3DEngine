@@ -38,6 +38,8 @@ public sealed class WebViewInstance : IDisposable
     private bool _disposed;
 
 
+    /// <summary>Whether the webview overlay is rendered. Toggled at runtime via F1 (<see cref="BehaviorConditions.KeyToggle"/>).</summary>
+    public bool Visible { get; set; } = true;
 
     /// <summary>Current pixel width of the webview view.</summary>
     public uint Width { get; private set; }

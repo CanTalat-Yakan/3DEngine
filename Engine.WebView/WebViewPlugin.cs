@@ -96,12 +96,18 @@ public sealed class WebViewPlugin : IPlugin
             .Write<AppWindow>()
             .Write<Renderer>());
 
+        // ── F1 toggle condition (uses SystemToggleRegistry, same as [ToggleKey]) ──
+        var webViewToggle = BehaviorConditions.KeyToggle("WebViewPlugin.Render", Key.F1);
+
         // ── Per-frame: resolve debounced resize, then update Ultralight ──
         app.AddSystem(Stage.Update, new SystemDescriptor((world) =>
             {
                 var b = world.TryResource<WebViewInstance>();
                 if (b is null) return;
-            
+
+                // Sync F1 toggle state → WebViewInstance.Visible
+                b.Visible = webViewToggle(world);
+
                 if (pendingWebViewResize && (Environment.TickCount64 - lastWebViewResizeTick) >= ResizeDebounceMs)
                 {
                     pendingWebViewResize = false;
@@ -113,7 +119,8 @@ public sealed class WebViewPlugin : IPlugin
             }, name: "WebViewPlugin.Update")
             .MainThreadOnly()
             .Write<WebViewInstance>()
-            .Read<AppWindow>());
+            .Read<AppWindow>()
+            .Read<Input>());
 
         // ── Cleanup: dispose Ultralight ──────────────────────────────
         app.AddSystem(Stage.Cleanup, new SystemDescriptor(static (World world) =>

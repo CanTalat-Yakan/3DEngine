@@ -45,10 +45,10 @@ public sealed class WebViewRenderNode : INode, IDisposable
     }
 
     /// <inheritdoc />
-    public unsafe void Run(RenderGraphContext graphContext, RenderContext renderContext, RenderWorld renderWorld)
+    public void Run(RenderGraphContext graphContext, RenderContext renderContext, RenderWorld renderWorld)
     {
         var webview = renderWorld.TryGet<WebViewInstance>();
-        if (webview?.View is null)
+        if (webview?.View is null || !webview.Visible)
             return;
 
         // Get the shared swapchain pass opened by MainPassNode
