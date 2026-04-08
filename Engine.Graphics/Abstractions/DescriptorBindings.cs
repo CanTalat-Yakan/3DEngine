@@ -1,13 +1,5 @@
 namespace Engine;
 
-/// <summary>Descriptor set abstractions for binding uniform buffers and samplers to shaders.</summary>
-
-/// <summary>Handle to an allocated descriptor set for binding resources to shaders.</summary>
-public interface IDescriptorSet : IDisposable { }
-
-/// <summary>Handle to a descriptor set layout defining the binding structure for a set.</summary>
-public interface IDescriptorSetLayout : IDisposable { }
-
 /// <summary>Descriptor resource type for layout bindings.</summary>
 public enum DescriptorType
 {
@@ -36,3 +28,4 @@ public readonly record struct UniformBufferBinding(IBuffer Buffer, uint Binding,
 /// <param name="Sampler">The sampler defining filtering and addressing modes.</param>
 /// <param name="Binding">Shader binding slot index.</param>
 public readonly record struct CombinedImageSamplerBinding(IImageView ImageView, ISampler Sampler, uint Binding);
+

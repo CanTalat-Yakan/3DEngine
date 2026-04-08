@@ -1,7 +1,5 @@
 namespace Engine;
 
-/// <summary>GPU buffer abstractions for vertex, index, uniform, and staging buffers.</summary>
-
 /// <summary>Flags describing how a GPU buffer will be used.</summary>
 [Flags]
 public enum BufferUsage
@@ -41,9 +39,3 @@ public enum CpuAccessMode
 /// <param name="CpuAccess">CPU access mode for mapping.</param>
 public readonly record struct BufferDesc(ulong Size, BufferUsage Usage, CpuAccessMode CpuAccess = CpuAccessMode.None);
 
-/// <summary>Handle to a GPU buffer resource.</summary>
-public interface IBuffer : IDisposable
-{
-    /// <summary>The descriptor used to create this buffer.</summary>
-    BufferDesc Description { get; }
-}

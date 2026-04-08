@@ -1,7 +1,5 @@
 namespace Engine;
 
-/// <summary>GPU image and image view abstractions for textures, render targets, and depth buffers.</summary>
-
 /// <summary>Pixel format for images and render targets.</summary>
 public enum ImageFormat
 {
@@ -40,20 +38,6 @@ public enum ImageUsage
 /// <param name="Format">Pixel format.</param>
 /// <param name="Usage">Usage flags.</param>
 public readonly record struct ImageDesc(Extent2D Extent, ImageFormat Format, ImageUsage Usage);
-
-/// <summary>Handle to a GPU image resource (texture, render target, depth buffer).</summary>
-public interface IImage : IDisposable
-{
-    /// <summary>The descriptor used to create this image.</summary>
-    ImageDesc Description { get; }
-}
-
-/// <summary>Handle to a GPU image view (typed view into an <see cref="IImage"/>).</summary>
-public interface IImageView : IDisposable
-{
-    /// <summary>The underlying image this view references.</summary>
-    IImage Image { get; }
-}
 
 /// <summary>Abstract image layout states used for pipeline barrier transitions.</summary>
 public enum ImageLayout

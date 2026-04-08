@@ -1,7 +1,5 @@
 namespace Engine;
 
-/// <summary>Sampler abstractions for texture filtering and addressing modes.</summary>
-
 /// <summary>Texture filtering mode for minification and magnification.</summary>
 public enum SamplerFilter
 {
@@ -35,9 +33,3 @@ public readonly record struct SamplerDesc(
     SamplerAddressMode AddressV,
     SamplerAddressMode AddressW);
 
-/// <summary>Handle to a GPU sampler resource.</summary>
-public interface ISampler : IDisposable
-{
-    /// <summary>The descriptor used to create this sampler.</summary>
-    SamplerDesc Description { get; }
-}

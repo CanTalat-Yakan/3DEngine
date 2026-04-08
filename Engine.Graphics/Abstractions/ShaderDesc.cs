@@ -1,7 +1,5 @@
 namespace Engine;
 
-/// <summary>Shader abstractions for SPIR-V shader modules.</summary>
-
 /// <summary>Shader pipeline stage.</summary>
 public enum ShaderStage
 {
@@ -17,9 +15,3 @@ public enum ShaderStage
 /// <param name="EntryPoint">The shader entry-point function name (defaults to <c>"main"</c>).</param>
 public readonly record struct ShaderDesc(ShaderStage Stage, ReadOnlyMemory<byte> Bytecode, string EntryPoint = "main");
 
-/// <summary>Handle to a compiled GPU shader module.</summary>
-public interface IShader : IDisposable
-{
-    /// <summary>The descriptor used to create this shader.</summary>
-    ShaderDesc Description { get; }
-}
