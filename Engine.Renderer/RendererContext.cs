@@ -138,11 +138,11 @@ public sealed class RendererContext : IDisposable
         }
     }
 
-    /// <summary>Begins a new render frame: acquires a swapchain image, uploads camera data, and returns a command recording context.</summary>
+    /// <summary>Begins a new render frame: acquires a swapchain image, uploads camera data, populates SwapchainTarget,
+    /// and returns a <see cref="RenderContext"/> for GPU commands.</summary>
     /// <param name="world">The render world containing camera and clear color data.</param>
-    /// <param name="imageIndex">The acquired swapchain image index.</param>
-    /// <returns>A <see cref="CommandRecordingContext"/> for recording GPU commands this frame.</returns>
-    public CommandRecordingContext BeginFrame(RenderWorld world, out uint imageIndex)
+    /// <returns>A tuple of the render context, the frame context, and the acquired image index.</returns>
+    public (RenderContext RenderContext, IFrameContext FrameContext, uint ImageIndex) BeginFrame(RenderWorld world)
     {
         if (!IsInitialized) throw new InvalidOperationException("RendererContext not initialized.");
 
@@ -151,10 +151,9 @@ public sealed class RendererContext : IDisposable
             : ClearColor.Black;
 
         var frame = _graphics!.BeginFrame(clear);
-        imageIndex = frame.FrameIndex;
+        var imageIndex = frame.FrameIndex;
 
-        // Advance the dynamic allocator - the fence wait inside BeginFrame guarantees
-        // this in-flight slot is idle, so resetting its cursors is safe.
+        // Advance the dynamic allocator
         DynamicAllocator?.BeginFrame(frame.InFlightIndex);
 
         if (_cameraBuffers is { Length: > 0 } cameraBuffers && _cameraDescriptorSets is { Length: > 0 })
@@ -176,7 +175,19 @@ public sealed class RendererContext : IDisposable
             }
         }
 
-        return new CommandRecordingContext(frame, DynamicAllocator);
+        // Populate SwapchainTarget in RenderWorld for nodes to use
+        var swapchainTarget = new SwapchainTarget(
+            _graphics.SwapchainRenderPass,
+            _graphics.SwapchainLoadRenderPass,
+            _graphics.GetSwapchainFramebuffer(imageIndex),
+            frame.Extent);
+        world.Set(swapchainTarget);
+
+        // Store the clear color for nodes that need it
+        world.Set(clear);
+
+        var renderCtx = new RenderContext(_graphics, frame.CommandBuffer, DynamicAllocator);
+        return (renderCtx, frame, imageIndex);
     }
 
     /// <summary>Uploads a camera uniform struct to the specified buffer via map/write/unmap.</summary>
@@ -189,23 +200,14 @@ public sealed class RendererContext : IDisposable
         _graphics.Unmap(buffer);
     }
 
-    /// <summary>Begins a new render frame without returning the image index.</summary>
-    /// <param name="world">The render world containing camera and clear color data.</param>
-    /// <returns>A <see cref="CommandRecordingContext"/> for recording GPU commands this frame.</returns>
-    public CommandRecordingContext BeginFrame(RenderWorld world) => BeginFrame(world, out _);
-
     /// <summary>Ends the current frame and submits it for presentation.</summary>
-    /// <param name="ctx">The command recording context for this frame.</param>
+    /// <param name="frameContext">The frame context for this frame.</param>
     /// <param name="imageIndex">The swapchain image index to present.</param>
-    public void EndFrame(CommandRecordingContext ctx, uint imageIndex)
+    public void EndFrame(IFrameContext frameContext, uint imageIndex)
     {
-        _graphics!.EndFrame(ctx.FrameContext);
-        ctx.Dispose();
+        _graphics!.EndFrame(frameContext);
+        frameContext.Dispose();
     }
-
-    /// <summary>Ends the current frame using the image index from the frame context.</summary>
-    /// <param name="ctx">The command recording context for this frame.</param>
-    public void EndFrame(CommandRecordingContext ctx) => EndFrame(ctx, ctx.FrameContext.FrameIndex);
 
     /// <summary>Handles a resize event by recreating the swapchain, dynamic allocator, and camera resources.</summary>
     public void OnResize()

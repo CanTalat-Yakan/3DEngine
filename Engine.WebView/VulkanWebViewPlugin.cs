@@ -3,13 +3,8 @@ namespace Engine;
 /// <summary>
 /// Plugin that wires the Ultralight webview rendering into the Vulkan render graph.
 /// Only activates when the graphics backend is Vulkan.
-/// Mirrors the <see cref="VulkanImGuiPlugin"/> pattern.
+/// Uses the CPU bitmap <see cref="WebViewRenderNode"/>.
 /// </summary>
-/// <remarks>
-/// Selects between <see cref="WebViewRenderNode"/> (CPU bitmap surface mode) and
-/// <see cref="GpuWebViewRenderNode"/> (GPU-accelerated mode) based on the
-/// <see cref="WebViewInstance.Mode"/> configured by <see cref="WebViewPlugin"/>.
-/// </remarks>
 public sealed class VulkanWebViewPlugin : IPlugin
 {
     private static readonly ILogger Logger = Log.Category("Engine.WebView.Vulkan");
@@ -24,7 +19,7 @@ public sealed class VulkanWebViewPlugin : IPlugin
             return;
         }
 
-        Logger.Info("VulkanWebViewPlugin: Building - will add appropriate render node to Vulkan graph.");
+        Logger.Info("VulkanWebViewPlugin: Building - will add WebViewRenderNode to Vulkan graph.");
 
         app.AddSystem(Stage.Startup, new SystemDescriptor(world =>
             {
@@ -34,18 +29,9 @@ public sealed class VulkanWebViewPlugin : IPlugin
                     return;
                 }
 
-                // Check if the WebViewInstance was initialized in GPU mode
-                var webview = world.TryResource<WebViewInstance>();
-                if (webview is not null && webview.Mode == WebViewMode.Gpu)
-                {
-                    renderer.AddNode(new GpuWebViewRenderNode());
-                    Logger.Info("GpuWebViewRenderNode registered in render graph (GPU-accelerated mode).");
-                }
-                else
-                {
-                    renderer.AddNode(new WebViewRenderNode());
-                    Logger.Info("WebViewRenderNode registered in render graph (CPU bitmap mode).");
-                }
+                renderer.Graph.AddNode("webview", new WebViewRenderNode());
+                renderer.Graph.AddNodeEdge("main_pass", "webview");
+                Logger.Info("WebViewRenderNode registered in render graph (CPU bitmap mode, after 'sample').");
             }, "VulkanWebViewPlugin.Startup")
             .MainThreadOnly()
             .Read<WebViewInstance>()
@@ -54,4 +40,3 @@ public sealed class VulkanWebViewPlugin : IPlugin
         Logger.Info("VulkanWebViewPlugin: Build complete.");
     }
 }
-

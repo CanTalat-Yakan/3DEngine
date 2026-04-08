@@ -66,6 +66,37 @@ public readonly record struct VertexInputAttributeDesc(uint Location, uint Bindi
 /// <param name="Size">Byte size of the range.</param>
 public readonly record struct PushConstantRange(ShaderStageFlags StageFlags, uint Offset, uint Size);
 
+/// <summary>Descriptor for creating an offscreen render pass with a single color attachment.</summary>
+/// <param name="ColorFormat">Pixel format of the color attachment.</param>
+/// <param name="ClearOnLoad">Whether to clear the attachment when the render pass begins.</param>
+public readonly record struct RenderPassDesc(ImageFormat ColorFormat, bool ClearOnLoad);
+
+/// <summary>Descriptor for creating a framebuffer from a render pass and a color image view.</summary>
+/// <param name="RenderPass">The render pass this framebuffer is compatible with.</param>
+/// <param name="ColorAttachment">The image view used as the color attachment.</param>
+/// <param name="Extent">Framebuffer dimensions in pixels.</param>
+public readonly record struct FramebufferDesc(IRenderPass RenderPass, IImageView ColorAttachment, Extent2D Extent);
+
+/// <summary>Attachment load operation when a render pass begins.</summary>
+public enum LoadOp
+{
+    /// <summary>Clear the attachment to a specified value.</summary>
+    Clear,
+    /// <summary>Preserve existing contents.</summary>
+    Load,
+    /// <summary>Contents are undefined (don't care).</summary>
+    DontCare
+}
+
+/// <summary>Attachment store operation when a render pass ends.</summary>
+public enum StoreOp
+{
+    /// <summary>Store the attachment contents for later use.</summary>
+    Store,
+    /// <summary>Contents are not needed after the render pass (don't care).</summary>
+    DontCare
+}
+
 /// <summary>Descriptor for creating a graphics pipeline.</summary>
 /// <param name="RenderPass">The render pass this pipeline will be used with.</param>
 /// <param name="VertexShader">The compiled vertex shader.</param>
@@ -75,6 +106,9 @@ public readonly record struct PushConstantRange(ShaderStageFlags StageFlags, uin
 /// <param name="VertexBindings">Optional vertex buffer binding descriptions.</param>
 /// <param name="VertexAttributes">Optional vertex attribute descriptions.</param>
 /// <param name="PushConstantRanges">Optional push constant range descriptions.</param>
+/// <param name="DescriptorSetLayouts">Optional custom descriptor set layouts. When provided, these replace the global camera layout in the pipeline layout.</param>
+/// <param name="PremultipliedAlpha">When <c>true</c> and <paramref name="BlendEnabled"/> is <c>true</c>,
+/// uses <c>srcColor=One</c> instead of <c>srcColor=SrcAlpha</c> for pre-multiplied alpha compositing.</param>
 public readonly record struct GraphicsPipelineDesc(
     IRenderPass RenderPass,
     IShader VertexShader,
@@ -83,4 +117,6 @@ public readonly record struct GraphicsPipelineDesc(
     bool CullBackFace = true,
     VertexInputBindingDesc[]? VertexBindings = null,
     VertexInputAttributeDesc[]? VertexAttributes = null,
-    PushConstantRange[]? PushConstantRanges = null);
+    PushConstantRange[]? PushConstantRanges = null,
+    IDescriptorSetLayout[]? DescriptorSetLayouts = null,
+    bool PremultipliedAlpha = false);

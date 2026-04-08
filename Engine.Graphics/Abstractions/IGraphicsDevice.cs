@@ -40,6 +40,20 @@ public interface IGraphicsDevice : IDisposable
     /// <summary>Handles window resize by recreating swapchain resources.</summary>
     void OnResize();
 
+    // ── Swapchain Resources ─────────────────────────────────────────────
+
+    /// <summary>The swapchain-compatible render pass. Nodes use this to begin their own render passes targeting the swapchain.</summary>
+    IRenderPass SwapchainRenderPass { get; }
+
+    /// <summary>The swapchain-compatible render pass with <c>loadOp = Load</c>.
+    /// Nodes that render after the initial clear pass use this to preserve existing framebuffer content.</summary>
+    IRenderPass SwapchainLoadRenderPass { get; }
+
+    /// <summary>Gets the swapchain framebuffer for the given image index (from <see cref="IFrameContext.FrameIndex"/>).</summary>
+    /// <param name="imageIndex">The swapchain image index.</param>
+    /// <returns>The framebuffer for the specified swapchain image.</returns>
+    IFramebuffer GetSwapchainFramebuffer(uint imageIndex);
+
     // ── Buffer API ──────────────────────────────────────────────────────
 
     /// <summary>Creates a GPU buffer with the specified descriptor.</summary>
@@ -87,9 +101,19 @@ public interface IGraphicsDevice : IDisposable
 
     // ── Descriptor API ──────────────────────────────────────────────────
 
-    /// <summary>Allocates a descriptor set for binding uniform buffers and samplers.</summary>
+    /// <summary>Creates a descriptor set layout from an array of binding descriptions.</summary>
+    /// <param name="bindings">The layout bindings.</param>
+    /// <returns>A new <see cref="IDescriptorSetLayout"/> handle.</returns>
+    IDescriptorSetLayout CreateDescriptorSetLayout(DescriptorSetLayoutBinding[] bindings);
+
+    /// <summary>Allocates a descriptor set using the default global layout (binding 0=UBO, 1=sampler).</summary>
     /// <returns>A new <see cref="IDescriptorSet"/> handle.</returns>
     IDescriptorSet CreateDescriptorSet();
+
+    /// <summary>Allocates a descriptor set using a custom layout.</summary>
+    /// <param name="layout">The descriptor set layout to allocate from.</param>
+    /// <returns>A new <see cref="IDescriptorSet"/> handle.</returns>
+    IDescriptorSet CreateDescriptorSet(IDescriptorSetLayout layout);
 
     /// <summary>Updates a descriptor set with optional uniform buffer and combined image sampler bindings.</summary>
     /// <param name="descriptorSet">The descriptor set to update.</param>
@@ -176,4 +200,43 @@ public interface IGraphicsDevice : IDisposable
     /// <param name="height">Texture height in pixels.</param>
     /// <param name="bytesPerPixel">Bytes per pixel (e.g., 4 for RGBA8).</param>
     void UploadTexture2D(IImage image, ReadOnlySpan<byte> data, uint width, uint height, int bytesPerPixel);
+
+    // ── Offscreen Rendering ──────────────────────────────────────────────
+
+    /// <summary>Creates an offscreen render pass with a single color attachment.</summary>
+    /// <param name="desc">Render pass creation descriptor.</param>
+    /// <returns>A new <see cref="IRenderPass"/> handle.</returns>
+    IRenderPass CreateRenderPass(RenderPassDesc desc);
+
+    /// <summary>Creates a framebuffer wrapping an image view for use with an offscreen render pass.</summary>
+    /// <param name="desc">Framebuffer creation descriptor.</param>
+    /// <returns>A new <see cref="IFramebuffer"/> handle.</returns>
+    IFramebuffer CreateFramebuffer(FramebufferDesc desc);
+
+    /// <summary>Allocates and begins a single-use command buffer for immediate GPU work.</summary>
+    /// <returns>An <see cref="ICommandBuffer"/> ready for recording commands.</returns>
+    ICommandBuffer BeginCommands();
+
+    /// <summary>Ends, submits, and waits for a single-use command buffer, then frees it.</summary>
+    /// <param name="commandBuffer">The command buffer returned by <see cref="BeginCommands"/>.</param>
+    void SubmitAndWait(ICommandBuffer commandBuffer);
+
+    /// <summary>Records the beginning of a render pass on the given command buffer.</summary>
+    /// <param name="commandBuffer">The active command buffer.</param>
+    /// <param name="renderPass">The render pass to begin.</param>
+    /// <param name="framebuffer">The framebuffer to render into.</param>
+    /// <param name="extent">The render area extent.</param>
+    /// <param name="clear">Optional clear color; <c>null</c> means load existing contents.</param>
+    void CmdBeginRenderPass(ICommandBuffer commandBuffer, IRenderPass renderPass, IFramebuffer framebuffer, Extent2D extent, ClearColor? clear = null);
+
+    /// <summary>Records the end of the current render pass on the given command buffer.</summary>
+    /// <param name="commandBuffer">The active command buffer.</param>
+    void CmdEndRenderPass(ICommandBuffer commandBuffer);
+
+    /// <summary>Records an image layout transition pipeline barrier on the given command buffer.</summary>
+    /// <param name="commandBuffer">The active command buffer.</param>
+    /// <param name="image">The image to transition.</param>
+    /// <param name="oldLayout">The current layout of the image.</param>
+    /// <param name="newLayout">The target layout.</param>
+    void CmdPipelineBarrier(ICommandBuffer commandBuffer, IImage image, ImageLayout oldLayout, ImageLayout newLayout);
 }

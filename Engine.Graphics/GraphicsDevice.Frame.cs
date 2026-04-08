@@ -4,8 +4,8 @@ namespace Engine;
 
 public sealed unsafe partial class GraphicsDevice
 {
-    /// <summary>Acquires the next swapchain image, begins a command buffer, and starts the render pass.</summary>
-    /// <param name="clearColor">The clear color applied to the color attachment.</param>
+    /// <summary>Acquires the next swapchain image and begins a command buffer. Render pass lifecycle is managed by graph nodes.</summary>
+    /// <param name="clearColor">The clear color (stored for SwapchainTarget consumers).</param>
     /// <returns>A <see cref="VulkanFrameContext"/> encapsulating the in-flight frame state.</returns>
     private partial IFrameContext BeginFrameInternal(ClearColor clearColor)
     {
@@ -34,26 +34,13 @@ public sealed unsafe partial class GraphicsDevice
         _deviceApi.vkResetCommandBuffer(cmd, 0).CheckResult();
         _deviceApi.vkBeginCommandBuffer(cmd, &beginInfo).CheckResult();
 
-        var clearValue = new VkClearValue(new VkClearColorValue(clearColor.R, clearColor.G, clearColor.B, clearColor.A));
-        VkRenderPassBeginInfo rpBegin = new()
-        {
-            renderPass = _renderPass,
-            framebuffer = _framebuffers[imageIndex],
-            renderArea = new VkRect2D(new VkOffset2D(0, 0), _swapchainExtent),
-            clearValueCount = 1,
-            pClearValues = &clearValue
-        };
-
-        _deviceApi.vkCmdBeginRenderPass(cmd, &rpBegin, VkSubpassContents.Inline);
-
-        return new VulkanFrameContext(this, imageIndex, _currentFrame, MaxFramesInFlight, cmd, _swapchainExtent, _renderPass, _framebuffers[imageIndex], _resizeVersion);
+        return new VulkanFrameContext(this, imageIndex, _currentFrame, MaxFramesInFlight, cmd, _swapchainExtent, _resizeVersion);
     }
 
-    /// <summary>Ends the render pass and command buffer, submits to the graphics queue, and presents the frame.</summary>
+    /// <summary>Ends the command buffer, submits to the graphics queue, and presents the frame.</summary>
     /// <param name="ctx">The frame context returned by <see cref="BeginFrameInternal"/>.</param>
     private partial void SubmitFrame(VulkanFrameContext ctx)
     {
-        _deviceApi.vkCmdEndRenderPass(ctx.CommandBufferHandle);
         _deviceApi.vkEndCommandBuffer(ctx.CommandBufferHandle).CheckResult();
 
         var waitStage = VkPipelineStageFlags.ColorAttachmentOutput;
@@ -137,10 +124,6 @@ public sealed unsafe partial class GraphicsDevice
         /// <inheritdoc />
         public ICommandBuffer CommandBuffer { get; }
         /// <inheritdoc />
-        public IRenderPass RenderPass { get; }
-        /// <inheritdoc />
-        public IFramebuffer Framebuffer { get; }
-        /// <inheritdoc />
         public Extent2D Extent { get; }
 
         /// <summary>The raw Vulkan command buffer handle for direct API calls.</summary>
@@ -153,12 +136,9 @@ public sealed unsafe partial class GraphicsDevice
         /// <param name="framesInFlight">Total number of frames allowed in flight.</param>
         /// <param name="cmd">The Vulkan command buffer for this frame.</param>
         /// <param name="extent">The current swapchain extent.</param>
-        /// <param name="renderPass">The active render pass handle.</param>
-        /// <param name="framebuffer">The target framebuffer handle.</param>
         /// <param name="resizeVersion">Swapchain resize generation at context creation time.</param>
         public VulkanFrameContext(GraphicsDevice owner, uint frameIndex, int inFlightIndex, int framesInFlight,
-            VkCommandBuffer cmd, VkExtent2D extent,
-            VkRenderPass renderPass, VkFramebuffer framebuffer, ulong resizeVersion)
+            VkCommandBuffer cmd, VkExtent2D extent, ulong resizeVersion)
         {
             _owner = owner;
             _bornResizeVersion = resizeVersion;
@@ -167,8 +147,6 @@ public sealed unsafe partial class GraphicsDevice
             FramesInFlight = framesInFlight;
             CommandBufferHandle = cmd;
             Extent = new Extent2D(extent.width, extent.height);
-            RenderPass = new VulkanRenderPass(renderPass);
-            Framebuffer = new VulkanFramebuffer(framebuffer);
             CommandBuffer = new VulkanCommandBuffer(cmd);
         }
 

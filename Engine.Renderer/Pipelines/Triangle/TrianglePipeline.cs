@@ -6,7 +6,6 @@ namespace Engine;
 /// no blending, and no back-face culling.  It is created once and reused for every frame.
 /// </remarks>
 /// <seealso cref="TriangleShaders"/>
-/// <seealso cref="SampleQueue"/>
 public sealed class TrianglePipeline : IDisposable
 {
     private static readonly ILogger Logger = Log.Category("Engine.Renderer.Triangle");

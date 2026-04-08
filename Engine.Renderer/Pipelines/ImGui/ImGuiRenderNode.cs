@@ -9,29 +9,15 @@ namespace Engine;
 /// Reads draw data directly from ImGui (valid after ImGui.Render(), before next NewFrame()).
 /// Manages its own pipeline and font atlas texture; vertex/index buffers are
 /// transiently allocated from the <see cref="DynamicBufferAllocator"/> each frame.
+/// Begins its own render pass with <see cref="LoadOp.Load"/> to preserve the 3D scene underneath.
 /// </summary>
-/// <remarks>
-/// <para>
-/// Pipeline and font atlas are created lazily on first <see cref="Execute"/>.
-/// Per-frame geometry is uploaded into transient dynamic buffer allocations that are
-/// automatically recycled after the GPU has consumed them.
-/// </para>
-/// <para>
-/// The node depends on <c>"sample"</c> so it renders <em>after</em> the 3D scene.
-/// </para>
-/// </remarks>
 /// <seealso cref="ImGuiShaders"/>
 /// <seealso cref="VulkanImGuiPlugin"/>
-internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
+internal sealed class ImGuiRenderNode : INode, IDisposable
 {
     private static readonly ILogger Logger = Log.Category("Engine.ImGui.Vulkan");
 
-    /// <inheritdoc />
-    public string Name => "imgui";
-    /// <inheritdoc />
-    public IReadOnlyCollection<string> Dependencies { get; } = new[] { "sample" };
-
-    // Pipeline and font resources (created lazily on first Execute)
+    // Pipeline and font resources (created lazily on first Run)
     private IPipeline? _pipeline;
     private IShader? _vertexShader;
     private IShader? _fragmentShader;
@@ -41,24 +27,21 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
     private IDescriptorSet? _fontDescriptorSet;
 
     /// <inheritdoc />
-    /// <param name="ctx">Renderer context providing GPU device access.</param>
-    /// <param name="cmds">Command recording context with dynamic allocator for transient buffers.</param>
-    /// <param name="renderWorld">The render world (unused by this node; ImGui data is read directly).</param>
-    public unsafe void Execute(RendererContext ctx, CommandRecordingContext cmds, RenderWorld renderWorld)
+    public unsafe void Run(RenderGraphContext graphContext, RenderContext renderContext, RenderWorld renderWorld)
     {
         var drawData = ImGui.GetDrawData();
         if (!drawData.Valid || drawData.CmdListsCount == 0)
             return;
 
-        var gfx = ctx.Graphics;
-        var cmd = cmds.FrameContext.CommandBuffer;
-        var extent = cmds.FrameContext.Extent;
-        var allocator = cmds.DynamicAllocator;
+        var gfx = renderContext.Device;
+        var allocator = renderContext.DynamicAllocator;
+        var swapchainTarget = renderWorld.TryGet<SwapchainTarget>();
+        if (swapchainTarget is null) return;
 
         // Lazy-init pipeline and font atlas
         if (_pipeline is null)
         {
-            CreatePipelineAndFontAtlas(gfx, cmds.FrameContext.RenderPass);
+            CreatePipelineAndFontAtlas(gfx, swapchainTarget.LoadRenderPass);
         }
 
         // Calculate total vertex/index sizes
@@ -70,10 +53,7 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
         ulong vertexSize = (ulong)(totalVertices * sizeof(ImDrawVert));
         ulong indexSize = (ulong)(totalIndices * sizeof(ushort));
 
-        // Allocate transient vertex/index buffers from the dynamic allocator.
-        // The allocator guarantees the backing buffer is idle (fence-waited) so
-        // CPU writes here are safe and the allocation lives until next BeginFrame
-        // recycles this in-flight slot.
+        // Allocate transient vertex/index buffers from the dynamic allocator
         DynamicAllocation vertexAlloc, indexAlloc;
         if (allocator is not null)
         {
@@ -111,6 +91,18 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
             allocator.Unmap(indexAlloc);
         }
 
+        // Begin render pass with LoadOp.Load to preserve 3D scene
+        var passDesc = new RenderPassDescriptor(
+            swapchainTarget.LoadRenderPass,
+            swapchainTarget.Framebuffer,
+            swapchainTarget.Extent,
+            LoadOp.Load,
+            StoreOp.Store);
+
+        using var pass = renderContext.BeginTrackedRenderPass(passDesc);
+
+        var extent = swapchainTarget.Extent;
+
         // Build orthographic projection matrix
         float L = drawData.DisplayPos.X;
         float R = drawData.DisplayPos.X + drawData.DisplaySize.X;
@@ -132,19 +124,19 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
         if (fbWidth <= 0 || fbHeight <= 0)
             return;
 
-        gfx.SetViewport(cmd, 0, 0, fbWidth, fbHeight, 0, 1);
+        pass.SetViewport(0, 0, fbWidth, fbHeight, 0, 1);
 
         // Bind pipeline and resources
-        gfx.BindGraphicsPipeline(cmd, _pipeline!);
-        gfx.BindDescriptorSet(cmd, _pipeline!, _fontDescriptorSet!);
+        pass.SetPipeline(_pipeline!);
+        pass.SetBindGroup(_pipeline!, _fontDescriptorSet!);
 
         // Push projection matrix
         var projBytes = MemoryMarshal.AsBytes(new ReadOnlySpan<Matrix4x4>(in projection));
-        gfx.PushConstants(cmd, _pipeline!, ShaderStageFlags.Vertex, 0, projBytes);
+        pass.PushConstants(_pipeline!, ShaderStageFlags.Vertex, 0, projBytes);
 
         // Bind vertex and index buffers from dynamic allocator
-        gfx.BindVertexBuffers(cmd, 0, new[] { vertexAlloc.Buffer }, new ulong[] { vertexAlloc.Offset });
-        gfx.BindIndexBuffer(cmd, indexAlloc.Buffer, indexAlloc.Offset, IndexType.UInt16);
+        pass.SetVertexBuffer(0, new[] { vertexAlloc.Buffer }, new ulong[] { vertexAlloc.Offset });
+        pass.SetIndexBuffer(indexAlloc.Buffer, indexAlloc.Offset, IndexType.UInt16);
 
         // Render draw commands
         var clipOff = drawData.DisplayPos;
@@ -183,9 +175,9 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
 
                 if (sw == 0 || sh == 0) continue;
 
-                gfx.SetScissor(cmd, sx, sy, sw, sh);
+                pass.SetScissor(sx, sy, sw, sh);
 
-                gfx.DrawIndexed(cmd,
+                pass.DrawIndexed(
                     pcmd.ElemCount,
                     instanceCount: 1,
                     firstIndex: (uint)(pcmd.IdxOffset + globalIdxOffset),
@@ -198,12 +190,10 @@ internal sealed class ImGuiRenderNode : IRenderNode, IDisposable
         }
 
         // Reset scissor to full framebuffer
-        gfx.SetScissor(cmd, 0, 0, extent.Width, extent.Height);
+        pass.SetScissor(0, 0, extent.Width, extent.Height);
     }
 
     /// <summary>Creates the ImGui graphics pipeline (with alpha blending and push-constant projection) and uploads the font atlas texture.</summary>
-    /// <param name="gfx">The graphics device to create GPU resources on.</param>
-    /// <param name="renderPass">The render pass the pipeline must be compatible with.</param>
     private unsafe void CreatePipelineAndFontAtlas(IGraphicsDevice gfx, IRenderPass renderPass)
     {
         Logger.Info("Creating ImGui Vulkan pipeline and font atlas...");

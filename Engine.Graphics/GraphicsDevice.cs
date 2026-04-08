@@ -55,6 +55,15 @@ public sealed partial class GraphicsDevice : IGraphicsDevice
     /// <inheritdoc />
     public int FramesInFlight => MaxFramesInFlight;
 
+    /// <inheritdoc />
+    public IRenderPass SwapchainRenderPass => new VulkanRenderPass(_renderPass);
+
+    /// <inheritdoc />
+    public IRenderPass SwapchainLoadRenderPass => new VulkanRenderPass(_loadRenderPass);
+
+    /// <inheritdoc />
+    public IFramebuffer GetSwapchainFramebuffer(uint imageIndex) => new VulkanFramebuffer(_framebuffers[imageIndex]);
+
     /// <summary>Creates a new uninitialized Vulkan graphics device. Call <see cref="Initialize"/> before use.</summary>
     public GraphicsDevice() => _swapchainWrapper = new VulkanSwapchain(this);
 
@@ -168,6 +177,7 @@ public sealed partial class GraphicsDevice : IGraphicsDevice
     private VkImageView[] _swapchainImageViews = Array.Empty<VkImageView>();
     private VkFramebuffer[] _framebuffers = Array.Empty<VkFramebuffer>();
     private VkRenderPass _renderPass;
+    private VkRenderPass _loadRenderPass;
     private uint _graphicsQueueFamily;
     private uint _presentQueueFamily;
     private VkQueue _graphicsQueue;
@@ -235,9 +245,9 @@ public sealed partial class GraphicsDevice : IGraphicsDevice
     /// <summary>Destroys all synchronization fences and semaphores.</summary>
     private partial void DestroySyncObjects();
 
-    /// <summary>Acquires the next swapchain image, begins a command buffer, and starts the render pass.</summary>
+    /// <summary>Acquires the next swapchain image and begins a command buffer (render pass lifecycle managed by nodes).</summary>
     private partial IFrameContext BeginFrameInternal(ClearColor clearColor);
 
-    /// <summary>Ends the render pass and command buffer, submits to the graphics queue, and presents the frame.</summary>
+    /// <summary>Ends the command buffer, submits to the graphics queue, and presents the frame.</summary>
     private partial void SubmitFrame(VulkanFrameContext ctx);
 }

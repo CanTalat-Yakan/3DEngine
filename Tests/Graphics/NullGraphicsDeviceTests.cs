@@ -74,8 +74,6 @@ public class NullGraphicsDeviceTests
         frame.Should().NotBeNull();
         frame.FrameIndex.Should().Be(1u);
         frame.CommandBuffer.Should().NotBeNull();
-        frame.RenderPass.Should().NotBeNull();
-        frame.Framebuffer.Should().NotBeNull();
         frame.Extent.Width.Should().Be(1);
         frame.Extent.Height.Should().Be(1);
         frame.FramesInFlight.Should().Be(1);

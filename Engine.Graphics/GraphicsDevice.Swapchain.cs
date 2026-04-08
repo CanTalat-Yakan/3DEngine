@@ -76,6 +76,8 @@ public sealed unsafe partial class GraphicsDevice
         CreateDepthResources();
         Logger.Debug("Creating render pass (color + depth attachments)...");
         CreateRenderPass();
+        Logger.Debug("Creating load render pass (loadOp=Load variant)...");
+        CreateLoadRenderPass();
         Logger.Debug("Creating framebuffers (one per swapchain image)...");
         CreateFramebuffers();
         Logger.Debug("Creating command pool and allocating command buffers...");
@@ -99,6 +101,8 @@ public sealed unsafe partial class GraphicsDevice
             _deviceApi.vkFreeMemory(_depthImageMemory);
         if (_renderPass.Handle != 0)
             _deviceApi.vkDestroyRenderPass(_renderPass);
+        if (_loadRenderPass.Handle != 0)
+            _deviceApi.vkDestroyRenderPass(_loadRenderPass);
         if (_swapchain.Handle != 0)
             _deviceApi.vkDestroySwapchainKHR(_swapchain);
         if (_commandPool.Handle != 0)
@@ -109,6 +113,7 @@ public sealed unsafe partial class GraphicsDevice
         _swapchainImages = Array.Empty<VkImage>();
         _commandBuffers = Array.Empty<VkCommandBuffer>();
         _renderPass = default;
+        _loadRenderPass = default;
         _swapchain = default;
         _commandPool = default;
         _depthImage = default;
@@ -292,6 +297,71 @@ public sealed unsafe partial class GraphicsDevice
         };
 
         _deviceApi.vkCreateRenderPass(&renderPassInfo, null, out _renderPass).CheckResult();
+    }
+
+    /// <summary>Creates a second render pass with <c>loadOp = Load</c> for subsequent passes that preserve existing content.</summary>
+    private void CreateLoadRenderPass()
+    {
+        var colorAttachment = new VkAttachmentDescription
+        {
+            format = _swapchainFormat,
+            samples = VkSampleCountFlags.Count1,
+            loadOp = VkAttachmentLoadOp.Load,
+            storeOp = VkAttachmentStoreOp.Store,
+            stencilLoadOp = VkAttachmentLoadOp.DontCare,
+            stencilStoreOp = VkAttachmentStoreOp.DontCare,
+            initialLayout = VkImageLayout.PresentSrcKHR,
+            finalLayout = VkImageLayout.PresentSrcKHR
+        };
+
+        var depthAttachment = new VkAttachmentDescription
+        {
+            format = VkFormat.D32Sfloat,
+            samples = VkSampleCountFlags.Count1,
+            loadOp = VkAttachmentLoadOp.Load,
+            storeOp = VkAttachmentStoreOp.DontCare,
+            stencilLoadOp = VkAttachmentLoadOp.DontCare,
+            stencilStoreOp = VkAttachmentStoreOp.DontCare,
+            initialLayout = VkImageLayout.DepthStencilAttachmentOptimal,
+            finalLayout = VkImageLayout.DepthStencilAttachmentOptimal
+        };
+
+        VkAttachmentDescription* attachments = stackalloc VkAttachmentDescription[2];
+        attachments[0] = colorAttachment;
+        attachments[1] = depthAttachment;
+
+        var colorAttachmentRef = new VkAttachmentReference { attachment = 0, layout = VkImageLayout.ColorAttachmentOptimal };
+        var depthAttachmentRef = new VkAttachmentReference { attachment = 1, layout = VkImageLayout.DepthStencilAttachmentOptimal };
+
+        var subpass = new VkSubpassDescription
+        {
+            pipelineBindPoint = VkPipelineBindPoint.Graphics,
+            colorAttachmentCount = 1,
+            pColorAttachments = &colorAttachmentRef,
+            pDepthStencilAttachment = &depthAttachmentRef
+        };
+
+        var dependency = new VkSubpassDependency
+        {
+            srcSubpass = uint.MaxValue,
+            dstSubpass = 0,
+            srcStageMask = VkPipelineStageFlags.ColorAttachmentOutput | VkPipelineStageFlags.EarlyFragmentTests,
+            dstStageMask = VkPipelineStageFlags.ColorAttachmentOutput | VkPipelineStageFlags.EarlyFragmentTests,
+            srcAccessMask = VkAccessFlags.ColorAttachmentWrite,
+            dstAccessMask = VkAccessFlags.ColorAttachmentRead | VkAccessFlags.ColorAttachmentWrite | VkAccessFlags.DepthStencilAttachmentWrite
+        };
+
+        VkRenderPassCreateInfo renderPassInfo = new()
+        {
+            attachmentCount = 2,
+            pAttachments = attachments,
+            subpassCount = 1,
+            pSubpasses = &subpass,
+            dependencyCount = 1,
+            pDependencies = &dependency
+        };
+
+        _deviceApi.vkCreateRenderPass(&renderPassInfo, null, out _loadRenderPass).CheckResult();
     }
 
     /// <summary>Creates one framebuffer per swapchain image, attaching color and depth views.</summary>

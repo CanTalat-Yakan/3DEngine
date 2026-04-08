@@ -3,16 +3,15 @@ using System.Diagnostics;
 namespace Engine;
 
 /// <summary>
-/// Orchestrates the rendering pipeline: extract → prepare → queue → graph execution.
+/// Orchestrates the Bevy-style rendering pipeline: extract → graph execution (update → auto-barrier → run per node).
 /// </summary>
 /// <remarks>
 /// <para>
 /// Each frame follows a fixed pipeline:
 /// <list>
 ///   <item><description><b>Extract</b> copies relevant game-world data into the <see cref="RenderWorld"/>.</description></item>
-///   <item><description><b>Prepare</b> uploads GPU resources (buffers, textures) using the extracted data.</description></item>
-///   <item><description><b>Queue</b> builds draw commands / render lists.</description></item>
-///   <item><description><b>Graph</b> executes <see cref="IRenderNode"/> instances in topological order.</description></item>
+///   <item><description><b>Graph</b> executes <see cref="INode"/> instances in topological order, with automatic
+///   image layout barrier insertion between nodes based on slot data flow.</description></item>
 /// </list>
 /// </para>
 /// </remarks>
@@ -25,8 +24,7 @@ public sealed class Renderer : IDisposable
 
     private readonly List<IExtractSystem> _extractSystems = new();
     private readonly List<IPrepareSystem> _prepareSystems = new();
-    private readonly List<IQueueSystem> _queueSystems = new();
-    
+
     /// <summary>The render-thread resource container.</summary>
     public RenderWorld RenderWorld { get; } = new();
 
@@ -57,8 +55,8 @@ public sealed class Renderer : IDisposable
         Diagnostics.Initialize(Context.AdapterInfo);
         Logger.Debug("Renderer diagnostics initialized.");
 
-        Graph.AddNode(new SampleNode());
-        Logger.Debug("Default SampleNode added to render graph.");
+        Graph.AddNode("main_pass", new MainPassNode());
+        Logger.Debug("Default MainPassNode added to render graph.");
 
         _initialized = true;
         Logger.Info($"Renderer initialized in {sw.ElapsedMilliseconds}ms.");
@@ -68,19 +66,11 @@ public sealed class Renderer : IDisposable
     /// <param name="sys">The extract system to add.</param>
     public void AddExtractSystem(IExtractSystem sys) => _extractSystems.Add(sys);
 
-    /// <summary>Registers a prepare system that uploads GPU resources each frame.</summary>
+    /// <summary>Registers a prepare system that runs before graph execution each frame.</summary>
     /// <param name="sys">The prepare system to add.</param>
     public void AddPrepareSystem(IPrepareSystem sys) => _prepareSystems.Add(sys);
 
-    /// <summary>Registers a queue system that builds draw commands each frame.</summary>
-    /// <param name="sys">The queue system to add.</param>
-    public void AddQueueSystem(IQueueSystem sys) => _queueSystems.Add(sys);
-
-    /// <summary>Adds a render graph node that will execute during the graph phase.</summary>
-    /// <param name="node">The render node to add.</param>
-    public void AddNode(IRenderNode node) => Graph.AddNode(node);
-
-    /// <summary>Executes one full render frame: extract → prepare → queue → graph.</summary>
+    /// <summary>Executes one full render frame: extract → begin frame → prepare → graph execution → end frame.</summary>
     /// <param name="world">The game world to read data from during the extract phase.</param>
     public void RenderFrame(World world)
     {
@@ -91,24 +81,79 @@ public sealed class Renderer : IDisposable
             sys.Run(world, RenderWorld);
 
         Logger.FrameTrace("RenderFrame: Beginning frame...");
-        var ctx = Context.BeginFrame(RenderWorld, out var imageIndex);
-        SyncSurfaceInfo(ctx.FrameContext.Extent);
-        UpdateDiagnostics(ctx.FrameContext.Extent);
+        var (renderCtx, frameCtx, imageIndex) = Context.BeginFrame(RenderWorld);
+        SyncSurfaceInfo(frameCtx.Extent);
+        UpdateDiagnostics(frameCtx.Extent);
 
         Logger.FrameTrace("RenderFrame: Running prepare systems...");
         foreach (var sys in _prepareSystems)
-            sys.Run(RenderWorld, Context, ctx);
-
-        Logger.FrameTrace("RenderFrame: Running queue systems...");
-        foreach (var sys in _queueSystems)
-            sys.Run(RenderWorld, Context, ctx);
+            sys.Run(RenderWorld, renderCtx);
 
         Logger.FrameTrace("RenderFrame: Executing render graph nodes...");
-        foreach (var node in Graph.TopologicalOrder())
-            node.Execute(Context, ctx, RenderWorld);
+        ExecuteGraph(renderCtx);
 
         Logger.FrameTrace("RenderFrame: Ending frame...");
-        Context.EndFrame(ctx, imageIndex);
+        Context.EndFrame(frameCtx, imageIndex);
+    }
+
+    /// <summary>Executes the render graph: per node calls Update → auto-barrier → Run.</summary>
+    private void ExecuteGraph(RenderContext renderCtx)
+    {
+        var orderedNodes = Graph.TopologicalOrder();
+        var outputStore = new Dictionary<string, SlotValue[]>();
+        var layoutTracker = new Dictionary<IImage, ImageLayout>();
+
+        foreach (var (label, node) in orderedNodes)
+        {
+            node.Update(RenderWorld);
+
+            // Gather inputs from connected upstream outputs
+            var inputs = Graph.GatherInputs(label, outputStore);
+
+            // Automatic barrier insertion: for TextureView inputs, transition to ShaderReadOnlyOptimal
+            foreach (var input in inputs)
+            {
+                if (input.Type != SlotType.TextureView) continue;
+
+                var imageView = input.AsTextureView();
+                var image = imageView.Image;
+                var currentLayout = layoutTracker.GetValueOrDefault(image, ImageLayout.Undefined);
+                if (currentLayout != ImageLayout.ShaderReadOnlyOptimal)
+                {
+                    renderCtx.Device.CmdPipelineBarrier(
+                        renderCtx.CommandBuffer, image, currentLayout, ImageLayout.ShaderReadOnlyOptimal);
+                    layoutTracker[image] = ImageLayout.ShaderReadOnlyOptimal;
+                }
+            }
+
+            // Execute the node
+            var graphCtx = new RenderGraphContext(inputs, node.Output().Length, RunSubGraph);
+            node.Run(graphCtx, renderCtx, RenderWorld);
+
+            // Track output textures as ColorAttachmentOptimal (they were rendered to)
+            var outputs = graphCtx.GetOutputs();
+            for (int i = 0; i < outputs.Length; i++)
+            {
+                if (outputs[i].Type != SlotType.TextureView) continue;
+                var imageView = outputs[i].AsTextureView();
+                layoutTracker[imageView.Image] = ImageLayout.ColorAttachmentOptimal;
+            }
+            outputStore[label] = outputs;
+        }
+    }
+
+    /// <summary>Runs a named sub-graph with forwarded slot values.</summary>
+    private void RunSubGraph(string name, SlotValue[] inputs)
+    {
+        var subGraph = Graph.GetSubGraph(name);
+        if (subGraph is null)
+        {
+            Logger.Warn($"Sub-graph '{name}' not found.");
+            return;
+        }
+        // Sub-graph execution would create its own RenderContext and execute similarly.
+        // Deferred to a follow-up iteration.
+        Logger.Debug($"Sub-graph '{name}' execution placeholder - not yet implemented.");
     }
 
     /// <summary>Syncs the render surface dimensions from the current swapchain extent.</summary>
@@ -149,7 +194,6 @@ public sealed class Renderer : IDisposable
     {
         Logger.Info("Disposing Renderer and underlying graphics context...");
 
-        DisposeSystems(_queueSystems);
         DisposeSystems(_prepareSystems);
         DisposeSystems(_extractSystems);
         Logger.Debug("Render systems disposed.");

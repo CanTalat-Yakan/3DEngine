@@ -34,8 +34,14 @@ public sealed class VulkanImGuiPlugin : IPlugin
                     return;
                 }
             
-                renderer.AddNode(new ImGuiRenderNode());
-                Logger.Info("ImGuiRenderNode registered in render graph.");
+                renderer.Graph.AddNode("imgui", new ImGuiRenderNode());
+                renderer.Graph.AddNodeEdge("main_pass", "imgui");
+
+                // Ensure imgui renders after webview composite (if present) so ImGui overlays on top
+                if (renderer.Graph.ContainsNode("webview"))
+                    renderer.Graph.AddNodeEdge("webview", "imgui");
+
+                Logger.Info("ImGuiRenderNode registered in render graph (after 'main_pass').");
             }, "VulkanImGuiPlugin.Startup")
             .MainThreadOnly()
             .Write<Renderer>());

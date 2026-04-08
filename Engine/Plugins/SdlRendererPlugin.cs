@@ -38,15 +38,14 @@ public sealed class SdlRendererPlugin : IPlugin
             : new ClearColor(0.45f, 0.55f, 0.60f, 1.00f)); // blue-ish for SDL
         Logger.Info($"Clear color set (R={color.R:F2}, G={color.G:F2}, B={color.B:F2}, A={color.A:F2}) for {cfg.Graphics} backend.");
 
-        Logger.Info("SdlRendererPlugin: Creating Renderer and wiring extract/prepare/queue systems...");
+        Logger.Info("SdlRendererPlugin: Creating Renderer and wiring extract/prepare systems...");
         var renderer = new Renderer(new RendererContext());
         renderer.AddExtractSystem(new ClearColorExtract());
         renderer.AddExtractSystem(new CameraExtract());
         renderer.AddExtractSystem(new MeshMaterialExtract());
-        renderer.AddPrepareSystem(new SamplePrepare());
-        renderer.AddQueueSystem(new SampleQueue());
+        renderer.AddPrepareSystem(new MeshPrepare());
         app.World.InsertResource(renderer);
-        Logger.Debug("Renderer resource registered with extract, prepare, and queue systems.");
+        Logger.Debug("Renderer resource registered with extract and prepare systems.");
 
         // Initialize Vulkan against SDL window if configured
         var window = app.World.Resource<AppWindow>();
@@ -85,6 +84,17 @@ public sealed class SdlRendererPlugin : IPlugin
         {
             Logger.Info("SdlRendererPlugin: Non-Vulkan backend - Vulkan renderer initialization skipped.");
         }
+
+        // Eagerly initialize the Renderer during Startup so the base render graph
+        // (including the "main_pass" node) exists before other plugins' Startup systems
+        // try to add edges referencing it (e.g. VulkanWebViewPlugin, VulkanImGuiPlugin).
+        app.AddSystem(Stage.Startup, new SystemDescriptor(world =>
+            {
+                if (world.TryGetResource<Renderer>(out var r) && r.Context.IsInitialized)
+                    r.Initialize();
+            }, "SdlRendererPlugin.Startup")
+            .MainThreadOnly()
+            .Write<Renderer>());
 
         // Run Vulkan renderer after other Render stage systems.
         // Also resolves debounced resize when the quiet period has elapsed.

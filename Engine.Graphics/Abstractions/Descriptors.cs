@@ -5,6 +5,25 @@ namespace Engine;
 /// <summary>Handle to an allocated descriptor set for binding resources to shaders.</summary>
 public interface IDescriptorSet : IDisposable { }
 
+/// <summary>Handle to a descriptor set layout defining the binding structure for a set.</summary>
+public interface IDescriptorSetLayout : IDisposable { }
+
+/// <summary>Descriptor resource type for layout bindings.</summary>
+public enum DescriptorType
+{
+    /// <summary>Uniform buffer (UBO).</summary>
+    UniformBuffer,
+    /// <summary>Combined image sampler (texture + sampler).</summary>
+    CombinedImageSampler
+}
+
+/// <summary>Describes a single binding within a descriptor set layout.</summary>
+/// <param name="Binding">Shader binding slot index.</param>
+/// <param name="Type">The type of descriptor resource.</param>
+/// <param name="Stages">Shader stages that access this binding.</param>
+/// <param name="Count">Number of descriptors in this binding (usually 1).</param>
+public readonly record struct DescriptorSetLayoutBinding(uint Binding, DescriptorType Type, ShaderStageFlags Stages, uint Count = 1);
+
 /// <summary>Binding descriptor for a uniform buffer within a descriptor set.</summary>
 /// <param name="Buffer">The uniform buffer to bind.</param>
 /// <param name="Binding">Shader binding slot index.</param>

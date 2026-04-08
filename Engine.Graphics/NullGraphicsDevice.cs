@@ -34,10 +34,6 @@ public sealed class NullGraphicsDevice : IGraphicsDevice
         /// <inheritdoc />
         public ICommandBuffer CommandBuffer { get; } = new NullCommandBuffer();
         /// <inheritdoc />
-        public IRenderPass RenderPass { get; } = new NullRenderPass();
-        /// <inheritdoc />
-        public IFramebuffer Framebuffer { get; } = new NullFramebuffer();
-        /// <inheritdoc />
         public Extent2D Extent { get; }
         /// <summary>Creates a frame context for the given frame index.</summary>
         public NullFrameContext(uint idx) { FrameIndex = idx; InFlightIndex = (int)(idx % 1); Extent = new Extent2D(1,1); }
@@ -70,6 +66,12 @@ public sealed class NullGraphicsDevice : IGraphicsDevice
     public void Dispose() { }
     /// <inheritdoc />
     public GraphicsAdapterInfo AdapterInfo => GraphicsAdapterInfo.Unknown;
+    /// <inheritdoc />
+    public IRenderPass SwapchainRenderPass => new NullRenderPass();
+    /// <inheritdoc />
+    public IRenderPass SwapchainLoadRenderPass => new NullRenderPass();
+    /// <inheritdoc />
+    public IFramebuffer GetSwapchainFramebuffer(uint imageIndex) => new NullFramebuffer();
 
     /// <inheritdoc />
     public IBuffer CreateBuffer(BufferDesc desc) => throw new NotSupportedException("NullGraphicsDevice does not support buffer creation.");
@@ -91,7 +93,11 @@ public sealed class NullGraphicsDevice : IGraphicsDevice
     public IPipeline CreateGraphicsPipeline(GraphicsPipelineDesc desc) => throw new NotSupportedException("NullGraphicsDevice does not support pipelines.");
 
     /// <inheritdoc />
+    public IDescriptorSetLayout CreateDescriptorSetLayout(DescriptorSetLayoutBinding[] bindings) => throw new NotSupportedException("NullGraphicsDevice does not support descriptors.");
+    /// <inheritdoc />
     public IDescriptorSet CreateDescriptorSet() => throw new NotSupportedException("NullGraphicsDevice does not support descriptors.");
+    /// <inheritdoc />
+    public IDescriptorSet CreateDescriptorSet(IDescriptorSetLayout layout) => throw new NotSupportedException("NullGraphicsDevice does not support descriptors.");
     /// <inheritdoc />
     public void UpdateDescriptorSet(IDescriptorSet descriptorSet, in UniformBufferBinding? uniformBinding, in CombinedImageSamplerBinding? samplerBinding)
         => throw new NotSupportedException("NullGraphicsDevice does not support descriptors.");
@@ -135,4 +141,26 @@ public sealed class NullGraphicsDevice : IGraphicsDevice
     /// <inheritdoc />
     public void UploadTexture2D(IImage image, ReadOnlySpan<byte> data, uint width, uint height, int bytesPerPixel)
         => throw new NotSupportedException("NullGraphicsDevice does not support texture upload.");
+
+    /// <inheritdoc />
+    public IRenderPass CreateRenderPass(RenderPassDesc desc)
+        => throw new NotSupportedException("NullGraphicsDevice does not support offscreen rendering.");
+    /// <inheritdoc />
+    public IFramebuffer CreateFramebuffer(FramebufferDesc desc)
+        => throw new NotSupportedException("NullGraphicsDevice does not support offscreen rendering.");
+    /// <inheritdoc />
+    public ICommandBuffer BeginCommands()
+        => throw new NotSupportedException("NullGraphicsDevice does not support command buffers.");
+    /// <inheritdoc />
+    public void SubmitAndWait(ICommandBuffer commandBuffer)
+        => throw new NotSupportedException("NullGraphicsDevice does not support command buffers.");
+    /// <inheritdoc />
+    public void CmdBeginRenderPass(ICommandBuffer commandBuffer, IRenderPass renderPass, IFramebuffer framebuffer, Extent2D extent, ClearColor? clear = null)
+        => throw new NotSupportedException("NullGraphicsDevice does not support offscreen rendering.");
+    /// <inheritdoc />
+    public void CmdEndRenderPass(ICommandBuffer commandBuffer)
+        => throw new NotSupportedException("NullGraphicsDevice does not support offscreen rendering.");
+    /// <inheritdoc />
+    public void CmdPipelineBarrier(ICommandBuffer commandBuffer, IImage image, ImageLayout oldLayout, ImageLayout newLayout)
+        => throw new NotSupportedException("NullGraphicsDevice does not support pipeline barriers.");
 }

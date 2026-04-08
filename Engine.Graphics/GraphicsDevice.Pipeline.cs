@@ -97,10 +97,14 @@ public sealed unsafe partial class GraphicsDevice
     /// <inheritdoc />
     public IPipeline CreateGraphicsPipeline(GraphicsPipelineDesc desc)
     {
-        if (desc.RenderPass is not VulkanRenderPass rpWrapper)
+        VkRenderPass rpHandle;
+        if (desc.RenderPass is VulkanRenderPass rpWrapper)
+            rpHandle = rpWrapper.Handle;
+        else if (desc.RenderPass is VulkanOffscreenRenderPass offscreenRp)
+            rpHandle = offscreenRp.Handle;
+        else
             throw new ArgumentException("RenderPass must originate from this GraphicsDevice.", nameof(desc));
 
-        VkRenderPass rpHandle = rpWrapper.Handle;
 
         var vs = (VulkanShader)desc.VertexShader;
         var fs = (VulkanShader)desc.FragmentShader;
@@ -192,7 +196,7 @@ public sealed unsafe partial class GraphicsDevice
         {
             colorWriteMask = VkColorComponentFlags.R | VkColorComponentFlags.G | VkColorComponentFlags.B | VkColorComponentFlags.A,
             blendEnable = desc.BlendEnabled,
-            srcColorBlendFactor = VkBlendFactor.SrcAlpha,
+            srcColorBlendFactor = desc.PremultipliedAlpha ? VkBlendFactor.One : VkBlendFactor.SrcAlpha,
             dstColorBlendFactor = VkBlendFactor.OneMinusSrcAlpha,
             colorBlendOp = VkBlendOp.Add,
             srcAlphaBlendFactor = VkBlendFactor.One,
@@ -216,8 +220,25 @@ public sealed unsafe partial class GraphicsDevice
             pDynamicStates = dynamics
         };
 
-        VkDescriptorSetLayout* setLayouts = stackalloc VkDescriptorSetLayout[1];
-        setLayouts[0] = _cameraSetLayout;
+        int setLayoutCount;
+        int maxSetLayouts = desc.DescriptorSetLayouts is { Length: > 0 } ? desc.DescriptorSetLayouts.Length : 1;
+        VkDescriptorSetLayout* setLayouts = stackalloc VkDescriptorSetLayout[maxSetLayouts];
+        if (desc.DescriptorSetLayouts is { Length: > 0 } customLayouts)
+        {
+            setLayoutCount = customLayouts.Length;
+            for (int i = 0; i < setLayoutCount; i++)
+            {
+                if (customLayouts[i] is VulkanDescriptorSetLayout vkDsl)
+                    setLayouts[i] = vkDsl.Handle;
+                else
+                    throw new ArgumentException("Descriptor set layout was not created by this device.", nameof(desc));
+            }
+        }
+        else
+        {
+            setLayoutCount = 1;
+            setLayouts[0] = _cameraSetLayout;
+        }
 
         // Push constant ranges
         var pcCount = desc.PushConstantRanges?.Length ?? 0;
@@ -235,7 +256,7 @@ public sealed unsafe partial class GraphicsDevice
 
         VkPipelineLayoutCreateInfo layoutInfo = new()
         {
-            setLayoutCount = 1,
+            setLayoutCount = (uint)setLayoutCount,
             pSetLayouts = setLayouts,
             pushConstantRangeCount = (uint)pcCount,
             pPushConstantRanges = pcCount > 0 ? vkPcRanges : null

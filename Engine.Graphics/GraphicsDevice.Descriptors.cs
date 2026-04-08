@@ -51,7 +51,7 @@ public sealed unsafe partial class GraphicsDevice
             binding = 0,
             descriptorType = VkDescriptorType.UniformBuffer,
             descriptorCount = 1,
-            stageFlags = VkShaderStageFlags.Vertex
+            stageFlags = VkShaderStageFlags.Vertex | VkShaderStageFlags.Fragment
         };
         bindings[1] = new VkDescriptorSetLayoutBinding
         {
@@ -70,15 +70,15 @@ public sealed unsafe partial class GraphicsDevice
         _deviceApi.vkCreateDescriptorSetLayout(&layoutInfo, null, out _cameraSetLayout).CheckResult();
         Logger.Debug("Descriptor set layout created.");
 
-        Logger.Debug("Creating descriptor pool (64 UBOs + 64 samplers, maxSets=64)...");
+        Logger.Debug("Creating descriptor pool (256 UBOs + 256 samplers, maxSets=256)...");
         VkDescriptorPoolSize* poolSizes = stackalloc VkDescriptorPoolSize[2];
-        poolSizes[0] = new VkDescriptorPoolSize(VkDescriptorType.UniformBuffer, 64);
-        poolSizes[1] = new VkDescriptorPoolSize(VkDescriptorType.CombinedImageSampler, 64);
+        poolSizes[0] = new VkDescriptorPoolSize(VkDescriptorType.UniformBuffer, 256);
+        poolSizes[1] = new VkDescriptorPoolSize(VkDescriptorType.CombinedImageSampler, 256);
 
         VkDescriptorPoolCreateInfo poolInfo = new()
         {
             flags = VkDescriptorPoolCreateFlags.FreeDescriptorSet,
-            maxSets = 64,
+            maxSets = 256,
             poolSizeCount = 2,
             pPoolSizes = poolSizes
         };
@@ -124,7 +124,88 @@ public sealed unsafe partial class GraphicsDevice
         return new VulkanDescriptorSet(this, set);
     }
 
+    /// <summary>Wraps a Vulkan descriptor set layout for custom pipeline layouts.</summary>
+    private sealed class VulkanDescriptorSetLayout : IDescriptorSetLayout
+    {
+        private readonly GraphicsDevice _device;
+        internal VkDescriptorSetLayout Handle;
+
+        public VulkanDescriptorSetLayout(GraphicsDevice device, VkDescriptorSetLayout handle)
+        {
+            _device = device;
+            Handle = handle;
+        }
+
+        public void Dispose()
+        {
+            if (Handle.Handle != 0)
+            {
+                _device._deviceApi.vkDestroyDescriptorSetLayout(Handle);
+                Handle = default;
+            }
+        }
+    }
+
+    /// <inheritdoc />
+    public IDescriptorSetLayout CreateDescriptorSetLayout(DescriptorSetLayoutBinding[] bindings)
+    {
+        if (_descriptorPool.Handle == 0)
+            CreateDescriptorResources();
+
+        VkDescriptorSetLayoutBinding* vkBindings = stackalloc VkDescriptorSetLayoutBinding[bindings.Length];
+        for (int i = 0; i < bindings.Length; i++)
+        {
+            vkBindings[i] = new VkDescriptorSetLayoutBinding
+            {
+                binding = bindings[i].Binding,
+                descriptorType = bindings[i].Type switch
+                {
+                    DescriptorType.UniformBuffer => VkDescriptorType.UniformBuffer,
+                    DescriptorType.CombinedImageSampler => VkDescriptorType.CombinedImageSampler,
+                    _ => throw new ArgumentOutOfRangeException()
+                },
+                descriptorCount = bindings[i].Count,
+                stageFlags = ToVkShaderStageFlags(bindings[i].Stages)
+            };
+        }
+
+        VkDescriptorSetLayoutCreateInfo layoutInfo = new()
+        {
+            bindingCount = (uint)bindings.Length,
+            pBindings = vkBindings
+        };
+
+        _deviceApi.vkCreateDescriptorSetLayout(&layoutInfo, null, out VkDescriptorSetLayout layout).CheckResult();
+        return new VulkanDescriptorSetLayout(this, layout);
+    }
+
+    /// <inheritdoc />
+    public IDescriptorSet CreateDescriptorSet(IDescriptorSetLayout layout)
+    {
+        if (_descriptorPool.Handle == 0)
+            CreateDescriptorResources();
+
+        if (layout is not VulkanDescriptorSetLayout vkLayout)
+            throw new ArgumentException("Descriptor set layout was not created by this device.", nameof(layout));
+
+        VkDescriptorSet set;
+        VkDescriptorSetLayout* layouts = stackalloc VkDescriptorSetLayout[1];
+        layouts[0] = vkLayout.Handle;
+
+        VkDescriptorSetAllocateInfo allocInfo = new()
+        {
+            descriptorPool = _descriptorPool,
+            descriptorSetCount = 1,
+            pSetLayouts = layouts
+        };
+
+        _deviceApi.vkAllocateDescriptorSets(&allocInfo, &set).CheckResult();
+        return new VulkanDescriptorSet(this, set);
+    }
+
+    IDescriptorSetLayout IGraphicsDevice.CreateDescriptorSetLayout(DescriptorSetLayoutBinding[] bindings) => CreateDescriptorSetLayout(bindings);
     IDescriptorSet IGraphicsDevice.CreateDescriptorSet() => CreateDescriptorSet();
+    IDescriptorSet IGraphicsDevice.CreateDescriptorSet(IDescriptorSetLayout layout) => CreateDescriptorSet(layout);
 
     /// <summary>Updates a descriptor set with optional uniform buffer and combined image sampler bindings by writing to Vulkan descriptors.</summary>
     /// <param name="descriptorSet">The descriptor set to update.</param>

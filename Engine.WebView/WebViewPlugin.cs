@@ -4,6 +4,7 @@ namespace Engine;
 /// Plugin that integrates UltralightNet into the engine.
 /// Creates a <see cref="WebViewInstance"/> resource, hooks SDL3 events for input,
 /// and registers per-frame Update and Cleanup systems.
+/// Uses CPU bitmap surface rendering — pixels are uploaded to a Vulkan texture each frame.
 /// <para>
 /// By default loads a simple "about:blank" page. Call
 /// <see cref="WebViewInstance.LoadHtml"/> or <see cref="WebViewInstance.LoadUrl"/>
@@ -24,23 +25,13 @@ public sealed class WebViewPlugin : IPlugin
     /// <summary>Optional initial URL to load. Set before adding to App.</summary>
     public string? InitialUrl { get; init; }
 
-    /// <summary>
-    /// Rendering mode for the webview. Defaults to <see cref="WebViewMode.Gpu"/> for GPU-accelerated
-    /// rendering via the Vulkan GPU driver. Set to <see cref="WebViewMode.Cpu"/> to fall back to
-    /// CPU bitmap surface rendering.
-    /// </summary>
-    public WebViewMode Mode { get; init; } = WebViewMode.Gpu;
-
     /// <inheritdoc />
     public void Build(App app)
     {
-        Logger.Info($"WebViewPlugin: Building (mode={Mode})...");
+        Logger.Info("WebViewPlugin: Building (CPU bitmap mode)...");
 
         var webview = new WebViewInstance();
         app.World.InsertResource(webview);
-
-        // Capture the mode for closures
-        var mode = Mode;
 
         // ── Debounce state for WebView native resize ──
         bool pendingWebViewResize = false;
@@ -53,30 +44,8 @@ public sealed class WebViewPlugin : IPlugin
                 var cfg = world.Resource<Config>();
                 var b = world.Resource<WebViewInstance>();
 
-                // Create GPU driver if GPU mode is selected and Vulkan is active
-                VulkanUltralightGpuDriver? gpuDriver = null;
-                if (mode == WebViewMode.Gpu && cfg.Graphics == GraphicsBackend.Vulkan)
-                {
-                    if (world.TryGetResource<Renderer>(out var renderer) && renderer.Context.IsInitialized)
-                    {
-                        gpuDriver = new VulkanUltralightGpuDriver(renderer.Context.Graphics);
-                        world.InsertResource(gpuDriver);
-                        Logger.Info("WebViewPlugin: GPU driver created and registered as resource.");
-                    }
-                    else
-                    {
-                        Logger.Warn("WebViewPlugin: GPU mode requested but Vulkan renderer not initialized. Falling back to CPU mode.");
-                        mode = WebViewMode.Cpu;
-                    }
-                }
-                else if (mode == WebViewMode.Gpu)
-                {
-                    Logger.Warn($"WebViewPlugin: GPU mode requires Vulkan backend (current: {cfg.Graphics}). Falling back to CPU mode.");
-                    mode = WebViewMode.Cpu;
-                }
-
-                // Initialize at config dimensions
-                b.Initialize((uint)cfg.WindowData.Width, (uint)cfg.WindowData.Height, mode, gpuDriver);
+                // Initialize at config dimensions (CPU bitmap mode)
+                b.Initialize((uint)cfg.WindowData.Width, (uint)cfg.WindowData.Height);
 
                 if (InitialHtml is not null)
                 {
@@ -92,7 +61,7 @@ public sealed class WebViewPlugin : IPlugin
                     b.LoadHtml(LoadDefaultHtml());
                 }
 
-                Logger.Info($"WebViewPlugin: Ultralight initialized (mode={mode}) and content loaded.");
+                Logger.Info("WebViewPlugin: Ultralight initialized (CPU bitmap) and content loaded.");
 
                 // Hook SDL events for input forwarding
                 if (world.TryGetResource<AppWindow>(out var window))
@@ -118,9 +87,6 @@ public sealed class WebViewPlugin : IPlugin
                 if (world.TryGetResource<Renderer>(out var rend))
                 {
                     rend.RenderWorld.Set(b);
-                    // Also sync the GPU driver to the render world if in GPU mode
-                    if (gpuDriver is not null)
-                        rend.RenderWorld.Set(gpuDriver);
                     Logger.Info("WebViewPlugin: WebViewInstance synced to RenderWorld.");
                 }
             }, "WebViewPlugin.Startup")
@@ -152,11 +118,6 @@ public sealed class WebViewPlugin : IPlugin
         // ── Cleanup: dispose Ultralight ──────────────────────────────
         app.AddSystem(Stage.Cleanup, new SystemDescriptor(static (World world) =>
             {
-                if (world.TryGetResource<VulkanUltralightGpuDriver>(out var gpuDriver))
-                {
-                    gpuDriver.Dispose();
-                    world.RemoveResource<VulkanUltralightGpuDriver>();
-                }
                 if (world.TryGetResource<WebViewInstance>(out var b))
                 {
                     b.Dispose();

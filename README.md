@@ -178,8 +178,8 @@ See `Engine/Program.cs` for the runtime entry point and `Editor/Program.cs` for 
   `VulkanWebViewPlugin`, `VulkanImGuiPlugin`.
 - **Vulkan graphics device** - Instance creation, physical device selection, logical device, swapchain management,
   pipeline creation, buffer/image allocation (VMA), descriptor sets, and synchronization primitives.
-- **Render pipeline** - Extract → Prepare → Queue → Graph execution model with `RenderWorld`, `RenderGraph`,
-  `IRenderNode`, `RendererContext`, and `RendererDiagnostics`.
+- **Render pipeline** - Extract → Graph execution model with `RenderWorld`, `RenderGraph`,
+  `INode`, `ViewNode`, `RenderContext`, `TrackedRenderPass`, `RendererContext`, and `RendererDiagnostics`.
 - **Shader pipeline** - GLSL → SPIR-V compilation via `Vortice.ShaderCompiler`; SPIR-V cross-reflection via
   `Vortice.SpirvCross`.
 - **ImGui overlays** - Performance HUD (FPS, frame time, entity count), schedule debug HUD (batch composition,
@@ -820,40 +820,49 @@ registration required.
 
 ### Render Pipeline
 
-The `Renderer` orchestrates a four-phase pipeline each frame:
+The `Renderer` orchestrates a Bevy-style rendering pipeline each frame:
 
 ```
- Extract ──► Prepare ──► Queue ──► Graph
+ Extract ──► BeginFrame ──► Prepare ──► Graph (Update → Barrier → Run per node) ──► EndFrame
 ```
 
 | Phase | Interface | Purpose |
 |---|---|---|
 | **Extract** | `IExtractSystem` | Copy game-world data into the `RenderWorld` |
-| **Prepare** | `IPrepareSystem` | Upload GPU resources (buffers, textures) |
-| **Queue** | `IQueueSystem` | Build draw commands and render lists |
-| **Graph** | `IRenderNode` | Execute render passes in topological order |
+| **Prepare** | `IPrepareSystem` | Upload GPU resources (buffers, textures) before graph execution |
+| **Graph** | `INode` / `ViewNode` | Execute render passes in topological order with typed slot edges |
+
+Each `INode` owns its own render passes and declares typed input/output slots (`SlotInfo`).
+`ViewNode` is a convenience base that auto-iterates `RenderCameras`, calling a per-camera `Run` overload.
+Nodes receive a `RenderContext` (wrapping `IGraphicsDevice`, `ICommandBuffer`, and `DynamicBufferAllocator`)
+and a `RenderGraphContext` for accessing slot values and running sub-graphs.
+`TrackedRenderPass` wraps begin/end render pass lifecycle with typed helpers for pipeline binding, draw calls, and push constants.
 
 ```csharp
-// Register custom render systems on the Renderer
+// Register custom render systems and graph nodes
 var renderer = world.Resource<Renderer>();
 renderer.AddExtractSystem(new MyExtractSystem());
 renderer.AddPrepareSystem(new MyPrepareSystem());
-renderer.AddQueueSystem(new MyQueueSystem());
-renderer.AddNode(new MyRenderNode());
+renderer.Graph.AddNode("mypass", new MyNode());
+renderer.Graph.AddNodeEdge("sample", "mypass");
 
-// Implement a custom render node
-public class MyRenderNode : IRenderNode
+// Implement a custom render graph node
+public class MyNode : INode
 {
-    public void Execute(RendererContext ctx, /* frame context */ ..., RenderWorld rw)
+    public void Run(RenderGraphContext graphContext, RenderContext renderContext, RenderWorld rw)
     {
-        // Issue draw calls using ctx.Device, read data from rw
+        var swapchain = rw.TryGet<SwapchainTarget>();
+        using var pass = renderContext.BeginTrackedRenderPass(new RenderPassDescriptor(
+            swapchain.RenderPass, swapchain.Framebuffer, swapchain.Extent, LoadOp.Load, StoreOp.Store));
+        pass.SetPipeline(myPipeline);
+        pass.Draw(vertexCount: 3);
     }
 }
 ```
 
-`RenderGraph` manages the directed acyclic graph of `IRenderNode` instances. `RendererContext` wraps the
-`GraphicsDevice` and provides frame-scoped resources (camera, dynamic allocator). `RendererDiagnostics` tracks adapter
-info, surface extent, and frame statistics.
+`RenderGraph` manages the directed acyclic graph of `INode` instances with typed slot edges and sub-graph support.
+`RendererContext` wraps the `GraphicsDevice` and provides frame-scoped resources (camera UBOs, dynamic allocator,
+`SwapchainTarget`). `RendererDiagnostics` tracks adapter info, surface extent, and frame statistics.
 
 ### Editor Architecture
 

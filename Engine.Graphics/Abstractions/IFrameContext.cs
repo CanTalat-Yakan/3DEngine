@@ -1,8 +1,9 @@
 namespace Engine;
 
 /// <summary>
-/// Per-frame rendering context providing access to the command buffer, render pass, framebuffer,
+/// Per-frame rendering context providing access to the command buffer
 /// and in-flight frame indices for GPU resource double/triple buffering.
+/// Render pass lifecycle is managed by individual render graph nodes, not the frame context.
 /// </summary>
 /// <seealso cref="IGraphicsDevice"/>
 public interface IFrameContext : IDisposable
@@ -13,11 +14,6 @@ public interface IFrameContext : IDisposable
     /// <summary>The command buffer for recording draw commands this frame.</summary>
     ICommandBuffer CommandBuffer { get; }
 
-    /// <summary>The active render pass for this frame.</summary>
-    IRenderPass RenderPass { get; }
-
-    /// <summary>The framebuffer (attachments) for this frame's render pass.</summary>
-    IFramebuffer Framebuffer { get; }
 
     /// <summary>Current swapchain extent (width × height) in pixels.</summary>
     Extent2D Extent { get; }

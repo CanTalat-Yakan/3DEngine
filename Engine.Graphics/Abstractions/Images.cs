@@ -54,3 +54,17 @@ public interface IImageView : IDisposable
     /// <summary>The underlying image this view references.</summary>
     IImage Image { get; }
 }
+
+/// <summary>Abstract image layout states used for pipeline barrier transitions.</summary>
+public enum ImageLayout
+{
+    /// <summary>Undefined / don't-care initial layout.</summary>
+    Undefined,
+    /// <summary>Optimal layout for use as a color attachment (render target).</summary>
+    ColorAttachmentOptimal,
+    /// <summary>Optimal layout for sampling from a shader.</summary>
+    ShaderReadOnlyOptimal,
+    /// <summary>Optimal layout for use as a transfer destination.</summary>
+    TransferDstOptimal,
+}
+
