@@ -314,10 +314,10 @@ public class EcsWorldTests
         ecs.Changed<TestComp>(e).Should().BeTrue();
     }
 
-    // ── IterateRef ──────────────────────────────────────────────────────
+    // ── QueryRef ──────────────────────────────────────────────────────
 
     [Fact]
-    public void IterateRef_ModifiesComponents()
+    public void QueryRef_ModifiesComponents()
     {
         var ecs = new EcsWorld();
         int e1 = ecs.Spawn();
@@ -326,7 +326,7 @@ public class EcsWorldTests
         ecs.Add(e2, new TestComp { A = 2 });
 
         ecs.BeginFrame();
-        foreach (var rc in ecs.IterateRef<TestComp>())
+        foreach (var rc in ecs.QueryRef<TestComp>())
             rc.Component.A += 5;
 
         ecs.Changed<TestComp>(e1).Should().BeTrue();
@@ -336,7 +336,7 @@ public class EcsWorldTests
     }
 
     [Fact]
-    public void IterateRef_TwoComponents_ModifiesBoth()
+    public void QueryRef_TwoComponents_ModifiesBoth()
     {
         var ecs = new EcsWorld();
         int e1 = ecs.Spawn();
@@ -347,7 +347,7 @@ public class EcsWorldTests
         ecs.Add(e2, new OtherComp { B = 2 });
 
         ecs.BeginFrame();
-        foreach (var rc in ecs.IterateRef<TestComp, OtherComp>())
+        foreach (var rc in ecs.QueryRef<TestComp, OtherComp>())
         {
             rc.C1.A += rc.C2.B * 10;
             rc.C2.B += 3;

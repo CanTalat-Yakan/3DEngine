@@ -589,7 +589,7 @@ are disposed.
 | Mode | Allocation | Marks Changed | Best For |
 |---|---|---|---|
 | `Query<T>()` | Value-copy tuples | No | Read-only scans, LINQ |
-| `IterateRef<T>()` | Zero-allocation refs | Yes | In-place mutation |
+| `QueryRef<T>()` | Zero-allocation refs | Yes | In-place mutation |
 | `GetSpan<T>()` | Raw spans | No (manual) | Tight indexed loops |
 | `TransformEach<T>(fn)` | Per-component callback | Yes | Bulk mutation |
 | `ParallelTransformEach<T>(fn)` | Per-component callback | Yes | Large sets, no cross-entity deps |
@@ -607,11 +607,11 @@ foreach (var (e, hp) in ecs.QueryWhere<Health>(h => h.Value <= 0))
     ecs.Despawn(e);
 
 // Zero-allocation ref iteration (marks changed)
-foreach (var rc in ecs.IterateRef<Velocity>())
+foreach (var rc in ecs.QueryRef<Velocity>())
     rc.Component.dx += 1;
 
 // Two-component ref iteration
-foreach (var rc in ecs.IterateRef<Position, Velocity>())
+foreach (var rc in ecs.QueryRef<Position, Velocity>())
     rc.C1.x += rc.C2.dx;
 
 // Mutate in-place via function (marks changed, no-op if missing)
@@ -633,7 +633,7 @@ ecs.TransformEach<Mass>((e, m) => m); // mark all changed
 ### Change Tracking
 
 - Each `ComponentStore<T>` maintains a per-entity "changed this frame" bitset aligned to dense storage.
-- The bit is set by `Update`, `TransformEach`, `ParallelTransformEach`, and `IterateRef`.
+- The bit is set by `Update`, `TransformEach`, `ParallelTransformEach`, and `QueryRef`.
 - `Changed<T>(id)` reads the bit; bits are cleared at `BeginFrame()` (executed in `Stage.First` by `DefaultPlugins`).
 
 ### Entity Generations

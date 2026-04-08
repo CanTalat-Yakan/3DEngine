@@ -6,7 +6,7 @@ public sealed partial class EcsWorld
     /// <typeparam name="T">The component type.</typeparam>
     /// <example>
     /// <code>
-    /// foreach (var rc in ecs.IterateRef&lt;Position&gt;())
+    /// foreach (var rc in ecs.QueryRef&lt;Position&gt;())
     /// {
     ///     int entity = rc.Entity;
     ///     rc.Component.X += 1.0f; // direct mutation by ref
@@ -36,13 +36,13 @@ public sealed partial class EcsWorld
 
     /// <summary>
     /// Zero-allocation ref-based enumerable for iterating a single component type with direct mutable access.
-    /// Returned by <see cref="EcsWorld.IterateRef{T}"/>.
+    /// Returned by <see cref="EcsWorld.QueryRef{T}"/>.
     /// </summary>
     /// <typeparam name="T">The component type.</typeparam>
     /// <example>
     /// <code>
     /// // Heal all entities with a Health component
-    /// foreach (var rc in ecs.IterateRef&lt;Health&gt;())
+    /// foreach (var rc in ecs.QueryRef&lt;Health&gt;())
     ///     rc.Component.Current = Math.Min(rc.Component.Current + 1, rc.Component.Max);
     /// </code>
     /// </example>
@@ -124,7 +124,7 @@ public sealed partial class EcsWorld
     /// <typeparam name="T2">The second component type.</typeparam>
     /// <example>
     /// <code>
-    /// foreach (var pair in ecs.IterateRef&lt;Position, Velocity&gt;())
+    /// foreach (var pair in ecs.QueryRef&lt;Position, Velocity&gt;())
     /// {
     ///     ref var pos = ref pair.C1;
     ///     ref var vel = ref pair.C2;
@@ -162,14 +162,14 @@ public sealed partial class EcsWorld
     /// <summary>
     /// Zero-allocation ref-based enumerable for iterating entities that match both
     /// <typeparamref name="T1"/> and <typeparamref name="T2"/>, providing direct mutable access to both.
-    /// Returned by <see cref="EcsWorld.IterateRef{T1,T2}"/>.
+    /// Returned by <see cref="EcsWorld.QueryRef{T1,T2}"/>.
     /// </summary>
     /// <typeparam name="T1">The first component type.</typeparam>
     /// <typeparam name="T2">The second component type.</typeparam>
     /// <example>
     /// <code>
     /// // Apply drag to all entities with Position and Velocity
-    /// foreach (var pair in ecs.IterateRef&lt;Position, Velocity&gt;())
+    /// foreach (var pair in ecs.QueryRef&lt;Position, Velocity&gt;())
     /// {
     ///     pair.C2.X *= 0.99f;
     ///     pair.C2.Y *= 0.99f;

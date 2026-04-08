@@ -207,11 +207,11 @@ public sealed partial class EcsWorld
     /// <example>
     /// <code>
     /// // Mutate positions in-place with zero allocation
-    /// foreach (var rc in ecs.IterateRef&lt;Position&gt;())
+    /// foreach (var rc in ecs.QueryRef&lt;Position&gt;())
     ///     rc.Component.X += velocity * dt;
     /// </code>
     /// </example>
-    public RefEnumerable<T> IterateRef<T>()
+    public RefEnumerable<T> QueryRef<T>()
     {
         var store = GetStore<T>(create: false);
         if (store == null || store.Count == 0) return RefEnumerable<T>.From(default);
@@ -225,7 +225,7 @@ public sealed partial class EcsWorld
     /// <example>
     /// <code>
     /// // Integrate velocity into position, both mutated by ref
-    /// foreach (var pair in ecs.IterateRef&lt;Position, Velocity&gt;())
+    /// foreach (var pair in ecs.QueryRef&lt;Position, Velocity&gt;())
     /// {
     ///     ref var pos = ref pair.C1;
     ///     ref var vel = ref pair.C2;
@@ -234,7 +234,7 @@ public sealed partial class EcsWorld
     /// }
     /// </code>
     /// </example>
-    public RefEnumerable<T1, T2> IterateRef<T1, T2>()
+    public RefEnumerable<T1, T2> QueryRef<T1, T2>()
     {
         var s1 = GetStore<T1>(create: false);
         var s2 = GetStore<T2>(create: false);

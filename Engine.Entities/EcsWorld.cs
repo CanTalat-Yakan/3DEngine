@@ -35,7 +35,7 @@ namespace Engine;
 ///     Console.WriteLine($"Entity {entity} at ({pos.X},{pos.Y}) HP={hp.Current}");
 ///
 /// // Zero-allocation ref iteration
-/// foreach (var rc in ecs.IterateRef&lt;Position&gt;())
+/// foreach (var rc in ecs.QueryRef&lt;Position&gt;())
 ///     rc.Component.X += 1.0f;
 /// </code>
 /// </example>

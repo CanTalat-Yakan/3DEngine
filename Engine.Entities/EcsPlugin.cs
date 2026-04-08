@@ -32,7 +32,7 @@ namespace Engine;
 ///     public static void Move(BehaviorContext ctx)
 ///     {
 ///         float dt = (float)ctx.Time.DeltaSeconds;
-///         foreach (var rc in ctx.Ecs.IterateRef&lt;Position&gt;())
+///         foreach (var rc in ctx.Ecs.QueryRef&lt;Position&gt;())
 ///             rc.Component.X += 10f * dt;
 ///     }
 /// }
