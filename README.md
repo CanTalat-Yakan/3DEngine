@@ -20,7 +20,7 @@
   <a href="https://deepwiki.com/CanTalat-Yakan/3DEngine"><img alt="Ask DeepWiki" src="https://deepwiki.com/badge.svg"></a>
 </p>
 
-<p align="center" style="text-align:center"><sub>Last updated: April 8, 2026</sub></p>
+<p align="center" style="text-align:center"><sub>Last updated: April 9, 2026</sub></p>
 
 <!-- TOC -->
 
@@ -40,6 +40,7 @@
     - [Parallel Scheduling](#parallel-scheduling)
     - [Plugins](#plugins)
     - [Resources and Events](#resources-and-events)
+    - [Asset Pipeline](#asset-pipeline)
     - [ECS: Entities, Components, and Commands](#ecs-entities-components-and-commands)
     - [ECS Iteration Modes](#ecs-iteration-modes)
     - [Change Tracking](#change-tracking)
@@ -50,6 +51,7 @@
     - [Native ECS Style (Manual Systems)](#native-ecs-style-manual-systems)
     - [Source Generator](#source-generator)
     - [Render Pipeline](#render-pipeline)
+    - [Renderer File Layout](#renderer-file-layout)
     - [Editor Architecture](#editor-architecture)
     - [Logging](#logging)
     - [FAQ](#faq)
@@ -104,15 +106,20 @@ What works today:
 - Behavior source generator supporting `[With]`/`[Without]`/`[Changed]` filters, `[RunIf]` conditions, and
   `[ToggleKey]` keyboard shortcuts.
 - Vulkan graphics device (instance, physical device, logical device, swapchain, pipelines, buffers, images,
-  descriptors, sync) via Vortice.Vulkan + VMA.
-- Render pipeline with extract → prepare → queue → render-graph execution model.
-- GLSL → SPIR-V shader compilation and SPIR-V cross-reflection.
+  descriptors, sync) via Vortice.Vulkan + VMA. `NullGraphicsDevice` for headless runs and unit tests.
+- Render pipeline with extract → prepare → queue → render-graph execution model, including mesh rendering with
+  `Camera`, `Mesh`, `Material`, and `Transform` components, opaque/transparent render phases, pipeline caching,
+  dynamic buffer allocation, and per-object push constants.
+- Asset pipeline with background threaded loading, path deduplication, typed `Assets<T>` storage, `Handle<T>` handles,
+  `AssetEvent<T>` lifecycle events, pluggable `IAssetLoader<T>`/`IAssetReader` sources, and hot-reload via file
+  watching.
+- GLSL → SPIR-V shader compilation (both standalone and as asset via `GlslLoader`) and SPIR-V cross-reflection.
 - ImGui runtime overlays (performance HUD, schedule debug HUD, WebView debug HUD).
 - Ultralight WebView overlay composited into the Vulkan render pipeline.
 - Editor: in-process Blazor Server with hot-reloadable Razor/C# shell scripts, served through the embedded WebView.
 - Typed event queues (`Events<T>`, `EventWriter<T>`, `EventReader<T>`).
 - Structured multi-provider logging (console + file).
-- Unit test suite covering core, ECS, and renderer subsystems.
+- Unit test suite covering core, ECS, graphics, renderer, and editor subsystems.
 
 See `Engine/Program.cs` for the runtime entry point and `Editor/Program.cs` for the editor entry point.
 
@@ -130,17 +137,22 @@ See `Engine/Program.cs` for the runtime entry point and `Editor/Program.cs` for 
 │  │                                                              │
 │  Engine.Generator  Roslyn source generator for [Behavior]       │
 │  │                                                              │
+│  Engine.Files ──── AssetServer, Assets<T>, Handle<T>,           │
+│  │                 AssetEvent<T>, IAssetLoader<T>, IAssetReader, │
+│  │                 FileAssetReader, FileWatcher, hot-reload      │
+│  │                                                              │
 │  Engine.Graphics ─ Vulkan device, swapchain, pipelines,         │
-│  │                 buffers, images, SPIR-V compilation          │
+│  │                 buffers, images, SPIR-V compilation,          │
+│  │                 NullGraphicsDevice (headless/test)            │
 │  │                                                              │
 │  Engine.Renderer ─ Renderer, RenderGraph, RenderWorld,          │
-│  │                 extract/prepare/queue systems, ImGui         │
+│  │                 extract/prepare/queue systems, render phases, │
+│  │                 Camera/Mesh/Material/Transform components,    │
+│  │                 PipelineCache, DynamicBufferAllocator, ImGui  │
 │  │                                                              │
 │  Engine.Application SDL3 window, input backend, ImGui host      │
 │  │                                                              │
 │  Engine.WebView ── Ultralight integration, WebView overlay      │
-│  │                                                              │
-│  Engine.Files ──── Native library loader                        │
 │  │                                                              │
 │  Engine ────────── Composition root, DefaultPlugins,            │
 │  │                 sample behaviors (HUD, stress test)          │
@@ -173,13 +185,25 @@ See `Engine/Program.cs` for the runtime entry point and `Editor/Program.cs` for 
   `PostUpdate`.
 - **Typed event system** - `Events<T>` queues with `EventWriter<T>` and `EventReader<T>` for decoupled, type-safe
   inter-system communication.
-- **Plugin model** - `DefaultPlugins` aggregates: `AppWindowPlugin`, `AppExitPlugin`, `ExceptionsPlugin`,
-  `TimePlugin`, `InputPlugin`, `EcsPlugin`, `BehaviorsPlugin`, `SdlImGuiPlugin`, `SdlRendererPlugin`,
-  `VulkanWebViewPlugin`, `VulkanImGuiPlugin`.
+- **Plugin model** - `DefaultPlugins` aggregates: `AssetPlugin`, `AppWindowPlugin`, `AppExitPlugin`,
+  `ExceptionsPlugin`, `TimePlugin`, `InputPlugin`, `EcsPlugin`, `BehaviorsPlugin`, `SdlImGuiPlugin`,
+  `SdlRendererPlugin`, `VulkanWebViewPlugin`, `VulkanImGuiPlugin`. Also registers `GlslLoader` with the `AssetServer`.
 - **Vulkan graphics device** - Instance creation, physical device selection, logical device, swapchain management,
   pipeline creation, buffer/image allocation (VMA), descriptor sets, and synchronization primitives.
-- **Render pipeline** - Extract → Graph execution model with `RenderWorld`, `RenderGraph`,
-  `INode`, `ViewNode`, `RenderContext`, `TrackedRenderPass`, `RendererContext`, and `RendererDiagnostics`.
+  `NullGraphicsDevice` provides a no-op implementation for headless runs and unit tests.
+- **Render pipeline** - Extract → BeginFrame → Prepare → Graph execution (Update → auto-barrier → Run per node) →
+  EndFrame. Built-in extract systems (`CameraExtract`, `MeshMaterialExtract`, `ClearColorExtract`), prepare systems
+  (`MeshPrepare`, `QueueMeshPhaseItems`), and the `MainPassNode` with mesh shader pipeline, per-object push constants
+  (`MeshPushConstants`), camera UBO, and `ActiveSwapchainPass` pattern (pass stays open for overlay nodes). Render
+  components: `Camera`, `Mesh`, `Material`, `Transform`, `RenderMeshInstance`, `ExtractedView`. Render phases:
+  `Opaque3dPhase` (front-to-back), `Transparent3dPhase` (back-to-front) with `IPhaseItem` and `IDrawFunction<T>`.
+  GPU resource management: `PipelineCache` for deduplicating compiled pipelines, `DynamicBufferAllocator` for
+  frame-scoped transient GPU buffers, `MeshGpuRegistry` for caching uploaded vertex buffers.
+- **Asset pipeline** - `AssetServer` with background threaded loading, path deduplication, typed `Assets<T>` storage,
+  `Handle<T>` handles, `AssetEvent<T>` lifecycle events (`Added`, `Modified`, `LoadedWithDependencies`), pluggable
+  `IAssetLoader<T>` / `IAssetReader` sources (`FileAssetReader`, `EmbeddedAssetReader`), dependency tracking, and
+  hot-reload via `FileAssetWatcher`. Built-in loaders: `ByteArrayLoader`, `StringLoader`, `GlslLoader` (GLSL → SPIR-V
+  as asset).
 - **Shader pipeline** - GLSL → SPIR-V compilation via `Vortice.ShaderCompiler`; SPIR-V cross-reflection via
   `Vortice.SpirvCross`.
 - **ImGui overlays** - Performance HUD (FPS, frame time, entity count), schedule debug HUD (batch composition,
@@ -413,6 +437,7 @@ public sealed class PhysicsPlugin : IPlugin
 
 | Plugin | Responsibility |
 |---|---|
+| `AssetPlugin` | `AssetServer` resource, `FileAssetReader` source, background loading, per-frame drain and event clearing |
 | `AppWindowPlugin` | SDL3 window, `IMainLoopDriver`, `IInputBackend`, Vulkan surface source |
 | `AppExitPlugin` | Graceful shutdown on quit events |
 | `ExceptionsPlugin` | Unhandled exception logging |
@@ -421,9 +446,12 @@ public sealed class PhysicsPlugin : IPlugin
 | `EcsPlugin` | `EcsWorld` + `EcsCommands` resources, PostUpdate command flush |
 | `BehaviorsPlugin` | Discovers and invokes source-generated behavior registrations |
 | `SdlImGuiPlugin` | SDL3-backed ImGui host |
-| `SdlRendererPlugin` | Vulkan renderer initialization and per-frame rendering |
+| `SdlRendererPlugin` | Vulkan renderer initialization, extract/prepare system wiring, per-frame rendering |
 | `VulkanWebViewPlugin` | WebView render node in the Vulkan pipeline |
 | `VulkanImGuiPlugin` | ImGui render node in the Vulkan pipeline |
+
+`DefaultPlugins.Build` also registers the `GlslLoader` with the `AssetServer` so that GLSL shader files can be loaded
+as SPIR-V bytecode assets.
 
 ### Resources and Events
 
@@ -444,7 +472,7 @@ if (world.TryGetResource<MyService>(out var s)) { ... }
 var res = world.InitResource<MyService>();
 ```
 
-Common resources: `Config`, `EcsWorld`, `EcsCommands`, `AppWindow`, `Time`, `Input`, `Renderer`,
+Common resources: `Config`, `EcsWorld`, `EcsCommands`, `AppWindow`, `Time`, `Input`, `AssetServer`, `Renderer`,
 `ScheduleDiagnostics`, `WebViewInstance`.
 
 **`Time`** - frame timing updated each frame by `TimePlugin`:
@@ -504,6 +532,97 @@ world.ClearEvents<DamageEvent>();
 ```
 
 Events accumulate during a frame and should be cleared once per frame (typically in `Stage.Last`).
+
+### Asset Pipeline
+
+The `AssetServer` is the central asset management coordinator registered as a world resource by `AssetPlugin`. It
+handles async background loading, path deduplication, typed storage, dependency tracking, and hot-reload via file
+watching.
+
+**Architecture:**
+
+```
+ AssetPlugin (Stage.PreUpdate) ─── drain completed loads → Assets<T> + fire AssetEvent<T>
+ AssetPlugin (Stage.Last) ──────── clear asset events
+ AssetPlugin (Stage.Cleanup) ───── dispose AssetServer
+
+ ┌──────────────────────────────────────────────────────────┐
+ │  AssetServer                                             │
+ │                                                          │
+ │  Sources: FileAssetReader, EmbeddedAssetReader, ...      │
+ │  Loaders: GlslLoader, ByteArrayLoader, StringLoader, ...│
+ │  Workers: N background threads (Channel<LoadRequest>)    │
+ │  Tracking: path→Handle deduplication, LoadState per ID   │
+ │  Hot-reload: FileAssetWatcher → re-enqueue on change     │
+ └──────────────────────────────────────────────────────────┘
+```
+
+**Loading assets:**
+
+```csharp
+// In a plugin's Build method - register a custom loader
+var server = world.Resource<AssetServer>();
+server.RegisterLoader(new TextureLoader());
+
+// Async loading (returns a handle immediately, loads on background thread)
+Handle<Texture> tex = server.Load<Texture>("textures/ground.png");
+
+// Synchronous loading (blocks - use sparingly, e.g. during Startup)
+byte[] spv = server.LoadSync<byte[]>("shaders/mesh.vert.glsl");
+
+// Check load state
+LoadState state = server.GetLoadState(tex);
+
+// Next frame, read from typed storage
+var assets = world.Resource<Assets<Texture>>();
+if (assets.TryGet(tex, out var texture))
+    BindTexture(texture);
+```
+
+**Asset events** fire when assets complete loading or are modified by hot-reload:
+
+```csharp
+foreach (var evt in world.ReadEvents<AssetEvent<Texture>>())
+{
+    if (evt.Kind == AssetEventKind.Added)
+        Console.WriteLine($"Texture loaded: {evt.Handle.Path}");
+    if (evt.Kind == AssetEventKind.Modified)
+        Console.WriteLine($"Texture hot-reloaded: {evt.Handle.Path}");
+}
+```
+
+**Custom loaders** implement `IAssetLoader<T>`:
+
+```csharp
+public sealed class TextureLoader : IAssetLoader<Texture>
+{
+    public string[] Extensions => [".png", ".jpg"];
+
+    public async Task<AssetLoadResult<Texture>> LoadAsync(AssetLoadContext context, CancellationToken ct)
+    {
+        var bytes = await context.ReadAllBytesAsync(ct);
+        var texture = DecodeTexture(bytes);
+        return AssetLoadResult<Texture>.Ok(texture);
+    }
+}
+```
+
+**Custom sources** implement `IAssetReader`. Built-in sources include `FileAssetReader` (filesystem) and
+`EmbeddedAssetReader` (embedded resources). Sources are probed in registration order.
+
+**Hot-reload** is enabled per `AssetPlugin` configuration:
+
+```csharp
+app.AddPlugin(new AssetPlugin
+{
+    AssetDirectory = "/path/to/assets",
+    WatchForChanges = true,
+    WorkerThreads = 4,
+});
+```
+
+When enabled, `FileAssetWatcher` monitors the filesystem source directory and re-enqueues changed assets
+for background reloading. Modified assets trigger `AssetEvent<T>.Modified` events.
 
 ### ECS: Entities, Components, and Commands
 
@@ -659,6 +778,17 @@ and lookup; cache-friendly sequential iteration.
 | `EcsWorld.Pool.cs` | `EntityPool` - generational ID allocator with free list |
 | `EcsWorld.SparseSet.cs` | `SparseSet<T>` data structure |
 | `EcsWorld.RefIterators.cs` | `RefEnumerable<T>`, `RefEnumerable<T1,T2>`, transforms |
+
+Supporting files in `Engine.Entities`:
+
+| File | Contents |
+|---|---|
+| `BehaviorAttributes.cs` | `[Behavior]`, `[OnUpdate]`, `[With]`, `[Without]`, `[Changed]`, `[RunIf]`, `[ToggleKey]` |
+| `BehaviorConditions.cs` | Built-in run condition factories (`ResourceIs<T>`, etc.) |
+| `BehaviorContext.cs` | `BehaviorContext` - per-invocation context (World, Ecs, Cmd, Time, Input, EntityId) |
+| `BehaviorsPlugin.cs` | Runtime discovery and registration of source-generated behaviors |
+| `EcsCommands.cs` | Deferred command buffer (Spawn, Despawn, Add, Remove) |
+| `EcsPlugin.cs` | Plugin inserting `EcsWorld` + `EcsCommands`, PostUpdate flush system |
 
 ### Behavior System (Attribute-Based ECS)
 
@@ -823,17 +953,77 @@ registration required.
 The `Renderer` orchestrates a rendering pipeline each frame:
 
 ```
- Extract ──► BeginFrame ──► Prepare ──► Graph (Update → Barrier → Run per node) ──► EndFrame
+ Extract ──► BeginFrame ──► Prepare ──► Graph (Update → auto-barrier → Run per node) ──► EndFrame
 ```
 
-| Phase | Interface | Purpose |
+| Phase | Interface / System | Purpose |
 |---|---|---|
-| **Extract** | `IExtractSystem` | Copy game-world data into the `RenderWorld` |
-| **Prepare** | `IPrepareSystem` | Upload GPU resources (buffers, textures) before graph execution |
+| **Extract** | `IExtractSystem` | Copy game-world data into the `RenderWorld` ECS (render entities) |
+| **BeginFrame** | `RendererContext` | Acquire swapchain image, upload camera UBO, populate `SwapchainTarget` |
+| **Prepare** | `IPrepareSystem` | Upload GPU resources (vertex buffers, textures) from extracted data |
 | **Graph** | `INode` / `ViewNode` | Execute render passes in topological order with typed slot edges |
+| **EndFrame** | `RendererContext` | Submit command buffer and present the swapchain image |
+
+The `RenderStage` enum defines the four conceptual phases: `Extract`, `Prepare`, `Queue`, `Execute`.
+
+**Built-in extract systems:**
+
+| System | Description |
+|---|---|
+| `ClearColorExtract` | Copies `ClearColor` resource from game world to render world |
+| `CameraExtract` | Extracts `Camera` + `Transform` components into `ExtractedView` render entities |
+| `MeshMaterialExtract` | Extracts `Mesh` + `Material` + `Transform` into `RenderMeshInstance` render entities |
+
+**Built-in prepare systems:**
+
+| System | Description |
+|---|---|
+| `MeshPrepare` | Ensures GPU vertex buffers exist for all `RenderMeshInstance` entities via `MeshGpuRegistry` |
+| `QueueMeshPhaseItems` | Populates `Opaque3dPhase` and `Transparent3dPhase` from extracted render data |
+
+**Render components** (game-world ECS):
+
+| Component | Description |
+|---|---|
+| `Camera` | Perspective projection parameters (FovY, Near, Far) with optional render texture target |
+| `Mesh` | Raw vertex position data (`Vector3[]`) for GPU upload |
+| `Material` | Simple RGBA albedo color |
+| `Transform` | World-space position, rotation (quaternion), and scale |
+
+**Render-world components** (render entities, re-created each frame):
+
+| Component | Description |
+|---|---|
+| `ExtractedView` | Computed view/projection matrices and viewport dimensions (from `Camera` + `Transform`) |
+| `RenderMeshInstance` | Model matrix, albedo, mesh data, vertex count, source entity ID |
+
+**Render phases:**
+
+- `Opaque3dPhase` - front-to-back sorted opaque draw calls.
+- `Transparent3dPhase` - back-to-front sorted transparent draw calls.
+- Each phase uses `RenderPhase<T>` with `IPhaseItem` items and `IDrawFunction<T>` draw functions.
+
+**MainPassNode** is the default render graph node. It begins the swapchain render pass with `LoadOp.Clear`, sets up
+the camera UBO via `DynamicBufferAllocator`, creates the `MeshPipeline` (vertex input + push constants), and drains
+opaque and transparent phases via their draw functions. The render pass is left **open** and published as
+`ActiveSwapchainPass` in the `RenderWorld` so that downstream overlay nodes (WebView, ImGui) can draw into the same
+pass without the overhead of separate begin/end cycles. The `Renderer` ends the pass after all graph nodes have
+executed.
+
+**GPU resource management:**
+
+- `PipelineCache` - deduplicates compiled `IPipeline` instances keyed by `GraphicsPipelineDesc`, shared across all
+  render graph nodes via the `RenderWorld`.
+- `DynamicBufferAllocator` - frame-aware bump allocator for transient GPU buffers (uniform, vertex, index). Maintains
+  per-frame-slot arenas with automatic power-of-two growth.
+- `MeshGpuRegistry` - caches uploaded vertex buffers keyed by game-world entity ID, avoiding redundant GPU uploads
+  across frames.
+- `RenderSurfaceInfo` - tracks the presentation surface dimensions with a monotonic revision counter for resize
+  detection.
+- `RenderTextures` - registry of named render texture descriptors for off-screen camera targets.
 
 Each `INode` owns its own render passes and declares typed input/output slots (`SlotInfo`).
-`ViewNode` is a convenience base that auto-iterates `RenderCameras`, calling a per-camera `Run` overload.
+`ViewNode` is a convenience base that auto-iterates `ExtractedView` entities, calling a per-camera `Run` overload.
 Nodes receive a `RenderContext` (wrapping `IGraphicsDevice`, `ICommandBuffer`, and `DynamicBufferAllocator`)
 and a `RenderGraphContext` for accessing slot values and running sub-graphs.
 `TrackedRenderPass` wraps begin/end render pass lifecycle with typed helpers for pipeline binding, draw calls, and push constants.
@@ -844,25 +1034,57 @@ var renderer = world.Resource<Renderer>();
 renderer.AddExtractSystem(new MyExtractSystem());
 renderer.AddPrepareSystem(new MyPrepareSystem());
 renderer.Graph.AddNode("mypass", new MyNode());
-renderer.Graph.AddNodeEdge("sample", "mypass");
+renderer.Graph.AddNodeEdge("main_pass", "mypass");
 
 // Implement a custom render graph node
 public class MyNode : INode
 {
     public void Run(RenderGraphContext graphContext, RenderContext renderContext, RenderWorld rw)
     {
-        var swapchain = rw.TryGet<SwapchainTarget>();
-        using var pass = renderContext.BeginTrackedRenderPass(new RenderPassDescriptor(
-            swapchain.RenderPass, swapchain.Framebuffer, swapchain.Extent, LoadOp.Load, StoreOp.Store));
+        // Reuse the open swapchain pass from MainPassNode
+        var activePass = rw.TryGet<ActiveSwapchainPass>();
+        if (activePass is null) return;
+
+        var pass = activePass.Pass;
         pass.SetPipeline(myPipeline);
         pass.Draw(vertexCount: 3);
     }
 }
+
+// Spawn a renderable entity in game world
+var ecs = world.Resource<EcsWorld>();
+var e = ecs.Spawn();
+ecs.Add(e, new Camera(fovY: 60f * (float)(Math.PI / 180.0), near: 0.1f, far: 1000f));
+ecs.Add(e, new Transform(new Vector3(0, 5, -10)));
+
+var mesh = ecs.Spawn();
+ecs.Add(mesh, new Mesh(new[] { new Vector3(0,1,0), new Vector3(-1,-1,0), new Vector3(1,-1,0) }));
+ecs.Add(mesh, new Material(new Vector4(1, 0, 0, 1))); // red triangle
+ecs.Add(mesh, new Transform(Vector3.Zero));
 ```
 
 `RenderGraph` manages the directed acyclic graph of `INode` instances with typed slot edges and sub-graph support.
 `RendererContext` wraps the `GraphicsDevice` and provides frame-scoped resources (camera UBOs, dynamic allocator,
 `SwapchainTarget`). `RendererDiagnostics` tracks adapter info, surface extent, and frame statistics.
+
+### Renderer File Layout
+
+The `Engine.Renderer` project is organized into subdirectories by concern:
+
+| Directory | Contents |
+|---|---|
+| `Abstractions/` | `INode`, `IExtractSystem`, `IPrepareSystem`, `IPhaseItem`, `IDrawFunction<T>` |
+| `Components/` | `Camera`, `Mesh`, `Material`, `Transform`, `RenderMeshInstance`, `ExtractedView`, `CameraUniform` |
+| `Extracts/` | `CameraExtract`, `MeshMaterialExtract` |
+| `Graph/` | `RenderGraph`, `RenderContext`, `RenderGraphContext`, `SlotInfo`, `SlotType`, `SlotValue` |
+| `Memory/` | `DynamicBufferAllocator`, `MeshGpuResources` (`MeshGpuRegistry`) |
+| `Passes/` | `MainPassNode`, `ViewNode`, `TrackedRenderPass`, `RenderPassDescriptor`, `SwapchainTarget`, `ActiveSwapchainPass` |
+| `Phases/` | `RenderPhase<T>`, `Opaque3dPhase`, `Transparent3dPhase`, phase items, draw functions, `QueueMeshPhaseItems` |
+| `Pipelines/` | `PipelineCache`, `MeshPipeline`, `MeshPrepare`, ImGui pipeline/render node |
+| `Shaders/` | Built-in GLSL shaders: `mesh.vert.glsl`, `mesh.frag.glsl`, `imgui.vert.glsl`, `imgui.frag.glsl` |
+
+Top-level files: `Renderer.cs`, `RendererContext.cs`, `RendererDiagnostics.cs`, `RenderWorld.cs`, `RenderStage.cs`,
+`RenderSurfaceInfo.cs`, `RenderTextures.cs`, `RenderTextureDesc.cs`, `GlslLoader.cs`.
 
 ### Editor Architecture
 
@@ -941,8 +1163,14 @@ stage. Adding explicit metadata enables parallel execution.
 
 - Platform layer (SDL3 windowing, input, timing)
 - Vulkan device initialization, swapchain, VMA allocations
-- Render pipeline (extract/prepare/queue/graph model)
+- `NullGraphicsDevice` for headless runs and unit tests
+- Render pipeline (extract/prepare/queue/graph model) with mesh rendering
+- Render components: Camera, Mesh, Material, Transform
+- Render phases (opaque front-to-back, transparent back-to-front)
+- GPU resource management: PipelineCache, DynamicBufferAllocator, MeshGpuRegistry
 - SPIR-V shader compilation and reflection
+- Asset pipeline: AssetServer, background loading, typed storage, handle deduplication, hot-reload
+- Built-in asset loaders (ByteArray, String, GlslLoader)
 - Sparse-set ECS with generational entity pool and change tracking
 - Behavior source generator with filters, run conditions, toggle keys
 - Parallel scheduler with resource-access batching
@@ -951,17 +1179,17 @@ stage. Adding explicit metadata enables parallel execution.
 - Editor scaffolding (Blazor Server, hot-reloadable shells)
 - Typed event system
 - Structured logging (console + file)
-- Unit test suite
+- Unit test suite (Common, Entities, Graphics, Renderer, Editor)
 
 ### In Progress
 
-- Full rendering pipeline: material system, PBR shading, lighting
-- Asset pipeline: import (Assimp), packaging, and caching
+- Material system with PBR shading and lighting
 - Scene graph and serialization (USD integration)
 - Editor tools: dockable panes, inspectors, scene view, property editors
 
 ### Planned
 
+- Asset import loaders (Assimp: FBX, glTF, OBJ), texture loaders, asset packaging and caching
 - Compute workloads (culling, particles, post-processing)
 - Audio system
 - Physics integration
