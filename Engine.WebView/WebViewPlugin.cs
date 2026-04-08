@@ -4,7 +4,7 @@ namespace Engine;
 /// Plugin that integrates UltralightNet into the engine.
 /// Creates a <see cref="WebViewInstance"/> resource, hooks SDL3 events for input,
 /// and registers per-frame Update and Cleanup systems.
-/// Uses CPU bitmap surface rendering — pixels are uploaded to a Vulkan texture each frame.
+/// Uses CPU bitmap surface rendering - pixels are uploaded to a Vulkan texture each frame.
 /// <para>
 /// By default loads a simple "about:blank" page. Call
 /// <see cref="WebViewInstance.LoadHtml"/> or <see cref="WebViewInstance.LoadUrl"/>

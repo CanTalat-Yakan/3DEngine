@@ -96,7 +96,7 @@ public sealed class Renderer : IDisposable
         Context.EndFrame(frameCtx, imageIndex);
     }
 
-    /// <summary>Executes the render graph: per node calls Update → auto-barrier → Run.</summary>
+    /// <summary>Executes the render graph: per node calls Update → auto-barrier → Run. Ends the active swapchain pass after all nodes.</summary>
     private void ExecuteGraph(RenderContext renderCtx)
     {
         var orderedNodes = Graph.TopologicalOrder();
@@ -140,6 +140,10 @@ public sealed class Renderer : IDisposable
             }
             outputStore[label] = outputs;
         }
+
+        // End the shared swapchain render pass opened by MainPassNode
+        var activePass = RenderWorld.TryGet<ActiveSwapchainPass>();
+        activePass?.Dispose();
     }
 
     /// <summary>Runs a named sub-graph with forwarded slot values.</summary>

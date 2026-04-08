@@ -9,7 +9,8 @@ namespace Engine;
 /// Reads draw data directly from ImGui (valid after ImGui.Render(), before next NewFrame()).
 /// Manages its own pipeline and font atlas texture; vertex/index buffers are
 /// transiently allocated from the <see cref="DynamicBufferAllocator"/> each frame.
-/// Begins its own render pass with <see cref="LoadOp.Load"/> to preserve the 3D scene underneath.
+/// Draws into the shared <see cref="ActiveSwapchainPass"/> opened by <see cref="MainPassNode"/>
+/// (no separate render pass begin/end).
 /// </summary>
 /// <seealso cref="ImGuiShaders"/>
 /// <seealso cref="VulkanImGuiPlugin"/>
@@ -33,15 +34,19 @@ internal sealed class ImGuiRenderNode : INode, IDisposable
         if (!drawData.Valid || drawData.CmdListsCount == 0)
             return;
 
+        // Get the shared swapchain pass opened by MainPassNode
+        var activePass = renderWorld.TryGet<ActiveSwapchainPass>();
+        if (activePass is null) return;
+
         var gfx = renderContext.Device;
         var allocator = renderContext.DynamicAllocator;
         var swapchainTarget = renderWorld.TryGet<SwapchainTarget>();
         if (swapchainTarget is null) return;
 
-        // Lazy-init pipeline and font atlas
+        // Lazy-init pipeline and font atlas (created against the main render pass)
         if (_pipeline is null)
         {
-            CreatePipelineAndFontAtlas(gfx, swapchainTarget.LoadRenderPass);
+            CreatePipelineAndFontAtlas(gfx, swapchainTarget.RenderPass);
         }
 
         // Calculate total vertex/index sizes
@@ -91,17 +96,9 @@ internal sealed class ImGuiRenderNode : INode, IDisposable
             allocator.Unmap(indexAlloc);
         }
 
-        // Begin render pass with LoadOp.Load to preserve 3D scene
-        var passDesc = new RenderPassDescriptor(
-            swapchainTarget.LoadRenderPass,
-            swapchainTarget.Framebuffer,
-            swapchainTarget.Extent,
-            LoadOp.Load,
-            StoreOp.Store);
-
-        using var pass = renderContext.BeginTrackedRenderPass(passDesc);
-
-        var extent = swapchainTarget.Extent;
+        // Draw into the shared pass — no separate render pass needed
+        var pass = activePass.Pass;
+        var extent = activePass.Extent;
 
         // Build orthographic projection matrix
         float L = drawData.DisplayPos.X;

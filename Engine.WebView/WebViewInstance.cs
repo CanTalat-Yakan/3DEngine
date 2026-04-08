@@ -6,7 +6,7 @@ using UltralightNet.Platform;
 using ULRenderer = UltralightNet.Renderer;
 using ULPlatform = UltralightNet.Platform.Platform;
 
-// CPU-only bitmap surface rendering mode — GPU driver was removed.
+// CPU-only bitmap surface rendering mode - GPU driver was removed.
 
 namespace Engine;
 
@@ -66,7 +66,7 @@ public sealed class WebViewInstance : IDisposable
     /// <summary>Total number of pixel uploads to the GPU texture (incremented by the render node).</summary>
     public int DiagUploadCount { get; internal set; }
     /// <summary>Count of non-zero BGRA pixels found during the last <see cref="TryGetPixels"/> call.</summary>
-    public long DiagNonZeroPixels { get; private set; }
+    public long DiagNonZeroPixels { get; internal set; }
     /// <summary>Total pixel count (<c>Width × Height</c>) for the current view dimensions.</summary>
     public long DiagTotalPixels => Width * Height;
 
@@ -74,7 +74,7 @@ public sealed class WebViewInstance : IDisposable
     public string? DiagPageTitle { get; private set; }
 
     /// <summary>Hex representation of the first 16 bytes of the last surface read.</summary>
-    public string? DiagFirstBytes { get; private set; }
+    public string? DiagFirstBytes { get; internal set; }
 
     /// <summary>Whether the ICU data file exists on disk.</summary>
     public bool DiagIcuExists => File.Exists(Path.Combine(AppContext.BaseDirectory, "runtimes", "icudt67l.dat"));
@@ -93,7 +93,7 @@ public sealed class WebViewInstance : IDisposable
     public string? DiagLastConsoleMessage { get; private set; }
 
     /// <summary>Non-zero pixel count from a forced surface probe (bypasses IsDirty).</summary>
-    public long DiagProbeNonZero { get; private set; }
+    public long DiagProbeNonZero { get; internal set; }
 
     private int _titleQueryCountdown;
 
@@ -113,9 +113,8 @@ public sealed class WebViewInstance : IDisposable
     /// <summary>Set to <c>true</c> for the single frame where the native
     /// <c>ulViewResize</c> was committed.  While set, no Ultralight
     /// Update/Render is executed and the render node must not touch the
-    /// surface - this is the "quiescent resize" pattern used by CEF and
-    /// similar browser-embedding solutions.</summary>
-    private bool _resizedThisFrame;
+    /// surface.</summary>
+    internal bool ResizedThisFrame { get; private set; }
 
     /// <summary>
     /// Initializes the Ultralight platform, renderer, and view.
@@ -276,19 +275,11 @@ public sealed class WebViewInstance : IDisposable
         if (_renderer is null) return;
 
         // Reset per-frame flag.
-        _resizedThisFrame = false;
+        ResizedThisFrame = false;
 
         // ── Quiescent resize ─────────────────────────────────────────
-        // If a resize is pending, commit it NOW and return immediately.
-        // No Ultralight Update/Render is called this frame - the native
-        // surface has just been reallocated and must not be touched until
-        // the next frame.  This is the industry-standard "frame gap"
-        // pattern used by CEF and similar browser-embedding solutions.
         if (_hasPendingResize && ApplyPendingResize())
         {
-            // The resize was committed.  Skip all Ultralight work this
-            // frame so the surface is fully quiescent.  The next frame's
-            // normal Update/Render cycle will paint into the new surface.
             DiagUpdateCount++;
             return;
         }
@@ -308,7 +299,8 @@ public sealed class WebViewInstance : IDisposable
 
         // Capture the dirty state BEFORE Render(), because Render() paints the
         // dirty regions to the bitmap surface and then clears the NeedsPaint flag.
-        if (_view is not null && _view.NeedsPaint)
+        bool needsPaint = _view is not null && _view.NeedsPaint;
+        if (needsPaint)
         {
             IsDirty = true;
             DiagPaintCount++;
@@ -317,64 +309,11 @@ public sealed class WebViewInstance : IDisposable
         // Render paints all dirty views to their surfaces.
         _renderer.Render();
 
-
         // Also check AFTER Render in case this SDK version sets NeedsPaint post-render.
         if (_view is not null && _view.NeedsPaint)
         {
             IsDirty = true;
             DiagPaintCount++;
-        }
-
-        // ── Forced pixel probe (every ~120 frames) ──────────────────
-        // Bypasses IsDirty: directly locks the surface and scans for non-zero
-        // pixels to confirm whether Ultralight ever writes content.
-        // Skipped on resize frames - the surface was just reallocated.
-        // Only applicable in CPU mode (GPU mode has no bitmap surface).
-        if (DiagUpdateCount % 120 == 0 && !_resizedThisFrame)
-            ProbeSurfacePixels();
-    }
-
-    /// <summary>
-    /// Directly reads and scans the surface for non-zero pixels,
-    /// regardless of IsDirty state. Used for diagnostics only.
-    /// </summary>
-    private unsafe void ProbeSurfacePixels()
-    {
-        if (_view?.Surface is not { } surface) return;
-
-        var rowBytes = surface.RowBytes;
-        var byteCount = (int)(rowBytes * Height);
-        if (byteCount <= 0) return;
-
-        var ptr = surface.LockPixels();
-        try
-        {
-            var src = new ReadOnlySpan<byte>(ptr, byteCount);
-
-            // Capture first bytes
-            var previewLen = Math.Min(16, byteCount);
-            DiagFirstBytes = Convert.ToHexString(src.Slice(0, previewLen));
-
-            // Count non-zero pixels
-            long nonZero = 0;
-            for (int i = 0; i < byteCount; i += 4)
-            {
-                if (src[i] != 0 || src[i + 1] != 0 || src[i + 2] != 0 || src[i + 3] != 0)
-                    nonZero++;
-            }
-            DiagProbeNonZero = nonZero;
-
-            // Safety net: if the surface has content but IsDirty is false,
-            // force a dirty flag so the render node picks it up.
-            if (nonZero > 0 && !IsDirty && DiagUploadCount == 0)
-            {
-                IsDirty = true;
-                Logger.Info($"WebViewInstance: Probe found {nonZero} non-zero pixels - forcing IsDirty.");
-            }
-        }
-        finally
-        {
-            surface.UnlockPixels();
         }
     }
 
@@ -408,19 +347,6 @@ public sealed class WebViewInstance : IDisposable
         {
             var src = new ReadOnlySpan<byte>(ptr, byteCount);
             src.CopyTo(destination);
-
-            // Capture first 16 bytes for diagnostics
-            var previewLen = Math.Min(16, byteCount);
-            DiagFirstBytes = Convert.ToHexString(src.Slice(0, previewLen));
-
-            // Scan for non-zero pixels (diagnostics)
-            long nonZero = 0;
-            for (int i = 0; i < byteCount; i += 4)
-            {
-                if (src[i] != 0 || src[i + 1] != 0 || src[i + 2] != 0 || src[i + 3] != 0)
-                    nonZero++;
-            }
-            DiagNonZeroPixels = nonZero;
         }
         finally
         {
@@ -520,7 +446,7 @@ public sealed class WebViewInstance : IDisposable
         // Bump the generation so the render node knows the surface was
         // reallocated and will skip pixel reads this frame.
         ResizeGeneration++;
-        _resizedThisFrame = true;
+        ResizedThisFrame = true;
 
         // Mark dirty so the render node picks up the resized surface on
         // the NEXT frame (after the quiescent gap).
@@ -531,21 +457,18 @@ public sealed class WebViewInstance : IDisposable
     }
 
     /// <summary>Fires a mouse event into the Ultralight view.</summary>
-    /// <param name="evt">The Ultralight mouse event describing motion, button presses, or releases.</param>
     public void FireMouseEvent(MouseEvent evt)
     {
         _view?.FireMouseEvent(evt);
     }
 
     /// <summary>Fires a key event into the Ultralight view.</summary>
-    /// <param name="evt">The Ultralight key event describing key down, key up, or character input.</param>
     public void FireKeyEvent(KeyEvent evt)
     {
         _view?.FireKeyEvent(evt);
     }
 
     /// <summary>Fires a scroll event into the Ultralight view.</summary>
-    /// <param name="evt">The Ultralight scroll event describing wheel delta.</param>
     public void FireScrollEvent(ScrollEvent evt)
     {
         _view?.FireScrollEvent(evt);

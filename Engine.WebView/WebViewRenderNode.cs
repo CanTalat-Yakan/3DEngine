@@ -3,8 +3,8 @@ namespace Engine;
 /// <summary>
 /// Render graph node that draws the Ultralight webview surface as a fullscreen textured overlay.
 /// Uses CPU bitmap surface mode - reads pixels from Ultralight, uploads to a Vulkan texture,
-/// then draws a fullscreen triangle with alpha blending.
-/// Begins its own render pass with <see cref="LoadOp.Load"/> to preserve the 3D scene underneath.
+/// then draws a fullscreen triangle with alpha blending into the shared
+/// <see cref="ActiveSwapchainPass"/> (no separate render pass begin/end).
 /// </summary>
 /// <seealso cref="WebViewInstance"/>
 /// <seealso cref="WebViewShaders"/>
@@ -40,13 +40,17 @@ public sealed class WebViewRenderNode : INode, IDisposable
         if (webview?.View is null)
             return;
 
+        // Get the shared swapchain pass opened by MainPassNode
+        var activePass = renderWorld.TryGet<ActiveSwapchainPass>();
+        if (activePass is null) return;
+
         var gfx = renderContext.Device;
         var swapchainTarget = renderWorld.TryGet<SwapchainTarget>();
         if (swapchainTarget is null) return;
 
-        // Lazy-init pipeline
+        // Lazy-init pipeline (created against the main render pass for compatibility)
         if (_pipeline is null)
-            CreatePipeline(gfx, swapchainTarget.LoadRenderPass);
+            CreatePipeline(gfx, swapchainTarget.RenderPass);
 
         // ── Quiescent resize guard ──────────────────────────────────
         var currentGen = webview.ResizeGeneration;
@@ -58,7 +62,7 @@ public sealed class WebViewRenderNode : INode, IDisposable
 
         // Recreate texture if webview size changed
         if (_webviewImage is null || _textureWidth != webview.Width || _textureHeight != webview.Height)
-            RecreatewebviewTexture(gfx, webview.Width, webview.Height);
+            RecreateWebviewTexture(gfx, webview.Width, webview.Height);
 
         // Upload new pixels if dirty
         if (webview.IsDirty && _webviewImage is not null)
@@ -79,6 +83,11 @@ public sealed class WebViewRenderNode : INode, IDisposable
                 webview.DiagUploadCount++;
                 var packedRowBytes = currentWidth * 4;
 
+                // End the render pass before texture upload (vkCmdCopyBufferToImage
+                // cannot be recorded inside a render pass). MainPassNode's pass will
+                // be re-opened below.
+                activePass.Pass.EndRenderPass();
+
                 if (actualRowBytes == packedRowBytes)
                 {
                     gfx.UploadTexture2D(_webviewImage, _stagingBuffer.AsSpan(0, totalBytes),
@@ -96,6 +105,20 @@ public sealed class WebViewRenderNode : INode, IDisposable
                     gfx.UploadTexture2D(_webviewImage, packed.AsSpan(0, packedSize),
                         currentWidth, currentHeight, bytesPerPixel: 4);
                 }
+
+                // Re-open the render pass with Load to preserve the cleared content
+                var reloadDesc = new RenderPassDescriptor(
+                    swapchainTarget.LoadRenderPass,
+                    swapchainTarget.Framebuffer,
+                    swapchainTarget.Extent,
+                    LoadOp.Load,
+                    StoreOp.Store);
+                var newPass = renderContext.BeginTrackedRenderPass(reloadDesc);
+                var extent = activePass.Extent;
+                newPass.SetViewport(0, 0, extent.Width, extent.Height, 0, 1);
+                newPass.SetScissor(0, 0, extent.Width, extent.Height);
+                renderWorld.Set(new ActiveSwapchainPass(newPass, extent));
+                activePass = renderWorld.TryGet<ActiveSwapchainPass>()!;
             }
         }
 
@@ -104,20 +127,8 @@ public sealed class WebViewRenderNode : INode, IDisposable
         if (_webviewImage is null || _pipeline is null || _descriptorSet is null)
             return;
 
-        // Begin render pass with LoadOp.Load to preserve 3D scene
-        var passDesc = new RenderPassDescriptor(
-            swapchainTarget.LoadRenderPass,
-            swapchainTarget.Framebuffer,
-            swapchainTarget.Extent,
-            LoadOp.Load,
-            StoreOp.Store);
-
-        using var pass = renderContext.BeginTrackedRenderPass(passDesc);
-        var extent = swapchainTarget.Extent;
-
-        // Set viewport and scissor to full framebuffer
-        pass.SetViewport(0, 0, extent.Width, extent.Height, 0, 1);
-        pass.SetScissor(0, 0, extent.Width, extent.Height);
+        // Draw into the shared pass - no separate render pass needed
+        var pass = activePass.Pass;
 
         // Bind pipeline and descriptor set (contains the webview texture)
         pass.SetPipeline(_pipeline);
@@ -153,7 +164,7 @@ public sealed class WebViewRenderNode : INode, IDisposable
     }
 
     /// <summary>Recreates the GPU texture, image view, sampler, and descriptor set for the given dimensions.</summary>
-    private void RecreatewebviewTexture(IGraphicsDevice gfx, uint width, uint height)
+    private void RecreateWebviewTexture(IGraphicsDevice gfx, uint width, uint height)
     {
         if (width == 0 || height == 0) return;
 

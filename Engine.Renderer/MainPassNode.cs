@@ -5,9 +5,12 @@ namespace Engine;
 /// <summary>
 /// Main render graph node that begins the swapchain render pass with <see cref="LoadOp.Clear"/>,
 /// sets up the camera UBO, and draws all extracted mesh entities.
-/// Subsequent nodes (webview, imgui) add ordering edges from <c>"main_pass"</c> to ensure
-/// they run after the clear.
+/// The render pass is left OPEN and published as <see cref="ActiveSwapchainPass"/> in the
+/// <see cref="RenderWorld"/> so downstream overlay nodes (webview, imgui) can draw into the
+/// same pass without the overhead of separate begin/end cycles.
+/// <see cref="Renderer"/> ends the pass after all graph nodes have executed.
 /// </summary>
+/// <seealso cref="ActiveSwapchainPass"/>
 /// <seealso cref="MeshPipeline"/>
 /// <seealso cref="CameraExtract"/>
 public sealed class MainPassNode : INode, IDisposable
@@ -24,7 +27,9 @@ public sealed class MainPassNode : INode, IDisposable
 
         var clearColor = renderWorld.TryGet<ClearColor>() is { } cc ? cc : ClearColor.Black;
 
-        // ── Always begin swapchain render pass with Clear ────────────────
+        // ── Begin swapchain render pass with Clear ──────────────────────
+        // The pass is NOT disposed here - it stays open for overlay nodes.
+        // Renderer.ExecuteGraph closes it after all nodes have run.
         var passDesc = new RenderPassDescriptor(
             swapchainTarget.RenderPass,
             swapchainTarget.Framebuffer,
@@ -33,16 +38,19 @@ public sealed class MainPassNode : INode, IDisposable
             StoreOp.Store,
             clearColor);
 
-        using var pass = renderContext.BeginTrackedRenderPass(passDesc);
+        var pass = renderContext.BeginTrackedRenderPass(passDesc);
 
         var extent = swapchainTarget.Extent;
         pass.SetViewport(0, 0, extent.Width, extent.Height, 0, 1);
         pass.SetScissor(0, 0, extent.Width, extent.Height);
 
+        // Publish the open pass for downstream overlay nodes
+        renderWorld.Set(new ActiveSwapchainPass(pass, extent));
+
         // ── Camera-dependent drawing ────────────────────────────────────
         var cameras = renderWorld.TryGet<RenderCameras>();
         if (cameras is null || cameras.Items.Count == 0)
-            return; // Clear was already issued; no cameras means no 3D draws
+            return; // Clear was already issued; overlay nodes will still draw
 
         var camera = cameras.Items[0];
 
