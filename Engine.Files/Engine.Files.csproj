@@ -3,12 +3,12 @@
     <PropertyGroup>  
         <Title>3DEngine Files</Title>
         <PackageId>3DEngine.Files</PackageId>
-        <Version>1.0.0</Version>
-        <Description>Cross-platform native library loader with DllImport resolution, search paths, and symlink helpers.</Description>
+        <Version>2.0.0</Version>
+        <Description>Bevy-style asset pipeline: AssetServer, typed handles, async loading, file watching, hot-reload, and native library loading.</Description>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.3.0" />
+        <ProjectReference Include="..\Engine.Common\Engine.Common.csproj" />
     </ItemGroup>
 
 </Project>
