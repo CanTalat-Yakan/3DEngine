@@ -16,7 +16,7 @@
 <p align="center" style="text-align:center">
   <img alt="Status" src="https://img.shields.io/badge/Status-Early%20Preview-yellow">
   <img alt="Platforms" src="https://img.shields.io/badge/Platforms-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey">
-  <a href="https://discord.gg/c3UtTVNbRb"><img alt="Discord" src="https://img.shields.io/discord/1288979341006475345?logo=discord&logoColor=white&color=5865F2"></a>
+  <a href="https://discord.gg/c3UtTVNbRb"><img alt="Discord" src="https://img.shields.io/discord/308323056592486420?logo=discord&logoColor=white&color=5865F2"></a>
   <a href="https://deepwiki.com/CanTalat-Yakan/3DEngine"><img alt="Ask DeepWiki" src="https://deepwiki.com/badge.svg"></a>
 </p>
 
@@ -54,7 +54,6 @@
     - [Logging](#logging)
     - [FAQ](#faq)
 - [Roadmap](#roadmap)
-- [Community](#community)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -929,7 +928,7 @@ stage. Adding explicit metadata enables parallel execution.
 
 ## Roadmap
 
-### Implemented ✅
+### Implemented
 
 - Platform layer (SDL3 windowing, input, timing)
 - Vulkan device initialization, swapchain, VMA allocations
@@ -945,14 +944,14 @@ stage. Adding explicit metadata enables parallel execution.
 - Structured logging (console + file)
 - Unit test suite
 
-### In Progress 🔧
+### In Progress
 
 - Full rendering pipeline: material system, PBR shading, lighting
 - Asset pipeline: import (Assimp), packaging, and caching
 - Scene graph and serialization (USD integration)
 - Editor tools: dockable panes, inspectors, scene view, property editors
 
-### Planned 📋
+### Planned
 
 - Compute workloads (culling, particles, post-processing)
 - Audio system
@@ -963,12 +962,6 @@ stage. Adding explicit metadata enables parallel execution.
 - Comprehensive documentation and samples
 
 Items are aspirational and subject to change as the project evolves.
-
-## Community
-
-<p align="center" style="text-align:center">
-  <a href="https://discord.gg/c3UtTVNbRb"><img src="https://discord.com/api/guilds/1288979341006475345/widget.png?style=banner4" alt="Discord Banner"/></a>
-</p>
 
 ## Contributing
 
