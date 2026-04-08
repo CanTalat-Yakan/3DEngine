@@ -33,8 +33,13 @@ public sealed class VulkanImGuiPlugin : IPlugin
                     Logger.Warn("No Renderer resource found - ImGui render node not added.");
                     return;
                 }
-            
-                renderer.Graph.AddNode("imgui", new ImGuiRenderNode());
+
+                // Load shaders via AssetServer at startup
+                var server = world.Resource<AssetServer>();
+                var vertexSpv = server.LoadSync<byte[]>("shaders/imgui.vert.glsl");
+                var fragmentSpv = server.LoadSync<byte[]>("shaders/imgui.frag.glsl");
+
+                renderer.Graph.AddNode("imgui", new ImGuiRenderNode(vertexSpv, fragmentSpv));
                 renderer.Graph.AddNodeEdge("main_pass", "imgui");
 
                 // Ensure imgui renders after webview composite (if present) so ImGui overlays on top

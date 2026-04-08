@@ -65,7 +65,6 @@ public static class BehaviorConditions
 
     /// <summary>
     /// Passes when resource <typeparamref name="T"/> is present in the world.
-    /// Equivalent to Bevy's <c>resource_exists</c>.
     /// </summary>
     /// <typeparam name="T">The resource type to check for.</typeparam>
     /// <returns>A condition delegate suitable for <see cref="SystemDescriptor.RunIf"/>.</returns>
@@ -74,7 +73,6 @@ public static class BehaviorConditions
 
     /// <summary>
     /// Passes when resource <typeparamref name="T"/> exists <em>and</em> satisfies <paramref name="predicate"/>.
-    /// Equivalent to Bevy's <c>resource_exists_and_equals</c>.
     /// </summary>
     /// <typeparam name="T">The resource type to check.</typeparam>
     /// <param name="predicate">A function that must return <c>true</c> for the system to run.</param>
@@ -86,7 +84,6 @@ public static class BehaviorConditions
 
     /// <summary>
     /// Passes when at least one entity currently has component <typeparamref name="T"/>.
-    /// Equivalent to Bevy's <c>any_with_component</c>.
     /// </summary>
     /// <typeparam name="T">The component type to check for.</typeparam>
     /// <returns>A condition delegate suitable for <see cref="SystemDescriptor.RunIf"/>.</returns>

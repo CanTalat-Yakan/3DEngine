@@ -4,7 +4,6 @@ namespace Engine;
 /// Caches compiled <see cref="IPipeline"/> instances keyed by <see cref="GraphicsPipelineDesc"/>,
 /// avoiding redundant pipeline compilation when multiple nodes or draw functions request
 /// the same shader/vertex layout/blend state combination.
-/// Bevy equivalent: <c>PipelineCache</c>.
 /// </summary>
 /// <remarks>
 /// <para>

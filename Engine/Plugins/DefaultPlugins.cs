@@ -26,7 +26,8 @@ public sealed class DefaultPlugins : IPlugin
     {
         Logger.Info("DefaultPlugins: Loading standard engine plugin set...");
 
-        app.AddPlugin(new AppWindowPlugin())
+        app.AddPlugin(new AssetPlugin())
+           .AddPlugin(new AppWindowPlugin())
            .AddPlugin(new AppExitPlugin())
            .AddPlugin(new ExceptionsPlugin())
            .AddPlugin(new TimePlugin())
@@ -37,6 +38,13 @@ public sealed class DefaultPlugins : IPlugin
            .AddPlugin(new SdlRendererPlugin())
            .AddPlugin(new VulkanWebViewPlugin())
            .AddPlugin(new VulkanImGuiPlugin());
+
+        // Register the GLSL shader loader with the asset server
+        if (app.World.TryGetResource<AssetServer>(out var server))
+        {
+            server.RegisterLoader(new GlslLoader());
+            Logger.Debug("DefaultPlugins: GlslLoader registered with AssetServer.");
+        }
 
         app.AddSystem(Stage.First, new SystemDescriptor(world =>
             {

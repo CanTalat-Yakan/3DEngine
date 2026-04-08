@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 namespace Engine;
 
 /// <summary>
-/// Minimal ECS-like world focusing on Bevy-style resource storage.
+/// Minimal ECS-like world focusing on resource storage.
 /// Resources are keyed by their concrete <see cref="Type"/>; each type may have at most one instance.
 /// </summary>
 /// <remarks>

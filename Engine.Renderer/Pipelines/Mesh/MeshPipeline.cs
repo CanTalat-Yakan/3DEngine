@@ -21,7 +21,6 @@ public struct MeshPushConstants
 /// push constants for the per-object model matrix and albedo color.  The camera UBO is
 /// bound at set 0 binding 0 via the default descriptor set layout.
 /// </remarks>
-/// <seealso cref="MeshShaders"/>
 /// <seealso cref="MeshPushConstants"/>
 /// <seealso cref="MainPassNode"/>
 public sealed class MeshPipeline : IDisposable

@@ -5,7 +5,6 @@ namespace Engine;
 /// <summary>
 /// Per-entity render component for cameras extracted during the extract phase.
 /// Contains the computed view/projection matrices and viewport dimensions.
-/// Bevy equivalent: <c>ExtractedView</c>.
 /// </summary>
 /// <seealso cref="CameraExtract"/>
 /// <seealso cref="MainPassNode"/>

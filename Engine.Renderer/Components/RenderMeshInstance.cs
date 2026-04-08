@@ -6,7 +6,6 @@ namespace Engine;
 /// Per-entity render component attached to render entities during the extract phase.
 /// Combines the model matrix, material albedo, mesh data, and source entity reference
 /// needed by the prepare and queue phases.
-/// Bevy equivalent: <c>RenderMeshInstance</c> + <c>MeshTransforms</c>.
 /// </summary>
 /// <seealso cref="MeshMaterialExtract"/>
 /// <seealso cref="MeshPrepare"/>

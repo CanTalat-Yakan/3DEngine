@@ -7,7 +7,7 @@ namespace Engine;
 /// Runs as a prepare system after <see cref="MeshPrepare"/> (vertex buffers are already uploaded).
 /// </summary>
 /// <remarks>
-/// Bevy equivalent: <c>queue_mesh3d_manual</c> system querying <c>RenderMeshInstance</c>
+/// <c>queue_mesh3d_manual</c> system querying <c>RenderMeshInstance</c>
 /// entities and populating typed <c>RenderPhase&lt;T&gt;</c> collections.
 /// </remarks>
 /// <seealso cref="RenderMeshInstance"/>

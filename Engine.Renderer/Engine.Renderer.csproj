@@ -18,6 +18,7 @@
     <ItemGroup>
         <ProjectReference Include="..\Engine.Common\Engine.Common.csproj" />
         <ProjectReference Include="..\Engine.Entities\Engine.Entities.csproj" />
+        <ProjectReference Include="..\Engine.Files\Engine.Files.csproj" />
         <ProjectReference Include="..\Engine.Graphics\Engine.Graphics.csproj" />
     </ItemGroup>
     

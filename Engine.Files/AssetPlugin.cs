@@ -1,34 +1,34 @@
 namespace Engine;
 
 /// <summary>
-/// Plugin that sets up the Bevy-style asset pipeline: registers the <see cref="AssetServer"/> resource,
+/// Plugin that sets up the asset pipeline: registers the <see cref="AssetServer"/> resource,
 /// default <see cref="FileAssetReader"/> source, built-in loaders, and per-frame processing systems.
 /// </summary>
 /// <remarks>
 /// <para>
 /// <b>Registered resources:</b>
 /// <list type="bullet">
-///   <item><description><see cref="AssetServer"/> — central asset coordinator.</description></item>
+///   <item><description><see cref="AssetServer"/> - central asset coordinator.</description></item>
 /// </list>
 /// </para>
 /// <para>
 /// <b>Registered systems:</b>
 /// <list type="bullet">
-///   <item><description><see cref="Stage.PreUpdate"/> — drains completed loads into <see cref="Assets{T}"/> and fires <see cref="AssetEvent{T}"/>.</description></item>
-///   <item><description><see cref="Stage.Last"/> — clears asset events for the frame.</description></item>
-///   <item><description><see cref="Stage.Cleanup"/> — disposes the <see cref="AssetServer"/>.</description></item>
+///   <item><description><see cref="Stage.PreUpdate"/> - drains completed loads into <see cref="Assets{T}"/> and fires <see cref="AssetEvent{T}"/>.</description></item>
+///   <item><description><see cref="Stage.Last"/> - clears asset events for the frame.</description></item>
+///   <item><description><see cref="Stage.Cleanup"/> - disposes the <see cref="AssetServer"/>.</description></item>
 /// </list>
 /// </para>
 /// </remarks>
 /// <example>
 /// <code>
-/// // Default: assets/ directory, no file watching
+/// // Default: source/ directory, no file watching
 /// app.AddPlugin(new AssetPlugin());
 ///
 /// // Custom: different directory, hot-reload enabled
 /// app.AddPlugin(new AssetPlugin
 /// {
-///     AssetDirectory = "/path/to/assets",
+///     AssetDirectory = "/path/to/source",
 ///     WatchForChanges = true,
 ///     WorkerThreads = 4,
 /// });
@@ -44,7 +44,7 @@ public sealed class AssetPlugin : IPlugin
 
     /// <summary>
     /// Root directory for the default <see cref="FileAssetReader"/>.
-    /// Defaults to <c>{AppContext.BaseDirectory}/assets</c>.
+    /// Defaults to <c>{AppContext.BaseDirectory}/source</c>.
     /// Set to <c>null</c> to skip adding a filesystem source.
     /// </summary>
     public string? AssetDirectory { get; init; } = null; // null = default convention
@@ -76,7 +76,7 @@ public sealed class AssetPlugin : IPlugin
         var server = new AssetServer(WorkerThreads);
 
         // Add default filesystem source
-        var dir = AssetDirectory ?? Path.Combine(AppContext.BaseDirectory, "assets");
+        var dir = AssetDirectory ?? Path.Combine(AppContext.BaseDirectory, "source");
         if (Directory.Exists(dir) || AssetDirectory is not null)
         {
             server.AddSource(new FileAssetReader(dir), "FileSystem");
@@ -84,7 +84,7 @@ public sealed class AssetPlugin : IPlugin
         }
         else
         {
-            Logger.Info($"AssetPlugin: Default assets directory not found ({dir}), no filesystem source added. Create 'assets/' to enable.");
+            Logger.Info($"AssetPlugin: Default source directory not found ({dir}), no filesystem source added. Create 'source/' to enable.");
         }
 
         // Register built-in loaders

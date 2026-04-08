@@ -18,10 +18,22 @@ namespace Engine;
 /// <seealso cref="Transparent3dPhase"/>
 public sealed class MainPassNode : INode, IDisposable
 {
+    private readonly ReadOnlyMemory<byte> _vertexSpv;
+    private readonly ReadOnlyMemory<byte> _fragmentSpv;
+
     private IDescriptorSet? _cameraSet;
     private MeshPipeline? _meshPipeline;
     private DrawMeshOpaque? _drawOpaque;
     private DrawMeshTransparent? _drawTransparent;
+
+    /// <summary>Creates a new <see cref="MainPassNode"/> with pre-compiled mesh shader SPIR-V bytecode.</summary>
+    /// <param name="vertexSpv">Compiled SPIR-V bytecode for the mesh vertex shader.</param>
+    /// <param name="fragmentSpv">Compiled SPIR-V bytecode for the mesh fragment shader.</param>
+    public MainPassNode(ReadOnlyMemory<byte> vertexSpv, ReadOnlyMemory<byte> fragmentSpv)
+    {
+        _vertexSpv = vertexSpv;
+        _fragmentSpv = fragmentSpv;
+    }
 
     /// <inheritdoc />
     public void Run(RenderGraphContext graphContext, RenderContext renderContext, RenderWorld renderWorld)
@@ -53,7 +65,7 @@ public sealed class MainPassNode : INode, IDisposable
         renderWorld.Set(new ActiveSwapchainPass(pass, extent));
 
         // ── Camera-dependent drawing ────────────────────────────────────
-        // Query the first ExtractedView render entity (Bevy: query extracted cameras)
+        // Query the first ExtractedView render entity
         ExtractedView? firstView = null;
         foreach (var (_, view) in renderWorld.Entities.Query<ExtractedView>())
         {
@@ -94,10 +106,9 @@ public sealed class MainPassNode : INode, IDisposable
         // ── Ensure pipeline and draw functions ───────────────────────────
         if (_meshPipeline is null)
         {
-            MeshShaders.EnsureLoaded();
             var cache = renderWorld.TryGet<PipelineCache>();
             _meshPipeline = new MeshPipeline(gfx, swapchainTarget.RenderPass,
-                MeshShaders.Vertex, MeshShaders.Fragment, cache);
+                _vertexSpv, _fragmentSpv, cache);
             _drawOpaque = new DrawMeshOpaque(_meshPipeline.Pipeline);
             _drawTransparent = new DrawMeshTransparent(_meshPipeline.Pipeline);
         }

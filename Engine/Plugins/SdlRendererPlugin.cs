@@ -91,7 +91,7 @@ public sealed class SdlRendererPlugin : IPlugin
         app.AddSystem(Stage.Startup, new SystemDescriptor(world =>
             {
                 if (world.TryGetResource<Renderer>(out var r) && r.Context.IsInitialized)
-                    r.Initialize();
+                    r.Initialize(world);
             }, "SdlRendererPlugin.Startup")
             .MainThreadOnly()
             .Write<Renderer>());

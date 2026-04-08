@@ -63,7 +63,7 @@ public sealed class StringLoader : IAssetLoader<string>
     {
         Extensions = extensions.Length > 0
             ? extensions
-            : [".txt", ".json", ".toml", ".yaml", ".yml", ".xml", ".csv", ".glsl", ".hlsl", ".wgsl", ".html", ".css", ".js", ".md"];
+            : [".txt", ".json", ".toml", ".yaml", ".yml", ".xml", ".csv", ".hlsl", ".wgsl", ".html", ".css", ".js", ".md"];
     }
 
     /// <inheritdoc />

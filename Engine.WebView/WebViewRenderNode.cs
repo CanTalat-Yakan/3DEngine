@@ -7,12 +7,14 @@ namespace Engine;
 /// <see cref="ActiveSwapchainPass"/> (no separate render pass begin/end).
 /// </summary>
 /// <seealso cref="WebViewInstance"/>
-/// <seealso cref="WebViewShaders"/>
 /// <seealso cref="WebViewPlugin"/>
 /// <seealso cref="VulkanWebViewPlugin"/>
 public sealed class WebViewRenderNode : INode, IDisposable
 {
     private static readonly ILogger Logger = Log.Category("Engine.WebView.Vulkan");
+
+    private readonly ReadOnlyMemory<byte> _vertexSpv;
+    private readonly ReadOnlyMemory<byte> _fragmentSpv;
 
     // GPU resources - created lazily on first Run
     private IPipeline? _pipeline;
@@ -32,6 +34,15 @@ public sealed class WebViewRenderNode : INode, IDisposable
 
     // Staging buffer for pixel upload
     private byte[]? _stagingBuffer;
+
+    /// <summary>Creates a new <see cref="WebViewRenderNode"/> with pre-compiled shader SPIR-V bytecode.</summary>
+    /// <param name="vertexSpv">Compiled SPIR-V bytecode for the webview vertex shader.</param>
+    /// <param name="fragmentSpv">Compiled SPIR-V bytecode for the webview fragment shader.</param>
+    public WebViewRenderNode(ReadOnlyMemory<byte> vertexSpv, ReadOnlyMemory<byte> fragmentSpv)
+    {
+        _vertexSpv = vertexSpv;
+        _fragmentSpv = fragmentSpv;
+    }
 
     /// <inheritdoc />
     public unsafe void Run(RenderGraphContext graphContext, RenderContext renderContext, RenderWorld renderWorld)
@@ -148,9 +159,8 @@ public sealed class WebViewRenderNode : INode, IDisposable
     {
         Logger.Info("Creating webview overlay Vulkan pipeline...");
 
-        WebViewShaders.EnsureLoaded();
-        var vsDesc = new ShaderDesc(ShaderStage.Vertex, WebViewShaders.Vertex, "main");
-        var fsDesc = new ShaderDesc(ShaderStage.Fragment, WebViewShaders.Fragment, "main");
+        var vsDesc = new ShaderDesc(ShaderStage.Vertex, _vertexSpv, "main");
+        var fsDesc = new ShaderDesc(ShaderStage.Fragment, _fragmentSpv, "main");
         _vertexShader = gfx.CreateShader(vsDesc);
         _fragmentShader = gfx.CreateShader(fsDesc);
 

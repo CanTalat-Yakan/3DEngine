@@ -3,7 +3,7 @@ using System.Diagnostics;
 namespace Engine;
 
 /// <summary>
-/// Orchestrates the Bevy-style rendering pipeline: extract → graph execution (update → auto-barrier → run per node).
+/// Orchestrates the rendering pipeline: extract → graph execution (update → auto-barrier → run per node).
 /// </summary>
 /// <remarks>
 /// <para>
@@ -46,7 +46,8 @@ public sealed class Renderer : IDisposable
         Context = context;
 
     /// <summary>Initializes the renderer, setting up diagnostics and the default render graph nodes.</summary>
-    public void Initialize()
+    /// <param name="world">The game world, used to load shader assets via <see cref="AssetServer"/>.</param>
+    public void Initialize(World world)
     {
         if (_initialized) return;
         Logger.Info("Initializing Renderer - setting up diagnostics and render graph...");
@@ -55,7 +56,12 @@ public sealed class Renderer : IDisposable
         Diagnostics.Initialize(Context.AdapterInfo);
         Logger.Debug("Renderer diagnostics initialized.");
 
-        Graph.AddNode("main_pass", new MainPassNode());
+        // Load mesh shaders via AssetServer at startup
+        var server = world.Resource<AssetServer>();
+        var meshVertSpv = server.LoadSync<byte[]>("shaders/mesh.vert.glsl");
+        var meshFragSpv = server.LoadSync<byte[]>("shaders/mesh.frag.glsl");
+
+        Graph.AddNode("main_pass", new MainPassNode(meshVertSpv, meshFragSpv));
         Logger.Debug("Default MainPassNode added to render graph.");
 
         // Pipeline cache for deduplicating compiled pipelines across nodes
@@ -84,7 +90,7 @@ public sealed class Renderer : IDisposable
     /// <param name="world">The game world to read data from during the extract phase.</param>
     public void RenderFrame(World world)
     {
-        if (!_initialized) Initialize();
+        if (!_initialized) Initialize(world);
 
         Logger.FrameTrace("RenderFrame: Running extract systems...");
         RenderWorld.ClearEntities();

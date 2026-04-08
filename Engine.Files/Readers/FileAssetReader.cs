@@ -6,7 +6,7 @@ namespace Engine;
 /// </summary>
 /// <remarks>
 /// <para>
-/// The base directory defaults to <c>{AppContext.BaseDirectory}/assets</c> but can be configured
+/// The base directory defaults to <c>{AppContext.BaseDirectory}/source</c> but can be configured
 /// via the constructor. All asset paths are resolved relative to this base directory.
 /// </para>
 /// </remarks>
@@ -35,12 +35,12 @@ public sealed class FileAssetReader : IAssetReader
     /// </summary>
     /// <param name="baseDirectory">
     /// The root directory for asset resolution. If <c>null</c> or empty, defaults to
-    /// <c>{AppContext.BaseDirectory}/assets</c>.
+    /// <c>{AppContext.BaseDirectory}/source</c>.
     /// </param>
     public FileAssetReader(string? baseDirectory = null)
     {
         BaseDirectory = string.IsNullOrWhiteSpace(baseDirectory)
-            ? Path.Combine(AppContext.BaseDirectory, "assets")
+            ? Path.Combine(AppContext.BaseDirectory, "source")
             : Path.GetFullPath(baseDirectory);
 
         Logger.Debug($"FileAssetReader initialized: {BaseDirectory}");

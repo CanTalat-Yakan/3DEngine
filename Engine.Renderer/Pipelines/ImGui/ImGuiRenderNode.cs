@@ -12,11 +12,13 @@ namespace Engine;
 /// Draws into the shared <see cref="ActiveSwapchainPass"/> opened by <see cref="MainPassNode"/>
 /// (no separate render pass begin/end).
 /// </summary>
-/// <seealso cref="ImGuiShaders"/>
 /// <seealso cref="VulkanImGuiPlugin"/>
 internal sealed class ImGuiRenderNode : INode, IDisposable
 {
     private static readonly ILogger Logger = Log.Category("Engine.ImGui.Vulkan");
+
+    private readonly ReadOnlyMemory<byte> _vertexSpv;
+    private readonly ReadOnlyMemory<byte> _fragmentSpv;
 
     // Pipeline and font resources (created lazily on first Run)
     private IPipeline? _pipeline;
@@ -26,6 +28,15 @@ internal sealed class ImGuiRenderNode : INode, IDisposable
     private IImageView? _fontImageView;
     private ISampler? _fontSampler;
     private IDescriptorSet? _fontDescriptorSet;
+
+    /// <summary>Creates a new <see cref="ImGuiRenderNode"/> with pre-compiled shader SPIR-V bytecode.</summary>
+    /// <param name="vertexSpv">Compiled SPIR-V bytecode for the ImGui vertex shader.</param>
+    /// <param name="fragmentSpv">Compiled SPIR-V bytecode for the ImGui fragment shader.</param>
+    public ImGuiRenderNode(ReadOnlyMemory<byte> vertexSpv, ReadOnlyMemory<byte> fragmentSpv)
+    {
+        _vertexSpv = vertexSpv;
+        _fragmentSpv = fragmentSpv;
+    }
 
     /// <inheritdoc />
     public unsafe void Run(RenderGraphContext graphContext, RenderContext renderContext, RenderWorld renderWorld)
@@ -96,7 +107,7 @@ internal sealed class ImGuiRenderNode : INode, IDisposable
             allocator.Unmap(indexAlloc);
         }
 
-        // Draw into the shared pass — no separate render pass needed
+        // Draw into the shared pass - no separate render pass needed
         var pass = activePass.Pass;
         var extent = activePass.Extent;
 
@@ -195,10 +206,8 @@ internal sealed class ImGuiRenderNode : INode, IDisposable
     {
         Logger.Info("Creating ImGui Vulkan pipeline and font atlas...");
 
-        // Load / compile shaders
-        ImGuiShaders.EnsureLoaded();
-        var vsDesc = new ShaderDesc(ShaderStage.Vertex, ImGuiShaders.Vertex, "main");
-        var fsDesc = new ShaderDesc(ShaderStage.Fragment, ImGuiShaders.Fragment, "main");
+        var vsDesc = new ShaderDesc(ShaderStage.Vertex, _vertexSpv, "main");
+        var fsDesc = new ShaderDesc(ShaderStage.Fragment, _fragmentSpv, "main");
         _vertexShader = gfx.CreateShader(vsDesc);
         _fragmentShader = gfx.CreateShader(fsDesc);
 

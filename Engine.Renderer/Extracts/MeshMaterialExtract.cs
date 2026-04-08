@@ -8,7 +8,7 @@ namespace Engine;
 /// <see cref="EcsWorld"/>.
 /// </summary>
 /// <remarks>
-/// Bevy equivalent: <c>extract_meshes</c> system that spawns render entities with
+/// <c>extract_meshes</c> system that spawns render entities with
 /// <c>RenderMeshInstance</c> + <c>MeshTransforms</c> components.
 /// </remarks>
 /// <seealso cref="RenderMeshInstance"/>

@@ -6,9 +6,6 @@ namespace Engine;
 /// Extracts <see cref="Camera"/> + <see cref="Transform"/> components from the ECS world
 /// into render entities with <see cref="ExtractedView"/> components.
 /// </summary>
-/// <remarks>
-/// Bevy equivalent: <c>extract_cameras</c> spawning render entities with <c>ExtractedView</c>.
-/// </remarks>
 /// <seealso cref="ExtractedView"/>
 /// <seealso cref="CameraUniform"/>
 public sealed class CameraExtract : IExtractSystem

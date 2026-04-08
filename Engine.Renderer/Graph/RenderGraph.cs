@@ -1,7 +1,7 @@
 namespace Engine;
 
 /// <summary>
-/// Bevy-style render graph with typed slot edges, node ordering edges, sub-graph support,
+/// render graph with typed slot edges, node ordering edges, sub-graph support,
 /// and automatic image layout barrier insertion between nodes.
 /// </summary>
 /// <seealso cref="INode"/>

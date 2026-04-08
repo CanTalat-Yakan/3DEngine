@@ -11,7 +11,7 @@ namespace Engine;
 /// processed output directory.
 /// </para>
 /// <para>
-/// This is the equivalent of Bevy's <c>AssetProcessor</c> — an offline/background pipeline that
+/// <c>AssetProcessor</c> - an offline/background pipeline that
 /// converts source assets into optimized runtime formats.
 /// </para>
 /// </remarks>

@@ -1,7 +1,7 @@
 namespace Engine;
 
 /// <summary>
-/// A render graph node with typed input/output slots, matching Bevy's Node trait.
+/// A render graph node with typed input/output slots.
 /// Nodes own their own render passes and declare resource dependencies via slots.
 /// </summary>
 /// <seealso cref="ViewNode"/>

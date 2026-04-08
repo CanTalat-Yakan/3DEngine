@@ -75,7 +75,7 @@ gameplay logic in two ways:
 
 ## Design Goals
 
-- **Ergonomic ECS** - Lightweight world + staged schedule inspired by Bevy; attribute-driven behaviors with run
+- **Ergonomic ECS** - Lightweight world + staged schedule; attribute-driven behaviors with run
   conditions and keyboard toggles to minimize boilerplate.
 - **Explicit Rendering** - Vulkan-first with a structured extract → prepare → queue → graph pipeline; no hidden
   abstractions.
@@ -341,7 +341,7 @@ public sealed class GamePlugin : IPlugin
 
 ### Stages and the Schedule
 
-The engine drives a Bevy-like staged loop (see `Engine.Common/Stage.cs`):
+The engine drives a staged loop (see `Engine.Common/Stage.cs`):
 
 - **`Startup`** - runs once before the main loop.
 - **Per-frame stages** - `First` → `PreUpdate` → `Update` → `PostUpdate` → `Render` → `Last`.
@@ -427,7 +427,7 @@ public sealed class PhysicsPlugin : IPlugin
 
 ### Resources and Events
 
-**`World`** is a thread-safe, type-keyed resource container (Bevy-style):
+**`World`** is a thread-safe, type-keyed resource container:
 
 ```csharp
 // Insert
@@ -820,7 +820,7 @@ registration required.
 
 ### Render Pipeline
 
-The `Renderer` orchestrates a Bevy-style rendering pipeline each frame:
+The `Renderer` orchestrates a rendering pipeline each frame:
 
 ```
  Extract ──► BeginFrame ──► Prepare ──► Graph (Update → Barrier → Run per node) ──► EndFrame

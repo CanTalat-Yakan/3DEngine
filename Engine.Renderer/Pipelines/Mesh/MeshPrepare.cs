@@ -7,7 +7,7 @@ namespace Engine;
 /// source game-world entity ID.
 /// </summary>
 /// <remarks>
-/// Bevy equivalent: <c>prepare_meshes</c> system querying <c>RenderMeshInstance</c> entities.
+/// <c>prepare_meshes</c> system querying <c>RenderMeshInstance</c> entities.
 /// </remarks>
 /// <seealso cref="RenderMeshInstance"/>
 /// <seealso cref="MeshGpuRegistry"/>

@@ -2,7 +2,6 @@ namespace Engine;
 
 /// <summary>
 /// Interface for a typed draw function that knows how to render a specific <see cref="IPhaseItem"/>.
-/// Bevy equivalent: <c>Draw&lt;T&gt;</c> / <c>RenderCommand&lt;T&gt;</c>.
 /// </summary>
 /// <typeparam name="T">The phase item type.</typeparam>
 /// <seealso cref="IPhaseItem"/>

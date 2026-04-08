@@ -29,7 +29,12 @@ public sealed class VulkanWebViewPlugin : IPlugin
                     return;
                 }
 
-                renderer.Graph.AddNode("webview", new WebViewRenderNode());
+                // Load shaders via AssetServer at startup
+                var server = world.Resource<AssetServer>();
+                var vertexSpv = server.LoadSync<byte[]>("shaders/webview.vert.glsl");
+                var fragmentSpv = server.LoadSync<byte[]>("shaders/webview.frag.glsl");
+
+                renderer.Graph.AddNode("webview", new WebViewRenderNode(vertexSpv, fragmentSpv));
                 renderer.Graph.AddNodeEdge("main_pass", "webview");
                 Logger.Info("WebViewRenderNode registered in render graph (CPU bitmap mode, after 'sample').");
             }, "VulkanWebViewPlugin.Startup")

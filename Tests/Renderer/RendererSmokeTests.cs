@@ -21,10 +21,17 @@ public class RendererSmokeTests
         context.Initialize(new StubSurfaceSource());
         var renderer = new Engine.Renderer(context);
 
-        renderer.Initialize();
-        var act = () => renderer.RenderFrame(new World());
+        var world = new World();
+        var server = new AssetServer(workerCount: 1);
+        server.AddSource(new FileAssetReader());
+        server.RegisterLoader(new GlslLoader());
+        world.InsertResource(server);
+
+        renderer.Initialize(world);
+        var act = () => renderer.RenderFrame(world);
 
         act.Should().NotThrow();
+        server.Dispose();
     }
 }
 

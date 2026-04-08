@@ -111,7 +111,7 @@ public sealed class SystemDescriptor
     }
 
     /// <summary>
-    /// Attaches a Bevy-style <c>run_if</c> condition. The system is skipped for the current frame
+    /// Attaches a <c>run_if</c> condition. The system is skipped for the current frame
     /// when <paramref name="condition"/> returns <c>false</c>.
     /// </summary>
     /// <param name="condition">A predicate evaluated against the <see cref="World"/> each frame.</param>
@@ -219,7 +219,7 @@ public sealed class SystemDescriptor
 }
 
 /// <summary>
-/// Schedules systems into Bevy-like stages and executes them.
+/// Schedules systems into stages and executes them.
 /// Stages run sequentially in a fixed order; within a stage, systems run in parallel by default.
 /// </summary>
 /// <remarks>
@@ -299,7 +299,7 @@ public sealed class Schedule
         return this;
     }
 
-    /// <summary>Adds a system with a Bevy-style <c>run_if</c> condition to the specified stage.</summary>
+    /// <summary>Adds a system with a <c>run_if</c> condition to the specified stage.</summary>
     /// <param name="stage">The <see cref="Stage"/> to register the system in.</param>
     /// <param name="system">The system delegate to execute when the stage runs.</param>
     /// <param name="runCondition">A predicate evaluated each frame; the system is skipped when <c>false</c>.</param>

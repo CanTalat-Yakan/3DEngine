@@ -2,7 +2,7 @@ namespace Engine;
 
 /// <summary>
 /// Central application object holding the <see cref="World"/> and execution <see cref="Schedule"/>.
-/// Supports Bevy-style plugin composition: add plugins, register systems, insert resources,
+/// Supports plugin composition: add plugins, register systems, insert resources,
 /// then call <see cref="Run"/> to enter the main loop.
 /// </summary>
 /// <remarks>
@@ -177,7 +177,7 @@ public sealed class App : IDisposable
         return this;
     }
 
-    /// <summary>Registers a system with a Bevy-style <c>run_if</c> condition to a given stage.</summary>
+    /// <summary>Registers a system with a <c>run_if</c> condition to a given stage.</summary>
     /// <param name="stage">The <see cref="Stage"/> during which the system should execute.</param>
     /// <param name="system">The system delegate to invoke each time the stage runs.</param>
     /// <param name="runCondition">

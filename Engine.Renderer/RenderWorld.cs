@@ -10,7 +10,7 @@ namespace Engine;
 /// </summary>
 /// <remarks>
 /// <para>
-/// In Bevy the render world is a complete <c>World</c> with entities and resources.
+/// The render world is a complete <c>World</c> with entities and resources.
 /// During the extract phase, game entities are cloned as render entities with render-specific
 /// components. This enables per-entity visibility culling, GPU resource tracking, and batching
 /// through standard ECS queries.

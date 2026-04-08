@@ -3,7 +3,6 @@ namespace Engine;
 /// <summary>
 /// Convenience base that auto-iterates <see cref="ExtractedView"/> render entities, calling
 /// <see cref="Run(RenderGraphContext, RenderContext, ExtractedView, RenderWorld)"/> per camera.
-/// Matches Bevy's ViewNode pattern using <see cref="ExtractedView"/> as the view query type.
 /// </summary>
 /// <seealso cref="INode"/>
 /// <seealso cref="ExtractedView"/>
