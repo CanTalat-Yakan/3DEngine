@@ -35,6 +35,15 @@ public sealed class WebViewInstance : IDisposable
     private View? _view;
     private bool _disposed;
 
+    /// <summary>The rendering mode this instance was initialized with.</summary>
+    public WebViewMode Mode { get; private set; } = WebViewMode.Cpu;
+
+    /// <summary>
+    /// The GPU driver backing this instance when <see cref="Mode"/> is <see cref="WebViewMode.Gpu"/>.
+    /// <c>null</c> in CPU mode.
+    /// </summary>
+    public VulkanUltralightGpuDriver? GpuDriver { get; private set; }
+
     /// <summary>Current pixel width of the webview view.</summary>
     public uint Width { get; private set; }
 
@@ -119,11 +128,18 @@ public sealed class WebViewInstance : IDisposable
     /// </summary>
     /// <param name="width">Initial pixel width of the Ultralight view.</param>
     /// <param name="height">Initial pixel height of the Ultralight view.</param>
-    public void Initialize(uint width, uint height)
+    /// <param name="mode">Rendering mode: CPU bitmap surface or GPU-accelerated.</param>
+    /// <param name="gpuDriver">
+    /// When <paramref name="mode"/> is <see cref="WebViewMode.Gpu"/>, the Vulkan GPU driver
+    /// to register with Ultralight. Ignored (and may be <c>null</c>) in CPU mode.
+    /// </param>
+    public void Initialize(uint width, uint height, WebViewMode mode = WebViewMode.Cpu, VulkanUltralightGpuDriver? gpuDriver = null)
     {
-        Logger.Info($"WebViewInstance: Initializing Ultralight ({width}x{height})...");
+        Logger.Info($"WebViewInstance: Initializing Ultralight ({width}x{height}, mode={mode})...");
         Width = width;
         Height = height;
+        Mode = mode;
+        GpuDriver = mode == WebViewMode.Gpu ? gpuDriver : null;
 
         // ── Extract embedded resources to disk ────────────────────────
         ExtractEmbeddedResources();
@@ -132,7 +148,19 @@ public sealed class WebViewInstance : IDisposable
         AppCoreMethods.SetDefaultLogger(Path.Combine(AppContext.BaseDirectory, "ultralight.log"));
         AppCoreMethods.SetPlatformFontLoader();
         AppCoreMethods.SetPlatformFileSystem(AppContext.BaseDirectory);
-        ULPlatform.ErrorGpuDriverNotSet = false;
+
+        if (mode == WebViewMode.Gpu && gpuDriver is not null)
+        {
+            // Register the custom GPU driver with Ultralight BEFORE creating the renderer
+            ULPlatform.ErrorGpuDriverNotSet = false;
+            ULPlatform.GpuDriver = gpuDriver;
+            Logger.Info("Ultralight GPU driver registered (Vulkan-backed).");
+        }
+        else
+        {
+            ULPlatform.ErrorGpuDriverNotSet = false;
+        }
+
         Logger.Info("AppCore platform font loader, file system, and logger enabled.");
 
         // ── Renderer ──────────────────────────────────────────────────
@@ -144,10 +172,11 @@ public sealed class WebViewInstance : IDisposable
         ULPlatform.ErrorWrongThread = false;
         Logger.Info("Ultralight renderer created.");
 
-        // ── View configuration (CPU/bitmap surface mode) ──────────────
+        // ── View configuration ────────────────────────────────────────
+        var isGpu = mode == WebViewMode.Gpu;
         var viewConfig = new ViewConfig
         {
-            IsAccelerated = false,   // CPU rendering → bitmap surface
+            IsAccelerated = isGpu,   // GPU mode → render to GPU texture; CPU mode → bitmap surface
             IsTransparent = true,    // transparent background for compositing
             InitialDeviceScale = 1.0,
             InitialFocus = true,
@@ -169,7 +198,7 @@ public sealed class WebViewInstance : IDisposable
         _view.OnFailLoading += OnFailLoadingHandler;
         _view.OnAddConsoleMessage += OnConsoleMessageHandler;
 
-        Logger.Info($"Ultralight view created ({width}x{height}, transparent={viewConfig.IsTransparent}).");
+        Logger.Info($"Ultralight view created ({width}x{height}, mode={mode}, accelerated={viewConfig.IsAccelerated}, transparent={viewConfig.IsTransparent}).");
     }
 
     // ── Native callback handlers ─────────────────────────────────────
@@ -322,7 +351,8 @@ public sealed class WebViewInstance : IDisposable
         // Bypasses IsDirty: directly locks the surface and scans for non-zero
         // pixels to confirm whether Ultralight ever writes content.
         // Skipped on resize frames - the surface was just reallocated.
-        if (DiagUpdateCount % 120 == 0 && !_resizedThisFrame)
+        // Only applicable in CPU mode (GPU mode has no bitmap surface).
+        if (Mode == WebViewMode.Cpu && DiagUpdateCount % 120 == 0 && !_resizedThisFrame)
             ProbeSurfacePixels();
     }
 

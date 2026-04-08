@@ -24,13 +24,23 @@ public sealed class WebViewPlugin : IPlugin
     /// <summary>Optional initial URL to load. Set before adding to App.</summary>
     public string? InitialUrl { get; init; }
 
+    /// <summary>
+    /// Rendering mode for the webview. Defaults to <see cref="WebViewMode.Gpu"/> for GPU-accelerated
+    /// rendering via the Vulkan GPU driver. Set to <see cref="WebViewMode.Cpu"/> to fall back to
+    /// CPU bitmap surface rendering.
+    /// </summary>
+    public WebViewMode Mode { get; init; } = WebViewMode.Gpu;
+
     /// <inheritdoc />
     public void Build(App app)
     {
-        Logger.Info("WebViewPlugin: Building...");
+        Logger.Info($"WebViewPlugin: Building (mode={Mode})...");
 
         var webview = new WebViewInstance();
         app.World.InsertResource(webview);
+
+        // Capture the mode for closures
+        var mode = Mode;
 
         // ── Debounce state for WebView native resize ──
         bool pendingWebViewResize = false;
@@ -42,12 +52,32 @@ public sealed class WebViewPlugin : IPlugin
             {
                 var cfg = world.Resource<Config>();
                 var b = world.Resource<WebViewInstance>();
-            
-                // Initialize at config dimensions - if the window is actually
-                // larger (e.g. HiDPI scaling), the deferred resize in Update()
-                // will handle it safely without crashing native code.
-                b.Initialize((uint)cfg.WindowData.Width, (uint)cfg.WindowData.Height);
-            
+
+                // Create GPU driver if GPU mode is selected and Vulkan is active
+                VulkanUltralightGpuDriver? gpuDriver = null;
+                if (mode == WebViewMode.Gpu && cfg.Graphics == GraphicsBackend.Vulkan)
+                {
+                    if (world.TryGetResource<Renderer>(out var renderer) && renderer.Context.IsInitialized)
+                    {
+                        gpuDriver = new VulkanUltralightGpuDriver(renderer.Context.Graphics);
+                        world.InsertResource(gpuDriver);
+                        Logger.Info("WebViewPlugin: GPU driver created and registered as resource.");
+                    }
+                    else
+                    {
+                        Logger.Warn("WebViewPlugin: GPU mode requested but Vulkan renderer not initialized. Falling back to CPU mode.");
+                        mode = WebViewMode.Cpu;
+                    }
+                }
+                else if (mode == WebViewMode.Gpu)
+                {
+                    Logger.Warn($"WebViewPlugin: GPU mode requires Vulkan backend (current: {cfg.Graphics}). Falling back to CPU mode.");
+                    mode = WebViewMode.Cpu;
+                }
+
+                // Initialize at config dimensions
+                b.Initialize((uint)cfg.WindowData.Width, (uint)cfg.WindowData.Height, mode, gpuDriver);
+
                 if (InitialHtml is not null)
                 {
                     b.LoadHtml(InitialHtml);
@@ -61,14 +91,14 @@ public sealed class WebViewPlugin : IPlugin
                     // Default: load the embedded test page
                     b.LoadHtml(LoadDefaultHtml());
                 }
-            
-                Logger.Info("WebViewPlugin: Ultralight initialized and content loaded.");
-            
+
+                Logger.Info($"WebViewPlugin: Ultralight initialized (mode={mode}) and content loaded.");
+
                 // Hook SDL events for input forwarding
                 if (world.TryGetResource<AppWindow>(out var window))
                 {
                     window.SDLEvent += evt => WebViewInput.ProcessEvent(evt, b);
-            
+
                     // Handle window resize → flag for debounced native resize
                     window.ResizeEvent += (w, h) =>
                     {
@@ -80,14 +110,17 @@ public sealed class WebViewPlugin : IPlugin
                             lastWebViewResizeTick = Environment.TickCount64;
                         }
                     };
-            
+
                     Logger.Info("WebViewPlugin: SDL event hooks registered.");
                 }
-            
+
                 // Sync the WebViewInstance into the RenderWorld for the render node
-                if (world.TryGetResource<Renderer>(out var renderer))
+                if (world.TryGetResource<Renderer>(out var rend))
                 {
-                    renderer.RenderWorld.Set(b);
+                    rend.RenderWorld.Set(b);
+                    // Also sync the GPU driver to the render world if in GPU mode
+                    if (gpuDriver is not null)
+                        rend.RenderWorld.Set(gpuDriver);
                     Logger.Info("WebViewPlugin: WebViewInstance synced to RenderWorld.");
                 }
             }, "WebViewPlugin.Startup")
@@ -119,6 +152,11 @@ public sealed class WebViewPlugin : IPlugin
         // ── Cleanup: dispose Ultralight ──────────────────────────────
         app.AddSystem(Stage.Cleanup, new SystemDescriptor(static (World world) =>
             {
+                if (world.TryGetResource<VulkanUltralightGpuDriver>(out var gpuDriver))
+                {
+                    gpuDriver.Dispose();
+                    world.RemoveResource<VulkanUltralightGpuDriver>();
+                }
                 if (world.TryGetResource<WebViewInstance>(out var b))
                 {
                     b.Dispose();
