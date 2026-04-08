@@ -31,19 +31,4 @@ public sealed class RenderPhase<T> where T : struct, IPhaseItem
     public void Clear() => Items.Clear();
 }
 
-/// <summary>Typed wrapper for the opaque 3D render phase, stored as a resource in <see cref="RenderWorld"/>.</summary>
-/// <seealso cref="OpaquePhaseItem"/>
-public sealed class Opaque3dPhase
-{
-    /// <summary>The underlying render phase.</summary>
-    public RenderPhase<OpaquePhaseItem> Phase { get; } = new();
-}
-
-/// <summary>Typed wrapper for the transparent 3D render phase, stored as a resource in <see cref="RenderWorld"/>.</summary>
-/// <seealso cref="TransparentPhaseItem"/>
-public sealed class Transparent3dPhase
-{
-    /// <summary>The underlying render phase.</summary>
-    public RenderPhase<TransparentPhaseItem> Phase { get; } = new();
-}
 

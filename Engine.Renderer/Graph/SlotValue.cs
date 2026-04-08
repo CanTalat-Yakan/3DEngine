@@ -1,25 +1,5 @@
 namespace Engine;
 
-/// <summary>Types of data that can flow through render graph slot edges.</summary>
-public enum SlotType
-{
-    /// <summary>Default / unset - no value has been assigned to this slot.</summary>
-    None = 0,
-    /// <summary>A GPU image view (texture).</summary>
-    TextureView,
-    /// <summary>A GPU sampler.</summary>
-    Sampler,
-    /// <summary>A GPU buffer.</summary>
-    Buffer,
-    /// <summary>An entity identifier.</summary>
-    Entity
-}
-
-/// <summary>Declares a named typed slot on a render graph node.</summary>
-/// <param name="Name">Human-readable slot name.</param>
-/// <param name="Type">The type of data this slot carries.</param>
-public readonly record struct SlotInfo(string Name, SlotType Type);
-
 /// <summary>Runtime value carried through a slot edge between render graph nodes.</summary>
 public readonly struct SlotValue
 {
