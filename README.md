@@ -554,7 +554,7 @@ watching.
  │  AssetServer                                             │
  │                                                          │
  │  Sources: FileAssetReader, EmbeddedAssetReader, ...      │
- │  Loaders: GlslLoader, ByteArrayLoader, StringLoader, ...│
+ │  Loaders: GlslLoader, ByteArrayLoader, StringLoader, ... │
  │  Workers: N background threads (Channel<LoadRequest>)    │
  │  Tracking: path→Handle deduplication, LoadState per ID   │
  │  Hot-reload: FileAssetWatcher → re-enqueue on change     │
