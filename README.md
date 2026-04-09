@@ -971,7 +971,7 @@ The `RenderStage` enum defines the four conceptual phases: `Extract`, `Prepare`,
 | System | Description |
 |---|---|
 | `ClearColorExtract` | Copies `ClearColor` resource from game world to render world |
-| `CameraExtract` | Extracts `Camera` + `Transform` components into `ExtractedView` render entities |
+| `CameraExtract` | Extracts `Camera` + `Transform` components into `ExtractedView` render entities (right-handed, camera looks along −Z; projection Y is flipped for Vulkan NDC) |
 | `MeshMaterialExtract` | Extracts `Mesh` + `Material` + `Transform` into `RenderMeshInstance` render entities |
 
 **Built-in prepare systems:**
@@ -1054,8 +1054,8 @@ public class MyNode : INode
 // Spawn a renderable entity in game world
 var ecs = world.Resource<EcsWorld>();
 var e = ecs.Spawn();
-ecs.Add(e, new Camera(fovY: 60f * (float)(Math.PI / 180.0), near: 0.1f, far: 1000f));
-ecs.Add(e, new Transform(new Vector3(0, 5, -10)));
+ecs.Add(e, new Camera(fovYDegrees: 60f, near: 0.1f, far: 1000f));
+ecs.Add(e, new Transform(new Vector3(0, 0, 5)));
 
 var mesh = ecs.Spawn();
 ecs.Add(mesh, new Mesh(new[] { new Vector3(0,1,0), new Vector3(-1,-1,0), new Vector3(1,-1,0) }));

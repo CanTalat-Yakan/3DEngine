@@ -21,7 +21,7 @@ public struct TriangleMeshTest
         var world = ctx.World;
         var ecs = world.Resource<EcsWorld>();
         var e = ecs.Spawn();
-        ecs.Add(e, new Camera(fovY: 60f * (float)(Math.PI / 180.0), near: 0.1f, far: 1000f));
+        ecs.Add(e, new Camera(fovYDegrees: 60f, near: 0.1f, far: 1000f));
         ecs.Add(e, new Transform(new Vector3(0, 0, 5)));
 
         var mesh = ecs.Spawn();
