@@ -133,6 +133,8 @@ See `Engine/Program.cs` for the runtime entry point and `Editor/Program.cs` for 
 ┌─────────────────────────────────────────────────────────────────┐
 │  3DEngine.sln                                                   │
 │                                                                 │
+│  Engine.Application SDL3 window, input backend, ImGui host      │
+│  │                                                              │
 │  Engine.Common ─── App, World, Schedule, Config, Logger,        │
 │  │                 Events, Time, Input, Stage                   │
 │  │                                                              │
@@ -142,19 +144,17 @@ See `Engine/Program.cs` for the runtime entry point and `Editor/Program.cs` for 
 │  Engine.Generator  Roslyn source generator for [Behavior]       │
 │  │                                                              │
 │  Engine.Files ──── AssetServer, Assets<T>, Handle<T>,           │
-│  │                 AssetEvent<T>, IAssetLoader<T>, IAssetReader, │
-│  │                 FileAssetReader, FileWatcher, hot-reload      │
+│  │                 AssetEvent<T>, IAssetLoader<T>, IAssetReader,│
+│  │                 FileAssetReader, FileWatcher, hot-reload     │
 │  │                                                              │
 │  Engine.Graphics ─ Vulkan device, swapchain, pipelines,         │
-│  │                 buffers, images, SPIR-V compilation,          │
-│  │                 NullGraphicsDevice (headless/test)            │
+│  │                 buffers, images, SPIR-V compilation,         │
+│  │                 NullGraphicsDevice (headless/test)           │
 │  │                                                              │
 │  Engine.Renderer ─ Renderer, RenderGraph, RenderWorld,          │
-│  │                 extract/prepare/queue systems, render phases, │
-│  │                 Camera/Mesh/Material/Transform components,    │
-│  │                 PipelineCache, DynamicBufferAllocator, ImGui  │
-│  │                                                              │
-│  Engine.Application SDL3 window, input backend, ImGui host      │
+│  │                 extract/prepare/queue systems, render phases,│
+│  │                 Camera/Mesh/Material/Transform components,   │
+│  │                 PipelineCache, DynamicBufferAllocator, ImGui │
 │  │                                                              │
 │  Engine.WebView ── Ultralight integration, WebView overlay      │
 │  │                                                              │
