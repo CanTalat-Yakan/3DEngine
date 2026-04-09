@@ -22,6 +22,10 @@
 
 <p align="center" style="text-align:center"><sub>Last updated: April 9, 2026</sub></p>
 
+<p align="center" style="text-align:center">
+  <img src=".github/assets/3dengine.png" alt="3D Engine Screenshot" width="720"/>
+</p>
+
 <!-- TOC -->
 
 - [Overview](#overview)
