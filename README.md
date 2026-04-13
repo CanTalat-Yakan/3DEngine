@@ -1,3 +1,5 @@
+___
+
 <p align="center" style="text-align:center">
   <img src=".github/assets/icon.png" alt="3D Engine Icon" width="256"/>
 </p>
@@ -20,11 +22,13 @@
   <a href="https://deepwiki.com/CanTalat-Yakan/3DEngine"><img alt="Ask DeepWiki" src="https://deepwiki.com/badge.svg"></a>
 </p>
 
-<p align="center" style="text-align:center"><sub>Last updated: April 9, 2026</sub></p>
+___
 
 <p align="center" style="text-align:center">
   <img src=".github/assets/3dengine.png" alt="3D Engine Screenshot" width="720"/>
 </p>
+
+___
 
 <!-- TOC -->
 
