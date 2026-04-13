@@ -6,8 +6,6 @@ using UltralightNet.Platform;
 using ULRenderer = UltralightNet.Renderer;
 using ULPlatform = UltralightNet.Platform.Platform;
 
-// CPU-only bitmap surface rendering mode - GPU driver was removed.
-
 namespace Engine;
 
 /// <summary>
@@ -18,10 +16,14 @@ namespace Engine;
 /// <para>
 /// Wraps the Ultralight <see cref="UltralightNet.Renderer"/> and <see cref="View"/>
 /// objects, providing CPU-mode bitmap surface rendering suitable for texture upload to
-/// a GPU pipeline.  The class implements a <em>quiescent resize</em> pattern: when the
-/// view is resized via <see cref="Resize"/>, the actual native resize is deferred to
-/// the next <see cref="Update"/> call, and on that frame all Ultralight work is skipped
-/// so the freshly-reallocated surface is not accessed before being painted into.
+/// a GPU pipeline.  The view is repainted every frame via forced <c>NeedsPaint</c>,
+/// ensuring scroll, CSS animation, hover, and other visual changes are always reflected.
+/// </para>
+/// <para>
+/// The class implements a <em>quiescent resize</em> pattern: when the view is resized
+/// via <see cref="Resize"/>, the actual native resize is deferred to the next
+/// <see cref="Update"/> call, and on that frame all Ultralight work is skipped so the
+/// freshly-reallocated surface is not accessed before being painted into.
 /// </para>
 /// <para>Thread safety: this class is <b>not</b> thread-safe. All calls must occur on the
 /// same thread (typically the main thread via <c>MainThreadOnly()</c> system descriptors).</para>
@@ -37,7 +39,6 @@ public sealed class WebViewInstance : IDisposable
     private View? _view;
     private bool _disposed;
 
-
     /// <summary>Whether the webview overlay is rendered. Toggled at runtime via F1 (<see cref="BehaviorConditions.KeyToggle"/>).</summary>
     public bool Visible { get; set; } = true;
 
@@ -47,9 +48,6 @@ public sealed class WebViewInstance : IDisposable
     /// <summary>Current pixel height of the webview view.</summary>
     public uint Height { get; private set; }
 
-    /// <summary>Whether the Ultralight surface has been painted since last GPU upload.</summary>
-    public bool IsDirty { get; private set; }
-
     /// <summary>The underlying Ultralight view (null before <see cref="Initialize"/>).</summary>
     public View? View => _view;
 
@@ -57,26 +55,24 @@ public sealed class WebViewInstance : IDisposable
     public uint SurfaceRowBytes => _view?.Surface?.RowBytes ?? (Width * 4);
 
     // ── Diagnostics (read by ImGui debug window) ─────────────────────
+
     /// <summary>Whether the Ultralight view has an active bitmap surface.</summary>
     public bool HasSurface => _view?.Surface is not null;
-    /// <summary>Whether the native view currently needs a paint pass (checked before <see cref="Update"/>).</summary>
-    public bool NeedsPaintNow => _view?.NeedsPaint ?? false;
+
     /// <summary>Total number of <see cref="Update"/> invocations since initialization.</summary>
     public int DiagUpdateCount { get; private set; }
-    /// <summary>Total number of paint events detected (NeedsPaint was true).</summary>
+
+    /// <summary>Total number of frames where Ultralight itself reported a dirty region (before we force-repaint).</summary>
     public int DiagPaintCount { get; private set; }
+
     /// <summary>Total number of pixel uploads to the GPU texture (incremented by the render node).</summary>
     public int DiagUploadCount { get; internal set; }
-    /// <summary>Count of non-zero BGRA pixels found during the last <see cref="TryGetPixels"/> call.</summary>
-    public long DiagNonZeroPixels { get; internal set; }
+
     /// <summary>Total pixel count (<c>Width × Height</c>) for the current view dimensions.</summary>
     public long DiagTotalPixels => Width * Height;
 
     /// <summary>Page title from the native View.Title property.</summary>
     public string? DiagPageTitle { get; private set; }
-
-    /// <summary>Hex representation of the first 16 bytes of the last surface read.</summary>
-    public string? DiagFirstBytes { get; internal set; }
 
     /// <summary>Whether the ICU data file exists on disk.</summary>
     public bool DiagIcuExists => File.Exists(Path.Combine(AppContext.BaseDirectory, "runtimes", "icudt67l.dat"));
@@ -85,17 +81,18 @@ public sealed class WebViewInstance : IDisposable
     public bool DiagCaCertExists => File.Exists(Path.Combine(AppContext.BaseDirectory, "runtimes", "cacert.pem"));
 
     // ── Page load state (set by native callbacks) ────────────────────
+
     /// <summary>Whether the DOM-ready callback has fired for the current page.</summary>
     public bool DiagDOMReady { get; private set; }
+
     /// <summary>Whether the page-finished-loading callback has fired for the current page.</summary>
     public bool DiagPageFinished { get; private set; }
+
     /// <summary>Formatted error string from the last page-load failure, or <c>null</c> if no error.</summary>
     public string? DiagLoadError { get; private set; }
+
     /// <summary>Last JavaScript console message captured by the native callback.</summary>
     public string? DiagLastConsoleMessage { get; private set; }
-
-    /// <summary>Non-zero pixel count from a forced surface probe (bypasses IsDirty).</summary>
-    public long DiagProbeNonZero { get; internal set; }
 
     private int _titleQueryCountdown;
 
@@ -111,12 +108,6 @@ public sealed class WebViewInstance : IDisposable
     /// Ultralight Render() has painted into it yet).
     /// </summary>
     public uint ResizeGeneration { get; private set; }
-
-    /// <summary>Set to <c>true</c> for the single frame where the native
-    /// <c>ulViewResize</c> was committed.  While set, no Ultralight
-    /// Update/Render is executed and the render node must not touch the
-    /// surface.</summary>
-    internal bool ResizedThisFrame { get; private set; }
 
     /// <summary>
     /// Initializes the Ultralight platform, renderer, and view.
@@ -180,6 +171,7 @@ public sealed class WebViewInstance : IDisposable
     }
 
     // ── Native callback handlers ─────────────────────────────────────
+
     private void OnDOMReadyHandler(ulong frameId, bool isMainFrame, string url)
     {
         DiagDOMReady = true;
@@ -212,9 +204,6 @@ public sealed class WebViewInstance : IDisposable
         if (_view is null) return;
         Logger.Info("WebViewInstance: Loading HTML content...");
         _view.LoadHtml(html);
-
-        // Warm-up: pump the renderer a few times so the page starts parsing
-        // before the main loop begins.
         WarmUp();
     }
 
@@ -225,8 +214,6 @@ public sealed class WebViewInstance : IDisposable
         if (_view is null) return;
         Logger.Info($"WebViewInstance: Loading URL: {url}");
         _view.Url = url;
-
-        // Warm-up pump
         WarmUp();
     }
 
@@ -242,11 +229,6 @@ public sealed class WebViewInstance : IDisposable
             _renderer.Update();
             _renderer.Render();
         }
-
-        // The warm-up likely painted the surface already, so mark dirty
-        // so the first render frame uploads it to the GPU.
-        IsDirty = true;
-
         Logger.Info($"WebViewInstance: Warm-up complete (DOMReady={DiagDOMReady}, Finished={DiagPageFinished}).");
     }
 
@@ -269,15 +251,12 @@ public sealed class WebViewInstance : IDisposable
     }
 
     /// <summary>
-    /// Advances Ultralight internal timers and triggers repaint when needed.
+    /// Advances Ultralight internal timers and forces a full repaint every frame.
     /// Call once per frame (Update stage).
     /// </summary>
     public void Update()
     {
         if (_renderer is null) return;
-
-        // Reset per-frame flag.
-        ResizedThisFrame = false;
 
         // ── Quiescent resize ─────────────────────────────────────────
         if (_hasPendingResize && ApplyPendingResize())
@@ -288,10 +267,10 @@ public sealed class WebViewInstance : IDisposable
 
         DiagUpdateCount++;
 
-        // Update processes timers, JS, layout, network - may flag the view as needing paint.
+        // Process timers, JS, layout, network — may flag the view as needing paint.
         _renderer.Update();
 
-        // Query page title once per ~60 frames AFTER Update() so the page has been processed.
+        // Query page title periodically after Update() so the page has been processed.
         if (--_titleQueryCountdown <= 0)
         {
             _titleQueryCountdown = 60;
@@ -299,45 +278,31 @@ public sealed class WebViewInstance : IDisposable
             catch { DiagPageTitle = "(error)"; }
         }
 
-        // Capture the dirty state BEFORE Render(), because Render() paints the
-        // dirty regions to the bitmap surface and then clears the NeedsPaint flag.
-        bool needsPaint = _view is not null && _view.NeedsPaint;
-        if (needsPaint)
-        {
-            IsDirty = true;
-            DiagPaintCount++;
-        }
-
-        // Render paints all dirty views to their surfaces.
-        _renderer.Render();
-
-        // Also check AFTER Render in case this SDK version sets NeedsPaint post-render.
+        // Track how often Ultralight itself detected dirty regions.
         if (_view is not null && _view.NeedsPaint)
-        {
-            IsDirty = true;
             DiagPaintCount++;
-        }
+
+        // Force a full repaint every frame so scroll, CSS animations, hover
+        // effects, and other visual changes are always reflected.
+        if (_view is not null)
+            _view.NeedsPaint = true;
+
+        // Paint all views to their bitmap surfaces.
+        _renderer.Render();
     }
 
     /// <summary>
-    /// Locks the bitmap surface pixels and copies them into <paramref name="destination"/>.
-    /// Returns true if new pixel data was copied (i.e. the surface was dirty).
+    /// Copies the current bitmap surface pixels into <paramref name="destination"/>.
     /// </summary>
     /// <param name="destination">Target buffer that must be at least <c>SurfaceRowBytes × Height</c> bytes.</param>
     /// <param name="rowBytes">Receives the row stride in bytes of the copied data.</param>
-    /// <returns><c>true</c> if pixels were copied; <c>false</c> if the surface is not dirty or unavailable.</returns>
+    /// <returns><c>true</c> if pixels were copied; <c>false</c> if the surface is unavailable.</returns>
     public unsafe bool TryGetPixels(Span<byte> destination, out uint rowBytes)
     {
         rowBytes = 0;
         if (_view?.Surface is not { } surface)
             return false;
 
-        if (!IsDirty)
-            return false;
-
-        // Guard against reading stale dimensions during a resize transition.
-        // The native surface may have been reallocated by ulViewResize() while
-        // the managed Width/Height are still being updated.
         var currentHeight = Height;
         rowBytes = surface.RowBytes;
         var byteCount = (int)(rowBytes * currentHeight);
@@ -347,48 +312,13 @@ public sealed class WebViewInstance : IDisposable
         var ptr = surface.LockPixels();
         try
         {
-            var src = new ReadOnlySpan<byte>(ptr, byteCount);
-            src.CopyTo(destination);
+            new ReadOnlySpan<byte>(ptr, byteCount).CopyTo(destination);
         }
         finally
         {
             surface.UnlockPixels();
         }
-
-        surface.ClearDirtyBounds();
-        IsDirty = false;
         return true;
-    }
-
-    /// <summary>
-    /// Gets a read-only span over the raw bitmap surface pixels (locks internally).
-    /// Caller must call <see cref="UnlockPixels"/> when done.
-    /// Returns an empty span if there's no surface or it's not dirty.
-    /// </summary>
-    /// <param name="rowBytes">Receives the row stride in bytes, or 0 if no surface is available.</param>
-    /// <returns>A read-only span over the locked pixel data, or an empty span.</returns>
-    public unsafe ReadOnlySpan<byte> LockPixels(out uint rowBytes)
-    {
-        rowBytes = 0;
-        if (_view?.Surface is not { } surface)
-            return ReadOnlySpan<byte>.Empty;
-
-        rowBytes = surface.RowBytes;
-        var ptr = surface.LockPixels();
-        return new ReadOnlySpan<byte>(ptr, (int)(rowBytes * Height));
-    }
-
-    /// <summary>Unlocks the bitmap surface pixels after a <see cref="LockPixels"/> call.</summary>
-    public void UnlockPixels()
-    {
-        _view?.Surface?.UnlockPixels();
-    }
-
-    /// <summary>Clears the dirty flag and dirty bounds after uploading to GPU.</summary>
-    public void ClearDirty()
-    {
-        _view?.Surface?.ClearDirtyBounds();
-        IsDirty = false;
     }
 
     /// <summary>
@@ -412,8 +342,7 @@ public sealed class WebViewInstance : IDisposable
 
     /// <summary>
     /// Applies a pending deferred resize.  Returns <c>true</c> if the native
-    /// <c>ulViewResize</c> was actually committed (caller should skip all
-    /// further Ultralight work this frame).
+    /// resize was committed (caller should skip Ultralight work this frame).
     /// </summary>
     private bool ApplyPendingResize()
     {
@@ -432,27 +361,16 @@ public sealed class WebViewInstance : IDisposable
 
         Logger.Info($"WebViewInstance: Resizing view to {newW}x{newH} (was {Width}x{Height})...");
 
-        // Clear any stale dirty-region rectangles that reference the old
-        // surface dimensions.  Without this the native resize code may
-        // dereference out-of-bounds offsets in the old bitmap buffer.
+        // Clear stale dirty-region rectangles that reference the old surface dimensions.
         _view.Surface?.ClearDirtyBounds();
 
-        // Use the native ulViewResize API - this resizes the view and its
-        // backing surface in-place without destroying/recreating the view,
-        // preserving all callbacks, JS state, and page content.
         _view.Resize(newW, newH);
-
         Width = newW;
         Height = newH;
 
-        // Bump the generation so the render node knows the surface was
-        // reallocated and will skip pixel reads this frame.
+        // Bump the generation so the render node skips pixel reads this frame
+        // (the surface was reallocated and hasn't been painted into yet).
         ResizeGeneration++;
-        ResizedThisFrame = true;
-
-        // Mark dirty so the render node picks up the resized surface on
-        // the NEXT frame (after the quiescent gap).
-        IsDirty = true;
 
         Logger.Info($"WebViewInstance: View resized to {newW}x{newH} (generation={ResizeGeneration}).");
         return true;
@@ -525,5 +443,3 @@ public sealed class WebViewInstance : IDisposable
         Logger.Info($"Extracted embedded resource: {path} ({fs.Length:N0} bytes)");
     }
 }
-
-

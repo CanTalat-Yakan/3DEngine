@@ -19,7 +19,6 @@ namespace Engine;
 /// <seealso cref="WebViewPlugin"/>
 internal static class WebViewInput
 {
-    private static readonly ILogger Logger = Log.Category("Engine.WebView.Input");
 
     /// <summary>
     /// Processes a single SDL event and forwards it to the given <see cref="WebViewInstance"/>.

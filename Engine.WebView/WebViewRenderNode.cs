@@ -2,9 +2,9 @@ namespace Engine;
 
 /// <summary>
 /// Render graph node that draws the Ultralight webview surface as a fullscreen textured overlay.
-/// Uses CPU bitmap surface mode - reads pixels from Ultralight, uploads to a Vulkan texture,
+/// Reads pixels from the CPU bitmap surface, uploads to a Vulkan texture every frame,
 /// then draws a fullscreen triangle with alpha blending into the shared
-/// <see cref="ActiveSwapchainPass"/> (no separate render pass begin/end).
+/// <see cref="ActiveSwapchainPass"/>.
 /// </summary>
 /// <seealso cref="WebViewInstance"/>
 /// <seealso cref="WebViewPlugin"/>
@@ -16,7 +16,7 @@ public sealed class WebViewRenderNode : INode, IDisposable
     private readonly ReadOnlyMemory<byte> _vertexSpv;
     private readonly ReadOnlyMemory<byte> _fragmentSpv;
 
-    // GPU resources - created lazily on first Run
+    // GPU resources — created lazily on first Run
     private IPipeline? _pipeline;
     private IShader? _vertexShader;
     private IShader? _fragmentShader;
@@ -29,15 +29,13 @@ public sealed class WebViewRenderNode : INode, IDisposable
     private uint _textureWidth;
     private uint _textureHeight;
 
-    // Tracks the webview resize generation
+    // Tracks the webview resize generation to skip reads on reallocation frames
     private uint _lastSeenResizeGeneration;
 
     // Staging buffer for pixel upload
     private byte[]? _stagingBuffer;
 
     /// <summary>Creates a new <see cref="WebViewRenderNode"/> with pre-compiled shader SPIR-V bytecode.</summary>
-    /// <param name="vertexSpv">Compiled SPIR-V bytecode for the webview vertex shader.</param>
-    /// <param name="fragmentSpv">Compiled SPIR-V bytecode for the webview fragment shader.</param>
     public WebViewRenderNode(ReadOnlyMemory<byte> vertexSpv, ReadOnlyMemory<byte> fragmentSpv)
     {
         _vertexSpv = vertexSpv;
@@ -51,7 +49,6 @@ public sealed class WebViewRenderNode : INode, IDisposable
         if (webview?.View is null || !webview.Visible)
             return;
 
-        // Get the shared swapchain pass opened by MainPassNode
         var activePass = renderWorld.TryGet<ActiveSwapchainPass>();
         if (activePass is null) return;
 
@@ -59,99 +56,104 @@ public sealed class WebViewRenderNode : INode, IDisposable
         var swapchainTarget = renderWorld.TryGet<SwapchainTarget>();
         if (swapchainTarget is null) return;
 
-        // Lazy-init pipeline (created against the main render pass for compatibility)
         if (_pipeline is null)
             CreatePipeline(gfx, swapchainTarget.RenderPass);
 
         // ── Quiescent resize guard ──────────────────────────────────
+        // On the frame a native resize was committed the surface is freshly
+        // allocated and empty — skip the upload, just draw the old texture.
         var currentGen = webview.ResizeGeneration;
         if (currentGen != _lastSeenResizeGeneration)
         {
             _lastSeenResizeGeneration = currentGen;
-            goto draw;
         }
-
-        // Recreate texture if webview size changed
-        if (_webviewImage is null || _textureWidth != webview.Width || _textureHeight != webview.Height)
-            RecreateWebviewTexture(gfx, webview.Width, webview.Height);
-
-        // Upload new pixels if dirty
-        if (webview.IsDirty && _webviewImage is not null)
+        else
         {
-            var surfaceRowBytes = webview.SurfaceRowBytes;
-            var currentWidth = webview.Width;
-            var currentHeight = webview.Height;
-            var totalBytes = (int)(surfaceRowBytes * currentHeight);
+            // Recreate GPU texture if dimensions changed
+            if (_webviewImage is null || _textureWidth != webview.Width || _textureHeight != webview.Height)
+                RecreateWebviewTexture(gfx, webview.Width, webview.Height);
 
-            if (totalBytes <= 0 || _textureWidth != currentWidth || _textureHeight != currentHeight)
-                goto draw;
-
-            if (_stagingBuffer is null || _stagingBuffer.Length < totalBytes)
-                _stagingBuffer = new byte[totalBytes];
-
-            if (webview.TryGetPixels(_stagingBuffer.AsSpan(0, totalBytes), out var actualRowBytes))
-            {
-                webview.DiagUploadCount++;
-                var packedRowBytes = currentWidth * 4;
-
-                // End the render pass before texture upload (vkCmdCopyBufferToImage
-                // cannot be recorded inside a render pass). MainPassNode's pass will
-                // be re-opened below.
-                activePass.Pass.EndRenderPass();
-
-                // Use deferred upload: records copy commands into the frame command buffer
-                // and tracks the staging buffer for cleanup after the frame fence signals.
-                // No GPU stall (no vkWaitForFences per upload).
-                var cmd = renderContext.CommandBuffer;
-
-                if (actualRowBytes == packedRowBytes)
-                {
-                    gfx.UploadTexture2DDeferred(cmd, _webviewImage, _stagingBuffer.AsSpan(0, totalBytes),
-                        currentWidth, currentHeight, bytesPerPixel: 4);
-                }
-                else
-                {
-                    var packedSize = (int)(packedRowBytes * currentHeight);
-                    var packed = new byte[packedSize];
-                    for (uint y = 0; y < currentHeight; y++)
-                    {
-                        _stagingBuffer.AsSpan((int)(y * actualRowBytes), (int)packedRowBytes)
-                            .CopyTo(packed.AsSpan((int)(y * packedRowBytes)));
-                    }
-                    gfx.UploadTexture2DDeferred(cmd, _webviewImage, packed.AsSpan(0, packedSize),
-                        currentWidth, currentHeight, bytesPerPixel: 4);
-                }
-
-                // Re-open the render pass with Load to preserve the cleared content
-                var reloadDesc = new RenderPassDescriptor(
-                    swapchainTarget.LoadRenderPass,
-                    swapchainTarget.Framebuffer,
-                    swapchainTarget.Extent,
-                    LoadOp.Load,
-                    StoreOp.Store);
-                var newPass = renderContext.BeginTrackedRenderPass(reloadDesc);
-                var extent = activePass.Extent;
-                newPass.SetViewport(0, 0, extent.Width, extent.Height, 0, 1);
-                newPass.SetScissor(0, 0, extent.Width, extent.Height);
-                renderWorld.Set(new ActiveSwapchainPass(newPass, extent));
-                activePass = renderWorld.TryGet<ActiveSwapchainPass>()!;
-            }
+            // Upload pixels every frame
+            if (_webviewImage is not null)
+                activePass = UploadPixels(webview, activePass, gfx, renderContext, swapchainTarget, renderWorld);
         }
 
-        draw:
-
+        // ── Draw ────────────────────────────────────────────────────
         if (_webviewImage is null || _pipeline is null || _descriptorSet is null)
             return;
 
-        // Draw into the shared pass - no separate render pass needed
         var pass = activePass.Pass;
-
-        // Bind pipeline and descriptor set (contains the webview texture)
         pass.SetPipeline(_pipeline);
         pass.SetBindGroup(_pipeline, _descriptorSet);
-
-        // Draw fullscreen triangle (3 vertices, generated in vertex shader)
         pass.Draw(vertexCount: 3, instanceCount: 1);
+    }
+
+    /// <summary>
+    /// Reads pixels from the webview surface and uploads them to the GPU texture.
+    /// Interrupts and re-opens the active render pass for the transfer command.
+    /// </summary>
+    private ActiveSwapchainPass UploadPixels(
+        WebViewInstance webview,
+        ActiveSwapchainPass activePass,
+        IGraphicsDevice gfx,
+        RenderContext renderContext,
+        SwapchainTarget swapchainTarget,
+        RenderWorld renderWorld)
+    {
+        var surfaceRowBytes = webview.SurfaceRowBytes;
+        var currentWidth = webview.Width;
+        var currentHeight = webview.Height;
+        var totalBytes = (int)(surfaceRowBytes * currentHeight);
+
+        if (totalBytes <= 0 || _textureWidth != currentWidth || _textureHeight != currentHeight)
+            return activePass;
+
+        if (_stagingBuffer is null || _stagingBuffer.Length < totalBytes)
+            _stagingBuffer = new byte[totalBytes];
+
+        if (!webview.TryGetPixels(_stagingBuffer.AsSpan(0, totalBytes), out var actualRowBytes))
+            return activePass;
+
+        webview.DiagUploadCount++;
+        var packedRowBytes = currentWidth * 4;
+
+        // End the render pass — vkCmdCopyBufferToImage cannot be inside one.
+        activePass.Pass.EndRenderPass();
+
+        var cmd = renderContext.CommandBuffer;
+
+        if (actualRowBytes == packedRowBytes)
+        {
+            gfx.UploadTexture2DDeferred(cmd, _webviewImage!, _stagingBuffer.AsSpan(0, totalBytes),
+                currentWidth, currentHeight, bytesPerPixel: 4);
+        }
+        else
+        {
+            var packedSize = (int)(packedRowBytes * currentHeight);
+            var packed = new byte[packedSize];
+            for (uint y = 0; y < currentHeight; y++)
+            {
+                _stagingBuffer.AsSpan((int)(y * actualRowBytes), (int)packedRowBytes)
+                    .CopyTo(packed.AsSpan((int)(y * packedRowBytes)));
+            }
+            gfx.UploadTexture2DDeferred(cmd, _webviewImage!, packed.AsSpan(0, packedSize),
+                currentWidth, currentHeight, bytesPerPixel: 4);
+        }
+
+        // Re-open the render pass with Load to preserve existing content.
+        var reloadDesc = new RenderPassDescriptor(
+            swapchainTarget.LoadRenderPass,
+            swapchainTarget.Framebuffer,
+            swapchainTarget.Extent,
+            LoadOp.Load,
+            StoreOp.Store);
+        var newPass = renderContext.BeginTrackedRenderPass(reloadDesc);
+        var extent = activePass.Extent;
+        newPass.SetViewport(0, 0, extent.Width, extent.Height, 0, 1);
+        newPass.SetScissor(0, 0, extent.Width, extent.Height);
+        var updated = new ActiveSwapchainPass(newPass, extent);
+        renderWorld.Set(updated);
+        return updated;
     }
 
     /// <summary>Creates the fullscreen overlay Vulkan pipeline with alpha blending and no vertex input.</summary>

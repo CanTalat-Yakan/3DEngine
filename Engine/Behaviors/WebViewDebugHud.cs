@@ -5,8 +5,8 @@ namespace Engine;
 /// <summary>ImGui diagnostic overlay for the Ultralight webview subsystem.</summary>
 /// <remarks>
 /// Toggled with <c>Alt+F3</c> (default off).  Displays view dimensions, surface state,
-/// page load callbacks, frame counters, pixel content diagnostics, resource file status,
-/// and actionable warnings when common failure conditions are detected.
+/// page load callbacks, frame counters, resource file status, and actionable warnings
+/// when common failure conditions are detected.
 /// </remarks>
 /// <seealso cref="WebViewInstance"/>
 /// <seealso cref="WebViewRenderNode"/>
@@ -20,7 +20,6 @@ public struct WebViewDebugHud
     private static string? _dumpPath;
 
     /// <summary>Draws webview debug info every render frame.</summary>
-    /// <param name="ctx">Behavior context providing world resource access.</param>
     [OnRender]
     [ToggleKey(Key.F3, KeyModifier.Alt, DefaultEnabled = false)]
     public static void Draw(BehaviorContext ctx)
@@ -53,22 +52,6 @@ public struct WebViewDebugHud
         ImGui.Text($"Updates:    {w.DiagUpdateCount}");
         ImGui.Text($"Paints:     {w.DiagPaintCount}");
         ImGui.Text($"Uploads:    {w.DiagUploadCount}");
-        ImGui.Text($"IsDirty:    {w.IsDirty}");
-        ImGui.Text($"NeedsPaint: {w.NeedsPaintNow}");
-
-        ImGui.Separator();
-
-        // ── Pixel content ────────────────────────────────────────────
-        var pct = w.DiagTotalPixels > 0
-            ? (double)w.DiagNonZeroPixels / w.DiagTotalPixels * 100.0
-            : 0;
-        ImGui.Text($"Non-zero (upload): {w.DiagNonZeroPixels}/{w.DiagTotalPixels} ({pct:F1}%)");
-
-        var probePct = w.DiagTotalPixels > 0
-            ? (double)w.DiagProbeNonZero / w.DiagTotalPixels * 100.0
-            : 0;
-        ImGui.Text($"Non-zero (probe):  {w.DiagProbeNonZero}/{w.DiagTotalPixels} ({probePct:F1}%)");
-        ImGui.Text($"First bytes: {w.DiagFirstBytes ?? "n/a"}");
 
         ImGui.Separator();
 
@@ -87,21 +70,9 @@ public struct WebViewDebugHud
             ImGui.TextColored(Red,
                 "CRITICAL: Page load failed! Check log for details.");
 
-        if (w.DiagUpdateCount > 60 && w.DiagPaintCount == 0)
-            ImGui.TextColored(Red,
-                "WARNING: NeedsPaint never true!");
-
         if (w.DiagUpdateCount > 60 && w.DiagUploadCount == 0)
             ImGui.TextColored(Red,
                 "WARNING: No uploads after 60+ frames!");
-
-        if (w.DiagUploadCount > 0 && w.DiagNonZeroPixels == 0 && w.DiagProbeNonZero == 0)
-            ImGui.TextColored(Yellow,
-                "WARNING: Pixels uploaded but all zero (upload + probe)!");
-
-        if (w.DiagUploadCount > 0 && w.DiagNonZeroPixels == 0 && w.DiagProbeNonZero > 0)
-            ImGui.TextColored(Yellow,
-                "HINT: Probe found pixels but upload didn't - timing issue!");
 
         if (!w.DiagIcuExists)
             ImGui.TextColored(Red,
@@ -132,11 +103,6 @@ public struct WebViewDebugHud
             sb.AppendLine($"Updates:    {w.DiagUpdateCount}");
             sb.AppendLine($"Paints:     {w.DiagPaintCount}");
             sb.AppendLine($"Uploads:    {w.DiagUploadCount}");
-            sb.AppendLine($"IsDirty:    {w.IsDirty}");
-            sb.AppendLine($"NeedsPaint: {w.NeedsPaintNow}");
-            sb.AppendLine($"Non-zero (upload): {w.DiagNonZeroPixels}/{w.DiagTotalPixels}");
-            sb.AppendLine($"Non-zero (probe):  {w.DiagProbeNonZero}/{w.DiagTotalPixels}");
-            sb.AppendLine($"First bytes: {w.DiagFirstBytes ?? "n/a"}");
             sb.AppendLine($"ICU data:   {(w.DiagIcuExists ? "OK" : "MISSING")}");
             sb.AppendLine($"CA certs:   {(w.DiagCaCertExists ? "OK" : "MISSING")}");
 
@@ -145,14 +111,8 @@ public struct WebViewDebugHud
                 sb.AppendLine("CRITICAL: DOM never became ready - page did not load!");
             if (w.DiagLoadError is not null)
                 sb.AppendLine("CRITICAL: Page load failed!");
-            if (w.DiagUpdateCount > 60 && w.DiagPaintCount == 0)
-                sb.AppendLine("WARNING: NeedsPaint never true!");
             if (w.DiagUpdateCount > 60 && w.DiagUploadCount == 0)
                 sb.AppendLine("WARNING: No uploads after 60+ frames!");
-            if (w.DiagUploadCount > 0 && w.DiagNonZeroPixels == 0 && w.DiagProbeNonZero == 0)
-                sb.AppendLine("WARNING: Pixels uploaded but all zero (upload + probe)!");
-            if (w.DiagUploadCount > 0 && w.DiagNonZeroPixels == 0 && w.DiagProbeNonZero > 0)
-                sb.AppendLine("HINT: Probe found pixels but upload didn't - timing issue!");
             if (!w.DiagIcuExists)
                 sb.AppendLine("CRITICAL: icudt67l.dat missing - text layout will fail!");
 
@@ -168,17 +128,11 @@ public struct WebViewDebugHud
     }
 
     /// <summary>Logs a concise diagnostic snapshot of the webview state to the engine logger.</summary>
-    /// <param name="w">The webview instance to snapshot.</param>
     private static void LogSnapshot(WebViewInstance w)
     {
-        var pct = w.DiagTotalPixels > 0
-            ? (double)w.DiagNonZeroPixels / w.DiagTotalPixels * 100.0
-            : 0;
-
         Logger.Info(
-            $"WebViewDebug view={w.Width}x{w.Height} dirty={w.IsDirty} needsPaint={w.NeedsPaintNow} " +
-            $"updates={w.DiagUpdateCount} paints={w.DiagPaintCount} uploads={w.DiagUploadCount} " +
-            $"nonZero={w.DiagNonZeroPixels}/{w.DiagTotalPixels} ({pct:F1}%)");
+            $"WebViewDebug view={w.Width}x{w.Height} " +
+            $"updates={w.DiagUpdateCount} paints={w.DiagPaintCount} uploads={w.DiagUploadCount}");
 
         if (w.DiagLoadError is not null)
             Logger.Warn($"WebViewDebug load error: {w.DiagLoadError}");
