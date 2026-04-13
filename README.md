@@ -37,12 +37,11 @@
 - [Supported Platforms](#supported-platforms)
 - [Build and Run](#build-and-run)
 - [Quick Start](#quick-start)
-- [How It Works](#how-it-works)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
 - [License](#license)
 
-<!-- /TOC -->
+### How It Works - see **[ARCHITECTURE.md](ARCHITECTURE.md)**
 
 ## Overview
 
@@ -343,21 +342,6 @@ public sealed class GamePlugin : IPlugin
     }
 }
 ```
-
----
-
-## How It Works - see **[ARCHITECTURE.md](ARCHITECTURE.md)** 
-
-- Staged update loop and parallel scheduler
-- Plugin model and `DefaultPlugins`
-- Resources, events, and the `World` container
-- Asset pipeline (async loading, hot-reload, custom loaders)
-- Sparse-set ECS (entities, components, queries, deferred commands, change tracking)
-- Behavior system (attribute-based ECS with source generator)
-- Run conditions and toggle keys
-- Render pipeline (extract → prepare → queue → graph)
-- Editor architecture (Blazor Server + Ultralight WebView)
-- Logging and FAQ
 
 ## Roadmap
 
