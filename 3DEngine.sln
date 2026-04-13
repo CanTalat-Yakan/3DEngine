@@ -40,6 +40,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{30
 		LICENSE = LICENSE
 		README.md = README.md
 		ARCHITECTURE.md = ARCHITECTURE.md
+		.github\CODE_OF_CONDUCT.md = .github\CODE_OF_CONDUCT.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet", "UltralightNet\Source\UltralightNet\UltralightNet.csproj", "{6856B621-DD6B-46F2-B41D-AAA594769D66}"
