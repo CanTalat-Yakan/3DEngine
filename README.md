@@ -129,7 +129,7 @@ See `Engine/Program.cs` for the runtime entry point and `Editor/Program.cs` for 
 
 ## Architecture
 
-```
+```markdown
 ┌─────────────────────────────────────────────────────────────────┐
 │  3DEngine.sln                                                   │
 │                                                                 │
