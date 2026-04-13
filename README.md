@@ -344,6 +344,8 @@ public sealed class GamePlugin : IPlugin
 }
 ```
 
+---
+
 ## How It Works - see **[ARCHITECTURE.md](ARCHITECTURE.md)** 
 
 - Staged update loop and parallel scheduler
