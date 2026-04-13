@@ -41,7 +41,7 @@
 - [Contributing](#contributing)
 - [License](#license)
 
-### How It Works - see **[ARCHITECTURE.md](ARCHITECTURE.md)**
+### How It Works -  **[ARCHITECTURE.md](ARCHITECTURE.md)**
 
 ## Overview
 
