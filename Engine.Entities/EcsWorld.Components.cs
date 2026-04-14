@@ -52,6 +52,7 @@ public sealed partial class EcsWorld
         }
         var created = new ComponentStore<T>();
         _stores[typeof(T)] = created;
+        _storeList.Add(created);
         SetStoreCache(created);
         return created;
     }

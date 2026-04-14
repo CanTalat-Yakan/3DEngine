@@ -69,6 +69,26 @@ public sealed class BehaviorContext
         Input = world.Resource<Input>();
     }
 
+    /// <summary>
+    /// Fast constructor that accepts pre-resolved resource references, avoiding
+    /// repeated dictionary lookups per construction.
+    /// Used by source-generated behavior runners for the parallel iteration path where
+    /// one context is created per chunk/thread.
+    /// </summary>
+    /// <param name="world">The world instance.</param>
+    /// <param name="ecs">Pre-resolved <see cref="EcsWorld"/>.</param>
+    /// <param name="cmd">Pre-resolved <see cref="EcsCommands"/>.</param>
+    /// <param name="time">Pre-resolved <see cref="Time"/>.</param>
+    /// <param name="input">Pre-resolved <see cref="Input"/>.</param>
+    public BehaviorContext(World world, EcsWorld ecs, EcsCommands cmd, Time time, Input input)
+    {
+        World = world;
+        Ecs = ecs;
+        Cmd = cmd;
+        Time = time;
+        Input = input;
+    }
+
     /// <summary>Gets a typed resource from the world.</summary>
     /// <typeparam name="T">The resource type to retrieve.</typeparam>
     /// <returns>The resource instance.</returns>

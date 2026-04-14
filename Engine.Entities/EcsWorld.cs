@@ -47,6 +47,13 @@ public sealed partial class EcsWorld
     private readonly EntityPool _entities = new();
     private readonly Dictionary<Type, IComponentStore> _stores = new();
 
+    /// <summary>
+    /// Flat cache of all component stores, maintained in parallel with <see cref="_stores"/>.
+    /// Used by <see cref="BeginFrame"/> and <see cref="Despawn"/> to avoid allocating a
+    /// <see cref="Dictionary{TKey,TValue}.ValueCollection"/> enumerator each frame.
+    /// </summary>
+    private readonly List<IComponentStore> _storeList = new();
+
     /// <summary>Internal marker interface for type-erased component storage.</summary>
     private interface IComponentStore
     {

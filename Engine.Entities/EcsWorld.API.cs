@@ -87,8 +87,9 @@ public sealed partial class EcsWorld
     /// <param name="entity">The entity ID to remove.</param>
     public void Despawn(int entity)
     {
-        foreach (var store in _stores.Values)
-            if (store.TryRemove(entity, out var disposable) && disposable is not null)
+        var list = _storeList;
+        for (int i = 0; i < list.Count; i++)
+            if (list[i].TryRemove(entity, out var disposable) && disposable is not null)
                 try { disposable.Dispose(); } catch { }
 
         _entities.Despawn(entity);
@@ -101,7 +102,9 @@ public sealed partial class EcsWorld
     public void BeginFrame()
     {
         _currentTick++;
-        foreach (var s in _stores.Values) s.ClearChangedTicks();
+        var list = _storeList;
+        for (int i = 0; i < list.Count; i++)
+            list[i].ClearChangedTicks();
     }
 
     /// <summary>Returns the number of entities that currently have component <typeparamref name="T"/>.</summary>
@@ -411,4 +414,37 @@ public sealed partial class EcsWorld
             if (predicate(comp))
                 yield return (entity, comp);
     }
+
+    /// <summary>
+    /// Provides raw span access to all components of type <typeparamref name="T"/> for bulk/SIMD processing.
+    /// The processor receives parallel mutable component and read-only entity spans.
+    /// </summary>
+    /// <typeparam name="T">The component type.</typeparam>
+    /// <param name="processor">
+    /// A callback receiving the component data as a mutable span and entity IDs as a read-only span,
+    /// both of the same length. The caller may use <see cref="SimdMath"/> or manual vectorization.
+    /// </param>
+    /// <example>
+    /// <code>
+    /// // SIMD-accelerate gravity on all Velocity.Y values
+    /// ecs.BulkProcess&lt;Velocity&gt;((comps, entities) =>
+    /// {
+    ///     var ySpan = MemoryMarshal.Cast&lt;Velocity, float&gt;(comps);
+    ///     // Process Y fields with SIMD...
+    /// });
+    /// </code>
+    /// </example>
+    public void BulkProcess<T>(BulkProcessAction<T> processor)
+    {
+        var store = GetStore<T>(create: false);
+        if (store == null || store.Count == 0) return;
+        var span = store.AsSpan();
+        processor(span.Components, span.Entities);
+    }
+
+    /// <summary>Delegate for <see cref="BulkProcess{T}"/> providing raw span access to component data.</summary>
+    /// <typeparam name="T">The component type.</typeparam>
+    /// <param name="components">Mutable span of component values in dense order.</param>
+    /// <param name="entities">Read-only span of entity IDs, aligned with <paramref name="components"/>.</param>
+    public delegate void BulkProcessAction<T>(Span<T> components, ReadOnlySpan<int> entities);
 }

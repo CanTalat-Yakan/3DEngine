@@ -270,12 +270,17 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
                 sb.AppendLine("    }");
                 continue;
             }
-            // non-static: ref-based iteration with direct array access and auto-parallel.
-            // Patterns from Arch/Bevy ECS:
-            //  - Direct array access eliminates per-element method call overhead
-            //  - ref var eliminates struct copy-in/copy-out (mutate component in-place)
-            //  - Parallel.For auto-scales across CPU cores for large entity counts (>= 4096)
+            // non-static: ref-based iteration with direct array access.
+            // Optimizations applied (Arch/Bevy ECS patterns):
+            //  1. Pre-resolve all World resources once (avoid ConcurrentDictionary lookups per thread/chunk)
+            //  2. Direct array access + ref var (no struct copies, no method call overhead)
+            //  3. Hoisted filter store lookups (avoid GetStore indirection per entity)
+            //  4. Chunked range partitioning via Parallel.ForEach + Partitioner.Create
+            //     (one delegate + one BehaviorContext per chunk, contiguous cache-linear access)
             sb.AppendLine("        var ecs = world.Resource<Engine.EcsWorld>();");
+            sb.AppendLine("        var __cmd = world.Resource<Engine.EcsCommands>();");
+            sb.AppendLine("        var __time = world.Resource<Engine.Time>();");
+            sb.AppendLine("        var __input = world.Resource<Engine.Input>();");
             sb.AppendLine($"        var __store = ecs.GetStorePublic<{b.BehaviorFqn}>();");
             sb.AppendLine("        var __count = __store.Count;");
             sb.AppendLine("        if (__count == 0) return;");
@@ -283,31 +288,35 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
             sb.AppendLine("        var __components = __store.ComponentsArray;");
 
             bool hasFilters = m.Filters.With.Count > 0 || m.Filters.Without.Count > 0 || m.Filters.Changed.Count > 0;
+            if (hasFilters)
+                sb.Append(GenFilterHoist(m.Filters));
 
-            // Parallel path: one BehaviorContext per thread-local partition
+            // Parallel path: chunked range partitioning with one BehaviorContext per chunk
             sb.AppendLine("        if (__count >= 4096)");
             sb.AppendLine("        {");
-            sb.AppendLine("            System.Threading.Tasks.Parallel.For<Engine.BehaviorContext>(");
-            sb.AppendLine("                0, __count,");
-            sb.AppendLine("                () => new Engine.BehaviorContext(world),");
-            sb.AppendLine("                (int __i, System.Threading.Tasks.ParallelLoopState _, Engine.BehaviorContext ctx) =>");
+            sb.AppendLine("            System.Threading.Tasks.Parallel.ForEach(");
+            sb.AppendLine("                System.Collections.Concurrent.Partitioner.Create(0, __count,");
+            sb.AppendLine("                    System.Math.Max(256, __count / (System.Environment.ProcessorCount * 4))),");
+            sb.AppendLine("                __range =>");
             sb.AppendLine("                {");
-            sb.AppendLine("                    int entity = __entities[__i];");
+            sb.AppendLine("                    var ctx = new Engine.BehaviorContext(world, ecs, __cmd, __time, __input);");
+            sb.AppendLine("                    for (int __i = __range.Item1; __i < __range.Item2; __i++)");
+            sb.AppendLine("                    {");
+            sb.AppendLine("                        int entity = __entities[__i];");
             if (hasFilters)
-                sb.Append(GenFilterChecks(m.Filters, "return ctx", "                    "));
-            sb.AppendLine("                    ctx.EntityId = entity;");
-            sb.AppendLine($"                    ref var behv = ref __components[__i];");
-            sb.AppendLine($"                    behv.{m.MethodName}(ctx);");
-            sb.AppendLine("                    return ctx;");
-            sb.AppendLine("                },");
-            sb.AppendLine("                _ => { }");
+                sb.Append(GenFilterChecks(m.Filters, "continue", "                        "));
+            sb.AppendLine("                        ctx.EntityId = entity;");
+            sb.AppendLine($"                        ref var behv = ref __components[__i];");
+            sb.AppendLine($"                        behv.{m.MethodName}(ctx);");
+            sb.AppendLine("                    }");
+            sb.AppendLine("                }");
             sb.AppendLine("            );");
             sb.AppendLine("        }");
 
             // Sequential path: cache-linear for small entity counts
             sb.AppendLine("        else");
             sb.AppendLine("        {");
-            sb.AppendLine("            var ctx = new Engine.BehaviorContext(world);");
+            sb.AppendLine("            var ctx = new Engine.BehaviorContext(world, ecs, __cmd, __time, __input);");
             sb.AppendLine($"            for (int __i = 0; __i < __count; __i++)");
             sb.AppendLine("            {");
             sb.AppendLine("                int entity = __entities[__i];");
@@ -338,16 +347,38 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
         };
     }
 
+    /// <summary>Emits variable declarations that hoist filter store lookups out of the hot loop.</summary>
+    /// <param name="f">The filter configuration.</param>
+    /// <param name="indent">Indentation prefix for each line.</param>
+    /// <returns>Source code declaring <c>__fWith0</c>, <c>__fWout0</c>, <c>__fChg0</c>, etc.</returns>
+    private static string GenFilterHoist(Filters f, string indent = "        ")
+    {
+        var sb = new StringBuilder();
+        int idx = 0;
+        foreach (var w in f.With)
+            sb.AppendLine($"{indent}var __fWith{idx++} = ecs.GetStorePublic<{w}>();");
+        idx = 0;
+        foreach (var wout in f.Without)
+            sb.AppendLine($"{indent}var __fWout{idx++} = ecs.GetStorePublic<{wout}>();");
+        idx = 0;
+        foreach (var ch in f.Changed)
+            sb.AppendLine($"{indent}var __fChg{idx++} = ecs.GetStorePublic<{ch}>();");
+        return sb.ToString();
+    }
+
+    /// <summary>Emits per-entity filter checks using the hoisted store variables from <see cref="GenFilterHoist"/>.</summary>
     private static string GenFilterChecks(Filters f, string skipStatement = "continue", string indent = "            ")
     {
         var sb = new StringBuilder();
-        // Always enforce With as guards to cover the fallback iteration paths (and as a cheap safety-net otherwise).
+        int idx = 0;
         foreach (var w in f.With)
-            sb.AppendLine($"{indent}if (!ecs.Has<{w}>(entity)) {skipStatement};");
+            sb.AppendLine($"{indent}if (!__fWith{idx++}.Has(entity)) {skipStatement};");
+        idx = 0;
         foreach (var wout in f.Without)
-            sb.AppendLine($"{indent}if (ecs.Has<{wout}>(entity)) {skipStatement};");
+            sb.AppendLine($"{indent}if (__fWout{idx++}.Has(entity)) {skipStatement};");
+        idx = 0;
         foreach (var ch in f.Changed)
-            sb.AppendLine($"{indent}if (!ecs.Changed<{ch}>(entity)) {skipStatement};");
+            sb.AppendLine($"{indent}if (!__fChg{idx++}.ChangedThisFrame(entity, 0)) {skipStatement};");
         return sb.ToString();
     }
 
