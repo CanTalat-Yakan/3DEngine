@@ -267,7 +267,7 @@ public sealed class WebViewInstance : IDisposable
 
         DiagUpdateCount++;
 
-        // Process timers, JS, layout, network — may flag the view as needing paint.
+        // Process timers, JS, layout, network - may flag the view as needing paint.
         _renderer.Update();
 
         // Query page title periodically after Update() so the page has been processed.

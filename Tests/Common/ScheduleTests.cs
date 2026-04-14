@@ -297,5 +297,94 @@ public class ScheduleTests
         var act = () => schedule.RunStage(Stage.Update, world);
         act.Should().NotThrow();
     }
+
+    // ── Fine-grained per-component-type scheduling ───────────────────────
+
+    /// <summary>Marker types used as resource keys to simulate per-behavior-type writes.</summary>
+    private struct CompA;
+    private struct CompB;
+    private struct CompC;
+
+    [Fact]
+    public void DisjointComponentWrites_Are_Batched_Together()
+    {
+        // Two systems writing different component types should NOT conflict,
+        // mirroring the generator's per-behavior-type Write<T>() metadata.
+        var a = new SystemDescriptor(_ => { }, "SystemA").Write<CompA>();
+        var b = new SystemDescriptor(_ => { }, "SystemB").Write<CompB>();
+
+        a.ConflictsWith(b).Should().BeFalse("different component-type writes should not conflict");
+    }
+
+    [Fact]
+    public void SameComponentWrite_Conflicts()
+    {
+        // Two instance behaviors of the same type would conflict (same Write<T>).
+        var a = new SystemDescriptor(_ => { }, "SystemA").Write<CompA>();
+        var b = new SystemDescriptor(_ => { }, "SystemB").Write<CompA>();
+
+        a.ConflictsWith(b).Should().BeTrue("same component-type writes must conflict");
+    }
+
+    [Fact]
+    public void ReadEcsWorld_Does_Not_Conflict_With_ComponentWrite()
+    {
+        // A static behavior with Read<EcsWorld>() should not conflict with
+        // an instance behavior with Write<CompA>() - different resource types.
+        var staticSys = new SystemDescriptor(_ => { }, "StaticSys").Read<EcsWorld>();
+        var instanceSys = new SystemDescriptor(_ => { }, "InstanceSys").Write<CompA>();
+
+        staticSys.ConflictsWith(instanceSys).Should().BeFalse(
+            "a reader of EcsWorld should not conflict with a writer of a different component type");
+    }
+
+    [Fact]
+    public void MultipleReadEcsWorld_Do_Not_Conflict()
+    {
+        // Multiple static behaviors with Read<EcsWorld>() should all be parallel.
+        var a = new SystemDescriptor(_ => { }, "StaticA").Read<EcsWorld>();
+        var b = new SystemDescriptor(_ => { }, "StaticB").Read<EcsWorld>();
+
+        a.ConflictsWith(b).Should().BeFalse("read/read on EcsWorld should not conflict");
+    }
+
+    [Fact]
+    public void Parallel_Batching_Groups_DisjointWrites()
+    {
+        var schedule = new Schedule();
+        var world = new World();
+        int count = 0;
+
+        // Three systems writing to three different types - should all land in one batch.
+        schedule.AddSystem(Stage.Update, new SystemDescriptor(_ => Interlocked.Increment(ref count), "SysA").Write<CompA>());
+        schedule.AddSystem(Stage.Update, new SystemDescriptor(_ => Interlocked.Increment(ref count), "SysB").Write<CompB>());
+        schedule.AddSystem(Stage.Update, new SystemDescriptor(_ => Interlocked.Increment(ref count), "SysC").Write<CompC>());
+
+        schedule.RunStage(Stage.Update, world);
+
+        count.Should().Be(3, "all systems should execute");
+
+        // Verify batching: with disjoint writes, they should be in a single batch.
+        var batches = schedule.Diagnostics.StageBatches;
+        batches.Should().ContainKey(Stage.Update);
+        batches[Stage.Update].Should().HaveCount(1, "disjoint-write systems should be packed into one parallel batch");
+        batches[Stage.Update][0].Should().HaveCount(3);
+    }
+
+    [Fact]
+    public void Parallel_Batching_Splits_ConflictingWrites()
+    {
+        var schedule = new Schedule();
+        var world = new World();
+
+        // Two systems writing the same type - must be in separate batches.
+        schedule.AddSystem(Stage.Update, new SystemDescriptor(_ => { }, "SysA1").Write<CompA>());
+        schedule.AddSystem(Stage.Update, new SystemDescriptor(_ => { }, "SysA2").Write<CompA>());
+
+        schedule.RunStage(Stage.Update, world);
+
+        var batches = schedule.Diagnostics.StageBatches;
+        batches[Stage.Update].Should().HaveCount(2, "conflicting-write systems must be in separate batches");
+    }
 }
 

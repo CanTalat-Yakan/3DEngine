@@ -221,12 +221,22 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
         {
             var first = g.First();
             var systemId = $"{b.SafeName}_{g.Key}";
+
+            // Fine-grained resource access: instance behaviors write only to their own
+            // component store type; static-only behaviors declare a read on EcsWorld.
+            // This prevents false write/write conflicts between unrelated behavior types,
+            // allowing the parallel scheduler to batch them together.
+            bool hasInstanceMethod = g.Any(m => !m.IsStatic);
+            string accessMetadata = hasInstanceMethod
+                ? $".Write<{b.BehaviorFqn}>()"
+                : $".Read<global::Engine.EcsWorld>()";
+
             string desc;
             if (first.ToggleKey is var (k, mod, defEnabled))
             {
                 desc = $"new global::Engine.SystemDescriptor({systemId}, \"{systemId}\")" +
                        $".RunIf(global::Engine.BehaviorConditions.KeyToggle(\"{systemId}\", (global::Engine.Key){k}, (global::Engine.KeyModifier){mod}, {(defEnabled ? "true" : "false")}))" +
-                       $".Write<global::Engine.EcsWorld>()";
+                       accessMetadata;
             }
             else if (first.RunIf is var (name, kind))
             {
@@ -239,11 +249,11 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
                 };
                 desc = $"new global::Engine.SystemDescriptor({systemId}, \"{systemId}\")" +
                        $".RunIf({runIfExpr})" +
-                       $".Write<global::Engine.EcsWorld>()";
+                       accessMetadata;
             }
             else
             {
-                desc = $"new global::Engine.SystemDescriptor({systemId}, \"{systemId}\").Write<global::Engine.EcsWorld>()";
+                desc = $"new global::Engine.SystemDescriptor({systemId}, \"{systemId}\"){accessMetadata}";
             }
             sb.AppendLine($"        app.AddSystem(Engine.Stage.{g.Key}, {desc});");
         }

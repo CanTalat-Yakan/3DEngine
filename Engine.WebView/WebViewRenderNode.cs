@@ -16,7 +16,7 @@ public sealed class WebViewRenderNode : INode, IDisposable
     private readonly ReadOnlyMemory<byte> _vertexSpv;
     private readonly ReadOnlyMemory<byte> _fragmentSpv;
 
-    // GPU resources — created lazily on first Run
+    // GPU resources - created lazily on first Run
     private IPipeline? _pipeline;
     private IShader? _vertexShader;
     private IShader? _fragmentShader;
@@ -61,7 +61,7 @@ public sealed class WebViewRenderNode : INode, IDisposable
 
         // ── Quiescent resize guard ──────────────────────────────────
         // On the frame a native resize was committed the surface is freshly
-        // allocated and empty — skip the upload, just draw the old texture.
+        // allocated and empty - skip the upload, just draw the old texture.
         var currentGen = webview.ResizeGeneration;
         if (currentGen != _lastSeenResizeGeneration)
         {
@@ -117,7 +117,7 @@ public sealed class WebViewRenderNode : INode, IDisposable
         webview.DiagUploadCount++;
         var packedRowBytes = currentWidth * 4;
 
-        // End the render pass — vkCmdCopyBufferToImage cannot be inside one.
+        // End the render pass - vkCmdCopyBufferToImage cannot be inside one.
         activePass.Pass.EndRenderPass();
 
         var cmd = renderContext.CommandBuffer;
