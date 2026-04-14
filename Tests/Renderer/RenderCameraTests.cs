@@ -89,7 +89,7 @@ public class CameraTests
     public void Parameterized_Constructor_Has_Sensible_Defaults()
     {
         // Must call the explicit constructor to get default parameter values
-        var cam = new Camera(fovYDegrees: 60f);
+        var cam = new Camera(fovY: 60f);
 
         cam.FovY.Should().BeApproximately(60f * (float)(Math.PI / 180.0), 0.001f);
         cam.Near.Should().BeApproximately(0.1f, 0.001f);
@@ -111,7 +111,7 @@ public class CameraTests
     [Fact]
     public void Constructor_With_Custom_Values()
     {
-        var cam = new Camera(fovYDegrees: 85f, near: 0.5f, far: 500f, targetName: "offscreen");
+        var cam = new Camera(fovY: 85f, near: 0.5f, far: 500f, targetName: "offscreen");
 
         cam.FovY.Should().BeApproximately(85f * (float)(Math.PI / 180.0), 0.001f);
         cam.Near.Should().BeApproximately(0.5f, 0.001f);
