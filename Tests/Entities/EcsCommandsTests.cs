@@ -161,6 +161,68 @@ public class EcsCommandsTests
         results[0].C1.A.Should().Be(10);
         results[0].C2.B.Should().Be(20);
     }
+
+    // ── SpawnBatch ──────────────────────────────────────────────────────
+
+    [Fact]
+    public void SpawnBatch_Creates_Correct_Number_Of_Entities()
+    {
+        var ecs = new EcsWorld();
+        var cmd = new EcsCommands();
+
+        cmd.SpawnBatch(100, (id, world) =>
+        {
+            world.Add(id, new TestComp { A = id });
+        });
+
+        cmd.Apply(ecs);
+
+        ecs.Count<TestComp>().Should().Be(100);
+    }
+
+    [Fact]
+    public void SpawnBatch_Generic_Factory_Creates_Correct_Count()
+    {
+        var ecs = new EcsWorld();
+        var cmd = new EcsCommands();
+
+        cmd.SpawnBatch<TestComp>(50, id => new TestComp { A = id });
+        cmd.Apply(ecs);
+
+        ecs.Count<TestComp>().Should().Be(50);
+    }
+
+    [Fact]
+    public void SpawnBatch_Default_Constructor_Creates_Correct_Count()
+    {
+        var ecs = new EcsWorld();
+        var cmd = new EcsCommands();
+
+        cmd.SpawnBatch<TestComp>(200);
+        cmd.Apply(ecs);
+
+        ecs.Count<TestComp>().Should().Be(200);
+    }
+
+    [Fact]
+    public void SpawnBatch_Returns_Fluent_Self()
+    {
+        var cmd = new EcsCommands();
+        var result = cmd.SpawnBatch(10, (id, w) => { });
+        result.Should().BeSameAs(cmd);
+    }
+
+    [Fact]
+    public void SpawnBatch_Large_Batch_100K()
+    {
+        var ecs = new EcsWorld();
+        var cmd = new EcsCommands();
+
+        cmd.SpawnBatch<TestComp>(100_000);
+        cmd.Apply(ecs);
+
+        ecs.Count<TestComp>().Should().Be(100_000);
+    }
 }
 
 

@@ -9,7 +9,7 @@ var config = Config.GetDefault(
 
 new App(config)
     .AddPlugin(new DefaultPlugins())
-    .AddPlugin(new WebViewPlugin())
+    // .AddPlugin(new WebViewPlugin())
     .Run();
 
 [Behavior]

@@ -22,6 +22,7 @@ public struct PerformanceHud
     {
         var time = ctx.Time;
         double fps = time.Fps;
+        int count = ctx.Ecs.Count<EntityCounter>();
 
         // Reset peak every second
         if (time.ElapsedSeconds - _peakWindowStart >= 1.0)
@@ -38,6 +39,7 @@ public struct PerformanceHud
         ImGui.Text($"Peak FPS:  {_peakFps:0}");
         ImGui.Text($"Frame:     {time.DeltaSeconds * 1000.0:0.00} ms");
         ImGui.Text($"Frames:    {time.FrameCount}");
+        ImGui.Text($"Entities:  {count:N0}");
         ImGui.End();
     }
 }
@@ -52,31 +54,16 @@ public struct EntityCounter
     public int Ticks;
 
     /// <summary>Increments this entity's tick counter each update.</summary>
-    /// <param name="ctx">Behavior context providing ECS access for self-update.</param>
     [OnUpdate]
-    public void Tick(BehaviorContext ctx)
-    {
+    public void Tick(BehaviorContext ctx) =>
         Ticks++;
-        ctx.Ecs.Update(ctx.EntityId, this);
-    }
-
-    /// <summary>Displays aggregate entity statistics.</summary>
-    /// <param name="ctx">Behavior context providing ECS query access.</param>
-    [OnRender]
-    public static void Draw(BehaviorContext ctx)
-    {
-        int count = ctx.Ecs.Count<EntityCounter>();
-
-        ImGui.Begin("Performance", ImGuiWindowFlags.NoSavedSettings);
-        ImGui.Text($"Entities:  {count:N0}");
-        ImGui.End();
-    }
 }
 
 /// <summary>Spawns a batch of entities with <see cref="EntityCounter"/> when Space is pressed.</summary>
 /// <remarks>
-/// Creates <c>100,000</c> entities per press via <see cref="EcsCommands.Spawn"/>.
-/// Commands are deferred and applied after PostUpdate.
+/// Creates <c>100_000</c> entities per press via <see cref="EcsCommands.SpawnBatch{T}(int)"/>.
+/// Commands are deferred and applied after PostUpdate. The batch API pre-allocates
+/// capacity to avoid resize storms and uses a single delegate allocation instead of N.
 /// </remarks>
 /// <seealso cref="EntityCounter"/>
 /// <seealso cref="EcsCommands"/>
@@ -96,13 +83,7 @@ public struct StressTestSpawner
 
         Logger.Info($"Spawning {BatchSize:N0} entities...");
 
-        for (int i = 0; i < BatchSize; i++)
-        {
-            ctx.Cmd.Spawn((id, ecs) =>
-            {
-                ecs.Add(id, new EntityCounter());
-            });
-        }
+        ctx.Cmd.SpawnBatch<EntityCounter>(BatchSize);
 
         Logger.Info($"Queued {BatchSize:N0} entity spawns (will apply after PostUpdate).");
     }

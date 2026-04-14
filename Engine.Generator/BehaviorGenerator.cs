@@ -262,14 +262,19 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
                 sb.AppendLine("    }");
                 continue;
             }
-            // non-static: iterate entities
-            var loopHeader = GenForeachHeader(b.BehaviorFqn, m.Filters.With);
-            sb.AppendLine(loopHeader);
-            // Filters: With / Without / Changed
+            // non-static: span-based iteration over dense arrays for zero-allocation, cache-linear access
+            sb.AppendLine($"        var __store = ecs.GetStorePublic<{b.BehaviorFqn}>();");
+            sb.AppendLine($"        var __count = __store.Count;");
+            sb.AppendLine($"        for (int __i = 0; __i < __count; __i++)");
+            sb.AppendLine("        {");
+            sb.AppendLine($"            int entity = __store.EntityByDenseIndex(__i);");
+            // Apply filters
             sb.Append(GenFilterChecks(m.Filters));
+            sb.AppendLine($"            var behv = __store.ComponentRefByDenseIndex(__i);");
             sb.AppendLine("            ctx.EntityId = entity;");
             sb.AppendLine($"            behv.{m.MethodName}(ctx);");
-            sb.AppendLine($"            ecs.Update<{b.BehaviorFqn}>(entity, behv);");
+            // Write back the mutated struct directly into the dense array (no dict lookup, no change-bit overhead)
+            sb.AppendLine($"            __store.ComponentRefByDenseIndex(__i) = behv;");
             sb.AppendLine("        }");
             sb.AppendLine("    }");
         }
@@ -277,6 +282,7 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
         return sb.ToString();
     }
 
+    /// <summary>Generates a foreach header for multi-component queries (retained for future use with [With] filter joins).</summary>
     private static string GenForeachHeader(string behaviorFqn, IReadOnlyList<string> with)
     {
         // Prefer joining via typed queries when up to 3 with-filters are present, else fallback to single-type scan.

@@ -461,6 +461,56 @@ public class EcsWorldTests
         // e2 should still have its changed bit
         ecs.Changed<TestComp>(e2).Should().BeTrue();
     }
+
+    // ── SpawnBatch ────────────────────────────────────────────────────────
+
+    [Fact]
+    public void SpawnBatch_With_Builder_Creates_Correct_Count()
+    {
+        var ecs = new EcsWorld();
+        ecs.SpawnBatch(1000, (id, world) => world.Add(id, new TestComp { A = id }));
+
+        ecs.Count<TestComp>().Should().Be(1000);
+    }
+
+    [Fact]
+    public void SpawnBatch_With_Factory_Creates_Correct_Count()
+    {
+        var ecs = new EcsWorld();
+        ecs.SpawnBatch<TestComp>(500, id => new TestComp { A = id * 2 });
+
+        ecs.Count<TestComp>().Should().Be(500);
+        // Verify values are correct
+        foreach (var (entity, comp) in ecs.Query<TestComp>())
+            comp.A.Should().Be(entity * 2);
+    }
+
+    [Fact]
+    public void SpawnBatch_Default_Creates_Correct_Count()
+    {
+        var ecs = new EcsWorld();
+        ecs.SpawnBatch<TestComp>(200);
+
+        ecs.Count<TestComp>().Should().Be(200);
+    }
+
+    [Fact]
+    public void SpawnBatch_Large_Batch_Works()
+    {
+        var ecs = new EcsWorld();
+        const int count = 100_000;
+        ecs.SpawnBatch<TestComp>(count);
+
+        ecs.Count<TestComp>().Should().Be(count);
+    }
+
+    [Fact]
+    public void SpawnBatch_Zero_Count_Is_NoOp()
+    {
+        var ecs = new EcsWorld();
+        ecs.SpawnBatch<TestComp>(0);
+        ecs.Count<TestComp>().Should().Be(0);
+    }
 }
 
 // ── Test helper types ──────────────────────────────────────────────────

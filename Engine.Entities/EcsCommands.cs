@@ -44,6 +44,43 @@ public sealed class EcsCommands
         return this;
     }
 
+    /// <summary>Queues a bulk spawn of <paramref name="count"/> entities, each initialized by <paramref name="builder"/>.</summary>
+    /// <param name="count">The number of entities to spawn.</param>
+    /// <param name="builder">
+    /// A callback invoked for each new entity with its ID and the <see cref="EcsWorld"/>.
+    /// </param>
+    /// <returns>This <see cref="EcsCommands"/> instance for fluent chaining.</returns>
+    /// <remarks>
+    /// This enqueues a single command that pre-allocates entity pool capacity and spawns in a tight loop,
+    /// avoiding the overhead of <paramref name="count"/> individual delegate allocations.
+    /// </remarks>
+    public EcsCommands SpawnBatch(int count, Action<int, EcsWorld> builder)
+    {
+        _queue.Enqueue(world => world.SpawnBatch(count, builder));
+        return this;
+    }
+
+    /// <summary>Queues a bulk spawn of <paramref name="count"/> entities with a single component type.</summary>
+    /// <typeparam name="T">The component type to attach to each entity.</typeparam>
+    /// <param name="count">The number of entities to spawn.</param>
+    /// <param name="factory">A factory function receiving the entity ID and returning the component value.</param>
+    /// <returns>This <see cref="EcsCommands"/> instance for fluent chaining.</returns>
+    public EcsCommands SpawnBatch<T>(int count, Func<int, T> factory)
+    {
+        _queue.Enqueue(world => world.SpawnBatch(count, factory));
+        return this;
+    }
+
+    /// <summary>Queues a bulk spawn of <paramref name="count"/> entities with a single default-constructed component.</summary>
+    /// <typeparam name="T">The component type. Must be <c>new()</c>-constructible.</typeparam>
+    /// <param name="count">The number of entities to spawn.</param>
+    /// <returns>This <see cref="EcsCommands"/> instance for fluent chaining.</returns>
+    public EcsCommands SpawnBatch<T>(int count) where T : new()
+    {
+        _queue.Enqueue(world => world.SpawnBatch<T>(count));
+        return this;
+    }
+
     /// <summary>Queues entity destruction by ID.</summary>
     /// <param name="entity">The entity ID to despawn.</param>
     /// <returns>This <see cref="EcsCommands"/> instance for fluent chaining.</returns>

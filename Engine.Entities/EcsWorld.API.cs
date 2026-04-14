@@ -16,6 +16,68 @@ public sealed partial class EcsWorld
     /// </example>
     public int Spawn() => _entities.Spawn();
 
+    /// <summary>Spawns <paramref name="count"/> entities in bulk, pre-allocating capacity to avoid resize storms.</summary>
+    /// <param name="count">The number of entities to spawn.</param>
+    /// <param name="builder">A callback invoked for each new entity ID to attach initial components.</param>
+    /// <remarks>
+    /// This is significantly faster than calling <see cref="Spawn"/> in a loop because it
+    /// pre-reserves entity pool and sparse-set capacity before the tight spawn loop.
+    /// </remarks>
+    public void SpawnBatch(int count, Action<int, EcsWorld> builder)
+    {
+        if (count <= 0) return;
+        int maxId = _entities.NextEntityId + count;
+        _entities.ReserveCapacity(maxId);
+        for (int i = 0; i < count; i++)
+        {
+            var id = _entities.Spawn();
+            builder(id, this);
+        }
+    }
+
+    /// <summary>Spawns <paramref name="count"/> entities in bulk with a single component type, fully pre-allocated.</summary>
+    /// <typeparam name="T">The component type to attach to each entity.</typeparam>
+    /// <param name="count">The number of entities to spawn.</param>
+    /// <param name="factory">A factory function receiving the entity ID and returning the component value.</param>
+    public void SpawnBatch<T>(int count, Func<int, T> factory)
+    {
+        if (count <= 0) return;
+        int maxId = _entities.NextEntityId + count;
+        _entities.ReserveCapacity(maxId);
+        var store = GetStore<T>();
+        store.Reserve(store.Count + count, maxId);
+        for (int i = 0; i < count; i++)
+        {
+            var id = _entities.Spawn();
+            store.Add(id, factory(id));
+        }
+    }
+
+    /// <summary>Spawns <paramref name="count"/> entities in bulk with a single default-constructed component, fully pre-allocated.</summary>
+    /// <typeparam name="T">The component type to attach to each entity. Must be <c>new()</c>-constructible.</typeparam>
+    /// <param name="count">The number of entities to spawn.</param>
+    public void SpawnBatch<T>(int count) where T : new()
+    {
+        if (count <= 0) return;
+        int maxId = _entities.NextEntityId + count;
+        _entities.ReserveCapacity(maxId);
+        var store = GetStore<T>();
+        store.Reserve(store.Count + count, maxId);
+        for (int i = 0; i < count; i++)
+        {
+            var id = _entities.Spawn();
+            store.Add(id, new T());
+        }
+    }
+
+    /// <summary>Pre-reserves capacity in the entity pool for upcoming bulk spawns.</summary>
+    /// <param name="additionalCount">The number of additional entities expected to be spawned.</param>
+    public void ReserveEntityCapacity(int additionalCount)
+    {
+        if (additionalCount <= 0) return;
+        _entities.ReserveCapacity(_entities.NextEntityId + additionalCount);
+    }
+
     /// <summary>Returns the current generation for an entity ID (0 if never allocated).</summary>
     /// <param name="entityId">The entity ID to query.</param>
     /// <returns>The generation counter, or <c>0</c> if the ID was never used.</returns>

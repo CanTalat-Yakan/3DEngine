@@ -57,6 +57,16 @@ internal sealed class EntityPool
         _free.Push(id);
     }
 
+    /// <summary>The next entity ID that will be allocated (useful for capacity hints).</summary>
+    public int NextEntityId => _nextEntity;
+
+    /// <summary>Pre-grows the generation array to hold at least <paramref name="maxEntityId"/> IDs without resizing during bulk spawns.</summary>
+    /// <param name="maxEntityId">The maximum entity ID expected.</param>
+    public void ReserveCapacity(int maxEntityId)
+    {
+        EnsureCapacity(maxEntityId);
+    }
+
     /// <summary>Ensures the generation array is large enough to index <paramref name="id"/>.</summary>
     /// <param name="id">The entity ID that must be indexable.</param>
     private void EnsureCapacity(int id)

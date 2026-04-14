@@ -75,7 +75,7 @@ internal sealed class SparseSet<T>
         while (entity >= newSize) newSize *= 2;
         int oldLen = _sparse.Length;
         Array.Resize(ref _sparse, newSize);
-        for (int i = oldLen; i < newSize; i++) _sparse[i] = -1;
+        Array.Fill(_sparse, -1, oldLen, newSize - oldLen);
     }
 
     /// <summary>Ensures the dense arrays have room for at least one more element.</summary>
@@ -105,7 +105,7 @@ internal sealed class SparseSet<T>
         {
             int oldLen = _sparse.Length;
             Array.Resize(ref _sparse, maxEntityIdHint + 1);
-            for (int i = oldLen; i < _sparse.Length; i++) _sparse[i] = -1;
+            Array.Fill(_sparse, -1, oldLen, _sparse.Length - oldLen);
         }
     }
 
@@ -325,7 +325,7 @@ internal sealed class SparseSet<T>
     }
 
     /// <summary>Clears all per-frame change-tracking bits, resetting every component to "unchanged".</summary>
-    public void ClearChangedTicks() => Array.Clear(_changedBits, 0, _changedBits.Length);
+    public void ClearChangedTicks() => _changedBits.AsSpan().Clear();
 
     /// <summary>Returns the dense array index for <paramref name="entity"/>, or <c>-1</c> if not present.</summary>
     /// <param name="entity">The entity ID.</param>
