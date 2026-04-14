@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+
 namespace Engine;
 
 /// <summary>
@@ -6,6 +8,7 @@ namespace Engine;
 /// <remarks>
 /// Commands are deferred to prevent invalidating iterators or causing data races during system execution.
 /// Typically flushed in <see cref="Stage.PostUpdate"/> by the <see cref="EcsPlugin"/>.
+/// Thread-safe: multiple systems (including parallel instance behaviors) may enqueue commands concurrently.
 /// </remarks>
 /// <example>
 /// <code>
@@ -26,7 +29,7 @@ namespace Engine;
 /// <seealso cref="BehaviorContext"/>
 public sealed class EcsCommands
 {
-    private readonly Queue<Action<EcsWorld>> _queue = new();
+    private readonly ConcurrentQueue<Action<EcsWorld>> _queue = new();
 
     /// <summary>Queues a spawn of a new entity built by the provided action.</summary>
     /// <param name="builder">
@@ -115,10 +118,7 @@ public sealed class EcsCommands
     /// <param name="world">The <see cref="EcsWorld"/> to apply commands against.</param>
     public void Apply(EcsWorld world)
     {
-        while (_queue.Count > 0)
-        {
-            var cmd = _queue.Dequeue();
+        while (_queue.TryDequeue(out var cmd))
             cmd(world);
-        }
     }
 }

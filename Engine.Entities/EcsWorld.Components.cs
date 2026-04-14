@@ -228,11 +228,11 @@ public sealed partial class EcsWorld
         /// <summary>Returns a read-only span of entity IDs in dense order.</summary>
         internal ReadOnlySpan<int> EntitiesSpan() => _set.EntitiesSpan();
 
-        /// <summary>Direct access to the underlying entity ID array (for parallel transforms).</summary>
-        internal int[] EntitiesArray => _set.EntitiesArray;
+        /// <summary>Direct access to the underlying entity ID array (for parallel transforms and generated iteration).</summary>
+        public int[] EntitiesArray => _set.EntitiesArray;
 
-        /// <summary>Direct access to the underlying component array (for parallel transforms).</summary>
-        internal T[] ComponentsArray => _set.ComponentsArray;
+        /// <summary>Direct access to the underlying component array (for parallel transforms and generated iteration).</summary>
+        public T[] ComponentsArray => _set.ComponentsArray;
     }
 
     /// <summary>

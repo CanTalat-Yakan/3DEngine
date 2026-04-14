@@ -263,28 +263,60 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
             sb.AppendLine();
             sb.AppendLine($"    private static void {b.SafeName}_{m.Stage}(Engine.World world)");
             sb.AppendLine("    {");
-            sb.AppendLine("        var ecs = world.Resource<Engine.EcsWorld>();");
-            sb.AppendLine("        var ctx = new Engine.BehaviorContext(world);");
             if (m.IsStatic)
             {
+                sb.AppendLine("        var ctx = new Engine.BehaviorContext(world);");
                 sb.AppendLine($"        {m.MethodContainer}.{m.MethodName}(ctx);");
-                sb.AppendLine("        return;");
                 sb.AppendLine("    }");
                 continue;
             }
-            // non-static: span-based iteration over dense arrays for zero-allocation, cache-linear access
+            // non-static: ref-based iteration with direct array access and auto-parallel.
+            // Patterns from Arch/Bevy ECS:
+            //  - Direct array access eliminates per-element method call overhead
+            //  - ref var eliminates struct copy-in/copy-out (mutate component in-place)
+            //  - Parallel.For auto-scales across CPU cores for large entity counts (>= 4096)
+            sb.AppendLine("        var ecs = world.Resource<Engine.EcsWorld>();");
             sb.AppendLine($"        var __store = ecs.GetStorePublic<{b.BehaviorFqn}>();");
-            sb.AppendLine($"        var __count = __store.Count;");
-            sb.AppendLine($"        for (int __i = 0; __i < __count; __i++)");
+            sb.AppendLine("        var __count = __store.Count;");
+            sb.AppendLine("        if (__count == 0) return;");
+            sb.AppendLine("        var __entities = __store.EntitiesArray;");
+            sb.AppendLine("        var __components = __store.ComponentsArray;");
+
+            bool hasFilters = m.Filters.With.Count > 0 || m.Filters.Without.Count > 0 || m.Filters.Changed.Count > 0;
+
+            // Parallel path: one BehaviorContext per thread-local partition
+            sb.AppendLine("        if (__count >= 4096)");
             sb.AppendLine("        {");
-            sb.AppendLine($"            int entity = __store.EntityByDenseIndex(__i);");
-            // Apply filters
-            sb.Append(GenFilterChecks(m.Filters));
-            sb.AppendLine($"            var behv = __store.ComponentRefByDenseIndex(__i);");
-            sb.AppendLine("            ctx.EntityId = entity;");
-            sb.AppendLine($"            behv.{m.MethodName}(ctx);");
-            // Write back the mutated struct directly into the dense array (no dict lookup, no change-bit overhead)
-            sb.AppendLine($"            __store.ComponentRefByDenseIndex(__i) = behv;");
+            sb.AppendLine("            System.Threading.Tasks.Parallel.For<Engine.BehaviorContext>(");
+            sb.AppendLine("                0, __count,");
+            sb.AppendLine("                () => new Engine.BehaviorContext(world),");
+            sb.AppendLine("                (int __i, System.Threading.Tasks.ParallelLoopState _, Engine.BehaviorContext ctx) =>");
+            sb.AppendLine("                {");
+            sb.AppendLine("                    int entity = __entities[__i];");
+            if (hasFilters)
+                sb.Append(GenFilterChecks(m.Filters, "return ctx", "                    "));
+            sb.AppendLine("                    ctx.EntityId = entity;");
+            sb.AppendLine($"                    ref var behv = ref __components[__i];");
+            sb.AppendLine($"                    behv.{m.MethodName}(ctx);");
+            sb.AppendLine("                    return ctx;");
+            sb.AppendLine("                },");
+            sb.AppendLine("                _ => { }");
+            sb.AppendLine("            );");
+            sb.AppendLine("        }");
+
+            // Sequential path: cache-linear for small entity counts
+            sb.AppendLine("        else");
+            sb.AppendLine("        {");
+            sb.AppendLine("            var ctx = new Engine.BehaviorContext(world);");
+            sb.AppendLine($"            for (int __i = 0; __i < __count; __i++)");
+            sb.AppendLine("            {");
+            sb.AppendLine("                int entity = __entities[__i];");
+            if (hasFilters)
+                sb.Append(GenFilterChecks(m.Filters, "continue", "                "));
+            sb.AppendLine("                ctx.EntityId = entity;");
+            sb.AppendLine($"                ref var behv = ref __components[__i];");
+            sb.AppendLine($"                behv.{m.MethodName}(ctx);");
+            sb.AppendLine("            }");
             sb.AppendLine("        }");
             sb.AppendLine("    }");
         }
@@ -306,16 +338,16 @@ public sealed class BehaviorGenerator : IIncrementalGenerator
         };
     }
 
-    private static string GenFilterChecks(Filters f)
+    private static string GenFilterChecks(Filters f, string skipStatement = "continue", string indent = "            ")
     {
         var sb = new StringBuilder();
         // Always enforce With as guards to cover the fallback iteration paths (and as a cheap safety-net otherwise).
         foreach (var w in f.With)
-            sb.AppendLine($"            if (!ecs.Has<{w}>(entity)) continue;");
+            sb.AppendLine($"{indent}if (!ecs.Has<{w}>(entity)) {skipStatement};");
         foreach (var wout in f.Without)
-            sb.AppendLine($"            if (ecs.Has<{wout}>(entity)) continue;");
+            sb.AppendLine($"{indent}if (ecs.Has<{wout}>(entity)) {skipStatement};");
         foreach (var ch in f.Changed)
-            sb.AppendLine($"            if (!ecs.Changed<{ch}>(entity)) continue;");
+            sb.AppendLine($"{indent}if (!ecs.Changed<{ch}>(entity)) {skipStatement};");
         return sb.ToString();
     }
 
